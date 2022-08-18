@@ -1,0 +1,59 @@
+//
+//  NextcloudKit+FilesLock.swift
+//  NextcloudKit
+//
+//  Created by Henrik Storch on 23.03.22.
+//  Copyright © 2022 Henrik Sorch. All rights reserved.
+//
+//  Author Henrik Storch <henrik.storch@nextcloud.com>
+//
+//  This program is free software: you can redistribute it and/or modify
+//  it under the terms of the GNU General Public License as published by
+//  the Free Software Foundation, either version 3 of the License, or
+//  (at your option) any later version.
+//
+//  This program is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU General Public License for more details.
+//
+//  You should have received a copy of the GNU General Public License
+//  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//
+
+import Foundation
+import Alamofire
+import SwiftyJSON
+
+extension NextcloudKit {
+
+    // available in NC >= 24
+    @objc public func lockUnlockFile(serverUrlFileName: String, shouldLock: Bool, options: NKRequestOptions = NKRequestOptions(), completionHandler: @escaping (_ error: NKError) -> Void) {
+
+        guard let url = serverUrlFileName.encodedToUrl
+        else {
+            options.queue.async {
+                completionHandler(.urlError)
+            }
+            return
+        }
+
+        let method = HTTPMethod(rawValue: shouldLock ? "LOCK" : "UNLOCK")
+
+        var headers = NKCommon.shared.getStandardHeaders(options: options)
+        headers.update(name: "X-User-Lock", value: "1")
+
+        sessionManager.request(url, method: method, parameters: nil, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).response(queue: NKCommon.shared.backgroundQueue) { (response) in
+            debugPrint(response)
+
+            switch response.result {
+            case .failure(let error):
+                let error = NKError(error: error, afResponse: response)
+                options.queue.async { completionHandler(error) }
+            case .success:
+                options.queue.async { completionHandler(.success) }
+            }
+        }
+    }
+}
+
