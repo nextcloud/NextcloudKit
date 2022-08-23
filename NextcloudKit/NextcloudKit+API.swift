@@ -21,7 +21,12 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 
+#if os(macOS)
+import Foundation
+import AppKit
+#else
 import UIKit
+#endif
 import Alamofire
 import SwiftyJSON
 
@@ -306,12 +311,32 @@ extension NextcloudKit {
                         let url = URL.init(fileURLWithPath: fileNameLocalPath)
                         if avatarSizeRounded > 0, let image = UIImage(data: data) {
                             imageAvatar = image
+
+                            #if os(macOS)
+                            let rect = CGRect(x: 0, y: 0, width: avatarSizeRounded, height: avatarSizeRounded)
+                            var transform = CGAffineTransform.identity
+
+                            let path = withUnsafePointer(to: &transform) { (pointer: UnsafePointer<CGAffineTransform>) in
+                                CGPath(roundedRect: rect, cornerWidth: rect.width, cornerHeight: rect.height, transform: pointer)
+                            }
+                            let maskLayer = CAShapeLayer()
+                            maskLayer.path = path
+
+                            let layerToMask = CALayer()
+                            layerToMask.contents = imageAvatar?.cgImage!
+                            layerToMask.mask = maskLayer
+
+                            let contextRef = CGContext(data: nil, width: Int(rect.width), height: Int(rect.height), bitsPerComponent: image.cgImage!.bitsPerComponent, bytesPerRow: image.cgImage!.bytesPerRow, space: image.cgImage!.colorSpace!, bitmapInfo: image.cgImage!.bitmapInfo.rawValue)
+                            layerToMask.render(in: contextRef!)
+                            #else
                             let rect = CGRect(x: 0, y: 0, width: avatarSizeRounded/Int(UIScreen.main.scale), height: avatarSizeRounded/Int(UIScreen.main.scale))
                             UIGraphicsBeginImageContextWithOptions(rect.size, false, UIScreen.main.scale)
                             UIBezierPath.init(roundedRect: rect, cornerRadius: rect.size.height).addClip()
                             imageAvatar?.draw(in: rect)
                             imageAvatar = UIGraphicsGetImageFromCurrentImageContext() ?? image
                             UIGraphicsEndImageContext()
+                            #endif
+
                             if let pngData = imageAvatar?.pngData() {
                                 try pngData.write(to: url)
                             } else {
