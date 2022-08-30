@@ -29,7 +29,7 @@ extension NextcloudKit {
     @objc public func getComments(fileId: String, customUserAgent: String? = nil, addCustomHeaders: [String: String]? = nil, queue: DispatchQueue = .main, completionHandler: @escaping (_ account: String, _ items: [NKComments]?, _ error: NKError) -> Void) {
            
         let account = NKCommon.shared.account
-        let serverUrlEndpoint = NKCommon.shared.urlBase + "/" + NKCommon.shared.webDav + "/comments/files/" + fileId
+        let serverUrlEndpoint = NKCommon.shared.urlBase + "/" + NKCommon.shared.dav + "/comments/files/" + fileId
             
         guard let url = serverUrlEndpoint.encodedToUrl else {
 
@@ -71,7 +71,7 @@ extension NextcloudKit {
     @objc public func putComments(fileId: String, message: String, customUserAgent: String? = nil, addCustomHeaders: [String: String]? = nil, queue: DispatchQueue = .main, completionHandler: @escaping (_ account: String, _ error: NKError) -> Void) {
         
         let account = NKCommon.shared.account
-        let serverUrlEndpoint = NKCommon.shared.urlBase + "/" + NKCommon.shared.webDav + "/comments/files/" + fileId
+        let serverUrlEndpoint = NKCommon.shared.urlBase + "/" + NKCommon.shared.dav + "/comments/files/" + fileId
         
         guard let url = serverUrlEndpoint.encodedToUrl else {
             queue.async { completionHandler(account, .urlError) }
@@ -109,7 +109,7 @@ extension NextcloudKit {
     @objc public func updateComments(fileId: String, messageId: String, message: String, customUserAgent: String? = nil, addCustomHeaders: [String: String]? = nil, queue: DispatchQueue = .main, completionHandler: @escaping (_ account: String, _ error: NKError) -> Void) {
         
         let account = NKCommon.shared.account
-        let serverUrlEndpoint = NKCommon.shared.urlBase + "/" + NKCommon.shared.webDav + "/comments/files/" + fileId + "/" + messageId
+        let serverUrlEndpoint = NKCommon.shared.urlBase + "/" + NKCommon.shared.dav + "/comments/files/" + fileId + "/" + messageId
         
         guard let url = serverUrlEndpoint.encodedToUrl else {
             queue.async { completionHandler(account, .urlError) }
@@ -147,7 +147,7 @@ extension NextcloudKit {
     @objc public func deleteComments(fileId: String, messageId: String, customUserAgent: String? = nil, addCustomHeaders: [String: String]? = nil, queue: DispatchQueue = .main, completionHandler: @escaping (_ account: String, _ error: NKError) -> Void) {
         
         let account = NKCommon.shared.account
-        let serverUrlEndpoint = NKCommon.shared.urlBase + "/" + NKCommon.shared.webDav + "/comments/files/" + fileId + "/" + messageId
+        let serverUrlEndpoint = NKCommon.shared.urlBase + "/" + NKCommon.shared.dav + "/comments/files/" + fileId + "/" + messageId
         
         guard let url = serverUrlEndpoint.encodedToUrl else {
             queue.async { completionHandler(account, .urlError) }
@@ -174,7 +174,7 @@ extension NextcloudKit {
     @objc public func markAsReadComments(fileId: String, customUserAgent: String? = nil, addCustomHeaders: [String: String]? = nil, queue: DispatchQueue = .main, completionHandler: @escaping (_ account: String, _ error: NKError) -> Void) {
         
         let account = NKCommon.shared.account
-        let serverUrlEndpoint = NKCommon.shared.urlBase + "/" + NKCommon.shared.webDav + "/comments/files/" + fileId
+        let serverUrlEndpoint = NKCommon.shared.urlBase + "/" + NKCommon.shared.dav + "/comments/files/" + fileId
         
         guard let url = serverUrlEndpoint.encodedToUrl else {
             queue.async { completionHandler(account, .urlError) }

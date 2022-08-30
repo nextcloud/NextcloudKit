@@ -299,7 +299,7 @@ extension NextcloudKit {
          
         var files: [NKFile] = []
         
-        guard let url = (serverUrl + "/" + NKCommon.shared.webDav).encodedToUrl else {
+        guard let url = (serverUrl + "/" + NKCommon.shared.dav).encodedToUrl else {
             return queue.async { completionHandler(account, files, .urlError) }
         }
          
@@ -338,7 +338,7 @@ extension NextcloudKit {
     @objc public func setFavorite(fileName: String, favorite: Bool, customUserAgent: String? = nil, addCustomHeaders: [String: String]? = nil, timeout: TimeInterval = 60, queue: DispatchQueue = .main, completionHandler: @escaping (_ account: String, _ error: NKError) -> Void) {
          
         let account = NKCommon.shared.account
-        let serverUrlFileName = NKCommon.shared.urlBase + "/" + NKCommon.shared.webDav + "/files/" + NKCommon.shared.userId + "/" + fileName
+        let serverUrlFileName = NKCommon.shared.urlBase + "/" + NKCommon.shared.dav + "/files/" + NKCommon.shared.userId + "/" + fileName
         
         guard let url = serverUrlFileName.encodedToUrl else {
             return queue.async { completionHandler(account, .urlError) }
@@ -374,7 +374,7 @@ extension NextcloudKit {
     @objc public func listingFavorites(showHiddenFiles: Bool, customUserAgent: String? = nil, addCustomHeaders: [String: String]? = nil, timeout: TimeInterval = 60, queue: DispatchQueue = .main, completionHandler: @escaping (_ account: String, _ files: [NKFile], _ error: NKError) -> Void) {
          
         let account = NKCommon.shared.account
-        let serverUrlFileName = NKCommon.shared.urlBase + "/" + NKCommon.shared.webDav + "/files/" + NKCommon.shared.userId
+        let serverUrlFileName = NKCommon.shared.urlBase + "/" + NKCommon.shared.dav + "/files/" + NKCommon.shared.userId
         var files: [NKFile] = []
 
         guard let url = serverUrlFileName.encodedToUrl else {
@@ -416,7 +416,7 @@ extension NextcloudKit {
            
         let account = NKCommon.shared.account
         var items: [NKTrash] = []
-        let serverUrlFileName = NKCommon.shared.urlBase + "/" + NKCommon.shared.webDav + "/trashbin/" + NKCommon.shared.userId + "/trash/"
+        let serverUrlFileName = NKCommon.shared.urlBase + "/" + NKCommon.shared.dav + "/trashbin/" + NKCommon.shared.userId + "/trash/"
             
         guard let url = serverUrlFileName.encodedToUrl else {
             return queue.async { completionHandler(account, items, .urlError) }

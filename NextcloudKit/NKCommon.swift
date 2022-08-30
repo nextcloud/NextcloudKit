@@ -51,7 +51,7 @@ import MobileCoreServices
     var urlBase = ""
     var userAgent: String?
     var nextcloudVersion: Int = 0
-    let webDav: String = "remote.php/dav"
+    let dav: String = "remote.php/dav"
     
     var cookies: [String:[HTTPCookie]] = [:]
     var internalTypeIdentifiers: [UTTypeConformsToServer] = []

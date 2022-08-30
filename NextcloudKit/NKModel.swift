@@ -851,7 +851,7 @@ class NKDataFileXML: NSObject {
         var files: [NKFile] = []
         var dicMOV: [String:Int] = [:]
         var dicImage: [String:Int] = [:]
-        let webDavRootFiles = "/" + NKCommon.shared.webDav + "/files/"
+        let rootFiles = "/" + NKCommon.shared.dav + "/files/"
         guard let baseUrl = NKCommon.shared.getHostName(urlString: NKCommon.shared.urlBase) else {
             return files
         }
@@ -884,11 +884,10 @@ class NKDataFileXML: NSObject {
                 file.fileName = file.fileName.removingPercentEncoding ?? ""
               
                 // ServerUrl
-                if href == webDavRootFiles + NKCommon.shared.user + "/" {
+                if href == rootFiles + NKCommon.shared.user + "/" {
                     file.fileName = "."
                     file.serverUrl = ".."
                 } else {
-                    //let postUrl = file.path.replacingOccurrences(of: webDavRootFiles + NCCommunicationCommon.shared.userId, with: webDavRootFiles.dropLast())
                     file.serverUrl = baseUrl + file.path.dropLast()
                 }
                 file.serverUrl = file.serverUrl.removingPercentEncoding ?? ""
