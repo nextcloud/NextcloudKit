@@ -120,6 +120,10 @@ extension NextcloudKit {
                                timeout: TimeInterval = 60,
                                completion: @escaping (NKSearchResult?, _ error: NKError) -> Void) -> DataRequest? {
 
+        guard let term = term.urlEncoded else {
+            completion(nil, .urlError)
+            return nil
+        }
         var endpoint = "ocs/v2.php/search/providers/\(id)/search?format=json&term=\(term)"
         if let limit = limit {
             endpoint += "&limit=\(limit)"
