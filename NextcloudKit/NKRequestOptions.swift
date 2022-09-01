@@ -25,12 +25,14 @@ import Foundation
 
 @objcMembers
 public class NKRequestOptions: NSObject {
+    let endpoint: String?
     let customHeader: [String: String]?
     let customUserAgent: String?
     let e2eToken: String?
     let queue: DispatchQueue
 
-    public init(customHeader: [String: String]? = nil, customUserAgent: String? = nil, e2eToken: String? = nil, queue: DispatchQueue = .main) {
+    public init(endpoint: String? = nil, customHeader: [String: String]? = nil, customUserAgent: String? = nil, e2eToken: String? = nil, queue: DispatchQueue = .main) {
+        self.endpoint = endpoint
         self.customHeader = customHeader
         self.customUserAgent = customUserAgent
         self.e2eToken = e2eToken

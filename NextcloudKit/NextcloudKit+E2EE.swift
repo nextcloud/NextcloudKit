@@ -57,7 +57,7 @@ extension NextcloudKit {
             case .success(let json):
                 let json = JSON(json)
                 let statusCode = json["ocs"]["meta"]["statuscode"].int ?? NKError.internalError
-                if 200..<300 ~= statusCode  {
+                if 200..<300 ~= statusCode {
                     queue.async { completionHandler(account, .success) }
                 } else {
                     queue.async { completionHandler(account, NKError(rootJson: json, fallbackStatusCode: response.response?.statusCode)) }

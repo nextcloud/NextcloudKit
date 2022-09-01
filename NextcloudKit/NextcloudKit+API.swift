@@ -172,22 +172,12 @@ extension NextcloudKit {
     
     //MARK: -
     
-    @objc public func getPreview(fileNamePath: String, widthPreview: Int, heightPreview: Int, customUserAgent: String? = nil, addCustomHeaders: [String: String]? = nil, queue: DispatchQueue = .main, completionHandler: @escaping (_ account: String, _ data: Data?, _ error: NKError) -> Void) {
-               
+    @objc public func getPreview(url: URL, customUserAgent: String? = nil, addCustomHeaders: [String: String]? = nil, queue: DispatchQueue = .main, completionHandler: @escaping (_ account: String, _ data: Data?, _ error: NKError) -> Void) {
+
         let account = NKCommon.shared.account
-        
-        guard let fileNamePath = fileNamePath.urlEncoded else {
-            return queue.async { completionHandler(account, nil, .urlError) }
-        }
-        
-        let endpoint = "index.php/core/preview.png?file=" + fileNamePath + "&x=\(widthPreview)&y=\(heightPreview)&a=1&mode=cover"
-        
-        guard let url = NKCommon.shared.createStandardUrl(serverUrl: NKCommon.shared.urlBase, endpoint: endpoint) else {
-            return queue.async { completionHandler(account, nil, .urlError) }
-        }
-           
+
         let method = HTTPMethod(rawValue: "GET")
-        
+
         let headers = NKCommon.shared.getStandardHeaders(addCustomHeaders, customUserAgent: customUserAgent)
                 
         sessionManager.request(url, method: method, parameters: nil, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).response(queue: NKCommon.shared.backgroundQueue) { (response) in
