@@ -85,10 +85,8 @@ extension NextcloudKit {
         if let userAgent = userAgent {
             headers = [HTTPHeader.userAgent(userAgent)]
         }
-        
-        let method = HTTPMethod(rawValue: "POST")
-        
-        sessionManager.request(url, method: method, parameters: nil, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).responseData(queue: NKCommon.shared.backgroundQueue) { (response) in
+
+        sessionManager.request(url, method: .post, parameters: nil, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).responseData(queue: NKCommon.shared.backgroundQueue) { (response) in
             debugPrint(response)
             
             switch response.result {
@@ -119,10 +117,8 @@ extension NextcloudKit {
         if let userAgent = userAgent {
             headers = [HTTPHeader.userAgent(userAgent)]
         }
-
-        let method = HTTPMethod(rawValue: "POST")
         
-        sessionManager.request(url, method: method, parameters: nil, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).responseData(queue: NKCommon.shared.backgroundQueue) { (response) in
+        sessionManager.request(url, method: .post, parameters: nil, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).responseData(queue: NKCommon.shared.backgroundQueue) { (response) in
             debugPrint(response)
             
             switch response.result {

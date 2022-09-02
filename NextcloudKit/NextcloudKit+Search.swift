@@ -53,14 +53,14 @@ extension NextcloudKit {
         update: @escaping (NKSearchResult?, _ provider: NKSearchProvider, _ error: NKError) -> Void,
         completion: @escaping (_ error: NKError) -> Void) {
 
-            let endpoint = "ocs/v2.php/search/providers?format=json"
+            let endpoint = "ocs/v2.php/search/providers"
             guard let url = NKCommon.shared.createStandardUrl(serverUrl: NKCommon.shared.urlBase, endpoint: endpoint) else {
                 return completion(.urlError)
             }
-            let method = HTTPMethod(rawValue: "GET")
+
             let headers = NKCommon.shared.getStandardHeaders(options: options)
 
-            let requestUnifiedSearch = sessionManager.request(url, method: method, parameters: nil, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).responseData(queue: NKCommon.shared.backgroundQueue) { (response) in
+            let requestUnifiedSearch = sessionManager.request(url, method: .get, parameters: nil, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).responseData(queue: NKCommon.shared.backgroundQueue) { (response) in
                 debugPrint(response)
 
                 switch response.result {
@@ -124,7 +124,7 @@ extension NextcloudKit {
             completion(nil, .urlError)
             return nil
         }
-        var endpoint = "ocs/v2.php/search/providers/\(id)/search?format=json&term=\(term)"
+        var endpoint = "ocs/v2.php/search/providers/\(id)/search?term=\(term)"
         if let limit = limit {
             endpoint += "&limit=\(limit)"
         }
@@ -140,12 +140,11 @@ extension NextcloudKit {
             return nil
         }
 
-        let method = HTTPMethod(rawValue: "GET")
         let headers = NKCommon.shared.getStandardHeaders(options: options)
 
         var urlRequest: URLRequest
         do {
-            try urlRequest = URLRequest(url: url, method: method, headers: headers)
+            try urlRequest = URLRequest(url: url, method: .get, headers: headers)
             urlRequest.timeoutInterval = timeout
         } catch {
             completion(nil, NKError(error: error))

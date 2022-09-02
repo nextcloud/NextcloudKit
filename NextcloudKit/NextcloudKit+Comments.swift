@@ -77,15 +77,13 @@ extension NextcloudKit {
             queue.async { completionHandler(account, .urlError) }
             return
         }
-        
-        let method = HTTPMethod(rawValue: "POST")
-        
+
         var headers = NKCommon.shared.getStandardHeaders(addCustomHeaders, customUserAgent: customUserAgent)
         headers.update(.contentType("application/json"))
 
         var urlRequest: URLRequest
         do {
-            try urlRequest = URLRequest(url: url, method: method, headers: headers)
+            try urlRequest = URLRequest(url: url, method: .post, headers: headers)
             let parameters = "{\"actorType\":\"users\",\"verb\":\"comment\",\"message\":\"" + message + "\"}"
             urlRequest.httpBody = parameters.data(using: .utf8)
         } catch {
@@ -153,12 +151,10 @@ extension NextcloudKit {
             queue.async { completionHandler(account, .urlError) }
             return
         }
-        
-        let method = HTTPMethod(rawValue: "DELETE")
-        
+
         let headers = NKCommon.shared.getStandardHeaders(addCustomHeaders, customUserAgent: customUserAgent)
 
-        sessionManager.request(url, method: method, parameters: nil, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).response(queue: NKCommon.shared.backgroundQueue) { (response) in
+        sessionManager.request(url, method: .delete, parameters: nil, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).response(queue: NKCommon.shared.backgroundQueue) { (response) in
             debugPrint(response)
             
             switch response.result {

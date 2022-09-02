@@ -76,14 +76,12 @@ extension NextcloudKit {
         guard let url = serverUrlFileName.encodedToUrl else {
             return queue.async { completionHandler(account, .urlError) }
         }
-         
-        let method = HTTPMethod(rawValue: "DELETE")
-        
+
         let headers = NKCommon.shared.getStandardHeaders(addCustomHeaders, customUserAgent: customUserAgent)
 
         var urlRequest: URLRequest
         do {
-            try urlRequest = URLRequest(url: url, method: method, headers: headers)
+            try urlRequest = URLRequest(url: url, method: .delete, headers: headers)
             urlRequest.timeoutInterval = timeout
         } catch {
             return queue.async { completionHandler(account, NKError(error: error)) }

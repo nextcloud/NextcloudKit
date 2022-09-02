@@ -45,11 +45,9 @@ extension NextcloudKit {
             return options.queue.async { completion(nil, nil, .urlError) }
         }
 
-        let method = HTTPMethod(rawValue: "GET")
         let headers = NKCommon.shared.getStandardHeaders(options: options)
-        let parameters: [String: Any] = ["format":"json"]
 
-        let dashboardRequest = sessionManager.request(url, method: method, parameters: parameters, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).responseData(queue: NKCommon.shared.backgroundQueue) { (response) in
+        let dashboardRequest = sessionManager.request(url, method: .get, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).responseData(queue: NKCommon.shared.backgroundQueue) { (response) in
             debugPrint(response)
 
             switch response.result {

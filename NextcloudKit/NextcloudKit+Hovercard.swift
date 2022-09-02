@@ -29,7 +29,7 @@ extension NextcloudKit {
 
     @objc public func getHovercard(for userId: String, customUserAgent: String? = nil, addCustomHeaders: [String: String]? = nil, queue: DispatchQueue = .main, completionHandler: @escaping (_ result: NKHovercard?, _ error: NKError) -> Void) {
 
-        let endpoint = "ocs/v2.php/hovercard/v1/\(userId)?format=json"
+        let endpoint = "ocs/v2.php/hovercard/v1/\(userId)"
 
         guard let url = NKCommon.shared.createStandardUrl(serverUrl: NKCommon.shared.urlBase, endpoint: endpoint)
         else {
@@ -39,11 +39,9 @@ extension NextcloudKit {
             return
         }
 
-        let method = HTTPMethod(rawValue: "GET")
-
         let headers = NKCommon.shared.getStandardHeaders(addCustomHeaders, customUserAgent: customUserAgent)
 
-        sessionManager.request(url, method: method, parameters: nil, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).responseData(queue: NKCommon.shared.backgroundQueue) { (response) in
+        sessionManager.request(url, method: .get, parameters: nil, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).responseData(queue: NKCommon.shared.backgroundQueue) { (response) in
             debugPrint(response)
 
             switch response.result {
