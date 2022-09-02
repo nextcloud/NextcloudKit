@@ -38,7 +38,6 @@ extension NextcloudKit {
         }
         
         let method = HTTPMethod(rawValue: "PROPFIND")
-             
         var headers = NKCommon.shared.getStandardHeaders(addCustomHeaders, customUserAgent: customUserAgent)
         headers.update(.contentType("application/xml"))
 
@@ -115,7 +114,6 @@ extension NextcloudKit {
         }
         
         let method = HTTPMethod(rawValue: "PROPPATCH")
-        
         var headers = NKCommon.shared.getStandardHeaders(addCustomHeaders, customUserAgent: customUserAgent)
         headers.update(.contentType("application/xml"))
 
@@ -178,7 +176,6 @@ extension NextcloudKit {
         }
         
         let method = HTTPMethod(rawValue: "PROPPATCH")
-        
         var headers = NKCommon.shared.getStandardHeaders(addCustomHeaders, customUserAgent: customUserAgent)
         headers.update(.contentType("application/xml"))
 

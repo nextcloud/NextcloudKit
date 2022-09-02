@@ -693,7 +693,6 @@ extension NextcloudKit {
         }
         
         let method = HTTPMethod(rawValue: method)
-        
         let headers = NKCommon.shared.getStandardHeaders(addCustomHeaders, customUserAgent: customUserAgent)
 
         sessionManager.request(urlRequest, method: method, parameters: nil, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).response(queue: NKCommon.shared.backgroundQueue) { (response) in

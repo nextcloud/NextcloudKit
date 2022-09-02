@@ -36,17 +36,10 @@ extension NextcloudKit {
             queue.async { completionHandler(account, .urlError) }
             return
         }
-        
-        var typeMethod = ""
-        if delete {
-            typeMethod = "DELETE"
-        } else {
-            typeMethod = "PUT"
-        }
-        let method = HTTPMethod(rawValue: typeMethod)
-        
+
+        let method: HTTPMethod = delete ? .delete : .put
         let headers = NKCommon.shared.getStandardHeaders(addCustomHeaders, customUserAgent: customUserAgent)
-      
+
         sessionManager.request(url, method: method, parameters: nil, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).responseData(queue: NKCommon.shared.backgroundQueue) { (response) in
             debugPrint(response)
 
@@ -78,7 +71,6 @@ extension NextcloudKit {
         }
         
         let method = HTTPMethod(rawValue: method)
-        
         let headers = NKCommon.shared.getStandardHeaders(addCustomHeaders, customUserAgent: customUserAgent, e2eToken: e2eToken)
         if e2eToken != nil {
             parameters = ["e2e-token": e2eToken!]
@@ -148,7 +140,6 @@ extension NextcloudKit {
         }
 
         let headers = NKCommon.shared.getStandardHeaders(addCustomHeaders, customUserAgent: customUserAgent, e2eToken: e2eToken)
-        
         let method = HTTPMethod(rawValue: method)
         
         if e2eMetadata != nil {
