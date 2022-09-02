@@ -1,6 +1,6 @@
 //
 //  NextcloudKit+Dashboard.swift
-//  NCCommunication
+//  NextcloudKit
 //
 //  Created by Marino Faggiana on 31/08/22.
 //  Copyright © 2022 Marino Faggiana. All rights reserved.
