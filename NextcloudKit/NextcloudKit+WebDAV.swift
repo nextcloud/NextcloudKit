@@ -36,7 +36,7 @@ extension NextcloudKit {
         }
          
         let method = HTTPMethod(rawValue: "MKCOL")
-        let headers = NKCommon.shared.getStandardHeaders(addCustomHeaders, customUserAgent: customUserAgent)
+        let headers = NKCommon.shared.getStandardHeaders(addCustomHeaders, customUserAgent: customUserAgent, setApplicationjson: false)
 
         var urlRequest: URLRequest
         do {
@@ -76,7 +76,7 @@ extension NextcloudKit {
             return queue.async { completionHandler(account, .urlError) }
         }
 
-        let headers = NKCommon.shared.getStandardHeaders(addCustomHeaders, customUserAgent: customUserAgent)
+        let headers = NKCommon.shared.getStandardHeaders(addCustomHeaders, customUserAgent: customUserAgent, setApplicationjson: false)
 
         var urlRequest: URLRequest
         do {
@@ -108,7 +108,7 @@ extension NextcloudKit {
         }
          
         let method = HTTPMethod(rawValue: "MOVE")
-        var headers = NKCommon.shared.getStandardHeaders(addCustomHeaders, customUserAgent: customUserAgent)
+        var headers = NKCommon.shared.getStandardHeaders(addCustomHeaders, customUserAgent: customUserAgent, setApplicationjson: false)
         headers.update(name: "Destination", value: serverUrlFileNameDestination.urlEncoded ?? "")
         if overwrite {
             headers.update(name: "Overwrite", value: "T")
@@ -146,7 +146,7 @@ extension NextcloudKit {
         }
          
         let method = HTTPMethod(rawValue: "COPY")
-        var headers = NKCommon.shared.getStandardHeaders(addCustomHeaders, customUserAgent: customUserAgent)
+        var headers = NKCommon.shared.getStandardHeaders(addCustomHeaders, customUserAgent: customUserAgent, setApplicationjson: false)
         headers.update(name: "Destination", value: serverUrlFileNameDestination.urlEncoded ?? "")
         if overwrite {
             headers.update(name: "Overwrite", value: "T")
@@ -189,7 +189,7 @@ extension NextcloudKit {
         }
          
         let method = HTTPMethod(rawValue: "PROPFIND")
-        var headers = NKCommon.shared.getStandardHeaders(addCustomHeaders, customUserAgent: customUserAgent)
+        var headers = NKCommon.shared.getStandardHeaders(addCustomHeaders, customUserAgent: customUserAgent, setApplicationjson: false)
         headers.update(.contentType("application/xml"))
         headers.update(name: "Depth", value: depth)
 
@@ -298,7 +298,7 @@ extension NextcloudKit {
         }
          
         let method = HTTPMethod(rawValue: "SEARCH")
-        var headers = NKCommon.shared.getStandardHeaders(addCustomHeaders, customUserAgent: customUserAgent)
+        var headers = NKCommon.shared.getStandardHeaders(addCustomHeaders, customUserAgent: customUserAgent, setApplicationjson: false)
         headers.update(.contentType("text/xml"))
          
         var urlRequest: URLRequest
@@ -338,7 +338,7 @@ extension NextcloudKit {
         }
          
         let method = HTTPMethod(rawValue: "PROPPATCH")
-        let headers = NKCommon.shared.getStandardHeaders(addCustomHeaders, customUserAgent: customUserAgent)
+        let headers = NKCommon.shared.getStandardHeaders(addCustomHeaders, customUserAgent: customUserAgent, setApplicationjson: false)
          
         var urlRequest: URLRequest
         do {
@@ -374,7 +374,7 @@ extension NextcloudKit {
         }
          
         let method = HTTPMethod(rawValue: "REPORT")
-        let headers = NKCommon.shared.getStandardHeaders(addCustomHeaders, customUserAgent: customUserAgent)
+        let headers = NKCommon.shared.getStandardHeaders(addCustomHeaders, customUserAgent: customUserAgent, setApplicationjson: false)
          
         var urlRequest: URLRequest
         do {
@@ -414,7 +414,7 @@ extension NextcloudKit {
         }
         
         let method = HTTPMethod(rawValue: "PROPFIND")
-        var headers = NKCommon.shared.getStandardHeaders(addCustomHeaders, customUserAgent: customUserAgent)
+        var headers = NKCommon.shared.getStandardHeaders(addCustomHeaders, customUserAgent: customUserAgent, setApplicationjson: false)
         headers.update(.contentType("application/xml"))
         headers.update(name: "Depth", value: "1")
 
