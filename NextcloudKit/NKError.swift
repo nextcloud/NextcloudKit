@@ -128,7 +128,7 @@ public class NKError: NSObject {
         }
     }
 
-    override public init() {
+    override init() {
         self.errorCode = 0
         self.errorDescription = ""
     }
