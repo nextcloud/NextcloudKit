@@ -190,7 +190,7 @@ extension NextcloudKit {
          
         let method = HTTPMethod(rawValue: "PROPFIND")
         var headers = NKCommon.shared.getStandardHeaders(addCustomHeaders, customUserAgent: customUserAgent)
-        headers.update(.contentType("application/xml"))
+        //headers.update(.contentType("application/xml"))
         headers.update(name: "Depth", value: depth)
 
         var urlRequest: URLRequest
@@ -299,7 +299,7 @@ extension NextcloudKit {
          
         let method = HTTPMethod(rawValue: "SEARCH")
         var headers = NKCommon.shared.getStandardHeaders(addCustomHeaders, customUserAgent: customUserAgent)
-        headers.update(.contentType("text/xml"))
+        //headers.update(.contentType("text/xml"))
          
         var urlRequest: URLRequest
         do {
@@ -415,7 +415,7 @@ extension NextcloudKit {
         
         let method = HTTPMethod(rawValue: "PROPFIND")
         var headers = NKCommon.shared.getStandardHeaders(addCustomHeaders, customUserAgent: customUserAgent)
-        headers.update(.contentType("application/xml"))
+        //headers.update(.contentType("application/xml"))
         headers.update(name: "Depth", value: "1")
 
         var urlRequest: URLRequest
