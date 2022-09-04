@@ -434,11 +434,11 @@ import MobileCoreServices
          return getStandardHeaders(user: user, password: password, appendHeaders: options.customHeader, customUserAgent: options.customUserAgent, e2eToken: options.e2eToken)
      }
 
-    func getStandardHeaders(_ appendHeaders: [String: String]?, customUserAgent: String?, e2eToken: String? = nil) -> HTTPHeaders {
+    func getStandardHeaders(_ appendHeaders: [String: String]?, customUserAgent: String?, contentType: String? = nil, e2eToken: String? = nil) -> HTTPHeaders {
         return getStandardHeaders(user: user, password: password, appendHeaders: appendHeaders, customUserAgent: customUserAgent, e2eToken: e2eToken)
     }
     
-    func getStandardHeaders(user: String, password: String, appendHeaders: [String: String]?, customUserAgent: String?, e2eToken: String? = nil) -> HTTPHeaders {
+    func getStandardHeaders(user: String, password: String, appendHeaders: [String: String]?, customUserAgent: String?, contentType: String? = nil, e2eToken: String? = nil) -> HTTPHeaders {
         
         var headers: HTTPHeaders = [.authorization(username: user, password: password)]
         if customUserAgent != nil {
@@ -446,7 +446,11 @@ import MobileCoreServices
         } else if let userAgent = userAgent {
             headers.update(.userAgent(userAgent))
         }
-        headers.update(.contentType("application/x-www-form-urlencoded"))
+        if let contentType = contentType {
+            headers.update(.contentType(contentType))
+        } else {
+            headers.update(.contentType("application/x-www-form-urlencoded"))
+        }
         headers.update(name: "Accept", value: "application/json")
         headers.update(name: "OCS-APIRequest", value: "true")
         if e2eToken != nil {

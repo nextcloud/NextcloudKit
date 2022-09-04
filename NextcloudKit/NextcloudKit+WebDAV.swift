@@ -180,7 +180,7 @@ extension NextcloudKit {
         let account = NKCommon.shared.account
         var files: [NKFile] = []
         var serverUrlFileName = serverUrlFileName
-        
+
         if depth == "1" && serverUrlFileName.last != "/" { serverUrlFileName = serverUrlFileName + "/" }
         if depth == "0" && serverUrlFileName.last == "/" { serverUrlFileName = String(serverUrlFileName.remove(at: serverUrlFileName.index(before: serverUrlFileName.endIndex))) }
         
@@ -190,7 +190,6 @@ extension NextcloudKit {
          
         let method = HTTPMethod(rawValue: "PROPFIND")
         var headers = NKCommon.shared.getStandardHeaders(addCustomHeaders, customUserAgent: customUserAgent)
-        //headers.update(.contentType("application/xml"))
         headers.update(name: "Depth", value: depth)
 
         var urlRequest: URLRequest
@@ -298,9 +297,8 @@ extension NextcloudKit {
         }
          
         let method = HTTPMethod(rawValue: "SEARCH")
-        var headers = NKCommon.shared.getStandardHeaders(addCustomHeaders, customUserAgent: customUserAgent)
-        //headers.update(.contentType("text/xml"))
-         
+        let headers = NKCommon.shared.getStandardHeaders(addCustomHeaders, customUserAgent: customUserAgent, contentType: "text/xml")
+
         var urlRequest: URLRequest
         do {
             try urlRequest = URLRequest(url: url, method: method, headers: headers)
@@ -415,7 +413,6 @@ extension NextcloudKit {
         
         let method = HTTPMethod(rawValue: "PROPFIND")
         var headers = NKCommon.shared.getStandardHeaders(addCustomHeaders, customUserAgent: customUserAgent)
-        //headers.update(.contentType("application/xml"))
         headers.update(name: "Depth", value: "1")
 
         var urlRequest: URLRequest
