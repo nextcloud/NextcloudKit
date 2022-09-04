@@ -27,14 +27,15 @@ import SwiftyJSON
 
 extension NextcloudKit {
 
-    @objc public func getHovercard(for userId: String, customUserAgent: String? = nil, addCustomHeaders: [String: String]? = nil, queue: DispatchQueue = .main, completionHandler: @escaping (_ result: NKHovercard?, _ error: NKError) -> Void) {
+    @objc public func getHovercard(for userId: String, customUserAgent: String? = nil, addCustomHeaders: [String: String]? = nil, queue: DispatchQueue = .main, completionHandler: @escaping (_ account: String, _ result: NKHovercard?, _ error: NKError) -> Void) {
 
         let endpoint = "ocs/v2.php/hovercard/v1/\(userId)"
+        let account = NKCommon.shared.account
 
         guard let url = NKCommon.shared.createStandardUrl(serverUrl: NKCommon.shared.urlBase, endpoint: endpoint)
         else {
             queue.async {
-                completionHandler(nil, .urlError)
+                completionHandler(account, nil, .urlError)
             }
             return
         }
@@ -47,7 +48,7 @@ extension NextcloudKit {
             switch response.result {
             case .failure(let error):
                 let error = NKError(error: error, afResponse: response)
-                queue.async { completionHandler(nil, error) }
+                queue.async { completionHandler(account, nil, error) }
             case .success(let json):
                 let json = JSON(json)
                 let data = json["ocs"]["data"]
@@ -55,11 +56,11 @@ extension NextcloudKit {
                       let result = NKHovercard(jsonData: data)
                 else {
                     let error = NKError(rootJson: json, fallbackStatusCode: response.response?.statusCode)
-                    queue.async { completionHandler(nil, error) }
+                    queue.async { completionHandler(account, nil, error) }
                     return
                 }
                 queue.async {
-                    completionHandler(result, .success)
+                    completionHandler(account, result, .success)
                 }
             }
         }

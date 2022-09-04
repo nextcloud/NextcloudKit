@@ -28,12 +28,13 @@ import SwiftyJSON
 extension NextcloudKit {
 
     // available in NC >= 24
-    @objc public func lockUnlockFile(serverUrlFileName: String, shouldLock: Bool, options: NKRequestOptions = NKRequestOptions(), completionHandler: @escaping (_ error: NKError) -> Void) {
+    @objc public func lockUnlockFile(serverUrlFileName: String, shouldLock: Bool, options: NKRequestOptions = NKRequestOptions(), completionHandler: @escaping (_ account: String, _ error: NKError) -> Void) {
 
+        let account = NKCommon.shared.account
         guard let url = serverUrlFileName.encodedToUrl
         else {
             options.queue.async {
-                completionHandler(.urlError)
+                completionHandler(account, .urlError)
             }
             return
         }
@@ -49,9 +50,9 @@ extension NextcloudKit {
             switch response.result {
             case .failure(let error):
                 let error = NKError(error: error, afResponse: response)
-                options.queue.async { completionHandler(error) }
+                options.queue.async { completionHandler(account, error) }
             case .success:
-                options.queue.async { completionHandler(.success) }
+                options.queue.async { completionHandler(account, .success) }
             }
         }
     }
