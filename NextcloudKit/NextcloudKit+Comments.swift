@@ -38,8 +38,7 @@ extension NextcloudKit {
         }
         
         let method = HTTPMethod(rawValue: "PROPFIND")
-        var headers = NKCommon.shared.getStandardHeaders(addCustomHeaders, customUserAgent: customUserAgent)
-        headers.update(.contentType("application/xml"))
+        let headers = NKCommon.shared.getStandardHeaders(addCustomHeaders, customUserAgent: customUserAgent, contentType: "application/xml")
 
         var urlRequest: URLRequest
         do {
@@ -77,8 +76,7 @@ extension NextcloudKit {
             return
         }
 
-        var headers = NKCommon.shared.getStandardHeaders(addCustomHeaders, customUserAgent: customUserAgent)
-        headers.update(.contentType("application/json"))
+        let headers = NKCommon.shared.getStandardHeaders(addCustomHeaders, customUserAgent: customUserAgent, contentType: "application/json")
 
         var urlRequest: URLRequest
         do {
@@ -114,8 +112,7 @@ extension NextcloudKit {
         }
         
         let method = HTTPMethod(rawValue: "PROPPATCH")
-        var headers = NKCommon.shared.getStandardHeaders(addCustomHeaders, customUserAgent: customUserAgent)
-        headers.update(.contentType("application/xml"))
+        let headers = NKCommon.shared.getStandardHeaders(addCustomHeaders, customUserAgent: customUserAgent, contentType: "application/xml")
 
         var urlRequest: URLRequest
         do {
@@ -176,8 +173,7 @@ extension NextcloudKit {
         }
         
         let method = HTTPMethod(rawValue: "PROPPATCH")
-        var headers = NKCommon.shared.getStandardHeaders(addCustomHeaders, customUserAgent: customUserAgent)
-        headers.update(.contentType("application/xml"))
+        let headers = NKCommon.shared.getStandardHeaders(addCustomHeaders, customUserAgent: customUserAgent, contentType: "application/xml")
 
         var urlRequest: URLRequest
         do {
