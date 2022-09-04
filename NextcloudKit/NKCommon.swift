@@ -451,7 +451,9 @@ import MobileCoreServices
         } else {
             headers.update(.contentType("application/x-www-form-urlencoded"))
         }
-        headers.update(name: "Accept", value: "application/json")
+        if contentType != "application/xml" {
+            headers.update(name: "Accept", value: "application/json")
+        }
         headers.update(name: "OCS-APIRequest", value: "true")
         if e2eToken != nil {
             headers.update(name: "e2e-token", value: e2eToken!)

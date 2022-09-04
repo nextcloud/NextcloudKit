@@ -76,7 +76,7 @@ extension NextcloudKit {
             return
         }
 
-        let headers = NKCommon.shared.getStandardHeaders(addCustomHeaders, customUserAgent: customUserAgent, contentType: "application/json")
+        let headers = NKCommon.shared.getStandardHeaders(addCustomHeaders, customUserAgent: customUserAgent)
 
         var urlRequest: URLRequest
         do {
