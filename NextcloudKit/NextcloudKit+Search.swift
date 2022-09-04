@@ -49,8 +49,8 @@ extension NextcloudKit {
         timeoutProvider: TimeInterval = 60,
         filter: @escaping (NKSearchProvider) -> Bool = { _ in true },
         request: @escaping (DataRequest?) -> Void,
-        providers: @escaping ([NKSearchProvider]?) -> Void,
-        update: @escaping (_ accounr: String, NKSearchResult?, _ provider: NKSearchProvider, _ error: NKError) -> Void,
+        providers: @escaping (_ account: String, _ searchProviders: [NKSearchProvider]?) -> Void,
+        update: @escaping (_ account: String, _ searchResult: NKSearchResult?, _ provider: NKSearchProvider, _ error: NKError) -> Void,
         completion: @escaping (_ account: String, _ error: NKError) -> Void) {
 
             let endpoint = "ocs/v2.php/search/providers"
@@ -72,7 +72,7 @@ extension NextcloudKit {
                         return completion(account, NKError(rootJson: json, fallbackStatusCode: response.response?.statusCode))
                     }
 
-                    providers(allProvider)
+                    providers(account, allProvider)
                     
                     let filteredProviders = allProvider.filter(filter)
                     let group = DispatchGroup()
