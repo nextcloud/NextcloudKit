@@ -431,11 +431,11 @@ import MobileCoreServices
     
     //MARK: - Common
     func getStandardHeaders(options: NKRequestOptions) -> HTTPHeaders {
-         return getStandardHeaders(user: user, password: password, appendHeaders: options.customHeader, customUserAgent: options.customUserAgent, e2eToken: options.e2eToken)
+        return getStandardHeaders(user: user, password: password, appendHeaders: options.customHeader, customUserAgent: options.customUserAgent, contentType: options.contentType, e2eToken: options.e2eToken)
      }
 
     func getStandardHeaders(_ appendHeaders: [String: String]?, customUserAgent: String?, contentType: String? = nil, e2eToken: String? = nil) -> HTTPHeaders {
-        return getStandardHeaders(user: user, password: password, appendHeaders: appendHeaders, customUserAgent: customUserAgent, e2eToken: e2eToken)
+        return getStandardHeaders(user: user, password: password, appendHeaders: appendHeaders, customUserAgent: customUserAgent, contentType: contentType, e2eToken: e2eToken)
     }
     
     func getStandardHeaders(user: String, password: String, appendHeaders: [String: String]?, customUserAgent: String?, contentType: String? = nil, e2eToken: String? = nil) -> HTTPHeaders {
