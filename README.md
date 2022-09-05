@@ -1,4 +1,4 @@
-# NextcloudKit [beta]
+# NextcloudKit
 
 ## Installation
 
