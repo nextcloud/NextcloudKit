@@ -133,7 +133,9 @@ extension NextcloudKit {
     @objc public func searchSharees(search: String = "", page: Int = 1, perPage: Int = 200, itemType: String = "file", lookup: Bool = false, customUserAgent: String? = nil, addCustomHeaders: [String: String]? = nil, queue: DispatchQueue = .main, completionHandler: @escaping (_ account: String, _ sharees: [NKSharee]?, _ error: NKError) -> Void) {
            
         let account = NKCommon.shared.account
+
         let endpoint = "ocs/v2.php/apps/files_sharing/api/v1/sharees"
+
         var lookupString = "false"
         if lookup {
             lookupString = "true"
@@ -252,6 +254,7 @@ extension NextcloudKit {
     private func createShare(path: String, shareType: Int, shareWith: String?, publicUpload: Bool? = nil, hideDownload: Bool? = nil, password: String? = nil, permissions: Int = 1, customUserAgent: String? = nil, addCustomHeaders: [String: String]? = nil, queue: DispatchQueue = .main, completionHandler: @escaping (_ account: String, _ share: NKShare?, _ error: NKError) -> Void) {
            
         let account = NKCommon.shared.account
+
         let endpoint = "ocs/v2.php/apps/files_sharing/api/v1/shares"
                 
         guard let url = NKCommon.shared.createStandardUrl(serverUrl: NKCommon.shared.urlBase, endpoint: endpoint) else {
@@ -320,6 +323,7 @@ extension NextcloudKit {
     @objc public func updateShare(idShare: Int, password: String? = nil, expireDate: String? = nil, permissions: Int = 1, publicUpload: Bool = false, note: String? = nil, label: String? = nil, hideDownload: Bool, customUserAgent: String? = nil, addCustomHeaders: [String: String]? = nil, queue: DispatchQueue = .main, completionHandler: @escaping (_ account: String, _ share: NKShare?, _ error: NKError) -> Void) {
            
         let account = NKCommon.shared.account
+
         let endpoint = "ocs/v2.php/apps/files_sharing/api/v1/shares/\(idShare)"
 
         guard let url = NKCommon.shared.createStandardUrl(serverUrl: NKCommon.shared.urlBase, endpoint: endpoint) else {
@@ -374,6 +378,7 @@ extension NextcloudKit {
     @objc public func deleteShare(idShare: Int, customUserAgent: String? = nil, addCustomHeaders: [String: String]? = nil, queue: DispatchQueue = .main, completionHandler: @escaping (_ account: String, _ error: NKError) -> Void) {
               
         let account = NKCommon.shared.account
+        
         let endpoint = "ocs/v2.php/apps/files_sharing/api/v1/shares/" + String(idShare)
                    
         guard let url = NKCommon.shared.createStandardUrl(serverUrl: NKCommon.shared.urlBase, endpoint: endpoint) else {

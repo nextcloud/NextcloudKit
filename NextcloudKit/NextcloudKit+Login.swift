@@ -108,6 +108,7 @@ extension NextcloudKit {
     @objc public func getLoginFlowV2Poll(token: String, endpoint: String, userAgent: String? = nil, queue: DispatchQueue = .main, completionHandler: @escaping (_ server: String?, _ loginName: String? , _ appPassword: String?, _ error: NKError) -> Void) {
                 
         let serverUrl = endpoint + "?token=" + token
+        
         guard let url = serverUrl.asUrl else {
             queue.async { completionHandler(nil, nil, nil, .urlError) }
             return

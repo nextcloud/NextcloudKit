@@ -6,6 +6,7 @@
 //  Copyright © 2022 Henrik Sorch. All rights reserved.
 //
 //  Author Henrik Storch <henrik.storch@nextcloud.com>
+//  Author Marino Faggiana <marino.faggiana@nextcloud.com>
 //
 //  This program is free software: you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -31,6 +32,7 @@ extension NextcloudKit {
     @objc public func lockUnlockFile(serverUrlFileName: String, shouldLock: Bool, options: NKRequestOptions = NKRequestOptions(), completionHandler: @escaping (_ account: String, _ error: NKError) -> Void) {
 
         let account = NKCommon.shared.account
+        
         guard let url = serverUrlFileName.encodedToUrl
         else {
             options.queue.async {

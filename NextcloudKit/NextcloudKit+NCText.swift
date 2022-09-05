@@ -30,11 +30,12 @@ extension NextcloudKit {
     @objc public func NCTextObtainEditorDetails(customUserAgent: String? = nil, addCustomHeaders: [String: String]? = nil, queue: DispatchQueue = .main, completionHandler: @escaping (_ account: String, _  editors: [NKEditorDetailsEditors], _ creators: [NKEditorDetailsCreators], _ error: NKError) -> Void) {
         
         let account = NKCommon.shared.account
+
+        let endpoint = "ocs/v2.php/apps/files/api/v1/directEditing"
+
         var editors: [NKEditorDetailsEditors] = []
         var creators: [NKEditorDetailsCreators] = []
 
-        let endpoint = "ocs/v2.php/apps/files/api/v1/directEditing"
-        
         guard let url = NKCommon.shared.createStandardUrl(serverUrl: NKCommon.shared.urlBase, endpoint: endpoint) else {
             queue.async { completionHandler(account, editors, creators, .urlError) }
             return
@@ -125,10 +126,11 @@ extension NextcloudKit {
     @objc public func NCTextGetListOfTemplates(customUserAgent: String? = nil, addCustomHeaders: [String: String]? = nil, queue: DispatchQueue = .main, completionHandler: @escaping (_ account: String, _  templates: [NKEditorTemplates], _ error: NKError) -> Void) {
                 
         let account = NKCommon.shared.account
-        var templates: [NKEditorTemplates] = []
 
         let endpoint = "ocs/v2.php/apps/files/api/v1/directEditing/templates/text/textdocumenttemplate"
-        
+
+        var templates: [NKEditorTemplates] = []
+
         guard let url = NKCommon.shared.createStandardUrl(serverUrl: NKCommon.shared.urlBase, endpoint: endpoint) else {
             queue.async { completionHandler(account, templates, .urlError) }
             return

@@ -6,6 +6,7 @@
 //  Copyright © 2021 Henrik Sorch. All rights reserved.
 //
 //  Author Henrik Storch <henrik.storch@nextcloud.com>
+//  Author Marino Faggiana <marino.faggiana@nextcloud.com>
 //
 //  This program is free software: you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -29,8 +30,9 @@ extension NextcloudKit {
 
     @objc public func getHovercard(for userId: String, customUserAgent: String? = nil, addCustomHeaders: [String: String]? = nil, queue: DispatchQueue = .main, completionHandler: @escaping (_ account: String, _ result: NKHovercard?, _ error: NKError) -> Void) {
 
-        let endpoint = "ocs/v2.php/hovercard/v1/\(userId)"
         let account = NKCommon.shared.account
+
+        let endpoint = "ocs/v2.php/hovercard/v1/\(userId)"
 
         guard let url = NKCommon.shared.createStandardUrl(serverUrl: NKCommon.shared.urlBase, endpoint: endpoint)
         else {

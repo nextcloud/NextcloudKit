@@ -64,6 +64,7 @@ extension NextcloudKit {
         }
         
         let method = HTTPMethod(rawValue: method.uppercased())
+
         let headers = NKCommon.shared.getStandardHeaders(addCustomHeaders, customUserAgent: customUserAgent)
         
         sessionManager.request(url, method: method, parameters: nil, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).responseData(queue: NKCommon.shared.backgroundQueue) { (response) in
@@ -84,6 +85,7 @@ extension NextcloudKit {
     @objc public func getExternalSite(customUserAgent: String? = nil, addCustomHeaders: [String: String]? = nil, queue: DispatchQueue = .main, completionHandler: @escaping (_ account: String, _ externalFiles: [NKExternalSite], _ error: NKError) -> Void) {
         
         let account = NKCommon.shared.account
+
         var externalSites: [NKExternalSite] = []
 
         let endpoint = "ocs/v2.php/apps/external/api/v1"
@@ -262,6 +264,7 @@ extension NextcloudKit {
     @objc public func downloadAvatar(user: String, fileNameLocalPath: String, sizeImage: Int, avatarSizeRounded: Int = 0, etag: String?, customUserAgent: String? = nil, addCustomHeaders: [String: String]? = nil, queue: DispatchQueue = .main, completionHandler: @escaping (_ account: String, _ imageAvatar: UIImage?, _ imageOriginal: UIImage?, _ etag: String?, _ error: NKError) -> Void) {
         
         let account = NKCommon.shared.account
+        
         let endpoint = "index.php/avatar/" + user + "/\(sizeImage)"
         
         guard let url = NKCommon.shared.createStandardUrl(serverUrl: NKCommon.shared.urlBase, endpoint: endpoint) else {
@@ -367,6 +370,7 @@ extension NextcloudKit {
     @objc public func getUserProfile(customUserAgent: String? = nil, addCustomHeaders: [String: String]? = nil, queue: DispatchQueue = .main, completionHandler: @escaping (_ account: String, _ userProfile: NKUserProfile?, _ error: NKError) -> Void) {
     
         let account = NKCommon.shared.account
+
         let endpoint = "ocs/v2.php/cloud/user"
         
         guard let url = NKCommon.shared.createStandardUrl(serverUrl: NKCommon.shared.urlBase, endpoint: endpoint) else {
@@ -435,6 +439,7 @@ extension NextcloudKit {
     @objc public func getCapabilities(customUserAgent: String? = nil, addCustomHeaders: [String: String]? = nil, queue: DispatchQueue = .main, completionHandler: @escaping (_ account: String, _ data: Data?, _ error: NKError) -> Void) {
     
         let account = NKCommon.shared.account
+
         let endpoint = "ocs/v1.php/cloud/capabilities"
         
         guard let url = NKCommon.shared.createStandardUrl(serverUrl: NKCommon.shared.urlBase, endpoint: endpoint) else {
@@ -465,7 +470,9 @@ extension NextcloudKit {
     @objc public func getRemoteWipeStatus(serverUrl: String, token: String, customUserAgent: String? = nil, addCustomHeaders: [String: String]? = nil, queue: DispatchQueue = .main, completionHandler: @escaping (_ account: String, _ wipe: Bool, _ error: NKError) -> Void) {
         
         let account = NKCommon.shared.account
+
         let endpoint = "index.php/core/wipe/check"
+
         let parameters: [String: Any] = ["token": token]
 
         guard let url = NKCommon.shared.createStandardUrl(serverUrl: serverUrl, endpoint: endpoint) else {
@@ -490,7 +497,9 @@ extension NextcloudKit {
     @objc public func setRemoteWipeCompletition(serverUrl: String, token: String, customUserAgent: String? = nil, addCustomHeaders: [String: String]? = nil, queue: DispatchQueue = .main, completionHandler: @escaping (_ account: String, _ error: NKError) -> Void) {
         
         let account = NKCommon.shared.account
+
         let endpoint = "index.php/core/wipe/success"
+
         let parameters: [String: Any] = ["token": token]
 
         guard let url = NKCommon.shared.createStandardUrl(serverUrl: serverUrl, endpoint: endpoint) else {
@@ -515,11 +524,13 @@ extension NextcloudKit {
     @objc public func getActivity(since: Int, limit: Int, objectId: String?, objectType: String?, previews: Bool, customUserAgent: String? = nil, addCustomHeaders: [String: String]? = nil, queue: DispatchQueue = .main, completionHandler: @escaping (_ account: String, _ activities: [NKActivity], _ activityFirstKnown: Int, _ activityLastGiven: Int, _ error: NKError) -> Void) {
     
         let account = NKCommon.shared.account
+
         var activities: [NKActivity] = []
         var activityFirstKnown = 0
         var activityLastGiven = 0
 
         var endpoint = "ocs/v2.php/apps/activity/api/v2/activity/"
+
         var parameters: [String: Any] = [
             "format":"json",
             "since": String(since),
@@ -608,9 +619,11 @@ extension NextcloudKit {
     @objc public func getNotifications(customUserAgent: String? = nil, addCustomHeaders: [String: String]? = nil, queue: DispatchQueue = .main, completionHandler: @escaping (_ account: String, _ notifications: [NKNotifications]?, _ error: NKError) -> Void) {
     
         let account = NKCommon.shared.account
-        var notifications: [NKNotifications] = []
+
         let endpoint = "ocs/v2.php/apps/notifications/api/v2/notifications"
-        
+
+        var notifications: [NKNotifications] = []
+
         guard let url = NKCommon.shared.createStandardUrl(serverUrl: NKCommon.shared.urlBase, endpoint: endpoint) else {
             return queue.async { completionHandler(account, nil, .urlError) }
         }
@@ -679,6 +692,7 @@ extension NextcloudKit {
     @objc public func setNotification(serverUrl: String?, idNotification: Int, method: String, customUserAgent: String? = nil, addCustomHeaders: [String: String]? = nil, queue: DispatchQueue = .main, completionHandler: @escaping (_ account: String, _ error: NKError) -> Void) {
                     
         let account = NKCommon.shared.account
+
         var url: URLConvertible?
 
         if serverUrl == nil {
@@ -713,7 +727,9 @@ extension NextcloudKit {
     @objc public func getDirectDownload(fileId: String, customUserAgent: String? = nil, addCustomHeaders: [String: String]? = nil, queue: DispatchQueue = .main, completionHandler: @escaping (_ account: String, _ url: String?, _ error: NKError) -> Void) {
         
         let account = NKCommon.shared.account
+
         let endpoint = "ocs/v2.php/apps/dav/api/v1/direct"
+        
         let parameters: [String: Any] = [
             "fileId": fileId,
             "format": "json"

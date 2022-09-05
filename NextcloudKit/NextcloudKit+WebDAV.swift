@@ -36,6 +36,7 @@ extension NextcloudKit {
         }
          
         let method = HTTPMethod(rawValue: "MKCOL")
+
         let headers = NKCommon.shared.getStandardHeaders(addCustomHeaders, customUserAgent: customUserAgent)
 
         var urlRequest: URLRequest
@@ -108,6 +109,7 @@ extension NextcloudKit {
         }
          
         let method = HTTPMethod(rawValue: "MOVE")
+
         var headers = NKCommon.shared.getStandardHeaders(addCustomHeaders, customUserAgent: customUserAgent)
         headers.update(name: "Destination", value: serverUrlFileNameDestination.urlEncoded ?? "")
         if overwrite {
@@ -146,6 +148,7 @@ extension NextcloudKit {
         }
          
         let method = HTTPMethod(rawValue: "COPY")
+
         var headers = NKCommon.shared.getStandardHeaders(addCustomHeaders, customUserAgent: customUserAgent)
         headers.update(name: "Destination", value: serverUrlFileNameDestination.urlEncoded ?? "")
         if overwrite {
@@ -178,6 +181,7 @@ extension NextcloudKit {
     @objc public func readFileOrFolder(serverUrlFileName: String, depth: String, showHiddenFiles: Bool = true, requestBody: Data? = nil, customUserAgent: String? = nil, addCustomHeaders: [String: String]? = nil, timeout: TimeInterval = 60, queue: DispatchQueue = .main, completionHandler: @escaping (_ account: String, _ files: [NKFile], _ responseData: Data?, _ error: NKError) -> Void) {
          
         let account = NKCommon.shared.account
+
         var files: [NKFile] = []
         var serverUrlFileName = serverUrlFileName
 
@@ -189,6 +193,7 @@ extension NextcloudKit {
         }
          
         let method = HTTPMethod(rawValue: "PROPFIND")
+
         var headers = NKCommon.shared.getStandardHeaders(addCustomHeaders, customUserAgent: customUserAgent)
         headers.update(name: "Depth", value: depth)
 
@@ -226,6 +231,7 @@ extension NextcloudKit {
     @objc public func searchBodyRequest(serverUrl: String, requestBody: String, showHiddenFiles: Bool, customUserAgent: String? = nil, addCustomHeaders: [String: String]? = nil, timeout: TimeInterval = 60, queue: DispatchQueue = .main, completionHandler: @escaping (_ account: String, _ files: [NKFile], _ error: NKError) -> Void) {
          
         let account = NKCommon.shared.account
+
         let httpBody = requestBody.data(using: .utf8)!
      
         search(serverUrl: serverUrl, httpBody: httpBody, showHiddenFiles: showHiddenFiles, customUserAgent: customUserAgent, addCustomHeaders: addCustomHeaders, account: account, timeout: timeout, queue: queue) { (account, files, error) in
@@ -251,6 +257,7 @@ extension NextcloudKit {
     @objc public func searchMedia(path: String = "", lessDate: Any, greaterDate: Any, elementDate: String, limit: Int, showHiddenFiles: Bool, customUserAgent: String? = nil, addCustomHeaders: [String: String]? = nil, timeout: TimeInterval = 60, queue: DispatchQueue = .main, completionHandler: @escaping (_ account: String, _ files: [NKFile], _ error: NKError) -> Void) {
             
         let account = NKCommon.shared.account
+
         let files: [NKFile] = []
         var greaterDateString: String?, lessDateString: String?
         
@@ -297,6 +304,7 @@ extension NextcloudKit {
         }
          
         let method = HTTPMethod(rawValue: "SEARCH")
+
         let headers = NKCommon.shared.getStandardHeaders(addCustomHeaders, customUserAgent: customUserAgent, contentType: "text/xml")
 
         var urlRequest: URLRequest
@@ -329,6 +337,7 @@ extension NextcloudKit {
     @objc public func setFavorite(fileName: String, favorite: Bool, customUserAgent: String? = nil, addCustomHeaders: [String: String]? = nil, timeout: TimeInterval = 60, queue: DispatchQueue = .main, completionHandler: @escaping (_ account: String, _ error: NKError) -> Void) {
          
         let account = NKCommon.shared.account
+
         let serverUrlFileName = NKCommon.shared.urlBase + "/" + NKCommon.shared.dav + "/files/" + NKCommon.shared.userId + "/" + fileName
         
         guard let url = serverUrlFileName.encodedToUrl else {
@@ -336,6 +345,7 @@ extension NextcloudKit {
         }
          
         let method = HTTPMethod(rawValue: "PROPPATCH")
+
         let headers = NKCommon.shared.getStandardHeaders(addCustomHeaders, customUserAgent: customUserAgent)
          
         var urlRequest: URLRequest
@@ -364,7 +374,9 @@ extension NextcloudKit {
     @objc public func listingFavorites(showHiddenFiles: Bool, customUserAgent: String? = nil, addCustomHeaders: [String: String]? = nil, timeout: TimeInterval = 60, queue: DispatchQueue = .main, completionHandler: @escaping (_ account: String, _ files: [NKFile], _ error: NKError) -> Void) {
          
         let account = NKCommon.shared.account
+
         let serverUrlFileName = NKCommon.shared.urlBase + "/" + NKCommon.shared.dav + "/files/" + NKCommon.shared.userId
+
         var files: [NKFile] = []
 
         guard let url = serverUrlFileName.encodedToUrl else {
@@ -372,6 +384,7 @@ extension NextcloudKit {
         }
          
         let method = HTTPMethod(rawValue: "REPORT")
+
         let headers = NKCommon.shared.getStandardHeaders(addCustomHeaders, customUserAgent: customUserAgent)
          
         var urlRequest: URLRequest
@@ -404,7 +417,9 @@ extension NextcloudKit {
     @objc public func listingTrash(showHiddenFiles: Bool, customUserAgent: String? = nil, addCustomHeaders: [String: String]? = nil, timeout: TimeInterval = 60, queue: DispatchQueue = .main, completionHandler: @escaping (_ account: String, _ items: [NKTrash], _ error: NKError) -> Void) {
            
         let account = NKCommon.shared.account
+
         var items: [NKTrash] = []
+
         let serverUrlFileName = NKCommon.shared.urlBase + "/" + NKCommon.shared.dav + "/trashbin/" + NKCommon.shared.userId + "/trash/"
             
         guard let url = serverUrlFileName.encodedToUrl else {
@@ -412,6 +427,7 @@ extension NextcloudKit {
         }
         
         let method = HTTPMethod(rawValue: "PROPFIND")
+        
         var headers = NKCommon.shared.getStandardHeaders(addCustomHeaders, customUserAgent: customUserAgent)
         headers.update(name: "Depth", value: "1")
 

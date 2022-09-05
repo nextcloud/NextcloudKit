@@ -30,7 +30,9 @@ extension NextcloudKit {
     @objc public func createUrlRichdocuments(fileID: String, customUserAgent: String? = nil, addCustomHeaders: [String: String]? = nil, queue: DispatchQueue = .main, completionHandler: @escaping (_ account: String, _  url: String?, _ error: NKError) -> Void) {
                 
         let account = NKCommon.shared.account
+
         let endpoint = "ocs/v2.php/apps/richdocuments/api/v1/document"
+
         let parameters: [String: Any] = ["fileId": fileID]
 
         guard let url = NKCommon.shared.createStandardUrl(serverUrl: NKCommon.shared.urlBase, endpoint: endpoint) else {
@@ -62,6 +64,7 @@ extension NextcloudKit {
     @objc public func getTemplatesRichdocuments(typeTemplate: String, customUserAgent: String? = nil, addCustomHeaders: [String: String]? = nil, queue: DispatchQueue = .main, completionHandler: @escaping (_ account: String, _ templates: [NKRichdocumentsTemplate]?, _ error: NKError) -> Void) {
         
         let account = NKCommon.shared.account
+
         let endpoint = "ocs/v2.php/apps/richdocuments/api/v1/templates/\(typeTemplate)"
         
         guard let url = NKCommon.shared.createStandardUrl(serverUrl: NKCommon.shared.urlBase, endpoint: endpoint) else {
@@ -106,7 +109,9 @@ extension NextcloudKit {
     @objc public func createRichdocuments(path: String, templateId: String, customUserAgent: String? = nil, addCustomHeaders: [String: String]? = nil, queue: DispatchQueue = .main, completionHandler: @escaping (_ account: String, _  url: String?, _ error: NKError) -> Void) {
                 
         let account = NKCommon.shared.account
+
         let endpoint = "ocs/v2.php/apps/richdocuments/api/v1/templates/new"
+
         let parameters: [String: Any] = ["path": path, "template": templateId]
         
         guard let url = NKCommon.shared.createStandardUrl(serverUrl: NKCommon.shared.urlBase, endpoint: endpoint) else {
@@ -138,7 +143,9 @@ extension NextcloudKit {
     @objc public func createAssetRichdocuments(path: String, customUserAgent: String? = nil, addCustomHeaders: [String: String]? = nil, queue: DispatchQueue = .main, completionHandler: @escaping (_ account: String, _  url: String?, _ error: NKError) -> Void) {
                 
         let account = NKCommon.shared.account
+
         let endpoint = "index.php/apps/richdocuments/assets"
+        
         let parameters: [String: Any] = ["path": path]
 
         guard let url = NKCommon.shared.createStandardUrl(serverUrl: NKCommon.shared.urlBase, endpoint: endpoint) else {

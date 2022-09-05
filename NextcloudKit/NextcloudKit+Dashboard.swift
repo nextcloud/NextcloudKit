@@ -32,9 +32,10 @@ extension NextcloudKit {
                              request: @escaping (DataRequest?) -> Void,
                              completion: @escaping (_ account: String, _ dashboardResults: [NCCDashboardResult]?, _ json: JSON?, _ error: NKError) -> Void) {
 
-        var url: URLConvertible?
         let account = NKCommon.shared.account
-        
+
+        var url: URLConvertible?
+
         if let endpoint = options.endpoint {
             url = URL(string: endpoint)
         } else {

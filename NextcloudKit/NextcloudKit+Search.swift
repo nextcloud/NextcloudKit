@@ -3,8 +3,8 @@
 //  NextcloudKit
 //
 //  Created by Henrik Storch on 2022.
-
 //  Copyright © 2022 Henrik Storch. All rights reserved.
+//
 //  Author Henrik Storch <henrik.storch@nextcloud.com>
 //  Author Marino Faggiana <marino.faggiana@nextcloud.com>
 //
@@ -53,8 +53,10 @@ extension NextcloudKit {
         update: @escaping (_ account: String, _ searchResult: NKSearchResult?, _ provider: NKSearchProvider, _ error: NKError) -> Void,
         completion: @escaping (_ account: String, _ error: NKError) -> Void) {
 
-            let endpoint = "ocs/v2.php/search/providers"
             let account = NKCommon.shared.account
+
+            let endpoint = "ocs/v2.php/search/providers"
+
             guard let url = NKCommon.shared.createStandardUrl(serverUrl: NKCommon.shared.urlBase, endpoint: endpoint) else {
                 return completion(account, .urlError)
             }
@@ -126,10 +128,13 @@ extension NextcloudKit {
             completion(account, nil, .urlError)
             return nil
         }
+
         var endpoint = "ocs/v2.php/search/providers/\(id)/search?term=\(term)"
+
         if let limit = limit {
             endpoint += "&limit=\(limit)"
         }
+
         if let cursor = cursor {
             endpoint += "&cursor=\(cursor)"
         }
