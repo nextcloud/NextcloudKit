@@ -128,7 +128,7 @@ public class NKError: NSObject {
         }
     }
 
-    public init(errorCode: Int = 0, errorDescription: String = "") {
+    init(errorCode: Int = 0, errorDescription: String = "") {
         self.errorCode = errorCode
         self.errorDescription = errorDescription
     }
@@ -215,8 +215,11 @@ public class NKError: NSObject {
             self.init(errorCode: 0, errorDescription: "")
         }
     }
-}
 
+    static func ==(lhs: NKError, rhs: NKError) -> Bool {
+        return lhs.errorCode == rhs.errorCode && lhs.errorDescription == lhs.errorDescription
+    }
+}
 
 public protocol AFResponse {
     associatedtype Failure: Error
