@@ -216,8 +216,15 @@ public class NKError: NSObject {
         }
     }
 
-    static func ==(lhs: NKError, rhs: NKError) -> Bool {
+    public static func ==(lhs: NKError, rhs: NKError) -> Bool {
         return lhs.errorCode == rhs.errorCode && lhs.errorDescription == lhs.errorDescription
+    }
+
+    public override func isEqual(_ object: Any?) -> Bool {
+        if let object = object as? NKError {
+            return self.errorCode == object.errorCode && self.errorDescription == object.errorDescription
+        }
+        return false
     }
 }
 
