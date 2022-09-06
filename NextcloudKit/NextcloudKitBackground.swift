@@ -23,9 +23,9 @@
 
 import Foundation
 
-@objc public class NCCommunicationBackground: NSObject, URLSessionTaskDelegate, URLSessionDelegate, URLSessionDownloadDelegate {
-    @objc public static let shared: NCCommunicationBackground = {
-        let instance = NCCommunicationBackground()
+@objc public class NKBackground: NSObject, URLSessionTaskDelegate, URLSessionDelegate, URLSessionDownloadDelegate {
+    @objc public static let shared: NKBackground = {
+        let instance = NKBackground()
         return instance
     }()
         

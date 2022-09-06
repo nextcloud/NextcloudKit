@@ -51,7 +51,7 @@ import MobileCoreServices
     var urlBase = ""
     var userAgent: String?
     var nextcloudVersion: Int = 0
-    var webDav: String = "remote.php/dav"
+    let dav: String = "remote.php/dav"
     
     var cookies: [String:[HTTPCookie]] = [:]
     var internalTypeIdentifiers: [UTTypeConformsToServer] = []
@@ -183,11 +183,10 @@ import MobileCoreServices
     
     //MARK: - Setup
     
-    @objc public func setup(account: String? = nil, user: String, userId: String, password: String, urlBase: String, userAgent: String, webDav: String?, nextcloudVersion: Int, delegate: NKCommonDelegate?) {
+    @objc public func setup(account: String? = nil, user: String, userId: String, password: String, urlBase: String, userAgent: String, nextcloudVersion: Int, delegate: NKCommonDelegate?) {
         
         self.setup(account:account, user: user, userId: userId, password: password, urlBase: urlBase)
         self.setup(userAgent: userAgent)
-        if (webDav != nil) { self.setup(webDav: webDav!) }
         self.setup(nextcloudVersion: nextcloudVersion)
         self.setup(delegate: delegate)
     }
@@ -214,15 +213,7 @@ import MobileCoreServices
         
         self.userAgent = userAgent
     }
-    
-    @objc public func setup(webDav: String) {
-        
-        self.webDav = webDav
-        
-        if webDav.first == "/" { self.webDav.removeFirst() }
-        if webDav.last == "/" { self.webDav.removeLast() }
-    }
-    
+
     @objc public func setup(nextcloudVersion: Int) {
         
         self.nextcloudVersion = nextcloudVersion
@@ -440,14 +431,14 @@ import MobileCoreServices
     
     //MARK: - Common
     func getStandardHeaders(options: NKRequestOptions) -> HTTPHeaders {
-         return getStandardHeaders(user: user, password: password, appendHeaders: options.customHeader, customUserAgent: options.customUserAgent, e2eToken: options.e2eToken)
+        return getStandardHeaders(user: user, password: password, appendHeaders: options.customHeader, customUserAgent: options.customUserAgent, contentType: options.contentType, e2eToken: options.e2eToken)
      }
 
-    func getStandardHeaders(_ appendHeaders: [String: String]?, customUserAgent: String?, e2eToken: String? = nil) -> HTTPHeaders {
-        return getStandardHeaders(user: user, password: password, appendHeaders: appendHeaders, customUserAgent: customUserAgent, e2eToken: e2eToken)
+    func getStandardHeaders(_ appendHeaders: [String: String]?, customUserAgent: String?, contentType: String? = nil, e2eToken: String? = nil) -> HTTPHeaders {
+        return getStandardHeaders(user: user, password: password, appendHeaders: appendHeaders, customUserAgent: customUserAgent, contentType: contentType, e2eToken: e2eToken)
     }
     
-    func getStandardHeaders(user: String, password: String, appendHeaders: [String: String]?, customUserAgent: String?, e2eToken: String? = nil) -> HTTPHeaders {
+    func getStandardHeaders(user: String, password: String, appendHeaders: [String: String]?, customUserAgent: String?, contentType: String? = nil, e2eToken: String? = nil) -> HTTPHeaders {
         
         var headers: HTTPHeaders = [.authorization(username: user, password: password)]
         if customUserAgent != nil {
@@ -455,7 +446,14 @@ import MobileCoreServices
         } else if let userAgent = userAgent {
             headers.update(.userAgent(userAgent))
         }
-        headers.update(.contentType("application/x-www-form-urlencoded"))
+        if let contentType = contentType {
+            headers.update(.contentType(contentType))
+        } else {
+            headers.update(.contentType("application/x-www-form-urlencoded"))
+        }
+        if contentType != "application/xml" {
+            headers.update(name: "Accept", value: "application/json")
+        }
         headers.update(name: "OCS-APIRequest", value: "true")
         if e2eToken != nil {
             headers.update(name: "e2e-token", value: e2eToken!)

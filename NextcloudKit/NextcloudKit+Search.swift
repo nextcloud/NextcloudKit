@@ -3,8 +3,8 @@
 //  NextcloudKit
 //
 //  Created by Henrik Storch on 2022.
-
 //  Copyright © 2022 Henrik Storch. All rights reserved.
+//
 //  Author Henrik Storch <henrik.storch@nextcloud.com>
 //  Author Marino Faggiana <marino.faggiana@nextcloud.com>
 //
@@ -49,18 +49,21 @@ extension NextcloudKit {
         timeoutProvider: TimeInterval = 60,
         filter: @escaping (NKSearchProvider) -> Bool = { _ in true },
         request: @escaping (DataRequest?) -> Void,
-        providers: @escaping ([NKSearchProvider]?) -> Void,
-        update: @escaping (NKSearchResult?, _ provider: NKSearchProvider, _ error: NKError) -> Void,
-        completion: @escaping (_ error: NKError) -> Void) {
+        providers: @escaping (_ account: String, _ searchProviders: [NKSearchProvider]?) -> Void,
+        update: @escaping (_ account: String, _ searchResult: NKSearchResult?, _ provider: NKSearchProvider, _ error: NKError) -> Void,
+        completion: @escaping (_ account: String, _ error: NKError) -> Void) {
 
-            let endpoint = "ocs/v2.php/search/providers?format=json"
+            let account = NKCommon.shared.account
+
+            let endpoint = "ocs/v2.php/search/providers"
+
             guard let url = NKCommon.shared.createStandardUrl(serverUrl: NKCommon.shared.urlBase, endpoint: endpoint) else {
-                return completion(.urlError)
+                return completion(account, .urlError)
             }
-            let method = HTTPMethod(rawValue: "GET")
+
             let headers = NKCommon.shared.getStandardHeaders(options: options)
 
-            let requestUnifiedSearch = sessionManager.request(url, method: method, parameters: nil, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).responseData(queue: NKCommon.shared.backgroundQueue) { (response) in
+            let requestUnifiedSearch = sessionManager.request(url, method: .get, parameters: nil, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).responseData(queue: NKCommon.shared.backgroundQueue) { (response) in
                 debugPrint(response)
 
                 switch response.result {
@@ -68,29 +71,29 @@ extension NextcloudKit {
                     let json = JSON(json)
                     let providerData = json["ocs"]["data"]
                     guard let allProvider = NKSearchProvider.factory(jsonArray: providerData) else {
-                        return completion(NKError(rootJson: json, fallbackStatusCode: response.response?.statusCode))
+                        return completion(account, NKError(rootJson: json, fallbackStatusCode: response.response?.statusCode))
                     }
 
-                    providers(allProvider)
+                    providers(account, allProvider)
                     
                     let filteredProviders = allProvider.filter(filter)
                     let group = DispatchGroup()
 
                     for provider in filteredProviders {
                         group.enter()
-                        let requestSearchProvider = self.searchProvider(provider.id, term: term, options: options, timeout: timeoutProvider) { partial, error in
-                            update(partial, provider, error)
+                        let requestSearchProvider = self.searchProvider(provider.id, account: account, term: term, options: options, timeout: timeoutProvider) { account, partial, error in
+                            update(account, partial, provider, error)
                             group.leave()
                         }
                         request(requestSearchProvider)
                     }
 
                     group.notify(queue: options.queue) {
-                        completion(.success)
+                        completion(account, .success)
                     }
                 case .failure(let error):
                     let error = NKError(error: error, afResponse: response)
-                    return completion(error)
+                    return completion(account, error)
                 }
             }
             request(requestUnifiedSearch)
@@ -113,17 +116,25 @@ extension NextcloudKit {
     ///   - completion: Callback, notifying that all search results.
     @discardableResult
     public func searchProvider(_ id: String,
+                               account: String,
                                term: String,
                                limit: Int? = nil,
                                cursor: Int? = nil,
                                options: NKRequestOptions = NKRequestOptions(),
                                timeout: TimeInterval = 60,
-                               completion: @escaping (NKSearchResult?, _ error: NKError) -> Void) -> DataRequest? {
+                               completion: @escaping (_ accoun: String, NKSearchResult?, _ error: NKError) -> Void) -> DataRequest? {
 
-        var endpoint = "ocs/v2.php/search/providers/\(id)/search?format=json&term=\(term)"
+        guard let term = term.urlEncoded else {
+            completion(account, nil, .urlError)
+            return nil
+        }
+
+        var endpoint = "ocs/v2.php/search/providers/\(id)/search?term=\(term)"
+
         if let limit = limit {
             endpoint += "&limit=\(limit)"
         }
+
         if let cursor = cursor {
             endpoint += "&cursor=\(cursor)"
         }
@@ -132,19 +143,18 @@ extension NextcloudKit {
             serverUrl: NKCommon.shared.urlBase,
             endpoint: endpoint)
         else {
-            completion(nil, .urlError)
+            completion(account, nil, .urlError)
             return nil
         }
 
-        let method = HTTPMethod(rawValue: "GET")
         let headers = NKCommon.shared.getStandardHeaders(options: options)
 
         var urlRequest: URLRequest
         do {
-            try urlRequest = URLRequest(url: url, method: method, headers: headers)
+            try urlRequest = URLRequest(url: url, method: .get, headers: headers)
             urlRequest.timeoutInterval = timeout
         } catch {
-            completion(nil, NKError(error: error))
+            completion(account, nil, NKError(error: error))
             return nil
         }
 
@@ -155,12 +165,12 @@ extension NextcloudKit {
                 let json = JSON(json)
                 let searchData = json["ocs"]["data"]
                 guard let searchResult = NKSearchResult(json: searchData, id: id) else {
-                    return completion(nil, NKError(rootJson: json, fallbackStatusCode: response.response?.statusCode))
+                    return completion(account, nil, NKError(rootJson: json, fallbackStatusCode: response.response?.statusCode))
                 }
-                completion(searchResult, .success)
+                completion(account, searchResult, .success)
             case .failure(let error):
                 let error = NKError(error: error, afResponse: response)
-                return completion(nil, error)
+                return completion(account, nil, error)
             }
         }
 

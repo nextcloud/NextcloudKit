@@ -27,6 +27,8 @@ import MobileCoreServices
 import SwiftyXMLParser
 import SwiftyJSON
 
+// MARK: - Hovercard
+
 @objc public class NKHovercard: NSObject {
     internal init?(jsonData: JSON) {
         guard let userId = jsonData["userId"].string,
@@ -54,17 +56,19 @@ import SwiftyJSON
             self.hyperlink = hyperlink
             self.appId = appId
         }
-        
+
         @objc public let title: String
         @objc public let icon: String
         @objc public let hyperlink: String
         @objc public var hyperlinkUrl: URL? { URL(string: hyperlink) }
         @objc public let appId: String
     }
-    
+
     @objc public let userId, displayName: String
     @objc public let actions: [Action]
 }
+
+// MARK: - Unified Search
 
 @objc public class NKSearchResult: NSObject {
     @objc public let id: String
@@ -146,6 +150,52 @@ import SwiftyJSON
         return allProvider.compactMap(NKSearchProvider.init)
     }
 }
+
+// MARK: - Dashboard
+
+@objc public class NCCDashboardResult: NSObject {
+    @objc public var application: String?
+    @objc public var dashboardEntries: [NCCDashboardEntry]?
+
+    init?(application: String, data: JSON) {
+        self.application = application
+        self.dashboardEntries = NCCDashboardEntry.factory(data: data)
+    }
+
+    static func factory(data: JSON) -> [NCCDashboardResult] {
+        var dashboardResults = [NCCDashboardResult]()
+        for (application, data):(String, JSON) in data {
+            if let result = NCCDashboardResult.init(application: application, data: data) {
+                dashboardResults.append(result)
+            }
+        }
+        return dashboardResults
+    }
+}
+
+@objc public class NCCDashboardEntry: NSObject {
+    @objc public let title: String?
+    @objc public let subtitle: String?
+    @objc public let link: String?
+    @objc public let iconUrl: String?
+    @objc public let sinceId: Int
+
+    init?(json: JSON) {
+        self.title = json["title"].string
+        self.subtitle = json["subtitle"].string
+        self.link = json["link"].string
+        self.iconUrl = json["iconUrl"].string
+        self.sinceId = json["sinceId"].int ?? 0
+    }
+
+    static func factory(data: JSON) -> [NCCDashboardEntry]? {
+        guard let allResults = data.array else { return nil }
+        return allResults.compactMap(NCCDashboardEntry.init)
+    }
+}
+
+// MARK: -
+
 
 @objc public class NKActivity: NSObject {
     
@@ -851,7 +901,7 @@ class NKDataFileXML: NSObject {
         var files: [NKFile] = []
         var dicMOV: [String:Int] = [:]
         var dicImage: [String:Int] = [:]
-        let webDavRootFiles = "/" + NKCommon.shared.webDav + "/files/"
+        let rootFiles = "/" + NKCommon.shared.dav + "/files/"
         guard let baseUrl = NKCommon.shared.getHostName(urlString: NKCommon.shared.urlBase) else {
             return files
         }
@@ -884,11 +934,10 @@ class NKDataFileXML: NSObject {
                 file.fileName = file.fileName.removingPercentEncoding ?? ""
               
                 // ServerUrl
-                if href == webDavRootFiles + NKCommon.shared.user + "/" {
+                if href == rootFiles + NKCommon.shared.user + "/" {
                     file.fileName = "."
                     file.serverUrl = ".."
                 } else {
-                    //let postUrl = file.path.replacingOccurrences(of: webDavRootFiles + NCCommunicationCommon.shared.userId, with: webDavRootFiles.dropLast())
                     file.serverUrl = baseUrl + file.path.dropLast()
                 }
                 file.serverUrl = file.serverUrl.removingPercentEncoding ?? ""

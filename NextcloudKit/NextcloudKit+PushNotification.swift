@@ -29,15 +29,13 @@ extension NextcloudKit {
 
     @objc public func subscribingPushNotification(serverUrl: String, account: String, user: String, password: String, pushTokenHash: String, devicePublicKey: String, proxyServerUrl: String, customUserAgent: String? = nil, addCustomHeaders: [String: String]? = nil, queue: DispatchQueue = .main, completionHandler: @escaping (_ account: String, _ deviceIdentifier: String?, _ signature: String?, _ publicKey: String?, _ error: NKError) -> Void) {
         
-        let endpoint = "ocs/v2.php/apps/notifications/api/v2/push?format=json"
+        let endpoint = "ocs/v2.php/apps/notifications/api/v2/push"
         
         guard let url = NKCommon.shared.createStandardUrl(serverUrl: serverUrl, endpoint: endpoint) else {
             queue.async { completionHandler(account, nil, nil, nil, .urlError) }
             return
         }
-        
-        let method = HTTPMethod(rawValue: "POST")
-        
+
         let parameters = [
             "pushTokenHash": pushTokenHash,
             "devicePublicKey": devicePublicKey,
@@ -46,7 +44,7 @@ extension NextcloudKit {
         
         let headers = NKCommon.shared.getStandardHeaders(user: user, password: password, appendHeaders: addCustomHeaders, customUserAgent: customUserAgent)
         
-        sessionManager.request(url, method: method, parameters:parameters, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).responseData(queue: NKCommon.shared.backgroundQueue) { (response) in
+        sessionManager.request(url, method: .post, parameters:parameters, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).responseData(queue: NKCommon.shared.backgroundQueue) { (response) in
             debugPrint(response)
             
             switch response.result {
@@ -76,12 +74,10 @@ extension NextcloudKit {
             queue.async { completionHandler(account, .urlError) }
             return
         }
-        
-        let method = HTTPMethod(rawValue: "DELETE")
-        
+
         let headers = NKCommon.shared.getStandardHeaders(user: user, password: password, appendHeaders: addCustomHeaders, customUserAgent: customUserAgent)
         
-        sessionManager.request(url, method: method, parameters: nil, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).response(queue: NKCommon.shared.backgroundQueue) { (response) in
+        sessionManager.request(url, method: .delete, parameters: nil, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).response(queue: NKCommon.shared.backgroundQueue) { (response) in
             debugPrint(response)
             
             switch response.result {
@@ -102,9 +98,7 @@ extension NextcloudKit {
             queue.async { completionHandler(.urlError) }
             return
         }
-        
-        let method = HTTPMethod(rawValue: "POST")
-        
+
         let parameters = [
             "pushToken": pushToken,
             "deviceIdentifier": deviceIdentifier,
@@ -114,7 +108,7 @@ extension NextcloudKit {
         
         let headers = HTTPHeaders.init(arrayLiteral: .userAgent(userAgent))
                 
-        sessionManager.request(url, method: method, parameters:parameters, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).response(queue: NKCommon.shared.backgroundQueue) { (response) in
+        sessionManager.request(url, method: .post, parameters:parameters, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).response(queue: NKCommon.shared.backgroundQueue) { (response) in
             debugPrint(response)
             
             switch response.result {
@@ -135,9 +129,7 @@ extension NextcloudKit {
             queue.async { completionHandler(.urlError) }
             return
         }
-        
-        let method = HTTPMethod(rawValue: "DELETE")
-        
+                
         let parameters = [
             "deviceIdentifier": deviceIdentifier,
             "deviceIdentifierSignature": signature,
@@ -146,7 +138,7 @@ extension NextcloudKit {
         
         let headers = HTTPHeaders.init(arrayLiteral: .userAgent(userAgent))
         
-        sessionManager.request(url, method: method, parameters: parameters, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).response(queue: NKCommon.shared.backgroundQueue) { (response) in
+        sessionManager.request(url, method: .delete, parameters: parameters, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).response(queue: NKCommon.shared.backgroundQueue) { (response) in
             debugPrint(response)
             
             switch response.result {
