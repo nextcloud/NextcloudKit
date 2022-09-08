@@ -70,21 +70,18 @@ extension NextcloudKit {
 
     @objc public func putComments(fileId: String,
                                   message: String,
-                                  customUserAgent: String? = nil,
-                                  addCustomHeaders: [String: String]? = nil,
-                                  queue: DispatchQueue = .main,
-                                  completionHandler: @escaping (_ account: String, _ error: NKError) -> Void) {
+                                  options: NKRequestOptions = NKRequestOptions(),
+                                  completion: @escaping (_ account: String, _ error: NKError) -> Void) {
         
         let account = NKCommon.shared.account
 
         let serverUrlEndpoint = NKCommon.shared.urlBase + "/" + NKCommon.shared.dav + "/comments/files/" + fileId
         
         guard let url = serverUrlEndpoint.encodedToUrl else {
-            queue.async { completionHandler(account, .urlError) }
-            return
+            return options.queue.async { completion(account, .urlError) }
         }
 
-        let headers = NKCommon.shared.getStandardHeaders(addCustomHeaders, customUserAgent: customUserAgent)
+        let headers = NKCommon.shared.getStandardHeaders(options: options)
 
         var urlRequest: URLRequest
         do {
@@ -92,7 +89,7 @@ extension NextcloudKit {
             let parameters = "{\"actorType\":\"users\",\"verb\":\"comment\",\"message\":\"" + message + "\"}"
             urlRequest.httpBody = parameters.data(using: .utf8)
         } catch {
-            queue.async { completionHandler(account, NKError(error: error)) }
+            options.queue.async { completion(account, NKError(error: error)) }
             return
         }
         
@@ -102,9 +99,9 @@ extension NextcloudKit {
             switch response.result {
             case .failure(let error):
                 let error = NKError(error: error, afResponse: response)
-                queue.async { completionHandler(account, error) }
+                options.queue.async { completion(account, error) }
             case .success( _):
-                queue.async { completionHandler(account, .success) }
+                options.queue.async { completion(account, .success) }
             }
         }
     }
@@ -112,22 +109,19 @@ extension NextcloudKit {
     @objc public func updateComments(fileId: String,
                                      messageId: String,
                                      message: String,
-                                     customUserAgent: String? = nil,
-                                     addCustomHeaders: [String: String]? = nil,
-                                     queue: DispatchQueue = .main,
-                                     completionHandler: @escaping (_ account: String, _ error: NKError) -> Void) {
+                                     options: NKRequestOptions = NKRequestOptions(),
+                                     completion: @escaping (_ account: String, _ error: NKError) -> Void) {
         
         let account = NKCommon.shared.account
 
         let serverUrlEndpoint = NKCommon.shared.urlBase + "/" + NKCommon.shared.dav + "/comments/files/" + fileId + "/" + messageId
         
         guard let url = serverUrlEndpoint.encodedToUrl else {
-            queue.async { completionHandler(account, .urlError) }
-            return
+            return options.queue.async { completion(account, .urlError) }
         }
         
         let method = HTTPMethod(rawValue: "PROPPATCH")
-        let headers = NKCommon.shared.getStandardHeaders(addCustomHeaders, customUserAgent: customUserAgent, contentType: "application/xml")
+        let headers = NKCommon.shared.getStandardHeaders(options.customHeader, customUserAgent: options.customUserAgent, contentType: "application/xml")
 
         var urlRequest: URLRequest
         do {
@@ -135,7 +129,7 @@ extension NextcloudKit {
             let parameters = String(format: NKDataFileXML().requestBodyCommentsUpdate, message)
             urlRequest.httpBody = parameters.data(using: .utf8)
         } catch {
-            queue.async { completionHandler(account, NKError(error: error)) }
+            options.queue.async { completion(account, NKError(error: error)) }
             return
         }
         
@@ -145,30 +139,27 @@ extension NextcloudKit {
             switch response.result {
             case .failure(let error):
                 let error = NKError(error: error, afResponse: response)
-                queue.async { completionHandler(account, error) }
+                options.queue.async { completion(account, error) }
             case .success( _):
-                queue.async { completionHandler(account, .success) }
+                options.queue.async{ completion(account, .success) }
             }
         }
     }
     
     @objc public func deleteComments(fileId: String,
                                      messageId: String,
-                                     customUserAgent: String? = nil,
-                                     addCustomHeaders: [String: String]? = nil,
-                                     queue: DispatchQueue = .main,
-                                     completionHandler: @escaping (_ account: String, _ error: NKError) -> Void) {
+                                     options: NKRequestOptions = NKRequestOptions(),
+                                     completion: @escaping (_ account: String, _ error: NKError) -> Void) {
         
         let account = NKCommon.shared.account
         
         let serverUrlEndpoint = NKCommon.shared.urlBase + "/" + NKCommon.shared.dav + "/comments/files/" + fileId + "/" + messageId
         
         guard let url = serverUrlEndpoint.encodedToUrl else {
-            queue.async { completionHandler(account, .urlError) }
-            return
+            return options.queue.async { completion(account, .urlError) }
         }
 
-        let headers = NKCommon.shared.getStandardHeaders(addCustomHeaders, customUserAgent: customUserAgent)
+        let headers = NKCommon.shared.getStandardHeaders(options: options)
 
         sessionManager.request(url, method: .delete, parameters: nil, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).response(queue: NKCommon.shared.backgroundQueue) { (response) in
             debugPrint(response)
@@ -176,30 +167,27 @@ extension NextcloudKit {
             switch response.result {
             case .failure(let error):
                 let error = NKError(error: error, afResponse: response)
-                queue.async { completionHandler(account, error) }
+                options.queue.async { completion(account, error) }
             case .success( _):
-                queue.async { completionHandler(account, .success) }
+                options.queue.async { completion(account, .success) }
             }
         }
     }
     
     @objc public func markAsReadComments(fileId: String,
-                                         customUserAgent: String? = nil,
-                                         addCustomHeaders: [String: String]? = nil,
-                                         queue: DispatchQueue = .main,
-                                         completionHandler: @escaping (_ account: String, _ error: NKError) -> Void) {
+                                         options: NKRequestOptions = NKRequestOptions(),
+                                         completion: @escaping (_ account: String, _ error: NKError) -> Void) {
         
         let account = NKCommon.shared.account
         
         let serverUrlEndpoint = NKCommon.shared.urlBase + "/" + NKCommon.shared.dav + "/comments/files/" + fileId
         
         guard let url = serverUrlEndpoint.encodedToUrl else {
-            queue.async { completionHandler(account, .urlError) }
-            return
+            return options.queue.async { completion(account, .urlError) }
         }
         
         let method = HTTPMethod(rawValue: "PROPPATCH")
-        let headers = NKCommon.shared.getStandardHeaders(addCustomHeaders, customUserAgent: customUserAgent, contentType: "application/xml")
+        let headers = NKCommon.shared.getStandardHeaders(options.customHeader, customUserAgent: options.customUserAgent, contentType: "application/xml")
 
         var urlRequest: URLRequest
         do {
@@ -207,7 +195,7 @@ extension NextcloudKit {
             let parameters = String(format: NKDataFileXML().requestBodyCommentsMarkAsRead)
             urlRequest.httpBody = parameters.data(using: .utf8)
         } catch {
-            queue.async { completionHandler(account, NKError(error: error)) }
+            options.queue.async { completion(account, NKError(error: error)) }
             return
         }
         
@@ -217,9 +205,9 @@ extension NextcloudKit {
             switch response.result {
             case .failure(let error):
                 let error = NKError(error: error, afResponse: response)
-                queue.async { completionHandler(account, error) }
+                options.queue.async { completion(account, error) }
             case .success( _):
-                queue.async { completionHandler(account, .success) }
+                options.queue.async { completion(account, .success) }
             }
         }
     }
