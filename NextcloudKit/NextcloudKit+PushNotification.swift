@@ -34,13 +34,15 @@ extension NextcloudKit {
                                                   pushTokenHash: String,
                                                   devicePublicKey: String,
                                                   proxyServerUrl: String,
-                                                  options: NKRequestOptions = NKRequestOptions(),
+                                                  customUserAgent: String? = nil,
+                                                  addCustomHeaders: [String: String]? = nil,
+                                                  queue: DispatchQueue = .main,
                                                   completion: @escaping (_ account: String, _ deviceIdentifier: String?, _ signature: String?, _ publicKey: String?, _ error: NKError) -> Void) {
         
         let endpoint = "ocs/v2.php/apps/notifications/api/v2/push"
         
         guard let url = NKCommon.shared.createStandardUrl(serverUrl: serverUrl, endpoint: endpoint) else {
-            return options.queue.async { completion(account, nil, nil, nil, .urlError) }
+            return queue.async { completion(account, nil, nil, nil, .urlError) }
         }
 
         let parameters = [
@@ -49,7 +51,7 @@ extension NextcloudKit {
             "proxyServer": proxyServerUrl,
         ]
         
-        let headers = NKCommon.shared.getStandardHeaders(user: user, password: password, appendHeaders: options.customHeader, customUserAgent: options.customUserAgent)
+        let headers = NKCommon.shared.getStandardHeaders(user: user, password: password, appendHeaders: addCustomHeaders, customUserAgent: customUserAgent)
         
         sessionManager.request(url, method: .post, parameters:parameters, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).responseData(queue: NKCommon.shared.backgroundQueue) { (response) in
             debugPrint(response)
@@ -57,7 +59,7 @@ extension NextcloudKit {
             switch response.result {
             case .failure(let error):
                 let error = NKError(error: error, afResponse: response)
-                options.queue.async { completion(account, nil, nil, nil, error) }
+                queue.async { completion(account, nil, nil, nil, error) }
             case .success(let json):
                 let json = JSON(json)
                 let statusCode = json["ocs"]["meta"]["statuscode"].int ?? NKError.internalError
@@ -65,9 +67,9 @@ extension NextcloudKit {
                     let deviceIdentifier = json["ocs"]["data"]["deviceIdentifier"].stringValue
                     let signature = json["ocs"]["data"]["signature"].stringValue
                     let publicKey = json["ocs"]["data"]["publicKey"].stringValue
-                    options.queue.async { completion(account, deviceIdentifier, signature, publicKey, .success) }
+                    queue.async { completion(account, deviceIdentifier, signature, publicKey, .success) }
                 } else {
-                    options.queue.async { completion(account, nil, nil, nil, NKError(rootJson: json, fallbackStatusCode: response.response?.statusCode)) }
+                    queue.async { completion(account, nil, nil, nil, NKError(rootJson: json, fallbackStatusCode: response.response?.statusCode)) }
                 }
             }
         }
@@ -77,16 +79,18 @@ extension NextcloudKit {
                                                     account: String,
                                                     user: String,
                                                     password: String,
-                                                    options: NKRequestOptions = NKRequestOptions(),
+                                                    customUserAgent: String? = nil,
+                                                    addCustomHeaders: [String: String]? = nil,
+                                                    queue: DispatchQueue = .main,
                                                     completion: @escaping (_ account: String, _ error: NKError) -> Void) {
                             
         let endpoint = "ocs/v2.php/apps/notifications/api/v2/push"
         
         guard let url = NKCommon.shared.createStandardUrl(serverUrl: serverUrl, endpoint: endpoint) else {
-            return options.queue.async { completion(account, .urlError) }
+            return queue.async { completion(account, .urlError) }
         }
 
-        let headers = NKCommon.shared.getStandardHeaders(user: user, password: password, appendHeaders: options.customHeader, customUserAgent: options.customUserAgent)
+        let headers = NKCommon.shared.getStandardHeaders(user: user, password: password, appendHeaders: addCustomHeaders, customUserAgent: customUserAgent)
         
         sessionManager.request(url, method: .delete, parameters: nil, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).response(queue: NKCommon.shared.backgroundQueue) { (response) in
             debugPrint(response)
@@ -94,9 +98,9 @@ extension NextcloudKit {
             switch response.result {
             case .failure(let error):
                 let error = NKError(error: error, afResponse: response)
-                options.queue.async { completion(account, error) }
+                queue.async { completion(account, error) }
             case .success( _):
-                options.queue.async { completion(account, .success) }
+                queue.async { completion(account, .success) }
             }
         }
     }
@@ -104,7 +108,8 @@ extension NextcloudKit {
     @objc public func subscribingPushProxy(proxyServerUrl: String,
                                            pushToken: String,
                                            deviceIdentifier: String,
-                                           signature: String, publicKey: String,
+                                           signature: String,
+                                           publicKey: String,
                                            userAgent: String,
                                            queue: DispatchQueue = .main,
                                            completion: @escaping (_ error: NKError) -> Void) {
