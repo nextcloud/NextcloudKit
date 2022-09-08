@@ -27,10 +27,8 @@ import Alamofire
 extension NextcloudKit {
 
     @objc public func getComments(fileId: String,
-                                  customUserAgent: String? = nil,
-                                  addCustomHeaders: [String: String]? = nil,
-                                  queue: DispatchQueue = .main,
-                                  completionHandler: @escaping (_ account: String, _ items: [NKComments]?, _ error: NKError) -> Void) {
+                                  options: NKRequestOptions = NKRequestOptions(),
+                                  completion: @escaping (_ account: String, _ items: [NKComments]?, _ error: NKError) -> Void) {
            
         let account = NKCommon.shared.account
 
@@ -38,19 +36,18 @@ extension NextcloudKit {
             
         guard let url = serverUrlEndpoint.encodedToUrl else {
 
-            queue.async { completionHandler(account, nil, .urlError) }
-            return
+            return options.queue.async { completion(account, nil, .urlError) }
         }
         
         let method = HTTPMethod(rawValue: "PROPFIND")
-        let headers = NKCommon.shared.getStandardHeaders(addCustomHeaders, customUserAgent: customUserAgent, contentType: "application/xml")
+        let headers = NKCommon.shared.getStandardHeaders(options.customHeader, customUserAgent: options.customUserAgent, contentType: "application/xml")
 
         var urlRequest: URLRequest
         do {
             try urlRequest = URLRequest(url: url, method: method, headers: headers)
             urlRequest.httpBody = NKDataFileXML().requestBodyComments.data(using: .utf8)
         } catch {
-            return queue.async { completionHandler(account, nil, NKError(error: error)) }
+            return options.queue.async { completion(account, nil, NKError(error: error)) }
         }
           
         sessionManager.request(urlRequest).validate(statusCode: 200..<300).responseData(queue: NKCommon.shared.backgroundQueue) { (response) in
@@ -59,13 +56,13 @@ extension NextcloudKit {
             switch response.result {
             case .failure(let error):
                 let error = NKError(error: error, afResponse: response)
-                queue.async { completionHandler(account, nil, error) }
+                options.queue.async { completion(account, nil, error) }
             case .success( _):
                 if let data = response.data {
                     let items = NKDataFileXML().convertDataComments(data: data)
-                    queue.async { completionHandler(account, items, .success) }
+                    options.queue.async { completion(account, items, .success) }
                 } else {
-                    queue.async { completionHandler(account, nil, .invalidData) }
+                    options.queue.async { completion(account, nil, .invalidData) }
                 }
             }
         }
