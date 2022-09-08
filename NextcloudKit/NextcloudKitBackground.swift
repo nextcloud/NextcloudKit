@@ -222,9 +222,9 @@ import Foundation
         }
         
         if nkError.errorCode == 0 {
-            NKCommon.shared.writeLog("Network completed upload file: " + serverUrl + "/" + fileName)
+            NKCommon.shared.writeLog("Network completed upload file: \(serverUrl)/\(fileName)")
         } else {
-            NKCommon.shared.writeLog("Network completed upload file: " + serverUrl + "/" + fileName + " with error code \(nkError.errorCode) and error description " + nkError.errorDescription)
+            NKCommon.shared.writeLog("Network completed upload file: \(serverUrl)/\(fileName) with error code \(nkError.errorCode) and error description " + nkError.errorDescription)
         }
     }
     

@@ -32,7 +32,7 @@ extension NextcloudKit {
            
         let account = NKCommon.shared.account
 
-        let serverUrlEndpoint = NKCommon.shared.urlBase + "/" + NKCommon.shared.dav + "/comments/files/" + fileId
+        let serverUrlEndpoint = NKCommon.shared.urlBase + "/" + NKCommon.shared.dav + "/comments/files/\(fileId)"
             
         guard let url = serverUrlEndpoint.encodedToUrl else {
             return options.queue.async { completion(account, nil, .urlError) }
@@ -74,7 +74,7 @@ extension NextcloudKit {
         
         let account = NKCommon.shared.account
 
-        let serverUrlEndpoint = NKCommon.shared.urlBase + "/" + NKCommon.shared.dav + "/comments/files/" + fileId
+        let serverUrlEndpoint = NKCommon.shared.urlBase + "/" + NKCommon.shared.dav + "/comments/files/\(fileId)"
         
         guard let url = serverUrlEndpoint.encodedToUrl else {
             return options.queue.async { completion(account, .urlError) }
@@ -112,7 +112,7 @@ extension NextcloudKit {
         
         let account = NKCommon.shared.account
 
-        let serverUrlEndpoint = NKCommon.shared.urlBase + "/" + NKCommon.shared.dav + "/comments/files/" + fileId + "/" + messageId
+        let serverUrlEndpoint = NKCommon.shared.urlBase + "/" + NKCommon.shared.dav + "/comments/files/\(fileId)/\(messageId)"
         
         guard let url = serverUrlEndpoint.encodedToUrl else {
             return options.queue.async { completion(account, .urlError) }
@@ -150,7 +150,7 @@ extension NextcloudKit {
         
         let account = NKCommon.shared.account
         
-        let serverUrlEndpoint = NKCommon.shared.urlBase + "/" + NKCommon.shared.dav + "/comments/files/" + fileId + "/" + messageId
+        let serverUrlEndpoint = NKCommon.shared.urlBase + "/" + NKCommon.shared.dav + "/comments/files/\(fileId)/\(messageId)"
         
         guard let url = serverUrlEndpoint.encodedToUrl else {
             return options.queue.async { completion(account, .urlError) }
@@ -177,7 +177,7 @@ extension NextcloudKit {
         
         let account = NKCommon.shared.account
         
-        let serverUrlEndpoint = NKCommon.shared.urlBase + "/" + NKCommon.shared.dav + "/comments/files/" + fileId
+        let serverUrlEndpoint = NKCommon.shared.urlBase + "/" + NKCommon.shared.dav + "/comments/files/\(fileId)"
         
         guard let url = serverUrlEndpoint.encodedToUrl else {
             return options.queue.async { completion(account, .urlError) }

@@ -66,7 +66,7 @@ import SwiftyJSON
         guard idShare > 0 else {
              return "ocs/v2.php/apps/files_sharing/api/v1/shares"
         }
-        return "ocs/v2.php/apps/files_sharing/api/v1/shares/" + String(idShare)
+        return "ocs/v2.php/apps/files_sharing/api/v1/shares/\(idShare)"
     }
 
     internal var queryParameters: [String: String] {
@@ -410,7 +410,7 @@ extension NextcloudKit {
               
         let account = NKCommon.shared.account
         
-        let endpoint = "ocs/v2.php/apps/files_sharing/api/v1/shares/" + String(idShare)
+        let endpoint = "ocs/v2.php/apps/files_sharing/api/v1/shares/\(idShare)"
                    
         guard let url = NKCommon.shared.createStandardUrl(serverUrl: NKCommon.shared.urlBase, endpoint: endpoint) else {
             return options.queue.async { completion(account, .urlError) }

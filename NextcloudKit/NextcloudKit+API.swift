@@ -219,12 +219,12 @@ extension NextcloudKit {
         if useInternalEndpoint {
             
             if endpointTrashbin {
-                endpoint = "index.php/apps/files_trashbin/preview?fileId=" + fileNamePathOrFileId + "&x=\(widthPreview)&y=\(heightPreview)"
+                endpoint = "index.php/apps/files_trashbin/preview?fileId=\(fileNamePathOrFileId)&x=\(widthPreview)&y=\(heightPreview)"
             } else {
                 guard let fileNamePath = fileNamePathOrFileId.urlEncoded else {
                     return options.queue.async { completion(account, nil, nil, nil, nil, .urlError) }
                 }
-                endpoint = "index.php/core/preview.png?file=" + fileNamePath + "&x=\(widthPreview)&y=\(heightPreview)&a=1&mode=cover"
+                endpoint = "index.php/core/preview.png?file=\(fileNamePath)&x=\(widthPreview)&y=\(heightPreview)&a=1&mode=cover"
             }
                 
             url = NKCommon.shared.createStandardUrl(serverUrl: NKCommon.shared.urlBase, endpoint: endpoint)
@@ -288,7 +288,7 @@ extension NextcloudKit {
         
         let account = NKCommon.shared.account
         
-        let endpoint = "index.php/avatar/" + user + "/\(sizeImage)"
+        let endpoint = "index.php/avatar/\(user)/\(sizeImage)"
         
         guard let url = NKCommon.shared.createStandardUrl(serverUrl: NKCommon.shared.urlBase, endpoint: endpoint) else {
             return options.queue.async { completion(account, nil, nil, nil, .urlError) }
@@ -744,7 +744,7 @@ extension NextcloudKit {
         var url: URLConvertible?
 
         if serverUrl == nil {
-            let endpoint = "ocs/v2.php/apps/notifications/api/v2/notifications/" + String(idNotification)
+            let endpoint = "ocs/v2.php/apps/notifications/api/v2/notifications/\(idNotification)"
             url = NKCommon.shared.createStandardUrl(serverUrl: NKCommon.shared.urlBase, endpoint: endpoint)
         } else {
             url = serverUrl!.asUrl
