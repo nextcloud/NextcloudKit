@@ -42,16 +42,15 @@ extension NextcloudKit {
     ///   - filter: Filter search provider that should be searched. Default is all available provider..
     ///   - update: Callback, notifying that a search provider return its result. Does not include previous results.
     ///   - completion: Callback, notifying that all search providers have been searched. The search is done. Includes all search results.
-    public func unifiedSearch(
-        term: String,
-        options: NKRequestOptions = NKRequestOptions(),
-        timeout: TimeInterval = 30,
-        timeoutProvider: TimeInterval = 60,
-        filter: @escaping (NKSearchProvider) -> Bool = { _ in true },
-        request: @escaping (DataRequest?) -> Void,
-        providers: @escaping (_ account: String, _ searchProviders: [NKSearchProvider]?) -> Void,
-        update: @escaping (_ account: String, _ searchResult: NKSearchResult?, _ provider: NKSearchProvider, _ error: NKError) -> Void,
-        completion: @escaping (_ account: String, _ error: NKError) -> Void) {
+    public func unifiedSearch(term: String,
+                              options: NKRequestOptions = NKRequestOptions(),
+                              timeout: TimeInterval = 30,
+                              timeoutProvider: TimeInterval = 60,
+                              filter: @escaping (NKSearchProvider) -> Bool = { _ in true },
+                              request: @escaping (DataRequest?) -> Void,
+                              providers: @escaping (_ account: String, _ searchProviders: [NKSearchProvider]?) -> Void,
+                              update: @escaping (_ account: String, _ searchResult: NKSearchResult?, _ provider: NKSearchProvider, _ error: NKError) -> Void,
+                              completion: @escaping (_ account: String, _ error: NKError) -> Void) {
 
             let account = NKCommon.shared.account
 
