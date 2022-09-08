@@ -29,7 +29,7 @@ extension NextcloudKit {
 
     public func getDashboard(filter: [String]? = nil,
                              options: NKRequestOptions = NKRequestOptions(),
-                             request: @escaping (DataRequest?) -> Void,
+                             request: @escaping (DataRequest?) -> ()?,
                              completion: @escaping (_ account: String, _ dashboardResults: [NCCDashboardResult]?, _ json: JSON?, _ error: NKError) -> Void) {
 
         let account = NKCommon.shared.account
