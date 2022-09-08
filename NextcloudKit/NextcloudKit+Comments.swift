@@ -26,7 +26,11 @@ import Alamofire
 
 extension NextcloudKit {
 
-    @objc public func getComments(fileId: String, customUserAgent: String? = nil, addCustomHeaders: [String: String]? = nil, queue: DispatchQueue = .main, completionHandler: @escaping (_ account: String, _ items: [NKComments]?, _ error: NKError) -> Void) {
+    @objc public func getComments(fileId: String,
+                                  customUserAgent: String? = nil,
+                                  addCustomHeaders: [String: String]? = nil,
+                                  queue: DispatchQueue = .main,
+                                  completionHandler: @escaping (_ account: String, _ items: [NKComments]?, _ error: NKError) -> Void) {
            
         let account = NKCommon.shared.account
 
@@ -67,7 +71,12 @@ extension NextcloudKit {
         }
     }
 
-    @objc public func putComments(fileId: String, message: String, customUserAgent: String? = nil, addCustomHeaders: [String: String]? = nil, queue: DispatchQueue = .main, completionHandler: @escaping (_ account: String, _ error: NKError) -> Void) {
+    @objc public func putComments(fileId: String,
+                                  message: String,
+                                  customUserAgent: String? = nil,
+                                  addCustomHeaders: [String: String]? = nil,
+                                  queue: DispatchQueue = .main,
+                                  completionHandler: @escaping (_ account: String, _ error: NKError) -> Void) {
         
         let account = NKCommon.shared.account
 
@@ -103,7 +112,13 @@ extension NextcloudKit {
         }
     }
     
-    @objc public func updateComments(fileId: String, messageId: String, message: String, customUserAgent: String? = nil, addCustomHeaders: [String: String]? = nil, queue: DispatchQueue = .main, completionHandler: @escaping (_ account: String, _ error: NKError) -> Void) {
+    @objc public func updateComments(fileId: String,
+                                     messageId: String,
+                                     message: String,
+                                     customUserAgent: String? = nil,
+                                     addCustomHeaders: [String: String]? = nil,
+                                     queue: DispatchQueue = .main,
+                                     completionHandler: @escaping (_ account: String, _ error: NKError) -> Void) {
         
         let account = NKCommon.shared.account
 
@@ -140,7 +155,12 @@ extension NextcloudKit {
         }
     }
     
-    @objc public func deleteComments(fileId: String, messageId: String, customUserAgent: String? = nil, addCustomHeaders: [String: String]? = nil, queue: DispatchQueue = .main, completionHandler: @escaping (_ account: String, _ error: NKError) -> Void) {
+    @objc public func deleteComments(fileId: String,
+                                     messageId: String,
+                                     customUserAgent: String? = nil,
+                                     addCustomHeaders: [String: String]? = nil,
+                                     queue: DispatchQueue = .main,
+                                     completionHandler: @escaping (_ account: String, _ error: NKError) -> Void) {
         
         let account = NKCommon.shared.account
         
@@ -166,7 +186,11 @@ extension NextcloudKit {
         }
     }
     
-    @objc public func markAsReadComments(fileId: String, customUserAgent: String? = nil, addCustomHeaders: [String: String]? = nil, queue: DispatchQueue = .main, completionHandler: @escaping (_ account: String, _ error: NKError) -> Void) {
+    @objc public func markAsReadComments(fileId: String,
+                                         customUserAgent: String? = nil,
+                                         addCustomHeaders: [String: String]? = nil,
+                                         queue: DispatchQueue = .main,
+                                         completionHandler: @escaping (_ account: String, _ error: NKError) -> Void) {
         
         let account = NKCommon.shared.account
         

@@ -168,7 +168,11 @@ extension NextcloudKit {
     
     //MARK: -
     
-    @objc public func getPreview(url: URL, customUserAgent: String? = nil, addCustomHeaders: [String: String]? = nil, queue: DispatchQueue = .main, completionHandler: @escaping (_ account: String, _ data: Data?, _ error: NKError) -> Void) {
+    @objc public func getPreview(url: URL,
+                                 customUserAgent: String? = nil,
+                                 addCustomHeaders: [String: String]? = nil,
+                                 queue: DispatchQueue = .main, completionHandler:
+                                 @escaping (_ account: String, _ data: Data?, _ error: NKError) -> Void) {
 
         let account = NKCommon.shared.account
 
@@ -191,7 +195,18 @@ extension NextcloudKit {
         }
     }
     
-    @objc public func downloadPreview(fileNamePathOrFileId: String, fileNamePreviewLocalPath: String, widthPreview: Int, heightPreview: Int, fileNameIconLocalPath: String? = nil, sizeIcon: Int = 0, etag: String?, customUserAgent: String? = nil, addCustomHeaders: [String: String]? = nil, endpointTrashbin: Bool = false, useInternalEndpoint: Bool = true, queue: DispatchQueue = .main, completionHandler: @escaping (_ account: String, _ imagePreview: UIImage?, _ imageIcon: UIImage?, _ imageOriginal: UIImage?, _ etag: String?, _ error: NKError) -> Void) {
+    @objc public func downloadPreview(fileNamePathOrFileId: String,
+                                      fileNamePreviewLocalPath: String,
+                                      widthPreview: Int,
+                                      heightPreview: Int,
+                                      fileNameIconLocalPath: String? = nil,
+                                      sizeIcon: Int = 0, etag: String?,
+                                      customUserAgent: String? = nil,
+                                      addCustomHeaders: [String: String]? = nil,
+                                      endpointTrashbin: Bool = false,
+                                      useInternalEndpoint: Bool = true,
+                                      queue: DispatchQueue = .main,
+                                      completionHandler: @escaping (_ account: String, _ imagePreview: UIImage?, _ imageIcon: UIImage?, _ imageOriginal: UIImage?, _ etag: String?, _ error: NKError) -> Void) {
                
         let account = NKCommon.shared.account
         var endpoint = ""
@@ -261,7 +276,15 @@ extension NextcloudKit {
         }
     }
     
-    @objc public func downloadAvatar(user: String, fileNameLocalPath: String, sizeImage: Int, avatarSizeRounded: Int = 0, etag: String?, customUserAgent: String? = nil, addCustomHeaders: [String: String]? = nil, queue: DispatchQueue = .main, completionHandler: @escaping (_ account: String, _ imageAvatar: UIImage?, _ imageOriginal: UIImage?, _ etag: String?, _ error: NKError) -> Void) {
+    @objc public func downloadAvatar(user: String,
+                                     fileNameLocalPath: String,
+                                     sizeImage: Int,
+                                     avatarSizeRounded: Int = 0,
+                                     etag: String?,
+                                     customUserAgent: String? = nil,
+                                     addCustomHeaders: [String: String]? = nil,
+                                     queue: DispatchQueue = .main,
+                                     completionHandler: @escaping (_ account: String, _ imageAvatar: UIImage?, _ imageOriginal: UIImage?, _ etag: String?, _ error: NKError) -> Void) {
         
         let account = NKCommon.shared.account
         
@@ -338,7 +361,11 @@ extension NextcloudKit {
         }
     }
     
-    @objc public func downloadContent(serverUrl: String, customUserAgent: String? = nil, addCustomHeaders: [String: String]? = nil, queue: DispatchQueue = .main, completionHandler: @escaping (_ account: String, _ data: Data?, _ error: NKError) -> Void) {
+    @objc public func downloadContent(serverUrl: String,
+                                      customUserAgent: String? = nil,
+                                      addCustomHeaders: [String: String]? = nil,
+                                      queue: DispatchQueue = .main, completionHandler:
+                                      @escaping (_ account: String, _ data: Data?, _ error: NKError) -> Void) {
         
         let account = NKCommon.shared.account
 
@@ -367,7 +394,10 @@ extension NextcloudKit {
     
     //MARK: -
     
-    @objc public func getUserProfile(customUserAgent: String? = nil, addCustomHeaders: [String: String]? = nil, queue: DispatchQueue = .main, completionHandler: @escaping (_ account: String, _ userProfile: NKUserProfile?, _ error: NKError) -> Void) {
+    @objc public func getUserProfile(customUserAgent: String? = nil,
+                                     addCustomHeaders: [String: String]? = nil,
+                                     queue: DispatchQueue = .main,
+                                     completionHandler: @escaping (_ account: String, _ userProfile: NKUserProfile?, _ error: NKError) -> Void) {
     
         let account = NKCommon.shared.account
 
@@ -436,7 +466,10 @@ extension NextcloudKit {
         }
     }
 
-    @objc public func getCapabilities(customUserAgent: String? = nil, addCustomHeaders: [String: String]? = nil, queue: DispatchQueue = .main, completionHandler: @escaping (_ account: String, _ data: Data?, _ error: NKError) -> Void) {
+    @objc public func getCapabilities(customUserAgent: String? = nil,
+                                      addCustomHeaders: [String: String]? = nil,
+                                      queue: DispatchQueue = .main,
+                                      completionHandler: @escaping (_ account: String, _ data: Data?, _ error: NKError) -> Void) {
     
         let account = NKCommon.shared.account
 
@@ -467,7 +500,12 @@ extension NextcloudKit {
     
     //MARK: -
     
-    @objc public func getRemoteWipeStatus(serverUrl: String, token: String, customUserAgent: String? = nil, addCustomHeaders: [String: String]? = nil, queue: DispatchQueue = .main, completionHandler: @escaping (_ account: String, _ wipe: Bool, _ error: NKError) -> Void) {
+    @objc public func getRemoteWipeStatus(serverUrl: String,
+                                          token: String,
+                                          customUserAgent: String? = nil,
+                                          addCustomHeaders: [String: String]? = nil,
+                                          queue: DispatchQueue = .main,
+                                          completionHandler: @escaping (_ account: String, _ wipe: Bool, _ error: NKError) -> Void) {
         
         let account = NKCommon.shared.account
 
@@ -494,7 +532,12 @@ extension NextcloudKit {
         }
     }
     
-    @objc public func setRemoteWipeCompletition(serverUrl: String, token: String, customUserAgent: String? = nil, addCustomHeaders: [String: String]? = nil, queue: DispatchQueue = .main, completionHandler: @escaping (_ account: String, _ error: NKError) -> Void) {
+    @objc public func setRemoteWipeCompletition(serverUrl: String,
+                                                token: String,
+                                                customUserAgent: String? = nil,
+                                                addCustomHeaders: [String: String]? = nil,
+                                                queue: DispatchQueue = .main,
+                                                completionHandler: @escaping (_ account: String, _ error: NKError) -> Void) {
         
         let account = NKCommon.shared.account
 
@@ -521,7 +564,15 @@ extension NextcloudKit {
     
     //MARK: -
     
-    @objc public func getActivity(since: Int, limit: Int, objectId: String?, objectType: String?, previews: Bool, customUserAgent: String? = nil, addCustomHeaders: [String: String]? = nil, queue: DispatchQueue = .main, completionHandler: @escaping (_ account: String, _ activities: [NKActivity], _ activityFirstKnown: Int, _ activityLastGiven: Int, _ error: NKError) -> Void) {
+    @objc public func getActivity(since: Int,
+                                  limit: Int,
+                                  objectId: String?,
+                                  objectType: String?,
+                                  previews: Bool,
+                                  customUserAgent: String? = nil,
+                                  addCustomHeaders: [String: String]? = nil,
+                                  queue: DispatchQueue = .main,
+                                  completionHandler: @escaping (_ account: String, _ activities: [NKActivity], _ activityFirstKnown: Int, _ activityLastGiven: Int, _ error: NKError) -> Void) {
     
         let account = NKCommon.shared.account
 
@@ -616,7 +667,10 @@ extension NextcloudKit {
     
     //MARK: -
     
-    @objc public func getNotifications(customUserAgent: String? = nil, addCustomHeaders: [String: String]? = nil, queue: DispatchQueue = .main, completionHandler: @escaping (_ account: String, _ notifications: [NKNotifications]?, _ error: NKError) -> Void) {
+    @objc public func getNotifications(customUserAgent: String? = nil,
+                                       addCustomHeaders: [String: String]? = nil,
+                                       queue: DispatchQueue = .main,
+                                       completionHandler: @escaping (_ account: String, _ notifications: [NKNotifications]?, _ error: NKError) -> Void) {
     
         let account = NKCommon.shared.account
 
@@ -689,7 +743,13 @@ extension NextcloudKit {
         }
     }
     
-    @objc public func setNotification(serverUrl: String?, idNotification: Int, method: String, customUserAgent: String? = nil, addCustomHeaders: [String: String]? = nil, queue: DispatchQueue = .main, completionHandler: @escaping (_ account: String, _ error: NKError) -> Void) {
+    @objc public func setNotification(serverUrl: String?,
+                                      idNotification: Int,
+                                      method: String,
+                                      customUserAgent: String? = nil,
+                                      addCustomHeaders: [String: String]? = nil,
+                                      queue: DispatchQueue = .main,
+                                      completionHandler: @escaping (_ account: String, _ error: NKError) -> Void) {
                     
         let account = NKCommon.shared.account
 
@@ -724,7 +784,11 @@ extension NextcloudKit {
     
     //MARK: -
     
-    @objc public func getDirectDownload(fileId: String, customUserAgent: String? = nil, addCustomHeaders: [String: String]? = nil, queue: DispatchQueue = .main, completionHandler: @escaping (_ account: String, _ url: String?, _ error: NKError) -> Void) {
+    @objc public func getDirectDownload(fileId: String,
+                                        customUserAgent: String? = nil,
+                                        addCustomHeaders: [String: String]? = nil,
+                                        queue: DispatchQueue = .main, completionHandler:
+                                        @escaping (_ account: String, _ url: String?, _ error: NKError) -> Void) {
         
         let account = NKCommon.shared.account
 
