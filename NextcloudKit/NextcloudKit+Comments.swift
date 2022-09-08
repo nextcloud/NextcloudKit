@@ -35,7 +35,6 @@ extension NextcloudKit {
         let serverUrlEndpoint = NKCommon.shared.urlBase + "/" + NKCommon.shared.dav + "/comments/files/" + fileId
             
         guard let url = serverUrlEndpoint.encodedToUrl else {
-
             return options.queue.async { completion(account, nil, .urlError) }
         }
         
@@ -89,8 +88,7 @@ extension NextcloudKit {
             let parameters = "{\"actorType\":\"users\",\"verb\":\"comment\",\"message\":\"" + message + "\"}"
             urlRequest.httpBody = parameters.data(using: .utf8)
         } catch {
-            options.queue.async { completion(account, NKError(error: error)) }
-            return
+            return options.queue.async { completion(account, NKError(error: error)) }
         }
         
         sessionManager.request(urlRequest).validate(statusCode: 200..<300).response(queue: NKCommon.shared.backgroundQueue) { (response) in
@@ -129,8 +127,7 @@ extension NextcloudKit {
             let parameters = String(format: NKDataFileXML().requestBodyCommentsUpdate, message)
             urlRequest.httpBody = parameters.data(using: .utf8)
         } catch {
-            options.queue.async { completion(account, NKError(error: error)) }
-            return
+            return options.queue.async { completion(account, NKError(error: error)) }
         }
         
         sessionManager.request(urlRequest).validate(statusCode: 200..<300).response(queue: NKCommon.shared.backgroundQueue) { (response) in
@@ -195,8 +192,7 @@ extension NextcloudKit {
             let parameters = String(format: NKDataFileXML().requestBodyCommentsMarkAsRead)
             urlRequest.httpBody = parameters.data(using: .utf8)
         } catch {
-            options.queue.async { completion(account, NKError(error: error)) }
-            return
+            return options.queue.async { completion(account, NKError(error: error)) }
         }
         
         sessionManager.request(urlRequest).validate(statusCode: 200..<300).response(queue: NKCommon.shared.backgroundQueue) { (response) in
