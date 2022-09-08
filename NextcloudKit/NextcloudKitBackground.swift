@@ -31,7 +31,10 @@ import Foundation
         
     //MARK: - Download
     
-    @objc public func download(serverUrlFileName: Any, fileNameLocalPath: String, description: String?, session: URLSession) -> URLSessionDownloadTask? {
+    @objc public func download(serverUrlFileName: Any,
+                               fileNameLocalPath: String,
+                               description: String?,
+                               session: URLSession) -> URLSessionDownloadTask? {
         
         var url: URL?
         
@@ -70,7 +73,12 @@ import Foundation
     
     //MARK: - Upload
     
-    @objc public func upload(serverUrlFileName: Any, fileNameLocalPath: String, dateCreationFile: Date?, dateModificationFile: Date?, description: String?, session: URLSession) -> URLSessionUploadTask? {
+    @objc public func upload(serverUrlFileName: Any,
+                             fileNameLocalPath: String,
+                             dateCreationFile: Date?,
+                             dateModificationFile: Date?,
+                             description: String?,
+                             session: URLSession) -> URLSessionUploadTask? {
         
         var url: URL?
         

@@ -430,6 +430,7 @@ import MobileCoreServices
     }
     
     //MARK: - Common
+    
     func getStandardHeaders(options: NKRequestOptions) -> HTTPHeaders {
         return getStandardHeaders(user: user, password: password, appendHeaders: options.customHeader, customUserAgent: options.customUserAgent, contentType: options.contentType, e2eToken: options.e2eToken)
      }
