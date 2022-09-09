@@ -156,29 +156,27 @@ import SwiftyJSON
 
 // MARK: - Dashboard
 
-@objc public class NCCDashboardItemsResult: NSObject {
-    
+@objc public class NCCDashboardApplication: NSObject {
     @objc public var application: String?
-    @objc public var dashboardEntries: [NCCDashboardItem]?
+    @objc public var items: [NCCDashboardItem]?
 
     init?(application: String, data: JSON) {
         self.application = application
-        self.dashboardEntries = NCCDashboardItem.factory(data: data)
+        self.items = NCCDashboardItem.factory(data: data)
     }
 
-    static func factory(data: JSON) -> [NCCDashboardItemsResult] {
-        var dashboardResults = [NCCDashboardItemsResult]()
+    static func factory(data: JSON) -> [NCCDashboardApplication] {
+        var results = [NCCDashboardApplication]()
         for (application, data):(String, JSON) in data {
-            if let result = NCCDashboardItemsResult.init(application: application, data: data) {
-                dashboardResults.append(result)
+            if let result = NCCDashboardApplication.init(application: application, data: data) {
+                results.append(result)
             }
         }
-        return dashboardResults
+        return results
     }
 }
 
 @objc public class NCCDashboardItem: NSObject {
-    
     @objc public let title: String?
     @objc public let subtitle: String?
     @objc public let link: String?
@@ -211,14 +209,14 @@ import SwiftyJSON
         self.items = NCCDashboardWidgetItem.factory(data: data)
     }
 
-    static func factory(data: JSON) -> [NCCDashboardWidgetItem] {
-        var widgets = [NCCDashboardWidgetItem]()
-        for (_, data):(String, JSON) in data {
-            if let result = NCCDashboardWidgetItem(json: data) {
-                widgets.append(result)
+    static func factory(data: JSON) -> [NCCDashboardWidgets] {
+        var results = [NCCDashboardWidgets]()
+        for (application, data):(String, JSON) in data {
+            if let result = NCCDashboardWidgets(application: application, data: data) {
+                results.append(result)
             }
         }
-        return widgets
+        return results
     }
     
 }

@@ -29,7 +29,7 @@ extension NextcloudKit {
 
     public func getDashboardWidgets(options: NKRequestOptions = NKRequestOptions(),
                                     request: @escaping (DataRequest?) -> () = { _ in },
-                                    completion: @escaping (_ account: String, _ dashboardResults: [NCCDashboardItemsResult]?, _ json: JSON?, _ error: NKError) -> Void) {
+                                    completion: @escaping (_ account: String, _ dashboardResults: [NCCDashboardWidgets]?, _ json: JSON?, _ error: NKError) -> Void) {
 
         let account = NKCommon.shared.account
 
@@ -57,7 +57,8 @@ extension NextcloudKit {
                 let data = json["ocs"]["data"]
                 let statusCode = json["ocs"]["meta"]["statuscode"].int ?? NKError.internalError
                 if 200..<300 ~= statusCode {
-                    print("")
+                    let results = NCCDashboardWidgets.factory(data: data)
+                    options.queue.async { completion(account, results, data, .success) }
                 } else {
                     options.queue.async { completion(account, nil, nil, NKError(rootJson: json, fallbackStatusCode: response.response?.statusCode)) }
                 }
@@ -69,10 +70,10 @@ extension NextcloudKit {
         options.queue.async { request(dashboardRequest) }
     }
     
-    public func getDashboardWidgetsItems(_ items: String,
+    public func getDashboardWidgetsApplication(_ items: String,
                              options: NKRequestOptions = NKRequestOptions(),
                              request: @escaping (DataRequest?) -> () = { _ in },
-                             completion: @escaping (_ account: String, _ dashboardResults: [NCCDashboardItemsResult]?, _ json: JSON?, _ error: NKError) -> Void) {
+                             completion: @escaping (_ account: String, _ results: [NCCDashboardApplication]?, _ json: JSON?, _ error: NKError) -> Void) {
 
         let account = NKCommon.shared.account
 
@@ -100,8 +101,8 @@ extension NextcloudKit {
                 let data = json["ocs"]["data"]
                 let statusCode = json["ocs"]["meta"]["statuscode"].int ?? NKError.internalError
                 if 200..<300 ~= statusCode {
-                    let dashboardItemsResult = NCCDashboardItemsResult.factory(data: data)
-                    options.queue.async { completion(account, dashboardItemsResult, data, .success) }
+                    let results = NCCDashboardApplication.factory(data: data)
+                    options.queue.async { completion(account, results, data, .success) }
                 } else {
                     options.queue.async { completion(account, nil, nil, NKError(rootJson: json, fallbackStatusCode: response.response?.statusCode)) }
                 }
