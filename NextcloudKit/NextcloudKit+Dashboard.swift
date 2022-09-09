@@ -27,7 +27,7 @@ import SwiftyJSON
 
 extension NextcloudKit {
 
-    public func getDashboard(parameters: [String: Any]? = nil,
+    public func getDashboard(widgets: String,
                              options: NKRequestOptions = NKRequestOptions(),
                              request: @escaping (DataRequest?) -> () = { _ in },
                              completion: @escaping (_ account: String, _ dashboardResults: [NCCDashboardResult]?, _ json: JSON?, _ error: NKError) -> Void) {
@@ -39,7 +39,7 @@ extension NextcloudKit {
         if let endpoint = options.endpoint {
             url = URL(string: endpoint)
         } else {
-            let endpoint = "/ocs/v2.php/apps/dashboard/api/v1/widget-items"
+            let endpoint = "/ocs/v2.php/apps/dashboard/api/v1/widget-items?widgets[]=\(widgets)"
             url = NKCommon.shared.createStandardUrl(serverUrl: NKCommon.shared.urlBase, endpoint: endpoint)
         }
 
@@ -49,7 +49,7 @@ extension NextcloudKit {
 
         let headers = NKCommon.shared.getStandardHeaders(options: options)
         
-        let dashboardRequest = sessionManager.request(url, method: .get, parameters: parameters, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).responseData(queue: NKCommon.shared.backgroundQueue) { (response) in
+        let dashboardRequest = sessionManager.request(url, method: .get, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).responseData(queue: NKCommon.shared.backgroundQueue) { (response) in
             debugPrint(response)
 
             switch response.result {
