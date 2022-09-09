@@ -29,7 +29,7 @@ extension NextcloudKit {
 
     public func getDashboardWidget(options: NKRequestOptions = NKRequestOptions(),
                                     request: @escaping (DataRequest?) -> () = { _ in },
-                                    completion: @escaping (_ account: String, _ dashboardResults: [NCCDashboardWidget]?, _ json: JSON?, _ error: NKError) -> Void) {
+                                    completion: @escaping (_ account: String, _ results: [NCCDashboardWidget]?, _ error: NKError) -> Void) {
 
         let account = NKCommon.shared.account
 
@@ -43,7 +43,7 @@ extension NextcloudKit {
         }
 
         guard let url = url else {
-            return options.queue.async { completion(account, nil, nil, .urlError) }
+            return options.queue.async { completion(account, nil, .urlError) }
         }
 
         let headers = NKCommon.shared.getStandardHeaders(options: options)
@@ -58,22 +58,22 @@ extension NextcloudKit {
                 let statusCode = json["ocs"]["meta"]["statuscode"].int ?? NKError.internalError
                 if 200..<300 ~= statusCode {
                     let results = NCCDashboardWidget.factory(data: data)
-                    options.queue.async { completion(account, results, data, .success) }
+                    options.queue.async { completion(account, results, .success) }
                 } else {
-                    options.queue.async { completion(account, nil, nil, NKError(rootJson: json, fallbackStatusCode: response.response?.statusCode)) }
+                    options.queue.async { completion(account, nil, NKError(rootJson: json, fallbackStatusCode: response.response?.statusCode)) }
                 }
             case .failure(let error):
                 let error = NKError(error: error, afResponse: response)
-                options.queue.async { completion(account, nil, nil, error) }
+                options.queue.async { completion(account, nil, error) }
             }
         }
         options.queue.async { request(dashboardRequest) }
     }
     
     public func getDashboardWidgetsApplication(_ items: String,
-                             options: NKRequestOptions = NKRequestOptions(),
-                             request: @escaping (DataRequest?) -> () = { _ in },
-                             completion: @escaping (_ account: String, _ results: [NCCDashboardApplication]?, _ json: JSON?, _ error: NKError) -> Void) {
+                                               options: NKRequestOptions = NKRequestOptions(),
+                                               request: @escaping (DataRequest?) -> () = { _ in },
+                                               completion: @escaping (_ account: String, _ results: [NCCDashboardApplication]?, _ error: NKError) -> Void) {
 
         let account = NKCommon.shared.account
 
@@ -87,7 +87,7 @@ extension NextcloudKit {
         }
 
         guard let url = url else {
-            return options.queue.async { completion(account, nil, nil, .urlError) }
+            return options.queue.async { completion(account, nil, .urlError) }
         }
 
         let headers = NKCommon.shared.getStandardHeaders(options: options)
@@ -102,13 +102,13 @@ extension NextcloudKit {
                 let statusCode = json["ocs"]["meta"]["statuscode"].int ?? NKError.internalError
                 if 200..<300 ~= statusCode {
                     let results = NCCDashboardApplication.factory(data: data)
-                    options.queue.async { completion(account, results, data, .success) }
+                    options.queue.async { completion(account, results, .success) }
                 } else {
-                    options.queue.async { completion(account, nil, nil, NKError(rootJson: json, fallbackStatusCode: response.response?.statusCode)) }
+                    options.queue.async { completion(account, nil, NKError(rootJson: json, fallbackStatusCode: response.response?.statusCode)) }
                 }
             case .failure(let error):
                 let error = NKError(error: error, afResponse: response)
-                options.queue.async { completion(account, nil, nil, error) }
+                options.queue.async { completion(account, nil, error) }
             }
         }
         options.queue.async { request(dashboardRequest) }

@@ -154,7 +154,7 @@ import SwiftyJSON
     }
 }
 
-// MARK: - Dashboard
+// MARK: - Dashboard / Widget
 
 @objc public class NCCDashboardApplication: NSObject {
     @objc public var application: String?
@@ -196,8 +196,6 @@ import SwiftyJSON
         return allResults.compactMap(NCCDashboardItem.init)
     }
 }
-
-// MARK: - ccccccccccc
 
 @objc public class NCCDashboardWidget: NSObject {
     
