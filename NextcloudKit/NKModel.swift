@@ -71,6 +71,7 @@ import SwiftyJSON
 // MARK: - Unified Search
 
 @objc public class NKSearchResult: NSObject {
+    
     @objc public let id: String
     @objc public let name: String
     @objc public let isPaginated: Bool
@@ -91,6 +92,7 @@ import SwiftyJSON
 }
 
 @objc public class NKSearchEntry: NSObject {
+    
     @objc public let thumbnailURL: String
     @objc public let title, subline: String
     @objc public let resourceURL: String
@@ -132,6 +134,7 @@ import SwiftyJSON
 }
 
 @objc public class NKSearchProvider: NSObject {
+    
     init?(json: JSON) {
         guard let id = json["id"].string,
               let name = json["name"].string,
@@ -153,19 +156,20 @@ import SwiftyJSON
 
 // MARK: - Dashboard
 
-@objc public class NCCDashboardResult: NSObject {
+@objc public class NCCDashboardItemsResult: NSObject {
+    
     @objc public var application: String?
-    @objc public var dashboardEntries: [NCCDashboardEntry]?
+    @objc public var dashboardEntries: [NCCDashboardItem]?
 
     init?(application: String, data: JSON) {
         self.application = application
-        self.dashboardEntries = NCCDashboardEntry.factory(data: data)
+        self.dashboardEntries = NCCDashboardItem.factory(data: data)
     }
 
-    static func factory(data: JSON) -> [NCCDashboardResult] {
-        var dashboardResults = [NCCDashboardResult]()
+    static func factory(data: JSON) -> [NCCDashboardItemsResult] {
+        var dashboardResults = [NCCDashboardItemsResult]()
         for (application, data):(String, JSON) in data {
-            if let result = NCCDashboardResult.init(application: application, data: data) {
+            if let result = NCCDashboardItemsResult.init(application: application, data: data) {
                 dashboardResults.append(result)
             }
         }
@@ -173,7 +177,8 @@ import SwiftyJSON
     }
 }
 
-@objc public class NCCDashboardEntry: NSObject {
+@objc public class NCCDashboardItem: NSObject {
+    
     @objc public let title: String?
     @objc public let subtitle: String?
     @objc public let link: String?
@@ -188,9 +193,82 @@ import SwiftyJSON
         self.sinceId = json["sinceId"].int ?? 0
     }
 
-    static func factory(data: JSON) -> [NCCDashboardEntry]? {
+    static func factory(data: JSON) -> [NCCDashboardItem]? {
         guard let allResults = data.array else { return nil }
-        return allResults.compactMap(NCCDashboardEntry.init)
+        return allResults.compactMap(NCCDashboardItem.init)
+    }
+}
+
+// MARK: - ccccccccccc
+
+@objc public class NCCDashboardWidgets: NSObject {
+    
+    @objc public var application: String?
+    @objc public var items: [NCCDashboardWidgetItem]?
+
+    init?(application: String, data: JSON) {
+        self.application = application
+        self.items = NCCDashboardWidgetItem.factory(data: data)
+    }
+
+    static func factory(data: JSON) -> [NCCDashboardWidgetItem] {
+        var widgets = [NCCDashboardWidgetItem]()
+        for (_, data):(String, JSON) in data {
+            if let result = NCCDashboardWidgetItem(json: data) {
+                widgets.append(result)
+            }
+        }
+        return widgets
+    }
+    
+}
+
+@objc public class NCCDashboardWidgetItem: NSObject {
+    
+    @objc public let id, title: String
+    @objc public let order: Int
+    @objc public let iconClass, iconUrl, widgetUrl: String?
+    @objc public var buttons: [NCCDashboardWidgetItemButton]?
+
+    init?(json: JSON) {
+        guard let id = json["id"].string,
+              let title = json["title"].string
+        else { return nil }
+        self.id = id
+        self.title = title
+        self.order = json["order"].int ?? 0
+        self.iconClass = json["icon_class"].string
+        self.iconUrl = json["icon_url"].string
+        self.widgetUrl = json["icon_url"].string
+        if let buttonsData = json["buttons"].array {
+            print("")
+            //self.buttons = NCCDashboardWidgetItemButton.factory(data: buttonsData)
+        }
+    }
+
+    static func factory(data: JSON) -> [NCCDashboardWidgetItem]? {
+        guard let allResults = data.array else { return nil }
+        return allResults.compactMap(NCCDashboardWidgetItem.init)
+    }
+}
+
+@objc public class NCCDashboardWidgetItemButton: NSObject {
+    
+    @objc public let type, text, link: String
+    
+    init?(json: JSON) {
+        guard let type = json["type"].string,
+              let text = json["text"].string,
+              let link = json["link"].string
+        else { return nil }
+        self.type = type
+        self.text = text
+        self.link = link
+    }
+
+    static func factory(data: JSON) -> [NCCDashboardWidgetItemButton]? {
+        guard let allResults = data.array else { return nil }
+        return allResults.compactMap(NCCDashboardWidgetItemButton.init)
     }
 }
 

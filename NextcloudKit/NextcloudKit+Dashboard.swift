@@ -29,7 +29,7 @@ extension NextcloudKit {
 
     public func getDashboardWidgets(options: NKRequestOptions = NKRequestOptions(),
                                     request: @escaping (DataRequest?) -> () = { _ in },
-                                    completion: @escaping (_ account: String, _ dashboardResults: [NCCDashboardResult]?, _ json: JSON?, _ error: NKError) -> Void) {
+                                    completion: @escaping (_ account: String, _ dashboardResults: [NCCDashboardItemsResult]?, _ json: JSON?, _ error: NKError) -> Void) {
 
         let account = NKCommon.shared.account
 
@@ -72,7 +72,7 @@ extension NextcloudKit {
     public func getDashboardWidgetsItems(_ items: String,
                              options: NKRequestOptions = NKRequestOptions(),
                              request: @escaping (DataRequest?) -> () = { _ in },
-                             completion: @escaping (_ account: String, _ dashboardResults: [NCCDashboardResult]?, _ json: JSON?, _ error: NKError) -> Void) {
+                             completion: @escaping (_ account: String, _ dashboardResults: [NCCDashboardItemsResult]?, _ json: JSON?, _ error: NKError) -> Void) {
 
         let account = NKCommon.shared.account
 
@@ -100,8 +100,8 @@ extension NextcloudKit {
                 let data = json["ocs"]["data"]
                 let statusCode = json["ocs"]["meta"]["statuscode"].int ?? NKError.internalError
                 if 200..<300 ~= statusCode {
-                    let dashboardResults = NCCDashboardResult.factory(data: data)
-                    options.queue.async { completion(account, dashboardResults, data, .success) }
+                    let dashboardItemsResult = NCCDashboardItemsResult.factory(data: data)
+                    options.queue.async { completion(account, dashboardItemsResult, data, .success) }
                 } else {
                     options.queue.async { completion(account, nil, nil, NKError(rootJson: json, fallbackStatusCode: response.response?.statusCode)) }
                 }
