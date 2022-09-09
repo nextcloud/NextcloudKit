@@ -27,7 +27,7 @@ import SwiftyJSON
 
 extension NextcloudKit {
 
-    public func getDashboard(filter: [String]? = nil,
+    public func getDashboard(parameters: [String: Any]? = nil,
                              options: NKRequestOptions = NKRequestOptions(),
                              request: @escaping (DataRequest?) -> () = { _ in },
                              completion: @escaping (_ account: String, _ dashboardResults: [NCCDashboardResult]?, _ json: JSON?, _ error: NKError) -> Void) {
@@ -48,8 +48,8 @@ extension NextcloudKit {
         }
 
         let headers = NKCommon.shared.getStandardHeaders(options: options)
-
-        let dashboardRequest = sessionManager.request(url, method: .get, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).responseData(queue: NKCommon.shared.backgroundQueue) { (response) in
+        
+        let dashboardRequest = sessionManager.request(url, method: .get, parameters: parameters, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).responseData(queue: NKCommon.shared.backgroundQueue) { (response) in
             debugPrint(response)
 
             switch response.result {
