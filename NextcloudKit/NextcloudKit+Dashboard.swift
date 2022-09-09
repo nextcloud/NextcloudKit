@@ -27,9 +27,9 @@ import SwiftyJSON
 
 extension NextcloudKit {
 
-    public func getDashboardWidgets(options: NKRequestOptions = NKRequestOptions(),
+    public func getDashboardWidget(options: NKRequestOptions = NKRequestOptions(),
                                     request: @escaping (DataRequest?) -> () = { _ in },
-                                    completion: @escaping (_ account: String, _ dashboardResults: [NCCDashboardWidgets]?, _ json: JSON?, _ error: NKError) -> Void) {
+                                    completion: @escaping (_ account: String, _ dashboardResults: [NCCDashboardWidget]?, _ json: JSON?, _ error: NKError) -> Void) {
 
         let account = NKCommon.shared.account
 
@@ -57,7 +57,7 @@ extension NextcloudKit {
                 let data = json["ocs"]["data"]
                 let statusCode = json["ocs"]["meta"]["statuscode"].int ?? NKError.internalError
                 if 200..<300 ~= statusCode {
-                    let results = NCCDashboardWidgets.factory(data: data)
+                    let results = NCCDashboardWidget.factory(data: data)
                     options.queue.async { completion(account, results, data, .success) }
                 } else {
                     options.queue.async { completion(account, nil, nil, NKError(rootJson: json, fallbackStatusCode: response.response?.statusCode)) }

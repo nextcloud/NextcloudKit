@@ -199,77 +199,47 @@ import SwiftyJSON
 
 // MARK: - ccccccccccc
 
-@objc public class NCCDashboardWidgets: NSObject {
+@objc public class NCCDashboardWidget: NSObject {
     
     @objc public var application: String?
-    @objc public var items: [NCCDashboardWidgetItem]?
+    @objc public var items: [NCCDashboardItem]?
 
     init?(application: String, data: JSON) {
         self.application = application
-        self.items = NCCDashboardWidgetItem.factory(data: data)
+        self.items = NCCDashboardItem.factory(data: data)
     }
 
-    static func factory(data: JSON) -> [NCCDashboardWidgets] {
-        var results = [NCCDashboardWidgets]()
+    static func factory(data: JSON) -> [NCCDashboardWidget] {
+        var results = [NCCDashboardWidget]()
         for (application, data):(String, JSON) in data {
-            if let result = NCCDashboardWidgets(application: application, data: data) {
+            if let result = NCCDashboardWidget(application: application, data: data) {
                 results.append(result)
             }
         }
         return results
     }
-    
 }
 
 @objc public class NCCDashboardWidgetItem: NSObject {
-    
-    @objc public let id, title: String
-    @objc public let order: Int
-    @objc public let iconClass, iconUrl, widgetUrl: String?
-    @objc public var buttons: [NCCDashboardWidgetItemButton]?
+    @objc public let title: String?
+    @objc public let subtitle: String?
+    @objc public let link: String?
+    @objc public let iconUrl: String?
+    @objc public let sinceId: Int
 
     init?(json: JSON) {
-        guard let id = json["id"].string,
-              let title = json["title"].string
-        else { return nil }
-        self.id = id
-        self.title = title
-        self.order = json["order"].int ?? 0
-        self.iconClass = json["icon_class"].string
-        self.iconUrl = json["icon_url"].string
-        self.widgetUrl = json["icon_url"].string
-        if let buttonsData = json["buttons"].array {
-            print("")
-            //self.buttons = NCCDashboardWidgetItemButton.factory(data: buttonsData)
-        }
+        self.title = json["title"].string
+        self.subtitle = json["subtitle"].string
+        self.link = json["link"].string
+        self.iconUrl = json["iconUrl"].string
+        self.sinceId = json["sinceId"].int ?? 0
     }
 
     static func factory(data: JSON) -> [NCCDashboardWidgetItem]? {
-        guard let allResults = data.array else { return nil }
-        return allResults.compactMap(NCCDashboardWidgetItem.init)
+        guard let results = data.array else { return nil }
+        return results.compactMap(NCCDashboardWidgetItem.init)
     }
 }
-
-@objc public class NCCDashboardWidgetItemButton: NSObject {
-    
-    @objc public let type, text, link: String
-    
-    init?(json: JSON) {
-        guard let type = json["type"].string,
-              let text = json["text"].string,
-              let link = json["link"].string
-        else { return nil }
-        self.type = type
-        self.text = text
-        self.link = link
-    }
-
-    static func factory(data: JSON) -> [NCCDashboardWidgetItemButton]? {
-        guard let allResults = data.array else { return nil }
-        return allResults.compactMap(NCCDashboardWidgetItemButton.init)
-    }
-}
-
 // MARK: -
 
 
