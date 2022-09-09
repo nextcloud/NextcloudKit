@@ -225,6 +225,7 @@ import SwiftyJSON
     @objc public let id, title: String
     @objc public let order: Int
     @objc public let iconClass, iconUrl, widgetUrl: String?
+    @objc public let button: [NCCDashboardWidgetButton]
 
     init?(json: JSON) {
         guard let id = json["id"].string,
@@ -237,10 +238,32 @@ import SwiftyJSON
         self.iconClass = json["icon_class"].string
         self.iconUrl = json["icon_url"].string
         self.widgetUrl = json["widget_url"].string
+        self.button = NCCDashboardWidgetButton.factory(data: json)
     }
 
     static func factory(data: JSON) -> NCCDashboardWidgetItem? {
         return NCCDashboardWidgetItem.init(json: data)
+    }
+}
+
+@objc public class NCCDashboardWidgetButton: NSObject {
+    
+    @objc public let type, text, link: String
+
+    init?(json: JSON) {
+        guard let type = json["type"].string,
+              let text = json["text"].string,
+              let link = json["link"].string
+        else { return nil }
+        self.type = type
+        self.text = text
+        self.link = link
+    }
+
+    static func factory(data: JSON) -> [NCCDashboardWidgetButton] {
+        var results = [NCCDashboardWidgetButton]()
+        let buttons = data["buttons"].array
+        return results
     }
 }
 // MARK: -
