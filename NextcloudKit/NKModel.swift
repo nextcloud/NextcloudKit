@@ -201,12 +201,12 @@ import SwiftyJSON
 
 @objc public class NCCDashboardWidget: NSObject {
     
-    @objc public var application: String?
-    @objc public var items: [NCCDashboardItem]?
+    @objc public var application: String
+    @objc public var item: NCCDashboardWidgetItem?
 
     init?(application: String, data: JSON) {
         self.application = application
-        self.items = NCCDashboardItem.factory(data: data)
+        self.item = NCCDashboardWidgetItem.factory(data: data)
     }
 
     static func factory(data: JSON) -> [NCCDashboardWidget] {
@@ -221,23 +221,26 @@ import SwiftyJSON
 }
 
 @objc public class NCCDashboardWidgetItem: NSObject {
-    @objc public let title: String?
-    @objc public let subtitle: String?
-    @objc public let link: String?
-    @objc public let iconUrl: String?
-    @objc public let sinceId: Int
+    
+    @objc public let id, title: String
+    @objc public let order: Int
+    @objc public let iconClass, iconUrl, widgetUrl: String?
 
     init?(json: JSON) {
-        self.title = json["title"].string
-        self.subtitle = json["subtitle"].string
-        self.link = json["link"].string
-        self.iconUrl = json["iconUrl"].string
-        self.sinceId = json["sinceId"].int ?? 0
+        guard let id = json["id"].string,
+              let title = json["title"].string,
+              let order = json["order"].int
+        else { return nil }
+        self.id = id
+        self.title = title
+        self.order = order
+        self.iconClass = json["icon_class"].string
+        self.iconUrl = json["icon_url"].string
+        self.widgetUrl = json["widget_url"].string
     }
 
-    static func factory(data: JSON) -> [NCCDashboardWidgetItem]? {
-        guard let results = data.array else { return nil }
-        return results.compactMap(NCCDashboardWidgetItem.init)
+    static func factory(data: JSON) -> NCCDashboardWidgetItem? {
+        return NCCDashboardWidgetItem.init(json: data)
     }
 }
 // MARK: -
