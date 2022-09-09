@@ -157,6 +157,7 @@ import SwiftyJSON
 // MARK: - Dashboard / Widget
 
 @objc public class NCCDashboardApplication: NSObject {
+    
     @objc public var application: String?
     @objc public var items: [NCCDashboardItem]?
 
@@ -177,6 +178,7 @@ import SwiftyJSON
 }
 
 @objc public class NCCDashboardItem: NSObject {
+    
     @objc public let title: String?
     @objc public let subtitle: String?
     @objc public let link: String?
@@ -199,13 +201,12 @@ import SwiftyJSON
 
 @objc public class NCCDashboardWidget: NSObject {
     
-    @objc public var application, id, title: String
+    @objc public var id, title: String
     @objc public let order: Int
     @objc public let iconClass, iconUrl, widgetUrl: String?
     @objc public let button: [NCCDashboardWidgetButton]?
 
     init?(application: String, data: JSON) {
-        self.application = application
         guard let item = NCCDashboardWidgetItem(data: data) else { return nil }
         self.id = item.id
         self.title = item.title
@@ -268,8 +269,8 @@ import SwiftyJSON
         return allProvider.compactMap(NCCDashboardWidgetButton.init)
     }
 }
-// MARK: -
 
+// MARK: -
 
 @objc public class NKActivity: NSObject {
     
