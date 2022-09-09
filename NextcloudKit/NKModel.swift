@@ -225,7 +225,7 @@ import SwiftyJSON
     @objc public let id, title: String
     @objc public let order: Int
     @objc public let iconClass, iconUrl, widgetUrl: String?
-    @objc public let button: [NCCDashboardWidgetButton]
+    @objc public let button: [NCCDashboardWidgetButton]?
 
     init?(json: JSON) {
         guard let id = json["id"].string,
@@ -238,7 +238,7 @@ import SwiftyJSON
         self.iconClass = json["icon_class"].string
         self.iconUrl = json["icon_url"].string
         self.widgetUrl = json["widget_url"].string
-        self.button = NCCDashboardWidgetButton.factory(data: json)
+        self.button = NCCDashboardWidgetButton.factory(data: json["buttons"])
     }
 
     static func factory(data: JSON) -> NCCDashboardWidgetItem? {
@@ -260,10 +260,9 @@ import SwiftyJSON
         self.link = link
     }
 
-    static func factory(data: JSON) -> [NCCDashboardWidgetButton] {
-        var results = [NCCDashboardWidgetButton]()
-        let buttons = data["buttons"].array
-        return results
+    static func factory(data: JSON) -> [NCCDashboardWidgetButton]? {
+        guard let allProvider = data.array else { return nil }
+        return allProvider.compactMap(NCCDashboardWidgetButton.init)
     }
 }
 // MARK: -
