@@ -235,9 +235,9 @@ extension NextcloudKit {
                 let error = NKError(error: error, afResponse: response)
                 options.queue.async { completion(account, files, nil, error) }
             case .success( _):
-                if let data = response.data {
-                    files = NKDataFileXML().convertDataFile(data: data, user: NKCommon.shared.user, userId: NKCommon.shared.userId, showHiddenFiles: showHiddenFiles)
-                    options.queue.async { completion(account, files, data, .success) }
+                if let xmlData = response.data {
+                    files = NKDataFileXML().convertDataFile(xmlData: xmlData, user: NKCommon.shared.user, userId: NKCommon.shared.userId, showHiddenFiles: showHiddenFiles)
+                    options.queue.async { completion(account, files, xmlData, .success) }
                 } else {
                     options.queue.async { completion(account, files, nil, .xmlError) }
                 }
@@ -363,8 +363,8 @@ extension NextcloudKit {
                 let error = NKError(error: error, afResponse: response)
                 options.queue.async { completion(account, files, error) }
             case .success( _):
-                if let data = response.data {
-                    files = NKDataFileXML().convertDataFile(data: data, user: NKCommon.shared.user, userId: NKCommon.shared.userId, showHiddenFiles: showHiddenFiles)
+                if let xmlData = response.data {
+                    files = NKDataFileXML().convertDataFile(xmlData: xmlData, user: NKCommon.shared.user, userId: NKCommon.shared.userId, showHiddenFiles: showHiddenFiles)
                     options.queue.async { completion(account, files, .success) }
                 } else {
                     options.queue.async { completion(account, files, .xmlError) }
@@ -448,8 +448,8 @@ extension NextcloudKit {
                 let error = NKError(error: error, afResponse: response)
                 options.queue.async { completion(account, files, error) }
             case .success( _):
-                if let data = response.data {
-                    files = NKDataFileXML().convertDataFile(data: data, user: NKCommon.shared.user, userId: NKCommon.shared.userId, showHiddenFiles: showHiddenFiles)
+                if let xmlData = response.data {
+                    files = NKDataFileXML().convertDataFile(xmlData: xmlData, user: NKCommon.shared.user, userId: NKCommon.shared.userId, showHiddenFiles: showHiddenFiles)
                     options.queue.async { completion(account, files, .success) }
                 } else {
                     options.queue.async { completion(account, files, .xmlError) }
@@ -494,8 +494,8 @@ extension NextcloudKit {
                 let error = NKError(error: error, afResponse: response)
                 options.queue.async { completion(account, items, error) }
             case .success( _):
-                if let data = response.data {
-                    items = NKDataFileXML().convertDataTrash(data: data, showHiddenFiles: showHiddenFiles)
+                if let xmlData = response.data {
+                    items = NKDataFileXML().convertDataTrash(xmlData: xmlData, showHiddenFiles: showHiddenFiles)
                     options.queue.async { completion(account, items, .success) }
                 } else {
                     options.queue.async { completion(account, items, .xmlError) }

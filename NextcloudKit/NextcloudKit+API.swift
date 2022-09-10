@@ -88,7 +88,7 @@ extension NextcloudKit {
     //MARK: -
     
     @objc public func getExternalSite(options: NKRequestOptions = NKRequestOptions(),
-                                      completion: @escaping (_ account: String, _ externalFiles: [NKExternalSite], _ error: NKError) -> Void) {
+                                      completion: @escaping (_ account: String, _ externalFiles: [NKExternalSite], _ data: Data?, _ error: NKError) -> Void) {
         
         let account = NKCommon.shared.account
 
@@ -97,7 +97,7 @@ extension NextcloudKit {
         let endpoint = "ocs/v2.php/apps/external/api/v1"
         
         guard let url = NKCommon.shared.createStandardUrl(serverUrl: NKCommon.shared.urlBase, endpoint: endpoint) else {
-            return options.queue.async { completion(account, externalSites, .urlError) }
+            return options.queue.async { completion(account, externalSites, nil, .urlError) }
         }
 
         let headers = NKCommon.shared.getStandardHeaders(options: options)
@@ -108,9 +108,9 @@ extension NextcloudKit {
             switch response.result {
             case .failure(let error):
                 let error = NKError(error: error, afResponse: response)
-                options.queue.async { completion(account, externalSites, error) }
-            case .success(let json):
-                let json = JSON(json)
+                options.queue.async { completion(account, externalSites, nil, error) }
+            case .success(let jsonData):
+                let json = JSON(jsonData)
                 let ocsdata = json["ocs"]["data"]
                 for (_, subJson):(String, JSON) in ocsdata {
                     let extrernalSite = NKExternalSite()
@@ -124,7 +124,7 @@ extension NextcloudKit {
                     
                     externalSites.append(extrernalSite)
                 }
-                options.queue.async { completion(account, externalSites, .success) }
+                options.queue.async { completion(account, externalSites, jsonData, .success) }
             }
         }
     }
@@ -148,8 +148,8 @@ extension NextcloudKit {
             case .failure(let error):
                 let error = NKError(error: error, afResponse: response)
                 options.queue.async { completion(nil, nil, 0, 0, 0, false, error) }
-            case .success(let json):
-                let json = JSON(json)
+            case .success(let jsonData):
+                let json = JSON(jsonData)
                 var versionMajor = 0, versionMinor = 0, versionMicro = 0
                 
                 let serverProductName = json["productname"].stringValue.lowercased()
@@ -412,8 +412,8 @@ extension NextcloudKit {
             case .failure(let error):
                 let error = NKError(error: error, afResponse: response)
                 options.queue.async { completion(account, nil, error) }
-            case .success(let json):
-                let json = JSON(json)
+            case .success(let jsonData):
+                let json = JSON(jsonData)
                 let ocs = json["ocs"]
                 let data = ocs["data"]
                 
@@ -518,8 +518,8 @@ extension NextcloudKit {
             case .failure(let error):
                 let error = NKError(error: error, afResponse: response)
                 options.queue.async { completion(account, false, error) }
-            case .success(let json):
-                let json = JSON(json)
+            case .success(let jsonData):
+                let json = JSON(jsonData)
                 let wipe = json["wipe"].boolValue
                 options.queue.async { completion(account, wipe, .success) }
             }
@@ -605,8 +605,8 @@ extension NextcloudKit {
             case .failure(let error):
                 let error = NKError(error: error, afResponse: response)
                 options.queue.async { completion(account, activities, activityFirstKnown, 0, error) }
-            case .success(let json):
-                let json = JSON(json)
+            case .success(let jsonData):
+                let json = JSON(jsonData)
                 let ocsdata = json["ocs"]["data"]
                 for (_, subJson):(String, JSON) in ocsdata {
                     let activity = NKActivity()
@@ -681,8 +681,8 @@ extension NextcloudKit {
             case .failure(let error):
                 let error = NKError(error: error, afResponse: response)
                 options.queue.async { completion(account, nil, error) }
-            case .success(let json):
-                let json = JSON(json)
+            case .success(let jsonData):
+                let json = JSON(jsonData)
                 if json["ocs"]["meta"]["statuscode"].int == 200 {
                     let ocsdata = json["ocs"]["data"]
                     for (_, subJson):(String, JSON) in ocsdata {
@@ -798,8 +798,8 @@ extension NextcloudKit {
             case .failure(let error):
                 let error = NKError(error: error, afResponse: response)
                 options.queue.async { completion(account, nil, error) }
-            case .success(let json):
-                let json = JSON(json)
+            case .success(let jsonData):
+                let json = JSON(jsonData)
                 let ocsdata = json["ocs"]["data"]
                 let url = ocsdata["url"].string
                 options.queue.async { completion(account, url, .success) }

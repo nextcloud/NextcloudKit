@@ -50,8 +50,8 @@ extension NextcloudKit {
             case .failure(let error):
                 let error = NKError(error: error, afResponse: response)
                 options.queue.async { completion(account, nil, error) }
-            case .success(let json):
-                let json = JSON(json)
+            case .success(let jsonData):
+                let json = JSON(jsonData)
                 let data = json["ocs"]["data"]
                 guard json["ocs"]["meta"]["statuscode"].int == 200,
                       let result = NKHovercard(jsonData: data)

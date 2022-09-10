@@ -50,8 +50,8 @@ extension NextcloudKit {
             case .failure(let error):
                 let error = NKError(error: error, afResponse: response)
                 options.queue.async { completion(account, editors, creators, error) }
-            case .success(let json):
-                let json = JSON(json)
+            case .success(let jsonData):
+                let json = JSON(jsonData)
                 let ocsdataeditors = json["ocs"]["data"]["editors"]
                 for (_, subJson):(String, JSON) in ocsdataeditors {
                     let editor = NKEditorDetailsEditors()
@@ -116,8 +116,8 @@ extension NextcloudKit {
             case .failure(let error):
                 let error = NKError(error: error, afResponse: response)
                 options.queue.async { completion(account, nil, error) }
-            case .success(let json):
-                let json = JSON(json)
+            case .success(let jsonData):
+                let json = JSON(jsonData)
                 let url = json["ocs"]["data"]["url"].stringValue
                 options.queue.async { completion(account, url, .success) }
             }
@@ -146,8 +146,8 @@ extension NextcloudKit {
             case .failure(let error):
                 let error = NKError(error: error, afResponse: response)
                 options.queue.async { completion(account, templates, error) }
-            case .success(let json):
-                let json = JSON(json)
+            case .success(let jsonData):
+                let json = JSON(jsonData)
                 let ocsdatatemplates = json["ocs"]["data"]["editors"]
                 
                 for (_, subJson):(String, JSON) in ocsdatatemplates {
@@ -200,8 +200,8 @@ extension NextcloudKit {
             case .failure(let error):
                 let error = NKError(error: error, afResponse: response)
                 options.queue.async { completion(account, nil, error) }
-            case .success(let json):
-                let json = JSON(json)
+            case .success(let jsonData):
+                let json = JSON(jsonData)
                 let url = json["ocs"]["data"]["url"].stringValue
                 options.queue.async { completion(account, url, .success) }
             }

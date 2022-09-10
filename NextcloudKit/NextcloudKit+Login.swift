@@ -62,8 +62,8 @@ extension NextcloudKit {
             case .failure(let error):
                 let error = NKError(error: error, afResponse: response)
                 queue.async { completion(nil, error) }
-            case .success(let data):
-                if let data = data {
+            case .success(let xmlData):
+                if let data = xmlData {
                     let apppassword = NKDataFileXML().convertDataAppPassword(data: data)
                     queue.async { completion(apppassword, .success) }
                 } else {
@@ -98,8 +98,8 @@ extension NextcloudKit {
             case .failure(let error):
                 let error = NKError(error: error, afResponse: response)
                 queue.async { completion(nil, nil, nil, error) }
-            case .success(let json):
-                let json = JSON(json)
+            case .success(let jsonData):
+                let json = JSON(jsonData)
                
                 let token = json["poll"]["token"].string
                 let endpoint = json["poll"]["endpoint"].string
@@ -134,8 +134,8 @@ extension NextcloudKit {
             case .failure(let error):
                 let error = NKError(error: error, afResponse: response)
                 queue.async { completion(nil, nil, nil, error) }
-            case .success(let json):
-                let json = JSON(json)
+            case .success(let jsonData):
+                let json = JSON(jsonData)
             
                 let server = json["server"].string
                 let loginName = json["loginName"].string

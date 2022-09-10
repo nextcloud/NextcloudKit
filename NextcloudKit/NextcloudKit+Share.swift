@@ -103,12 +103,12 @@ extension NextcloudKit {
                 let error = NKError(error: error, afResponse: response)
                 options.queue.async { completion(account, nil, error) }
             case .success( _):
-                if let data = response.data {
-                    let shares = NKDataFileXML().convertDataShare(data: data)
+                if let xmlData = response.data {
+                    let shares = NKDataFileXML().convertDataShare(data: xmlData)
                     if shares.statusCode == 200 {
                         options.queue.async { completion(account, shares.shares, .success) }
                     } else {
-                        options.queue.async { completion(account, nil, NKError(xmlData: data, fallbackStatusCode: response.response?.statusCode)) }
+                        options.queue.async { completion(account, nil, NKError(xmlData: xmlData, fallbackStatusCode: response.response?.statusCode)) }
                     }
                 } else {
                     options.queue.async { completion(account, nil, .xmlError) }
@@ -163,8 +163,8 @@ extension NextcloudKit {
             case .failure(let error):
                 let error = NKError(error: error, afResponse: response)
                 options.queue.async { completion(account, nil, error) }
-            case .success(let json):
-                let json = JSON(json)
+            case .success(let jsonData):
+                let json = JSON(jsonData)
 
                 if json["ocs"]["meta"]["statuscode"].int == 200 {
                     var sharees: [NKSharee] = []
@@ -309,8 +309,8 @@ extension NextcloudKit {
             case .failure(let error):
                 let error = NKError(error: error, afResponse: response)
                 options.queue.async { completion(account, nil, error) }
-            case .success(let json):
-                let json = JSON(json)
+            case .success(let jsonData):
+                let json = JSON(jsonData)
                 
                 let statusCode = json["ocs"]["meta"]["statuscode"].int ?? NKError.internalError
                 if statusCode == 200 {
@@ -387,8 +387,8 @@ extension NextcloudKit {
             case .failure(let error):
                 let error = NKError(error: error, afResponse: response)
                 options.queue.async { completion(account, nil, error) }
-            case .success(let json):
-                let json = JSON(json)
+            case .success(let jsonData):
+                let json = JSON(jsonData)
                 
                 let statusCode = json["ocs"]["meta"]["statuscode"].int ?? NKError.internalError
                 if statusCode == 200 {

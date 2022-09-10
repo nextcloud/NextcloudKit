@@ -952,7 +952,7 @@ class NKDataFileXML: NSObject {
         return xml["ocs", "data", "apppassword"].text
     }
     
-    func convertDataFile(data: Data, user: String, userId: String, showHiddenFiles: Bool) -> [NKFile] {
+    func convertDataFile(xmlData: Data, user: String, userId: String, showHiddenFiles: Bool) -> [NKFile] {
         
         var files: [NKFile] = []
         var dicMOV: [String:Int] = [:]
@@ -962,7 +962,7 @@ class NKDataFileXML: NSObject {
             return files
         }
         
-        let xml = XML.parse(data)
+        let xml = XML.parse(xmlData)
         let elements = xml["d:multistatus", "d:response"]
         for element in elements {
             let file = NKFile()
@@ -1190,7 +1190,7 @@ class NKDataFileXML: NSObject {
         return files
     }
     
-    func convertDataTrash(data: Data, showHiddenFiles: Bool) -> [NKTrash] {
+    func convertDataTrash(xmlData: Data, showHiddenFiles: Bool) -> [NKTrash] {
         
         var files: [NKTrash] = []
         var first: Bool = true
@@ -1198,7 +1198,7 @@ class NKDataFileXML: NSObject {
             return files
         }
     
-        let xml = XML.parse(data)
+        let xml = XML.parse(xmlData)
         let elements = xml["d:multistatus", "d:response"]
         for element in elements {
             if first {

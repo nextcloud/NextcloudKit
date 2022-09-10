@@ -66,8 +66,8 @@ extension NextcloudKit {
                 debugPrint(response)
 
                 switch response.result {
-                case .success(let json):
-                    let json = JSON(json)
+                case .success(let jsonData):
+                    let json = JSON(jsonData)
                     let providerData = json["ocs"]["data"]
                     guard let allProvider = NKSearchProvider.factory(jsonArray: providerData) else {
                         return completion(account, NKError(rootJson: json, fallbackStatusCode: response.response?.statusCode))
@@ -160,8 +160,8 @@ extension NextcloudKit {
         let requestSearchProvider = sessionManager.request(urlRequest).validate(statusCode: 200..<300).responseData(queue: NKCommon.shared.backgroundQueue) { (response) in
             debugPrint(response)
             switch response.result {
-            case .success(let json):
-                let json = JSON(json)
+            case .success(let jsonData):
+                let json = JSON(jsonData)
                 let searchData = json["ocs"]["data"]
                 guard let searchResult = NKSearchResult(json: searchData, id: id) else {
                     return completion(account, nil, NKError(rootJson: json, fallbackStatusCode: response.response?.statusCode))
