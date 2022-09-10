@@ -56,7 +56,7 @@ extension NextcloudKit {
                     let url = json["ocs"]["data"]["url"].stringValue
                     options.queue.async { completion(account, url, jsonData, .success) }
                 } else {
-                    options.queue.async { completion(account, nil, nil, NKError(rootJson: json, fallbackStatusCode: response.response?.statusCode)) }
+                    options.queue.async { completion(account, nil, jsonData, NKError(rootJson: json, fallbackStatusCode: response.response?.statusCode)) }
                 }
             }
         }
@@ -102,7 +102,7 @@ extension NextcloudKit {
                     }
                     options.queue.async { completion(account, templates, jsonData, .success) }
                 } else {
-                    options.queue.async { completion(account, nil, nil, NKError(rootJson: json, fallbackStatusCode: response.response?.statusCode)) }
+                    options.queue.async { completion(account, nil, jsonData, NKError(rootJson: json, fallbackStatusCode: response.response?.statusCode)) }
                 }
             }
         }
@@ -138,7 +138,7 @@ extension NextcloudKit {
                     let url = json["ocs"]["data"]["url"].stringValue
                     options.queue.async { completion(account, url, jsonData, .success) }
                 } else {
-                    options.queue.async { completion(account, nil, nil, NKError(rootJson: json, fallbackStatusCode: response.response?.statusCode)) }
+                    options.queue.async { completion(account, nil, jsonData, NKError(rootJson: json, fallbackStatusCode: response.response?.statusCode)) }
                 }
             }
         }

@@ -218,7 +218,7 @@ extension NextcloudKit {
                     }
                     options.queue.async { completion(account, sharees, jsonData, .success) }
                 }  else {
-                    options.queue.async { completion(account, nil, nil, NKError(rootJson: json, fallbackStatusCode: response.response?.statusCode)) }
+                    options.queue.async { completion(account, nil, jsonData, NKError(rootJson: json, fallbackStatusCode: response.response?.statusCode)) }
                 }
             }
         }
@@ -316,7 +316,7 @@ extension NextcloudKit {
                 if statusCode == 200 {
                     options.queue.async { completion(account, self.convertResponseShare(json: json),jsonData,  .success) }
                 }  else {
-                    options.queue.async { completion(account, nil, nil, NKError(rootJson: json, fallbackStatusCode: response.response?.statusCode)) }
+                    options.queue.async { completion(account, nil, jsonData, NKError(rootJson: json, fallbackStatusCode: response.response?.statusCode)) }
                 }
             }
         }
@@ -394,7 +394,7 @@ extension NextcloudKit {
                 if statusCode == 200 {
                     options.queue.async { completion(account, self.convertResponseShare(json: json), jsonData, .success) }
                 }  else {
-                    options.queue.async { completion(account, nil, nil, NKError(rootJson: json, fallbackStatusCode: response.response?.statusCode)) }
+                    options.queue.async { completion(account, nil, jsonData, NKError(rootJson: json, fallbackStatusCode: response.response?.statusCode)) }
                 }
             }
         }

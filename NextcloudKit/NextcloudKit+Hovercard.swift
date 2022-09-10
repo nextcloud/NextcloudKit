@@ -57,7 +57,7 @@ extension NextcloudKit {
                       let result = NKHovercard(jsonData: data)
                 else {
                     let error = NKError(rootJson: json, fallbackStatusCode: response.response?.statusCode)
-                    options.queue.async { completion(account, nil, nil, error) }
+                    options.queue.async { completion(account, nil, jsonData, error) }
                     return
                 }
                 options.queue.async { completion(account, result, jsonData, .success) }

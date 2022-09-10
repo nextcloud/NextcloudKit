@@ -69,7 +69,7 @@ extension NextcloudKit {
                     let publicKey = json["ocs"]["data"]["publicKey"].stringValue
                     queue.async { completion(account, deviceIdentifier, signature, publicKey, jsonData, .success) }
                 } else {
-                    queue.async { completion(account, nil, nil, nil, nil, NKError(rootJson: json, fallbackStatusCode: response.response?.statusCode)) }
+                    queue.async { completion(account, nil, nil, nil, jsonData, NKError(rootJson: json, fallbackStatusCode: response.response?.statusCode)) }
                 }
             }
         }

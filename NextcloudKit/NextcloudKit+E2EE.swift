@@ -96,7 +96,7 @@ extension NextcloudKit {
                     let e2eToken = json["ocs"]["data"]["e2e-token"].string
                     queue.async { completionHandler(account, e2eToken, jsonData, .success) }
                 } else {
-                    queue.async { completionHandler(account, nil, nil, NKError(rootJson: json, fallbackStatusCode: response.response?.statusCode)) }
+                    queue.async { completionHandler(account, nil, jsonData, NKError(rootJson: json, fallbackStatusCode: response.response?.statusCode)) }
                 }
             }
         }
@@ -129,7 +129,7 @@ extension NextcloudKit {
                     let e2eMetadata = json["ocs"]["data"]["meta-data"].string
                     queue.async { completionHandler(account, e2eMetadata, jsonData, .success) }
                 } else {
-                    queue.async { completionHandler(account, nil, nil, NKError(rootJson: json, fallbackStatusCode: response.response?.statusCode)) }
+                    queue.async { completionHandler(account, nil, jsonData, NKError(rootJson: json, fallbackStatusCode: response.response?.statusCode)) }
                 }
             }
         }
@@ -170,7 +170,7 @@ extension NextcloudKit {
                     let metadata = json["ocs"]["data"]["meta-data"].string
                     queue.async { completionHandler(account, metadata, jsonData, .success) }
                 } else {
-                    queue.async { completionHandler(account, nil, nil, NKError(rootJson: json, fallbackStatusCode: response.response?.statusCode)) }
+                    queue.async { completionHandler(account, nil, jsonData, NKError(rootJson: json, fallbackStatusCode: response.response?.statusCode)) }
                 }
             }
         }
@@ -206,7 +206,7 @@ extension NextcloudKit {
                     let key = json["ocs"]["data"]["public-keys"][userId].stringValue
                     queue.async { completionHandler(account, key, jsonData, .success) }
                 } else {
-                    queue.async { completionHandler(account, nil, nil, NKError(rootJson: json, fallbackStatusCode: response.response?.statusCode)) }
+                    queue.async { completionHandler(account, nil, jsonData, NKError(rootJson: json, fallbackStatusCode: response.response?.statusCode)) }
                 }
             }
         }
@@ -239,7 +239,7 @@ extension NextcloudKit {
                     let key = json["ocs"]["data"]["private-key"].stringValue
                     queue.async { completionHandler(account, key, jsonData, .success) }
                 } else {
-                    queue.async { completionHandler(account, nil, nil, NKError(rootJson: json, fallbackStatusCode: response.response?.statusCode)) }
+                    queue.async { completionHandler(account, nil, jsonData, NKError(rootJson: json, fallbackStatusCode: response.response?.statusCode)) }
                 }
             }
         }
@@ -272,7 +272,7 @@ extension NextcloudKit {
                     let key = json["ocs"]["data"]["public-key"].stringValue
                     queue.async { completionHandler(account, key, jsonData, .success) }
                 } else {
-                    queue.async { completionHandler(account, nil, nil, NKError(rootJson: json, fallbackStatusCode: response.response?.statusCode)) }
+                    queue.async { completionHandler(account, nil, jsonData, NKError(rootJson: json, fallbackStatusCode: response.response?.statusCode)) }
                 }
             }
         }
@@ -308,7 +308,7 @@ extension NextcloudKit {
                     print(key)
                     queue.async { completionHandler(account, key, jsonData, .success) }
                 } else {
-                    queue.async { completionHandler(account, nil, nil, NKError(rootJson: json, fallbackStatusCode: response.response?.statusCode)) }
+                    queue.async { completionHandler(account, nil, jsonData, NKError(rootJson: json, fallbackStatusCode: response.response?.statusCode)) }
                 }
             }
         }
@@ -343,7 +343,7 @@ extension NextcloudKit {
                     let key = json["ocs"]["data"]["private-key"].stringValue
                     queue.async { completionHandler(account, key, jsonData, .success) }
                 } else {
-                    queue.async { completionHandler(account, nil, nil, NKError(rootJson: json, fallbackStatusCode: response.response?.statusCode)) }
+                    queue.async { completionHandler(account, nil, jsonData, NKError(rootJson: json, fallbackStatusCode: response.response?.statusCode)) }
                 }
             }
         }

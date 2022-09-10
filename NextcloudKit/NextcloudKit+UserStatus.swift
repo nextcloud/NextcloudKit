@@ -70,7 +70,7 @@ extension NextcloudKit {
 
                     options.queue.async { completion(account, clearAt, icon, message, messageId, messageIsPredefined, status, statusIsUserDefined, userId, jsonData, .success) }
                 } else {
-                    options.queue.async { completion(account, nil, nil, nil, nil, false, nil, false, nil, nil, NKError(rootJson: json, fallbackStatusCode: response.response?.statusCode)) }
+                    options.queue.async { completion(account, nil, nil, nil, nil, false, nil, false, nil, jsonData, NKError(rootJson: json, fallbackStatusCode: response.response?.statusCode)) }
                 }
             }
         }
@@ -276,7 +276,7 @@ extension NextcloudKit {
                 
                     options.queue.async { completion(account, userStatuses, jsonData, .success) }
                 }  else {
-                    options.queue.async { completion(account, nil, nil, NKError(rootJson: json, fallbackStatusCode: response.response?.statusCode)) }
+                    options.queue.async { completion(account, nil, jsonData, NKError(rootJson: json, fallbackStatusCode: response.response?.statusCode)) }
                 }
             }
         }
@@ -335,7 +335,7 @@ extension NextcloudKit {
                     
                 } else {
                     
-                    options.queue.async { completion(account, nil, nil, NKError(rootJson: json, fallbackStatusCode: response.response?.statusCode)) }
+                    options.queue.async { completion(account, nil, jsonData, NKError(rootJson: json, fallbackStatusCode: response.response?.statusCode)) }
                 }
             }
         }

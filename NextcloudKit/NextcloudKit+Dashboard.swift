@@ -60,7 +60,7 @@ extension NextcloudKit {
                     let results = NCCDashboardWidget.factory(data: data)
                     options.queue.async { completion(account, results, jsonData, .success) }
                 } else {
-                    options.queue.async { completion(account, nil, nil, NKError(rootJson: json, fallbackStatusCode: response.response?.statusCode)) }
+                    options.queue.async { completion(account, nil, jsonData, NKError(rootJson: json, fallbackStatusCode: response.response?.statusCode)) }
                 }
             case .failure(let error):
                 let error = NKError(error: error, afResponse: response)
@@ -104,7 +104,7 @@ extension NextcloudKit {
                     let results = NCCDashboardApplication.factory(data: data)
                     options.queue.async { completion(account, results, jsonData, .success) }
                 } else {
-                    options.queue.async { completion(account, nil, nil, NKError(rootJson: json, fallbackStatusCode: response.response?.statusCode)) }
+                    options.queue.async { completion(account, nil, jsonData, NKError(rootJson: json, fallbackStatusCode: response.response?.statusCode)) }
                 }
             case .failure(let error):
                 let error = NKError(error: error, afResponse: response)
