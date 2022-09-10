@@ -28,7 +28,7 @@ import SwiftyJSON
 extension NextcloudKit {
 
     @objc public func NCTextObtainEditorDetails(options: NKRequestOptions = NKRequestOptions(),
-                                                completion: @escaping (_ account: String, _  editors: [NKEditorDetailsEditors], _ creators: [NKEditorDetailsCreators], _ error: NKError) -> Void) {
+                                                completion: @escaping (_ account: String, _  editors: [NKEditorDetailsEditors], _ creators: [NKEditorDetailsCreators], _ data: Data?, _ error: NKError) -> Void) {
         
         let account = NKCommon.shared.account
 
@@ -38,7 +38,7 @@ extension NextcloudKit {
         var creators: [NKEditorDetailsCreators] = []
 
         guard let url = NKCommon.shared.createStandardUrl(serverUrl: NKCommon.shared.urlBase, endpoint: endpoint) else {
-            return options.queue.async { completion(account, editors, creators, .urlError) }
+            return options.queue.async { completion(account, editors, creators, nil, .urlError) }
         }
 
         let headers = NKCommon.shared.getStandardHeaders(options: options)
@@ -49,7 +49,7 @@ extension NextcloudKit {
             switch response.result {
             case .failure(let error):
                 let error = NKError(error: error, afResponse: response)
-                options.queue.async { completion(account, editors, creators, error) }
+                options.queue.async { completion(account, editors, creators, nil, error) }
             case .success(let jsonData):
                 let json = JSON(jsonData)
                 let ocsdataeditors = json["ocs"]["data"]["editors"]
@@ -85,7 +85,7 @@ extension NextcloudKit {
                     creators.append(creator)
                 }
                 
-                options.queue.async { completion(account, editors, creators, .success) }
+                options.queue.async { completion(account, editors, creators, jsonData, .success) }
             }
         }
     }
@@ -93,18 +93,18 @@ extension NextcloudKit {
     @objc public func NCTextOpenFile(fileNamePath: String,
                                      editor: String,
                                      options: NKRequestOptions = NKRequestOptions(),
-                                     completion: @escaping (_ account: String, _  url: String?, _ error: NKError) -> Void) {
+                                     completion: @escaping (_ account: String, _  url: String?, _ data: Data?, _ error: NKError) -> Void) {
                 
         let account = NKCommon.shared.account
 
         guard let fileNamePath = fileNamePath.urlEncoded else {
-            return options.queue.async { completion(account, nil, .urlError) }
+            return options.queue.async { completion(account, nil, nil, .urlError) }
         }
         
         let endpoint = "ocs/v2.php/apps/files/api/v1/directEditing/open?path=/\(fileNamePath)&editorId=\(editor)"
         
         guard let url = NKCommon.shared.createStandardUrl(serverUrl: NKCommon.shared.urlBase, endpoint: endpoint) else {
-            return options.queue.async { completion(account, nil, .urlError) }
+            return options.queue.async { completion(account, nil, nil, .urlError) }
         }
 
         let headers = NKCommon.shared.getStandardHeaders(options: options)
@@ -115,17 +115,17 @@ extension NextcloudKit {
             switch response.result {
             case .failure(let error):
                 let error = NKError(error: error, afResponse: response)
-                options.queue.async { completion(account, nil, error) }
+                options.queue.async { completion(account, nil, nil, error) }
             case .success(let jsonData):
                 let json = JSON(jsonData)
                 let url = json["ocs"]["data"]["url"].stringValue
-                options.queue.async { completion(account, url, .success) }
+                options.queue.async { completion(account, url, jsonData, .success) }
             }
         }
     }
     
     @objc public func NCTextGetListOfTemplates(options: NKRequestOptions = NKRequestOptions(),
-                                               completion: @escaping (_ account: String, _  templates: [NKEditorTemplates], _ error: NKError) -> Void) {
+                                               completion: @escaping (_ account: String, _  templates: [NKEditorTemplates], _ data: Data?, _ error: NKError) -> Void) {
                 
         let account = NKCommon.shared.account
 
@@ -134,7 +134,7 @@ extension NextcloudKit {
         var templates: [NKEditorTemplates] = []
 
         guard let url = NKCommon.shared.createStandardUrl(serverUrl: NKCommon.shared.urlBase, endpoint: endpoint) else {
-            return options.queue.async { completion(account, templates, .urlError) }
+            return options.queue.async { completion(account, templates, nil, .urlError) }
         }
 
         let headers = NKCommon.shared.getStandardHeaders(options: options)
@@ -145,7 +145,7 @@ extension NextcloudKit {
             switch response.result {
             case .failure(let error):
                 let error = NKError(error: error, afResponse: response)
-                options.queue.async { completion(account, templates, error) }
+                options.queue.async { completion(account, templates, nil, error) }
             case .success(let jsonData):
                 let json = JSON(jsonData)
                 let ocsdatatemplates = json["ocs"]["data"]["editors"]
@@ -161,7 +161,7 @@ extension NextcloudKit {
                     templates.append(template)
                 }
                 
-                options.queue.async { completion(account, templates, .success) }
+                options.queue.async { completion(account, templates, jsonData, .success) }
             }
         }
     }
@@ -171,12 +171,12 @@ extension NextcloudKit {
                                        creatorId: String,
                                        templateId: String,
                                        options: NKRequestOptions = NKRequestOptions(),
-                                       completion: @escaping (_ account: String, _ url: String?, _ error: NKError) -> Void) {
+                                       completion: @escaping (_ account: String, _ url: String?, _ data: Data?, _ error: NKError) -> Void) {
                 
         let account = NKCommon.shared.account
 
         guard let fileNamePath = fileNamePath.urlEncoded else {
-            return options.queue.async { completion(account, nil, .urlError) }
+            return options.queue.async { completion(account, nil, nil, .urlError) }
         }
         
         var endpoint = ""
@@ -188,7 +188,7 @@ extension NextcloudKit {
         }
         
         guard let url = NKCommon.shared.createStandardUrl(serverUrl: NKCommon.shared.urlBase, endpoint: endpoint) else {
-            return options.queue.async { completion(account, nil, .urlError) }
+            return options.queue.async { completion(account, nil, nil, .urlError) }
         }
                 
         let headers = NKCommon.shared.getStandardHeaders(options: options)
@@ -199,11 +199,11 @@ extension NextcloudKit {
             switch response.result {
             case .failure(let error):
                 let error = NKError(error: error, afResponse: response)
-                options.queue.async { completion(account, nil, error) }
+                options.queue.async { completion(account, nil, nil, error) }
             case .success(let jsonData):
                 let json = JSON(jsonData)
                 let url = json["ocs"]["data"]["url"].stringValue
-                options.queue.async { completion(account, url, .success) }
+                options.queue.async { completion(account, url, jsonData, .success) }
             }
         }
     }

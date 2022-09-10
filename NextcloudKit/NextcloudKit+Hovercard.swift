@@ -30,7 +30,7 @@ extension NextcloudKit {
 
     @objc public func getHovercard(for userId: String,
                                    options: NKRequestOptions = NKRequestOptions(),
-                                   completion: @escaping (_ account: String, _ result: NKHovercard?, _ error: NKError) -> Void) {
+                                   completion: @escaping (_ account: String, _ result: NKHovercard?, _ data: Data?, _ error: NKError) -> Void) {
 
         let account = NKCommon.shared.account
 
@@ -38,7 +38,7 @@ extension NextcloudKit {
 
         guard let url = NKCommon.shared.createStandardUrl(serverUrl: NKCommon.shared.urlBase, endpoint: endpoint)
         else {
-            return options.queue.async { completion(account, nil, .urlError) }
+            return options.queue.async { completion(account, nil, nil, .urlError) }
         }
 
         let headers = NKCommon.shared.getStandardHeaders(options: options)
@@ -49,7 +49,7 @@ extension NextcloudKit {
             switch response.result {
             case .failure(let error):
                 let error = NKError(error: error, afResponse: response)
-                options.queue.async { completion(account, nil, error) }
+                options.queue.async { completion(account, nil, nil, error) }
             case .success(let jsonData):
                 let json = JSON(jsonData)
                 let data = json["ocs"]["data"]
@@ -57,10 +57,10 @@ extension NextcloudKit {
                       let result = NKHovercard(jsonData: data)
                 else {
                     let error = NKError(rootJson: json, fallbackStatusCode: response.response?.statusCode)
-                    options.queue.async { completion(account, nil, error) }
+                    options.queue.async { completion(account, nil, nil, error) }
                     return
                 }
-                options.queue.async { completion(account, result, .success) }
+                options.queue.async { completion(account, result, jsonData, .success) }
             }
         }
     }

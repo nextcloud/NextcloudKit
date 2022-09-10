@@ -29,7 +29,7 @@ extension NextcloudKit {
 
     @objc public func createUrlRichdocuments(fileID: String,
                                              options: NKRequestOptions = NKRequestOptions(),
-                                             completion: @escaping (_ account: String, _  url: String?, _ error: NKError) -> Void) {
+                                             completion: @escaping (_ account: String, _  url: String?, _ data: Data?, _ error: NKError) -> Void) {
                 
         let account = NKCommon.shared.account
 
@@ -38,7 +38,7 @@ extension NextcloudKit {
         let parameters: [String: Any] = ["fileId": fileID]
 
         guard let url = NKCommon.shared.createStandardUrl(serverUrl: NKCommon.shared.urlBase, endpoint: endpoint) else {
-            return options.queue.async { completion(account, nil, .urlError) }
+            return options.queue.async { completion(account, nil, nil, .urlError) }
         }
 
         let headers = NKCommon.shared.getStandardHeaders(options: options)
@@ -49,14 +49,14 @@ extension NextcloudKit {
             switch response.result {
             case .failure(let error):
                 let error = NKError(error: error, afResponse: response)
-                options.queue.async { completion(account, nil, error) }
+                options.queue.async { completion(account, nil, nil, error) }
             case .success(let jsonData):
                 let json = JSON(jsonData)
                 if json["ocs"]["meta"]["statuscode"].int == 200 {
                     let url = json["ocs"]["data"]["url"].stringValue
-                    options.queue.async { completion(account, url, .success) }
+                    options.queue.async { completion(account, url, jsonData, .success) }
                 } else {
-                    options.queue.async { completion(account, nil, NKError(rootJson: json, fallbackStatusCode: response.response?.statusCode)) }
+                    options.queue.async { completion(account, nil, nil, NKError(rootJson: json, fallbackStatusCode: response.response?.statusCode)) }
                 }
             }
         }
@@ -64,14 +64,14 @@ extension NextcloudKit {
     
     @objc public func getTemplatesRichdocuments(typeTemplate: String,
                                                 options: NKRequestOptions = NKRequestOptions(),
-                                                completion: @escaping (_ account: String, _ templates: [NKRichdocumentsTemplate]?, _ error: NKError) -> Void) {
+                                                completion: @escaping (_ account: String, _ templates: [NKRichdocumentsTemplate]?, _ data: Data?, _ error: NKError) -> Void) {
         
         let account = NKCommon.shared.account
 
         let endpoint = "ocs/v2.php/apps/richdocuments/api/v1/templates/\(typeTemplate)"
         
         guard let url = NKCommon.shared.createStandardUrl(serverUrl: NKCommon.shared.urlBase, endpoint: endpoint) else {
-            return options.queue.async { completion(account, nil, .urlError) }
+            return options.queue.async { completion(account, nil, nil, .urlError) }
         }
 
         let headers = NKCommon.shared.getStandardHeaders(options: options)
@@ -82,7 +82,7 @@ extension NextcloudKit {
             switch response.result {
             case .failure(let error):
                 let error = NKError(error: error, afResponse: response)
-                options.queue.async { completion(account, nil, error) }
+                options.queue.async { completion(account, nil, nil, error) }
             case .success(let jsonData):
                 let json = JSON(jsonData)
                 let data = json["ocs"]["data"].arrayValue
@@ -100,9 +100,9 @@ extension NextcloudKit {
 
                         templates.append(template)
                     }
-                    options.queue.async { completion(account, templates, .success) }
+                    options.queue.async { completion(account, templates, jsonData, .success) }
                 } else {
-                    options.queue.async { completion(account, nil, NKError(rootJson: json, fallbackStatusCode: response.response?.statusCode)) }
+                    options.queue.async { completion(account, nil, nil, NKError(rootJson: json, fallbackStatusCode: response.response?.statusCode)) }
                 }
             }
         }
@@ -111,7 +111,7 @@ extension NextcloudKit {
     @objc public func createRichdocuments(path: String,
                                           templateId: String,
                                           options: NKRequestOptions = NKRequestOptions(),
-                                          completion: @escaping (_ account: String, _  url: String?, _ error: NKError) -> Void) {
+                                          completion: @escaping (_ account: String, _  url: String?, _ data: Data?, _ error: NKError) -> Void) {
                 
         let account = NKCommon.shared.account
 
@@ -120,7 +120,7 @@ extension NextcloudKit {
         let parameters: [String: Any] = ["path": path, "template": templateId]
         
         guard let url = NKCommon.shared.createStandardUrl(serverUrl: NKCommon.shared.urlBase, endpoint: endpoint) else {
-            return options.queue.async { completion(account, nil, .urlError) }
+            return options.queue.async { completion(account, nil, nil, .urlError) }
         }
 
         let headers = NKCommon.shared.getStandardHeaders(options: options)
@@ -131,14 +131,14 @@ extension NextcloudKit {
             switch response.result {
             case .failure(let error):
                 let error = NKError(error: error, afResponse: response)
-                options.queue.async { completion(account, nil, error) }
+                options.queue.async { completion(account, nil, nil, error) }
             case .success(let jsonData):
                 let json = JSON(jsonData)
                 if json["ocs"]["meta"]["statuscode"].int == 200 {
                     let url = json["ocs"]["data"]["url"].stringValue
-                    options.queue.async { completion(account, url, .success) }
+                    options.queue.async { completion(account, url, jsonData, .success) }
                 } else {
-                    options.queue.async { completion(account, nil, NKError(rootJson: json, fallbackStatusCode: response.response?.statusCode)) }
+                    options.queue.async { completion(account, nil, nil, NKError(rootJson: json, fallbackStatusCode: response.response?.statusCode)) }
                 }
             }
         }
@@ -146,7 +146,7 @@ extension NextcloudKit {
     
     @objc public func createAssetRichdocuments(path: String,
                                                options: NKRequestOptions = NKRequestOptions(),
-                                               completion: @escaping (_ account: String, _  url: String?, _ error: NKError) -> Void) {
+                                               completion: @escaping (_ account: String, _  url: String?, _ data: Data?, _ error: NKError) -> Void) {
                 
         let account = NKCommon.shared.account
 
@@ -155,7 +155,7 @@ extension NextcloudKit {
         let parameters: [String: Any] = ["path": path]
 
         guard let url = NKCommon.shared.createStandardUrl(serverUrl: NKCommon.shared.urlBase, endpoint: endpoint) else {
-            return options.queue.async { completion(account, nil, .urlError) }
+            return options.queue.async { completion(account, nil, nil, .urlError) }
         }
                 
         let headers = NKCommon.shared.getStandardHeaders(options: options)
@@ -166,11 +166,11 @@ extension NextcloudKit {
             switch response.result {
             case .failure(let error):
                 let error = NKError(error: error, afResponse: response)
-                options.queue.async { completion(account, nil, error) }
+                options.queue.async { completion(account, nil, nil, error) }
             case .success(let jsonData):
                 let json = JSON(jsonData)
                 let url = json["url"].string
-                options.queue.async { completion(account, url, .success) }
+                options.queue.async { completion(account, url, jsonData, .success) }
             }
         }
     }

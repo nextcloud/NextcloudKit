@@ -84,13 +84,13 @@ extension NextcloudKit {
 
     @objc public func readShares(parameters: NKShareParameter,
                                  options: NKRequestOptions = NKRequestOptions(),
-                                 completion: @escaping (_ account: String, _ shares: [NKShare]?, _ error: NKError) -> Void) {
+                                 completion: @escaping (_ account: String, _ shares: [NKShare]?, _ data: Data?, _ error: NKError) -> Void) {
 
         let account = NKCommon.shared.account
 
         guard let url = NKCommon.shared.createStandardUrl(serverUrl: NKCommon.shared.urlBase, endpoint: parameters.endpoint)
         else {
-            return options.queue.async { completion(account, nil, .urlError) }
+            return options.queue.async { completion(account, nil, nil, .urlError) }
         }
 
         let headers = NKCommon.shared.getStandardHeaders(options.customHeader, customUserAgent: options.customUserAgent, contentType: "application/xml")
@@ -101,17 +101,17 @@ extension NextcloudKit {
             switch response.result {
             case .failure(let error):
                 let error = NKError(error: error, afResponse: response)
-                options.queue.async { completion(account, nil, error) }
+                options.queue.async { completion(account, nil, nil, error) }
             case .success( _):
                 if let xmlData = response.data {
                     let shares = NKDataFileXML().convertDataShare(data: xmlData)
                     if shares.statusCode == 200 {
-                        options.queue.async { completion(account, shares.shares, .success) }
+                        options.queue.async { completion(account, shares.shares, xmlData, .success) }
                     } else {
-                        options.queue.async { completion(account, nil, NKError(xmlData: xmlData, fallbackStatusCode: response.response?.statusCode)) }
+                        options.queue.async { completion(account, nil, nil, NKError(xmlData: xmlData, fallbackStatusCode: response.response?.statusCode)) }
                     }
                 } else {
-                    options.queue.async { completion(account, nil, .xmlError) }
+                    options.queue.async { completion(account, nil, nil, .xmlError) }
                 }
             }
         }
@@ -131,7 +131,7 @@ extension NextcloudKit {
                                     itemType: String = "file",
                                     lookup: Bool = false,
                                     options: NKRequestOptions = NKRequestOptions(),
-                                    completion: @escaping (_ account: String, _ sharees: [NKSharee]?, _ error: NKError) -> Void) {
+                                    completion: @escaping (_ account: String, _ sharees: [NKSharee]?, _ data: Data?, _ error: NKError) -> Void) {
            
         let account = NKCommon.shared.account
 
@@ -143,7 +143,7 @@ extension NextcloudKit {
         }
         
         guard let url = NKCommon.shared.createStandardUrl(serverUrl: NKCommon.shared.urlBase, endpoint: endpoint) else {
-            return options.queue.async { completion(account, nil, .urlError) }
+            return options.queue.async { completion(account, nil, nil, .urlError) }
         }
 
         let headers = NKCommon.shared.getStandardHeaders(options: options)
@@ -162,7 +162,7 @@ extension NextcloudKit {
             switch response.result {
             case .failure(let error):
                 let error = NKError(error: error, afResponse: response)
-                options.queue.async { completion(account, nil, error) }
+                options.queue.async { completion(account, nil, nil, error) }
             case .success(let jsonData):
                 let json = JSON(jsonData)
 
@@ -216,9 +216,9 @@ extension NextcloudKit {
                             sharees.append(sharee)
                         }
                     }
-                    options.queue.async { completion(account, sharees, .success) }
+                    options.queue.async { completion(account, sharees, jsonData, .success) }
                 }  else {
-                    options.queue.async { completion(account, nil, NKError(rootJson: json, fallbackStatusCode: response.response?.statusCode)) }
+                    options.queue.async { completion(account, nil, nil, NKError(rootJson: json, fallbackStatusCode: response.response?.statusCode)) }
                 }
             }
         }
@@ -248,7 +248,7 @@ extension NextcloudKit {
                                       password: String? = nil,
                                       permissions: Int = 1,
                                       options: NKRequestOptions = NKRequestOptions(),
-                                      completion: @escaping (_ account: String, _ share: NKShare?, _ error: NKError) -> Void) {
+                                      completion: @escaping (_ account: String, _ share: NKShare?, _ data: Data?, _ error: NKError) -> Void) {
 
         createShare(path: path, shareType: 3, shareWith: nil, publicUpload: publicUpload, hideDownload: hideDownload, password: password, permissions: permissions, options: options, completion: completion)
     }
@@ -259,7 +259,7 @@ extension NextcloudKit {
                                   password: String? = nil,
                                   permissions: Int = 1,
                                   options: NKRequestOptions = NKRequestOptions(),
-                                  completion: @escaping (_ account: String, _ share: NKShare?, _ error: NKError) -> Void) {
+                                  completion: @escaping (_ account: String, _ share: NKShare?, _ data: Data?,  _ error: NKError) -> Void) {
      
         createShare(path: path, shareType: shareType, shareWith: shareWith, publicUpload: false, hideDownload: false, password: password, permissions: permissions, options: options, completion: completion)
     }
@@ -272,14 +272,14 @@ extension NextcloudKit {
                              password: String? = nil,
                              permissions: Int = 1,
                              options: NKRequestOptions = NKRequestOptions(),
-                             completion: @escaping (_ account: String, _ share: NKShare?, _ error: NKError) -> Void) {
+                             completion: @escaping (_ account: String, _ share: NKShare?, _ data: Data?, _ error: NKError) -> Void) {
            
         let account = NKCommon.shared.account
 
         let endpoint = "ocs/v2.php/apps/files_sharing/api/v1/shares"
                 
         guard let url = NKCommon.shared.createStandardUrl(serverUrl: NKCommon.shared.urlBase, endpoint: endpoint) else {
-            return options.queue.async { completion(account, nil, .urlError) }
+            return options.queue.async { completion(account, nil, nil, .urlError) }
         }
 
         let headers = NKCommon.shared.getStandardHeaders(options: options)
@@ -308,15 +308,15 @@ extension NextcloudKit {
             switch response.result {
             case .failure(let error):
                 let error = NKError(error: error, afResponse: response)
-                options.queue.async { completion(account, nil, error) }
+                options.queue.async { completion(account, nil, nil, error) }
             case .success(let jsonData):
                 let json = JSON(jsonData)
                 
                 let statusCode = json["ocs"]["meta"]["statuscode"].int ?? NKError.internalError
                 if statusCode == 200 {
-                    options.queue.async { completion(account, self.convertResponseShare(json: json), .success) }
+                    options.queue.async { completion(account, self.convertResponseShare(json: json),jsonData,  .success) }
                 }  else {
-                    options.queue.async { completion(account, nil, NKError(rootJson: json, fallbackStatusCode: response.response?.statusCode)) }
+                    options.queue.async { completion(account, nil, nil, NKError(rootJson: json, fallbackStatusCode: response.response?.statusCode)) }
                 }
             }
         }
@@ -350,14 +350,14 @@ extension NextcloudKit {
                                   label: String? = nil,
                                   hideDownload: Bool,
                                   options: NKRequestOptions = NKRequestOptions(),
-                                  completion: @escaping (_ account: String, _ share: NKShare?, _ error: NKError) -> Void) {
+                                  completion: @escaping (_ account: String, _ share: NKShare?, _ data: Data?, _ error: NKError) -> Void) {
            
         let account = NKCommon.shared.account
 
         let endpoint = "ocs/v2.php/apps/files_sharing/api/v1/shares/\(idShare)"
 
         guard let url = NKCommon.shared.createStandardUrl(serverUrl: NKCommon.shared.urlBase, endpoint: endpoint) else {
-            return options.queue.async { completion(account, nil, .urlError) }
+            return options.queue.async { completion(account, nil, nil, .urlError) }
         }
 
         let headers = NKCommon.shared.getStandardHeaders(options: options)
@@ -386,15 +386,15 @@ extension NextcloudKit {
             switch response.result {
             case .failure(let error):
                 let error = NKError(error: error, afResponse: response)
-                options.queue.async { completion(account, nil, error) }
+                options.queue.async { completion(account, nil, nil, error) }
             case .success(let jsonData):
                 let json = JSON(jsonData)
                 
                 let statusCode = json["ocs"]["meta"]["statuscode"].int ?? NKError.internalError
                 if statusCode == 200 {
-                    options.queue.async { completion(account, self.convertResponseShare(json: json), .success) }
+                    options.queue.async { completion(account, self.convertResponseShare(json: json), jsonData, .success) }
                 }  else {
-                    options.queue.async { completion(account, nil, NKError(rootJson: json, fallbackStatusCode: response.response?.statusCode)) }
+                    options.queue.async { completion(account, nil, nil, NKError(rootJson: json, fallbackStatusCode: response.response?.statusCode)) }
                 }
             }
         }

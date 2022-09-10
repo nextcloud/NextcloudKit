@@ -1279,11 +1279,11 @@ class NKDataFileXML: NSObject {
         return files
     }
     
-    func convertDataComments(data: Data) -> [NKComments] {
+    func convertDataComments(xmlData: Data) -> [NKComments] {
         
         var items: [NKComments] = []
     
-        let xml = XML.parse(data)
+        let xml = XML.parse(xmlData)
         let elements = xml["d:multistatus", "d:response"]
         for element in elements {
             let item = NKComments()

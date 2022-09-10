@@ -28,14 +28,14 @@ extension NextcloudKit {
 
     @objc public func getComments(fileId: String,
                                   options: NKRequestOptions = NKRequestOptions(),
-                                  completion: @escaping (_ account: String, _ items: [NKComments]?, _ error: NKError) -> Void) {
+                                  completion: @escaping (_ account: String, _ items: [NKComments]?, _ data: Data?, _ error: NKError) -> Void) {
            
         let account = NKCommon.shared.account
 
         let serverUrlEndpoint = NKCommon.shared.urlBase + "/" + NKCommon.shared.dav + "/comments/files/\(fileId)"
             
         guard let url = serverUrlEndpoint.encodedToUrl else {
-            return options.queue.async { completion(account, nil, .urlError) }
+            return options.queue.async { completion(account, nil, nil, .urlError) }
         }
         
         let method = HTTPMethod(rawValue: "PROPFIND")
@@ -46,7 +46,7 @@ extension NextcloudKit {
             try urlRequest = URLRequest(url: url, method: method, headers: headers)
             urlRequest.httpBody = NKDataFileXML().requestBodyComments.data(using: .utf8)
         } catch {
-            return options.queue.async { completion(account, nil, NKError(error: error)) }
+            return options.queue.async { completion(account, nil, nil, NKError(error: error)) }
         }
           
         sessionManager.request(urlRequest).validate(statusCode: 200..<300).responseData(queue: NKCommon.shared.backgroundQueue) { (response) in
@@ -55,13 +55,13 @@ extension NextcloudKit {
             switch response.result {
             case .failure(let error):
                 let error = NKError(error: error, afResponse: response)
-                options.queue.async { completion(account, nil, error) }
+                options.queue.async { completion(account, nil, nil, error) }
             case .success( _):
-                if let data = response.data {
-                    let items = NKDataFileXML().convertDataComments(data: data)
-                    options.queue.async { completion(account, items, .success) }
+                if let xmlData = response.data {
+                    let items = NKDataFileXML().convertDataComments(xmlData: xmlData)
+                    options.queue.async { completion(account, items, xmlData, .success) }
                 } else {
-                    options.queue.async { completion(account, nil, .invalidData) }
+                    options.queue.async { completion(account, nil, nil, .invalidData) }
                 }
             }
         }

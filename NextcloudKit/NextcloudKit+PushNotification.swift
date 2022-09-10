@@ -37,12 +37,12 @@ extension NextcloudKit {
                                                   customUserAgent: String? = nil,
                                                   addCustomHeaders: [String: String]? = nil,
                                                   queue: DispatchQueue = .main,
-                                                  completion: @escaping (_ account: String, _ deviceIdentifier: String?, _ signature: String?, _ publicKey: String?, _ error: NKError) -> Void) {
+                                                  completion: @escaping (_ account: String, _ deviceIdentifier: String?, _ signature: String?, _ publicKey: String?, _ data: Data?, _ error: NKError) -> Void) {
         
         let endpoint = "ocs/v2.php/apps/notifications/api/v2/push"
         
         guard let url = NKCommon.shared.createStandardUrl(serverUrl: serverUrl, endpoint: endpoint) else {
-            return queue.async { completion(account, nil, nil, nil, .urlError) }
+            return queue.async { completion(account, nil, nil, nil, nil, .urlError) }
         }
 
         let parameters = [
@@ -59,7 +59,7 @@ extension NextcloudKit {
             switch response.result {
             case .failure(let error):
                 let error = NKError(error: error, afResponse: response)
-                queue.async { completion(account, nil, nil, nil, error) }
+                queue.async { completion(account, nil, nil, nil, nil, error) }
             case .success(let jsonData):
                 let json = JSON(jsonData)
                 let statusCode = json["ocs"]["meta"]["statuscode"].int ?? NKError.internalError
@@ -67,9 +67,9 @@ extension NextcloudKit {
                     let deviceIdentifier = json["ocs"]["data"]["deviceIdentifier"].stringValue
                     let signature = json["ocs"]["data"]["signature"].stringValue
                     let publicKey = json["ocs"]["data"]["publicKey"].stringValue
-                    queue.async { completion(account, deviceIdentifier, signature, publicKey, .success) }
+                    queue.async { completion(account, deviceIdentifier, signature, publicKey, jsonData, .success) }
                 } else {
-                    queue.async { completion(account, nil, nil, nil, NKError(rootJson: json, fallbackStatusCode: response.response?.statusCode)) }
+                    queue.async { completion(account, nil, nil, nil, nil, NKError(rootJson: json, fallbackStatusCode: response.response?.statusCode)) }
                 }
             }
         }

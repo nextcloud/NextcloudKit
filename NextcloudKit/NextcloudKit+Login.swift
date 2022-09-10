@@ -34,12 +34,12 @@ extension NextcloudKit {
                                      password: String,
                                      userAgent: String? = nil,
                                      queue: DispatchQueue = .main,
-                                     completion: @escaping (_ token: String?, _ error: NKError) -> Void) {
+                                     completion: @escaping (_ token: String?, _ data: Data?, _ error: NKError) -> Void) {
                 
         let endpoint = "ocs/v2.php/core/getapppassword"
         
         guard let url = NKCommon.shared.createStandardUrl(serverUrl: serverUrl, endpoint: endpoint) else {
-            return queue.async { completion(nil, .urlError) }
+            return queue.async { completion(nil, nil, .urlError) }
         }
         
         var headers: HTTPHeaders = [.authorization(username: username, password: password)]
@@ -52,7 +52,7 @@ extension NextcloudKit {
         do {
             try urlRequest = URLRequest(url: url, method: HTTPMethod(rawValue: "GET"), headers: headers)
         } catch {
-            return queue.async { completion(nil, NKError(error: error)) }
+            return queue.async { completion(nil, nil, NKError(error: error)) }
         }
 
         sessionManager.request(urlRequest).validate(statusCode: 200..<300).response(queue: NKCommon.shared.backgroundQueue) { (response) in
@@ -61,13 +61,13 @@ extension NextcloudKit {
             switch response.result {
             case .failure(let error):
                 let error = NKError(error: error, afResponse: response)
-                queue.async { completion(nil, error) }
+                queue.async { completion(nil, nil, error) }
             case .success(let xmlData):
                 if let data = xmlData {
                     let apppassword = NKDataFileXML().convertDataAppPassword(data: data)
-                    queue.async { completion(apppassword, .success) }
+                    queue.async { completion(apppassword, xmlData, .success) }
                 } else {
-                    queue.async { completion(nil, .xmlError) }
+                    queue.async { completion(nil, nil, .xmlError) }
                 }
             }
         }
@@ -78,12 +78,12 @@ extension NextcloudKit {
     @objc public func getLoginFlowV2(serverUrl: String,
                                      userAgent: String? = nil,
                                      queue: DispatchQueue = .main,
-                                     completion: @escaping (_ token: String?, _ endpoint: String? , _ login: String?, _ error: NKError) -> Void) {
+                                     completion: @escaping (_ token: String?, _ endpoint: String? , _ login: String?, _ data: Data?, _ error: NKError) -> Void) {
                 
         let endpoint = "index.php/login/v2"
         
         guard let url = NKCommon.shared.createStandardUrl(serverUrl: serverUrl, endpoint: endpoint) else {
-            return queue.async { completion(nil, nil, nil, .urlError) }
+            return queue.async { completion(nil, nil, nil, nil, .urlError) }
         }
         
         var headers: HTTPHeaders?
@@ -97,7 +97,7 @@ extension NextcloudKit {
             switch response.result {
             case .failure(let error):
                 let error = NKError(error: error, afResponse: response)
-                queue.async { completion(nil, nil, nil, error) }
+                queue.async { completion(nil, nil, nil, nil, error) }
             case .success(let jsonData):
                 let json = JSON(jsonData)
                
@@ -105,7 +105,7 @@ extension NextcloudKit {
                 let endpoint = json["poll"]["endpoint"].string
                 let login = json["login"].string
                 
-                queue.async { completion(token, endpoint, login, .success) }
+                queue.async { completion(token, endpoint, login, jsonData, .success) }
             }
         }
     }
@@ -114,12 +114,12 @@ extension NextcloudKit {
                                          endpoint: String,
                                          userAgent: String? = nil,
                                          queue: DispatchQueue = .main,
-                                         completion: @escaping (_ server: String?, _ loginName: String? , _ appPassword: String?, _ error: NKError) -> Void) {
+                                         completion: @escaping (_ server: String?, _ loginName: String? , _ appPassword: String?, _ data: Data?, _ error: NKError) -> Void) {
                 
         let serverUrl = endpoint + "?token=" + token
         
         guard let url = serverUrl.asUrl else {
-            return queue.async { completion(nil, nil, nil, .urlError) }
+            return queue.async { completion(nil, nil, nil, nil, .urlError) }
         }
         
         var headers: HTTPHeaders?
@@ -133,7 +133,7 @@ extension NextcloudKit {
             switch response.result {
             case .failure(let error):
                 let error = NKError(error: error, afResponse: response)
-                queue.async { completion(nil, nil, nil, error) }
+                queue.async { completion(nil, nil, nil, nil, error) }
             case .success(let jsonData):
                 let json = JSON(jsonData)
             
@@ -141,7 +141,7 @@ extension NextcloudKit {
                 let loginName = json["loginName"].string
                 let appPassword = json["appPassword"].string
                 
-                queue.async { completion(server, loginName, appPassword, .success) }
+                queue.async { completion(server, loginName, appPassword, jsonData, .success) }
             }
         }
     }
