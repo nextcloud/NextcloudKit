@@ -207,35 +207,6 @@ import SwiftyJSON
     @objc public let button: [NCCDashboardWidgetButton]?
 
     init?(application: String, data: JSON) {
-        guard let item = NCCDashboardWidgetItem(data: data) else { return nil }
-        self.id = item.id
-        self.title = item.title
-        self.order = item.order
-        self.iconClass = item.iconClass
-        self.iconUrl = item.iconUrl
-        self.widgetUrl = item.widgetUrl
-        self.button = item.button
-    }
-
-    static func factory(data: JSON) -> [NCCDashboardWidget] {
-        var results = [NCCDashboardWidget]()
-        for (application, data):(String, JSON) in data {
-            if let result = NCCDashboardWidget(application: application, data: data) {
-                results.append(result)
-            }
-        }
-        return results
-    }
-}
-
-@objc public class NCCDashboardWidgetItem: NSObject {
-    
-    @objc public let id, title: String
-    @objc public let order: Int
-    @objc public let iconClass, iconUrl, widgetUrl: String?
-    @objc public let button: [NCCDashboardWidgetButton]?
-
-    init?(data: JSON) {
         guard let id = data["id"].string,
               let title = data["title"].string,
               let order = data["order"].int
@@ -247,6 +218,16 @@ import SwiftyJSON
         self.iconUrl = data["icon_url"].string
         self.widgetUrl = data["widget_url"].string
         self.button = NCCDashboardWidgetButton.factory(data: data["buttons"])
+    }
+
+    static func factory(data: JSON) -> [NCCDashboardWidget] {
+        var results = [NCCDashboardWidget]()
+        for (application, data):(String, JSON) in data {
+            if let result = NCCDashboardWidget(application: application, data: data) {
+                results.append(result)
+            }
+        }
+        return results
     }
 }
 
