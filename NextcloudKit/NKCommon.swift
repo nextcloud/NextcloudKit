@@ -431,15 +431,15 @@ import MobileCoreServices
     
     //MARK: - Common
     
-    func getStandardHeaders(options: NKRequestOptions) -> HTTPHeaders {
+    public func getStandardHeaders(options: NKRequestOptions) -> HTTPHeaders {
         return getStandardHeaders(user: user, password: password, appendHeaders: options.customHeader, customUserAgent: options.customUserAgent, contentType: options.contentType, e2eToken: options.e2eToken)
      }
 
-    func getStandardHeaders(_ appendHeaders: [String: String]?, customUserAgent: String?, contentType: String? = nil, e2eToken: String? = nil) -> HTTPHeaders {
+    public func getStandardHeaders(_ appendHeaders: [String: String]?, customUserAgent: String?, contentType: String? = nil, e2eToken: String? = nil) -> HTTPHeaders {
         return getStandardHeaders(user: user, password: password, appendHeaders: appendHeaders, customUserAgent: customUserAgent, contentType: contentType, e2eToken: e2eToken)
     }
     
-    func getStandardHeaders(user: String, password: String, appendHeaders: [String: String]?, customUserAgent: String?, contentType: String? = nil, e2eToken: String? = nil) -> HTTPHeaders {
+    public func getStandardHeaders(user: String, password: String, appendHeaders: [String: String]?, customUserAgent: String?, contentType: String? = nil, e2eToken: String? = nil) -> HTTPHeaders {
         
         var headers: HTTPHeaders = [.authorization(username: user, password: password)]
         if customUserAgent != nil {
