@@ -38,7 +38,7 @@ extension NextcloudKit {
         if let endpoint = options.endpoint {
             url = URL(string: endpoint)
         } else {
-            let endpoint = "/ocs/v2.php/apps/dashboard/api/v1/widgets"
+            let endpoint = "ocs/v2.php/apps/dashboard/api/v1/widgets"
             url = NKCommon.shared.createStandardUrl(serverUrl: NKCommon.shared.urlBase, endpoint: endpoint)
         }
 
@@ -82,7 +82,7 @@ extension NextcloudKit {
         if let endpoint = options.endpoint {
             url = URL(string: endpoint)
         } else {
-            let endpoint = "/ocs/v2.php/apps/dashboard/api/v1/widget-items?widgets[]=\(items)"
+            let endpoint = "ocs/v2.php/apps/dashboard/api/v1/widget-items?widgets[]=\(items)"
             url = NKCommon.shared.createStandardUrl(serverUrl: NKCommon.shared.urlBase, endpoint: endpoint)
         }
 
