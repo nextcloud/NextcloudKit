@@ -204,6 +204,7 @@ import SwiftyJSON
     @objc public var id, title: String
     @objc public let order: Int
     @objc public let iconClass, iconUrl, widgetUrl: String?
+    @objc public let itemIconsRound: Bool
     @objc public let button: [NCCDashboardWidgetButton]?
 
     init?(application: String, data: JSON) {
@@ -217,6 +218,7 @@ import SwiftyJSON
         self.iconClass = data["icon_class"].string
         self.iconUrl = data["icon_url"].string
         self.widgetUrl = data["widget_url"].string
+        self.itemIconsRound = data["item_icons_round"].boolValue
         self.button = NCCDashboardWidgetButton.factory(data: data["buttons"])
     }
 
