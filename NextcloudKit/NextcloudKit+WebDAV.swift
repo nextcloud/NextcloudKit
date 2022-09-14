@@ -245,17 +245,26 @@ extension NextcloudKit {
         }
     }
      
+    @objc public func getFileFromFileId(_ fileId: String,
+                                        options: NKRequestOptions = NKRequestOptions(),
+                                        completion: @escaping (_ account: String, _ files: NKFile?, _ data: Data?, _ error: NKError) -> Void) {
+            
+        let httpBody = String(format: NKDataFileXML().requestBodySearchFileId, NKCommon.shared.userId, fileId).data(using: .utf8)!
+        
+        search(serverUrl: NKCommon.shared.urlBase, httpBody: httpBody, showHiddenFiles: true, account: NKCommon.shared.account, options: options) { (account, files, data, error) in
+            options.queue.async { completion(account, files.first, data, error) }
+        }
+    }
+
     @objc public func searchBodyRequest(serverUrl: String,
                                         requestBody: String,
                                         showHiddenFiles: Bool,
                                         options: NKRequestOptions = NKRequestOptions(),
                                         completion: @escaping (_ account: String, _ files: [NKFile], _ data: Data?, _ error: NKError) -> Void) {
          
-        let account = NKCommon.shared.account
-
         let httpBody = requestBody.data(using: .utf8)!
      
-        search(serverUrl: serverUrl, httpBody: httpBody, showHiddenFiles: showHiddenFiles, account: account, options: options) { (account, files, data, error) in
+        search(serverUrl: serverUrl, httpBody: httpBody, showHiddenFiles: showHiddenFiles, account: NKCommon.shared.account, options: options) { (account, files, data, error) in
             options.queue.async { completion(account, files, data, error) }
         }
     }
@@ -317,7 +326,7 @@ extension NextcloudKit {
         
         var requestBody = ""
         if limit > 0 {
-            requestBody = String(format: NKDataFileXML().requestBodySearchMediaWithLimit, href, elementDate, elementDate, lessDateString!, elementDate, greaterDateString!, String(limit))
+            requestBody = String(format: NKDataFileXML().requestBodySearchMediaWithLimit, NKCommon.shared.userId, elementDate, elementDate, lessDateString!, elementDate, greaterDateString!, String(limit))
         } else {
             requestBody = String(format: NKDataFileXML().requestBodySearchMedia, href, elementDate, elementDate, lessDateString!, elementDate, greaterDateString!)
         }
@@ -328,7 +337,7 @@ extension NextcloudKit {
             options.queue.async { completion(account, files, data, error) }
         }
     }
-     
+
     private func search(serverUrl: String,
                         httpBody: Data,
                         showHiddenFiles: Bool,
