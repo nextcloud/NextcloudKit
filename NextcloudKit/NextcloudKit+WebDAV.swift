@@ -326,7 +326,7 @@ extension NextcloudKit {
         
         var requestBody = ""
         if limit > 0 {
-            requestBody = String(format: NKDataFileXML().requestBodySearchMediaWithLimit, NKCommon.shared.userId, elementDate, elementDate, lessDateString!, elementDate, greaterDateString!, String(limit))
+            requestBody = String(format: NKDataFileXML().requestBodySearchMediaWithLimit, href, elementDate, elementDate, lessDateString!, elementDate, greaterDateString!, String(limit))
         } else {
             requestBody = String(format: NKDataFileXML().requestBodySearchMedia, href, elementDate, elementDate, lessDateString!, elementDate, greaterDateString!)
         }
