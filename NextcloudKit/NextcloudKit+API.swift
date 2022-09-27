@@ -206,7 +206,8 @@ extension NextcloudKit {
                                       widthPreview: Int,
                                       heightPreview: Int,
                                       fileNameIconLocalPath: String? = nil,
-                                      sizeIcon: Int = 0, etag: String?,
+                                      sizeIcon: Int = 0,
+                                      etag: String?,
                                       endpointTrashbin: Bool = false,
                                       useInternalEndpoint: Bool = true,
                                       options: NKRequestOptions = NKRequestOptions(),
@@ -280,14 +281,15 @@ extension NextcloudKit {
 
     @available(iOS 13.0, *)
     public func downloadPreview(fileNamePathOrFileId: String,
-                                   fileNamePreviewLocalPath: String,
-                                   widthPreview: Int,
-                                   heightPreview: Int,
-                                   fileNameIconLocalPath: String? = nil,
-                                   sizeIcon: Int = 0, etag: String?,
-                                   endpointTrashbin: Bool = false,
-                                   useInternalEndpoint: Bool = true,
-                                   options: NKRequestOptions = NKRequestOptions()) async throws -> (account: String, imagePreview: UIImage?, imageIcon: UIImage?, imageOriginal: UIImage?, etag: String?) {
+                                fileNamePreviewLocalPath: String,
+                                widthPreview: Int,
+                                heightPreview: Int,
+                                fileNameIconLocalPath: String? = nil,
+                                sizeIcon: Int = 0,
+                                etag: String? = nil,
+                                endpointTrashbin: Bool = false,
+                                useInternalEndpoint: Bool = true,
+                                options: NKRequestOptions = NKRequestOptions()) async throws -> (account: String, imagePreview: UIImage?, imageIcon: UIImage?, imageOriginal: UIImage?, etag: String?) {
 
         try await withUnsafeThrowingContinuation { continuation in
 
