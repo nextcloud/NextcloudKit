@@ -207,7 +207,7 @@ extension NextcloudKit {
                                       heightPreview: Int,
                                       fileNameIconLocalPath: String? = nil,
                                       sizeIcon: Int = 0,
-                                      etag: String?,
+                                      etag: String? = nil,
                                       endpointTrashbin: Bool = false,
                                       useInternalEndpoint: Bool = true,
                                       options: NKRequestOptions = NKRequestOptions(),
