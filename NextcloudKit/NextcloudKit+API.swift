@@ -279,7 +279,7 @@ extension NextcloudKit {
     }
 
     @available(iOS 13.0, *)
-    func downloadAsyncPreview(fileNamePathOrFileId: String,
+    public func downloadPreview(fileNamePathOrFileId: String,
                                    fileNamePreviewLocalPath: String,
                                    widthPreview: Int,
                                    heightPreview: Int,
