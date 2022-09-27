@@ -466,6 +466,16 @@ import MobileCoreServices
         
         return headers
     }
+
+    public func createStandardUrl(serverUrl: String, endpoint: String) -> URLConvertible? {
+
+        guard var serverUrl = serverUrl.urlEncoded else { return nil }
+        if serverUrl.last != "/" { serverUrl = serverUrl + "/" }
+
+        serverUrl = serverUrl + endpoint
+
+        return serverUrl.asUrl
+    }
     
     func convertDate(_ dateString: String, format: String) -> NSDate? {
         
@@ -487,16 +497,6 @@ import MobileCoreServices
         return dateFormatter.string(from: date)
     }
 
-    func createStandardUrl(serverUrl: String, endpoint: String) -> URLConvertible? {
-        
-        guard var serverUrl = serverUrl.urlEncoded else { return nil }
-        if serverUrl.last != "/" { serverUrl = serverUrl + "/" }
-        
-        serverUrl = serverUrl + endpoint
-        
-        return serverUrl.asUrl
-    }
-    
     func findHeader(_ header: String, allHeaderFields: [AnyHashable : Any]?) -> String? {
        
         guard let allHeaderFields = allHeaderFields else { return nil }
