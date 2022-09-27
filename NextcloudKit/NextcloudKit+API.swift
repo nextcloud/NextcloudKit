@@ -277,6 +277,30 @@ extension NextcloudKit {
             }
         }
     }
+
+    @available(iOS 13.0, *)
+    @Sendable func downloadPreview(fileNamePathOrFileId: String,
+                                   fileNamePreviewLocalPath: String,
+                                   widthPreview: Int,
+                                   heightPreview: Int,
+                                   fileNameIconLocalPath: String? = nil,
+                                   sizeIcon: Int = 0, etag: String?,
+                                   endpointTrashbin: Bool = false,
+                                   useInternalEndpoint: Bool = true,
+                                   options: NKRequestOptions = NKRequestOptions()) async throws -> (account: String, imagePreview: UIImage?, imageIcon: UIImage?, imageOriginal: UIImage?, etag: String?) {
+
+        try await withUnsafeThrowingContinuation { continuation in
+
+            NextcloudKit.shared.downloadPreview(fileNamePathOrFileId: fileNamePathOrFileId, fileNamePreviewLocalPath: fileNamePreviewLocalPath, widthPreview: widthPreview, heightPreview: heightPreview, fileNameIconLocalPath: fileNameIconLocalPath, sizeIcon: sizeIcon, etag: etag, options: options) { account, imagePreview, imageIcon, imageOriginal, etag, nkerror in
+
+                if nkerror == .success {
+                    continuation.resume(returning: (account: account, imagePreview: imagePreview, imageIcon: imageIcon, imageOriginal: imageOriginal, etag: etag))
+                } else {
+                    continuation.resume(throwing: NSError(domain: NSCocoaErrorDomain, code: nkerror.errorCode, userInfo: [NSLocalizedDescriptionKey:nkerror.description]))
+                }
+            }
+        }
+    }
     
     @objc public func downloadAvatar(user: String,
                                      fileNameLocalPath: String,
