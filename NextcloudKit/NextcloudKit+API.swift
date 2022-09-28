@@ -293,12 +293,12 @@ extension NextcloudKit {
 
         try await withUnsafeThrowingContinuation { continuation in
 
-            NextcloudKit.shared.downloadPreview(fileNamePathOrFileId: fileNamePathOrFileId, fileNamePreviewLocalPath: fileNamePreviewLocalPath, widthPreview: widthPreview, heightPreview: heightPreview, fileNameIconLocalPath: fileNameIconLocalPath, sizeIcon: sizeIcon, etag: etag, options: options) { account, imagePreview, imageIcon, imageOriginal, etag, nkerror in
+            NextcloudKit.shared.downloadPreview(fileNamePathOrFileId: fileNamePathOrFileId, fileNamePreviewLocalPath: fileNamePreviewLocalPath, widthPreview: widthPreview, heightPreview: heightPreview, fileNameIconLocalPath: fileNameIconLocalPath, sizeIcon: sizeIcon, etag: etag, options: options) { account, imagePreview, imageIcon, imageOriginal, etag, error in
 
-                if nkerror == .success {
+                if error == .success {
                     continuation.resume(returning: (account: account, imagePreview: imagePreview, imageIcon: imageIcon, imageOriginal: imageOriginal, etag: etag))
                 } else {
-                    continuation.resume(throwing: NSError(domain: NSCocoaErrorDomain, code: nkerror.errorCode, userInfo: [NSLocalizedDescriptionKey:nkerror.description]))
+                    continuation.resume(throwing: error.error)
                 }
             }
         }
