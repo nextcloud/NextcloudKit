@@ -266,7 +266,7 @@ extension NextcloudKit {
                     }
                     if fileNameIconLocalPath != nil && sizeIcon > 0 {
                         imageIcon =  imageOriginal.resizeImage(size: CGSize(width: sizeIcon, height: sizeIcon), isAspectRation: true)
-                        if let data = imageIcon?.jpegData(compressionQuality: 1) {
+                        if let data = imageIcon?.jpegData(compressionQuality: 0.5) {
                             try data.write(to: URL.init(fileURLWithPath: fileNameIconLocalPath!), options: .atomic)
                             imageIcon = UIImage.init(data: data)!
                         }
