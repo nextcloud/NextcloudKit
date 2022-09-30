@@ -245,12 +245,25 @@ extension NextcloudKit {
         }
     }
      
-    @objc public func getFileFromFileId(_ fileId: String,
+    @objc public func getFileFromFileId(_ fileId: String?,
+                                        link: String?,
                                         options: NKRequestOptions = NKRequestOptions(),
-                                        completion: @escaping (_ account: String, _ files: NKFile?, _ data: Data?, _ error: NKError) -> Void) {
-            
-        let httpBody = String(format: NKDataFileXML().requestBodySearchFileId, NKCommon.shared.userId, fileId).data(using: .utf8)!
-        
+                                        completion: @escaping (_ account: String, _ file: NKFile?, _ data: Data?, _ error: NKError) -> Void) {
+
+        var httpBody: Data?
+
+        if let fileId = fileId {
+            httpBody = String(format: NKDataFileXML().requestBodySearchFileId, NKCommon.shared.userId, fileId).data(using: .utf8)!
+        } else if let link = link {
+            var linkArray = link.components(separatedBy: "/")
+            if let fileId =  linkArray.last {
+                httpBody = String(format: NKDataFileXML().requestBodySearchFileId, NKCommon.shared.userId, fileId).data(using: .utf8)!
+            }
+        }
+        guard let httpBody = httpBody else {
+            return options.queue.async { completion(NKCommon.shared.account, nil, nil, .urlError) }
+        }
+
         search(serverUrl: NKCommon.shared.urlBase, httpBody: httpBody, showHiddenFiles: true, account: NKCommon.shared.account, options: options) { (account, files, data, error) in
             options.queue.async { completion(account, files.first, data, error) }
         }
