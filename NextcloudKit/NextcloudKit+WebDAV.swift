@@ -245,8 +245,8 @@ extension NextcloudKit {
         }
     }
      
-    @objc public func getFileFromFileId(_ fileId: String?,
-                                        link: String?,
+    @objc public func getFileFromFileId(fileId: String? = nil,
+                                        link: String? = nil,
                                         options: NKRequestOptions = NKRequestOptions(),
                                         completion: @escaping (_ account: String, _ file: NKFile?, _ data: Data?, _ error: NKError) -> Void) {
 
@@ -255,7 +255,7 @@ extension NextcloudKit {
         if let fileId = fileId {
             httpBody = String(format: NKDataFileXML().requestBodySearchFileId, NKCommon.shared.userId, fileId).data(using: .utf8)!
         } else if let link = link {
-            var linkArray = link.components(separatedBy: "/")
+            let linkArray = link.components(separatedBy: "/")
             if let fileId =  linkArray.last {
                 httpBody = String(format: NKDataFileXML().requestBodySearchFileId, NKCommon.shared.userId, fileId).data(using: .utf8)!
             }
