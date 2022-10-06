@@ -781,7 +781,74 @@ class NKDataFileXML: NSObject {
         </d:basicsearch>
     </d:searchrequest>
     """
-    
+
+    let requestBodySearchLessThan =
+    """
+    <?xml version=\"1.0\"?>
+    <d:searchrequest xmlns:d=\"DAV:\" xmlns:oc=\"http://owncloud.org/ns\" xmlns:nc=\"http://nextcloud.org/ns\">
+    <d:basicsearch>
+        <d:select>
+            <d:prop>
+                <d:getlastmodified />
+                <d:getetag />
+                <d:getcontenttype />
+                <d:resourcetype />
+                <d:quota-available-bytes />
+                <d:quota-used-bytes />
+
+                <permissions xmlns=\"http://owncloud.org/ns\"/>
+                <id xmlns=\"http://owncloud.org/ns\"/>
+                <fileid xmlns=\"http://owncloud.org/ns\"/>
+                <size xmlns=\"http://owncloud.org/ns\"/>
+                <favorite xmlns=\"http://owncloud.org/ns\"/>
+                <share-types xmlns=\"http://owncloud.org/ns\"/>
+                <owner-id xmlns=\"http://owncloud.org/ns\"/>
+                <owner-display-name xmlns=\"http://owncloud.org/ns\"/>
+                <comments-unread xmlns=\"http://owncloud.org/ns\"/>
+                <checksums xmlns=\"http://owncloud.org/ns\"/>
+                <downloadURL xmlns=\"http://owncloud.org/ns\"/>
+                <data-fingerprint xmlns=\"http://owncloud.org/ns\"/>
+
+                <creation_time xmlns=\"http://nextcloud.org/ns\"/>
+                <upload_time xmlns=\"http://nextcloud.org/ns\"/>
+                <is-encrypted xmlns=\"http://nextcloud.org/ns\"/>
+                <has-preview xmlns=\"http://nextcloud.org/ns\"/>
+                <mount-type xmlns=\"http://nextcloud.org/ns\"/>
+                <rich-workspace xmlns=\"http://nextcloud.org/ns\"/>
+                <note xmlns=\"http://nextcloud.org/ns\"/>
+                <lock xmlns=\"http://nextcloud.org/ns\"/>
+                <lock-owner xmlns=\"http://nextcloud.org/ns\"/>
+                <lock-owner-editor xmlns=\"http://nextcloud.org/ns\"/>
+                <lock-owner-displayname xmlns=\"http://nextcloud.org/ns\"/>
+                <lock-owner-type xmlns="http://nextcloud.org/ns"/>
+                <lock-time xmlns=\"http://nextcloud.org/ns\"/>
+                <lock-timeout xmlns=\"http://nextcloud.org/ns\"/>
+
+                <share-permissions xmlns=\"http://open-collaboration-services.org/ns\"/>
+                <share-permissions xmlns=\"http://open-cloud-mesh.org/ns\"/>
+            </d:prop>
+        </d:select>
+        <d:from>
+            <d:scope>
+                <d:href>%@</d:href>
+                <d:depth>infinity</d:depth>
+            </d:scope>
+        </d:from>
+        <d:where>
+            <d:lt>
+                <d:prop>
+                    <d:getlastmodified/>
+                </d:prop>
+                <d:literal>%@</d:literal>
+            </d:lt>
+        </d:where>
+            <d:limit>
+                <d:nresults>%@</d:nresults>
+            </d:limit>
+        </d:basicsearch>
+    </d:searchrequest>
+    """
+
     let requestBodySearchMedia =
     """
     <?xml version=\"1.0\"?>
