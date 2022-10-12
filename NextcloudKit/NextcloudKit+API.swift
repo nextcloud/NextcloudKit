@@ -200,6 +200,32 @@ extension NextcloudKit {
             }
         }
     }
+
+    @available(iOS 13.0, *)
+    public func getPreview(url: URL,
+                           options: NKRequestOptions = NKRequestOptions()) async throws -> (account: String, data: Data?) {
+
+        try await withUnsafeThrowingContinuation { continuation in
+
+            let account = NKCommon.shared.account
+            let headers = NKCommon.shared.getStandardHeaders(options: options)
+
+            sessionManager.request(url, method: .get, parameters: nil, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).response(queue: NKCommon.shared.backgroundQueue) { (response) in
+                debugPrint(response)
+
+                switch response.result {
+                case .failure(let error):
+                    let error = NKError(error: error, afResponse: response)
+                    continuation.resume(throwing: error.error)
+                    options.queue.async { continuation.resume(throwing: error.error) }
+                    break
+                case .success( _):
+                    options.queue.async { continuation.resume(returning: (account: account, data: response.data)) }
+                    break
+                }
+            }
+        }
+    }
     
     @objc public func downloadPreview(fileNamePathOrFileId: String,
                                       fileNamePreviewLocalPath: String,
