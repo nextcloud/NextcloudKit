@@ -28,8 +28,8 @@ import SwiftyJSON
 extension NextcloudKit {
 
     public func getDashboardWidget(options: NKRequestOptions = NKRequestOptions(),
-                                    request: @escaping (DataRequest?) -> () = { _ in },
-                                    completion: @escaping (_ account: String, _ dashboardWidgets: [NCCDashboardWidget]?, _ data: Data?, _ error: NKError) -> Void) {
+                                   request: @escaping (DataRequest?) -> () = { _ in },
+                                   completion: @escaping (_ account: String, _ dashboardWidgets: [NCCDashboardWidget]?, _ data: Data?, _ error: NKError) -> Void) {
 
         let account = NKCommon.shared.account
 
