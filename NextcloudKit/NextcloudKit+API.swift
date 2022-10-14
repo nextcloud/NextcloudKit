@@ -201,27 +201,6 @@ extension NextcloudKit {
         }
     }
 
-    /// - Description: Async wrapper for getPreview(...)
-    /// - Parameters:
-    ///     - url: url to file
-    ///     - options: look the NKRequestOptions
-    @available(iOS 13.0, *)
-    public func getPreview(url: URL,
-                           options: NKRequestOptions = NKRequestOptions()) async throws -> (account: String, data: Data?) {
-
-        try await withUnsafeThrowingContinuation { continuation in
-
-            NextcloudKit.shared.getPreview(url: url, options: options) { account, data, error in
-                
-                if error == .success {
-                    continuation.resume(returning: (account: account, data: data))
-                } else {
-                    continuation.resume(throwing: error.error)
-                }
-            }
-        }
-    }
-    
     @objc public func downloadPreview(fileNamePathOrFileId: String,
                                       fileNamePreviewLocalPath: String,
                                       widthPreview: Int,
@@ -300,35 +279,6 @@ extension NextcloudKit {
         }
     }
 
-    /// - Description: Async wrapper for downloadPreview(...)
-    /// - Parameters:
-    ///     - ...
-    ///     - options: look the NKRequestOptions
-    @available(iOS 13.0, *)
-    public func downloadPreview(fileNamePathOrFileId: String,
-                                fileNamePreviewLocalPath: String,
-                                widthPreview: Int,
-                                heightPreview: Int,
-                                fileNameIconLocalPath: String? = nil,
-                                sizeIcon: Int = 0,
-                                etag: String? = nil,
-                                endpointTrashbin: Bool = false,
-                                useInternalEndpoint: Bool = true,
-                                options: NKRequestOptions = NKRequestOptions()) async throws -> (account: String, imagePreview: UIImage?, imageIcon: UIImage?, imageOriginal: UIImage?, etag: String?) {
-
-        try await withUnsafeThrowingContinuation { continuation in
-
-            NextcloudKit.shared.downloadPreview(fileNamePathOrFileId: fileNamePathOrFileId, fileNamePreviewLocalPath: fileNamePreviewLocalPath, widthPreview: widthPreview, heightPreview: heightPreview, fileNameIconLocalPath: fileNameIconLocalPath, sizeIcon: sizeIcon, etag: etag, options: options) { account, imagePreview, imageIcon, imageOriginal, etag, error in
-
-                if error == .success {
-                    continuation.resume(returning: (account: account, imagePreview: imagePreview, imageIcon: imageIcon, imageOriginal: imageOriginal, etag: etag))
-                } else {
-                    continuation.resume(throwing: error.error)
-                }
-            }
-        }
-    }
-    
     @objc public func downloadAvatar(user: String,
                                      fileNameLocalPath: String,
                                      sizeImage: Int,
