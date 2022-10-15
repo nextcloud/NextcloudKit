@@ -430,15 +430,16 @@ import MobileCoreServices
     }
     
     //MARK: - Common
-    func getStandardHeaders(options: NKRequestOptions) -> HTTPHeaders {
+    
+    public func getStandardHeaders(options: NKRequestOptions) -> HTTPHeaders {
         return getStandardHeaders(user: user, password: password, appendHeaders: options.customHeader, customUserAgent: options.customUserAgent, contentType: options.contentType, e2eToken: options.e2eToken)
      }
 
-    func getStandardHeaders(_ appendHeaders: [String: String]?, customUserAgent: String?, contentType: String? = nil, e2eToken: String? = nil) -> HTTPHeaders {
+    public func getStandardHeaders(_ appendHeaders: [String: String]?, customUserAgent: String?, contentType: String? = nil, e2eToken: String? = nil) -> HTTPHeaders {
         return getStandardHeaders(user: user, password: password, appendHeaders: appendHeaders, customUserAgent: customUserAgent, contentType: contentType, e2eToken: e2eToken)
     }
     
-    func getStandardHeaders(user: String, password: String, appendHeaders: [String: String]?, customUserAgent: String?, contentType: String? = nil, e2eToken: String? = nil) -> HTTPHeaders {
+    public func getStandardHeaders(user: String, password: String, appendHeaders: [String: String]?, customUserAgent: String?, contentType: String? = nil, e2eToken: String? = nil) -> HTTPHeaders {
         
         var headers: HTTPHeaders = [.authorization(username: user, password: password)]
         if customUserAgent != nil {
@@ -465,6 +466,16 @@ import MobileCoreServices
         
         return headers
     }
+
+    public func createStandardUrl(serverUrl: String, endpoint: String) -> URLConvertible? {
+
+        guard var serverUrl = serverUrl.urlEncoded else { return nil }
+        if serverUrl.last != "/" { serverUrl = serverUrl + "/" }
+
+        serverUrl = serverUrl + endpoint
+
+        return serverUrl.asUrl
+    }
     
     func convertDate(_ dateString: String, format: String) -> NSDate? {
         
@@ -486,16 +497,6 @@ import MobileCoreServices
         return dateFormatter.string(from: date)
     }
 
-    func createStandardUrl(serverUrl: String, endpoint: String) -> URLConvertible? {
-        
-        guard var serverUrl = serverUrl.urlEncoded else { return nil }
-        if serverUrl.last != "/" { serverUrl = serverUrl + "/" }
-        
-        serverUrl = serverUrl + endpoint
-        
-        return serverUrl.asUrl
-    }
-    
     func findHeader(_ header: String, allHeaderFields: [AnyHashable : Any]?) -> String? {
        
         guard let allHeaderFields = allHeaderFields else { return nil }

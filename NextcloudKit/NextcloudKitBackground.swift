@@ -31,7 +31,10 @@ import Foundation
         
     //MARK: - Download
     
-    @objc public func download(serverUrlFileName: Any, fileNameLocalPath: String, description: String?, session: URLSession) -> URLSessionDownloadTask? {
+    @objc public func download(serverUrlFileName: Any,
+                               fileNameLocalPath: String,
+                               description: String?,
+                               session: URLSession) -> URLSessionDownloadTask? {
         
         var url: URL?
         
@@ -70,7 +73,12 @@ import Foundation
     
     //MARK: - Upload
     
-    @objc public func upload(serverUrlFileName: Any, fileNameLocalPath: String, dateCreationFile: Date?, dateModificationFile: Date?, description: String?, session: URLSession) -> URLSessionUploadTask? {
+    @objc public func upload(serverUrlFileName: Any,
+                             fileNameLocalPath: String,
+                             dateCreationFile: Date?,
+                             dateModificationFile: Date?,
+                             description: String?,
+                             session: URLSession) -> URLSessionUploadTask? {
         
         var url: URL?
         
@@ -214,15 +222,16 @@ import Foundation
         }
         
         if nkError.errorCode == 0 {
-            NKCommon.shared.writeLog("Network completed upload file: " + serverUrl + "/" + fileName)
+            NKCommon.shared.writeLog("Network completed upload file: \(serverUrl)/\(fileName)")
         } else {
-            NKCommon.shared.writeLog("Network completed upload file: " + serverUrl + "/" + fileName + " with error code \(nkError.errorCode) and error description " + nkError.errorDescription)
+            NKCommon.shared.writeLog("Network completed upload file: \(serverUrl)/\(fileName) with error code \(nkError.errorCode) and error description " + nkError.errorDescription)
         }
     }
     
     public func urlSession(_ session: URLSession, didReceive challenge: URLAuthenticationChallenge, completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
         
         if NKCommon.shared.delegate == nil {
+            NKCommon.shared.writeLog("[WARNING] URLAuthenticationChallenge, no delegate found, perform with default handling")
             completionHandler(URLSession.AuthChallengeDisposition.performDefaultHandling, nil)
         } else {
             NKCommon.shared.delegate?.authenticationChallenge?(session, didReceive: challenge, completionHandler: { authChallengeDisposition, credential in

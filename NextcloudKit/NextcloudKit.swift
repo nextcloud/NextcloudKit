@@ -154,7 +154,11 @@ import SwiftyJSON
     
     //MARK: - download / upload
     
-    @objc public func download(serverUrlFileName: Any, fileNameLocalPath: String, customUserAgent: String? = nil, addCustomHeaders: [String: String]? = nil, queue: DispatchQueue = .main,
+    @objc public func download(serverUrlFileName: Any,
+                               fileNameLocalPath: String,
+                               customUserAgent: String? = nil,
+                               addCustomHeaders: [String: String]? = nil,
+                               queue: DispatchQueue = .main,
                                taskHandler: @escaping (_ task: URLSessionTask) -> () = { _ in },
                                progressHandler: @escaping (_ progress: Progress) -> () = { _ in },
                                completionHandler: @escaping (_ account: String, _ etag: String?, _ date: NSDate?, _ lenght: Int64, _ allHeaderFields: [AnyHashable : Any]?, _ nkError: NKError) -> Void) {
@@ -171,7 +175,11 @@ import SwiftyJSON
         }
     }
     
-    public func download(serverUrlFileName: Any, fileNameLocalPath: String, customUserAgent: String? = nil, addCustomHeaders: [String: String]? = nil, queue: DispatchQueue = .main,
+    public func download(serverUrlFileName: Any,
+                         fileNameLocalPath: String,
+                         customUserAgent: String? = nil,
+                         addCustomHeaders: [String: String]? = nil,
+                         queue: DispatchQueue = .main,
                          requestHandler: @escaping (_ request: DownloadRequest) -> () = { _ in },
                          taskHandler: @escaping (_ task: URLSessionTask) -> () = { _ in },
                          progressHandler: @escaping (_ progress: Progress) -> () = { _ in },
@@ -246,7 +254,13 @@ import SwiftyJSON
         queue.async { requestHandler(request) }
     }
     
-    @objc public func upload(serverUrlFileName: String, fileNameLocalPath: String, dateCreationFile: Date? = nil, dateModificationFile: Date? = nil, customUserAgent: String? = nil, addCustomHeaders: [String: String]? = nil, queue: DispatchQueue = .main,
+    @objc public func upload(serverUrlFileName: String,
+                             fileNameLocalPath: String,
+                             dateCreationFile: Date? = nil,
+                             dateModificationFile: Date? = nil,
+                             customUserAgent: String? = nil,
+                             addCustomHeaders: [String: String]? = nil,
+                             queue: DispatchQueue = .main,
                              taskHandler: @escaping (_ task: URLSessionTask) -> () = { _ in },
                              progressHandler: @escaping (_ progress: Progress) -> () = { _ in },
                              completionHandler: @escaping (_ account: String, _ ocId: String?, _ etag: String?, _ date: NSDate?, _ size: Int64, _ allHeaderFields: [AnyHashable : Any]?, _ nkError: NKError) -> Void) {
@@ -263,7 +277,13 @@ import SwiftyJSON
         }
     }
 
-    public func upload(serverUrlFileName: Any, fileNameLocalPath: String, dateCreationFile: Date? = nil, dateModificationFile: Date? = nil, customUserAgent: String? = nil, addCustomHeaders: [String: String]? = nil, queue: DispatchQueue = .main,
+    public func upload(serverUrlFileName: Any,
+                       fileNameLocalPath: String,
+                       dateCreationFile: Date? = nil,
+                       dateModificationFile: Date? = nil,
+                       customUserAgent: String? = nil,
+                       addCustomHeaders: [String: String]? = nil,
+                       queue: DispatchQueue = .main,
                        requestHandler: @escaping (_ request: UploadRequest) -> () = { _ in },
                        taskHandler: @escaping (_ task: URLSessionTask) -> () = { _ in },
                        progressHandler: @escaping (_ progress: Progress) -> () = { _ in },

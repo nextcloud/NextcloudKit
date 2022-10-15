@@ -58,6 +58,7 @@ public class NKError: NSObject {
 
     public let errorCode: Int
     public let errorDescription: String
+    public let error: Error
 
     static let urlError = NKError(errorCode: NSURLErrorBadURL, errorDescription: NSLocalizedString("_invalid_url_", value: "Invalid server url", comment: ""))
     static let xmlError = NKError(errorCode: NSURLErrorBadServerResponse, errorDescription: NSLocalizedString("_error_decode_xml_", value: "Invalid response, error decoding XML", comment: ""))
@@ -131,16 +132,19 @@ public class NKError: NSObject {
     public init(errorCode: Int = 0, errorDescription: String = "") {
         self.errorCode = errorCode
         self.errorDescription = errorDescription
+        self.error = NSError(domain: NSCocoaErrorDomain, code: self.errorCode, userInfo: [NSLocalizedDescriptionKey:self.errorDescription])
     }
 
     init(error: Error) {
-        errorCode = error._code
-        errorDescription = error.localizedDescription
+        self.errorCode = error._code
+        self.errorDescription = error.localizedDescription
+        self.error = error
     }
 
     init(nsError: NSError) {
-        errorCode = nsError.code
-        errorDescription = nsError.localizedDescription
+        self.errorCode = nsError.code
+        self.errorDescription = nsError.localizedDescription
+        self.error = nsError
     }
 
     init(rootJson: JSON, fallbackStatusCode: Int?) {
@@ -154,11 +158,13 @@ public class NKError: NSObject {
         } else {
             errorDescription = NKError.getErrorDescription(for: statuscode) ?? ""
         }
+        self.error = NSError(domain: NSCocoaErrorDomain, code: self.errorCode, userInfo: [NSLocalizedDescriptionKey:self.errorDescription])
     }
 
     init(statusCode: Int, fallbackDescription: String) {
         self.errorCode = statusCode
         self.errorDescription = "\(statusCode): " + (NKError.getErrorDescription(for: statusCode) ?? fallbackDescription)
+        self.error = NSError(domain: NSCocoaErrorDomain, code: self.errorCode, userInfo: [NSLocalizedDescriptionKey:self.errorDescription])
     }
 
     convenience init(httpResponse: HTTPURLResponse) {
@@ -179,6 +185,7 @@ public class NKError: NSObject {
         } else {
             errorDescription = NKError.getErrorDescription(for: statuscode) ?? ""
         }
+        self.error = NSError(domain: NSCocoaErrorDomain, code: self.errorCode, userInfo: [NSLocalizedDescriptionKey:self.errorDescription])
     }
 
     convenience init<T: AFResponse>(error: AFError?, afResponse: T) {

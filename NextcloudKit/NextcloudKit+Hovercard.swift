@@ -28,7 +28,9 @@ import SwiftyJSON
 
 extension NextcloudKit {
 
-    @objc public func getHovercard(for userId: String, customUserAgent: String? = nil, addCustomHeaders: [String: String]? = nil, queue: DispatchQueue = .main, completionHandler: @escaping (_ account: String, _ result: NKHovercard?, _ error: NKError) -> Void) {
+    @objc public func getHovercard(for userId: String,
+                                   options: NKRequestOptions = NKRequestOptions(),
+                                   completion: @escaping (_ account: String, _ result: NKHovercard?, _ data: Data?, _ error: NKError) -> Void) {
 
         let account = NKCommon.shared.account
 
@@ -36,13 +38,10 @@ extension NextcloudKit {
 
         guard let url = NKCommon.shared.createStandardUrl(serverUrl: NKCommon.shared.urlBase, endpoint: endpoint)
         else {
-            queue.async {
-                completionHandler(account, nil, .urlError)
-            }
-            return
+            return options.queue.async { completion(account, nil, nil, .urlError) }
         }
 
-        let headers = NKCommon.shared.getStandardHeaders(addCustomHeaders, customUserAgent: customUserAgent)
+        let headers = NKCommon.shared.getStandardHeaders(options: options)
 
         sessionManager.request(url, method: .get, parameters: nil, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).responseData(queue: NKCommon.shared.backgroundQueue) { (response) in
             debugPrint(response)
@@ -50,20 +49,18 @@ extension NextcloudKit {
             switch response.result {
             case .failure(let error):
                 let error = NKError(error: error, afResponse: response)
-                queue.async { completionHandler(account, nil, error) }
-            case .success(let json):
-                let json = JSON(json)
+                options.queue.async { completion(account, nil, nil, error) }
+            case .success(let jsonData):
+                let json = JSON(jsonData)
                 let data = json["ocs"]["data"]
                 guard json["ocs"]["meta"]["statuscode"].int == 200,
                       let result = NKHovercard(jsonData: data)
                 else {
                     let error = NKError(rootJson: json, fallbackStatusCode: response.response?.statusCode)
-                    queue.async { completionHandler(account, nil, error) }
+                    options.queue.async { completion(account, nil, jsonData, error) }
                     return
                 }
-                queue.async {
-                    completionHandler(account, result, .success)
-                }
+                options.queue.async { completion(account, result, jsonData, .success) }
             }
         }
     }

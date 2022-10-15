@@ -71,6 +71,7 @@ import SwiftyJSON
 // MARK: - Unified Search
 
 @objc public class NKSearchResult: NSObject {
+    
     @objc public let id: String
     @objc public let name: String
     @objc public let isPaginated: Bool
@@ -91,6 +92,7 @@ import SwiftyJSON
 }
 
 @objc public class NKSearchEntry: NSObject {
+    
     @objc public let thumbnailURL: String
     @objc public let title, subline: String
     @objc public let resourceURL: String
@@ -132,6 +134,7 @@ import SwiftyJSON
 }
 
 @objc public class NKSearchProvider: NSObject {
+    
     init?(json: JSON) {
         guard let id = json["id"].string,
               let name = json["name"].string,
@@ -151,29 +154,31 @@ import SwiftyJSON
     }
 }
 
-// MARK: - Dashboard
+// MARK: - Dashboard / Widget
 
-@objc public class NCCDashboardResult: NSObject {
+@objc public class NCCDashboardApplication: NSObject {
+    
     @objc public var application: String?
-    @objc public var dashboardEntries: [NCCDashboardEntry]?
+    @objc public var items: [NCCDashboardItem]?
 
     init?(application: String, data: JSON) {
         self.application = application
-        self.dashboardEntries = NCCDashboardEntry.factory(data: data)
+        self.items = NCCDashboardItem.factory(data: data)
     }
 
-    static func factory(data: JSON) -> [NCCDashboardResult] {
-        var dashboardResults = [NCCDashboardResult]()
+    static func factory(data: JSON) -> [NCCDashboardApplication] {
+        var results = [NCCDashboardApplication]()
         for (application, data):(String, JSON) in data {
-            if let result = NCCDashboardResult.init(application: application, data: data) {
-                dashboardResults.append(result)
+            if let result = NCCDashboardApplication.init(application: application, data: data) {
+                results.append(result)
             }
         }
-        return dashboardResults
+        return results
     }
 }
 
-@objc public class NCCDashboardEntry: NSObject {
+@objc public class NCCDashboardItem: NSObject {
+    
     @objc public let title: String?
     @objc public let subtitle: String?
     @objc public let link: String?
@@ -188,14 +193,67 @@ import SwiftyJSON
         self.sinceId = json["sinceId"].int ?? 0
     }
 
-    static func factory(data: JSON) -> [NCCDashboardEntry]? {
+    static func factory(data: JSON) -> [NCCDashboardItem]? {
         guard let allResults = data.array else { return nil }
-        return allResults.compactMap(NCCDashboardEntry.init)
+        return allResults.compactMap(NCCDashboardItem.init)
+    }
+}
+
+@objc public class NCCDashboardWidget: NSObject {
+    
+    @objc public var id, title: String
+    @objc public let order: Int
+    @objc public let iconClass, iconUrl, widgetUrl: String?
+    @objc public let itemIconsRound: Bool
+    @objc public let button: [NCCDashboardWidgetButton]?
+
+    init?(application: String, data: JSON) {
+        guard let id = data["id"].string,
+              let title = data["title"].string,
+              let order = data["order"].int
+        else { return nil }
+        self.id = id
+        self.title = title
+        self.order = order
+        self.iconClass = data["icon_class"].string
+        self.iconUrl = data["icon_url"].string
+        self.widgetUrl = data["widget_url"].string
+        self.itemIconsRound = data["item_icons_round"].boolValue
+        self.button = NCCDashboardWidgetButton.factory(data: data["buttons"])
+    }
+
+    static func factory(data: JSON) -> [NCCDashboardWidget] {
+        var results = [NCCDashboardWidget]()
+        for (application, data):(String, JSON) in data {
+            if let result = NCCDashboardWidget(application: application, data: data) {
+                results.append(result)
+            }
+        }
+        return results
+    }
+}
+
+@objc public class NCCDashboardWidgetButton: NSObject {
+    
+    @objc public let type, text, link: String
+
+    init?(data: JSON) {
+        guard let type = data["type"].string,
+              let text = data["text"].string,
+              let link = data["link"].string
+        else { return nil }
+        self.type = type
+        self.text = text
+        self.link = link
+    }
+
+    static func factory(data: JSON) -> [NCCDashboardWidgetButton]? {
+        guard let allProvider = data.array else { return nil }
+        return allProvider.compactMap(NCCDashboardWidgetButton.init)
     }
 }
 
 // MARK: -
-
 
 @objc public class NKActivity: NSObject {
     
@@ -673,6 +731,124 @@ class NKDataFileXML: NSObject {
     </d:searchrequest>
     """
     
+    let requestBodySearchFileId =
+    """
+    <?xml version=\"1.0\"?>
+    <d:searchrequest xmlns:d=\"DAV:\" xmlns:oc=\"http://owncloud.org/ns\" xmlns:nc=\"http://nextcloud.org/ns\">
+        <d:basicsearch>
+            <d:select>
+                <d:prop>
+                    <d:displayname/>
+                    <d:getcontenttype/>
+                    <d:resourcetype/>
+                    <d:getcontentlength/>
+                    <d:getlastmodified/>
+                    <d:getetag/>
+                    <d:quota-used-bytes/>
+                    <d:quota-available-bytes/>
+                    <permissions xmlns=\"http://owncloud.org/ns\"/>
+                    <id xmlns=\"http://owncloud.org/ns\"/>
+                    <fileid xmlns=\"http://owncloud.org/ns\"/>
+                    <size xmlns=\"http://owncloud.org/ns\"/>
+                    <favorite xmlns=\"http://owncloud.org/ns\"/>
+                    <creation_time xmlns=\"http://nextcloud.org/ns\"/>
+                    <upload_time xmlns=\"http://nextcloud.org/ns\"/>
+                    <is-encrypted xmlns=\"http://nextcloud.org/ns\"/>
+                    <mount-type xmlns=\"http://nextcloud.org/ns\"/>
+                    <owner-id xmlns=\"http://owncloud.org/ns\"/>
+                    <owner-display-name xmlns=\"http://owncloud.org/ns\"/>
+                    <comments-unread xmlns=\"http://owncloud.org/ns\"/>
+                    <has-preview xmlns=\"http://nextcloud.org/ns\"/>
+                    <trashbin-filename xmlns=\"http://nextcloud.org/ns\"/>
+                    <trashbin-original-location xmlns=\"http://nextcloud.org/ns\"/>
+                    <trashbin-deletion-time xmlns=\"http://nextcloud.org/ns\"/>
+                </d:prop>
+            </d:select>
+            <d:from>
+                <d:scope>
+                    <d:href>/files/%@</d:href>
+                    <d:depth>infinity</d:depth>
+                </d:scope>
+            </d:from>
+            <d:where>
+                <d:eq>
+                    <d:prop>
+                        <oc:fileid xmlns:oc=\"http://owncloud.org/ns\"/>
+                    </d:prop>
+                    <d:literal>%@</d:literal>
+                </d:eq>
+            </d:where>
+        </d:basicsearch>
+    </d:searchrequest>
+    """
+
+    let requestBodySearchLessThan =
+    """
+    <?xml version=\"1.0\"?>
+    <d:searchrequest xmlns:d=\"DAV:\" xmlns:oc=\"http://owncloud.org/ns\" xmlns:nc=\"http://nextcloud.org/ns\">
+    <d:basicsearch>
+        <d:select>
+            <d:prop>
+                <d:getlastmodified />
+                <d:getetag />
+                <d:getcontenttype />
+                <d:resourcetype />
+                <d:quota-available-bytes />
+                <d:quota-used-bytes />
+
+                <permissions xmlns=\"http://owncloud.org/ns\"/>
+                <id xmlns=\"http://owncloud.org/ns\"/>
+                <fileid xmlns=\"http://owncloud.org/ns\"/>
+                <size xmlns=\"http://owncloud.org/ns\"/>
+                <favorite xmlns=\"http://owncloud.org/ns\"/>
+                <share-types xmlns=\"http://owncloud.org/ns\"/>
+                <owner-id xmlns=\"http://owncloud.org/ns\"/>
+                <owner-display-name xmlns=\"http://owncloud.org/ns\"/>
+                <comments-unread xmlns=\"http://owncloud.org/ns\"/>
+                <checksums xmlns=\"http://owncloud.org/ns\"/>
+                <downloadURL xmlns=\"http://owncloud.org/ns\"/>
+                <data-fingerprint xmlns=\"http://owncloud.org/ns\"/>
+
+                <creation_time xmlns=\"http://nextcloud.org/ns\"/>
+                <upload_time xmlns=\"http://nextcloud.org/ns\"/>
+                <is-encrypted xmlns=\"http://nextcloud.org/ns\"/>
+                <has-preview xmlns=\"http://nextcloud.org/ns\"/>
+                <mount-type xmlns=\"http://nextcloud.org/ns\"/>
+                <rich-workspace xmlns=\"http://nextcloud.org/ns\"/>
+                <note xmlns=\"http://nextcloud.org/ns\"/>
+                <lock xmlns=\"http://nextcloud.org/ns\"/>
+                <lock-owner xmlns=\"http://nextcloud.org/ns\"/>
+                <lock-owner-editor xmlns=\"http://nextcloud.org/ns\"/>
+                <lock-owner-displayname xmlns=\"http://nextcloud.org/ns\"/>
+                <lock-owner-type xmlns="http://nextcloud.org/ns"/>
+                <lock-time xmlns=\"http://nextcloud.org/ns\"/>
+                <lock-timeout xmlns=\"http://nextcloud.org/ns\"/>
+
+                <share-permissions xmlns=\"http://open-collaboration-services.org/ns\"/>
+                <share-permissions xmlns=\"http://open-cloud-mesh.org/ns\"/>
+            </d:prop>
+        </d:select>
+        <d:from>
+            <d:scope>
+                <d:href>%@</d:href>
+                <d:depth>infinity</d:depth>
+            </d:scope>
+        </d:from>
+        <d:where>
+            <d:lt>
+                <d:prop>
+                    <d:getlastmodified/>
+                </d:prop>
+                <d:literal>%@</d:literal>
+            </d:lt>
+        </d:where>
+            <d:limit>
+                <d:nresults>%@</d:nresults>
+            </d:limit>
+        </d:basicsearch>
+    </d:searchrequest>
+    """
+
     let requestBodySearchMedia =
     """
     <?xml version=\"1.0\"?>
@@ -896,7 +1072,7 @@ class NKDataFileXML: NSObject {
         return xml["ocs", "data", "apppassword"].text
     }
     
-    func convertDataFile(data: Data, user: String, userId: String, showHiddenFiles: Bool) -> [NKFile] {
+    func convertDataFile(xmlData: Data, user: String, userId: String, showHiddenFiles: Bool) -> [NKFile] {
         
         var files: [NKFile] = []
         var dicMOV: [String:Int] = [:]
@@ -906,7 +1082,7 @@ class NKDataFileXML: NSObject {
             return files
         }
         
-        let xml = XML.parse(data)
+        let xml = XML.parse(xmlData)
         let elements = xml["d:multistatus", "d:response"]
         for element in elements {
             let file = NKFile()
@@ -1134,7 +1310,7 @@ class NKDataFileXML: NSObject {
         return files
     }
     
-    func convertDataTrash(data: Data, showHiddenFiles: Bool) -> [NKTrash] {
+    func convertDataTrash(xmlData: Data, showHiddenFiles: Bool) -> [NKTrash] {
         
         var files: [NKTrash] = []
         var first: Bool = true
@@ -1142,7 +1318,7 @@ class NKDataFileXML: NSObject {
             return files
         }
     
-        let xml = XML.parse(data)
+        let xml = XML.parse(xmlData)
         let elements = xml["d:multistatus", "d:response"]
         for element in elements {
             if first {
@@ -1223,11 +1399,11 @@ class NKDataFileXML: NSObject {
         return files
     }
     
-    func convertDataComments(data: Data) -> [NKComments] {
+    func convertDataComments(xmlData: Data) -> [NKComments] {
         
         var items: [NKComments] = []
     
-        let xml = XML.parse(data)
+        let xml = XML.parse(xmlData)
         let elements = xml["d:multistatus", "d:response"]
         for element in elements {
             let item = NKComments()
