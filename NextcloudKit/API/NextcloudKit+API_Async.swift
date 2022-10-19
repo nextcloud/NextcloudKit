@@ -27,7 +27,7 @@ import UIKit
 @available(iOS 13.0, *)
 extension NextcloudKit {
 
-    func getPreviewAsync(url: URL,
+    public func getPreview(url: URL,
                          options: NKRequestOptions = NKRequestOptions()) async -> (account: String, data: Data?, error: NKError) {
 
         await withUnsafeContinuation({ continuation in
@@ -37,7 +37,7 @@ extension NextcloudKit {
         })
     }
 
-    func downloadPreviewAsync(fileNamePathOrFileId: String,
+    public func downloadPreview(fileNamePathOrFileId: String,
                               fileNamePreviewLocalPath: String,
                               widthPreview: Int,
                               heightPreview: Int,
