@@ -113,7 +113,7 @@ extension NextcloudKit {
     ///     - optionsE2EE.e2eToken: e2eToken
     ///
     @objc public func getE2EEMetadata(fileId: String,
-                                      optionsE2EE: NKRequestOptionsE2EE,
+                                      optionsE2EE: NKRequestOptionsE2EE?,
                                       options: NKRequestOptions = NKRequestOptions(),
                                       completionHandler: @escaping (_ account: String, _ e2eMetadata: String?, _ data: Data?, _ error: NKError) -> Void) {
                             
