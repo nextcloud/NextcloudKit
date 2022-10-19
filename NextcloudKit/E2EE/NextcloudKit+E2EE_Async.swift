@@ -41,15 +41,15 @@ extension NextcloudKit {
     /// - Parameters:
     ///     - fileId: the nextcloud fileId
     ///     - method: POST / DELETE
-    ///     - optionsE2EE.e2eToken: e2eToken
+    ///     - e2eToken: e2eToken
     ///
     public func lockE2EEFolder(fileId: String,
+                               e2eToken: String?,
                                method: String,
-                               optionsE2EE: NKRequestOptionsE2EE,
                                options: NKRequestOptions = NKRequestOptions()) async -> (account: String, e2eToken: String?, data: Data?, error: NKError) {
 
         await withUnsafeContinuation({ continuation in
-            lockE2EEFolder(fileId: fileId, method: method, optionsE2EE: optionsE2EE, options: options) { account, e2eToken, data, error in
+            lockE2EEFolder(fileId: fileId, e2eToken: e2eToken, method: method, options: options) { account, e2eToken, data, error in
                 continuation.resume(returning: (account: account, e2eToken: e2eToken, data: data, error: error))
             }
         })
@@ -58,14 +58,14 @@ extension NextcloudKit {
     ///
     /// - Parameters:
     ///     - fileId: the nextcloud fileId
-    ///     - optionsE2EE.e2eToken: e2eToken
+    ///     - e2eToken: e2eToken
     ///
     public func getE2EEMetadata(fileId: String,
-                                optionsE2EE: NKRequestOptionsE2EE,
+                                e2eToken: String?,
                                 options: NKRequestOptions = NKRequestOptions()) async -> (account: String, e2eMetadata: String?, data: Data?, error: NKError) {
 
         await withUnsafeContinuation({ continuation in
-            getE2EEMetadata(fileId: fileId, optionsE2EE: optionsE2EE, options: options) { account, e2eMetadata, data, error in
+            getE2EEMetadata(fileId: fileId, e2eToken: e2eToken, options: options) { account, e2eMetadata, data, error in
                 continuation.resume(returning: (account: account, e2eMetadata: e2eMetadata, data: data, error: error))
             }
         })
@@ -75,16 +75,17 @@ extension NextcloudKit {
     /// - Parameters:
     ///     - fileId: the nextcloud fileId
     ///     - method: POST / PUT / DELETE
-    ///     - optionsE2EE.e2eToken: e2eToken
-    ///     - optionsE2EE.e2eMetadata: e2eMetadata (optional)
+    ///     - e2eToken: e2eToken
+    ///     - e2eMetadata: e2eMetadata (optional)
     ///
     public func putE2EEMetadata(fileId: String,
+                                e2eToken: String,
+                                e2eMetadata: String?,
                                 method: String,
-                                optionsE2EE: NKRequestOptionsE2EE,
                                 options: NKRequestOptions = NKRequestOptions()) async -> (account: String, metadata: String?, data: Data?, error: NKError) {
 
         await withUnsafeContinuation({ continuation in
-            putE2EEMetadata(fileId: fileId, method: method, optionsE2EE: optionsE2EE, options: options) { account, metadata, data, error in
+            putE2EEMetadata(fileId: fileId, e2eToken: e2eToken, e2eMetadata: e2eMetadata, method: method, options: options) { account, metadata, data, error in
                 continuation.resume(returning: (account: account, metadata: metadata, data:data, error: error))
             }
         })
@@ -119,13 +120,13 @@ extension NextcloudKit {
 
     ///
     /// - Parameters:
-    ///     - optionsE2EE.csr: csr
+    ///     - certificate: csr
     ///
-    public func signE2EECertificate(optionsE2EE: NKRequestOptionsE2EE,
+    public func signE2EECertificate(certificate: String,
                                     options: NKRequestOptions = NKRequestOptions()) async -> (account: String, certificate: String?, data: Data?, error: NKError) {
 
         await withUnsafeContinuation({ continuation in
-            signE2EECertificate(optionsE2EE: optionsE2EE, options: options) { account, certificate, data, error in
+            signE2EECertificate(certificate: certificate, options: options) { account, certificate, data, error in
                 continuation.resume(returning: (account: account, certificate:certificate, data:data, error:error))
             }
         })
@@ -133,13 +134,13 @@ extension NextcloudKit {
 
     ///
     /// - Parameters:
-    ///     - optionsE2EE.privateKey: privateKey
+    ///     - privateKey: privateKey
     ///
-    public func storeE2EEPrivateKey(optionsE2EE: NKRequestOptionsE2EE,
+    public func storeE2EEPrivateKey(privateKey: String,
                                     options: NKRequestOptions = NKRequestOptions()) async -> (account: String, privateKey: String?, data: Data?, error: NKError) {
 
         await withUnsafeContinuation({ continuation in
-            storeE2EEPrivateKey(optionsE2EE: optionsE2EE, options: options) { account, privateKey, data, error in
+            storeE2EEPrivateKey(privateKey: privateKey, options: options) { account, privateKey, data, error in
                 continuation.resume(returning: (account: account, privateKey: privateKey, data: data, error: error))
             }
         })

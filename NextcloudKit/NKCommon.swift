@@ -431,15 +431,15 @@ import MobileCoreServices
     
     //MARK: - Common
     
-    public func getStandardHeaders(options: NKRequestOptions, optionsE2EE: NKRequestOptionsE2EE? = nil) -> HTTPHeaders {
-        return getStandardHeaders(user: user, password: password, appendHeaders: options.customHeader, customUserAgent: options.customUserAgent, contentType: options.contentType, optionsE2EE: optionsE2EE)
+    public func getStandardHeaders(options: NKRequestOptions) -> HTTPHeaders {
+        return getStandardHeaders(user: user, password: password, appendHeaders: options.customHeader, customUserAgent: options.customUserAgent, contentType: options.contentType, e2eToken: options.e2eToken)
      }
 
-    public func getStandardHeaders(_ appendHeaders: [String: String]?, customUserAgent: String?, contentType: String? = nil) -> HTTPHeaders {
-        return getStandardHeaders(user: user, password: password, appendHeaders: appendHeaders, customUserAgent: customUserAgent, contentType: contentType)
+    public func getStandardHeaders(_ appendHeaders: [String: String]?, customUserAgent: String?, contentType: String? = nil, e2eToken: String? = nil) -> HTTPHeaders {
+        return getStandardHeaders(user: user, password: password, appendHeaders: appendHeaders, customUserAgent: customUserAgent, contentType: contentType, e2eToken: e2eToken)
     }
     
-    public func getStandardHeaders(user: String, password: String, appendHeaders: [String: String]?, customUserAgent: String?, contentType: String? = nil, optionsE2EE: NKRequestOptionsE2EE? = nil) -> HTTPHeaders {
+    public func getStandardHeaders(user: String, password: String, appendHeaders: [String: String]?, customUserAgent: String?, contentType: String? = nil, e2eToken: String? = nil) -> HTTPHeaders {
         
         var headers: HTTPHeaders = [.authorization(username: user, password: password)]
         if customUserAgent != nil {
@@ -456,19 +456,10 @@ import MobileCoreServices
             headers.update(name: "Accept", value: "application/json")
         }
         headers.update(name: "OCS-APIRequest", value: "true")
-        if let e2eToken = optionsE2EE?.e2eToken {
-            headers.update(name: "e2e-token", value: e2eToken)
+        if e2eToken != nil {
+            headers.update(name: "e2e-token", value: e2eToken!)
         }
-        if let e2eMetadata = optionsE2EE?.e2eMetadata {
-            headers.update(name: "metaData", value: e2eMetadata)
-        }
-        if let csr = optionsE2EE?.csr {
-            headers.update(name: "csr", value: csr)
-        }
-        if let privateKey = optionsE2EE?.privateKey {
-            headers.update(name: "privateKey", value: privateKey)
-        }
-
+        
         for (key, value) in appendHeaders ?? [:] {
             headers.update(name: key, value: value)
         }
