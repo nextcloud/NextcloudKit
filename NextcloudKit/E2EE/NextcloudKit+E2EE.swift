@@ -79,11 +79,7 @@ extension NextcloudKit {
         
         let method = HTTPMethod(rawValue: method)
 
-        let headers = NKCommon.shared.getStandardHeaders(options.customHeader, customUserAgent: options.customUserAgent)
-
-        if let e2eToken = e2eToken {
-            parameters = ["e2e-token": e2eToken]
-        }
+        let headers = NKCommon.shared.getStandardHeaders(options.customHeader, customUserAgent: options.customUserAgent, e2eToken: e2eToken)
 
         sessionManager.request(url, method: method, parameters: parameters, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).responseData(queue: NKCommon.shared.backgroundQueue) { (response) in
             debugPrint(response)
