@@ -1,9 +1,9 @@
 //
-//  NKRequestOptions.swift
+//  NKRequestOptionsE2EE.swift
 //  NextcloudKit
 //
-//  Created by Henrik Storch on 26.11.2021.
-//  Copyright © 2022 Henrik Sorch. All rights reserved.
+//  Created by Marino Faggiana on 19.10.2022.
+//  Copyright © 2022 Marino Faggiana. All rights reserved.
 //
 //  Author Henrik Storch <henrik.storch@nextcloud.com>
 //
@@ -24,22 +24,16 @@
 import Foundation
 
 @objcMembers
-public class NKRequestOptions: NSObject {
-    let endpoint: String?
-    let customHeader: [String: String]?
-    let customUserAgent: String?
-    let contentType: String?
+public class NKRequestOptionsE2EE: NSObject {
     let e2eToken: String?
-    let timeout: TimeInterval
-    let queue: DispatchQueue
+    let e2eMetadata: String?
+    let csr: String?
+    let privateKey: String?
 
-    public init(endpoint: String? = nil, customHeader: [String: String]? = nil, customUserAgent: String? = nil, contentType: String? = nil, e2eToken: String? = nil, timeout: TimeInterval = 60, queue: DispatchQueue = .main) {
-        self.endpoint = endpoint
-        self.customHeader = customHeader
-        self.customUserAgent = customUserAgent
-        self.contentType = contentType
+    public init(e2eToken: String? = nil, e2eMetadata: String? = nil, csr: String? = nil, privateKey: String? = nil) {
         self.e2eToken = e2eToken
-        self.timeout = timeout
-        self.queue = queue
+        self.e2eMetadata = e2eMetadata
+        self.csr = csr
+        self.privateKey = privateKey
     }
 }
