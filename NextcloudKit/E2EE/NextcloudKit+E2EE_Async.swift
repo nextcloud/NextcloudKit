@@ -37,12 +37,6 @@ extension NextcloudKit {
         })
     }
 
-    ///
-    /// - Parameters:
-    ///     - fileId: the nextcloud fileId
-    ///     - method: POST / DELETE
-    ///     - e2eToken: e2eToken
-    ///
     public func lockE2EEFolder(fileId: String,
                                e2eToken: String?,
                                method: String,
@@ -55,11 +49,6 @@ extension NextcloudKit {
         })
     }
 
-    ///
-    /// - Parameters:
-    ///     - fileId: the nextcloud fileId
-    ///     - e2eToken: e2eToken
-    ///
     public func getE2EEMetadata(fileId: String,
                                 e2eToken: String?,
                                 options: NKRequestOptions = NKRequestOptions()) async -> (account: String, e2eMetadata: String?, data: Data?, error: NKError) {
@@ -71,13 +60,6 @@ extension NextcloudKit {
         })
     }
 
-    ///
-    /// - Parameters:
-    ///     - fileId: the nextcloud fileId
-    ///     - method: POST / PUT / DELETE
-    ///     - e2eToken: e2eToken
-    ///     - e2eMetadata: e2eMetadata (optional)
-    ///
     public func putE2EEMetadata(fileId: String,
                                 e2eToken: String,
                                 e2eMetadata: String?,
@@ -118,10 +100,6 @@ extension NextcloudKit {
         })
     }
 
-    ///
-    /// - Parameters:
-    ///     - certificate: csr
-    ///
     public func signE2EECertificate(certificate: String,
                                     options: NKRequestOptions = NKRequestOptions()) async -> (account: String, certificate: String?, data: Data?, error: NKError) {
 
@@ -132,10 +110,6 @@ extension NextcloudKit {
         })
     }
 
-    ///
-    /// - Parameters:
-    ///     - privateKey: privateKey
-    ///
     public func storeE2EEPrivateKey(privateKey: String,
                                     options: NKRequestOptions = NKRequestOptions()) async -> (account: String, privateKey: String?, data: Data?, error: NKError) {
 
