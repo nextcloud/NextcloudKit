@@ -305,7 +305,7 @@ extension NextcloudKit {
             return options.queue.async { completionHandler(account, nil, nil, .urlError) }
         }
 
-        let headers = NKCommon.shared.getStandardHeaders(options: options)
+        let headers = NKCommon.shared.getStandardHeaders(options: options, optionsE2EE: optionsE2EE)
 
         sessionManager.request(url, method: .post, parameters: nil, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).responseData(queue: NKCommon.shared.backgroundQueue) { (response) in
             debugPrint(response)
@@ -343,7 +343,7 @@ extension NextcloudKit {
             return options.queue.async { completionHandler(account, nil, nil, .urlError) }
         }
 
-        let headers = NKCommon.shared.getStandardHeaders(options: options)
+        let headers = NKCommon.shared.getStandardHeaders(options: options, optionsE2EE: optionsE2EE)
 
         sessionManager.request(url, method: .post, parameters: nil, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).responseData(queue: NKCommon.shared.backgroundQueue) { (response) in
             debugPrint(response)
