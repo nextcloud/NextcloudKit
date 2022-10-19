@@ -71,15 +71,18 @@ extension NextcloudKit {
 
         let endpoint = "ocs/v2.php/apps/end_to_end_encryption/api/v1/lock/\(fileId)"
 
-        var parameters: [String: Any] = [:]
-        
         guard let url = NKCommon.shared.createStandardUrl(serverUrl: NKCommon.shared.urlBase, endpoint: endpoint) else {
             return options.queue.async { completionHandler(account, nil, nil, .urlError) }
         }
         
         let method = HTTPMethod(rawValue: method)
 
-        let headers = NKCommon.shared.getStandardHeaders(options.customHeader, customUserAgent: options.customUserAgent, e2eToken: e2eToken)
+        let headers = NKCommon.shared.getStandardHeaders(options: options)
+
+        var parameters: [String: Any] = [:]
+        if let e2eToken = e2eToken {
+            parameters = ["e2e-token": e2eToken]
+        }
 
         sessionManager.request(url, method: method, parameters: parameters, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).responseData(queue: NKCommon.shared.backgroundQueue) { (response) in
             debugPrint(response)
@@ -113,9 +116,14 @@ extension NextcloudKit {
             return options.queue.async { completionHandler(account, nil, nil, .urlError) }
         }
 
-        let headers = NKCommon.shared.getStandardHeaders(options.customHeader, customUserAgent: options.customUserAgent, e2eToken: e2eToken)
-        
-        sessionManager.request(url, method: .get, parameters: nil, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).responseData(queue: NKCommon.shared.backgroundQueue) { (response) in
+        let headers = NKCommon.shared.getStandardHeaders(options: options)
+
+        var parameters: [String: Any] = [:]
+        if let e2eToken = e2eToken {
+            parameters = ["e2e-token": e2eToken]
+        }
+
+        sessionManager.request(url, method: .get, parameters: parameters, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).responseData(queue: NKCommon.shared.backgroundQueue) { (response) in
             debugPrint(response)
 
             switch response.result {
@@ -145,20 +153,21 @@ extension NextcloudKit {
 
         let endpoint = "ocs/v2.php/apps/end_to_end_encryption/api/v1/meta-data/\(fileId)"
 
-        var parameters: [String: Any] = [:]
-
         guard let url = NKCommon.shared.createStandardUrl(serverUrl: NKCommon.shared.urlBase, endpoint: endpoint) else {
             return options.queue.async { completionHandler(account, nil, nil, .urlError) }
         }
 
-        let headers = NKCommon.shared.getStandardHeaders(options.customHeader, customUserAgent: options.customUserAgent, e2eToken: e2eToken)
+        let headers = NKCommon.shared.getStandardHeaders(options: options)
 
         let method = HTTPMethod(rawValue: method)
-        
+
+        var parameters: [String: Any] = [:]
         if let e2eMetadata = e2eMetadata {
             parameters = ["metaData": e2eMetadata, "e2e-token":e2eToken]
+        } else {
+            parameters = ["e2e-token":e2eToken]
         }
-       
+
         sessionManager.request(url, method: method, parameters: parameters, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).responseData(queue: NKCommon.shared.backgroundQueue) { (response) in
             debugPrint(response)
 
