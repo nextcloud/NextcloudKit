@@ -77,7 +77,7 @@ extension NextcloudKit {
         
         let method = HTTPMethod(rawValue: method)
 
-        let headers = NKCommon.shared.getStandardHeaders(options: options)
+        let headers = NKCommon.shared.getStandardHeaders(options.customHeader, customUserAgent: options.customUserAgent, e2eToken: e2eToken)
 
         var parameters: [String: Any] = [:]
         if let e2eToken = e2eToken {
