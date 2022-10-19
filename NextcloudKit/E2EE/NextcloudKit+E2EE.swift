@@ -79,10 +79,10 @@ extension NextcloudKit {
         
         let method = HTTPMethod(rawValue: method)
 
-        let headers = NKCommon.shared.getStandardHeaders(options.customHeader, customUserAgent: options.customUserAgent, e2eToken: e2eToken)
+        let headers = NKCommon.shared.getStandardHeaders(options.customHeader, customUserAgent: options.customUserAgent)
 
-        if e2eToken != nil {
-            parameters = ["e2e-token": e2eToken!]
+        if let e2eToken = e2eToken {
+            parameters = ["e2e-token": e2eToken]
         }
 
         sessionManager.request(url, method: method, parameters: parameters, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).responseData(queue: NKCommon.shared.backgroundQueue) { (response) in
@@ -159,8 +159,8 @@ extension NextcloudKit {
 
         let method = HTTPMethod(rawValue: method)
         
-        if e2eMetadata != nil {
-            parameters = ["metaData": e2eMetadata!, "e2e-token":e2eToken]
+        if let e2eMetadata = e2eMetadata {
+            parameters = ["metaData": e2eMetadata, "e2e-token":e2eToken]
         }
        
         sessionManager.request(url, method: method, parameters: parameters, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).responseData(queue: NKCommon.shared.backgroundQueue) { (response) in
