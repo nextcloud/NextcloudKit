@@ -432,14 +432,14 @@ import MobileCoreServices
     //MARK: - Common
     
     public func getStandardHeaders(options: NKRequestOptions) -> HTTPHeaders {
-        return getStandardHeaders(user: user, password: password, appendHeaders: options.customHeader, customUserAgent: options.customUserAgent, contentType: options.contentType, e2eToken: options.e2eToken)
+        return getStandardHeaders(user: user, password: password, appendHeaders: options.customHeader, customUserAgent: options.customUserAgent, contentType: options.contentType)
      }
 
-    public func getStandardHeaders(_ appendHeaders: [String: String]?, customUserAgent: String?, contentType: String? = nil, e2eToken: String? = nil) -> HTTPHeaders {
-        return getStandardHeaders(user: user, password: password, appendHeaders: appendHeaders, customUserAgent: customUserAgent, contentType: contentType, e2eToken: e2eToken)
+    public func getStandardHeaders(_ appendHeaders: [String: String]?, customUserAgent: String?, contentType: String? = nil) -> HTTPHeaders {
+        return getStandardHeaders(user: user, password: password, appendHeaders: appendHeaders, customUserAgent: customUserAgent, contentType: contentType)
     }
     
-    public func getStandardHeaders(user: String, password: String, appendHeaders: [String: String]?, customUserAgent: String?, contentType: String? = nil, e2eToken: String? = nil) -> HTTPHeaders {
+    public func getStandardHeaders(user: String, password: String, appendHeaders: [String: String]?, customUserAgent: String?, contentType: String? = nil) -> HTTPHeaders {
         
         var headers: HTTPHeaders = [.authorization(username: user, password: password)]
         if customUserAgent != nil {
@@ -456,10 +456,7 @@ import MobileCoreServices
             headers.update(name: "Accept", value: "application/json")
         }
         headers.update(name: "OCS-APIRequest", value: "true")
-        if e2eToken != nil {
-            headers.update(name: "e2e-token", value: e2eToken!)
-        }
-        
+
         for (key, value) in appendHeaders ?? [:] {
             headers.update(name: key, value: value)
         }
