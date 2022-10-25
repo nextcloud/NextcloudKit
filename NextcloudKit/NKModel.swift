@@ -606,7 +606,7 @@ class NKDataFileXML: NSObject {
             <lock-owner xmlns=\"http://nextcloud.org/ns\"/>
             <lock-owner-editor xmlns=\"http://nextcloud.org/ns\"/>
             <lock-owner-displayname xmlns=\"http://nextcloud.org/ns\"/>
-            <lock-owner-type xmlns="http://nextcloud.org/ns"/>
+            <lock-owner-type xmlns=\"http://nextcloud.org/ns\"/>
             <lock-time xmlns=\"http://nextcloud.org/ns\"/>
             <lock-timeout xmlns=\"http://nextcloud.org/ns\"/>
 
@@ -667,8 +667,8 @@ class NKDataFileXML: NSObject {
             <lock-owner-displayname xmlns=\"http://nextcloud.org/ns\"/>
             <lock-time xmlns=\"http://nextcloud.org/ns\"/>
             <lock-timeout xmlns=\"http://nextcloud.org/ns\"/>
-            <lock-owner-editor xmlns="http://nextcloud.org/ns"/>
-            <lock-owner-type xmlns="http://nextcloud.org/ns"/>
+            <lock-owner-editor xmlns=\"http://nextcloud.org/ns\"/>
+            <lock-owner-type xmlns=\"http://nextcloud.org/ns\"/>
             <lock-token xmlns="http://nextcloud.org/ns"/>
 
             <share-permissions xmlns=\"http://open-collaboration-services.org/ns\"/>
@@ -820,7 +820,7 @@ class NKDataFileXML: NSObject {
                 <lock-owner xmlns=\"http://nextcloud.org/ns\"/>
                 <lock-owner-editor xmlns=\"http://nextcloud.org/ns\"/>
                 <lock-owner-displayname xmlns=\"http://nextcloud.org/ns\"/>
-                <lock-owner-type xmlns="http://nextcloud.org/ns"/>
+                <lock-owner-type xmlns=\"http://nextcloud.org/ns\"/>
                 <lock-time xmlns=\"http://nextcloud.org/ns\"/>
                 <lock-timeout xmlns=\"http://nextcloud.org/ns\"/>
 
