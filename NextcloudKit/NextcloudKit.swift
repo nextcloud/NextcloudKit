@@ -374,7 +374,7 @@ import SwiftyJSON
         } else {
             NKCommon.shared.delegate?.authenticationChallenge?(session, didReceive: challenge, completionHandler: { authChallengeDisposition, credential in
                 if NKCommon.shared.levelLog > 1 {
-                    NKCommon.shared.writeLog("[INFO AUTH] Challenge Disposition: \(authChallengeDisposition)")
+                    NKCommon.shared.writeLog("[INFO AUTH] Challenge Disposition: \(authChallengeDisposition.rawValue)")
                 }
                 completionHandler(authChallengeDisposition, credential)
             })
