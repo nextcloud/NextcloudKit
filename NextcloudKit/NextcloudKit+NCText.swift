@@ -31,13 +31,14 @@ extension NextcloudKit {
                                                 completion: @escaping (_ account: String, _  editors: [NKEditorDetailsEditors], _ creators: [NKEditorDetailsCreators], _ data: Data?, _ error: NKError) -> Void) {
         
         let account = NKCommon.shared.account
+        let urlBase = NKCommon.shared.urlBase
 
         let endpoint = "ocs/v2.php/apps/files/api/v1/directEditing"
 
         var editors: [NKEditorDetailsEditors] = []
         var creators: [NKEditorDetailsCreators] = []
 
-        guard let url = NKCommon.shared.createStandardUrl(serverUrl: NKCommon.shared.urlBase, endpoint: endpoint) else {
+        guard let url = NKCommon.shared.createStandardUrl(serverUrl: urlBase, endpoint: endpoint) else {
             return options.queue.async { completion(account, editors, creators, nil, .urlError) }
         }
 
@@ -96,6 +97,7 @@ extension NextcloudKit {
                                      completion: @escaping (_ account: String, _  url: String?, _ data: Data?, _ error: NKError) -> Void) {
                 
         let account = NKCommon.shared.account
+        let urlBase = NKCommon.shared.urlBase
 
         guard let fileNamePath = fileNamePath.urlEncoded else {
             return options.queue.async { completion(account, nil, nil, .urlError) }
@@ -103,7 +105,7 @@ extension NextcloudKit {
         
         let endpoint = "ocs/v2.php/apps/files/api/v1/directEditing/open?path=/\(fileNamePath)&editorId=\(editor)"
         
-        guard let url = NKCommon.shared.createStandardUrl(serverUrl: NKCommon.shared.urlBase, endpoint: endpoint) else {
+        guard let url = NKCommon.shared.createStandardUrl(serverUrl: urlBase, endpoint: endpoint) else {
             return options.queue.async { completion(account, nil, nil, .urlError) }
         }
 
@@ -128,12 +130,13 @@ extension NextcloudKit {
                                                completion: @escaping (_ account: String, _  templates: [NKEditorTemplates], _ data: Data?, _ error: NKError) -> Void) {
                 
         let account = NKCommon.shared.account
+        let urlBase = NKCommon.shared.urlBase
 
         let endpoint = "ocs/v2.php/apps/files/api/v1/directEditing/templates/text/textdocumenttemplate"
 
         var templates: [NKEditorTemplates] = []
 
-        guard let url = NKCommon.shared.createStandardUrl(serverUrl: NKCommon.shared.urlBase, endpoint: endpoint) else {
+        guard let url = NKCommon.shared.createStandardUrl(serverUrl: urlBase, endpoint: endpoint) else {
             return options.queue.async { completion(account, templates, nil, .urlError) }
         }
 
@@ -174,6 +177,7 @@ extension NextcloudKit {
                                        completion: @escaping (_ account: String, _ url: String?, _ data: Data?, _ error: NKError) -> Void) {
                 
         let account = NKCommon.shared.account
+        let urlBase = NKCommon.shared.urlBase
 
         guard let fileNamePath = fileNamePath.urlEncoded else {
             return options.queue.async { completion(account, nil, nil, .urlError) }
@@ -187,7 +191,7 @@ extension NextcloudKit {
             endpoint = "ocs/v2.php/apps/files/api/v1/directEditing/create?path=/\(fileNamePath)&editorId=\(editorId)&creatorId=\(creatorId)&templateId=\(templateId)"
         }
         
-        guard let url = NKCommon.shared.createStandardUrl(serverUrl: NKCommon.shared.urlBase, endpoint: endpoint) else {
+        guard let url = NKCommon.shared.createStandardUrl(serverUrl: urlBase, endpoint: endpoint) else {
             return options.queue.async { completion(account, nil, nil, .urlError) }
         }
                 

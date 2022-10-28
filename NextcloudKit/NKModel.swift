@@ -1072,13 +1072,13 @@ class NKDataFileXML: NSObject {
         return xml["ocs", "data", "apppassword"].text
     }
     
-    func convertDataFile(xmlData: Data, user: String, userId: String, showHiddenFiles: Bool) -> [NKFile] {
+    func convertDataFile(xmlData: Data, dav: String, urlBase: String, user: String, userId: String, showHiddenFiles: Bool) -> [NKFile] {
         
         var files: [NKFile] = []
         var dicMOV: [String:Int] = [:]
         var dicImage: [String:Int] = [:]
-        let rootFiles = "/" + NKCommon.shared.dav + "/files/"
-        guard let baseUrl = NKCommon.shared.getHostName(urlString: NKCommon.shared.urlBase) else {
+        let rootFiles = "/" + dav + "/files/"
+        guard let baseUrl = NKCommon.shared.getHostName(urlString: urlBase) else {
             return files
         }
         
@@ -1110,7 +1110,7 @@ class NKDataFileXML: NSObject {
                 file.fileName = file.fileName.removingPercentEncoding ?? ""
               
                 // ServerUrl
-                if href == rootFiles + NKCommon.shared.user + "/" {
+                if href == rootFiles + user + "/" {
                     file.fileName = "."
                     file.serverUrl = ".."
                 } else {
@@ -1278,7 +1278,7 @@ class NKDataFileXML: NSObject {
             file.iconName = results.iconName
             file.name = "files"
             file.classFile = results.classFile
-            file.urlBase = NKCommon.shared.urlBase
+            file.urlBase = urlBase
             file.user = user
             file.userId = userId
             
@@ -1310,11 +1310,11 @@ class NKDataFileXML: NSObject {
         return files
     }
     
-    func convertDataTrash(xmlData: Data, showHiddenFiles: Bool) -> [NKTrash] {
+    func convertDataTrash(xmlData: Data, urlBase: String, showHiddenFiles: Bool) -> [NKTrash] {
         
         var files: [NKTrash] = []
         var first: Bool = true
-        guard let baseUrl = NKCommon.shared.getHostName(urlString: NKCommon.shared.urlBase) else {
+        guard let baseUrl = NKCommon.shared.getHostName(urlString: urlBase) else {
             return files
         }
     

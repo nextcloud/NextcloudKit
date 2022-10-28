@@ -198,7 +198,10 @@ extension NextcloudKit {
                                        completion: @escaping (_ account: String, _ files: [NKFile], _ data: Data?, _ error: NKError) -> Void) {
          
         let account = NKCommon.shared.account
-
+        let user = NKCommon.shared.user
+        let userId = NKCommon.shared.userId
+        let urlBase = NKCommon.shared.urlBase
+        let dav = NKCommon.shared.dav
         var files: [NKFile] = []
         var serverUrlFileName = serverUrlFileName
 
@@ -236,7 +239,7 @@ extension NextcloudKit {
                 options.queue.async { completion(account, files, nil, error) }
             case .success( _):
                 if let xmlData = response.data {
-                    files = NKDataFileXML().convertDataFile(xmlData: xmlData, user: NKCommon.shared.user, userId: NKCommon.shared.userId, showHiddenFiles: showHiddenFiles)
+                    files = NKDataFileXML().convertDataFile(xmlData: xmlData, dav: dav, urlBase: urlBase, user: user, userId: userId, showHiddenFiles: showHiddenFiles)
                     options.queue.async { completion(account, files, xmlData, .success) }
                 } else {
                     options.queue.async { completion(account, files, nil, .xmlError) }
@@ -250,21 +253,24 @@ extension NextcloudKit {
                                         options: NKRequestOptions = NKRequestOptions(),
                                         completion: @escaping (_ account: String, _ file: NKFile?, _ data: Data?, _ error: NKError) -> Void) {
 
+        let account = NKCommon.shared.account
+        let userId = NKCommon.shared.userId
+        let urlBase = NKCommon.shared.urlBase
         var httpBody: Data?
 
         if let fileId = fileId {
-            httpBody = String(format: NKDataFileXML().requestBodySearchFileId, NKCommon.shared.userId, fileId).data(using: .utf8)!
+            httpBody = String(format: NKDataFileXML().requestBodySearchFileId, userId, fileId).data(using: .utf8)!
         } else if let link = link {
             let linkArray = link.components(separatedBy: "/")
             if let fileId =  linkArray.last {
-                httpBody = String(format: NKDataFileXML().requestBodySearchFileId, NKCommon.shared.userId, fileId).data(using: .utf8)!
+                httpBody = String(format: NKDataFileXML().requestBodySearchFileId, userId, fileId).data(using: .utf8)!
             }
         }
         guard let httpBody = httpBody else {
-            return options.queue.async { completion(NKCommon.shared.account, nil, nil, .urlError) }
+            return options.queue.async { completion(account, nil, nil, .urlError) }
         }
 
-        search(serverUrl: NKCommon.shared.urlBase, httpBody: httpBody, showHiddenFiles: true, account: NKCommon.shared.account, options: options) { (account, files, data, error) in
+        search(serverUrl: urlBase, httpBody: httpBody, showHiddenFiles: true, options: options) { (account, files, data, error) in
             options.queue.async { completion(account, files.first, data, error) }
         }
     }
@@ -277,7 +283,7 @@ extension NextcloudKit {
          
         let httpBody = requestBody.data(using: .utf8)!
      
-        search(serverUrl: serverUrl, httpBody: httpBody, showHiddenFiles: showHiddenFiles, account: NKCommon.shared.account, options: options) { (account, files, data, error) in
+        search(serverUrl: serverUrl, httpBody: httpBody, showHiddenFiles: showHiddenFiles, options: options) { (account, files, data, error) in
             options.queue.async { completion(account, files, data, error) }
         }
     }
@@ -290,15 +296,16 @@ extension NextcloudKit {
                                     completion: @escaping (_ account: String, _ files: [NKFile], _ data: Data?, _ error: NKError) -> Void) {
         
         let account = NKCommon.shared.account
+        let userId = NKCommon.shared.userId
 
-        guard let href = ("/files/" + NKCommon.shared.userId).urlEncoded else {
+        guard let href = ("/files/" + userId).urlEncoded else {
             return options.queue.async { completion(account, [], nil, .urlError) }
         }
         
         let requestBody = String(format: NKDataFileXML().requestBodySearchFileName, href, depth, "%"+literal+"%")
         let httpBody = requestBody.data(using: .utf8)!
      
-        search(serverUrl: serverUrl, httpBody: httpBody, showHiddenFiles: showHiddenFiles, account: account, options: options) { (account, files, data, error) in
+        search(serverUrl: serverUrl, httpBody: httpBody, showHiddenFiles: showHiddenFiles, options: options) { (account, files, data, error) in
             options.queue.async { completion(account, files, data, error) }
         }
     }
@@ -313,11 +320,12 @@ extension NextcloudKit {
                                   completion: @escaping (_ account: String, _ files: [NKFile], _ data: Data?, _ error: NKError) -> Void) {
             
         let account = NKCommon.shared.account
-
+        let userId = NKCommon.shared.userId
+        let urlBase = NKCommon.shared.urlBase
         let files: [NKFile] = []
         var greaterDateString: String?, lessDateString: String?
         
-        guard let href = ("/files/" + NKCommon.shared.userId + path).urlEncoded else {
+        guard let href = ("/files/" + userId + path).urlEncoded else {
             return options.queue.async { completion(account, files, nil, .urlError) }
         }
         
@@ -346,7 +354,7 @@ extension NextcloudKit {
         
         let httpBody = requestBody.data(using: .utf8)!
         
-        search(serverUrl: NKCommon.shared.urlBase, httpBody: httpBody, showHiddenFiles: showHiddenFiles, account: account, options: options) { (account, files, data, error) in
+        search(serverUrl: urlBase, httpBody: httpBody, showHiddenFiles: showHiddenFiles, options: options) { (account, files, data, error) in
             options.queue.async { completion(account, files, data, error) }
         }
     }
@@ -354,13 +362,17 @@ extension NextcloudKit {
     private func search(serverUrl: String,
                         httpBody: Data,
                         showHiddenFiles: Bool,
-                        account: String,
                         options: NKRequestOptions = NKRequestOptions(),
                         completion: @escaping (_ account: String, _ files: [NKFile], _ data: Data?, _ error: NKError) -> Void) {
-         
+
+        let account = NKCommon.shared.account
+        let user = NKCommon.shared.user
+        let userId = NKCommon.shared.userId
+        let urlBase = NKCommon.shared.urlBase
+        let dav = NKCommon.shared.dav
         var files: [NKFile] = []
-        
-        guard let url = (serverUrl + "/" + NKCommon.shared.dav).encodedToUrl else {
+
+        guard let url = (serverUrl + "/" + dav).encodedToUrl else {
             return options.queue.async { completion(account, files, nil, .urlError) }
         }
          
@@ -386,7 +398,7 @@ extension NextcloudKit {
                 options.queue.async { completion(account, files, nil, error) }
             case .success( _):
                 if let xmlData = response.data {
-                    files = NKDataFileXML().convertDataFile(xmlData: xmlData, user: NKCommon.shared.user, userId: NKCommon.shared.userId, showHiddenFiles: showHiddenFiles)
+                    files = NKDataFileXML().convertDataFile(xmlData: xmlData, dav: dav, urlBase: urlBase, user: user, userId: userId, showHiddenFiles: showHiddenFiles)
                     options.queue.async { completion(account, files, xmlData, .success) }
                 } else {
                     options.queue.async { completion(account, files, nil, .xmlError) }
@@ -401,8 +413,10 @@ extension NextcloudKit {
                                   completion: @escaping (_ account: String, _ error: NKError) -> Void) {
          
         let account = NKCommon.shared.account
-
-        let serverUrlFileName = NKCommon.shared.urlBase + "/" + NKCommon.shared.dav + "/files/" + NKCommon.shared.userId + "/" + fileName
+        let userId = NKCommon.shared.userId
+        let urlBase = NKCommon.shared.urlBase
+        let dav = NKCommon.shared.dav
+        let serverUrlFileName = urlBase + "/" + dav + "/files/" + userId + "/" + fileName
         
         guard let url = serverUrlFileName.encodedToUrl else {
             return options.queue.async { completion(account, .urlError) }
@@ -440,9 +454,11 @@ extension NextcloudKit {
                                        completion: @escaping (_ account: String, _ files: [NKFile], _ data: Data?, _ error: NKError) -> Void) {
          
         let account = NKCommon.shared.account
-
-        let serverUrlFileName = NKCommon.shared.urlBase + "/" + NKCommon.shared.dav + "/files/" + NKCommon.shared.userId
-
+        let user = NKCommon.shared.user
+        let userId = NKCommon.shared.userId
+        let urlBase = NKCommon.shared.urlBase
+        let dav = NKCommon.shared.dav
+        let serverUrlFileName = urlBase + "/" + dav + "/files/" + userId
         var files: [NKFile] = []
 
         guard let url = serverUrlFileName.encodedToUrl else {
@@ -471,7 +487,7 @@ extension NextcloudKit {
                 options.queue.async { completion(account, files, nil, error) }
             case .success( _):
                 if let xmlData = response.data {
-                    files = NKDataFileXML().convertDataFile(xmlData: xmlData, user: NKCommon.shared.user, userId: NKCommon.shared.userId, showHiddenFiles: showHiddenFiles)
+                    files = NKDataFileXML().convertDataFile(xmlData: xmlData, dav: dav, urlBase: urlBase, user: user, userId: userId, showHiddenFiles: showHiddenFiles)
                     options.queue.async { completion(account, files, xmlData, .success) }
                 } else {
                     options.queue.async { completion(account, files, nil, .xmlError) }
@@ -485,11 +501,12 @@ extension NextcloudKit {
                                    completion: @escaping (_ account: String, _ items: [NKTrash], _ data: Data?, _ error: NKError) -> Void) {
            
         let account = NKCommon.shared.account
-
+        let userId = NKCommon.shared.userId
+        let urlBase = NKCommon.shared.urlBase
+        let dav = NKCommon.shared.dav
+        let serverUrlFileName = urlBase + "/" + dav + "/trashbin/" + userId + "/trash/"
         var items: [NKTrash] = []
 
-        let serverUrlFileName = NKCommon.shared.urlBase + "/" + NKCommon.shared.dav + "/trashbin/" + NKCommon.shared.userId + "/trash/"
-            
         guard let url = serverUrlFileName.encodedToUrl else {
             return options.queue.async { completion(account, items, nil, .urlError) }
         }
@@ -517,7 +534,7 @@ extension NextcloudKit {
                 options.queue.async { completion(account, items, nil, error) }
             case .success( _):
                 if let xmlData = response.data {
-                    items = NKDataFileXML().convertDataTrash(xmlData: xmlData, showHiddenFiles: showHiddenFiles)
+                    items = NKDataFileXML().convertDataTrash(xmlData: xmlData, urlBase: urlBase, showHiddenFiles: showHiddenFiles)
                     options.queue.async { completion(account, items, xmlData, .success) }
                 } else {
                     options.queue.async { completion(account, items, nil, .xmlError) }

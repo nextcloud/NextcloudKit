@@ -87,8 +87,9 @@ extension NextcloudKit {
                                  completion: @escaping (_ account: String, _ shares: [NKShare]?, _ data: Data?, _ error: NKError) -> Void) {
 
         let account = NKCommon.shared.account
+        let urlBase = NKCommon.shared.urlBase
 
-        guard let url = NKCommon.shared.createStandardUrl(serverUrl: NKCommon.shared.urlBase, endpoint: parameters.endpoint)
+        guard let url = NKCommon.shared.createStandardUrl(serverUrl: urlBase, endpoint: parameters.endpoint)
         else {
             return options.queue.async { completion(account, nil, nil, .urlError) }
         }
@@ -134,6 +135,7 @@ extension NextcloudKit {
                                     completion: @escaping (_ account: String, _ sharees: [NKSharee]?, _ data: Data?, _ error: NKError) -> Void) {
            
         let account = NKCommon.shared.account
+        let urlBase = NKCommon.shared.urlBase
 
         let endpoint = "ocs/v2.php/apps/files_sharing/api/v1/sharees"
 
@@ -142,7 +144,7 @@ extension NextcloudKit {
             lookupString = "true"
         }
         
-        guard let url = NKCommon.shared.createStandardUrl(serverUrl: NKCommon.shared.urlBase, endpoint: endpoint) else {
+        guard let url = NKCommon.shared.createStandardUrl(serverUrl: urlBase, endpoint: endpoint) else {
             return options.queue.async { completion(account, nil, nil, .urlError) }
         }
 
@@ -275,10 +277,11 @@ extension NextcloudKit {
                              completion: @escaping (_ account: String, _ share: NKShare?, _ data: Data?, _ error: NKError) -> Void) {
            
         let account = NKCommon.shared.account
+        let urlBase = NKCommon.shared.urlBase
 
         let endpoint = "ocs/v2.php/apps/files_sharing/api/v1/shares"
                 
-        guard let url = NKCommon.shared.createStandardUrl(serverUrl: NKCommon.shared.urlBase, endpoint: endpoint) else {
+        guard let url = NKCommon.shared.createStandardUrl(serverUrl: urlBase, endpoint: endpoint) else {
             return options.queue.async { completion(account, nil, nil, .urlError) }
         }
 
@@ -353,10 +356,11 @@ extension NextcloudKit {
                                   completion: @escaping (_ account: String, _ share: NKShare?, _ data: Data?, _ error: NKError) -> Void) {
            
         let account = NKCommon.shared.account
+        let urlBase = NKCommon.shared.urlBase
 
         let endpoint = "ocs/v2.php/apps/files_sharing/api/v1/shares/\(idShare)"
 
-        guard let url = NKCommon.shared.createStandardUrl(serverUrl: NKCommon.shared.urlBase, endpoint: endpoint) else {
+        guard let url = NKCommon.shared.createStandardUrl(serverUrl: urlBase, endpoint: endpoint) else {
             return options.queue.async { completion(account, nil, nil, .urlError) }
         }
 
@@ -409,10 +413,11 @@ extension NextcloudKit {
                                   completion: @escaping (_ account: String, _ error: NKError) -> Void) {
               
         let account = NKCommon.shared.account
-        
+        let urlBase = NKCommon.shared.urlBase
+
         let endpoint = "ocs/v2.php/apps/files_sharing/api/v1/shares/\(idShare)"
                    
-        guard let url = NKCommon.shared.createStandardUrl(serverUrl: NKCommon.shared.urlBase, endpoint: endpoint) else {
+        guard let url = NKCommon.shared.createStandardUrl(serverUrl: urlBase, endpoint: endpoint) else {
             return options.queue.async { completion(account, .urlError) }
         }
 

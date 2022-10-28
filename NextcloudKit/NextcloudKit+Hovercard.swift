@@ -33,10 +33,11 @@ extension NextcloudKit {
                                    completion: @escaping (_ account: String, _ result: NKHovercard?, _ data: Data?, _ error: NKError) -> Void) {
 
         let account = NKCommon.shared.account
+        let urlBase = NKCommon.shared.urlBase
 
         let endpoint = "ocs/v2.php/hovercard/v1/\(userId)"
 
-        guard let url = NKCommon.shared.createStandardUrl(serverUrl: NKCommon.shared.urlBase, endpoint: endpoint)
+        guard let url = NKCommon.shared.createStandardUrl(serverUrl: urlBase, endpoint: endpoint)
         else {
             return options.queue.async { completion(account, nil, nil, .urlError) }
         }

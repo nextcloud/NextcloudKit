@@ -32,13 +32,14 @@ extension NextcloudKit {
                                     completion: @escaping (_ account: String, _ clearAt: NSDate?, _ icon: String?, _ message: String?, _ messageId: String?, _ messageIsPredefined: Bool, _ status: String?, _ statusIsUserDefined: Bool, _ userId: String?, _ data: Data?, _ error: NKError) -> Void) {
     
         let account = NKCommon.shared.account
-        
+        let urlBase = NKCommon.shared.urlBase
+
         var endpoint = "ocs/v2.php/apps/user_status/api/v1/user_status"
         if let userId = userId {
             endpoint = "ocs/v2.php/apps/user_status/api/v1/user_status/\(userId)"
         }
         
-        guard let url = NKCommon.shared.createStandardUrl(serverUrl: NKCommon.shared.urlBase, endpoint: endpoint) else {
+        guard let url = NKCommon.shared.createStandardUrl(serverUrl: urlBase, endpoint: endpoint) else {
             return options.queue.async { completion(account, nil, nil, nil, nil, false, nil, false, nil, nil, .urlError) }
         }
 
@@ -81,9 +82,11 @@ extension NextcloudKit {
                                     completion: @escaping (_ account: String, _ error: NKError) -> Void) {
            
         let account = NKCommon.shared.account
+        let urlBase = NKCommon.shared.urlBase
+
         let endpoint = "ocs/v2.php/apps/user_status/api/v1/user_status/status"
 
-        guard let url = NKCommon.shared.createStandardUrl(serverUrl: NKCommon.shared.urlBase, endpoint: endpoint) else {
+        guard let url = NKCommon.shared.createStandardUrl(serverUrl: urlBase, endpoint: endpoint) else {
             return options.queue.async { completion(account, .urlError) }
         }
 
@@ -119,9 +122,11 @@ extension NextcloudKit {
                                                  completion: @escaping (_ account: String, _ error: NKError) -> Void) {
            
         let account = NKCommon.shared.account
+        let urlBase = NKCommon.shared.urlBase
+
         let endpoint = "ocs/v2.php/apps/user_status/api/v1/user_status/message/predefined"
 
-        guard let url = NKCommon.shared.createStandardUrl(serverUrl: NKCommon.shared.urlBase, endpoint: endpoint) else {
+        guard let url = NKCommon.shared.createStandardUrl(serverUrl: urlBase, endpoint: endpoint) else {
             return options.queue.async { completion(account, .urlError) }
         }
 
@@ -161,9 +166,11 @@ extension NextcloudKit {
                                                   completion: @escaping (_ account: String, _ error: NKError) -> Void) {
            
         let account = NKCommon.shared.account
+        let urlBase = NKCommon.shared.urlBase
+
         let endpoint = "ocs/v2.php/apps/user_status/api/v1/user_status/message/custom"
 
-        guard let url = NKCommon.shared.createStandardUrl(serverUrl: NKCommon.shared.urlBase, endpoint: endpoint) else {
+        guard let url = NKCommon.shared.createStandardUrl(serverUrl: urlBase, endpoint: endpoint) else {
             return options.queue.async { completion(account, .urlError) }
         }
 
@@ -203,9 +210,11 @@ extension NextcloudKit {
                                    completion: @escaping (_ account: String, _ error: NKError) -> Void) {
            
         let account = NKCommon.shared.account
+        let urlBase = NKCommon.shared.urlBase
+
         let endpoint = "ocs/v2.php/apps/user_status/api/v1/user_status/message"
 
-        guard let url = NKCommon.shared.createStandardUrl(serverUrl: NKCommon.shared.urlBase, endpoint: endpoint) else {
+        guard let url = NKCommon.shared.createStandardUrl(serverUrl: urlBase, endpoint: endpoint) else {
             return options.queue.async { completion(account, .urlError) }
         }
 
@@ -235,10 +244,12 @@ extension NextcloudKit {
                                                       completion: @escaping (_ account: String, _ userStatuses: [NKUserStatus]?, _ data: Data?, _ error: NKError) -> Void) {
     
         let account = NKCommon.shared.account
+        let urlBase = NKCommon.shared.urlBase
         var userStatuses: [NKUserStatus] = []
+
         let endpoint = "ocs/v2.php/apps/user_status/api/v1/predefined_statuses"
         
-        guard let url = NKCommon.shared.createStandardUrl(serverUrl: NKCommon.shared.urlBase, endpoint: endpoint) else {
+        guard let url = NKCommon.shared.createStandardUrl(serverUrl: urlBase, endpoint: endpoint) else {
             return options.queue.async { completion(account, nil, nil, .urlError) }
         }
 
@@ -288,10 +299,12 @@ extension NextcloudKit {
                                                     completion: @escaping (_ account: String, _ userStatuses: [NKUserStatus]?, _ data: Data?, _ error: NKError) -> Void) {
     
         let account = NKCommon.shared.account
+        let urlBase = NKCommon.shared.urlBase
         var userStatuses: [NKUserStatus] = []
+
         let endpoint = "ocs/v2.php/apps/user_status/api/v1/statuses"
         
-        guard let url = NKCommon.shared.createStandardUrl(serverUrl: NKCommon.shared.urlBase, endpoint: endpoint) else {
+        guard let url = NKCommon.shared.createStandardUrl(serverUrl: urlBase, endpoint: endpoint) else {
             return options.queue.async { completion(account, nil, nil, .urlError) }
         }
                 
