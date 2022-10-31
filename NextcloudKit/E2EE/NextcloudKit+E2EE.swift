@@ -32,10 +32,11 @@ extension NextcloudKit {
                                      options: NKRequestOptions = NKRequestOptions(), completionHandler: @escaping (_ account: String, _ error: NKError) -> Void) {
                             
         let account = NKCommon.shared.account
+        let urlBase = NKCommon.shared.urlBase
 
         let endpoint = "ocs/v2.php/apps/end_to_end_encryption/api/v1/encrypted/\(fileId)"
         
-        guard let url = NKCommon.shared.createStandardUrl(serverUrl: NKCommon.shared.urlBase, endpoint: endpoint) else {
+        guard let url = NKCommon.shared.createStandardUrl(serverUrl: urlBase, endpoint: endpoint) else {
             return options.queue.async { completionHandler(account, .urlError) }
         }
 
@@ -68,10 +69,11 @@ extension NextcloudKit {
                                      options: NKRequestOptions = NKRequestOptions(), completionHandler: @escaping (_ account: String, _ e2eToken: String?, _ data: Data?, _ error: NKError) -> Void) {
                             
         let account = NKCommon.shared.account
+        let urlBase = NKCommon.shared.urlBase
 
         let endpoint = "ocs/v2.php/apps/end_to_end_encryption/api/v1/lock/\(fileId)"
 
-        guard let url = NKCommon.shared.createStandardUrl(serverUrl: NKCommon.shared.urlBase, endpoint: endpoint) else {
+        guard let url = NKCommon.shared.createStandardUrl(serverUrl: urlBase, endpoint: endpoint) else {
             return options.queue.async { completionHandler(account, nil, nil, .urlError) }
         }
         
@@ -109,10 +111,11 @@ extension NextcloudKit {
                                       options: NKRequestOptions = NKRequestOptions(), completionHandler: @escaping (_ account: String, _ e2eMetadata: String?, _ data: Data?, _ error: NKError) -> Void) {
                             
         let account = NKCommon.shared.account
+        let urlBase = NKCommon.shared.urlBase
 
         let endpoint = "ocs/v2.php/apps/end_to_end_encryption/api/v1/meta-data/\(fileId)"
         
-        guard let url = NKCommon.shared.createStandardUrl(serverUrl: NKCommon.shared.urlBase, endpoint: endpoint) else {
+        guard let url = NKCommon.shared.createStandardUrl(serverUrl: urlBase, endpoint: endpoint) else {
             return options.queue.async { completionHandler(account, nil, nil, .urlError) }
         }
 
@@ -150,10 +153,11 @@ extension NextcloudKit {
                                       options: NKRequestOptions = NKRequestOptions(), completionHandler: @escaping (_ account: String, _ metadata: String?, _ data: Data?, _ error: NKError) -> Void) {
                             
         let account = NKCommon.shared.account
+        let urlBase = NKCommon.shared.urlBase
 
         let endpoint = "ocs/v2.php/apps/end_to_end_encryption/api/v1/meta-data/\(fileId)"
 
-        guard let url = NKCommon.shared.createStandardUrl(serverUrl: NKCommon.shared.urlBase, endpoint: endpoint) else {
+        guard let url = NKCommon.shared.createStandardUrl(serverUrl: urlBase, endpoint: endpoint) else {
             return options.queue.async { completionHandler(account, nil, nil, .urlError) }
         }
 
@@ -193,10 +197,12 @@ extension NextcloudKit {
     @objc public func getE2EECertificate(options: NKRequestOptions = NKRequestOptions(), completionHandler: @escaping (_ account: String, _ certificate: String?, _ data: Data?, _ error: NKError) -> Void) {
                                
         let account = NKCommon.shared.account
+        let urlBase = NKCommon.shared.urlBase
+        let userId = NKCommon.shared.userId
 
         let endpoint = "ocs/v2.php/apps/end_to_end_encryption/api/v1/public-key"
            
-        guard let url = NKCommon.shared.createStandardUrl(serverUrl: NKCommon.shared.urlBase, endpoint: endpoint) else {
+        guard let url = NKCommon.shared.createStandardUrl(serverUrl: urlBase, endpoint: endpoint) else {
             return options.queue.async { completionHandler(account, nil, nil, .urlError) }
         }
 
@@ -213,7 +219,6 @@ extension NextcloudKit {
                 let json = JSON(jsonData)
                 let statusCode = json["ocs"]["meta"]["statuscode"].int ?? NKError.internalError
                 if 200..<300 ~= statusCode  {
-                    let userId = NKCommon.shared.userId
                     let key = json["ocs"]["data"]["public-keys"][userId].stringValue
                     options.queue.async { completionHandler(account, key, jsonData, .success) }
                 } else {
@@ -226,10 +231,11 @@ extension NextcloudKit {
     @objc public func getE2EEPrivateKey(options: NKRequestOptions = NKRequestOptions(), completionHandler: @escaping (_ account: String, _ privateKey: String?, _ data: Data?, _ error: NKError) -> Void) {
                            
         let account = NKCommon.shared.account
+        let urlBase = NKCommon.shared.urlBase
 
         let endpoint = "ocs/v2.php/apps/end_to_end_encryption/api/v1/private-key"
        
-        guard let url = NKCommon.shared.createStandardUrl(serverUrl: NKCommon.shared.urlBase, endpoint: endpoint) else {
+        guard let url = NKCommon.shared.createStandardUrl(serverUrl: urlBase, endpoint: endpoint) else {
             return options.queue.async { completionHandler(account, nil, nil, .urlError) }
         }
 
@@ -258,10 +264,11 @@ extension NextcloudKit {
     @objc public func getE2EEPublicKey(options: NKRequestOptions = NKRequestOptions(), completionHandler: @escaping (_ account: String, _ publicKey: String?, _ data: Data?, _ error: NKError) -> Void) {
                                
         let account = NKCommon.shared.account
+        let urlBase = NKCommon.shared.urlBase
 
         let endpoint = "ocs/v2.php/apps/end_to_end_encryption/api/v1/server-key"
            
-        guard let url = NKCommon.shared.createStandardUrl(serverUrl: NKCommon.shared.urlBase, endpoint: endpoint) else {
+        guard let url = NKCommon.shared.createStandardUrl(serverUrl: urlBase, endpoint: endpoint) else {
             return options.queue.async { completionHandler(account, nil, nil, .urlError) }
         }
 
@@ -291,10 +298,11 @@ extension NextcloudKit {
                                           options: NKRequestOptions = NKRequestOptions(), completionHandler: @escaping (_ account: String, _ certificate: String?, _ data: Data?, _ error: NKError) -> Void) {
                                
         let account = NKCommon.shared.account
+        let urlBase = NKCommon.shared.urlBase
 
         let endpoint = "ocs/v2.php/apps/end_to_end_encryption/api/v1/public-key"
            
-        guard let url = NKCommon.shared.createStandardUrl(serverUrl: NKCommon.shared.urlBase, endpoint: endpoint) else {
+        guard let url = NKCommon.shared.createStandardUrl(serverUrl: urlBase, endpoint: endpoint) else {
             return options.queue.async { completionHandler(account, nil, nil, .urlError) }
         }
 
@@ -327,10 +335,11 @@ extension NextcloudKit {
                                           options: NKRequestOptions = NKRequestOptions(), completionHandler: @escaping (_ account: String, _ privateKey: String?, _ data: Data?, _ error: NKError) -> Void) {
                                
         let account = NKCommon.shared.account
+        let urlBase = NKCommon.shared.urlBase
 
         let endpoint = "ocs/v2.php/apps/end_to_end_encryption/api/v1/private-key"
            
-        guard let url = NKCommon.shared.createStandardUrl(serverUrl: NKCommon.shared.urlBase, endpoint: endpoint) else {
+        guard let url = NKCommon.shared.createStandardUrl(serverUrl: urlBase, endpoint: endpoint) else {
             return options.queue.async { completionHandler(account, nil, nil, .urlError) }
         }
 
@@ -361,10 +370,11 @@ extension NextcloudKit {
     @objc public func deleteE2EECertificate(options: NKRequestOptions = NKRequestOptions(), completionHandler: @escaping (_ account: String, _ error: NKError) -> Void) {
 
         let account = NKCommon.shared.account
+        let urlBase = NKCommon.shared.urlBase
 
         let endpoint = "ocs/v2.php/apps/end_to_end_encryption/api/v1/public-key"
            
-        guard let url = NKCommon.shared.createStandardUrl(serverUrl: NKCommon.shared.urlBase, endpoint: endpoint) else {
+        guard let url = NKCommon.shared.createStandardUrl(serverUrl: urlBase, endpoint: endpoint) else {
             return options.queue.async { completionHandler(account, .urlError) }
         }
 
@@ -386,10 +396,11 @@ extension NextcloudKit {
     @objc public func deleteE2EEPrivateKey(options: NKRequestOptions = NKRequestOptions(), completionHandler: @escaping (_ account: String, _ error: NKError) -> Void) {
 
         let account = NKCommon.shared.account
-        
+        let urlBase = NKCommon.shared.urlBase
+
         let endpoint = "ocs/v2.php/apps/end_to_end_encryption/api/v1/private-key"
            
-        guard let url = NKCommon.shared.createStandardUrl(serverUrl: NKCommon.shared.urlBase, endpoint: endpoint) else {
+        guard let url = NKCommon.shared.createStandardUrl(serverUrl: urlBase, endpoint: endpoint) else {
             return options.queue.async { completionHandler(account, .urlError) }
         }
                       

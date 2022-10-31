@@ -32,14 +32,14 @@ extension NextcloudKit {
                                    completion: @escaping (_ account: String, _ dashboardWidgets: [NCCDashboardWidget]?, _ data: Data?, _ error: NKError) -> Void) {
 
         let account = NKCommon.shared.account
-
+        let urlBase = NKCommon.shared.urlBase
         var url: URLConvertible?
 
         if let endpoint = options.endpoint {
             url = URL(string: endpoint)
         } else {
             let endpoint = "ocs/v2.php/apps/dashboard/api/v1/widgets"
-            url = NKCommon.shared.createStandardUrl(serverUrl: NKCommon.shared.urlBase, endpoint: endpoint)
+            url = NKCommon.shared.createStandardUrl(serverUrl: urlBase, endpoint: endpoint)
         }
 
         guard let url = url else {
@@ -76,14 +76,14 @@ extension NextcloudKit {
                                                completion: @escaping (_ account: String, _ dashboardApplications: [NCCDashboardApplication]?, _ data: Data?, _ error: NKError) -> Void) {
 
         let account = NKCommon.shared.account
-
+        let urlBase = NKCommon.shared.urlBase
         var url: URLConvertible?
 
         if let endpoint = options.endpoint {
             url = URL(string: endpoint)
         } else {
             let endpoint = "ocs/v2.php/apps/dashboard/api/v1/widget-items?widgets[]=\(items)"
-            url = NKCommon.shared.createStandardUrl(serverUrl: NKCommon.shared.urlBase, endpoint: endpoint)
+            url = NKCommon.shared.createStandardUrl(serverUrl: urlBase, endpoint: endpoint)
         }
 
         guard let url = url else {

@@ -63,8 +63,9 @@ extension NextcloudKit {
                                           completion: @escaping (_ account: String, _ data: Data?, _ error: NKError) -> Void) {
                 
         let account = NKCommon.shared.account
+        let urlBase = NKCommon.shared.urlBase
 
-        guard let url = NKCommon.shared.createStandardUrl(serverUrl: NKCommon.shared.urlBase, endpoint: endpoint) else {
+        guard let url = NKCommon.shared.createStandardUrl(serverUrl: urlBase, endpoint: endpoint) else {
             return options.queue.async { completion(account, nil, .urlError) }
         }
         
@@ -91,12 +92,12 @@ extension NextcloudKit {
                                       completion: @escaping (_ account: String, _ externalFiles: [NKExternalSite], _ data: Data?, _ error: NKError) -> Void) {
         
         let account = NKCommon.shared.account
-
+        let urlBase = NKCommon.shared.urlBase
         var externalSites: [NKExternalSite] = []
 
         let endpoint = "ocs/v2.php/apps/external/api/v1"
         
-        guard let url = NKCommon.shared.createStandardUrl(serverUrl: NKCommon.shared.urlBase, endpoint: endpoint) else {
+        guard let url = NKCommon.shared.createStandardUrl(serverUrl: urlBase, endpoint: endpoint) else {
             return options.queue.async { completion(account, externalSites, nil, .urlError) }
         }
 
@@ -214,6 +215,7 @@ extension NextcloudKit {
                                       completion: @escaping (_ account: String, _ imagePreview: UIImage?, _ imageIcon: UIImage?, _ imageOriginal: UIImage?, _ etag: String?, _ error: NKError) -> Void) {
                
         let account = NKCommon.shared.account
+        let urlBase = NKCommon.shared.urlBase
         var endpoint = ""
         var url: URLConvertible?
 
@@ -228,7 +230,7 @@ extension NextcloudKit {
                 endpoint = "index.php/core/preview.png?file=\(fileNamePath)&x=\(widthPreview)&y=\(heightPreview)&a=1&mode=cover"
             }
                 
-            url = NKCommon.shared.createStandardUrl(serverUrl: NKCommon.shared.urlBase, endpoint: endpoint)
+            url = NKCommon.shared.createStandardUrl(serverUrl: urlBase, endpoint: endpoint)
             
         } else {
             
@@ -288,10 +290,11 @@ extension NextcloudKit {
                                      completion: @escaping (_ account: String, _ imageAvatar: UIImage?, _ imageOriginal: UIImage?, _ etag: String?, _ error: NKError) -> Void) {
         
         let account = NKCommon.shared.account
+        let urlBase = NKCommon.shared.urlBase
         
         let endpoint = "index.php/avatar/\(user)/\(sizeImage)"
         
-        guard let url = NKCommon.shared.createStandardUrl(serverUrl: NKCommon.shared.urlBase, endpoint: endpoint) else {
+        guard let url = NKCommon.shared.createStandardUrl(serverUrl: urlBase, endpoint: endpoint) else {
             return options.queue.async { completion(account, nil, nil, nil, .urlError) }
         }
 
@@ -397,10 +400,11 @@ extension NextcloudKit {
                                      completion: @escaping (_ account: String, _ userProfile: NKUserProfile?, _ data: Data?, _ error: NKError) -> Void) {
     
         let account = NKCommon.shared.account
+        let urlBase = NKCommon.shared.urlBase
 
         let endpoint = "ocs/v2.php/cloud/user"
         
-        guard let url = NKCommon.shared.createStandardUrl(serverUrl: NKCommon.shared.urlBase, endpoint: endpoint) else {
+        guard let url = NKCommon.shared.createStandardUrl(serverUrl: urlBase, endpoint: endpoint) else {
             return options.queue.async { completion(account, nil, nil, .urlError) }
         }
 
@@ -467,10 +471,11 @@ extension NextcloudKit {
                                       completion: @escaping (_ account: String, _ data: Data?, _ error: NKError) -> Void) {
     
         let account = NKCommon.shared.account
+        let urlBase = NKCommon.shared.urlBase
 
         let endpoint = "ocs/v1.php/cloud/capabilities"
         
-        guard let url = NKCommon.shared.createStandardUrl(serverUrl: NKCommon.shared.urlBase, endpoint: endpoint) else {
+        guard let url = NKCommon.shared.createStandardUrl(serverUrl: urlBase, endpoint: endpoint) else {
             return options.queue.async { completion(account, nil, .urlError) }
         }
 
@@ -568,7 +573,7 @@ extension NextcloudKit {
                                   completion: @escaping (_ account: String, _ activities: [NKActivity], _ activityFirstKnown: Int, _ activityLastGiven: Int, _ data: Data?, _ error: NKError) -> Void) {
     
         let account = NKCommon.shared.account
-
+        let urlBase = NKCommon.shared.urlBase
         var activities: [NKActivity] = []
         var activityFirstKnown = 0
         var activityLastGiven = 0
@@ -593,7 +598,7 @@ extension NextcloudKit {
             parameters["previews"] = "true"
         }
 
-        guard let url = NKCommon.shared.createStandardUrl(serverUrl: NKCommon.shared.urlBase, endpoint: endpoint) else {
+        guard let url = NKCommon.shared.createStandardUrl(serverUrl: urlBase, endpoint: endpoint) else {
             return options.queue.async { completion(account, activities, activityFirstKnown, activityLastGiven, nil, .urlError) }
         }
 
@@ -664,12 +669,13 @@ extension NextcloudKit {
                                        completion: @escaping (_ account: String, _ notifications: [NKNotifications]?, _ data: Data?, _ error: NKError) -> Void) {
     
         let account = NKCommon.shared.account
+        let urlBase = NKCommon.shared.urlBase
 
         let endpoint = "ocs/v2.php/apps/notifications/api/v2/notifications"
 
         var notifications: [NKNotifications] = []
 
-        guard let url = NKCommon.shared.createStandardUrl(serverUrl: NKCommon.shared.urlBase, endpoint: endpoint) else {
+        guard let url = NKCommon.shared.createStandardUrl(serverUrl: urlBase, endpoint: endpoint) else {
             return options.queue.async { completion(account, nil, nil, .urlError) }
         }
 
@@ -741,12 +747,12 @@ extension NextcloudKit {
                                       completion: @escaping (_ account: String, _ error: NKError) -> Void) {
                     
         let account = NKCommon.shared.account
-
+        let urlBase = NKCommon.shared.urlBase
         var url: URLConvertible?
 
         if serverUrl == nil {
             let endpoint = "ocs/v2.php/apps/notifications/api/v2/notifications/\(idNotification)"
-            url = NKCommon.shared.createStandardUrl(serverUrl: NKCommon.shared.urlBase, endpoint: endpoint)
+            url = NKCommon.shared.createStandardUrl(serverUrl: urlBase, endpoint: endpoint)
         } else {
             url = serverUrl!.asUrl
         }
@@ -778,6 +784,7 @@ extension NextcloudKit {
                                         completion: @escaping (_ account: String, _ url: String?, _ data: Data?, _ error: NKError) -> Void) {
         
         let account = NKCommon.shared.account
+        let urlBase = NKCommon.shared.urlBase
 
         let endpoint = "ocs/v2.php/apps/dav/api/v1/direct"
         
@@ -786,7 +793,7 @@ extension NextcloudKit {
             "format": "json"
         ]
 
-        guard let url = NKCommon.shared.createStandardUrl(serverUrl: NKCommon.shared.urlBase, endpoint: endpoint) else {
+        guard let url = NKCommon.shared.createStandardUrl(serverUrl: urlBase, endpoint: endpoint) else {
             return options.queue.async { completion(account, nil, nil, .urlError) }
         }
                 

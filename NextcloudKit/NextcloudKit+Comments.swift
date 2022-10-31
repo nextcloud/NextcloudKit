@@ -31,8 +31,9 @@ extension NextcloudKit {
                                   completion: @escaping (_ account: String, _ items: [NKComments]?, _ data: Data?, _ error: NKError) -> Void) {
            
         let account = NKCommon.shared.account
-
-        let serverUrlEndpoint = NKCommon.shared.urlBase + "/" + NKCommon.shared.dav + "/comments/files/\(fileId)"
+        let urlBase = NKCommon.shared.urlBase
+        let dav = NKCommon.shared.dav
+        let serverUrlEndpoint = urlBase + "/" + dav + "/comments/files/\(fileId)"
             
         guard let url = serverUrlEndpoint.encodedToUrl else {
             return options.queue.async { completion(account, nil, nil, .urlError) }
@@ -73,8 +74,9 @@ extension NextcloudKit {
                                   completion: @escaping (_ account: String, _ error: NKError) -> Void) {
         
         let account = NKCommon.shared.account
-
-        let serverUrlEndpoint = NKCommon.shared.urlBase + "/" + NKCommon.shared.dav + "/comments/files/\(fileId)"
+        let urlBase = NKCommon.shared.urlBase
+        let dav = NKCommon.shared.dav
+        let serverUrlEndpoint = urlBase + "/" + dav + "/comments/files/\(fileId)"
         
         guard let url = serverUrlEndpoint.encodedToUrl else {
             return options.queue.async { completion(account, .urlError) }
@@ -111,8 +113,9 @@ extension NextcloudKit {
                                      completion: @escaping (_ account: String, _ error: NKError) -> Void) {
         
         let account = NKCommon.shared.account
-
-        let serverUrlEndpoint = NKCommon.shared.urlBase + "/" + NKCommon.shared.dav + "/comments/files/\(fileId)/\(messageId)"
+        let urlBase = NKCommon.shared.urlBase
+        let dav = NKCommon.shared.dav
+        let serverUrlEndpoint = urlBase + "/" + dav + "/comments/files/\(fileId)/\(messageId)"
         
         guard let url = serverUrlEndpoint.encodedToUrl else {
             return options.queue.async { completion(account, .urlError) }
@@ -149,8 +152,9 @@ extension NextcloudKit {
                                      completion: @escaping (_ account: String, _ error: NKError) -> Void) {
         
         let account = NKCommon.shared.account
-        
-        let serverUrlEndpoint = NKCommon.shared.urlBase + "/" + NKCommon.shared.dav + "/comments/files/\(fileId)/\(messageId)"
+        let urlBase = NKCommon.shared.urlBase
+        let dav = NKCommon.shared.dav
+        let serverUrlEndpoint = urlBase + "/" + dav + "/comments/files/\(fileId)/\(messageId)"
         
         guard let url = serverUrlEndpoint.encodedToUrl else {
             return options.queue.async { completion(account, .urlError) }
@@ -176,8 +180,9 @@ extension NextcloudKit {
                                          completion: @escaping (_ account: String, _ error: NKError) -> Void) {
         
         let account = NKCommon.shared.account
-        
-        let serverUrlEndpoint = NKCommon.shared.urlBase + "/" + NKCommon.shared.dav + "/comments/files/\(fileId)"
+        let urlBase = NKCommon.shared.urlBase
+        let dav = NKCommon.shared.dav
+        let serverUrlEndpoint = urlBase + "/" + dav + "/comments/files/\(fileId)"
         
         guard let url = serverUrlEndpoint.encodedToUrl else {
             return options.queue.async { completion(account, .urlError) }

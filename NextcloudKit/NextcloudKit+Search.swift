@@ -52,51 +52,52 @@ extension NextcloudKit {
                               update: @escaping (_ account: String, _ searchResult: NKSearchResult?, _ provider: NKSearchProvider, _ error: NKError) -> Void,
                               completion: @escaping (_ account: String, _ data: Data?, _ error: NKError) -> Void) {
 
-            let account = NKCommon.shared.account
+        let account = NKCommon.shared.account
+        let urlBase = NKCommon.shared.urlBase
 
-            let endpoint = "ocs/v2.php/search/providers"
+        let endpoint = "ocs/v2.php/search/providers"
 
-            guard let url = NKCommon.shared.createStandardUrl(serverUrl: NKCommon.shared.urlBase, endpoint: endpoint) else {
-                return completion(account, nil, .urlError)
-            }
-
-            let headers = NKCommon.shared.getStandardHeaders(options: options)
-
-            let requestUnifiedSearch = sessionManager.request(url, method: .get, parameters: nil, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).responseData(queue: NKCommon.shared.backgroundQueue) { (response) in
-                debugPrint(response)
-
-                switch response.result {
-                case .success(let jsonData):
-                    let json = JSON(jsonData)
-                    let providerData = json["ocs"]["data"]
-                    guard let allProvider = NKSearchProvider.factory(jsonArray: providerData) else {
-                        return completion(account, jsonData, NKError(rootJson: json, fallbackStatusCode: response.response?.statusCode))
-                    }
-
-                    providers(account, allProvider)
-                    
-                    let filteredProviders = allProvider.filter(filter)
-                    let group = DispatchGroup()
-
-                    for provider in filteredProviders {
-                        group.enter()
-                        let requestSearchProvider = self.searchProvider(provider.id, account: account, term: term, options: options, timeout: timeoutProvider) { account, partial, data, error in
-                            update(account, partial, provider, error)
-                            group.leave()
-                        }
-                        request(requestSearchProvider)
-                    }
-
-                    group.notify(queue: options.queue) {
-                        completion(account, jsonData, .success)
-                    }
-                case .failure(let error):
-                    let error = NKError(error: error, afResponse: response)
-                    return completion(account, nil, error)
-                }
-            }
-            request(requestUnifiedSearch)
+        guard let url = NKCommon.shared.createStandardUrl(serverUrl: urlBase, endpoint: endpoint) else {
+            return completion(account, nil, .urlError)
         }
+
+        let headers = NKCommon.shared.getStandardHeaders(options: options)
+
+        let requestUnifiedSearch = sessionManager.request(url, method: .get, parameters: nil, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).responseData(queue: NKCommon.shared.backgroundQueue) { (response) in
+            debugPrint(response)
+
+            switch response.result {
+            case .success(let jsonData):
+                let json = JSON(jsonData)
+                let providerData = json["ocs"]["data"]
+                guard let allProvider = NKSearchProvider.factory(jsonArray: providerData) else {
+                    return completion(account, jsonData, NKError(rootJson: json, fallbackStatusCode: response.response?.statusCode))
+                }
+
+                providers(account, allProvider)
+
+                let filteredProviders = allProvider.filter(filter)
+                let group = DispatchGroup()
+
+                for provider in filteredProviders {
+                    group.enter()
+                    let requestSearchProvider = self.searchProvider(provider.id, account: account, term: term, options: options, timeout: timeoutProvider) { account, partial, data, error in
+                        update(account, partial, provider, error)
+                        group.leave()
+                    }
+                    request(requestSearchProvider)
+                }
+
+                group.notify(queue: options.queue) {
+                    completion(account, jsonData, .success)
+                }
+            case .failure(let error):
+                let error = NKError(error: error, afResponse: response)
+                return completion(account, nil, error)
+            }
+        }
+        request(requestUnifiedSearch)
+    }
 
     /// Available NC >= 20
     /// Search many different datasources in the cloud and combine them into one result.
@@ -123,6 +124,8 @@ extension NextcloudKit {
                                timeout: TimeInterval = 60,
                                completion: @escaping (_ accoun: String, NKSearchResult?, _ data: Data?, _ error: NKError) -> Void) -> DataRequest? {
 
+        let urlBase = NKCommon.shared.urlBase
+
         guard let term = term.urlEncoded else {
             completion(account, nil, nil, .urlError)
             return nil
@@ -139,7 +142,7 @@ extension NextcloudKit {
         }
         
         guard let url = NKCommon.shared.createStandardUrl(
-            serverUrl: NKCommon.shared.urlBase,
+            serverUrl: urlBase,
             endpoint: endpoint)
         else {
             completion(account, nil, nil, .urlError)
