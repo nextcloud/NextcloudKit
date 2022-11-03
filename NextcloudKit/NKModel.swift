@@ -1116,7 +1116,6 @@ class NKDataFileXML: NSObject {
                 } else {
                     file.serverUrl = baseUrl + file.path.dropLast()
                 }
-                file.serverUrl = file.serverUrl.removingPercentEncoding ?? ""
             }
             
             let propstat = element["d:propstat"][0]
