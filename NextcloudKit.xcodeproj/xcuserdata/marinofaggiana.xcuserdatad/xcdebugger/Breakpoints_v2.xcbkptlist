@@ -14,8 +14,8 @@
             filePath = "NextcloudKit/NKModel.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "1281"
-            endingLineNumber = "1281"
+            startingLineNumber = "1280"
+            endingLineNumber = "1280"
             landmarkName = "convertDataFile(xmlData:dav:urlBase:user:userId:showHiddenFiles:)"
             landmarkType = "7">
          </BreakpointContent>
