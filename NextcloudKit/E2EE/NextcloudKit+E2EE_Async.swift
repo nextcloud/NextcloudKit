@@ -37,6 +37,7 @@ extension NextcloudKit {
         })
     }
 
+    @discardableResult
     public func lockE2EEFolder(fileId: String,
                                e2eToken: String?,
                                method: String,

@@ -27,11 +27,21 @@ import Foundation
 extension NextcloudKit {
 
     public func createFolder(_ serverUrlFileName: String,
-                      options: NKRequestOptions = NKRequestOptions()) async -> (account: String, ocId: String?, date: NSDate?, error: NKError) {
+                             options: NKRequestOptions = NKRequestOptions()) async -> (account: String, ocId: String?, date: NSDate?, error: NKError) {
 
         await withUnsafeContinuation({ continuation in
             createFolder(serverUrlFileName, options: options) { account, ocId, date, error in
                 continuation.resume(returning: (account: account, ocId:ocId, date:date, error:error))
+            }
+        })
+    }
+
+    public func deleteFileOrFolder(_ serverUrlFileName: String,
+                                   options: NKRequestOptions = NKRequestOptions()) async -> (account: String, error: NKError) {
+
+        await withUnsafeContinuation({ continuation in
+            deleteFileOrFolder(serverUrlFileName, options: options) { account, error in
+                continuation.resume(returning: (account: account, error:error))
             }
         })
     }
