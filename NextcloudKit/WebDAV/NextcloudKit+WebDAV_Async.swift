@@ -46,7 +46,7 @@ extension NextcloudKit {
         })
     }
 
-    public func readFileOrFolder(_ serverUrlFileName: String,
+    public func readFileOrFolder(serverUrlFileName: String,
                                  depth: String,
                                  showHiddenFiles: Bool = true,
                                  requestBody: Data? = nil,
