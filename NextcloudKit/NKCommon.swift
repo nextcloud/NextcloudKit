@@ -56,6 +56,11 @@ import MobileCoreServices
     var cookies: [String:[HTTPCookie]] = [:]
     var internalTypeIdentifiers: [UTTypeConformsToServer] = []
 
+    var dateFormatterCache: [String: DateFormatter] = [:]
+    var utiCache: [String: CFString] = [:]
+    var mimeTypeCache: [CFString: String] = [:]
+    var filePropertiesCache: [CFString: (classFile: String, iconName: String, name: String, ext: String)] = [:]
+
     var delegate: NKCommonDelegate?
     
     @objc public let sessionIdentifierDownload: String = "com.nextcloud.nextcloudkit.session.download"
@@ -261,21 +266,35 @@ import MobileCoreServices
         var ext = (fileName as NSString).pathExtension.lowercased()
         var mimeType = mimeType
         var classFile = "", iconName = "", typeIdentifier = "", fileNameWithoutExt = ""
-        
-        // UTI
-        if let unmanagedFileUTI = UTTypeCreatePreferredIdentifierForTag(kUTTagClassFilenameExtension, ext as CFString, nil) {
-            let inUTI = unmanagedFileUTI.takeRetainedValue()
+
+        var inUTI: CFString?
+
+        if let cachedUTI = utiCache[ext] {
+            inUTI = cachedUTI
+        } else {
+            if let unmanagedFileUTI = UTTypeCreatePreferredIdentifierForTag(kUTTagClassFilenameExtension, ext as CFString, nil) {
+                inUTI = unmanagedFileUTI.takeRetainedValue()
+                utiCache[ext] = inUTI
+            }
+        }
+
+        if let inUTI = inUTI {
+            typeIdentifier = inUTI as String
             fileNameWithoutExt = (fileName as NSString).deletingPathExtension
-            
+
             // contentType detect
             if mimeType == "" {
-                if let mimeUTI = UTTypeCopyPreferredTagWithClass(inUTI, kUTTagClassMIMEType) {
-                    mimeType = mimeUTI.takeRetainedValue() as String
+                if let cachedMimeUTI = mimeTypeCache[inUTI] {
+                    mimeType = cachedMimeUTI as String
+                } else {
+                    if let mimeUTI = UTTypeCopyPreferredTagWithClass(inUTI, kUTTagClassMIMEType) {
+                        let mimeUTIString = mimeUTI.takeRetainedValue() as String
+
+                        mimeType = mimeUTIString
+                        mimeTypeCache[inUTI] = mimeUTIString
+                    }
                 }
             }
-            
-            // TypeIdentifier
-            typeIdentifier = inUTI as String
 
             if directory {
                 mimeType = "httpd/unix-directory"
@@ -285,12 +304,20 @@ import MobileCoreServices
                 fileNameWithoutExt = fileName
                 ext = ""
             } else {
-                let result = getFileProperties(inUTI: inUTI)
-                classFile = result.classFile
-                iconName = result.iconName
+                var fileProperties: (classFile: String, iconName: String, name: String, ext: String)
+
+                if let cachedFileProperties = filePropertiesCache[inUTI] {
+                    fileProperties = cachedFileProperties
+                } else {
+                    fileProperties = getFileProperties(inUTI: inUTI)
+                    filePropertiesCache[inUTI] = fileProperties
+                }
+
+                classFile = fileProperties.classFile
+                iconName = fileProperties.iconName
             }
         }
-        
+
         return(mimeType: mimeType, classFile: classFile, iconName: iconName, typeIdentifier: typeIdentifier, fileNameWithoutExt: fileNameWithoutExt, ext: ext)
     }
     
@@ -475,10 +502,19 @@ import MobileCoreServices
     }
     
     func convertDate(_ dateString: String, format: String) -> NSDate? {
-        
-        let dateFormatter = DateFormatter()
-        dateFormatter.locale = Locale.init(identifier: "en_US_POSIX")
-        dateFormatter.dateFormat = format
+
+        var dateFormatter: DateFormatter
+
+        if let cachedFormatter = dateFormatterCache[format] {
+            dateFormatter = cachedFormatter
+        } else {
+            dateFormatter = DateFormatter()
+            dateFormatter.locale = Locale.init(identifier: "en_US_POSIX")
+            dateFormatter.dateFormat = format
+
+            dateFormatterCache[format] = dateFormatter
+        }
+
         if let date = dateFormatter.date(from: dateString) {
             return date as NSDate
         } else {
