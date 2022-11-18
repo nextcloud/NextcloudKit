@@ -27,7 +27,7 @@ import SwiftyJSON
 
 extension NextcloudKit {
 
-    @objc public func createFolder(_ serverUrlFileName: String,
+    @objc public func createFolder(serverUrlFileName: String,
                                    options: NKRequestOptions = NKRequestOptions(),
                                    completion: @escaping (_ account: String, _ ocId: String?, _ date: NSDate?, _ error: NKError) -> Void) {
          
@@ -71,7 +71,7 @@ extension NextcloudKit {
         }
     }
      
-    @objc public func deleteFileOrFolder(_ serverUrlFileName: String,
+    @objc public func deleteFileOrFolder(serverUrlFileName: String,
                                          options: NKRequestOptions = NKRequestOptions(),
                                          completion: @escaping (_ account: String, _ error: NKError) -> Void) {
          

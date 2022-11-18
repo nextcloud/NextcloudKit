@@ -26,22 +26,35 @@ import Foundation
 @available(iOS 13.0, *)
 extension NextcloudKit {
 
-    public func createFolder(_ serverUrlFileName: String,
+    public func createFolder(serverUrlFileName: String,
                              options: NKRequestOptions = NKRequestOptions()) async -> (account: String, ocId: String?, date: NSDate?, error: NKError) {
 
         await withUnsafeContinuation({ continuation in
-            createFolder(serverUrlFileName, options: options) { account, ocId, date, error in
+            createFolder(serverUrlFileName: serverUrlFileName, options: options) { account, ocId, date, error in
                 continuation.resume(returning: (account: account, ocId:ocId, date:date, error:error))
             }
         })
     }
 
-    public func deleteFileOrFolder(_ serverUrlFileName: String,
+    public func deleteFileOrFolder(serverUrlFileName: String,
                                    options: NKRequestOptions = NKRequestOptions()) async -> (account: String, error: NKError) {
 
         await withUnsafeContinuation({ continuation in
-            deleteFileOrFolder(serverUrlFileName, options: options) { account, error in
+            deleteFileOrFolder(serverUrlFileName: serverUrlFileName, options: options) { account, error in
                 continuation.resume(returning: (account: account, error:error))
+            }
+        })
+    }
+
+    public func readFileOrFolder(serverUrlFileName: String,
+                                 depth: String,
+                                 showHiddenFiles: Bool = true,
+                                 requestBody: Data? = nil,
+                                 options: NKRequestOptions = NKRequestOptions()) async -> (account: String, files: [NKFile], data: Data?, error: NKError) {
+
+        await withUnsafeContinuation({ continuation in
+            readFileOrFolder(serverUrlFileName: serverUrlFileName, depth: depth, showHiddenFiles: showHiddenFiles, requestBody: requestBody, options: options) { account, files, data, error in
+                continuation.resume(returning: (account: account, files:files, data:data,error:error))
             }
         })
     }
