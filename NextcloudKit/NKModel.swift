@@ -262,7 +262,7 @@ import SwiftyJSON
     @objc var alias: String?
     @objc var avatar: String?
 
-    init(withUrl url: String, user: String, alias: String? = nil, avatar: String? = nil) {
+    @objc public init(withUrl url: String, user: String, alias: String? = nil, avatar: String? = nil) {
         self.url = url
         self.user = user
         self.alias = alias
