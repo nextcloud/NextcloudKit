@@ -173,7 +173,7 @@ import MobileCoreServices
         }
     }
 
-    //MARK: - Init
+    // MARK: - Init
     
     override init() {
         super.init()
@@ -181,7 +181,7 @@ import MobileCoreServices
         _filenamePathLog = _pathLog + "/" + _filenameLog
     }
     
-    //MARK: - Setup
+    // MARK: - Setup
     
     @objc public func setup(account: String? = nil, user: String, userId: String, password: String, urlBase: String, userAgent: String, nextcloudVersion: Int, delegate: NKCommonDelegate?) {
         
@@ -219,14 +219,14 @@ import MobileCoreServices
         self.nextcloudVersion = nextcloudVersion
     }
     
-    //MARK: -
+    // MARK: -
     
     @objc public func remove(account: String) {
         
         cookies[account] = nil
     }
         
-    //MARK: -  Type Identifier
+    // MARK: -  Type Identifier
     
     public func getInternalTypeIdentifier(typeIdentifier: String) -> [UTTypeConformsToServer] {
         
@@ -358,7 +358,7 @@ import MobileCoreServices
         return(classFile, iconName, name, ext)
     }
     
-    //MARK: -  chunkedFile
+    // MARK: -  chunkedFile
     
     @objc public func chunkedFile(inputDirectory: String, outputDirectory: String, fileName: String, chunkSizeMB:Int, bufferSize: Int = 1000000) -> [String] {
         
@@ -429,7 +429,7 @@ import MobileCoreServices
         return outputFilesName
     }
     
-    //MARK: - Common
+    // MARK: - Common
     
     public func getStandardHeaders(options: NKRequestOptions) -> HTTPHeaders {
         return getStandardHeaders(user: user, password: password, appendHeaders: options.customHeader, customUserAgent: options.customUserAgent, contentType: options.contentType)
@@ -526,8 +526,32 @@ import MobileCoreServices
         }
         return nil
     }
+
+    // MARK: - Share account data from Nextcloud iOS & Nextcloud Talk
+
+    @objc func createDataAccountFile(at url: URL, accounts: [NKDataAccountFile]) -> Error? {
+
+        do {
+            let encode = try JSONEncoder().encode(accounts)
+            try encode.write(to: url)
+        } catch {
+            return error
+        }
+        return nil
+    }
+
+    @objc func readDataAccountFile(at url: URL) -> [NKDataAccountFile]? {
+
+        do {
+            let data = try Data(contentsOf: url)
+            let accounts: [NKDataAccountFile] = try JSONDecoder().decode([NKDataAccountFile].self, from: data)
+            return accounts
+        } catch {
+            return nil
+        }
+    }
     
-    //MARK: - Log
+    // MARK: - Log
 
     @objc public func clearFileLog() {
 
