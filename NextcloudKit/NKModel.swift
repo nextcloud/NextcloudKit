@@ -255,7 +255,7 @@ import SwiftyJSON
 
 // MARK: - Share account data from Nextcloud iOS & Nextcloud Talk
 
-@objc class NKDataAccountFile: NSObject, Codable {
+@objc public class NKDataAccountFile: NSObject, Codable {
 
     @objc var url: String
     @objc var user: String
