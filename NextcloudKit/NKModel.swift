@@ -257,10 +257,10 @@ import SwiftyJSON
 
 @objc public class NKDataAccountFile: NSObject, Codable {
 
-    @objc var url: String
-    @objc var user: String
-    @objc var alias: String?
-    @objc var avatar: String?
+    @objc public var url: String
+    @objc public var user: String
+    @objc public var alias: String?
+    @objc public var avatar: String?
 
     @objc public init(withUrl url: String, user: String, alias: String? = nil, avatar: String? = nil) {
         self.url = url
