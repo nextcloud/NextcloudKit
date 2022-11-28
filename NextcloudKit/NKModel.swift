@@ -341,6 +341,7 @@ import SwiftyJSON
     @objc public var idExternalSite: Int = 0
     @objc public var lang = ""
     @objc public var name = ""
+    @objc public var order: Int = 0
     @objc public var type = ""
     @objc public var url = ""
 }
