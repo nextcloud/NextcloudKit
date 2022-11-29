@@ -56,6 +56,11 @@ import MobileCoreServices
     var cookies: [String:[HTTPCookie]] = [:]
     var internalTypeIdentifiers: [UTTypeConformsToServer] = []
 
+    var dateFormatterCache = NSCache<NSString, DateFormatter>();
+    var utiCache = NSCache<NSString, CFString>();
+    var mimeTypeCache = NSCache<CFString, NSString>();
+    var filePropertiesCache = NSCache<CFString, NKFileProperty>();
+
     var delegate: NKCommonDelegate?
     
     @objc public let sessionIdentifierDownload: String = "com.nextcloud.nextcloudkit.session.download"
@@ -174,7 +179,7 @@ import MobileCoreServices
     }
 
     // MARK: - Init
-    
+
     override init() {
         super.init()
         
@@ -182,7 +187,7 @@ import MobileCoreServices
     }
     
     // MARK: - Setup
-    
+
     @objc public func setup(account: String? = nil, user: String, userId: String, password: String, urlBase: String, userAgent: String, nextcloudVersion: Int, delegate: NKCommonDelegate?) {
         
         self.setup(account:account, user: user, userId: userId, password: password, urlBase: urlBase)
@@ -220,14 +225,14 @@ import MobileCoreServices
     }
     
     // MARK: -
-    
+
     @objc public func remove(account: String) {
         
         cookies[account] = nil
     }
         
     // MARK: -  Type Identifier
-    
+
     public func getInternalTypeIdentifier(typeIdentifier: String) -> [UTTypeConformsToServer] {
         
         var results: [UTTypeConformsToServer] = []
@@ -262,20 +267,34 @@ import MobileCoreServices
         var mimeType = mimeType
         var classFile = "", iconName = "", typeIdentifier = "", fileNameWithoutExt = ""
 
-        // UTI
-        if let unmanagedFileUTI = UTTypeCreatePreferredIdentifierForTag(kUTTagClassFilenameExtension, ext as CFString, nil) {
-            let inUTI = unmanagedFileUTI.takeRetainedValue()
+        var inUTI: CFString?
+
+        if let cachedUTI = utiCache.object(forKey: ext as NSString) {
+            inUTI = cachedUTI
+        } else {
+            if let unmanagedFileUTI = UTTypeCreatePreferredIdentifierForTag(kUTTagClassFilenameExtension, ext as CFString, nil) {
+                inUTI = unmanagedFileUTI.takeRetainedValue()
+                utiCache.setObject(inUTI!, forKey: ext as NSString)
+            }
+        }
+
+        if let inUTI = inUTI {
+            typeIdentifier = inUTI as String
             fileNameWithoutExt = (fileName as NSString).deletingPathExtension
 
             // contentType detect
             if mimeType == "" {
-                if let mimeUTI = UTTypeCopyPreferredTagWithClass(inUTI, kUTTagClassMIMEType) {
-                    mimeType = mimeUTI.takeRetainedValue() as String
+                if let cachedMimeUTI = mimeTypeCache.object(forKey: inUTI) {
+                    mimeType = cachedMimeUTI as String
+                } else {
+                    if let mimeUTI = UTTypeCopyPreferredTagWithClass(inUTI, kUTTagClassMIMEType) {
+                        let mimeUTIString = mimeUTI.takeRetainedValue() as String
+
+                        mimeType = mimeUTIString
+                        mimeTypeCache.setObject(mimeUTIString as NSString, forKey: inUTI)
+                    }
                 }
             }
-
-            // TypeIdentifier
-            typeIdentifier = inUTI as String
 
             if directory {
                 mimeType = "httpd/unix-directory"
@@ -285,77 +304,84 @@ import MobileCoreServices
                 fileNameWithoutExt = fileName
                 ext = ""
             } else {
-                let result = getFileProperties(inUTI: inUTI)
-                classFile = result.classFile
-                iconName = result.iconName
+                var fileProperties: NKFileProperty
+
+                if let cachedFileProperties = filePropertiesCache.object(forKey: inUTI) {
+                    fileProperties = cachedFileProperties
+                } else {
+                    fileProperties = getFileProperties(inUTI: inUTI)
+                    filePropertiesCache.setObject(fileProperties, forKey: inUTI)
+                }
+
+                classFile = fileProperties.classFile
+                iconName = fileProperties.iconName
             }
         }
 
         return(mimeType: mimeType, classFile: classFile, iconName: iconName, typeIdentifier: typeIdentifier, fileNameWithoutExt: fileNameWithoutExt, ext: ext)
     }
     
-    public func getFileProperties(inUTI: CFString) -> (classFile: String, iconName: String, name: String, ext: String) {
-    
-        var classFile: String = ""
-        var iconName: String = ""
-        var name: String = ""
-        var ext: String = ""
+    public func getFileProperties(inUTI: CFString) -> NKFileProperty {
+
+        let fileProperty = NKFileProperty()
         let typeIdentifier: String = inUTI as String
         
         if let fileExtension = UTTypeCopyPreferredTagWithClass(inUTI as CFString, kUTTagClassFilenameExtension) {
-            ext = String(fileExtension.takeRetainedValue())
+            fileProperty.ext = String(fileExtension.takeRetainedValue())
         }
         
         if UTTypeConformsTo(inUTI, kUTTypeImage) {
-            classFile = typeClassFile.image.rawValue
-            iconName = typeIconFile.image.rawValue
-            name = "image"
+            fileProperty.classFile = typeClassFile.image.rawValue
+            fileProperty.iconName = typeIconFile.image.rawValue
+            fileProperty.name = "image"
         } else if UTTypeConformsTo(inUTI, kUTTypeMovie) {
-            classFile = typeClassFile.video.rawValue
-            iconName = typeIconFile.movie.rawValue
-            name = "movie"
+            fileProperty.classFile = typeClassFile.video.rawValue
+            fileProperty.iconName = typeIconFile.movie.rawValue
+            fileProperty.name = "movie"
         } else if UTTypeConformsTo(inUTI, kUTTypeAudio) {
-            classFile = typeClassFile.audio.rawValue
-            iconName = typeIconFile.audio.rawValue
-            name = "audio"
+            fileProperty.classFile = typeClassFile.audio.rawValue
+            fileProperty.iconName = typeIconFile.audio.rawValue
+            fileProperty.name = "audio"
         } else if UTTypeConformsTo(inUTI, kUTTypeZipArchive) {
-            classFile = typeClassFile.compress.rawValue
-            iconName = typeIconFile.compress.rawValue
-            name = "archive"
+            fileProperty.classFile = typeClassFile.compress.rawValue
+            fileProperty.iconName = typeIconFile.compress.rawValue
+            fileProperty.name = "archive"
         } else if UTTypeConformsTo(inUTI, kUTTypeHTML) {
-            classFile = typeClassFile.document.rawValue
-            iconName = typeIconFile.code.rawValue
-            name = "code"
+            fileProperty.classFile = typeClassFile.document.rawValue
+            fileProperty.iconName = typeIconFile.code.rawValue
+            fileProperty.name = "code"
         } else if UTTypeConformsTo(inUTI, kUTTypePDF) {
-            classFile = typeClassFile.document.rawValue
-            iconName = typeIconFile.pdf.rawValue
-            name = "document"
+            fileProperty.classFile = typeClassFile.document.rawValue
+            fileProperty.iconName = typeIconFile.pdf.rawValue
+            fileProperty.name = "document"
         } else if UTTypeConformsTo(inUTI, kUTTypeRTF) {
-            classFile = typeClassFile.document.rawValue
-            iconName = typeIconFile.txt.rawValue
-            name = "document"
+            fileProperty.classFile = typeClassFile.document.rawValue
+            fileProperty.iconName = typeIconFile.txt.rawValue
+            fileProperty.name = "document"
         } else if UTTypeConformsTo(inUTI, kUTTypeText) {
-            if ext == "" { ext = "txt" }
-            classFile = typeClassFile.document.rawValue
-            iconName = typeIconFile.txt.rawValue
-            name = "text"
+            if fileProperty.ext == "" { fileProperty.ext = "txt" }
+            fileProperty.classFile = typeClassFile.document.rawValue
+            fileProperty.iconName = typeIconFile.txt.rawValue
+            fileProperty.name = "text"
         } else {
             if let result = internalTypeIdentifiers.first(where: {$0.typeIdentifier == typeIdentifier}) {
-                return(result.classFile, result.iconName, result.name, ext)
+                fileProperty.classFile = result.classFile
+                fileProperty.iconName = result.iconName
+                fileProperty.name = result.name
             } else {
                 if UTTypeConformsTo(inUTI, kUTTypeContent) {
-                    classFile = typeClassFile.document.rawValue
-                    iconName = typeIconFile.document.rawValue
-                    name = "document"
+                    fileProperty.classFile = typeClassFile.document.rawValue
+                    fileProperty.iconName = typeIconFile.document.rawValue
+                    fileProperty.name = "document"
                 } else {
-                    classFile = typeClassFile.unknow.rawValue
-                    iconName = typeIconFile.unknow.rawValue
-                    name = "file"
+                    fileProperty.classFile = typeClassFile.unknow.rawValue
+                    fileProperty.iconName = typeIconFile.unknow.rawValue
+                    fileProperty.name = "file"
                 }
             }
         }
         
-        return(classFile, iconName, name, ext)
+        return fileProperty
     }
     
     // MARK: -  chunkedFile
@@ -476,9 +502,18 @@ import MobileCoreServices
     
     func convertDate(_ dateString: String, format: String) -> NSDate? {
 
-        let dateFormatter = DateFormatter()
-        dateFormatter.locale = Locale.init(identifier: "en_US_POSIX")
-        dateFormatter.dateFormat = format
+        var dateFormatter: DateFormatter
+
+        if let cachedFormatter = dateFormatterCache.object(forKey: format as NSString) {
+            dateFormatter = cachedFormatter
+        } else {
+            dateFormatter = DateFormatter()
+            dateFormatter.locale = Locale.init(identifier: "en_US_POSIX")
+            dateFormatter.dateFormat = format
+
+            dateFormatterCache.setObject(dateFormatter, forKey: format as NSString)
+        }
+
         if let date = dateFormatter.date(from: dateString) {
             return date as NSDate
         } else {

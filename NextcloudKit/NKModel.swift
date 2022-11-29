@@ -408,6 +408,14 @@ import SwiftyJSON
     }()
 }
 
+@objcMembers public class NKFileProperty: NSObject {
+
+    public var classFile: String = ""
+    public var iconName: String = ""
+    public var name: String = ""
+    public var ext: String = ""
+}
+
 @objc public class NKNotifications: NSObject {
     
     @objc public var actions: Data?
