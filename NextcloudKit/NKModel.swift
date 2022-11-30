@@ -347,7 +347,8 @@ import SwiftyJSON
 }
 
 @objc public class NKFile: NSObject {
-    
+
+    @objc public var account = ""
     @objc public var classFile = ""
     @objc public var commentsUnread: Bool = false
     @objc public var contentType = ""
@@ -1134,7 +1135,10 @@ class NKDataFileXML: NSObject {
                     }
                     if componentsFiltered.count > 0 { continue }
                 }
-                
+
+                // account
+                file.account = NKCommon.shared.account
+
                 // path
                 file.path = (fileNamePath as NSString).deletingLastPathComponent + "/"
                 file.path = file.path.removingPercentEncoding ?? ""
