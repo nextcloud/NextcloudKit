@@ -461,7 +461,7 @@ import MobileCoreServices
         return getStandardHeaders(user: user, password: password, appendHeaders: options.customHeader, customUserAgent: options.customUserAgent, contentType: options.contentType)
      }
 
-    public func getStandardHeaders(_ appendHeaders: [String: String]?, customUserAgent: String?, contentType: String? = nil) -> HTTPHeaders {
+    public func getStandardHeaders(_ appendHeaders: [String: String]? = nil, customUserAgent: String? = nil, contentType: String? = nil) -> HTTPHeaders {
         return getStandardHeaders(user: user, password: password, appendHeaders: appendHeaders, customUserAgent: customUserAgent, contentType: contentType)
     }
     
