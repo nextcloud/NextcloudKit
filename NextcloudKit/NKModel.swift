@@ -359,14 +359,11 @@ import SwiftyJSON
     @objc public var downloadURL = ""
     @objc public var e2eEncrypted: Bool = false
     @objc public var etag = ""
-    @objc public var ext = ""
     @objc public var favorite: Bool = false
     @objc public var fileId = ""
     @objc public var fileName = ""
-    @objc public var fileNameWithoutExt = ""
     @objc public var hasPreview: Bool = false
     @objc public var iconName = ""
-    @objc public var livePhoto: Bool = false
     @objc public var mountType = ""
     @objc public var name = ""
     @objc public var note = ""
@@ -1110,8 +1107,6 @@ class NKDataFileXML: NSObject {
     func convertDataFile(xmlData: Data, dav: String, urlBase: String, user: String, userId: String, showHiddenFiles: Bool) -> [NKFile] {
         
         var files: [NKFile] = []
-        var dicMOV: [String:Int] = [:]
-        var dicImage: [String:Int] = [:]
         let rootFiles = "/" + dav + "/files/"
         guard let baseUrl = NKCommon.shared.getHostName(urlString: urlBase) else {
             return files
@@ -1308,8 +1303,6 @@ class NKDataFileXML: NSObject {
             let results = NKCommon.shared.getInternalType(fileName: file.fileName, mimeType: file.contentType, directory: file.directory)
             
             file.contentType = results.mimeType
-            file.ext = results.ext
-            file.fileNameWithoutExt = results.fileNameWithoutExt
             file.iconName = results.iconName
             file.name = "files"
             file.classFile = results.classFile
@@ -1318,30 +1311,8 @@ class NKDataFileXML: NSObject {
             file.userId = userId
             
             files.append(file)
-            
-            // Detect Live Photo
-            if file.ext == "mov" {
-                dicMOV[file.fileNameWithoutExt] = files.count - 1
-            } else if file.classFile == NKCommon.typeClassFile.image.rawValue {
-                dicImage[file.fileNameWithoutExt] = files.count - 1
-            }
         }
-        
-        // Detect Live Photo
-        if dicMOV.count > 0 {
-            for index in dicImage.values {
-                let fileImage = files[index]
-                if dicMOV.keys.contains(fileImage.fileNameWithoutExt) {
-                    if let index = dicMOV[fileImage.fileNameWithoutExt] {
-                        let fileMOV = files[index]
-                        fileImage.livePhoto = true
-                        fileMOV.livePhoto = true
-                        dicMOV[fileImage.fileNameWithoutExt] = nil
-                    }
-                }
-            }
-        }
-        
+
         return files
     }
     
