@@ -1157,16 +1157,12 @@ class NKDataFileXML: NSObject {
                 file.dateString = getlastmodified
             }
             
-            if let creationtime = propstat["d:prop", "nc:creation_time"].double {
-                if creationtime > 0 {
-                    file.creationDate = NSDate(timeIntervalSince1970: creationtime)
-                }
+            if let creationtime = propstat["d:prop", "nc:creation_time"].double, creationtime > 0 {
+                file.creationDate = NSDate(timeIntervalSince1970: creationtime)
             }
             
-            if let uploadtime = propstat["d:prop", "nc:upload_time"].double {
-                if uploadtime > 0 {
-                    file.uploadDate = NSDate(timeIntervalSince1970: uploadtime)
-                }
+            if let uploadtime = propstat["d:prop", "nc:upload_time"].double, uploadtime > 0 {
+                file.uploadDate = NSDate(timeIntervalSince1970: uploadtime)
             }
             
             if let getetag = propstat["d:prop", "d:getetag"].text {
@@ -1351,10 +1347,8 @@ class NKDataFileXML: NSObject {
             
             let propstat = element["d:propstat"][0]
                         
-            if let getlastmodified = propstat["d:prop", "d:getlastmodified"].text {
-                if let date = NKCommon.shared.convertDate(getlastmodified, format: "EEE, dd MMM y HH:mm:ss zzz") {
-                    file.date = date
-                }
+            if let getlastmodified = propstat["d:prop", "d:getlastmodified"].text, let date = NKCommon.shared.convertDate(getlastmodified, format: "EEE, dd MMM y HH:mm:ss zzz") {
+                file.date = date
             }
             
             if let getcontenttype = propstat["d:prop", "d:getcontenttype"].text {
@@ -1387,10 +1381,8 @@ class NKDataFileXML: NSObject {
                 file.trashbinOriginalLocation = trashbinOriginalLocation
             }
             
-            if let trashbinDeletionTime = propstat["d:prop", "nc:trashbin-deletion-time"].text {
-                if let trashbinDeletionTimeDouble = Double(trashbinDeletionTime) {
-                    file.trashbinDeletionTime = Date.init(timeIntervalSince1970: trashbinDeletionTimeDouble) as NSDate
-                }
+            if let trashbinDeletionTime = propstat["d:prop", "nc:trashbin-deletion-time"].text, let trashbinDeletionTimeDouble = Double(trashbinDeletionTime) {
+                file.trashbinDeletionTime = Date.init(timeIntervalSince1970: trashbinDeletionTimeDouble) as NSDate
             }
 
             let results = NKCommon.shared.getInternalType(fileName: file.trashbinFileName, mimeType: file.contentType, directory: file.directory)
@@ -1430,10 +1422,8 @@ class NKDataFileXML: NSObject {
                 item.actorType = value
             }
             
-            if let creationDateTime = element["d:propstat", "d:prop", "oc:creationDateTime"].text {
-                if let date = NKCommon.shared.convertDate(creationDateTime, format: "EEE, dd MMM y HH:mm:ss zzz") {
-                    item.creationDateTime = date
-                }
+            if let creationDateTime = element["d:propstat", "d:prop", "oc:creationDateTime"].text, let date = NKCommon.shared.convertDate(creationDateTime, format: "EEE, dd MMM y HH:mm:ss zzz") {
+                item.creationDateTime = date
             }
            
             if let value = element["d:propstat", "d:prop", "oc:isUnread"].text {
@@ -1460,10 +1450,8 @@ class NKDataFileXML: NSObject {
                 item.verb = value
             }
             
-            if let value = element["d:propstat", "d:status"].text {
-                if value.contains("200") {
-                    items.append(item)
-                }
+            if let value = element["d:propstat", "d:status"].text, value.contains("200") {
+                items.append(item)
             }
         }
         
@@ -1583,10 +1571,8 @@ class NKDataFileXML: NSObject {
                 item.shareWithDisplayname = value
             }
             
-            if let value = element["stime"].double {
-                if value > 0 {
-                    item.date = NSDate(timeIntervalSince1970: value)
-                }
+            if let value = element["stime"].double, value > 0 {
+                item.date = NSDate(timeIntervalSince1970: value)
             }
             
             if let value = element["storage"].int {
@@ -1613,10 +1599,8 @@ class NKDataFileXML: NSObject {
                 item.url = value
             }
             
-            if let value = element["status","clearAt"].double {
-                if value > 0 {
-                     item.userClearAt = NSDate(timeIntervalSince1970: value)
-                }
+            if let value = element["status","clearAt"].double, value > 0 {
+                item.userClearAt = NSDate(timeIntervalSince1970: value)
             }
             
             if let value = element["status","icon"].text {
