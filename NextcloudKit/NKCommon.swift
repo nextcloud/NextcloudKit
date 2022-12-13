@@ -56,7 +56,6 @@ import MobileCoreServices
     var cookies: [String:[HTTPCookie]] = [:]
     var internalTypeIdentifiers: [UTTypeConformsToServer] = []
 
-    var dateFormatterCache = NSCache<NSString, DateFormatter>();
     var utiCache = NSCache<NSString, CFString>();
     var mimeTypeCache = NSCache<CFString, NSString>();
     var filePropertiesCache = NSCache<CFString, NKFileProperty>();
@@ -501,24 +500,15 @@ import MobileCoreServices
     }
     
     func convertDate(_ dateString: String, format: String) -> NSDate? {
+        if dateString.isEmpty { return nil }
 
-        var dateFormatter: DateFormatter
+        let dateFormatter = DateFormatter()
 
-        if let cachedFormatter = dateFormatterCache.object(forKey: format as NSString) {
-            dateFormatter = cachedFormatter
-        } else {
-            dateFormatter = DateFormatter()
-            dateFormatter.locale = Locale.init(identifier: "en_US_POSIX")
-            dateFormatter.dateFormat = format
+        dateFormatter.locale = Locale.init(identifier: "en_US_POSIX")
+        dateFormatter.dateFormat = format
 
-            dateFormatterCache.setObject(dateFormatter, forKey: format as NSString)
-        }
-
-        if let date = dateFormatter.date(from: dateString) {
-            return date as NSDate
-        } else {
-            return nil
-        }
+        guard let date = dateFormatter.date(from: dateString) as? NSDate else { return nil }
+        return date
     }
     
     func convertDate(_ date: Date, format: String) -> String? {
