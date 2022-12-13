@@ -451,7 +451,7 @@ import SwiftyJSON
     @objc public var date: NSDate?
     @objc public var displaynameFileOwner = ""
     @objc public var displaynameOwner = ""
-    @objc public var expirationDate = ""
+    @objc public var expirationDate: NSDate?
     @objc public var fileParent: Int = 0
     @objc public var fileSource: Int = 0
     @objc public var fileTarget = ""
@@ -1475,7 +1475,11 @@ class NKDataFileXML: NSObject {
         var items: [NKShare] = []
         var statusCode: Int = 0
         var message = ""
-        
+        let dateFormatter = DateFormatter()
+
+        dateFormatter.locale = Locale.init(identifier: "en_US_POSIX")
+        dateFormatter.dateFormat = "YYYY-MM-dd HH:mm:ss"
+
         let xml = XML.parse(data)
         if let value = xml["ocs", "meta", "statuscode"].int {
             statusCode = value
@@ -1504,10 +1508,9 @@ class NKDataFileXML: NSObject {
             }
             
             if let value = element["expiration"].text {
-                item.expirationDate = value
-                //if let date = NKCommon.shared.convertDate(value, format: "YYYY-MM-dd HH:mm:ss") {
-                //     item.expirationDate = date
-                //}
+                if !value.isEmpty, let date = dateFormatter.date(from: value) as? NSDate {
+                    item.expirationDate = date
+                }
             }
             
             if let value = element["file_parent"].int {
