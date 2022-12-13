@@ -440,16 +440,12 @@ extension NextcloudKit {
 
     private func convertResponseShare(json: JSON) -> NKShare {
         let share = NKShare()
-        let dateFormatter = DateFormatter()
 
-        dateFormatter.locale = Locale.init(identifier: "en_US_POSIX")
-        dateFormatter.dateFormat = "YYYY-MM-dd HH:mm:ss"
-                           
         share.canDelete = json["ocs"]["data"]["can_delete"].boolValue
         share.canEdit = json["ocs"]["data"]["can_edit"].boolValue
         share.displaynameFileOwner = json["ocs"]["data"]["displayname_file_owner"].stringValue
         share.displaynameOwner = json["ocs"]["data"]["displayname_owner"].stringValue
-        if let expiration = json["ocs"]["data"]["expiration"].string, !expiration.isEmpty, let date = dateFormatter.date(from: expiration) as? NSDate {
+        if let expiration = json["ocs"]["data"]["expiration"].string, let date = NKCommon.shared.convertDate(expiration, format: "YYYY-MM-dd HH:mm:ss") {
             share.expirationDate = date
         }
         share.fileParent = json["ocs"]["data"]["file_parent"].intValue

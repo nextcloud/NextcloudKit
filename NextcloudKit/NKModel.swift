@@ -1475,10 +1475,6 @@ class NKDataFileXML: NSObject {
         var items: [NKShare] = []
         var statusCode: Int = 0
         var message = ""
-        let dateFormatter = DateFormatter()
-
-        dateFormatter.locale = Locale.init(identifier: "en_US_POSIX")
-        dateFormatter.dateFormat = "YYYY-MM-dd HH:mm:ss"
 
         let xml = XML.parse(data)
         if let value = xml["ocs", "meta", "statuscode"].int {
@@ -1507,7 +1503,7 @@ class NKDataFileXML: NSObject {
                 item.displaynameOwner = value
             }
             
-            if let value = element["expiration"].text, !value.isEmpty, let date = dateFormatter.date(from: value) as? NSDate {
+            if let value = element["expiration"].text, let date = NKCommon.shared.convertDate(value, format: "YYYY-MM-dd HH:mm:ss") {
                 item.expirationDate = date
             }
             
