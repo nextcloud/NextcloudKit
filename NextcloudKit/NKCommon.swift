@@ -467,6 +467,7 @@ import MobileCoreServices
     public func getStandardHeaders(user: String, password: String, appendHeaders: [String: String]?, customUserAgent: String?, contentType: String? = nil) -> HTTPHeaders {
         
         var headers: HTTPHeaders = [.authorization(username: user, password: password)]
+
         if customUserAgent != nil {
             headers.update(.userAgent(customUserAgent!))
         } else if let userAgent = userAgent {
@@ -514,8 +515,10 @@ import MobileCoreServices
     func convertDate(_ date: Date, format: String) -> String? {
         
         let dateFormatter = DateFormatter()
+
         dateFormatter.locale = Locale.init(identifier: "en_US_POSIX")
         dateFormatter.dateFormat = format
+
         return dateFormatter.string(from: date)
     }
 
