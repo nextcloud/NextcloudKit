@@ -451,7 +451,7 @@ import SwiftyJSON
     @objc public var date: NSDate?
     @objc public var displaynameFileOwner = ""
     @objc public var displaynameOwner = ""
-    @objc public var expirationDate: NSDate?
+    @objc public var expirationDate = ""
     @objc public var fileParent: Int = 0
     @objc public var fileSource: Int = 0
     @objc public var fileTarget = ""
@@ -1504,9 +1504,10 @@ class NKDataFileXML: NSObject {
             }
             
             if let value = element["expiration"].text {
-                if let date = NKCommon.shared.convertDate(value, format: "YYYY-MM-dd HH:mm:ss") {
-                     item.expirationDate = date
-                }
+                item.expirationDate = value
+                //if let date = NKCommon.shared.convertDate(value, format: "YYYY-MM-dd HH:mm:ss") {
+                //     item.expirationDate = date
+                //}
             }
             
             if let value = element["file_parent"].int {
