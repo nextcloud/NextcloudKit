@@ -1507,10 +1507,8 @@ class NKDataFileXML: NSObject {
                 item.displaynameOwner = value
             }
             
-            if let value = element["expiration"].text {
-                if !value.isEmpty, let date = dateFormatter.date(from: value) as? NSDate {
-                    item.expirationDate = date
-                }
+            if let value = element["expiration"].text, !value.isEmpty, let date = dateFormatter.date(from: value) as? NSDate {
+                item.expirationDate = date
             }
             
             if let value = element["file_parent"].int {
