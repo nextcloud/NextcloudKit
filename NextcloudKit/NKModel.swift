@@ -355,6 +355,7 @@ import SwiftyJSON
     @objc public var checksums = ""
     @objc public var creationDate: NSDate?
     @objc public var dataFingerprint = ""
+    @objc public var date = NSDate()
     @objc public var directory: Bool = false
     @objc public var downloadURL = ""
     @objc public var e2eEncrypted: Bool = false
@@ -395,15 +396,6 @@ import SwiftyJSON
     @objc public var urlBase = ""
     @objc public var user = ""
     @objc public var userId = ""
-
-    @objc public var dateString = ""
-    @objc public lazy var date: NSDate = {
-        if let date = NKCommon.shared.convertDate(dateString, format: "EEE, dd MMM y HH:mm:ss zzz") {
-            return date
-        } else {
-            return NSDate()
-        }
-    }()
 }
 
 @objcMembers public class NKFileProperty: NSObject {
@@ -1153,8 +1145,8 @@ class NKDataFileXML: NSObject {
             
             let propstat = element["d:propstat"][0]
                         
-            if let getlastmodified = propstat["d:prop", "d:getlastmodified"].text {
-                file.dateString = getlastmodified
+            if let getlastmodified = propstat["d:prop", "d:getlastmodified"].text, let date = NKCommon.shared.convertDate(getlastmodified, format: "EEE, dd MMM y HH:mm:ss zzz") {
+                file.date = date
             }
             
             if let creationtime = propstat["d:prop", "nc:creation_time"].double, creationtime > 0 {
