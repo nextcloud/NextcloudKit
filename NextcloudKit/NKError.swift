@@ -135,13 +135,13 @@ public class NKError: NSObject {
         self.error = NSError(domain: NSCocoaErrorDomain, code: self.errorCode, userInfo: [NSLocalizedDescriptionKey:self.errorDescription])
     }
 
-    init(error: Error) {
+    public init(error: Error) {
         self.errorCode = error._code
         self.errorDescription = error.localizedDescription
         self.error = error
     }
 
-    init(nsError: NSError) {
+    public init(nsError: NSError) {
         self.errorCode = nsError.code
         self.errorDescription = nsError.localizedDescription
         self.error = nsError

@@ -253,6 +253,23 @@ import SwiftyJSON
     }
 }
 
+// MARK: - Share account data from Nextcloud iOS & Nextcloud Talk
+
+@objc public class NKDataAccountFile: NSObject, Codable {
+
+    @objc public var url: String
+    @objc public var user: String
+    @objc public var alias: String?
+    @objc public var avatar: String?
+
+    @objc public init(withUrl url: String, user: String, alias: String? = nil, avatar: String? = nil) {
+        self.url = url
+        self.user = user
+        self.alias = alias
+        self.avatar = avatar
+    }
+}
+
 // MARK: -
 
 @objc public class NKActivity: NSObject {
@@ -324,30 +341,30 @@ import SwiftyJSON
     @objc public var idExternalSite: Int = 0
     @objc public var lang = ""
     @objc public var name = ""
+    @objc public var order: Int = 0
     @objc public var type = ""
     @objc public var url = ""
 }
 
 @objc public class NKFile: NSObject {
-    
+
+    @objc public var account = ""
     @objc public var classFile = ""
     @objc public var commentsUnread: Bool = false
     @objc public var contentType = ""
     @objc public var checksums = ""
     @objc public var creationDate: NSDate?
     @objc public var dataFingerprint = ""
+    @objc public var date = NSDate()
     @objc public var directory: Bool = false
     @objc public var downloadURL = ""
     @objc public var e2eEncrypted: Bool = false
     @objc public var etag = ""
-    @objc public var ext = ""
     @objc public var favorite: Bool = false
     @objc public var fileId = ""
     @objc public var fileName = ""
-    @objc public var fileNameWithoutExt = ""
     @objc public var hasPreview: Bool = false
     @objc public var iconName = ""
-    @objc public var livePhoto: Bool = false
     @objc public var mountType = ""
     @objc public var name = ""
     @objc public var note = ""
@@ -379,15 +396,14 @@ import SwiftyJSON
     @objc public var urlBase = ""
     @objc public var user = ""
     @objc public var userId = ""
+}
 
-    @objc public var dateString = ""
-    @objc public lazy var date: NSDate = {
-        if let date = NKCommon.shared.convertDate(dateString, format: "EEE, dd MMM y HH:mm:ss zzz") {
-            return date
-        } else {
-            return NSDate()
-        }
-    }()
+@objcMembers public class NKFileProperty: NSObject {
+
+    public var classFile: String = ""
+    public var iconName: String = ""
+    public var name: String = ""
+    public var ext: String = ""
 }
 
 @objc public class NKNotifications: NSObject {
@@ -1083,8 +1099,6 @@ class NKDataFileXML: NSObject {
     func convertDataFile(xmlData: Data, dav: String, urlBase: String, user: String, userId: String, showHiddenFiles: Bool) -> [NKFile] {
         
         var files: [NKFile] = []
-        var dicMOV: [String:Int] = [:]
-        var dicImage: [String:Int] = [:]
         let rootFiles = "/" + dav + "/files/"
         guard let baseUrl = NKCommon.shared.getHostName(urlString: urlBase) else {
             return files
@@ -1108,7 +1122,10 @@ class NKDataFileXML: NSObject {
                     }
                     if componentsFiltered.count > 0 { continue }
                 }
-                
+
+                // account
+                file.account = NKCommon.shared.account
+
                 // path
                 file.path = (fileNamePath as NSString).deletingLastPathComponent + "/"
                 file.path = file.path.removingPercentEncoding ?? ""
@@ -1128,20 +1145,16 @@ class NKDataFileXML: NSObject {
             
             let propstat = element["d:propstat"][0]
                         
-            if let getlastmodified = propstat["d:prop", "d:getlastmodified"].text {
-                file.dateString = getlastmodified
+            if let getlastmodified = propstat["d:prop", "d:getlastmodified"].text, let date = NKCommon.shared.convertDate(getlastmodified, format: "EEE, dd MMM y HH:mm:ss zzz") {
+                file.date = date
             }
             
-            if let creationtime = propstat["d:prop", "nc:creation_time"].double {
-                if creationtime > 0 {
-                    file.creationDate = NSDate(timeIntervalSince1970: creationtime)
-                }
+            if let creationtime = propstat["d:prop", "nc:creation_time"].double, creationtime > 0 {
+                file.creationDate = NSDate(timeIntervalSince1970: creationtime)
             }
             
-            if let uploadtime = propstat["d:prop", "nc:upload_time"].double {
-                if uploadtime > 0 {
-                    file.uploadDate = NSDate(timeIntervalSince1970: uploadtime)
-                }
+            if let uploadtime = propstat["d:prop", "nc:upload_time"].double, uploadtime > 0 {
+                file.uploadDate = NSDate(timeIntervalSince1970: uploadtime)
             }
             
             if let getetag = propstat["d:prop", "d:getetag"].text {
@@ -1278,8 +1291,6 @@ class NKDataFileXML: NSObject {
             let results = NKCommon.shared.getInternalType(fileName: file.fileName, mimeType: file.contentType, directory: file.directory)
             
             file.contentType = results.mimeType
-            file.ext = results.ext
-            file.fileNameWithoutExt = results.fileNameWithoutExt
             file.iconName = results.iconName
             file.name = "files"
             file.classFile = results.classFile
@@ -1288,30 +1299,8 @@ class NKDataFileXML: NSObject {
             file.userId = userId
             
             files.append(file)
-            
-            // Detect Live Photo
-            if file.ext == "mov" {
-                dicMOV[file.fileNameWithoutExt] = files.count - 1
-            } else if file.classFile == NKCommon.typeClassFile.image.rawValue {
-                dicImage[file.fileNameWithoutExt] = files.count - 1
-            }
         }
-        
-        // Detect Live Photo
-        if dicMOV.count > 0 {
-            for index in dicImage.values {
-                let fileImage = files[index]
-                if dicMOV.keys.contains(fileImage.fileNameWithoutExt) {
-                    if let index = dicMOV[fileImage.fileNameWithoutExt] {
-                        let fileMOV = files[index]
-                        fileImage.livePhoto = true
-                        fileMOV.livePhoto = true
-                        dicMOV[fileImage.fileNameWithoutExt] = nil
-                    }
-                }
-            }
-        }
-        
+
         return files
     }
     
@@ -1350,10 +1339,8 @@ class NKDataFileXML: NSObject {
             
             let propstat = element["d:propstat"][0]
                         
-            if let getlastmodified = propstat["d:prop", "d:getlastmodified"].text {
-                if let date = NKCommon.shared.convertDate(getlastmodified, format: "EEE, dd MMM y HH:mm:ss zzz") {
-                    file.date = date
-                }
+            if let getlastmodified = propstat["d:prop", "d:getlastmodified"].text, let date = NKCommon.shared.convertDate(getlastmodified, format: "EEE, dd MMM y HH:mm:ss zzz") {
+                file.date = date
             }
             
             if let getcontenttype = propstat["d:prop", "d:getcontenttype"].text {
@@ -1386,10 +1373,8 @@ class NKDataFileXML: NSObject {
                 file.trashbinOriginalLocation = trashbinOriginalLocation
             }
             
-            if let trashbinDeletionTime = propstat["d:prop", "nc:trashbin-deletion-time"].text {
-                if let trashbinDeletionTimeDouble = Double(trashbinDeletionTime) {
-                    file.trashbinDeletionTime = Date.init(timeIntervalSince1970: trashbinDeletionTimeDouble) as NSDate
-                }
+            if let trashbinDeletionTime = propstat["d:prop", "nc:trashbin-deletion-time"].text, let trashbinDeletionTimeDouble = Double(trashbinDeletionTime) {
+                file.trashbinDeletionTime = Date.init(timeIntervalSince1970: trashbinDeletionTimeDouble) as NSDate
             }
 
             let results = NKCommon.shared.getInternalType(fileName: file.trashbinFileName, mimeType: file.contentType, directory: file.directory)
@@ -1429,10 +1414,8 @@ class NKDataFileXML: NSObject {
                 item.actorType = value
             }
             
-            if let creationDateTime = element["d:propstat", "d:prop", "oc:creationDateTime"].text {
-                if let date = NKCommon.shared.convertDate(creationDateTime, format: "EEE, dd MMM y HH:mm:ss zzz") {
-                    item.creationDateTime = date
-                }
+            if let creationDateTime = element["d:propstat", "d:prop", "oc:creationDateTime"].text, let date = NKCommon.shared.convertDate(creationDateTime, format: "EEE, dd MMM y HH:mm:ss zzz") {
+                item.creationDateTime = date
             }
            
             if let value = element["d:propstat", "d:prop", "oc:isUnread"].text {
@@ -1459,10 +1442,8 @@ class NKDataFileXML: NSObject {
                 item.verb = value
             }
             
-            if let value = element["d:propstat", "d:status"].text {
-                if value.contains("200") {
-                    items.append(item)
-                }
+            if let value = element["d:propstat", "d:status"].text, value.contains("200") {
+                items.append(item)
             }
         }
         
@@ -1474,7 +1455,7 @@ class NKDataFileXML: NSObject {
         var items: [NKShare] = []
         var statusCode: Int = 0
         var message = ""
-        
+
         let xml = XML.parse(data)
         if let value = xml["ocs", "meta", "statuscode"].int {
             statusCode = value
@@ -1502,10 +1483,8 @@ class NKDataFileXML: NSObject {
                 item.displaynameOwner = value
             }
             
-            if let value = element["expiration"].text {
-                if let date = NKCommon.shared.convertDate(value, format: "YYYY-MM-dd HH:mm:ss") {
-                     item.expirationDate = date
-                }
+            if let value = element["expiration"].text, let date = NKCommon.shared.convertDate(value, format: "YYYY-MM-dd HH:mm:ss") {
+                item.expirationDate = date
             }
             
             if let value = element["file_parent"].int {
@@ -1584,10 +1563,8 @@ class NKDataFileXML: NSObject {
                 item.shareWithDisplayname = value
             }
             
-            if let value = element["stime"].double {
-                if value > 0 {
-                    item.date = NSDate(timeIntervalSince1970: value)
-                }
+            if let value = element["stime"].double, value > 0 {
+                item.date = NSDate(timeIntervalSince1970: value)
             }
             
             if let value = element["storage"].int {
@@ -1614,10 +1591,8 @@ class NKDataFileXML: NSObject {
                 item.url = value
             }
             
-            if let value = element["status","clearAt"].double {
-                if value > 0 {
-                     item.userClearAt = NSDate(timeIntervalSince1970: value)
-                }
+            if let value = element["status","clearAt"].double, value > 0 {
+                item.userClearAt = NSDate(timeIntervalSince1970: value)
             }
             
             if let value = element["status","icon"].text {
