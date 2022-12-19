@@ -38,6 +38,7 @@ import SwiftyJSON
     }()
     
     private let reachabilityManager = Alamofire.NetworkReachabilityManager()
+    //private var cookies: [String:[HTTPCookie]] = [:]
     
     override public init(fileManager: FileManager = .default) {
         super.init(fileManager: fileManager)
@@ -94,6 +95,31 @@ import SwiftyJSON
 
         NKCommon.shared.nextcloudVersion = nextcloudVersion
     }
+
+    /*
+    internal func saveCookies(response : HTTPURLResponse?) {
+
+        if let headerFields = response?.allHeaderFields as? [String : String] {
+            if let url = URL(string: NKCommon.shared.urlBase) {
+                let HTTPCookie = HTTPCookie.cookies(withResponseHeaderFields: headerFields, for: url)
+                if HTTPCookie.count > 0 {
+                    cookies[NKCommon.shared.account] = HTTPCookie
+                } else {
+                    cookies[NKCommon.shared.account] = nil
+                }
+            }
+        }
+    }
+
+    internal func injectsCookies() {
+
+        if let cookies = cookies[NKCommon.shared.account] {
+            if let url = URL(string: NKCommon.shared.urlBase) {
+                sessionManager.session.configuration.httpCookieStorage?.setCookies(cookies, for: url, mainDocumentURL: nil)
+            }
+        }
+    }
+    */
 
     //MARK: - Reachability
     
