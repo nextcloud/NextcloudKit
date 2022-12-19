@@ -41,57 +41,60 @@ import SwiftyJSON
     
     override public init(fileManager: FileManager = .default) {
         super.init(fileManager: fileManager)
-        
-        NotificationCenter.default.addObserver(self, selector: #selector(changeUser(_:)), name: NSNotification.Name(rawValue: "changeUser"), object: nil)
-        
         startNetworkReachabilityObserver()
     }
     
     deinit {
-        NotificationCenter.default.removeObserver(self, name: NSNotification.Name(rawValue: "changeUser"), object: nil)
-        
         stopNetworkReachabilityObserver()
     }
-    
-    //MARK: - Notification Center
-    
-    @objc func changeUser(_ notification: NSNotification) {
-        sessionDeleteCookies()
-        //
-        NKCommon.shared.internalTypeIdentifiers = []
+
+    // MARK: - Setup
+
+    @objc public func setup(account: String? = nil, user: String, userId: String, password: String, urlBase: String, userAgent: String, nextcloudVersion: Int, delegate: NKCommonDelegate?) {
+
+        self.setup(account:account, user: user, userId: userId, password: password, urlBase: urlBase)
+        self.setup(userAgent: userAgent)
+        self.setup(nextcloudVersion: nextcloudVersion)
+        self.setup(delegate: delegate)
     }
-    
-    //MARK: -  Cookies
-   
-    internal func saveCookiesTEST(response : HTTPURLResponse?) {
-        if let headerFields = response?.allHeaderFields as? [String : String] {
-            if let url = URL(string: NKCommon.shared.urlBase) {
-                let cookies = HTTPCookie.cookies(withResponseHeaderFields: headerFields, for: url)
-                if cookies.count > 0 {
-                    NKCommon.shared.cookies[NKCommon.shared.account] = cookies
-                } else {
-                    NKCommon.shared.cookies[NKCommon.shared.account] = nil
+
+    @objc public func setup(account: String? = nil, user: String, userId: String, password: String, urlBase: String) {
+
+        if NKCommon.shared.account != account {
+            if let cookieStore = sessionManager.session.configuration.httpCookieStorage {
+                for cookie in cookieStore.cookies ?? [] {
+                    cookieStore.deleteCookie(cookie)
                 }
             }
+            NKCommon.shared.internalTypeIdentifiers = []
         }
-    }
-    
-    internal func injectsCookiesTEST() {
-        if let cookies = NKCommon.shared.cookies[NKCommon.shared.account] {
-            if let url = URL(string: NKCommon.shared.urlBase) {
-                sessionManager.session.configuration.httpCookieStorage?.setCookies(cookies, for: url, mainDocumentURL: nil)
-            }
+
+        if let account = account {
+            NKCommon.shared.account = account
+        } else {
+            NKCommon.shared.account = ""
         }
+        NKCommon.shared.user = user
+        NKCommon.shared.userId = userId
+        NKCommon.shared.password = password
+        NKCommon.shared.urlBase = urlBase
     }
-    
-    @objc public func sessionDeleteCookies() {
-        if let cookieStore = sessionManager.session.configuration.httpCookieStorage {
-            for cookie in cookieStore.cookies ?? [] {
-                cookieStore.deleteCookie(cookie)
-            }
-        }
+
+    @objc public func setup(delegate: NKCommonDelegate?) {
+
+        NKCommon.shared.delegate = delegate
     }
-        
+
+    @objc public func setup(userAgent: String) {
+
+        NKCommon.shared.userAgent = userAgent
+    }
+
+    @objc public func setup(nextcloudVersion: Int) {
+
+        NKCommon.shared.nextcloudVersion = nextcloudVersion
+    }
+
     //MARK: - Reachability
     
     @objc public func isNetworkReachable() -> Bool {

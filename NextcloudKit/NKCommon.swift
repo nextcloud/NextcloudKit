@@ -52,14 +52,10 @@ import MobileCoreServices
     var userAgent: String?
     var nextcloudVersion: Int = 0
     let dav: String = "remote.php/dav"
-    
-    var cookies: [String:[HTTPCookie]] = [:]
     var internalTypeIdentifiers: [UTTypeConformsToServer] = []
-
     var utiCache = NSCache<NSString, CFString>();
     var mimeTypeCache = NSCache<CFString, NSString>();
     var filePropertiesCache = NSCache<CFString, NKFileProperty>();
-
     var delegate: NKCommonDelegate?
     
     @objc public let sessionIdentifierDownload: String = "com.nextcloud.nextcloudkit.session.download"
@@ -184,52 +180,7 @@ import MobileCoreServices
         
         _filenamePathLog = _pathLog + "/" + _filenameLog
     }
-    
-    // MARK: - Setup
 
-    @objc public func setup(account: String? = nil, user: String, userId: String, password: String, urlBase: String, userAgent: String, nextcloudVersion: Int, delegate: NKCommonDelegate?) {
-        
-        self.setup(account:account, user: user, userId: userId, password: password, urlBase: urlBase)
-        self.setup(userAgent: userAgent)
-        self.setup(nextcloudVersion: nextcloudVersion)
-        self.setup(delegate: delegate)
-    }
-    
-    @objc public func setup(account: String? = nil, user: String, userId: String, password: String, urlBase: String) {
-        
-        if self.account != account {
-            NotificationCenter.default.post(name: Notification.Name.init(rawValue: "changeUser"), object: nil)
-        }
-        
-        if account == nil { self.account = "" } else { self.account = account! }
-        self.user = user
-        self.userId = userId
-        self.password = password
-        self.urlBase = urlBase
-    }
-    
-    @objc public func setup(delegate: NKCommonDelegate?) {
-        
-        self.delegate = delegate
-    }
-    
-    @objc public func setup(userAgent: String) {
-        
-        self.userAgent = userAgent
-    }
-
-    @objc public func setup(nextcloudVersion: Int) {
-        
-        self.nextcloudVersion = nextcloudVersion
-    }
-    
-    // MARK: -
-
-    @objc public func remove(account: String) {
-        
-        cookies[account] = nil
-    }
-        
     // MARK: -  Type Identifier
 
     public func getInternalTypeIdentifier(typeIdentifier: String) -> [UTTypeConformsToServer] {
