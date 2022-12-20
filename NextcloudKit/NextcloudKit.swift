@@ -61,7 +61,7 @@ import SwiftyJSON
 
     @objc public func setup(account: String? = nil, user: String, userId: String, password: String, urlBase: String) {
 
-        if NKCommon.shared.account != account {
+        if (NKCommon.shared.account != account) || (NKCommon.shared.urlBase != urlBase && NKCommon.shared.user != user) {
             if let cookieStore = sessionManager.session.configuration.httpCookieStorage {
                 for cookie in cookieStore.cookies ?? [] {
                     cookieStore.deleteCookie(cookie)
