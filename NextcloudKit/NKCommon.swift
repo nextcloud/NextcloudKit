@@ -109,8 +109,9 @@ import MobileCoreServices
     private var _levelLog: Int = 0
     private var _printLog: Bool = true
     private var _copyLogToDocumentDirectory: Bool = false
-    
-    @objc public let backgroundQueue = DispatchQueue(label: "com.nextcloud.nextcloudkit.backgroundQueue", qos: .background, attributes: .concurrent)
+    private let queueLog =  DispatchQueue (label: "com.nextcloud.nextcloudkit.queuelog", attributes: .concurrent )
+
+    @objc public let backgroundQueue = DispatchQueue(label: "com.nextcloud.nextcloudkit.backgroundqueue", qos: .background, attributes: .concurrent)
 
     @objc public var filenameLog: String {
         get {
@@ -553,20 +554,22 @@ import MobileCoreServices
         }
         
         if levelLog > 0 {
-            
-            writeLogToDisk(filename: filenamePathLog, text: textToWrite)
-           
-            if copyLogToDocumentDirectory {
-                let filenameCopyToDocumentDirectory = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true).first! + "/" + filenameLog
-                writeLogToDisk(filename: filenameCopyToDocumentDirectory, text: textToWrite)
+
+            queueLog.async(flags: .barrier) {
+                self.writeLogToDisk(filename: self.filenamePathLog, text: textToWrite)
+
+                if self.copyLogToDocumentDirectory {
+                    let filenameCopyToDocumentDirectory = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true).first! + "/" + self.filenameLog
+                    self.writeLogToDisk(filename: filenameCopyToDocumentDirectory, text: textToWrite)
+                }
             }
         }
     }
     
     private func writeLogToDisk(filename: String, text: String) {
-        
+
         guard let data = text.data(using: .utf8) else { return }
-        
+
         if !FileManager.default.fileExists(atPath: filename) {
             FileManager.default.createFile(atPath: filename, contents: nil, attributes: nil)
         }
