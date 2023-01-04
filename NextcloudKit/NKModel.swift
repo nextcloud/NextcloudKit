@@ -23,7 +23,11 @@
 //
 
 import Foundation
+
+#if os(iOS)
 import MobileCoreServices
+#endif
+
 import SwiftyXMLParser
 import SwiftyJSON
 
