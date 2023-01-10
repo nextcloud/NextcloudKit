@@ -23,7 +23,10 @@
 
 import Foundation
 import Alamofire
+
+#if os(iOS)
 import MobileCoreServices
+#endif
 
 @objc public protocol NKCommonDelegate {
     
