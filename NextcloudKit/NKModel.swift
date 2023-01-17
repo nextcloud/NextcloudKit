@@ -1124,10 +1124,18 @@ class NKDataFileXML: NSObject {
                     let componentsFiltered = componentsPath.filter {
                         $0.hasPrefix(".")
                     }
-                    let includeHiddenFilesFilter = componentsPath.filter {
-                        includeHiddenFiles.contains($0)
+                    if includeHiddenFiles.isEmpty {
+                        if componentsFiltered.count > 0 {
+                            continue
+                        }
+                    } else {
+                        let includeHiddenFilesFilter = componentsPath.filter {
+                            includeHiddenFiles.contains($0)
+                        }
+                        if includeHiddenFilesFilter.count == 0 && componentsFiltered.count > 0 {
+                            continue
+                        }
                     }
-                    if includeHiddenFilesFilter.count == 0 && componentsFiltered.count > 0 { continue }
                 }
 
                 // account
