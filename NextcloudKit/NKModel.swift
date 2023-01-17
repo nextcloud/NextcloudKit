@@ -1121,17 +1121,13 @@ class NKDataFileXML: NSObject {
                 // Hidden File/Directory/Sub of directoty
                 if !showHiddenFiles {
                     let componentsPath = (href as NSString).pathComponents
-                    let componentsFiltered = componentsPath.filter {
-                        $0.hasPrefix(".")
-                    }
+                    let componentsFiltered = componentsPath.filter { $0.hasPrefix(".") }
                     if includeHiddenFiles.isEmpty {
                         if componentsFiltered.count > 0 {
                             continue
                         }
                     } else {
-                        let includeHiddenFilesFilter = componentsPath.filter {
-                            includeHiddenFiles.contains($0)
-                        }
+                        let includeHiddenFilesFilter = componentsPath.filter { includeHiddenFiles.contains($0) }
                         if includeHiddenFilesFilter.count == 0 && componentsFiltered.count > 0 {
                             continue
                         }
