@@ -1100,7 +1100,7 @@ class NKDataFileXML: NSObject {
         return xml["ocs", "data", "apppassword"].text
     }
     
-    func convertDataFile(xmlData: Data, dav: String, urlBase: String, user: String, userId: String, showHiddenFiles: Bool) -> [NKFile] {
+    func convertDataFile(xmlData: Data, dav: String, urlBase: String, user: String, userId: String, showHiddenFiles: Bool, includeHiddenFiles: [String]) -> [NKFile] {
         
         var files: [NKFile] = []
         let rootFiles = "/" + dav + "/files/"
@@ -1121,10 +1121,17 @@ class NKDataFileXML: NSObject {
                 // Hidden File/Directory/Sub of directoty
                 if !showHiddenFiles {
                     let componentsPath = (href as NSString).pathComponents
-                    let componentsFiltered = componentsPath.filter {
-                        $0.hasPrefix(".")
+                    let componentsFiltered = componentsPath.filter { $0.hasPrefix(".") }
+                    if includeHiddenFiles.isEmpty {
+                        if componentsFiltered.count > 0 {
+                            continue
+                        }
+                    } else {
+                        let includeHiddenFilesFilter = componentsPath.filter { includeHiddenFiles.contains($0) }
+                        if includeHiddenFilesFilter.count == 0 && componentsFiltered.count > 0 {
+                            continue
+                        }
                     }
-                    if componentsFiltered.count > 0 { continue }
                 }
 
                 // account
