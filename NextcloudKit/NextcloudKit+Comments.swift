@@ -82,7 +82,7 @@ extension NextcloudKit {
             return options.queue.async { completion(account, .urlError) }
         }
 
-        let headers = NKCommon.shared.getStandardHeaders(options: options)
+        let headers = NKCommon.shared.getStandardHeaders(options.customHeader, customUserAgent: options.customUserAgent, contentType: "application/json")
 
         var urlRequest: URLRequest
         do {
