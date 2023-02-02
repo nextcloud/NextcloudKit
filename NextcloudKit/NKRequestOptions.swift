@@ -31,7 +31,13 @@ public class NKRequestOptions: NSObject {
     let contentType: String?
     let e2eToken: String?
     let timeout: TimeInterval
-    let queue: DispatchQueue
+    let _queue: DispatchQueue
+
+    public var queue: DispatchQueue {
+        get {
+            return _queue
+        }
+    }
 
     public init(endpoint: String? = nil, customHeader: [String: String]? = nil, customUserAgent: String? = nil, contentType: String? = nil, e2eToken: String? = nil, timeout: TimeInterval = 60, queue: DispatchQueue = .main) {
         self.endpoint = endpoint
@@ -40,6 +46,6 @@ public class NKRequestOptions: NSObject {
         self.contentType = contentType
         self.e2eToken = e2eToken
         self.timeout = timeout
-        self.queue = queue
+        self._queue = queue
     }
 }
