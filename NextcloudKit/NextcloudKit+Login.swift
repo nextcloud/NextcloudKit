@@ -38,7 +38,7 @@ extension NextcloudKit {
                 
         let endpoint = "ocs/v2.php/core/getapppassword"
         
-        guard let url = NKCommon.shared.createStandardUrl(serverUrl: serverUrl, endpoint: endpoint) else {
+        guard let url = self.nkCommonInstance.createStandardUrl(serverUrl: serverUrl, endpoint: endpoint) else {
             return queue.async { completion(nil, nil, .urlError) }
         }
         
@@ -55,7 +55,7 @@ extension NextcloudKit {
             return queue.async { completion(nil, nil, NKError(error: error)) }
         }
 
-        sessionManager.request(urlRequest).validate(statusCode: 200..<300).response(queue: NKCommon.shared.backgroundQueue) { (response) in
+        sessionManager.request(urlRequest).validate(statusCode: 200..<300).response(queue: self.nkCommonInstance.backgroundQueue) { (response) in
             debugPrint(response)
             
             switch response.result {
@@ -64,7 +64,7 @@ extension NextcloudKit {
                 queue.async { completion(nil, nil, error) }
             case .success(let xmlData):
                 if let data = xmlData {
-                    let apppassword = NKDataFileXML().convertDataAppPassword(data: data)
+                    let apppassword = NKDataFileXML(nkCommonInstance: self.nkCommonInstance).convertDataAppPassword(data: data)
                     queue.async { completion(apppassword, xmlData, .success) }
                 } else {
                     queue.async { completion(nil, nil, .xmlError) }
@@ -82,7 +82,7 @@ extension NextcloudKit {
                 
         let endpoint = "index.php/login/v2"
         
-        guard let url = NKCommon.shared.createStandardUrl(serverUrl: serverUrl, endpoint: endpoint) else {
+        guard let url = self.nkCommonInstance.createStandardUrl(serverUrl: serverUrl, endpoint: endpoint) else {
             return queue.async { completion(nil, nil, nil, nil, .urlError) }
         }
         
@@ -91,7 +91,7 @@ extension NextcloudKit {
             headers = [HTTPHeader.userAgent(userAgent)]
         }
 
-        sessionManager.request(url, method: .post, parameters: nil, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).responseData(queue: NKCommon.shared.backgroundQueue) { (response) in
+        sessionManager.request(url, method: .post, parameters: nil, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).responseData(queue: self.nkCommonInstance.backgroundQueue) { (response) in
             debugPrint(response)
             
             switch response.result {
@@ -127,7 +127,7 @@ extension NextcloudKit {
             headers = [HTTPHeader.userAgent(userAgent)]
         }
         
-        sessionManager.request(url, method: .post, parameters: nil, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).responseData(queue: NKCommon.shared.backgroundQueue) { (response) in
+        sessionManager.request(url, method: .post, parameters: nil, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).responseData(queue: self.nkCommonInstance.backgroundQueue) { (response) in
             debugPrint(response)
             
             switch response.result {
