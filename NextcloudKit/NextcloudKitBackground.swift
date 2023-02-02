@@ -26,7 +26,7 @@ import Foundation
 @objc public class NKBackground: NSObject, URLSessionTaskDelegate, URLSessionDelegate, URLSessionDownloadDelegate {
     let nkCommonInstance: NKCommon
 
-    init(nkCommonInstance: NKCommon) {
+    public init(nkCommonInstance: NKCommon) {
         self.nkCommonInstance = nkCommonInstance
         super.init()
     }
