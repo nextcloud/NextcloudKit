@@ -25,7 +25,7 @@ import Foundation
 import Alamofire
 import SwiftyJSON
 
-@objc public class NextcloudKit: SessionDelegate {
+@objc open class NextcloudKit: SessionDelegate {
     @objc public static let shared: NextcloudKit = {
         let instance = NextcloudKit()
         return instance
