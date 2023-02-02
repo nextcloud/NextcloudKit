@@ -42,11 +42,6 @@ import MobileCoreServices
 }
 
 @objc public class NKCommon: NSObject {
-    @objc public static var shared: NKCommon = {
-        let instance = NKCommon()
-        return instance
-    }()
-
     @objc public let dav: String = "remote.php/dav"
 
     @objc public let sessionIdentifierDownload: String = "com.nextcloud.nextcloudkit.session.download"
@@ -593,7 +588,7 @@ import MobileCoreServices
     @objc public func writeLog(_ text: String?) {
         
         guard let text = text else { return }
-        guard let date = NKCommon.shared.convertDate(Date(), format: "yyyy-MM-dd' 'HH:mm:ss") else { return }
+        guard let date = self.convertDate(Date(), format: "yyyy-MM-dd' 'HH:mm:ss") else { return }
         let textToWrite = "\(date) " + text + "\n"
 
         if printLog {
