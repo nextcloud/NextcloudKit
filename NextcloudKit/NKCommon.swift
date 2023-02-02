@@ -47,12 +47,6 @@ import MobileCoreServices
         return instance
     }()
 
-    var internalTypeIdentifiers: [UTTypeConformsToServer] = []
-    var utiCache = NSCache<NSString, CFString>();
-    var mimeTypeCache = NSCache<CFString, NSString>();
-    var filePropertiesCache = NSCache<CFString, NKFileProperty>();
-    var delegate: NKCommonDelegate?
-
     @objc public let dav: String = "remote.php/dav"
 
     @objc public let sessionIdentifierDownload: String = "com.nextcloud.nextcloudkit.session.download"
@@ -107,6 +101,12 @@ import MobileCoreServices
     internal var _urlBase = ""
     internal var _userAgent: String?
     internal var _nextcloudVersion: Int = 0
+
+    internal var internalTypeIdentifiers: [UTTypeConformsToServer] = []
+    internal var utiCache = NSCache<NSString, CFString>();
+    internal var mimeTypeCache = NSCache<CFString, NSString>();
+    internal var filePropertiesCache = NSCache<CFString, NKFileProperty>();
+    internal var delegate: NKCommonDelegate?
 
     private var _filenameLog: String = "communication.log"
     private var _pathLog: String = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true).first!
