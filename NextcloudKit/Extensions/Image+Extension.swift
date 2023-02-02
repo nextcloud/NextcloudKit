@@ -1,5 +1,5 @@
 //
-//  UIImage+Extension.swift
+//  Image+Extension.swift
 //  NextcloudKit
 //
 //  Created by Marino Faggiana on 21/12/20.

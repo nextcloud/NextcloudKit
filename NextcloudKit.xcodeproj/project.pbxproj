@@ -37,7 +37,7 @@
 		F7CE41BC28AD428D00262CD7 /* NKError.swift in Sources */ = {isa = PBXBuildFile; fileRef = F7CE41BB28AD428D00262CD7 /* NKError.swift */; };
 		F7CE41BE28AD48CC00262CD7 /* NextcloudKit+API.swift in Sources */ = {isa = PBXBuildFile; fileRef = F7CE41BD28AD48CC00262CD7 /* NextcloudKit+API.swift */; };
 		F7CE41C028AD49D800262CD7 /* NKModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F7CE41BF28AD49D800262CD7 /* NKModel.swift */; };
-		F7CE41C228AD4E5500262CD7 /* UIImage+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = F7CE41C128AD4E5500262CD7 /* UIImage+Extension.swift */; };
+		F7CE41C228AD4E5500262CD7 /* Image+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = F7CE41C128AD4E5500262CD7 /* Image+Extension.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -79,7 +79,7 @@
 		F7CE41BB28AD428D00262CD7 /* NKError.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NKError.swift; sourceTree = "<group>"; };
 		F7CE41BD28AD48CC00262CD7 /* NextcloudKit+API.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "NextcloudKit+API.swift"; sourceTree = "<group>"; };
 		F7CE41BF28AD49D800262CD7 /* NKModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NKModel.swift; sourceTree = "<group>"; };
-		F7CE41C128AD4E5500262CD7 /* UIImage+Extension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIImage+Extension.swift"; sourceTree = "<group>"; };
+		F7CE41C128AD4E5500262CD7 /* Image+Extension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Image+Extension.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -189,7 +189,7 @@
 		F7CE41C328AD507B00262CD7 /* Extensions */ = {
 			isa = PBXGroup;
 			children = (
-				F7CE41C128AD4E5500262CD7 /* UIImage+Extension.swift */,
+				F7CE41C128AD4E5500262CD7 /* Image+Extension.swift */,
 				F787AC0C298BE9FA0001BB00 /* String+Extension.swift */,
 			);
 			path = Extensions;
@@ -329,7 +329,7 @@
 				F72E2E5328AE5AA700842580 /* NextcloudKit+Share.swift in Sources */,
 				F72E2E4B28AE328800842580 /* NextcloudKit+NCText.swift in Sources */,
 				F769D7E62900261000F95372 /* NextcloudKit+E2EE_Async.swift in Sources */,
-				F7CE41C228AD4E5500262CD7 /* UIImage+Extension.swift in Sources */,
+				F7CE41C228AD4E5500262CD7 /* Image+Extension.swift in Sources */,
 				F7AC9D0D28C112F800FD336E /* NextcloudKit+Dashboard.swift in Sources */,
 				F72E2E4F28AE3A4B00842580 /* NextcloudKit+Richdocuments.swift in Sources */,
 				F7CE41BC28AD428D00262CD7 /* NKError.swift in Sources */,
