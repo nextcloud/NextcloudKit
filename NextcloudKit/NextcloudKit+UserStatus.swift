@@ -31,21 +31,21 @@ extension NextcloudKit {
                                     options: NKRequestOptions = NKRequestOptions(),
                                     completion: @escaping (_ account: String, _ clearAt: NSDate?, _ icon: String?, _ message: String?, _ messageId: String?, _ messageIsPredefined: Bool, _ status: String?, _ statusIsUserDefined: Bool, _ userId: String?, _ data: Data?, _ error: NKError) -> Void) {
     
-        let account = NKCommon.shared.account
-        let urlBase = NKCommon.shared.urlBase
+        let account = self.nkCommonInstance.account
+        let urlBase = self.nkCommonInstance.urlBase
 
         var endpoint = "ocs/v2.php/apps/user_status/api/v1/user_status"
         if let userId = userId {
             endpoint = "ocs/v2.php/apps/user_status/api/v1/user_status/\(userId)"
         }
         
-        guard let url = NKCommon.shared.createStandardUrl(serverUrl: urlBase, endpoint: endpoint) else {
+        guard let url = self.nkCommonInstance.createStandardUrl(serverUrl: urlBase, endpoint: endpoint) else {
             return options.queue.async { completion(account, nil, nil, nil, nil, false, nil, false, nil, nil, .urlError) }
         }
 
-        let headers = NKCommon.shared.getStandardHeaders(options: options)
+        let headers = self.nkCommonInstance.getStandardHeaders(options: options)
         
-        sessionManager.request(url, method: .get, parameters: nil, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).responseData(queue: NKCommon.shared.backgroundQueue) { (response) in
+        sessionManager.request(url, method: .get, parameters: nil, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).responseData(queue: self.nkCommonInstance.backgroundQueue) { (response) in
             debugPrint(response)
             
             switch response.result {
@@ -81,22 +81,22 @@ extension NextcloudKit {
                                     options: NKRequestOptions = NKRequestOptions(),
                                     completion: @escaping (_ account: String, _ error: NKError) -> Void) {
            
-        let account = NKCommon.shared.account
-        let urlBase = NKCommon.shared.urlBase
+        let account = self.nkCommonInstance.account
+        let urlBase = self.nkCommonInstance.urlBase
 
         let endpoint = "ocs/v2.php/apps/user_status/api/v1/user_status/status"
 
-        guard let url = NKCommon.shared.createStandardUrl(serverUrl: urlBase, endpoint: endpoint) else {
+        guard let url = self.nkCommonInstance.createStandardUrl(serverUrl: urlBase, endpoint: endpoint) else {
             return options.queue.async { completion(account, .urlError) }
         }
 
-        let headers = NKCommon.shared.getStandardHeaders(options: options)
+        let headers = self.nkCommonInstance.getStandardHeaders(options: options)
 
         let parameters = [
             "statusType": String(status)
         ]
                 
-        sessionManager.request(url, method: .put, parameters: parameters, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).responseData(queue: NKCommon.shared.backgroundQueue) { (response) in
+        sessionManager.request(url, method: .put, parameters: parameters, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).responseData(queue: self.nkCommonInstance.backgroundQueue) { (response) in
             debugPrint(response)
             
             switch response.result {
@@ -121,16 +121,16 @@ extension NextcloudKit {
                                                  options: NKRequestOptions = NKRequestOptions(),
                                                  completion: @escaping (_ account: String, _ error: NKError) -> Void) {
            
-        let account = NKCommon.shared.account
-        let urlBase = NKCommon.shared.urlBase
+        let account = self.nkCommonInstance.account
+        let urlBase = self.nkCommonInstance.urlBase
 
         let endpoint = "ocs/v2.php/apps/user_status/api/v1/user_status/message/predefined"
 
-        guard let url = NKCommon.shared.createStandardUrl(serverUrl: urlBase, endpoint: endpoint) else {
+        guard let url = self.nkCommonInstance.createStandardUrl(serverUrl: urlBase, endpoint: endpoint) else {
             return options.queue.async { completion(account, .urlError) }
         }
 
-        let headers = NKCommon.shared.getStandardHeaders(options: options)
+        let headers = self.nkCommonInstance.getStandardHeaders(options: options)
 
         var parameters = [
             "messageId": String(messageId)
@@ -139,7 +139,7 @@ extension NextcloudKit {
             parameters["clearAt"] = String(clearAt)
         }
                 
-        sessionManager.request(url, method: .put, parameters: parameters, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).responseData(queue: NKCommon.shared.backgroundQueue) { (response) in
+        sessionManager.request(url, method: .put, parameters: parameters, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).responseData(queue: self.nkCommonInstance.backgroundQueue) { (response) in
             debugPrint(response)
             
             switch response.result {
@@ -165,16 +165,16 @@ extension NextcloudKit {
                                                   options: NKRequestOptions = NKRequestOptions(),
                                                   completion: @escaping (_ account: String, _ error: NKError) -> Void) {
            
-        let account = NKCommon.shared.account
-        let urlBase = NKCommon.shared.urlBase
+        let account = self.nkCommonInstance.account
+        let urlBase = self.nkCommonInstance.urlBase
 
         let endpoint = "ocs/v2.php/apps/user_status/api/v1/user_status/message/custom"
 
-        guard let url = NKCommon.shared.createStandardUrl(serverUrl: urlBase, endpoint: endpoint) else {
+        guard let url = self.nkCommonInstance.createStandardUrl(serverUrl: urlBase, endpoint: endpoint) else {
             return options.queue.async { completion(account, .urlError) }
         }
 
-        let headers = NKCommon.shared.getStandardHeaders(options: options)
+        let headers = self.nkCommonInstance.getStandardHeaders(options: options)
 
         var parameters = [
             "message": String(message)
@@ -186,7 +186,7 @@ extension NextcloudKit {
             parameters["clearAt"] = String(clearAt)
         }
                 
-        sessionManager.request(url, method: .put, parameters: parameters, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).responseData(queue: NKCommon.shared.backgroundQueue) { (response) in
+        sessionManager.request(url, method: .put, parameters: parameters, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).responseData(queue: self.nkCommonInstance.backgroundQueue) { (response) in
             debugPrint(response)
             
             switch response.result {
@@ -209,18 +209,18 @@ extension NextcloudKit {
     @objc public func clearMessage(options: NKRequestOptions = NKRequestOptions(),
                                    completion: @escaping (_ account: String, _ error: NKError) -> Void) {
            
-        let account = NKCommon.shared.account
-        let urlBase = NKCommon.shared.urlBase
+        let account = self.nkCommonInstance.account
+        let urlBase = self.nkCommonInstance.urlBase
 
         let endpoint = "ocs/v2.php/apps/user_status/api/v1/user_status/message"
 
-        guard let url = NKCommon.shared.createStandardUrl(serverUrl: urlBase, endpoint: endpoint) else {
+        guard let url = self.nkCommonInstance.createStandardUrl(serverUrl: urlBase, endpoint: endpoint) else {
             return options.queue.async { completion(account, .urlError) }
         }
 
-        let headers = NKCommon.shared.getStandardHeaders(options: options)
+        let headers = self.nkCommonInstance.getStandardHeaders(options: options)
 
-        sessionManager.request(url, method: .delete, parameters: nil, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).responseData(queue: NKCommon.shared.backgroundQueue) { (response) in
+        sessionManager.request(url, method: .delete, parameters: nil, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).responseData(queue: self.nkCommonInstance.backgroundQueue) { (response) in
             debugPrint(response)
             
             switch response.result {
@@ -243,19 +243,19 @@ extension NextcloudKit {
     @objc public func getUserStatusPredefinedStatuses(options: NKRequestOptions = NKRequestOptions(),
                                                       completion: @escaping (_ account: String, _ userStatuses: [NKUserStatus]?, _ data: Data?, _ error: NKError) -> Void) {
     
-        let account = NKCommon.shared.account
-        let urlBase = NKCommon.shared.urlBase
+        let account = self.nkCommonInstance.account
+        let urlBase = self.nkCommonInstance.urlBase
         var userStatuses: [NKUserStatus] = []
 
         let endpoint = "ocs/v2.php/apps/user_status/api/v1/predefined_statuses"
         
-        guard let url = NKCommon.shared.createStandardUrl(serverUrl: urlBase, endpoint: endpoint) else {
+        guard let url = self.nkCommonInstance.createStandardUrl(serverUrl: urlBase, endpoint: endpoint) else {
             return options.queue.async { completion(account, nil, nil, .urlError) }
         }
 
-        let headers = NKCommon.shared.getStandardHeaders(options: options)
+        let headers = self.nkCommonInstance.getStandardHeaders(options: options)
 
-        sessionManager.request(url, method: .get, parameters: nil, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).responseData(queue: NKCommon.shared.backgroundQueue) { (response) in
+        sessionManager.request(url, method: .get, parameters: nil, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).responseData(queue: self.nkCommonInstance.backgroundQueue) { (response) in
             debugPrint(response)
             
             switch response.result {
@@ -298,24 +298,24 @@ extension NextcloudKit {
                                                     options: NKRequestOptions = NKRequestOptions(),
                                                     completion: @escaping (_ account: String, _ userStatuses: [NKUserStatus]?, _ data: Data?, _ error: NKError) -> Void) {
     
-        let account = NKCommon.shared.account
-        let urlBase = NKCommon.shared.urlBase
+        let account = self.nkCommonInstance.account
+        let urlBase = self.nkCommonInstance.urlBase
         var userStatuses: [NKUserStatus] = []
 
         let endpoint = "ocs/v2.php/apps/user_status/api/v1/statuses"
         
-        guard let url = NKCommon.shared.createStandardUrl(serverUrl: urlBase, endpoint: endpoint) else {
+        guard let url = self.nkCommonInstance.createStandardUrl(serverUrl: urlBase, endpoint: endpoint) else {
             return options.queue.async { completion(account, nil, nil, .urlError) }
         }
                 
-        let headers = NKCommon.shared.getStandardHeaders(options: options)
+        let headers = self.nkCommonInstance.getStandardHeaders(options: options)
 
         let parameters = [
             "limit": String(limit),
             "offset": String(offset)
         ]
         
-        sessionManager.request(url, method: .get, parameters: parameters, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).responseData(queue: NKCommon.shared.backgroundQueue) { (response) in
+        sessionManager.request(url, method: .get, parameters: parameters, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).responseData(queue: self.nkCommonInstance.backgroundQueue) { (response) in
             debugPrint(response)
             
             switch response.result {

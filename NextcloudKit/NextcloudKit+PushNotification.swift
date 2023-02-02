@@ -41,7 +41,7 @@ extension NextcloudKit {
         
         let endpoint = "ocs/v2.php/apps/notifications/api/v2/push"
         
-        guard let url = NKCommon.shared.createStandardUrl(serverUrl: serverUrl, endpoint: endpoint) else {
+        guard let url = self.nkCommonInstance.createStandardUrl(serverUrl: serverUrl, endpoint: endpoint) else {
             return queue.async { completion(account, nil, nil, nil, nil, .urlError) }
         }
 
@@ -51,9 +51,9 @@ extension NextcloudKit {
             "proxyServer": proxyServerUrl,
         ]
         
-        let headers = NKCommon.shared.getStandardHeaders(user: user, password: password, appendHeaders: addCustomHeaders, customUserAgent: customUserAgent)
+        let headers = self.nkCommonInstance.getStandardHeaders(user: user, password: password, appendHeaders: addCustomHeaders, customUserAgent: customUserAgent)
         
-        sessionManager.request(url, method: .post, parameters:parameters, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).responseData(queue: NKCommon.shared.backgroundQueue) { (response) in
+        sessionManager.request(url, method: .post, parameters:parameters, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).responseData(queue: self.nkCommonInstance.backgroundQueue) { (response) in
             debugPrint(response)
             
             switch response.result {
@@ -86,13 +86,13 @@ extension NextcloudKit {
                             
         let endpoint = "ocs/v2.php/apps/notifications/api/v2/push"
         
-        guard let url = NKCommon.shared.createStandardUrl(serverUrl: serverUrl, endpoint: endpoint) else {
+        guard let url = self.nkCommonInstance.createStandardUrl(serverUrl: serverUrl, endpoint: endpoint) else {
             return queue.async { completion(account, .urlError) }
         }
 
-        let headers = NKCommon.shared.getStandardHeaders(user: user, password: password, appendHeaders: addCustomHeaders, customUserAgent: customUserAgent)
+        let headers = self.nkCommonInstance.getStandardHeaders(user: user, password: password, appendHeaders: addCustomHeaders, customUserAgent: customUserAgent)
         
-        sessionManager.request(url, method: .delete, parameters: nil, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).response(queue: NKCommon.shared.backgroundQueue) { (response) in
+        sessionManager.request(url, method: .delete, parameters: nil, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).response(queue: self.nkCommonInstance.backgroundQueue) { (response) in
             debugPrint(response)
             
             switch response.result {
@@ -116,7 +116,7 @@ extension NextcloudKit {
         
         let endpoint = "devices?format=json"
         
-        guard let url = NKCommon.shared.createStandardUrl(serverUrl: proxyServerUrl, endpoint: endpoint) else {
+        guard let url = self.nkCommonInstance.createStandardUrl(serverUrl: proxyServerUrl, endpoint: endpoint) else {
             return queue.async { completion(.urlError) }
         }
 
@@ -129,7 +129,7 @@ extension NextcloudKit {
         
         let headers = HTTPHeaders.init(arrayLiteral: .userAgent(userAgent))
                 
-        sessionManager.request(url, method: .post, parameters:parameters, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).response(queue: NKCommon.shared.backgroundQueue) { (response) in
+        sessionManager.request(url, method: .post, parameters:parameters, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).response(queue: self.nkCommonInstance.backgroundQueue) { (response) in
             debugPrint(response)
             
             switch response.result {
@@ -152,7 +152,7 @@ extension NextcloudKit {
                 
         let endpoint = "devices"
         
-        guard let url = NKCommon.shared.createStandardUrl(serverUrl: proxyServerUrl, endpoint: endpoint) else {
+        guard let url = self.nkCommonInstance.createStandardUrl(serverUrl: proxyServerUrl, endpoint: endpoint) else {
             return queue.async { completion(.urlError) }
         }
                 
@@ -164,7 +164,7 @@ extension NextcloudKit {
         
         let headers = HTTPHeaders.init(arrayLiteral: .userAgent(userAgent))
         
-        sessionManager.request(url, method: .delete, parameters: parameters, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).response(queue: NKCommon.shared.backgroundQueue) { (response) in
+        sessionManager.request(url, method: .delete, parameters: parameters, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).response(queue: self.nkCommonInstance.backgroundQueue) { (response) in
             debugPrint(response)
             
             switch response.result {

@@ -30,9 +30,9 @@ extension NextcloudKit {
                                   options: NKRequestOptions = NKRequestOptions(),
                                   completion: @escaping (_ account: String, _ items: [NKComments]?, _ data: Data?, _ error: NKError) -> Void) {
            
-        let account = NKCommon.shared.account
-        let urlBase = NKCommon.shared.urlBase
-        let dav = NKCommon.shared.dav
+        let account = self.nkCommonInstance.account
+        let urlBase = self.nkCommonInstance.urlBase
+        let dav = self.nkCommonInstance.dav
         let serverUrlEndpoint = urlBase + "/" + dav + "/comments/files/\(fileId)"
             
         guard let url = serverUrlEndpoint.encodedToUrl else {
@@ -40,17 +40,17 @@ extension NextcloudKit {
         }
         
         let method = HTTPMethod(rawValue: "PROPFIND")
-        let headers = NKCommon.shared.getStandardHeaders(options.customHeader, customUserAgent: options.customUserAgent, contentType: "application/xml")
+        let headers = self.nkCommonInstance.getStandardHeaders(options.customHeader, customUserAgent: options.customUserAgent, contentType: "application/xml")
 
         var urlRequest: URLRequest
         do {
             try urlRequest = URLRequest(url: url, method: method, headers: headers)
-            urlRequest.httpBody = NKDataFileXML().requestBodyComments.data(using: .utf8)
+            urlRequest.httpBody = NKDataFileXML(nkCommonInstance: self.nkCommonInstance).requestBodyComments.data(using: .utf8)
         } catch {
             return options.queue.async { completion(account, nil, nil, NKError(error: error)) }
         }
           
-        sessionManager.request(urlRequest).validate(statusCode: 200..<300).responseData(queue: NKCommon.shared.backgroundQueue) { (response) in
+        sessionManager.request(urlRequest).validate(statusCode: 200..<300).responseData(queue: self.nkCommonInstance.backgroundQueue) { (response) in
             debugPrint(response)
             
             switch response.result {
@@ -59,7 +59,7 @@ extension NextcloudKit {
                 options.queue.async { completion(account, nil, nil, error) }
             case .success( _):
                 if let xmlData = response.data {
-                    let items = NKDataFileXML().convertDataComments(xmlData: xmlData)
+                    let items = NKDataFileXML(nkCommonInstance: self.nkCommonInstance).convertDataComments(xmlData: xmlData)
                     options.queue.async { completion(account, items, xmlData, .success) }
                 } else {
                     options.queue.async { completion(account, nil, nil, .invalidData) }
@@ -73,16 +73,16 @@ extension NextcloudKit {
                                   options: NKRequestOptions = NKRequestOptions(),
                                   completion: @escaping (_ account: String, _ error: NKError) -> Void) {
         
-        let account = NKCommon.shared.account
-        let urlBase = NKCommon.shared.urlBase
-        let dav = NKCommon.shared.dav
+        let account = self.nkCommonInstance.account
+        let urlBase = self.nkCommonInstance.urlBase
+        let dav = self.nkCommonInstance.dav
         let serverUrlEndpoint = urlBase + "/" + dav + "/comments/files/\(fileId)"
         
         guard let url = serverUrlEndpoint.encodedToUrl else {
             return options.queue.async { completion(account, .urlError) }
         }
 
-        let headers = NKCommon.shared.getStandardHeaders(options.customHeader, customUserAgent: options.customUserAgent, contentType: "application/json")
+        let headers = self.nkCommonInstance.getStandardHeaders(options.customHeader, customUserAgent: options.customUserAgent, contentType: "application/json")
 
         var urlRequest: URLRequest
         do {
@@ -93,7 +93,7 @@ extension NextcloudKit {
             return options.queue.async { completion(account, NKError(error: error)) }
         }
         
-        sessionManager.request(urlRequest).validate(statusCode: 200..<300).response(queue: NKCommon.shared.backgroundQueue) { (response) in
+        sessionManager.request(urlRequest).validate(statusCode: 200..<300).response(queue: self.nkCommonInstance.backgroundQueue) { (response) in
             debugPrint(response)
             
             switch response.result {
@@ -112,9 +112,9 @@ extension NextcloudKit {
                                      options: NKRequestOptions = NKRequestOptions(),
                                      completion: @escaping (_ account: String, _ error: NKError) -> Void) {
         
-        let account = NKCommon.shared.account
-        let urlBase = NKCommon.shared.urlBase
-        let dav = NKCommon.shared.dav
+        let account = self.nkCommonInstance.account
+        let urlBase = self.nkCommonInstance.urlBase
+        let dav = self.nkCommonInstance.dav
         let serverUrlEndpoint = urlBase + "/" + dav + "/comments/files/\(fileId)/\(messageId)"
         
         guard let url = serverUrlEndpoint.encodedToUrl else {
@@ -122,18 +122,18 @@ extension NextcloudKit {
         }
         
         let method = HTTPMethod(rawValue: "PROPPATCH")
-        let headers = NKCommon.shared.getStandardHeaders(options.customHeader, customUserAgent: options.customUserAgent, contentType: "application/xml")
+        let headers = self.nkCommonInstance.getStandardHeaders(options.customHeader, customUserAgent: options.customUserAgent, contentType: "application/xml")
 
         var urlRequest: URLRequest
         do {
             try urlRequest = URLRequest(url: url, method: method, headers: headers)
-            let parameters = String(format: NKDataFileXML().requestBodyCommentsUpdate, message)
+            let parameters = String(format: NKDataFileXML(nkCommonInstance: self.nkCommonInstance).requestBodyCommentsUpdate, message)
             urlRequest.httpBody = parameters.data(using: .utf8)
         } catch {
             return options.queue.async { completion(account, NKError(error: error)) }
         }
         
-        sessionManager.request(urlRequest).validate(statusCode: 200..<300).response(queue: NKCommon.shared.backgroundQueue) { (response) in
+        sessionManager.request(urlRequest).validate(statusCode: 200..<300).response(queue: self.nkCommonInstance.backgroundQueue) { (response) in
             debugPrint(response)
             
             switch response.result {
@@ -151,18 +151,18 @@ extension NextcloudKit {
                                      options: NKRequestOptions = NKRequestOptions(),
                                      completion: @escaping (_ account: String, _ error: NKError) -> Void) {
         
-        let account = NKCommon.shared.account
-        let urlBase = NKCommon.shared.urlBase
-        let dav = NKCommon.shared.dav
+        let account = self.nkCommonInstance.account
+        let urlBase = self.nkCommonInstance.urlBase
+        let dav = self.nkCommonInstance.dav
         let serverUrlEndpoint = urlBase + "/" + dav + "/comments/files/\(fileId)/\(messageId)"
         
         guard let url = serverUrlEndpoint.encodedToUrl else {
             return options.queue.async { completion(account, .urlError) }
         }
 
-        let headers = NKCommon.shared.getStandardHeaders(options: options)
+        let headers = self.nkCommonInstance.getStandardHeaders(options: options)
 
-        sessionManager.request(url, method: .delete, parameters: nil, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).response(queue: NKCommon.shared.backgroundQueue) { (response) in
+        sessionManager.request(url, method: .delete, parameters: nil, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).response(queue: self.nkCommonInstance.backgroundQueue) { (response) in
             debugPrint(response)
             
             switch response.result {
@@ -179,9 +179,9 @@ extension NextcloudKit {
                                          options: NKRequestOptions = NKRequestOptions(),
                                          completion: @escaping (_ account: String, _ error: NKError) -> Void) {
         
-        let account = NKCommon.shared.account
-        let urlBase = NKCommon.shared.urlBase
-        let dav = NKCommon.shared.dav
+        let account = self.nkCommonInstance.account
+        let urlBase = self.nkCommonInstance.urlBase
+        let dav = self.nkCommonInstance.dav
         let serverUrlEndpoint = urlBase + "/" + dav + "/comments/files/\(fileId)"
         
         guard let url = serverUrlEndpoint.encodedToUrl else {
@@ -189,18 +189,18 @@ extension NextcloudKit {
         }
         
         let method = HTTPMethod(rawValue: "PROPPATCH")
-        let headers = NKCommon.shared.getStandardHeaders(options.customHeader, customUserAgent: options.customUserAgent, contentType: "application/xml")
+        let headers = self.nkCommonInstance.getStandardHeaders(options.customHeader, customUserAgent: options.customUserAgent, contentType: "application/xml")
 
         var urlRequest: URLRequest
         do {
             try urlRequest = URLRequest(url: url, method: method, headers: headers)
-            let parameters = String(format: NKDataFileXML().requestBodyCommentsMarkAsRead)
+            let parameters = String(format: NKDataFileXML(nkCommonInstance: self.nkCommonInstance).requestBodyCommentsMarkAsRead)
             urlRequest.httpBody = parameters.data(using: .utf8)
         } catch {
             return options.queue.async { completion(account, NKError(error: error)) }
         }
         
-        sessionManager.request(urlRequest).validate(statusCode: 200..<300).response(queue: NKCommon.shared.backgroundQueue) { (response) in
+        sessionManager.request(urlRequest).validate(statusCode: 200..<300).response(queue: self.nkCommonInstance.backgroundQueue) { (response) in
             debugPrint(response)
             
             switch response.result {

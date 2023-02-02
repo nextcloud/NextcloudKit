@@ -86,17 +86,17 @@ extension NextcloudKit {
                                  options: NKRequestOptions = NKRequestOptions(),
                                  completion: @escaping (_ account: String, _ shares: [NKShare]?, _ data: Data?, _ error: NKError) -> Void) {
 
-        let account = NKCommon.shared.account
-        let urlBase = NKCommon.shared.urlBase
+        let account = self.nkCommonInstance.account
+        let urlBase = self.nkCommonInstance.urlBase
 
-        guard let url = NKCommon.shared.createStandardUrl(serverUrl: urlBase, endpoint: parameters.endpoint)
+        guard let url = self.nkCommonInstance.createStandardUrl(serverUrl: urlBase, endpoint: parameters.endpoint)
         else {
             return options.queue.async { completion(account, nil, nil, .urlError) }
         }
 
-        let headers = NKCommon.shared.getStandardHeaders(options.customHeader, customUserAgent: options.customUserAgent, contentType: "application/xml")
+        let headers = self.nkCommonInstance.getStandardHeaders(options.customHeader, customUserAgent: options.customUserAgent, contentType: "application/xml")
 
-        sessionManager.request(url, method: .get, parameters: parameters.queryParameters, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).responseData(queue: NKCommon.shared.backgroundQueue) { (response) in
+        sessionManager.request(url, method: .get, parameters: parameters.queryParameters, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).responseData(queue: self.nkCommonInstance.backgroundQueue) { (response) in
         debugPrint(response)
             
             switch response.result {
@@ -105,7 +105,7 @@ extension NextcloudKit {
                 options.queue.async { completion(account, nil, nil, error) }
             case .success( _):
                 if let xmlData = response.data {
-                    let shares = NKDataFileXML().convertDataShare(data: xmlData)
+                    let shares = NKDataFileXML(nkCommonInstance: self.nkCommonInstance).convertDataShare(data: xmlData)
                     if shares.statusCode == 200 {
                         options.queue.async { completion(account, shares.shares, xmlData, .success) }
                     } else {
@@ -134,8 +134,8 @@ extension NextcloudKit {
                                     options: NKRequestOptions = NKRequestOptions(),
                                     completion: @escaping (_ account: String, _ sharees: [NKSharee]?, _ data: Data?, _ error: NKError) -> Void) {
            
-        let account = NKCommon.shared.account
-        let urlBase = NKCommon.shared.urlBase
+        let account = self.nkCommonInstance.account
+        let urlBase = self.nkCommonInstance.urlBase
 
         let endpoint = "ocs/v2.php/apps/files_sharing/api/v1/sharees"
 
@@ -144,11 +144,11 @@ extension NextcloudKit {
             lookupString = "true"
         }
         
-        guard let url = NKCommon.shared.createStandardUrl(serverUrl: urlBase, endpoint: endpoint) else {
+        guard let url = self.nkCommonInstance.createStandardUrl(serverUrl: urlBase, endpoint: endpoint) else {
             return options.queue.async { completion(account, nil, nil, .urlError) }
         }
 
-        let headers = NKCommon.shared.getStandardHeaders(options: options)
+        let headers = self.nkCommonInstance.getStandardHeaders(options: options)
 
         let parameters = [
             "search": search,
@@ -158,7 +158,7 @@ extension NextcloudKit {
             "lookup": lookupString
         ]
     
-        sessionManager.request(url, method: .get, parameters: parameters, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).responseData(queue: NKCommon.shared.backgroundQueue) { (response) in
+        sessionManager.request(url, method: .get, parameters: parameters, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).responseData(queue: self.nkCommonInstance.backgroundQueue) { (response) in
             debugPrint(response)
             
             switch response.result {
@@ -276,16 +276,16 @@ extension NextcloudKit {
                              options: NKRequestOptions = NKRequestOptions(),
                              completion: @escaping (_ account: String, _ share: NKShare?, _ data: Data?, _ error: NKError) -> Void) {
            
-        let account = NKCommon.shared.account
-        let urlBase = NKCommon.shared.urlBase
+        let account = self.nkCommonInstance.account
+        let urlBase = self.nkCommonInstance.urlBase
 
         let endpoint = "ocs/v2.php/apps/files_sharing/api/v1/shares"
                 
-        guard let url = NKCommon.shared.createStandardUrl(serverUrl: urlBase, endpoint: endpoint) else {
+        guard let url = self.nkCommonInstance.createStandardUrl(serverUrl: urlBase, endpoint: endpoint) else {
             return options.queue.async { completion(account, nil, nil, .urlError) }
         }
 
-        let headers = NKCommon.shared.getStandardHeaders(options: options)
+        let headers = self.nkCommonInstance.getStandardHeaders(options: options)
 
         var parameters = [
             "path": path,
@@ -305,7 +305,7 @@ extension NextcloudKit {
             parameters["password"] = password!
         }
         
-        sessionManager.request(url, method: .post, parameters: parameters, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).responseData(queue: NKCommon.shared.backgroundQueue) { (response) in
+        sessionManager.request(url, method: .post, parameters: parameters, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).responseData(queue: self.nkCommonInstance.backgroundQueue) { (response) in
             debugPrint(response)
             
             switch response.result {
@@ -355,16 +355,16 @@ extension NextcloudKit {
                                   options: NKRequestOptions = NKRequestOptions(),
                                   completion: @escaping (_ account: String, _ share: NKShare?, _ data: Data?, _ error: NKError) -> Void) {
            
-        let account = NKCommon.shared.account
-        let urlBase = NKCommon.shared.urlBase
+        let account = self.nkCommonInstance.account
+        let urlBase = self.nkCommonInstance.urlBase
 
         let endpoint = "ocs/v2.php/apps/files_sharing/api/v1/shares/\(idShare)"
 
-        guard let url = NKCommon.shared.createStandardUrl(serverUrl: urlBase, endpoint: endpoint) else {
+        guard let url = self.nkCommonInstance.createStandardUrl(serverUrl: urlBase, endpoint: endpoint) else {
             return options.queue.async { completion(account, nil, nil, .urlError) }
         }
 
-        let headers = NKCommon.shared.getStandardHeaders(options: options)
+        let headers = self.nkCommonInstance.getStandardHeaders(options: options)
 
         var parameters = [
             "permissions": String(permissions)
@@ -384,7 +384,7 @@ extension NextcloudKit {
         parameters["publicUpload"] = publicUpload == true ? "true" : "false"
         parameters["hideDownload"] = hideDownload == true ? "true" : "false"
         
-        sessionManager.request(url, method: .put, parameters: parameters, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).responseData(queue: NKCommon.shared.backgroundQueue) { (response) in
+        sessionManager.request(url, method: .put, parameters: parameters, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).responseData(queue: self.nkCommonInstance.backgroundQueue) { (response) in
             debugPrint(response)
             
             switch response.result {
@@ -412,18 +412,18 @@ extension NextcloudKit {
                                   options: NKRequestOptions = NKRequestOptions(),
                                   completion: @escaping (_ account: String, _ error: NKError) -> Void) {
               
-        let account = NKCommon.shared.account
-        let urlBase = NKCommon.shared.urlBase
+        let account = self.nkCommonInstance.account
+        let urlBase = self.nkCommonInstance.urlBase
 
         let endpoint = "ocs/v2.php/apps/files_sharing/api/v1/shares/\(idShare)"
                    
-        guard let url = NKCommon.shared.createStandardUrl(serverUrl: urlBase, endpoint: endpoint) else {
+        guard let url = self.nkCommonInstance.createStandardUrl(serverUrl: urlBase, endpoint: endpoint) else {
             return options.queue.async { completion(account, .urlError) }
         }
 
-        let headers = NKCommon.shared.getStandardHeaders(options: options)
+        let headers = self.nkCommonInstance.getStandardHeaders(options: options)
        
-        sessionManager.request(url, method: .delete, parameters: nil, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).response(queue: NKCommon.shared.backgroundQueue) { (response) in
+        sessionManager.request(url, method: .delete, parameters: nil, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).response(queue: self.nkCommonInstance.backgroundQueue) { (response) in
             debugPrint(response)
             
             switch response.result {
@@ -445,7 +445,7 @@ extension NextcloudKit {
         share.canEdit = json["ocs"]["data"]["can_edit"].boolValue
         share.displaynameFileOwner = json["ocs"]["data"]["displayname_file_owner"].stringValue
         share.displaynameOwner = json["ocs"]["data"]["displayname_owner"].stringValue
-        if let expiration = json["ocs"]["data"]["expiration"].string, let date = NKCommon.shared.convertDate(expiration, format: "YYYY-MM-dd HH:mm:ss") {
+        if let expiration = json["ocs"]["data"]["expiration"].string, let date = self.nkCommonInstance.convertDate(expiration, format: "YYYY-MM-dd HH:mm:ss") {
             share.expirationDate = date
         }
         share.fileParent = json["ocs"]["data"]["file_parent"].intValue
