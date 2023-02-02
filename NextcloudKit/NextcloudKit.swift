@@ -71,14 +71,14 @@ import SwiftyJSON
         }
 
         if let account = account {
-            NKCommon.shared.account = account
+            NKCommon.shared._account = account
         } else {
-            NKCommon.shared.account = ""
+            NKCommon.shared._account = ""
         }
-        NKCommon.shared.user = user
-        NKCommon.shared.userId = userId
-        NKCommon.shared.password = password
-        NKCommon.shared.urlBase = urlBase
+        NKCommon.shared._user = user
+        NKCommon.shared._userId = userId
+        NKCommon.shared._password = password
+        NKCommon.shared._urlBase = urlBase
     }
 
     @objc public func setup(delegate: NKCommonDelegate?) {

@@ -46,12 +46,7 @@ import MobileCoreServices
         let instance = NKCommon()
         return instance
     }()
-    
-    var user = ""
-    var userId = ""
-    var password = ""
-    var account = ""
-    var urlBase = ""
+
     var userAgent: String?
     var nextcloudVersion: Int = 0
     let dav: String = "remote.php/dav"
@@ -105,7 +100,13 @@ import MobileCoreServices
         var iconName: String
         var name: String
     }
-    
+
+    internal var _user = ""
+    internal var _userId = ""
+    internal var _password = ""
+    internal var _account = ""
+    internal var _urlBase = ""
+
     private var _filenameLog: String = "communication.log"
     private var _pathLog: String = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true).first!
     private var _filenamePathLog: String = ""
@@ -113,6 +114,36 @@ import MobileCoreServices
     private var _printLog: Bool = true
     private var _copyLogToDocumentDirectory: Bool = false
     private let queueLog =  DispatchQueue (label: "com.nextcloud.nextcloudkit.queuelog", attributes: .concurrent )
+
+    @objc public var user: String {
+        get {
+            return _user
+        }
+    }
+
+    @objc public var userId: String {
+        get {
+            return _userId
+        }
+    }
+
+    @objc public var password: String {
+        get {
+            return _password
+        }
+    }
+
+    @objc public var account: String {
+        get {
+            return _account
+        }
+    }
+
+    @objc public var urlBase: String {
+        get {
+            return _urlBase
+        }
+    }
 
     @objc public let backgroundQueue = DispatchQueue(label: "com.nextcloud.nextcloudkit.backgroundqueue", qos: .background, attributes: .concurrent)
 
