@@ -187,7 +187,7 @@ public class NKError: NSObject {
         self.error = NSError(domain: NSCocoaErrorDomain, code: self.errorCode, userInfo: [NSLocalizedDescriptionKey:self.errorDescription])
     }
 
-    convenience init<T: AFResponse>(error: AFError?, afResponse: T) {
+    public convenience init<T: AFResponse>(error: AFError?, afResponse: T) {
         if let errorCode = afResponse.response?.statusCode {
             guard let dataResponse = afResponse as? Alamofire.DataResponse<T.Success, T.Failure>,
                   let errorData = dataResponse.data
