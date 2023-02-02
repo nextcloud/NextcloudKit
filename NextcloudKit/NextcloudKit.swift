@@ -31,11 +31,17 @@ import SwiftyJSON
         return instance
     }()
             
-    internal lazy var sessionManager: Alamofire.Session = {
+    internal lazy var _sessionManager: Alamofire.Session = {
         let configuration = URLSessionConfiguration.af.default
         configuration.requestCachePolicy = .reloadIgnoringLocalCacheData
         return Alamofire.Session(configuration: configuration, delegate: self, rootQueue: DispatchQueue(label: "com.nextcloud.nextcloudkit.sessionManagerData.rootQueue"), startRequestsImmediately: true, requestQueue: nil, serializationQueue: nil, interceptor: nil, serverTrustManager: nil, redirectHandler: nil, cachedResponseHandler: nil, eventMonitors: [AlamofireLogger()])
     }()
+
+    public var sessionManager: Alamofire.Session {
+        get {
+            return _sessionManager
+        }
+    }
     
     private let reachabilityManager = Alamofire.NetworkReachabilityManager()
     //private var cookies: [String:[HTTPCookie]] = [:]

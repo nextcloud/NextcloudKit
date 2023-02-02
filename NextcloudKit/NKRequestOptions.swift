@@ -25,13 +25,49 @@ import Foundation
 
 @objcMembers
 public class NKRequestOptions: NSObject {
-    let endpoint: String?
-    let customHeader: [String: String]?
-    let customUserAgent: String?
-    let contentType: String?
-    let e2eToken: String?
-    let timeout: TimeInterval
+    let _endpoint: String?
+    let _customHeader: [String: String]?
+    let _customUserAgent: String?
+    let _contentType: String?
+    let _e2eToken: String?
+    let _timeout: TimeInterval
     let _queue: DispatchQueue
+
+    public var endpoint: String? {
+        get {
+            return _endpoint
+        }
+    }
+
+    public var customHeader: [String: String]? {
+        get {
+            return _customHeader
+        }
+    }
+
+    public var customUserAgent: String? {
+        get {
+            return _customUserAgent
+        }
+    }
+
+    public var contentType: String? {
+        get {
+            return _contentType
+        }
+    }
+
+    public var e2eToken: String? {
+        get {
+            return _e2eToken
+        }
+    }
+
+    public var timeout: TimeInterval {
+        get {
+            return _timeout
+        }
+    }
 
     public var queue: DispatchQueue {
         get {
@@ -40,12 +76,12 @@ public class NKRequestOptions: NSObject {
     }
 
     public init(endpoint: String? = nil, customHeader: [String: String]? = nil, customUserAgent: String? = nil, contentType: String? = nil, e2eToken: String? = nil, timeout: TimeInterval = 60, queue: DispatchQueue = .main) {
-        self.endpoint = endpoint
-        self.customHeader = customHeader
-        self.customUserAgent = customUserAgent
-        self.contentType = contentType
-        self.e2eToken = e2eToken
-        self.timeout = timeout
+        self._endpoint = endpoint
+        self._customHeader = customHeader
+        self._customUserAgent = customUserAgent
+        self._contentType = contentType
+        self._e2eToken = e2eToken
+        self._timeout = timeout
         self._queue = queue
     }
 }
