@@ -94,12 +94,12 @@ import SwiftyJSON
 
     @objc public func setup(userAgent: String) {
 
-        NKCommon.shared.userAgent = userAgent
+        NKCommon.shared._userAgent = userAgent
     }
 
     @objc public func setup(nextcloudVersion: Int) {
 
-        NKCommon.shared.nextcloudVersion = nextcloudVersion
+        NKCommon.shared._nextcloudVersion = nextcloudVersion
     }
 
     /*
