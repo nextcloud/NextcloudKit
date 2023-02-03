@@ -25,6 +25,7 @@ import Foundation
 
 @objcMembers
 public class NKRequestOptions: NSObject {
+
     let _endpoint: String?
     let _customHeader: [String: String]?
     let _customUserAgent: String?
