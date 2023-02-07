@@ -23,6 +23,7 @@
 		F769D7E62900261000F95372 /* NextcloudKit+E2EE_Async.swift in Sources */ = {isa = PBXBuildFile; fileRef = F769D7E52900261000F95372 /* NextcloudKit+E2EE_Async.swift */; };
 		F769D7EA290027EA00F95372 /* NextcloudKit+API_Async.swift in Sources */ = {isa = PBXBuildFile; fileRef = F769D7E9290027EA00F95372 /* NextcloudKit+API_Async.swift */; };
 		F769D7ED290028AE00F95372 /* NextcloudKit+WebDAV_Async.swift in Sources */ = {isa = PBXBuildFile; fileRef = F769D7EC290028AE00F95372 /* NextcloudKit+WebDAV_Async.swift */; };
+		F7791EE42992C386009A03AA /* NKShareAccounts.swift in Sources */ = {isa = PBXBuildFile; fileRef = F7791EE32992C386009A03AA /* NKShareAccounts.swift */; };
 		F787AC0D298BE9FA0001BB00 /* String+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = F787AC0C298BE9FA0001BB00 /* String+Extension.swift */; };
 		F7AC9D0D28C112F800FD336E /* NextcloudKit+Dashboard.swift in Sources */ = {isa = PBXBuildFile; fileRef = F7AC9D0C28C112F800FD336E /* NextcloudKit+Dashboard.swift */; };
 		F7CE419D28AD3CD800262CD7 /* NextcloudKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F7CE419428AD3CD700262CD7 /* NextcloudKit.framework */; };
@@ -67,6 +68,7 @@
 		F769D7E52900261000F95372 /* NextcloudKit+E2EE_Async.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NextcloudKit+E2EE_Async.swift"; sourceTree = "<group>"; };
 		F769D7E9290027EA00F95372 /* NextcloudKit+API_Async.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NextcloudKit+API_Async.swift"; sourceTree = "<group>"; };
 		F769D7EC290028AE00F95372 /* NextcloudKit+WebDAV_Async.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NextcloudKit+WebDAV_Async.swift"; sourceTree = "<group>"; };
+		F7791EE32992C386009A03AA /* NKShareAccounts.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NKShareAccounts.swift; sourceTree = "<group>"; };
 		F787AC0C298BE9FA0001BB00 /* String+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "String+Extension.swift"; sourceTree = "<group>"; };
 		F7AC9D0C28C112F800FD336E /* NextcloudKit+Dashboard.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "NextcloudKit+Dashboard.swift"; sourceTree = "<group>"; };
 		F7CE419428AD3CD700262CD7 /* NextcloudKit.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = NextcloudKit.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -170,6 +172,7 @@
 				F72E2E5428AE616000842580 /* NextcloudKit+UserStatus.swift */,
 				F769D7EB2900288700F95372 /* WebDAV */,
 				F72E2E5828AE6B6200842580 /* NextcloudKitBackground.swift */,
+				F7791EE32992C386009A03AA /* NKShareAccounts.swift */,
 				F7CE41B728AD3FB800262CD7 /* NKCommon.swift */,
 				F7CE41BB28AD428D00262CD7 /* NKError.swift */,
 				F7CE41BF28AD49D800262CD7 /* NKModel.swift */,
@@ -331,6 +334,7 @@
 				F769D7E62900261000F95372 /* NextcloudKit+E2EE_Async.swift in Sources */,
 				F7CE41C228AD4E5500262CD7 /* Image+Extension.swift in Sources */,
 				F7AC9D0D28C112F800FD336E /* NextcloudKit+Dashboard.swift in Sources */,
+				F7791EE42992C386009A03AA /* NKShareAccounts.swift in Sources */,
 				F72E2E4F28AE3A4B00842580 /* NextcloudKit+Richdocuments.swift in Sources */,
 				F7CE41BC28AD428D00262CD7 /* NKError.swift in Sources */,
 				F769D7ED290028AE00F95372 /* NextcloudKit+WebDAV_Async.swift in Sources */,
