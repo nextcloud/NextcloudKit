@@ -52,7 +52,7 @@ import UIKit
         let apps: [String: [Account]]?
     }
 
-    @objc func putShareAccounts(at url: URL, app: String, dataAccounts: [DataAccounts]) -> Error? {
+    @objc public func putShareAccounts(at url: URL, app: String, dataAccounts: [DataAccounts]) -> Error? {
 
         var apps: [String : [Account]] = [:]
         var accounts: [Account] = []
@@ -83,7 +83,7 @@ import UIKit
         return nil
     }
 
-    @objc func getShareAccount(at url: URL, application: UIApplication?) -> [DataAccounts]? {
+    @objc public func getShareAccount(at url: URL, application: UIApplication?) -> [DataAccounts]? {
 
         var dataAccounts: [DataAccounts] = []
 
