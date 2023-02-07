@@ -26,7 +26,7 @@ import UIKit
 
 @objc public class NKShareAccounts: NSObject {
 
-    @objc public class NKDataAccountFile: NSObject {
+    @objc public class DataAccounts: NSObject {
 
         @objc public var url: String
         @objc public var user: String
@@ -52,7 +52,7 @@ import UIKit
         let apps: [String: [Account]]?
     }
 
-    @objc func putShareAccounts(at url: URL, app: String, dataAccounts: [NKDataAccountFile]) -> Error? {
+    @objc func putShareAccounts(at url: URL, app: String, dataAccounts: [DataAccounts]) -> Error? {
 
         var apps: [String : [Account]] = [:]
         var accounts: [Account] = []
@@ -83,9 +83,9 @@ import UIKit
         return nil
     }
 
-    @objc func getShareAccount(at url: URL, application: UIApplication?) -> [NKDataAccountFile]? {
+    @objc func getShareAccount(at url: URL, application: UIApplication?) -> [DataAccounts]? {
 
-        var dataAccounts: [NKDataAccountFile] = []
+        var dataAccounts: [DataAccounts] = []
 
         do {
             let data = try Data(contentsOf: url)
@@ -97,7 +97,7 @@ import UIKit
                     if let url = URL(string: app + "://"), let application = application, application.canOpenURL(url) {
                         for account in accounts {
                             if dataAccounts.first(where: { $0.url == account.url && $0.user == account.user }) == nil {
-                                let account = NKDataAccountFile(withUrl: account.url, user: account.user, alias: account.alias, avatar: account.avatar)
+                                let account = DataAccounts(withUrl: account.url, user: account.user, alias: account.alias, avatar: account.avatar)
                                 dataAccounts.append(account)
                             }
                         }
