@@ -54,6 +54,10 @@ import UIKit
     internal let fileName: String = "accounts.json"
     internal let directoryAccounts: String = "Library/Application Support/NextcloudAccounts"
 
+    /// - Parameters:
+    ///     - directory: the group directory of share the accounts (group.com.nextcloud.apps), use the  func containerURL(forSecurityApplicationGroupIdentifier groupIdentifier: String) -> URL? // Available for OS X in 10.8.3.
+    ///     - app: the name of app
+    ///     - dataAccounts: the accounts data
     @objc public func putShareAccounts(at directory: URL, app: String, dataAccounts: [DataAccounts]) -> Error? {
 
         var apps: [String : [Account]] = [:]
@@ -97,6 +101,9 @@ import UIKit
         return nil
     }
 
+    /// - Parameters:
+    ///     - directory: the group directory of share the accounts (group.com.nextcloud.apps), use the  func containerURL(forSecurityApplicationGroupIdentifier groupIdentifier: String) -> URL? // Available for OS X in 10.8.3.
+    ///     - application: the UIApplication used for verify if the app(s) is still installed
     @objc public func getShareAccount(at directory: URL, application: UIApplication) -> [DataAccounts]? {
 
         var dataAccounts: [DataAccounts] = []
