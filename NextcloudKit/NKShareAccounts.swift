@@ -26,6 +26,11 @@ import UIKit
 
 @objc public class NKShareAccounts: NSObject {
 
+    @objc public static let shared: NKShareAccounts = {
+        let instance = NKShareAccounts()
+        return instance
+    }()
+
     @objc public class DataAccounts: NSObject {
 
         @objc public var url: String
