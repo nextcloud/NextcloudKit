@@ -30,35 +30,49 @@ import UIKit
 
         @objc public var url: String
         @objc public var user: String
-        @objc public var alias: String?
-        @objc public var avatar: String?
+        @objc public var name: String?
+        @objc public var image: UIImage?
 
-        @objc public init(withUrl url: String, user: String, alias: String? = nil, avatar: String? = nil) {
+        @objc public init(withUrl url: String, user: String, name: String? = nil, image: UIImage? = nil) {
             self.url = url
             self.user = user
-            self.alias = alias
-            self.avatar = avatar
+            self.name = name
+            self.image = image
         }
     }
 
     internal struct Account: Codable {
         let url: String
         let user: String
-        let alias: String?
-        let avatar: String?
+        let name: String?
     }
 
     internal struct Apps: Codable {
         let apps: [String: [Account]]?
     }
 
-    @objc public func putShareAccounts(at url: URL, app: String, dataAccounts: [DataAccounts]) -> Error? {
+    internal let fileName: String = "accounts.json"
+    internal let directoryAccounts: String = "Library/Application Support/NextcloudAccounts"
+
+    @objc public func putShareAccounts(at directory: URL, app: String, dataAccounts: [DataAccounts]) -> Error? {
 
         var apps: [String : [Account]] = [:]
         var accounts: [Account] = []
+        let url = directory.appendingPathComponent(directoryAccounts + "/" + fileName)
 
+        do {
+            try FileManager.default.createDirectory(at: directory.appendingPathComponent(directoryAccounts), withIntermediateDirectories: true)
+        } catch { }
+
+        // Add data account and image
         for dataAccount in dataAccounts {
-            let account = Account(url: dataAccount.url, user: dataAccount.user, alias: dataAccount.alias, avatar: dataAccount.avatar)
+            if let image = dataAccount.image {
+                do {
+                    let filePathImage = getFileNamePathImage(at: directory, url: dataAccount.url, user: dataAccount.user)
+                    try image.pngData()?.write(to: filePathImage, options: .atomic)
+                } catch { }
+            }
+            let account = Account(url: dataAccount.url, user: dataAccount.user, name: dataAccount.name)
             accounts.append(account)
         }
         apps[app] = accounts
@@ -83,9 +97,10 @@ import UIKit
         return nil
     }
 
-    @objc public func getShareAccount(at url: URL, application: UIApplication?) -> [DataAccounts]? {
+    @objc public func getShareAccount(at directory: URL, application: UIApplication) -> [DataAccounts]? {
 
         var dataAccounts: [DataAccounts] = []
+        let url = directory.appendingPathComponent(directoryAccounts + "/" + fileName)
 
         do {
             let data = try Data(contentsOf: url)
@@ -94,10 +109,12 @@ import UIKit
                 for appDecoder in appsDecoder {
                     let app = appDecoder.key
                     let accounts = appDecoder.value
-                    if let url = URL(string: app + "://"), let application = application, application.canOpenURL(url) {
+                    if let url = URL(string: app + "://"), application.canOpenURL(url) {
                         for account in accounts {
                             if dataAccounts.first(where: { $0.url == account.url && $0.user == account.user }) == nil {
-                                let account = DataAccounts(withUrl: account.url, user: account.user, alias: account.alias, avatar: account.avatar)
+                                let filePathImage = getFileNamePathImage(at: directory, url: account.url, user: account.user)
+                                let image = UIImage(contentsOfFile: filePathImage.path)
+                                let account = DataAccounts(withUrl: account.url, user: account.user, name: account.name, image: image)
                                 dataAccounts.append(account)
                             }
                         }
@@ -107,5 +124,12 @@ import UIKit
         } catch { }
 
         return dataAccounts.isEmpty ? nil : dataAccounts
+    }
+
+    private func getFileNamePathImage(at directory: URL, url: String, user: String) -> URL {
+
+        let userBaseUrl = user + "-" + (URL(string: url)?.host ?? "")
+        let fileName = userBaseUrl + "-\(user).png"
+        return directory.appendingPathComponent(directoryAccounts + "/" + fileName)
     }
 }
