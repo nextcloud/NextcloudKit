@@ -23,7 +23,11 @@
 //
 
 import Foundation
+
+#if os(iOS)
 import MobileCoreServices
+#endif
+
 import SwiftyXMLParser
 import SwiftyJSON
 
@@ -250,23 +254,6 @@ import SwiftyJSON
     static func factory(data: JSON) -> [NCCDashboardWidgetButton]? {
         guard let allProvider = data.array else { return nil }
         return allProvider.compactMap(NCCDashboardWidgetButton.init)
-    }
-}
-
-// MARK: - Share account data from Nextcloud iOS & Nextcloud Talk
-
-@objc public class NKDataAccountFile: NSObject, Codable {
-
-    @objc public var url: String
-    @objc public var user: String
-    @objc public var alias: String?
-    @objc public var avatar: String?
-
-    @objc public init(withUrl url: String, user: String, alias: String? = nil, avatar: String? = nil) {
-        self.url = url
-        self.user = user
-        self.alias = alias
-        self.avatar = avatar
     }
 }
 
@@ -1096,7 +1083,7 @@ class NKDataFileXML: NSObject {
         return xml["ocs", "data", "apppassword"].text
     }
     
-    func convertDataFile(xmlData: Data, dav: String, urlBase: String, user: String, userId: String, showHiddenFiles: Bool) -> [NKFile] {
+    func convertDataFile(xmlData: Data, dav: String, urlBase: String, user: String, userId: String, showHiddenFiles: Bool, includeHiddenFiles: [String]) -> [NKFile] {
         
         var files: [NKFile] = []
         let rootFiles = "/" + dav + "/files/"
@@ -1117,10 +1104,17 @@ class NKDataFileXML: NSObject {
                 // Hidden File/Directory/Sub of directoty
                 if !showHiddenFiles {
                     let componentsPath = (href as NSString).pathComponents
-                    let componentsFiltered = componentsPath.filter {
-                        $0.hasPrefix(".")
+                    let componentsFiltered = componentsPath.filter { $0.hasPrefix(".") }
+                    if includeHiddenFiles.isEmpty {
+                        if componentsFiltered.count > 0 {
+                            continue
+                        }
+                    } else {
+                        let includeHiddenFilesFilter = componentsPath.filter { includeHiddenFiles.contains($0) }
+                        if includeHiddenFilesFilter.count == 0 && componentsFiltered.count > 0 {
+                            continue
+                        }
                     }
-                    if componentsFiltered.count > 0 { continue }
                 }
 
                 // account

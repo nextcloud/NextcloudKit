@@ -60,11 +60,10 @@ public class NKError: NSObject {
     public let errorDescription: String
     public let error: Error
 
-    static let urlError = NKError(errorCode: NSURLErrorBadURL, errorDescription: NSLocalizedString("_invalid_url_", value: "Invalid server url", comment: ""))
-    static let xmlError = NKError(errorCode: NSURLErrorBadServerResponse, errorDescription: NSLocalizedString("_error_decode_xml_", value: "Invalid response, error decoding XML", comment: ""))
-    static let invalidDate = NKError(errorCode: NSURLErrorBadServerResponse, errorDescription: NSLocalizedString("_invalid_date_format_", value: "Invalid date format", comment: ""))
-    static let invalidData = NKError(errorCode: NSURLErrorCannotDecodeContentData, errorDescription: NSLocalizedString("_invalid_data_format_", value: "Invalid data format", comment: ""))
-
+    public static let urlError = NKError(errorCode: NSURLErrorBadURL, errorDescription: NSLocalizedString("_invalid_url_", value: "Invalid server url", comment: ""))
+    public static let xmlError = NKError(errorCode: NSURLErrorBadServerResponse, errorDescription: NSLocalizedString("_error_decode_xml_", value: "Invalid response, error decoding XML", comment: ""))
+    public static let invalidDate = NKError(errorCode: NSURLErrorBadServerResponse, errorDescription: NSLocalizedString("_invalid_date_format_", value: "Invalid date format", comment: ""))
+    public static let invalidData = NKError(errorCode: NSURLErrorCannotDecodeContentData, errorDescription: NSLocalizedString("_invalid_data_format_", value: "Invalid data format", comment: ""))
     public static let success = NKError(errorCode: 0, errorDescription: "")
 
     private static func getErrorDescription(for code: Int) -> String? {
@@ -188,7 +187,7 @@ public class NKError: NSObject {
         self.error = NSError(domain: NSCocoaErrorDomain, code: self.errorCode, userInfo: [NSLocalizedDescriptionKey:self.errorDescription])
     }
 
-    convenience init<T: AFResponse>(error: AFError?, afResponse: T) {
+    public convenience init<T: AFResponse>(error: AFError?, afResponse: T) {
         if let errorCode = afResponse.response?.statusCode {
             guard let dataResponse = afResponse as? Alamofire.DataResponse<T.Success, T.Failure>,
                   let errorData = dataResponse.data

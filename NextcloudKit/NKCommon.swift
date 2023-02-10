@@ -23,7 +23,10 @@
 
 import Foundation
 import Alamofire
+
+#if os(iOS)
 import MobileCoreServices
+#endif
 
 @objc public protocol NKCommonDelegate {
     
@@ -43,25 +46,9 @@ import MobileCoreServices
         let instance = NKCommon()
         return instance
     }()
-    
-    var user = ""
-    var userId = ""
-    var password = ""
-    var account = ""
-    var urlBase = ""
-    var userAgent: String?
-    var nextcloudVersion: Int = 0
-    let dav: String = "remote.php/dav"
-    
-    var cookies: [String:[HTTPCookie]] = [:]
-    var internalTypeIdentifiers: [UTTypeConformsToServer] = []
 
-    var utiCache = NSCache<NSString, CFString>();
-    var mimeTypeCache = NSCache<CFString, NSString>();
-    var filePropertiesCache = NSCache<CFString, NKFileProperty>();
+    @objc public let dav: String = "remote.php/dav"
 
-    var delegate: NKCommonDelegate?
-    
     @objc public let sessionIdentifierDownload: String = "com.nextcloud.nextcloudkit.session.download"
     @objc public let sessionIdentifierUpload: String = "com.nextcloud.nextcloudkit.session.upload"
 
@@ -106,15 +93,72 @@ import MobileCoreServices
         var iconName: String
         var name: String
     }
-    
+
+    internal var _user = ""
+    internal var _userId = ""
+    internal var _password = ""
+    internal var _account = ""
+    internal var _urlBase = ""
+    internal var _userAgent: String?
+    internal var _nextcloudVersion: Int = 0
+
+    internal var internalTypeIdentifiers: [UTTypeConformsToServer] = []
+    internal var utiCache = NSCache<NSString, CFString>();
+    internal var mimeTypeCache = NSCache<CFString, NSString>();
+    internal var filePropertiesCache = NSCache<CFString, NKFileProperty>();
+    internal var delegate: NKCommonDelegate?
+
     private var _filenameLog: String = "communication.log"
     private var _pathLog: String = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true).first!
     private var _filenamePathLog: String = ""
     private var _levelLog: Int = 0
     private var _printLog: Bool = true
     private var _copyLogToDocumentDirectory: Bool = false
-    
-    @objc public let backgroundQueue = DispatchQueue(label: "com.nextcloud.nextcloudkit.backgroundQueue", qos: .background, attributes: .concurrent)
+    private let queueLog =  DispatchQueue (label: "com.nextcloud.nextcloudkit.queuelog", attributes: .concurrent )
+
+    @objc public var user: String {
+        get {
+            return _user
+        }
+    }
+
+    @objc public var userId: String {
+        get {
+            return _userId
+        }
+    }
+
+    @objc public var password: String {
+        get {
+            return _password
+        }
+    }
+
+    @objc public var account: String {
+        get {
+            return _account
+        }
+    }
+
+    @objc public var urlBase: String {
+        get {
+            return _urlBase
+        }
+    }
+
+    @objc public var userAgent: String? {
+        get {
+            return _userAgent
+        }
+    }
+
+    @objc public var nextcloudVersion: Int {
+        get {
+            return _nextcloudVersion
+        }
+    }
+
+    @objc public let backgroundQueue = DispatchQueue(label: "com.nextcloud.nextcloudkit.backgroundqueue", qos: .background, attributes: .concurrent)
 
     @objc public var filenameLog: String {
         get {
@@ -184,52 +228,7 @@ import MobileCoreServices
         
         _filenamePathLog = _pathLog + "/" + _filenameLog
     }
-    
-    // MARK: - Setup
 
-    @objc public func setup(account: String? = nil, user: String, userId: String, password: String, urlBase: String, userAgent: String, nextcloudVersion: Int, delegate: NKCommonDelegate?) {
-        
-        self.setup(account:account, user: user, userId: userId, password: password, urlBase: urlBase)
-        self.setup(userAgent: userAgent)
-        self.setup(nextcloudVersion: nextcloudVersion)
-        self.setup(delegate: delegate)
-    }
-    
-    @objc public func setup(account: String? = nil, user: String, userId: String, password: String, urlBase: String) {
-        
-        if self.account != account {
-            NotificationCenter.default.post(name: Notification.Name.init(rawValue: "changeUser"), object: nil)
-        }
-        
-        if account == nil { self.account = "" } else { self.account = account! }
-        self.user = user
-        self.userId = userId
-        self.password = password
-        self.urlBase = urlBase
-    }
-    
-    @objc public func setup(delegate: NKCommonDelegate?) {
-        
-        self.delegate = delegate
-    }
-    
-    @objc public func setup(userAgent: String) {
-        
-        self.userAgent = userAgent
-    }
-
-    @objc public func setup(nextcloudVersion: Int) {
-        
-        self.nextcloudVersion = nextcloudVersion
-    }
-    
-    // MARK: -
-
-    @objc public func remove(account: String) {
-        
-        cookies[account] = nil
-    }
-        
     // MARK: -  Type Identifier
 
     public func getInternalTypeIdentifier(typeIdentifier: String) -> [UTTypeConformsToServer] {
@@ -555,30 +554,6 @@ import MobileCoreServices
         return nil
     }
 
-    // MARK: - Share account data from Nextcloud iOS & Nextcloud Talk
-
-    @objc public func createDataAccountFile(at url: URL, accounts: [NKDataAccountFile]) -> Error? {
-
-        do {
-            let encode = try JSONEncoder().encode(accounts)
-            try encode.write(to: url)
-        } catch {
-            return error
-        }
-        return nil
-    }
-
-    @objc public func readDataAccountFile(at url: URL) -> [NKDataAccountFile]? {
-
-        do {
-            let data = try Data(contentsOf: url)
-            let accounts: [NKDataAccountFile] = try JSONDecoder().decode([NKDataAccountFile].self, from: data)
-            return accounts
-        } catch {
-            return nil
-        }
-    }
-    
     // MARK: - Log
 
     @objc public func clearFileLog() {
@@ -602,20 +577,22 @@ import MobileCoreServices
         }
         
         if levelLog > 0 {
-            
-            writeLogToDisk(filename: filenamePathLog, text: textToWrite)
-           
-            if copyLogToDocumentDirectory {
-                let filenameCopyToDocumentDirectory = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true).first! + "/" + filenameLog
-                writeLogToDisk(filename: filenameCopyToDocumentDirectory, text: textToWrite)
+
+            queueLog.async(flags: .barrier) {
+                self.writeLogToDisk(filename: self.filenamePathLog, text: textToWrite)
+
+                if self.copyLogToDocumentDirectory {
+                    let filenameCopyToDocumentDirectory = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true).first! + "/" + self.filenameLog
+                    self.writeLogToDisk(filename: filenameCopyToDocumentDirectory, text: textToWrite)
+                }
             }
         }
     }
     
     private func writeLogToDisk(filename: String, text: String) {
-        
+
         guard let data = text.data(using: .utf8) else { return }
-        
+
         if !FileManager.default.fileExists(atPath: filename) {
             FileManager.default.createFile(atPath: filename, contents: nil, attributes: nil)
         }
@@ -627,21 +604,3 @@ import MobileCoreServices
     }
  }
 
-// MARK: - String URL encoding
-
-extension String {
-    var urlEncoded: String? {
-        // +        for historical reason, most web servers treat + as a replacement of whitespace
-        // ?, &     mark query pararmeter which should not be part of a url string, but added seperately
-        let urlAllowedCharSet = CharacterSet.urlQueryAllowed.subtracting(["+", "?", "&"])
-        return addingPercentEncoding(withAllowedCharacters: urlAllowedCharSet)
-    }
-    
-    var encodedToUrl: URLConvertible? {
-        return urlEncoded?.asUrl
-    }
-    
-    var asUrl: URLConvertible? {
-        return try? asURL()
-    }
-}

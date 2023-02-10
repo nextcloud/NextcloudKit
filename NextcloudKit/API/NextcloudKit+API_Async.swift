@@ -21,8 +21,12 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 
+#if os(macOS)
 import Foundation
+import AppKit
+#else
 import UIKit
+#endif
 
 @available(iOS 13.0, *)
 extension NextcloudKit {
