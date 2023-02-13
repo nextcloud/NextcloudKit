@@ -46,7 +46,7 @@ import SwiftyJSON
     private let reachabilityManager = Alamofire.NetworkReachabilityManager()
     //private var cookies: [String:[HTTPCookie]] = [:]
 
-    public let nkCommonInstance = NKCommon()
+    @objc public let nkCommonInstance = NKCommon()
     
     override public init(fileManager: FileManager = .default) {
         super.init(fileManager: fileManager)
