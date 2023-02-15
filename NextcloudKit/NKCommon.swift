@@ -549,30 +549,6 @@ import MobileCoreServices
         return nil
     }
 
-    // MARK: - Share account data from Nextcloud iOS & Nextcloud Talk
-
-    @objc public func createDataAccountFile(at url: URL, accounts: [NKDataAccountFile]) -> Error? {
-
-        do {
-            let encode = try JSONEncoder().encode(accounts)
-            try encode.write(to: url)
-        } catch {
-            return error
-        }
-        return nil
-    }
-
-    @objc public func readDataAccountFile(at url: URL) -> [NKDataAccountFile]? {
-
-        do {
-            let data = try Data(contentsOf: url)
-            let accounts: [NKDataAccountFile] = try JSONDecoder().decode([NKDataAccountFile].self, from: data)
-            return accounts
-        } catch {
-            return nil
-        }
-    }
-    
     // MARK: - Log
 
     @objc public func clearFileLog() {
