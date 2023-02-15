@@ -30,21 +30,21 @@ extension NextcloudKit {
     @objc public func NCTextObtainEditorDetails(options: NKRequestOptions = NKRequestOptions(),
                                                 completion: @escaping (_ account: String, _  editors: [NKEditorDetailsEditors], _ creators: [NKEditorDetailsCreators], _ data: Data?, _ error: NKError) -> Void) {
         
-        let account = NKCommon.shared.account
-        let urlBase = NKCommon.shared.urlBase
+        let account = self.nkCommonInstance.account
+        let urlBase = self.nkCommonInstance.urlBase
 
         let endpoint = "ocs/v2.php/apps/files/api/v1/directEditing"
 
         var editors: [NKEditorDetailsEditors] = []
         var creators: [NKEditorDetailsCreators] = []
 
-        guard let url = NKCommon.shared.createStandardUrl(serverUrl: urlBase, endpoint: endpoint) else {
+        guard let url = self.nkCommonInstance.createStandardUrl(serverUrl: urlBase, endpoint: endpoint) else {
             return options.queue.async { completion(account, editors, creators, nil, .urlError) }
         }
 
-        let headers = NKCommon.shared.getStandardHeaders(options: options)
+        let headers = self.nkCommonInstance.getStandardHeaders(options: options)
         
-        sessionManager.request(url, method: .get, parameters: nil, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).responseData(queue: NKCommon.shared.backgroundQueue) { (response) in
+        sessionManager.request(url, method: .get, parameters: nil, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).responseData(queue: self.nkCommonInstance.backgroundQueue) { (response) in
             debugPrint(response)
             
             switch response.result {
@@ -96,8 +96,8 @@ extension NextcloudKit {
                                      options: NKRequestOptions = NKRequestOptions(),
                                      completion: @escaping (_ account: String, _  url: String?, _ data: Data?, _ error: NKError) -> Void) {
                 
-        let account = NKCommon.shared.account
-        let urlBase = NKCommon.shared.urlBase
+        let account = self.nkCommonInstance.account
+        let urlBase = self.nkCommonInstance.urlBase
 
         guard let fileNamePath = fileNamePath.urlEncoded else {
             return options.queue.async { completion(account, nil, nil, .urlError) }
@@ -105,13 +105,13 @@ extension NextcloudKit {
         
         let endpoint = "ocs/v2.php/apps/files/api/v1/directEditing/open?path=/\(fileNamePath)&editorId=\(editor)"
         
-        guard let url = NKCommon.shared.createStandardUrl(serverUrl: urlBase, endpoint: endpoint) else {
+        guard let url = self.nkCommonInstance.createStandardUrl(serverUrl: urlBase, endpoint: endpoint) else {
             return options.queue.async { completion(account, nil, nil, .urlError) }
         }
 
-        let headers = NKCommon.shared.getStandardHeaders(options: options)
+        let headers = self.nkCommonInstance.getStandardHeaders(options: options)
     
-        sessionManager.request(url, method: .post, parameters: nil, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).responseData(queue: NKCommon.shared.backgroundQueue) { (response) in
+        sessionManager.request(url, method: .post, parameters: nil, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).responseData(queue: self.nkCommonInstance.backgroundQueue) { (response) in
             debugPrint(response)
 
             switch response.result {
@@ -129,20 +129,20 @@ extension NextcloudKit {
     @objc public func NCTextGetListOfTemplates(options: NKRequestOptions = NKRequestOptions(),
                                                completion: @escaping (_ account: String, _  templates: [NKEditorTemplates], _ data: Data?, _ error: NKError) -> Void) {
                 
-        let account = NKCommon.shared.account
-        let urlBase = NKCommon.shared.urlBase
+        let account = self.nkCommonInstance.account
+        let urlBase = self.nkCommonInstance.urlBase
 
         let endpoint = "ocs/v2.php/apps/files/api/v1/directEditing/templates/text/textdocumenttemplate"
 
         var templates: [NKEditorTemplates] = []
 
-        guard let url = NKCommon.shared.createStandardUrl(serverUrl: urlBase, endpoint: endpoint) else {
+        guard let url = self.nkCommonInstance.createStandardUrl(serverUrl: urlBase, endpoint: endpoint) else {
             return options.queue.async { completion(account, templates, nil, .urlError) }
         }
 
-        let headers = NKCommon.shared.getStandardHeaders(options: options)
+        let headers = self.nkCommonInstance.getStandardHeaders(options: options)
         
-        sessionManager.request(url, method: .get, parameters: nil, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).responseData(queue: NKCommon.shared.backgroundQueue) { (response) in
+        sessionManager.request(url, method: .get, parameters: nil, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).responseData(queue: self.nkCommonInstance.backgroundQueue) { (response) in
             debugPrint(response)
 
             switch response.result {
@@ -176,8 +176,8 @@ extension NextcloudKit {
                                        options: NKRequestOptions = NKRequestOptions(),
                                        completion: @escaping (_ account: String, _ url: String?, _ data: Data?, _ error: NKError) -> Void) {
                 
-        let account = NKCommon.shared.account
-        let urlBase = NKCommon.shared.urlBase
+        let account = self.nkCommonInstance.account
+        let urlBase = self.nkCommonInstance.urlBase
 
         guard let fileNamePath = fileNamePath.urlEncoded else {
             return options.queue.async { completion(account, nil, nil, .urlError) }
@@ -191,13 +191,13 @@ extension NextcloudKit {
             endpoint = "ocs/v2.php/apps/files/api/v1/directEditing/create?path=/\(fileNamePath)&editorId=\(editorId)&creatorId=\(creatorId)&templateId=\(templateId)"
         }
         
-        guard let url = NKCommon.shared.createStandardUrl(serverUrl: urlBase, endpoint: endpoint) else {
+        guard let url = self.nkCommonInstance.createStandardUrl(serverUrl: urlBase, endpoint: endpoint) else {
             return options.queue.async { completion(account, nil, nil, .urlError) }
         }
                 
-        let headers = NKCommon.shared.getStandardHeaders(options: options)
+        let headers = self.nkCommonInstance.getStandardHeaders(options: options)
         
-        sessionManager.request(url, method: .post, parameters: nil, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).responseData(queue: NKCommon.shared.backgroundQueue) { (response) in
+        sessionManager.request(url, method: .post, parameters: nil, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).responseData(queue: self.nkCommonInstance.backgroundQueue) { (response) in
             debugPrint(response)
 
             switch response.result {

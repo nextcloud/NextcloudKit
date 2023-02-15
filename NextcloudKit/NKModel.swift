@@ -537,6 +537,7 @@ import SwiftyJSON
 //MARK: - Data File
 
 class NKDataFileXML: NSObject {
+    let nkCommonInstance: NKCommon
 
     let requestBodyComments =
     """
@@ -1076,6 +1077,11 @@ class NKDataFileXML: NSObject {
         </d:prop>
     </d:propfind>
     """
+
+    init(nkCommonInstance: NKCommon) {
+        self.nkCommonInstance = nkCommonInstance
+        super.init()
+    }
     
     func convertDataAppPassword(data: Data) -> String? {
         
@@ -1087,7 +1093,7 @@ class NKDataFileXML: NSObject {
         
         var files: [NKFile] = []
         let rootFiles = "/" + dav + "/files/"
-        guard let baseUrl = NKCommon.shared.getHostName(urlString: urlBase) else {
+        guard let baseUrl = self.nkCommonInstance.getHostName(urlString: urlBase) else {
             return files
         }
         
@@ -1118,7 +1124,7 @@ class NKDataFileXML: NSObject {
                 }
 
                 // account
-                file.account = NKCommon.shared.account
+                file.account = self.nkCommonInstance.account
 
                 // path
                 file.path = (fileNamePath as NSString).deletingLastPathComponent + "/"
@@ -1139,7 +1145,7 @@ class NKDataFileXML: NSObject {
             
             let propstat = element["d:propstat"][0]
                         
-            if let getlastmodified = propstat["d:prop", "d:getlastmodified"].text, let date = NKCommon.shared.convertDate(getlastmodified, format: "EEE, dd MMM y HH:mm:ss zzz") {
+            if let getlastmodified = propstat["d:prop", "d:getlastmodified"].text, let date = self.nkCommonInstance.convertDate(getlastmodified, format: "EEE, dd MMM y HH:mm:ss zzz") {
                 file.date = date
             }
             
@@ -1282,7 +1288,7 @@ class NKDataFileXML: NSObject {
                 }
             }
             
-            let results = NKCommon.shared.getInternalType(fileName: file.fileName, mimeType: file.contentType, directory: file.directory)
+            let results = self.nkCommonInstance.getInternalType(fileName: file.fileName, mimeType: file.contentType, directory: file.directory)
             
             file.contentType = results.mimeType
             file.iconName = results.iconName
@@ -1302,7 +1308,7 @@ class NKDataFileXML: NSObject {
         
         var files: [NKTrash] = []
         var first: Bool = true
-        guard let baseUrl = NKCommon.shared.getHostName(urlString: urlBase) else {
+        guard let baseUrl = self.nkCommonInstance.getHostName(urlString: urlBase) else {
             return files
         }
     
@@ -1333,7 +1339,7 @@ class NKDataFileXML: NSObject {
             
             let propstat = element["d:propstat"][0]
                         
-            if let getlastmodified = propstat["d:prop", "d:getlastmodified"].text, let date = NKCommon.shared.convertDate(getlastmodified, format: "EEE, dd MMM y HH:mm:ss zzz") {
+            if let getlastmodified = propstat["d:prop", "d:getlastmodified"].text, let date = self.nkCommonInstance.convertDate(getlastmodified, format: "EEE, dd MMM y HH:mm:ss zzz") {
                 file.date = date
             }
             
@@ -1371,7 +1377,7 @@ class NKDataFileXML: NSObject {
                 file.trashbinDeletionTime = Date.init(timeIntervalSince1970: trashbinDeletionTimeDouble) as NSDate
             }
 
-            let results = NKCommon.shared.getInternalType(fileName: file.trashbinFileName, mimeType: file.contentType, directory: file.directory)
+            let results = self.nkCommonInstance.getInternalType(fileName: file.trashbinFileName, mimeType: file.contentType, directory: file.directory)
             
             file.contentType = results.mimeType
             file.classFile = results.classFile
@@ -1408,7 +1414,7 @@ class NKDataFileXML: NSObject {
                 item.actorType = value
             }
             
-            if let creationDateTime = element["d:propstat", "d:prop", "oc:creationDateTime"].text, let date = NKCommon.shared.convertDate(creationDateTime, format: "EEE, dd MMM y HH:mm:ss zzz") {
+            if let creationDateTime = element["d:propstat", "d:prop", "oc:creationDateTime"].text, let date = self.nkCommonInstance.convertDate(creationDateTime, format: "EEE, dd MMM y HH:mm:ss zzz") {
                 item.creationDateTime = date
             }
            
@@ -1477,7 +1483,7 @@ class NKDataFileXML: NSObject {
                 item.displaynameOwner = value
             }
             
-            if let value = element["expiration"].text, let date = NKCommon.shared.convertDate(value, format: "YYYY-MM-dd HH:mm:ss") {
+            if let value = element["expiration"].text, let date = self.nkCommonInstance.convertDate(value, format: "YYYY-MM-dd HH:mm:ss") {
                 item.expirationDate = date
             }
             
