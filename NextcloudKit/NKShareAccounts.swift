@@ -22,6 +22,7 @@
 //
 
 import Foundation
+#if os(iOS)
 import UIKit
 
 @objc public class NKShareAccounts: NSObject {
@@ -140,3 +141,4 @@ import UIKit
         return directory.appendingPathComponent(directoryAccounts + "/" + fileName)
     }
 }
+#endif
