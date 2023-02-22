@@ -146,7 +146,7 @@ public class NKError: NSObject {
         self.error = nsError
     }
 
-    init(rootJson: JSON, fallbackStatusCode: Int?) {
+    public init(rootJson: JSON, fallbackStatusCode: Int?) {
         let statuscode = rootJson[.ocsMetaCode].int ?? fallbackStatusCode ?? NSURLErrorCannotDecodeContentData
         errorCode = 200..<300 ~= statuscode ? 0 : statuscode
 
@@ -160,7 +160,7 @@ public class NKError: NSObject {
         self.error = NSError(domain: NSCocoaErrorDomain, code: self.errorCode, userInfo: [NSLocalizedDescriptionKey:self.errorDescription])
     }
 
-    init(statusCode: Int, fallbackDescription: String) {
+    public init(statusCode: Int, fallbackDescription: String) {
         self.errorCode = statusCode
         self.errorDescription = "\(statusCode): " + (NKError.getErrorDescription(for: statusCode) ?? fallbackDescription)
         self.error = NSError(domain: NSCocoaErrorDomain, code: self.errorCode, userInfo: [NSLocalizedDescriptionKey:self.errorDescription])
