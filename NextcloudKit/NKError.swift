@@ -131,7 +131,7 @@ public class NKError: NSObject {
     public init(errorCode: Int = 0, errorDescription: String = "") {
         self.errorCode = errorCode
         self.errorDescription = errorDescription
-        self.error = NSError(domain: NSCocoaErrorDomain, code: self.errorCode, userInfo: [NSLocalizedDescriptionKey:self.errorDescription])
+        self.error = NSError(domain: NSCocoaErrorDomain, code: self.errorCode, userInfo: [NSLocalizedDescriptionKey: self.errorDescription])
     }
 
     public init(error: Error) {
@@ -157,13 +157,13 @@ public class NKError: NSObject {
         } else {
             errorDescription = NKError.getErrorDescription(for: statuscode) ?? ""
         }
-        self.error = NSError(domain: NSCocoaErrorDomain, code: self.errorCode, userInfo: [NSLocalizedDescriptionKey:self.errorDescription])
+        self.error = NSError(domain: NSCocoaErrorDomain, code: self.errorCode, userInfo: [NSLocalizedDescriptionKey: self.errorDescription])
     }
 
     public init(statusCode: Int, fallbackDescription: String) {
         self.errorCode = statusCode
         self.errorDescription = "\(statusCode): " + (NKError.getErrorDescription(for: statusCode) ?? fallbackDescription)
-        self.error = NSError(domain: NSCocoaErrorDomain, code: self.errorCode, userInfo: [NSLocalizedDescriptionKey:self.errorDescription])
+        self.error = NSError(domain: NSCocoaErrorDomain, code: self.errorCode, userInfo: [NSLocalizedDescriptionKey: self.errorDescription])
     }
 
     convenience init(httpResponse: HTTPURLResponse) {
@@ -184,7 +184,7 @@ public class NKError: NSObject {
         } else {
             errorDescription = NKError.getErrorDescription(for: statuscode) ?? ""
         }
-        self.error = NSError(domain: NSCocoaErrorDomain, code: self.errorCode, userInfo: [NSLocalizedDescriptionKey:self.errorDescription])
+        self.error = NSError(domain: NSCocoaErrorDomain, code: self.errorCode, userInfo: [NSLocalizedDescriptionKey: self.errorDescription])
     }
 
     public convenience init<T: AFResponse>(error: AFError?, afResponse: T) {
@@ -214,7 +214,7 @@ public class NKError: NSObject {
                 self.init(nsError: error)
             case .sessionTaskFailed(let error as NSError):
                 self.init(nsError: error)
-            default :
+            default:
                 self.init(error: error)
             }
         } else {

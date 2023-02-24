@@ -38,9 +38,9 @@ extension NextcloudKit {
                                                   addCustomHeaders: [String: String]? = nil,
                                                   queue: DispatchQueue = .main,
                                                   completion: @escaping (_ account: String, _ deviceIdentifier: String?, _ signature: String?, _ publicKey: String?, _ data: Data?, _ error: NKError) -> Void) {
-        
+
         let endpoint = "ocs/v2.php/apps/notifications/api/v2/push"
-        
+
         guard let url = self.nkCommonInstance.createStandardUrl(serverUrl: serverUrl, endpoint: endpoint) else {
             return queue.async { completion(account, nil, nil, nil, nil, .urlError) }
         }
@@ -48,14 +48,14 @@ extension NextcloudKit {
         let parameters = [
             "pushTokenHash": pushTokenHash,
             "devicePublicKey": devicePublicKey,
-            "proxyServer": proxyServerUrl,
+            "proxyServer": proxyServerUrl
         ]
-        
+
         let headers = self.nkCommonInstance.getStandardHeaders(user: user, password: password, appendHeaders: addCustomHeaders, customUserAgent: customUserAgent)
-        
-        sessionManager.request(url, method: .post, parameters:parameters, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).responseData(queue: self.nkCommonInstance.backgroundQueue) { (response) in
+
+        sessionManager.request(url, method: .post, parameters: parameters, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).responseData(queue: self.nkCommonInstance.backgroundQueue) { response in
             debugPrint(response)
-            
+
             switch response.result {
             case .failure(let error):
                 let error = NKError(error: error, afResponse: response)
@@ -63,7 +63,7 @@ extension NextcloudKit {
             case .success(let jsonData):
                 let json = JSON(jsonData)
                 let statusCode = json["ocs"]["meta"]["statuscode"].int ?? NKError.internalError
-                if 200..<300 ~= statusCode  {
+                if 200..<300 ~= statusCode {
                     let deviceIdentifier = json["ocs"]["data"]["deviceIdentifier"].stringValue
                     let signature = json["ocs"]["data"]["signature"].stringValue
                     let publicKey = json["ocs"]["data"]["publicKey"].stringValue
@@ -74,7 +74,7 @@ extension NextcloudKit {
             }
         }
     }
-    
+
     @objc public func unsubscribingPushNotification(serverUrl: String,
                                                     account: String,
                                                     user: String,
@@ -83,28 +83,28 @@ extension NextcloudKit {
                                                     addCustomHeaders: [String: String]? = nil,
                                                     queue: DispatchQueue = .main,
                                                     completion: @escaping (_ account: String, _ error: NKError) -> Void) {
-                            
+
         let endpoint = "ocs/v2.php/apps/notifications/api/v2/push"
-        
+
         guard let url = self.nkCommonInstance.createStandardUrl(serverUrl: serverUrl, endpoint: endpoint) else {
             return queue.async { completion(account, .urlError) }
         }
 
         let headers = self.nkCommonInstance.getStandardHeaders(user: user, password: password, appendHeaders: addCustomHeaders, customUserAgent: customUserAgent)
-        
-        sessionManager.request(url, method: .delete, parameters: nil, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).response(queue: self.nkCommonInstance.backgroundQueue) { (response) in
+
+        sessionManager.request(url, method: .delete, parameters: nil, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).response(queue: self.nkCommonInstance.backgroundQueue) { response in
             debugPrint(response)
-            
+
             switch response.result {
             case .failure(let error):
                 let error = NKError(error: error, afResponse: response)
                 queue.async { completion(account, error) }
-            case .success( _):
+            case .success:
                 queue.async { completion(account, .success) }
             }
         }
     }
-    
+
     @objc public func subscribingPushProxy(proxyServerUrl: String,
                                            pushToken: String,
                                            deviceIdentifier: String,
@@ -113,9 +113,9 @@ extension NextcloudKit {
                                            userAgent: String,
                                            queue: DispatchQueue = .main,
                                            completion: @escaping (_ error: NKError) -> Void) {
-        
+
         let endpoint = "devices?format=json"
-        
+
         guard let url = self.nkCommonInstance.createStandardUrl(serverUrl: proxyServerUrl, endpoint: endpoint) else {
             return queue.async { completion(.urlError) }
         }
@@ -126,22 +126,22 @@ extension NextcloudKit {
             "deviceIdentifierSignature": signature,
             "userPublicKey": publicKey
         ]
-        
-        let headers = HTTPHeaders.init(arrayLiteral: .userAgent(userAgent))
-                
-        sessionManager.request(url, method: .post, parameters:parameters, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).response(queue: self.nkCommonInstance.backgroundQueue) { (response) in
+
+        let headers = HTTPHeaders(arrayLiteral: .userAgent(userAgent))
+
+        sessionManager.request(url, method: .post, parameters: parameters, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).response(queue: self.nkCommonInstance.backgroundQueue) { response in
             debugPrint(response)
-            
+
             switch response.result {
             case .failure(let error):
                 let error = NKError(error: error, afResponse: response)
                 queue.async { completion(error) }
-            case .success( _):
+            case .success:
                 queue.async { completion(.success) }
             }
         }
     }
-    
+
     @objc public func unsubscribingPushProxy(proxyServerUrl: String,
                                              deviceIdentifier: String,
                                              signature: String,
@@ -149,32 +149,31 @@ extension NextcloudKit {
                                              userAgent: String,
                                              queue: DispatchQueue = .main,
                                              completion: @escaping (_ error: NKError) -> Void) {
-                
+
         let endpoint = "devices"
-        
+
         guard let url = self.nkCommonInstance.createStandardUrl(serverUrl: proxyServerUrl, endpoint: endpoint) else {
             return queue.async { completion(.urlError) }
         }
-                
+
         let parameters = [
             "deviceIdentifier": deviceIdentifier,
             "deviceIdentifierSignature": signature,
             "userPublicKey": publicKey
         ]
-        
-        let headers = HTTPHeaders.init(arrayLiteral: .userAgent(userAgent))
-        
-        sessionManager.request(url, method: .delete, parameters: parameters, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).response(queue: self.nkCommonInstance.backgroundQueue) { (response) in
+
+        let headers = HTTPHeaders(arrayLiteral: .userAgent(userAgent))
+
+        sessionManager.request(url, method: .delete, parameters: parameters, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).response(queue: self.nkCommonInstance.backgroundQueue) { response in
             debugPrint(response)
-            
+
             switch response.result {
             case .failure(let error):
                 let error = NKError(error: error, afResponse: response)
                 queue.async { completion(error) }
-            case .success( _):
+            case .success:
                 queue.async { completion(.success) }
             }
         }
     }
 }
-

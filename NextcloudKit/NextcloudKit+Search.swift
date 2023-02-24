@@ -63,7 +63,7 @@ extension NextcloudKit {
 
         let headers = self.nkCommonInstance.getStandardHeaders(options: options)
 
-        let requestUnifiedSearch = sessionManager.request(url, method: .get, parameters: nil, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).responseData(queue: self.nkCommonInstance.backgroundQueue) { (response) in
+        let requestUnifiedSearch = sessionManager.request(url, method: .get, parameters: nil, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).responseData(queue: self.nkCommonInstance.backgroundQueue) { response in
             debugPrint(response)
 
             switch response.result {
@@ -81,7 +81,7 @@ extension NextcloudKit {
 
                 for provider in filteredProviders {
                     group.enter()
-                    let requestSearchProvider = self.searchProvider(provider.id, account: account, term: term, options: options, timeout: timeoutProvider) { account, partial, data, error in
+                    let requestSearchProvider = self.searchProvider(provider.id, account: account, term: term, options: options, timeout: timeoutProvider) { account, partial, _, error in
                         update(account, partial, provider, error)
                         group.leave()
                     }
@@ -140,7 +140,7 @@ extension NextcloudKit {
         if let cursor = cursor {
             endpoint += "&cursor=\(cursor)"
         }
-        
+
         guard let url = self.nkCommonInstance.createStandardUrl(
             serverUrl: urlBase,
             endpoint: endpoint)
@@ -160,7 +160,7 @@ extension NextcloudKit {
             return nil
         }
 
-        let requestSearchProvider = sessionManager.request(urlRequest).validate(statusCode: 200..<300).responseData(queue: self.nkCommonInstance.backgroundQueue) { (response) in
+        let requestSearchProvider = sessionManager.request(urlRequest).validate(statusCode: 200..<300).responseData(queue: self.nkCommonInstance.backgroundQueue) { response in
             debugPrint(response)
             switch response.result {
             case .success(let jsonData):

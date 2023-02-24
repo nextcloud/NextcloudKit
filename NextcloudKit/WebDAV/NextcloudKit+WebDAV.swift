@@ -30,13 +30,13 @@ extension NextcloudKit {
     @objc public func createFolder(serverUrlFileName: String,
                                    options: NKRequestOptions = NKRequestOptions(),
                                    completion: @escaping (_ account: String, _ ocId: String?, _ date: NSDate?, _ error: NKError) -> Void) {
-         
+
         let account = self.nkCommonInstance.account
 
         guard let url = serverUrlFileName.encodedToUrl else {
             return options.queue.async { completion(account, nil, nil, .urlError) }
         }
-         
+
         let method = HTTPMethod(rawValue: "MKCOL")
 
         let headers = self.nkCommonInstance.getStandardHeaders(options: options)
@@ -49,14 +49,14 @@ extension NextcloudKit {
             return options.queue.async { completion(account, nil, nil, NKError(error: error)) }
         }
 
-        sessionManager.request(urlRequest).validate(statusCode: 200..<300).response(queue: self.nkCommonInstance.backgroundQueue) { (response) in
+        sessionManager.request(urlRequest).validate(statusCode: 200..<300).response(queue: self.nkCommonInstance.backgroundQueue) { response in
             debugPrint(response)
-            
+
             switch response.result {
             case .failure(let error):
                 let error = NKError(error: error, afResponse: response)
                 options.queue.async { completion(account, nil, nil, error) }
-            case .success( _):
+            case .success:
                 let ocId = self.nkCommonInstance.findHeader("oc-fileid", allHeaderFields: response.response?.allHeaderFields)
                 if let dateString = self.nkCommonInstance.findHeader("date", allHeaderFields: response.response?.allHeaderFields) {
                     if let date = self.nkCommonInstance.convertDate(dateString, format: "EEE, dd MMM y HH:mm:ss zzz") {
@@ -70,11 +70,11 @@ extension NextcloudKit {
             }
         }
     }
-     
+
     @objc public func deleteFileOrFolder(serverUrlFileName: String,
                                          options: NKRequestOptions = NKRequestOptions(),
                                          completion: @escaping (_ account: String, _ error: NKError) -> Void) {
-         
+
         let account = self.nkCommonInstance.account
 
         guard let url = serverUrlFileName.encodedToUrl else {
@@ -91,31 +91,31 @@ extension NextcloudKit {
             return options.queue.async { completion(account, NKError(error: error)) }
         }
 
-        sessionManager.request(urlRequest).validate(statusCode: 200..<300).response(queue: self.nkCommonInstance.backgroundQueue) { (response) in
+        sessionManager.request(urlRequest).validate(statusCode: 200..<300).response(queue: self.nkCommonInstance.backgroundQueue) { response in
             debugPrint(response)
-            
+
             switch response.result {
             case .failure(let error):
                 let error = NKError(error: error, afResponse: response)
                 options.queue.async { completion(account, error) }
-            case .success( _):
+            case .success:
                 options.queue.async { completion(account, .success) }
             }
         }
     }
-     
+
     @objc public func moveFileOrFolder(serverUrlFileNameSource: String,
                                        serverUrlFileNameDestination: String,
                                        overwrite: Bool,
                                        options: NKRequestOptions = NKRequestOptions(),
                                        completion: @escaping (_ account: String, _ error: NKError) -> Void) {
-         
+
         let account = self.nkCommonInstance.account
 
         guard let url = serverUrlFileNameSource.encodedToUrl else {
             return options.queue.async { completion(account, .urlError) }
         }
-         
+
         let method = HTTPMethod(rawValue: "MOVE")
 
         var headers = self.nkCommonInstance.getStandardHeaders(options: options)
@@ -133,32 +133,32 @@ extension NextcloudKit {
         } catch {
             return options.queue.async { completion(account, NKError(error: error)) }
         }
-         
-        sessionManager.request(urlRequest).validate(statusCode: 200..<300).response(queue: self.nkCommonInstance.backgroundQueue) { (response) in
+
+        sessionManager.request(urlRequest).validate(statusCode: 200..<300).response(queue: self.nkCommonInstance.backgroundQueue) { response in
             debugPrint(response)
-            
+
             switch response.result {
             case .failure(let error):
                 let error = NKError(error: error, afResponse: response)
                 options.queue.async { completion(account, error) }
-            case .success( _):
+            case .success:
                 options.queue.async { completion(account, .success) }
             }
         }
     }
-     
+
     @objc public func copyFileOrFolder(serverUrlFileNameSource: String,
                                        serverUrlFileNameDestination: String,
                                        overwrite: Bool,
                                        options: NKRequestOptions = NKRequestOptions(),
                                        completion: @escaping (_ account: String, _ error: NKError) -> Void) {
-         
+
         let account = self.nkCommonInstance.account
 
         guard let url = serverUrlFileNameSource.encodedToUrl else {
             return options.queue.async { completion(account, .urlError) }
         }
-         
+
         let method = HTTPMethod(rawValue: "COPY")
 
         var headers = self.nkCommonInstance.getStandardHeaders(options: options)
@@ -177,19 +177,19 @@ extension NextcloudKit {
             return options.queue.async { completion(account, NKError(error: error)) }
         }
 
-        sessionManager.request(urlRequest).validate(statusCode: 200..<300).response(queue: self.nkCommonInstance.backgroundQueue) { (response) in
+        sessionManager.request(urlRequest).validate(statusCode: 200..<300).response(queue: self.nkCommonInstance.backgroundQueue) { response in
             debugPrint(response)
-            
+
             switch response.result {
             case .failure(let error):
                 let error = NKError(error: error, afResponse: response)
                 options.queue.async { completion(account, error) }
-            case .success( _):
+            case .success:
                 options.queue.async { completion(account, .success) }
             }
         }
     }
-     
+
     @objc public func readFileOrFolder(serverUrlFileName: String,
                                        depth: String,
                                        showHiddenFiles: Bool = true,
@@ -197,7 +197,7 @@ extension NextcloudKit {
                                        requestBody: Data? = nil,
                                        options: NKRequestOptions = NKRequestOptions(),
                                        completion: @escaping (_ account: String, _ files: [NKFile], _ data: Data?, _ error: NKError) -> Void) {
-         
+
         let account = self.nkCommonInstance.account
         let user = self.nkCommonInstance.user
         let userId = self.nkCommonInstance.userId
@@ -208,11 +208,11 @@ extension NextcloudKit {
 
         if depth == "1" && serverUrlFileName.last != "/" { serverUrlFileName = serverUrlFileName + "/" }
         if depth == "0" && serverUrlFileName.last == "/" { serverUrlFileName = String(serverUrlFileName.remove(at: serverUrlFileName.index(before: serverUrlFileName.endIndex))) }
-        
+
         guard let url = serverUrlFileName.encodedToUrl else {
             return options.queue.async { completion(account, files, nil, .urlError) }
         }
-         
+
         let method = HTTPMethod(rawValue: "PROPFIND")
 
         var headers = self.nkCommonInstance.getStandardHeaders(options: options)
@@ -230,15 +230,15 @@ extension NextcloudKit {
         } catch {
             return options.queue.async { completion(account, files, nil, NKError(error: error)) }
         }
-        
-        sessionManager.request(urlRequest).validate(statusCode: 200..<300).responseData(queue: self.nkCommonInstance.backgroundQueue) { (response) in
+
+        sessionManager.request(urlRequest).validate(statusCode: 200..<300).responseData(queue: self.nkCommonInstance.backgroundQueue) { response in
             debugPrint(response)
-            
+
             switch response.result {
             case .failure(let error):
                 let error = NKError(error: error, afResponse: response)
                 options.queue.async { completion(account, files, nil, error) }
-            case .success( _):
+            case .success:
                 if let xmlData = response.data {
                     files = NKDataFileXML(nkCommonInstance: self.nkCommonInstance).convertDataFile(xmlData: xmlData, dav: dav, urlBase: urlBase, user: user, userId: userId, showHiddenFiles: showHiddenFiles, includeHiddenFiles: includeHiddenFiles)
                     options.queue.async { completion(account, files, xmlData, .success) }
@@ -248,7 +248,7 @@ extension NextcloudKit {
             }
         }
     }
-     
+
     @objc public func getFileFromFileId(fileId: String? = nil,
                                         link: String? = nil,
                                         options: NKRequestOptions = NKRequestOptions(),
@@ -263,7 +263,7 @@ extension NextcloudKit {
             httpBody = String(format: NKDataFileXML(nkCommonInstance: self.nkCommonInstance).requestBodySearchFileId, userId, fileId).data(using: .utf8)!
         } else if let link = link {
             let linkArray = link.components(separatedBy: "/")
-            if let fileId =  linkArray.last {
+            if let fileId = linkArray.last {
                 httpBody = String(format: NKDataFileXML(nkCommonInstance: self.nkCommonInstance).requestBodySearchFileId, userId, fileId).data(using: .utf8)!
             }
         }
@@ -271,7 +271,7 @@ extension NextcloudKit {
             return options.queue.async { completion(account, nil, nil, .urlError) }
         }
 
-        search(serverUrl: urlBase, httpBody: httpBody, showHiddenFiles: true, includeHiddenFiles: [], options: options) { (account, files, data, error) in
+        search(serverUrl: urlBase, httpBody: httpBody, showHiddenFiles: true, includeHiddenFiles: [], options: options) { account, files, data, error in
             options.queue.async { completion(account, files.first, data, error) }
         }
     }
@@ -282,14 +282,14 @@ extension NextcloudKit {
                                         includeHiddenFiles: [String] = [],
                                         options: NKRequestOptions = NKRequestOptions(),
                                         completion: @escaping (_ account: String, _ files: [NKFile], _ data: Data?, _ error: NKError) -> Void) {
-         
+
         let httpBody = requestBody.data(using: .utf8)!
-     
-        search(serverUrl: serverUrl, httpBody: httpBody, showHiddenFiles: showHiddenFiles, includeHiddenFiles: includeHiddenFiles, options: options) { (account, files, data, error) in
+
+        search(serverUrl: serverUrl, httpBody: httpBody, showHiddenFiles: showHiddenFiles, includeHiddenFiles: includeHiddenFiles, options: options) { account, files, data, error in
             options.queue.async { completion(account, files, data, error) }
         }
     }
-    
+
     @objc public func searchLiteral(serverUrl: String,
                                     depth: String,
                                     literal: String,
@@ -297,22 +297,22 @@ extension NextcloudKit {
                                     includeHiddenFiles: [String] = [],
                                     options: NKRequestOptions = NKRequestOptions(),
                                     completion: @escaping (_ account: String, _ files: [NKFile], _ data: Data?, _ error: NKError) -> Void) {
-        
+
         let account = self.nkCommonInstance.account
         let userId = self.nkCommonInstance.userId
 
         guard let href = ("/files/" + userId).urlEncoded else {
             return options.queue.async { completion(account, [], nil, .urlError) }
         }
-        
-        let requestBody = String(format: NKDataFileXML(nkCommonInstance: self.nkCommonInstance).requestBodySearchFileName, href, depth, "%"+literal+"%")
+
+        let requestBody = String(format: NKDataFileXML(nkCommonInstance: self.nkCommonInstance).requestBodySearchFileName, href, depth, "%" + literal + "%")
         let httpBody = requestBody.data(using: .utf8)!
-     
-        search(serverUrl: serverUrl, httpBody: httpBody, showHiddenFiles: showHiddenFiles, includeHiddenFiles: includeHiddenFiles, options: options) { (account, files, data, error) in
+
+        search(serverUrl: serverUrl, httpBody: httpBody, showHiddenFiles: showHiddenFiles, includeHiddenFiles: includeHiddenFiles, options: options) { account, files, data, error in
             options.queue.async { completion(account, files, data, error) }
         }
     }
-    
+
     @objc public func searchMedia(path: String = "",
                                   lessDate: Any,
                                   greaterDate: Any,
@@ -322,43 +322,43 @@ extension NextcloudKit {
                                   includeHiddenFiles: [String] = [],
                                   options: NKRequestOptions = NKRequestOptions(),
                                   completion: @escaping (_ account: String, _ files: [NKFile], _ data: Data?, _ error: NKError) -> Void) {
-            
+
         let account = self.nkCommonInstance.account
         let userId = self.nkCommonInstance.userId
         let urlBase = self.nkCommonInstance.urlBase
         let files: [NKFile] = []
         var greaterDateString: String?, lessDateString: String?
-        
+
         guard let href = ("/files/" + userId + path).urlEncoded else {
             return options.queue.async { completion(account, files, nil, .urlError) }
         }
-        
-        if lessDate is Date || lessDate is NSDate {
-            lessDateString = self.nkCommonInstance.convertDate(lessDate as! Date, format: "yyyy-MM-dd'T'HH:mm:ssZZZZZ")
-        } else if lessDate is Int {
-            lessDateString = String(lessDate as! Int)
+
+        if let lessDate = lessDate as? Date {
+            lessDateString = self.nkCommonInstance.convertDate(lessDate, format: "yyyy-MM-dd'T'HH:mm:ssZZZZZ")
+        } else if let lessDate = lessDate as? Int {
+            lessDateString = String(lessDate)
         }
-        
-        if greaterDate is Date || greaterDate is NSDate {
-            greaterDateString = self.nkCommonInstance.convertDate(greaterDate as! Date, format: "yyyy-MM-dd'T'HH:mm:ssZZZZZ")
-        } else if greaterDate is Int {
-            greaterDateString = String(greaterDate as! Int)
+
+        if let greaterDate = greaterDate as? Date {
+            greaterDateString = self.nkCommonInstance.convertDate(greaterDate, format: "yyyy-MM-dd'T'HH:mm:ssZZZZZ")
+        } else if let greaterDate = greaterDate as? Int {
+            greaterDateString = String(greaterDate)
         }
-        
+
         if lessDateString == nil || greaterDateString == nil {
             return options.queue.async { completion(account, files, nil, .invalidDate) }
         }
-        
+
         var requestBody = ""
         if limit > 0 {
             requestBody = String(format: NKDataFileXML(nkCommonInstance: self.nkCommonInstance).requestBodySearchMediaWithLimit, href, elementDate, elementDate, lessDateString!, elementDate, greaterDateString!, String(limit))
         } else {
             requestBody = String(format: NKDataFileXML(nkCommonInstance: self.nkCommonInstance).requestBodySearchMedia, href, elementDate, elementDate, lessDateString!, elementDate, greaterDateString!)
         }
-        
+
         let httpBody = requestBody.data(using: .utf8)!
-        
-        search(serverUrl: urlBase, httpBody: httpBody, showHiddenFiles: showHiddenFiles, includeHiddenFiles: includeHiddenFiles, options: options) { (account, files, data, error) in
+
+        search(serverUrl: urlBase, httpBody: httpBody, showHiddenFiles: showHiddenFiles, includeHiddenFiles: includeHiddenFiles, options: options) { account, files, data, error in
             options.queue.async { completion(account, files, data, error) }
         }
     }
@@ -380,7 +380,7 @@ extension NextcloudKit {
         guard let url = (serverUrl + "/" + dav).encodedToUrl else {
             return options.queue.async { completion(account, files, nil, .urlError) }
         }
-         
+
         let method = HTTPMethod(rawValue: "SEARCH")
 
         let headers = self.nkCommonInstance.getStandardHeaders(options.customHeader, customUserAgent: options.customUserAgent, contentType: "text/xml")
@@ -393,15 +393,15 @@ extension NextcloudKit {
         } catch {
             return options.queue.async { completion(account, files, nil, NKError(error: error)) }
         }
-         
-        sessionManager.request(urlRequest).validate(statusCode: 200..<300).responseData(queue: self.nkCommonInstance.backgroundQueue) { (response) in
+
+        sessionManager.request(urlRequest).validate(statusCode: 200..<300).responseData(queue: self.nkCommonInstance.backgroundQueue) { response in
             debugPrint(response)
-            
+
             switch response.result {
             case .failure(let error):
                 let error = NKError(error: error, afResponse: response)
                 options.queue.async { completion(account, files, nil, error) }
-            case .success( _):
+            case .success:
                 if let xmlData = response.data {
                     files = NKDataFileXML(nkCommonInstance: self.nkCommonInstance).convertDataFile(xmlData: xmlData, dav: dav, urlBase: urlBase, user: user, userId: userId, showHiddenFiles: showHiddenFiles, includeHiddenFiles: includeHiddenFiles)
                     options.queue.async { completion(account, files, xmlData, .success) }
@@ -411,54 +411,54 @@ extension NextcloudKit {
             }
         }
     }
-     
+
     @objc public func setFavorite(fileName: String,
                                   favorite: Bool,
                                   options: NKRequestOptions = NKRequestOptions(),
                                   completion: @escaping (_ account: String, _ error: NKError) -> Void) {
-         
+
         let account = self.nkCommonInstance.account
         let userId = self.nkCommonInstance.userId
         let urlBase = self.nkCommonInstance.urlBase
         let dav = self.nkCommonInstance.dav
         let serverUrlFileName = urlBase + "/" + dav + "/files/" + userId + "/" + fileName
-        
+
         guard let url = serverUrlFileName.encodedToUrl else {
             return options.queue.async { completion(account, .urlError) }
         }
-         
+
         let method = HTTPMethod(rawValue: "PROPPATCH")
 
         let headers = self.nkCommonInstance.getStandardHeaders(options: options)
-         
+
         var urlRequest: URLRequest
         do {
             try urlRequest = URLRequest(url: url, method: method, headers: headers)
-            let body = NSString.init(format: NKDataFileXML(nkCommonInstance: self.nkCommonInstance).requestBodyFileSetFavorite as NSString, (favorite ? 1 : 0)) as String
+            let body = NSString(format: NKDataFileXML(nkCommonInstance: self.nkCommonInstance).requestBodyFileSetFavorite as NSString, (favorite ? 1 : 0)) as String
             urlRequest.httpBody = body.data(using: .utf8)
             urlRequest.timeoutInterval = options.timeout
         } catch {
             return options.queue.async { completion(account, NKError(error: error)) }
         }
-         
-        sessionManager.request(urlRequest).validate(statusCode: 200..<300).response(queue: self.nkCommonInstance.backgroundQueue) { (response) in
+
+        sessionManager.request(urlRequest).validate(statusCode: 200..<300).response(queue: self.nkCommonInstance.backgroundQueue) { response in
             debugPrint(response)
-            
+
             switch response.result {
             case .failure(let error):
                 let error = NKError(error: error, afResponse: response)
                 options.queue.async { completion(account, error) }
-            case .success( _):
+            case .success:
                 options.queue.async { completion(account, .success) }
             }
         }
     }
-     
+
     @objc public func listingFavorites(showHiddenFiles: Bool,
                                        includeHiddenFiles: [String] = [],
                                        options: NKRequestOptions = NKRequestOptions(),
                                        completion: @escaping (_ account: String, _ files: [NKFile], _ data: Data?, _ error: NKError) -> Void) {
-         
+
         let account = self.nkCommonInstance.account
         let user = self.nkCommonInstance.user
         let userId = self.nkCommonInstance.userId
@@ -470,7 +470,7 @@ extension NextcloudKit {
         guard let url = serverUrlFileName.encodedToUrl else {
             return options.queue.async { completion(account, files, nil, .urlError) }
         }
-         
+
         let method = HTTPMethod(rawValue: "REPORT")
 
         let headers = self.nkCommonInstance.getStandardHeaders(options: options)
@@ -483,15 +483,15 @@ extension NextcloudKit {
         } catch {
             return options.queue.async { completion(account, files, nil, NKError(error: error)) }
         }
-         
-        sessionManager.request(urlRequest).validate(statusCode: 200..<300).responseData(queue: self.nkCommonInstance.backgroundQueue) { (response) in
+
+        sessionManager.request(urlRequest).validate(statusCode: 200..<300).responseData(queue: self.nkCommonInstance.backgroundQueue) { response in
             debugPrint(response)
-            
+
             switch response.result {
             case .failure(let error):
                 let error = NKError(error: error, afResponse: response)
                 options.queue.async { completion(account, files, nil, error) }
-            case .success( _):
+            case .success:
                 if let xmlData = response.data {
                     files = NKDataFileXML(nkCommonInstance: self.nkCommonInstance).convertDataFile(xmlData: xmlData, dav: dav, urlBase: urlBase, user: user, userId: userId, showHiddenFiles: showHiddenFiles, includeHiddenFiles: includeHiddenFiles)
                     options.queue.async { completion(account, files, xmlData, .success) }
@@ -501,11 +501,11 @@ extension NextcloudKit {
             }
         }
     }
-    
+
     @objc public func listingTrash(showHiddenFiles: Bool,
                                    options: NKRequestOptions = NKRequestOptions(),
                                    completion: @escaping (_ account: String, _ items: [NKTrash], _ data: Data?, _ error: NKError) -> Void) {
-           
+
         let account = self.nkCommonInstance.account
         let userId = self.nkCommonInstance.userId
         let urlBase = self.nkCommonInstance.urlBase
@@ -516,9 +516,9 @@ extension NextcloudKit {
         guard let url = serverUrlFileName.encodedToUrl else {
             return options.queue.async { completion(account, items, nil, .urlError) }
         }
-        
+
         let method = HTTPMethod(rawValue: "PROPFIND")
-        
+
         var headers = self.nkCommonInstance.getStandardHeaders(options: options)
         headers.update(name: "Depth", value: "1")
 
@@ -530,15 +530,15 @@ extension NextcloudKit {
         } catch {
             return options.queue.async { completion(account, items, nil, NKError(error: error)) }
         }
-             
-        sessionManager.request(urlRequest).validate(statusCode: 200..<300).responseData(queue: self.nkCommonInstance.backgroundQueue) { (response) in
+
+        sessionManager.request(urlRequest).validate(statusCode: 200..<300).responseData(queue: self.nkCommonInstance.backgroundQueue) { response in
             debugPrint(response)
-            
+
             switch response.result {
             case .failure(let error):
                 let error = NKError(error: error, afResponse: response)
                 options.queue.async { completion(account, items, nil, error) }
-            case .success( _):
+            case .success:
                 if let xmlData = response.data {
                     items = NKDataFileXML(nkCommonInstance: self.nkCommonInstance).convertDataTrash(xmlData: xmlData, urlBase: urlBase, showHiddenFiles: showHiddenFiles)
                     options.queue.async { completion(account, items, xmlData, .success) }

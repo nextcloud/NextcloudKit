@@ -35,7 +35,7 @@ extension NextcloudKit {
                                      completion: @escaping (_ account: String, _ error: NKError) -> Void) {
 
         let account = self.nkCommonInstance.account
-        
+
         guard let url = serverUrlFileName.encodedToUrl
         else {
             return options.queue.async { completion(account, .urlError) }
@@ -46,7 +46,7 @@ extension NextcloudKit {
         var headers = self.nkCommonInstance.getStandardHeaders(options: options)
         headers.update(name: "X-User-Lock", value: "1")
 
-        sessionManager.request(url, method: method, parameters: nil, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).response(queue: self.nkCommonInstance.backgroundQueue) { (response) in
+        sessionManager.request(url, method: method, parameters: nil, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).response(queue: self.nkCommonInstance.backgroundQueue) { response in
             debugPrint(response)
 
             switch response.result {
@@ -59,4 +59,3 @@ extension NextcloudKit {
         }
     }
 }
-

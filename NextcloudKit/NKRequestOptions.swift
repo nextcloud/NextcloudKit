@@ -26,63 +26,49 @@ import Foundation
 @objcMembers
 public class NKRequestOptions: NSObject {
 
-    let _endpoint: String?
-    let _customHeader: [String: String]?
-    let _customUserAgent: String?
-    let _contentType: String?
-    let _e2eToken: String?
-    let _timeout: TimeInterval
-    let _queue: DispatchQueue
+    let internalEndpoint: String?
+    let internalCustomHeader: [String: String]?
+    let internalCustomUserAgent: String?
+    let internalContentType: String?
+    let internalE2eToken: String?
+    let internalTimeout: TimeInterval
+    let internalQueue: DispatchQueue
 
     public var endpoint: String? {
-        get {
-            return _endpoint
-        }
+        return internalEndpoint
     }
 
     public var customHeader: [String: String]? {
-        get {
-            return _customHeader
-        }
+        return internalCustomHeader
     }
 
     public var customUserAgent: String? {
-        get {
-            return _customUserAgent
-        }
+        return internalCustomUserAgent
     }
 
     public var contentType: String? {
-        get {
-            return _contentType
-        }
+        return internalContentType
     }
 
     public var e2eToken: String? {
-        get {
-            return _e2eToken
-        }
+        return internalE2eToken
     }
 
     public var timeout: TimeInterval {
-        get {
-            return _timeout
-        }
+        return internalTimeout
     }
 
     public var queue: DispatchQueue {
-        get {
-            return _queue
-        }
+        return internalQueue
     }
 
     public init(endpoint: String? = nil, customHeader: [String: String]? = nil, customUserAgent: String? = nil, contentType: String? = nil, e2eToken: String? = nil, timeout: TimeInterval = 60, queue: DispatchQueue = .main) {
-        self._endpoint = endpoint
-        self._customHeader = customHeader
-        self._customUserAgent = customUserAgent
-        self._contentType = contentType
-        self._e2eToken = e2eToken
-        self._timeout = timeout
-        self._queue = queue
+        self.internalEndpoint = endpoint
+        self.internalCustomHeader = customHeader
+        self.internalCustomUserAgent = customUserAgent
+        self.internalContentType = contentType
+        self.internalE2eToken = e2eToken
+        self.internalTimeout = timeout
+        self.internalQueue = queue
     }
 }

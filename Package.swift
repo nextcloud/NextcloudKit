@@ -14,17 +14,17 @@ let package = Package(
     products: [
         .library(
             name: "NextcloudKit",
-            targets: ["NextcloudKit"]),
+            targets: ["NextcloudKit"])
     ],
     dependencies: [
         .package(url: "https://github.com/Alamofire/Alamofire", .upToNextMajor(from: "5.4.1")),
         .package(url: "https://github.com/SwiftyJSON/SwiftyJSON", .upToNextMajor(from: "5.0.0")),
-        .package(url: "https://github.com/yahoojapan/SwiftyXMLParser", .upToNextMajor(from: "5.3.0")),
+        .package(url: "https://github.com/yahoojapan/SwiftyXMLParser", .upToNextMajor(from: "5.3.0"))
     ],
     targets: [
         .target(
             name: "NextcloudKit",
-            dependencies: ["Alamofire","SwiftyJSON","SwiftyXMLParser"],
+            dependencies: ["Alamofire", "SwiftyJSON", "SwiftyXMLParser"]
             path: "NextcloudKit"),
         .testTarget(
             name: "NextcloudKitTests",

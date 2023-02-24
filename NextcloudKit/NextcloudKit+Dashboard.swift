@@ -28,7 +28,7 @@ import SwiftyJSON
 extension NextcloudKit {
 
     public func getDashboardWidget(options: NKRequestOptions = NKRequestOptions(),
-                                   request: @escaping (DataRequest?) -> () = { _ in },
+                                   request: @escaping (DataRequest?) -> Void = { _ in },
                                    completion: @escaping (_ account: String, _ dashboardWidgets: [NCCDashboardWidget]?, _ data: Data?, _ error: NKError) -> Void) {
 
         let account = self.nkCommonInstance.account
@@ -47,8 +47,8 @@ extension NextcloudKit {
         }
 
         let headers = self.nkCommonInstance.getStandardHeaders(options: options)
-        
-        let dashboardRequest = sessionManager.request(url, method: .get, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).responseData(queue: self.nkCommonInstance.backgroundQueue) { (response) in
+
+        let dashboardRequest = sessionManager.request(url, method: .get, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).responseData(queue: self.nkCommonInstance.backgroundQueue) { response in
             debugPrint(response)
 
             switch response.result {
@@ -69,10 +69,10 @@ extension NextcloudKit {
         }
         options.queue.async { request(dashboardRequest) }
     }
-    
+
     public func getDashboardWidgetsApplication(_ items: String,
                                                options: NKRequestOptions = NKRequestOptions(),
-                                               request: @escaping (DataRequest?) -> () = { _ in },
+                                               request: @escaping (DataRequest?) -> Void = { _ in },
                                                completion: @escaping (_ account: String, _ dashboardApplications: [NCCDashboardApplication]?, _ data: Data?, _ error: NKError) -> Void) {
 
         let account = self.nkCommonInstance.account
@@ -91,8 +91,8 @@ extension NextcloudKit {
         }
 
         let headers = self.nkCommonInstance.getStandardHeaders(options: options)
-        
-        let dashboardRequest = sessionManager.request(url, method: .get, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).responseData(queue: self.nkCommonInstance.backgroundQueue) { (response) in
+
+        let dashboardRequest = sessionManager.request(url, method: .get, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).responseData(queue: self.nkCommonInstance.backgroundQueue) { response in
             debugPrint(response)
 
             switch response.result {

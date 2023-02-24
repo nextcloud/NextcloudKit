@@ -69,7 +69,7 @@ extension NextcloudKit {
 
         await withUnsafeContinuation({ continuation in
             putE2EEMetadata(fileId: fileId, e2eToken: e2eToken, e2eMetadata: e2eMetadata, method: method, options: options) { account, metadata, data, error in
-                continuation.resume(returning: (account: account, metadata: metadata, data:data, error: error))
+                continuation.resume(returning: (account: account, metadata: metadata, data: data, error: error))
             }
         })
     }
@@ -78,7 +78,7 @@ extension NextcloudKit {
 
         await withUnsafeContinuation({ continuation in
             getE2EECertificate(options: options) { account, certificate, data, error in
-                continuation.resume(returning: (account: account, certificate:certificate, data:data, error:error))
+                continuation.resume(returning: (account: account, certificate: certificate, data: data, error: error))
             }
         })
     }
@@ -87,7 +87,7 @@ extension NextcloudKit {
 
         await withUnsafeContinuation({ continuation in
             getE2EEPrivateKey(options: options) { account, privateKey, data, error in
-                continuation.resume(returning: (account: account, privateKey:privateKey, data:data, error:error))
+                continuation.resume(returning: (account: account, privateKey: privateKey, data: data, error: error))
             }
         })
     }
@@ -96,7 +96,7 @@ extension NextcloudKit {
 
         await withUnsafeContinuation({ continuation in
             getE2EEPublicKey(options: options) { account, publicKey, data, error in
-                continuation.resume(returning: (account: account, publicKey:publicKey, data:data, error:error))
+                continuation.resume(returning: (account: account, publicKey: publicKey, data: data, error: error))
             }
         })
     }
@@ -106,7 +106,7 @@ extension NextcloudKit {
 
         await withUnsafeContinuation({ continuation in
             signE2EECertificate(certificate: certificate, options: options) { account, certificate, data, error in
-                continuation.resume(returning: (account: account, certificate:certificate, data:data, error:error))
+                continuation.resume(returning: (account: account, certificate: certificate, data: data, error: error))
             }
         })
     }

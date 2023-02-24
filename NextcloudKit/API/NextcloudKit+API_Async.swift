@@ -32,7 +32,7 @@ import UIKit
 extension NextcloudKit {
 
     public func getPreview(url: URL,
-                         options: NKRequestOptions = NKRequestOptions()) async -> (account: String, data: Data?, error: NKError) {
+                           options: NKRequestOptions = NKRequestOptions()) async -> (account: String, data: Data?, error: NKError) {
 
         await withUnsafeContinuation({ continuation in
             getPreview(url: url, options: options) { account, data, error in
@@ -42,15 +42,15 @@ extension NextcloudKit {
     }
 
     public func downloadPreview(fileNamePathOrFileId: String,
-                              fileNamePreviewLocalPath: String,
-                              widthPreview: Int,
-                              heightPreview: Int,
-                              fileNameIconLocalPath: String? = nil,
-                              sizeIcon: Int = 0,
-                              etag: String? = nil,
-                              endpointTrashbin: Bool = false,
-                              useInternalEndpoint: Bool = true,
-                              options: NKRequestOptions = NKRequestOptions()) async -> (account: String, imagePreview: UIImage?, imageIcon: UIImage?, imageOriginal: UIImage?, etag: String?, error: NKError) {
+                                fileNamePreviewLocalPath: String,
+                                widthPreview: Int,
+                                heightPreview: Int,
+                                fileNameIconLocalPath: String? = nil,
+                                sizeIcon: Int = 0,
+                                etag: String? = nil,
+                                endpointTrashbin: Bool = false,
+                                useInternalEndpoint: Bool = true,
+                                options: NKRequestOptions = NKRequestOptions()) async -> (account: String, imagePreview: UIImage?, imageIcon: UIImage?, imageOriginal: UIImage?, etag: String?, error: NKError) {
 
         await withUnsafeContinuation({ continuation in
             downloadPreview(fileNamePathOrFileId: fileNamePathOrFileId, fileNamePreviewLocalPath: fileNamePreviewLocalPath, widthPreview: widthPreview, heightPreview: heightPreview, fileNameIconLocalPath: fileNameIconLocalPath, sizeIcon: sizeIcon, etag: etag, options: options) { account, imagePreview, imageIcon, imageOriginal, etag, error in
