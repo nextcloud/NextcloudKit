@@ -24,7 +24,7 @@ let package = Package(
     targets: [
         .target(
             name: "NextcloudKit",
-            dependencies: ["Alamofire","SwiftyJSON","SwiftyXMLParser"]
+            dependencies: ["Alamofire","SwiftyJSON","SwiftyXMLParser",]
             path: "NextcloudKit"),
         .testTarget(
             name: "NextcloudKitTests",
