@@ -1,4 +1,5 @@
-# NextcloudKit
+# NextcloudKit V 2
+<img src="image.png" alt="Demo of the Nextcloud iOS files app" width="200" height="200">
 
 ## Installation
 
