@@ -74,11 +74,11 @@ extension NextcloudKit {
         })
     }
 
-    public func getE2EECertificate(options: NKRequestOptions = NKRequestOptions()) async -> (account: String, certificate: String?, data: Data?, error: NKError) {
+    public func getE2EECertificate(user: String? = nil, options: NKRequestOptions = NKRequestOptions()) async -> (account: String, certificate: String?, certificateUser: String?, data: Data?, error: NKError) {
 
         await withUnsafeContinuation({ continuation in
-            getE2EECertificate(options: options) { account, certificate, data, error in
-                continuation.resume(returning: (account: account, certificate: certificate, data: data, error: error))
+            getE2EECertificate(user: user, options: options) { account, certificate, certificateUser, data, error in
+                continuation.resume(returning: (account: account, certificate: certificate, certificateUser: certificateUser, data: data, error: error))
             }
         })
     }

@@ -29,7 +29,8 @@ extension NextcloudKit {
 
     @objc public func markE2EEFolder(fileId: String,
                                      delete: Bool,
-                                     options: NKRequestOptions = NKRequestOptions(), completionHandler: @escaping (_ account: String, _ error: NKError) -> Void) {
+                                     options: NKRequestOptions = NKRequestOptions(),
+                                     completion: @escaping (_ account: String, _ error: NKError) -> Void) {
 
         let account = self.nkCommonInstance.account
         let urlBase = self.nkCommonInstance.urlBase
@@ -37,7 +38,7 @@ extension NextcloudKit {
         let endpoint = "ocs/v2.php/apps/end_to_end_encryption/api/v1/encrypted/\(fileId)"
 
         guard let url = self.nkCommonInstance.createStandardUrl(serverUrl: urlBase, endpoint: endpoint) else {
-            return options.queue.async { completionHandler(account, .urlError) }
+            return options.queue.async { completion(account, .urlError) }
         }
 
         let method: HTTPMethod = delete ? .delete : .put
@@ -50,14 +51,14 @@ extension NextcloudKit {
             switch response.result {
             case .failure(let error):
                 let error = NKError(error: error, afResponse: response)
-                options.queue.async { completionHandler(account, error) }
+                options.queue.async { completion(account, error) }
             case .success(let jsonData):
                 let json = JSON(jsonData)
                 let statusCode = json["ocs"]["meta"]["statuscode"].int ?? NKError.internalError
                 if 200..<300 ~= statusCode {
-                    options.queue.async { completionHandler(account, .success) }
+                    options.queue.async { completion(account, .success) }
                 } else {
-                    options.queue.async { completionHandler(account, NKError(rootJson: json, fallbackStatusCode: response.response?.statusCode)) }
+                    options.queue.async { completion(account, NKError(rootJson: json, fallbackStatusCode: response.response?.statusCode)) }
                 }
             }
         }
@@ -66,7 +67,8 @@ extension NextcloudKit {
     @objc public func lockE2EEFolder(fileId: String,
                                      e2eToken: String?,
                                      method: String,
-                                     options: NKRequestOptions = NKRequestOptions(), completionHandler: @escaping (_ account: String, _ e2eToken: String?, _ data: Data?, _ error: NKError) -> Void) {
+                                     options: NKRequestOptions = NKRequestOptions(),
+                                     completion: @escaping (_ account: String, _ e2eToken: String?, _ data: Data?, _ error: NKError) -> Void) {
 
         let account = self.nkCommonInstance.account
         let urlBase = self.nkCommonInstance.urlBase
@@ -74,7 +76,7 @@ extension NextcloudKit {
         let endpoint = "ocs/v2.php/apps/end_to_end_encryption/api/v1/lock/\(fileId)"
 
         guard let url = self.nkCommonInstance.createStandardUrl(serverUrl: urlBase, endpoint: endpoint) else {
-            return options.queue.async { completionHandler(account, nil, nil, .urlError) }
+            return options.queue.async { completion(account, nil, nil, .urlError) }
         }
 
         let method = HTTPMethod(rawValue: method)
@@ -92,15 +94,15 @@ extension NextcloudKit {
             switch response.result {
             case .failure(let error):
                 let error = NKError(error: error, afResponse: response)
-                options.queue.async { completionHandler(account, nil, nil, error) }
+                options.queue.async { completion(account, nil, nil, error) }
             case .success(let jsonData):
                 let json = JSON(jsonData)
                 let statusCode = json["ocs"]["meta"]["statuscode"].int ?? NKError.internalError
                 if 200..<300 ~= statusCode {
                     let e2eToken = json["ocs"]["data"]["e2e-token"].string
-                    options.queue.async { completionHandler(account, e2eToken, jsonData, .success) }
+                    options.queue.async { completion(account, e2eToken, jsonData, .success) }
                 } else {
-                    options.queue.async { completionHandler(account, nil, jsonData, NKError(rootJson: json, fallbackStatusCode: response.response?.statusCode)) }
+                    options.queue.async { completion(account, nil, jsonData, NKError(rootJson: json, fallbackStatusCode: response.response?.statusCode)) }
                 }
             }
         }
@@ -108,7 +110,8 @@ extension NextcloudKit {
 
     @objc public func getE2EEMetadata(fileId: String,
                                       e2eToken: String?,
-                                      options: NKRequestOptions = NKRequestOptions(), completionHandler: @escaping (_ account: String, _ e2eMetadata: String?, _ data: Data?, _ error: NKError) -> Void) {
+                                      options: NKRequestOptions = NKRequestOptions(),
+                                      completion: @escaping (_ account: String, _ e2eMetadata: String?, _ data: Data?, _ error: NKError) -> Void) {
 
         let account = self.nkCommonInstance.account
         let urlBase = self.nkCommonInstance.urlBase
@@ -116,7 +119,7 @@ extension NextcloudKit {
         let endpoint = "ocs/v2.php/apps/end_to_end_encryption/api/v1/meta-data/\(fileId)"
 
         guard let url = self.nkCommonInstance.createStandardUrl(serverUrl: urlBase, endpoint: endpoint) else {
-            return options.queue.async { completionHandler(account, nil, nil, .urlError) }
+            return options.queue.async { completion(account, nil, nil, .urlError) }
         }
 
         let headers = self.nkCommonInstance.getStandardHeaders(options: options)
@@ -132,15 +135,15 @@ extension NextcloudKit {
             switch response.result {
             case .failure(let error):
                 let error = NKError(error: error, afResponse: response)
-                options.queue.async { completionHandler(account, nil, nil, error) }
+                options.queue.async { completion(account, nil, nil, error) }
             case .success(let jsonData):
                 let json = JSON(jsonData)
                 let statusCode = json["ocs"]["meta"]["statuscode"].int ?? NKError.internalError
                 if 200..<300 ~= statusCode {
                     let e2eMetadata = json["ocs"]["data"]["meta-data"].string
-                    options.queue.async { completionHandler(account, e2eMetadata, jsonData, .success) }
+                    options.queue.async { completion(account, e2eMetadata, jsonData, .success) }
                 } else {
-                    options.queue.async { completionHandler(account, nil, jsonData, NKError(rootJson: json, fallbackStatusCode: response.response?.statusCode)) }
+                    options.queue.async { completion(account, nil, jsonData, NKError(rootJson: json, fallbackStatusCode: response.response?.statusCode)) }
                 }
             }
         }
@@ -150,7 +153,8 @@ extension NextcloudKit {
                                       e2eToken: String,
                                       e2eMetadata: String?,
                                       method: String,
-                                      options: NKRequestOptions = NKRequestOptions(), completionHandler: @escaping (_ account: String, _ metadata: String?, _ data: Data?, _ error: NKError) -> Void) {
+                                      options: NKRequestOptions = NKRequestOptions(),
+                                      completion: @escaping (_ account: String, _ metadata: String?, _ data: Data?, _ error: NKError) -> Void) {
 
         let account = self.nkCommonInstance.account
         let urlBase = self.nkCommonInstance.urlBase
@@ -158,7 +162,7 @@ extension NextcloudKit {
         let endpoint = "ocs/v2.php/apps/end_to_end_encryption/api/v1/meta-data/\(fileId)"
 
         guard let url = self.nkCommonInstance.createStandardUrl(serverUrl: urlBase, endpoint: endpoint) else {
-            return options.queue.async { completionHandler(account, nil, nil, .urlError) }
+            return options.queue.async { completion(account, nil, nil, .urlError) }
         }
 
         let headers = self.nkCommonInstance.getStandardHeaders(options: options)
@@ -178,15 +182,15 @@ extension NextcloudKit {
             switch response.result {
             case .failure(let error):
                 let error = NKError(error: error, afResponse: response)
-                return options.queue.async { completionHandler(account, nil, nil, error) }
+                return options.queue.async { completion(account, nil, nil, error) }
             case .success(let jsonData):
                 let json = JSON(jsonData)
                 let statusCode = json["ocs"]["meta"]["statuscode"].int ?? NKError.internalError
                 if 200..<300 ~= statusCode {
                     let metadata = json["ocs"]["data"]["meta-data"].string
-                    options.queue.async { completionHandler(account, metadata, jsonData, .success) }
+                    options.queue.async { completion(account, metadata, jsonData, .success) }
                 } else {
-                    options.queue.async { completionHandler(account, nil, jsonData, NKError(rootJson: json, fallbackStatusCode: response.response?.statusCode)) }
+                    options.queue.async { completion(account, nil, jsonData, NKError(rootJson: json, fallbackStatusCode: response.response?.statusCode)) }
                 }
             }
         }
@@ -194,16 +198,27 @@ extension NextcloudKit {
 
     // MARK: -
 
-    @objc public func getE2EECertificate(options: NKRequestOptions = NKRequestOptions(), completionHandler: @escaping (_ account: String, _ certificate: String?, _ data: Data?, _ error: NKError) -> Void) {
+    @objc public func getE2EECertificate(user: String? = nil,
+                                         options: NKRequestOptions = NKRequestOptions(),
+                                         completion: @escaping (_ account: String, _ certificate: String?, _ certificateUser: String?, _ data: Data?, _ error: NKError) -> Void) {
 
         let account = self.nkCommonInstance.account
         let urlBase = self.nkCommonInstance.urlBase
         let userId = self.nkCommonInstance.userId
 
-        let endpoint = "ocs/v2.php/apps/end_to_end_encryption/api/v1/public-key"
+        var endpoint = ""
+
+        if let user = user {
+            guard let users = ("[\"" + user + "\"]").urlEncoded else {
+                return options.queue.async { completion(account, nil, nil, nil, .urlError) }
+            }
+            endpoint = "ocs/v2.php/apps/end_to_end_encryption/api/v1/public-key?users=" + users
+        } else {
+            endpoint = "ocs/v2.php/apps/end_to_end_encryption/api/v1/public-key"
+        }
 
         guard let url = self.nkCommonInstance.createStandardUrl(serverUrl: urlBase, endpoint: endpoint) else {
-            return options.queue.async { completionHandler(account, nil, nil, .urlError) }
+            return options.queue.async { completion(account, nil, nil, nil, .urlError) }
         }
 
         let headers = self.nkCommonInstance.getStandardHeaders(options: options)
@@ -214,21 +229,27 @@ extension NextcloudKit {
             switch response.result {
             case .failure(let error):
                 let error = NKError(error: error, afResponse: response)
-                options.queue.async { completionHandler(account, nil, nil, error) }
+                options.queue.async { completion(account, nil, nil, nil, error) }
             case .success(let jsonData):
                 let json = JSON(jsonData)
                 let statusCode = json["ocs"]["meta"]["statuscode"].int ?? NKError.internalError
                 if 200..<300 ~= statusCode {
                     let key = json["ocs"]["data"]["public-keys"][userId].stringValue
-                    options.queue.async { completionHandler(account, key, jsonData, .success) }
+                    if let user = user {
+                        let keyUser = json["ocs"]["data"]["public-keys"][user].string
+                        options.queue.async { completion(account, key, keyUser, jsonData, .success) }
+                    } else {
+                        options.queue.async { completion(account, key, nil, jsonData, .success) }
+                    }
                 } else {
-                    options.queue.async { completionHandler(account, nil, jsonData, NKError(rootJson: json, fallbackStatusCode: response.response?.statusCode)) }
+                    options.queue.async { completion(account, nil, nil, jsonData, NKError(rootJson: json, fallbackStatusCode: response.response?.statusCode)) }
                 }
             }
         }
     }
 
-    @objc public func getE2EEPrivateKey(options: NKRequestOptions = NKRequestOptions(), completionHandler: @escaping (_ account: String, _ privateKey: String?, _ data: Data?, _ error: NKError) -> Void) {
+    @objc public func getE2EEPrivateKey(options: NKRequestOptions = NKRequestOptions(),
+                                        completion: @escaping (_ account: String, _ privateKey: String?, _ data: Data?, _ error: NKError) -> Void) {
 
         let account = self.nkCommonInstance.account
         let urlBase = self.nkCommonInstance.urlBase
@@ -236,7 +257,7 @@ extension NextcloudKit {
         let endpoint = "ocs/v2.php/apps/end_to_end_encryption/api/v1/private-key"
 
         guard let url = self.nkCommonInstance.createStandardUrl(serverUrl: urlBase, endpoint: endpoint) else {
-            return options.queue.async { completionHandler(account, nil, nil, .urlError) }
+            return options.queue.async { completion(account, nil, nil, .urlError) }
         }
 
         let headers = self.nkCommonInstance.getStandardHeaders(options: options)
@@ -247,21 +268,22 @@ extension NextcloudKit {
             switch response.result {
             case .failure(let error):
                     let error = NKError(error: error, afResponse: response)
-                    options.queue.async { completionHandler(account, nil, nil, error) }
+                    options.queue.async { completion(account, nil, nil, error) }
             case .success(let jsonData):
                 let json = JSON(jsonData)
                 let statusCode = json["ocs"]["meta"]["statuscode"].int ?? NKError.internalError
                 if 200..<300 ~= statusCode {
                     let key = json["ocs"]["data"]["private-key"].stringValue
-                    options.queue.async { completionHandler(account, key, jsonData, .success) }
+                    options.queue.async { completion(account, key, jsonData, .success) }
                 } else {
-                    options.queue.async { completionHandler(account, nil, jsonData, NKError(rootJson: json, fallbackStatusCode: response.response?.statusCode)) }
+                    options.queue.async { completion(account, nil, jsonData, NKError(rootJson: json, fallbackStatusCode: response.response?.statusCode)) }
                 }
             }
         }
     }
 
-    @objc public func getE2EEPublicKey(options: NKRequestOptions = NKRequestOptions(), completionHandler: @escaping (_ account: String, _ publicKey: String?, _ data: Data?, _ error: NKError) -> Void) {
+    @objc public func getE2EEPublicKey(options: NKRequestOptions = NKRequestOptions(),
+                                       completion: @escaping (_ account: String, _ publicKey: String?, _ data: Data?, _ error: NKError) -> Void) {
 
         let account = self.nkCommonInstance.account
         let urlBase = self.nkCommonInstance.urlBase
@@ -269,7 +291,7 @@ extension NextcloudKit {
         let endpoint = "ocs/v2.php/apps/end_to_end_encryption/api/v1/server-key"
 
         guard let url = self.nkCommonInstance.createStandardUrl(serverUrl: urlBase, endpoint: endpoint) else {
-            return options.queue.async { completionHandler(account, nil, nil, .urlError) }
+            return options.queue.async { completion(account, nil, nil, .urlError) }
         }
 
         let headers = self.nkCommonInstance.getStandardHeaders(options: options)
@@ -280,22 +302,23 @@ extension NextcloudKit {
             switch response.result {
             case .failure(let error):
                 let error = NKError(error: error, afResponse: response)
-                options.queue.async { completionHandler(account, nil, nil, error) }
+                options.queue.async { completion(account, nil, nil, error) }
             case .success(let jsonData):
                 let json = JSON(jsonData)
                 let statusCode = json["ocs"]["meta"]["statuscode"].int ?? NKError.internalError
                 if 200..<300 ~= statusCode {
                     let key = json["ocs"]["data"]["public-key"].stringValue
-                    options.queue.async { completionHandler(account, key, jsonData, .success) }
+                    options.queue.async { completion(account, key, jsonData, .success) }
                 } else {
-                    options.queue.async { completionHandler(account, nil, jsonData, NKError(rootJson: json, fallbackStatusCode: response.response?.statusCode)) }
+                    options.queue.async { completion(account, nil, jsonData, NKError(rootJson: json, fallbackStatusCode: response.response?.statusCode)) }
                 }
             }
         }
     }
 
     @objc public func signE2EECertificate(certificate: String,
-                                          options: NKRequestOptions = NKRequestOptions(), completionHandler: @escaping (_ account: String, _ certificate: String?, _ data: Data?, _ error: NKError) -> Void) {
+                                          options: NKRequestOptions = NKRequestOptions(),
+                                          completion: @escaping (_ account: String, _ certificate: String?, _ data: Data?, _ error: NKError) -> Void) {
 
         let account = self.nkCommonInstance.account
         let urlBase = self.nkCommonInstance.urlBase
@@ -303,7 +326,7 @@ extension NextcloudKit {
         let endpoint = "ocs/v2.php/apps/end_to_end_encryption/api/v1/public-key"
 
         guard let url = self.nkCommonInstance.createStandardUrl(serverUrl: urlBase, endpoint: endpoint) else {
-            return options.queue.async { completionHandler(account, nil, nil, .urlError) }
+            return options.queue.async { completion(account, nil, nil, .urlError) }
         }
 
         let headers = self.nkCommonInstance.getStandardHeaders(options: options)
@@ -316,23 +339,24 @@ extension NextcloudKit {
             switch response.result {
             case .failure(let error):
                 let error = NKError(error: error, afResponse: response)
-                options.queue.async { completionHandler(account, nil, nil, error) }
+                options.queue.async { completion(account, nil, nil, error) }
             case .success(let jsonData):
                 let json = JSON(jsonData)
                 let statusCode = json["ocs"]["meta"]["statuscode"].int ?? NKError.internalError
                 if 200..<300 ~= statusCode {
                     let key = json["ocs"]["data"]["public-key"].stringValue
                     print(key)
-                    options.queue.async { completionHandler(account, key, jsonData, .success) }
+                    options.queue.async { completion(account, key, jsonData, .success) }
                 } else {
-                    options.queue.async { completionHandler(account, nil, jsonData, NKError(rootJson: json, fallbackStatusCode: response.response?.statusCode)) }
+                    options.queue.async { completion(account, nil, jsonData, NKError(rootJson: json, fallbackStatusCode: response.response?.statusCode)) }
                 }
             }
         }
     }
 
     @objc public func storeE2EEPrivateKey(privateKey: String,
-                                          options: NKRequestOptions = NKRequestOptions(), completionHandler: @escaping (_ account: String, _ privateKey: String?, _ data: Data?, _ error: NKError) -> Void) {
+                                          options: NKRequestOptions = NKRequestOptions(),
+                                          completion: @escaping (_ account: String, _ privateKey: String?, _ data: Data?, _ error: NKError) -> Void) {
 
         let account = self.nkCommonInstance.account
         let urlBase = self.nkCommonInstance.urlBase
@@ -340,7 +364,7 @@ extension NextcloudKit {
         let endpoint = "ocs/v2.php/apps/end_to_end_encryption/api/v1/private-key"
 
         guard let url = self.nkCommonInstance.createStandardUrl(serverUrl: urlBase, endpoint: endpoint) else {
-            return options.queue.async { completionHandler(account, nil, nil, .urlError) }
+            return options.queue.async { completion(account, nil, nil, .urlError) }
         }
 
         let headers = self.nkCommonInstance.getStandardHeaders(options: options)
@@ -353,21 +377,22 @@ extension NextcloudKit {
             switch response.result {
             case .failure(let error):
                 let error = NKError(error: error, afResponse: response)
-                options.queue.async { completionHandler(account, nil, nil, error) }
+                options.queue.async { completion(account, nil, nil, error) }
             case .success(let jsonData):
                 let json = JSON(jsonData)
                 let statusCode = json["ocs"]["meta"]["statuscode"].int ?? NKError.internalError
                 if 200..<300 ~= statusCode {
                     let key = json["ocs"]["data"]["private-key"].stringValue
-                    options.queue.async { completionHandler(account, key, jsonData, .success) }
+                    options.queue.async { completion(account, key, jsonData, .success) }
                 } else {
-                    options.queue.async { completionHandler(account, nil, jsonData, NKError(rootJson: json, fallbackStatusCode: response.response?.statusCode)) }
+                    options.queue.async { completion(account, nil, jsonData, NKError(rootJson: json, fallbackStatusCode: response.response?.statusCode)) }
                 }
             }
         }
     }
 
-    @objc public func deleteE2EECertificate(options: NKRequestOptions = NKRequestOptions(), completionHandler: @escaping (_ account: String, _ error: NKError) -> Void) {
+    @objc public func deleteE2EECertificate(options: NKRequestOptions = NKRequestOptions(),
+                                            completion: @escaping (_ account: String, _ error: NKError) -> Void) {
 
         let account = self.nkCommonInstance.account
         let urlBase = self.nkCommonInstance.urlBase
@@ -375,7 +400,7 @@ extension NextcloudKit {
         let endpoint = "ocs/v2.php/apps/end_to_end_encryption/api/v1/public-key"
 
         guard let url = self.nkCommonInstance.createStandardUrl(serverUrl: urlBase, endpoint: endpoint) else {
-            return options.queue.async { completionHandler(account, .urlError) }
+            return options.queue.async { completion(account, .urlError) }
         }
 
         let headers = self.nkCommonInstance.getStandardHeaders(options: options)
@@ -386,14 +411,15 @@ extension NextcloudKit {
             switch response.result {
             case .failure(let error):
                 let error = NKError(error: error, afResponse: response)
-                options.queue.async { completionHandler(account, error) }
+                options.queue.async { completion(account, error) }
             case .success:
-                options.queue.async { completionHandler(account, .success) }
+                options.queue.async { completion(account, .success) }
             }
         }
     }
 
-    @objc public func deleteE2EEPrivateKey(options: NKRequestOptions = NKRequestOptions(), completionHandler: @escaping (_ account: String, _ error: NKError) -> Void) {
+    @objc public func deleteE2EEPrivateKey(options: NKRequestOptions = NKRequestOptions(),
+                                           completion: @escaping (_ account: String, _ error: NKError) -> Void) {
 
         let account = self.nkCommonInstance.account
         let urlBase = self.nkCommonInstance.urlBase
@@ -401,7 +427,7 @@ extension NextcloudKit {
         let endpoint = "ocs/v2.php/apps/end_to_end_encryption/api/v1/private-key"
 
         guard let url = self.nkCommonInstance.createStandardUrl(serverUrl: urlBase, endpoint: endpoint) else {
-            return options.queue.async { completionHandler(account, .urlError) }
+            return options.queue.async { completion(account, .urlError) }
         }
 
         let headers = self.nkCommonInstance.getStandardHeaders(options: options)
@@ -412,9 +438,9 @@ extension NextcloudKit {
             switch response.result {
             case .failure(let error):
                 let error = NKError(error: error, afResponse: response)
-                options.queue.async { completionHandler(account, error) }
+                options.queue.async { completion(account, error) }
             case .success:
-                options.queue.async { completionHandler(account, .success) }
+                options.queue.async { completion(account, .success) }
             }
         }
     }
