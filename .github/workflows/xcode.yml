@@ -1,0 +1,30 @@
+name: Build
+
+on:
+  push:
+    branches:
+      - master
+      - develop
+  pull_request:
+    types: [synchronize, opened, reopened, ready_for_review]
+    branches: 
+      - master
+      - develop
+
+jobs:
+  XCBuild:
+    runs-on: macOS-latest
+    if: github.event.pull_request.draft == false
+    env:
+      PROJECT: NextcloudKit.xcodeproj
+      DESTINATION: platform=iOS Simulator,name=iPhone 14
+    steps:
+    - name: Set env var
+      run: echo "DEVELOPER_DIR=$(xcode-select --print-path)" >> $GITHUB_ENV
+    - uses: actions/checkout@v2
+    - name: Build NextcloudKit
+      run: |
+        xcodebuild build -project $PROJECT -scheme "$SCHEME" -destination "$DESTINATION"
+      env:
+          SCHEME: NextcloudKit
+    

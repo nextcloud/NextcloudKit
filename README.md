@@ -1,4 +1,5 @@
-# NextcloudKit
+# NextcloudKit V 2
+<img src="image.png" alt="Demo of the Nextcloud iOS files app" width="200" height="200">
 
 ## Installation
 
@@ -22,7 +23,7 @@ Once you have your Swift package set up, adding NextcloudKit as a dependency is 
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/Nextcloud/NextcloudKit.git", .upToNextMajor(from: "1.0.0"))
+    .package(url: "https://github.com/Nextcloud/NextcloudKit.git", .upToNextMajor(from: "2.0.0"))
 ]
 ```
 

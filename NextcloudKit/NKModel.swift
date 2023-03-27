@@ -75,7 +75,7 @@ import SwiftyJSON
 // MARK: - Unified Search
 
 @objc public class NKSearchResult: NSObject {
-    
+
     @objc public let id: String
     @objc public let name: String
     @objc public let isPaginated: Bool
@@ -96,7 +96,7 @@ import SwiftyJSON
 }
 
 @objc public class NKSearchEntry: NSObject {
-    
+
     @objc public let thumbnailURL: String
     @objc public let title, subline: String
     @objc public let resourceURL: String
@@ -138,7 +138,7 @@ import SwiftyJSON
 }
 
 @objc public class NKSearchProvider: NSObject {
-    
+
     init?(json: JSON) {
         guard let id = json["id"].string,
               let name = json["name"].string,
@@ -161,7 +161,7 @@ import SwiftyJSON
 // MARK: - Dashboard / Widget
 
 @objc public class NCCDashboardApplication: NSObject {
-    
+
     @objc public var application: String?
     @objc public var items: [NCCDashboardItem]?
 
@@ -172,8 +172,8 @@ import SwiftyJSON
 
     static func factory(data: JSON) -> [NCCDashboardApplication] {
         var results = [NCCDashboardApplication]()
-        for (application, data):(String, JSON) in data {
-            if let result = NCCDashboardApplication.init(application: application, data: data) {
+        for (application, data): (String, JSON) in data {
+            if let result = NCCDashboardApplication(application: application, data: data) {
                 results.append(result)
             }
         }
@@ -182,7 +182,7 @@ import SwiftyJSON
 }
 
 @objc public class NCCDashboardItem: NSObject {
-    
+
     @objc public let title: String?
     @objc public let subtitle: String?
     @objc public let link: String?
@@ -204,7 +204,7 @@ import SwiftyJSON
 }
 
 @objc public class NCCDashboardWidget: NSObject {
-    
+
     @objc public var id, title: String
     @objc public let order: Int
     @objc public let iconClass, iconUrl, widgetUrl: String?
@@ -228,7 +228,7 @@ import SwiftyJSON
 
     static func factory(data: JSON) -> [NCCDashboardWidget] {
         var results = [NCCDashboardWidget]()
-        for (application, data):(String, JSON) in data {
+        for (application, data): (String, JSON) in data {
             if let result = NCCDashboardWidget(application: application, data: data) {
                 results.append(result)
             }
@@ -238,7 +238,7 @@ import SwiftyJSON
 }
 
 @objc public class NCCDashboardWidgetButton: NSObject {
-    
+
     @objc public let type, text, link: String
 
     init?(data: JSON) {
@@ -260,26 +260,26 @@ import SwiftyJSON
 // MARK: -
 
 @objc public class NKActivity: NSObject {
-    
+
     @objc public var app = ""
     @objc public var date = NSDate()
     @objc public var idActivity: Int = 0
     @objc public var icon = ""
     @objc public var link = ""
     @objc public var message = ""
-    @objc public var message_rich: Data?
-    @objc public var object_id: Int = 0
-    @objc public var object_name = ""
-    @objc public var object_type = ""
+    @objc public var messageRich: Data?
+    @objc public var objectId: Int = 0
+    @objc public var objectName = ""
+    @objc public var objectType = ""
     @objc public var previews: Data?
     @objc public var subject = ""
-    @objc public var subject_rich: Data?
+    @objc public var subjectRich: Data?
     @objc public var type = ""
     @objc public var user = ""
 }
 
 @objc public class NKComments: NSObject {
-    
+
     @objc public var actorDisplayName = ""
     @objc public var actorId = ""
     @objc public var actorType = ""
@@ -293,9 +293,8 @@ import SwiftyJSON
     @objc public var verb = ""
 }
 
-
 @objc public class NKEditorDetailsCreators: NSObject {
-    
+
     @objc public var editor = ""
     @objc public var ext = ""
     @objc public var identifier = ""
@@ -305,7 +304,7 @@ import SwiftyJSON
 }
 
 @objc public class NKEditorDetailsEditors: NSObject {
-    
+
     @objc public var mimetypes: [String] = []
     @objc public var name = ""
     @objc public var optionalMimetypes: [String] = []
@@ -313,7 +312,7 @@ import SwiftyJSON
 }
 
 @objc public class NKEditorTemplates: NSObject {
-    
+
     @objc public var delete = ""
     @objc public var ext = ""
     @objc public var identifier = ""
@@ -323,7 +322,7 @@ import SwiftyJSON
 }
 
 @objc public class NKExternalSite: NSObject {
-    
+
     @objc public var icon = ""
     @objc public var idExternalSite: Int = 0
     @objc public var lang = ""
@@ -394,7 +393,7 @@ import SwiftyJSON
 }
 
 @objc public class NKNotifications: NSObject {
-    
+
     @objc public var actions: Data?
     @objc public var app = ""
     @objc public var date = NSDate()
@@ -412,7 +411,6 @@ import SwiftyJSON
     @objc public var user = ""
 }
 
-
 @objc public class NKRichdocumentsTemplate: NSObject {
 
     @objc public var delete = ""
@@ -424,7 +422,7 @@ import SwiftyJSON
 }
 
 @objc public class NKShare: NSObject {
-    
+
     @objc public var canEdit: Bool = false
     @objc public var canDelete: Bool = false
     @objc public var date: NSDate?
@@ -463,7 +461,7 @@ import SwiftyJSON
 }
 
 @objc public class NKSharee: NSObject {
-    
+
     @objc public var circleInfo = ""
     @objc public var circleOwner = ""
     @objc public var label = ""
@@ -495,7 +493,7 @@ import SwiftyJSON
 }
 
 @objc public class NKUserProfile: NSObject {
-    
+
     @objc public var address = ""
     @objc public var backend = ""
     @objc public var backendCapabilitiesSetDisplayName: Bool = false
@@ -522,7 +520,7 @@ import SwiftyJSON
 }
 
 @objc public class NKUserStatus: NSObject {
-    
+
     @objc public var clearAt: NSDate?
     @objc public var clearAtTime: String?
     @objc public var clearAtType: String?
@@ -534,9 +532,10 @@ import SwiftyJSON
     @objc public var userId: String?
 }
 
-//MARK: - Data File
+// MARK: - Data File
 
 class NKDataFileXML: NSObject {
+    let nkCommonInstance: NKCommon
 
     let requestBodyComments =
     """
@@ -556,7 +555,7 @@ class NKDataFileXML: NSObject {
         </d:prop>
     </d:propfind>
     """
-    
+
     let requestBodyCommentsMarkAsRead =
     """
     <?xml version=\"1.0\" encoding=\"UTF-8\"?>
@@ -568,7 +567,7 @@ class NKDataFileXML: NSObject {
         </d:set>
     </d:propertyupdate>
     """
-    
+
     let requestBodyCommentsUpdate =
     """
     <?xml version=\"1.0\" encoding=\"UTF-8\"?>
@@ -580,7 +579,7 @@ class NKDataFileXML: NSObject {
         </d:set>
     </d:propertyupdate>
     """
-    
+
     let requestBodyFile =
     """
     <?xml version=\"1.0\" encoding=\"UTF-8\"?>
@@ -627,7 +626,7 @@ class NKDataFileXML: NSObject {
         </d:prop>
     </d:propfind>
     """
-    
+
     let requestBodyFileSetFavorite =
     """
     <?xml version=\"1.0\"?>
@@ -639,7 +638,7 @@ class NKDataFileXML: NSObject {
         </d:set>
     </d:propertyupdate>
     """
-    
+
     let requestBodyFileListingFavorites =
     """
     <?xml version=\"1.0\"?>
@@ -690,7 +689,7 @@ class NKDataFileXML: NSObject {
         </oc:filter-rules>
     </oc:filter-files>
     """
-    
+
     let requestBodySearchFileName =
     """
     <?xml version=\"1.0\"?>
@@ -741,7 +740,7 @@ class NKDataFileXML: NSObject {
     </d:basicsearch>
     </d:searchrequest>
     """
-    
+
     let requestBodySearchFileId =
     """
     <?xml version=\"1.0\"?>
@@ -950,7 +949,7 @@ class NKDataFileXML: NSObject {
       </d:basicsearch>
     </d:searchrequest>
     """
-    
+
     let requestBodySearchMediaWithLimit =
     """
     <?xml version=\"1.0\"?>
@@ -1044,7 +1043,7 @@ class NKDataFileXML: NSObject {
       </d:basicsearch>
     </d:searchrequest>
     """
-    
+
     let requestBodyTrash =
     """
     <?xml version=\"1.0\" encoding=\"UTF-8\"?>
@@ -1076,21 +1075,26 @@ class NKDataFileXML: NSObject {
         </d:prop>
     </d:propfind>
     """
-    
+
+    init(nkCommonInstance: NKCommon) {
+        self.nkCommonInstance = nkCommonInstance
+        super.init()
+    }
+
     func convertDataAppPassword(data: Data) -> String? {
-        
+
         let xml = XML.parse(data)
         return xml["ocs", "data", "apppassword"].text
     }
-    
+
     func convertDataFile(xmlData: Data, dav: String, urlBase: String, user: String, userId: String, showHiddenFiles: Bool, includeHiddenFiles: [String]) -> [NKFile] {
-        
+
         var files: [NKFile] = []
         let rootFiles = "/" + dav + "/files/"
-        guard let baseUrl = NKCommon.shared.getHostName(urlString: urlBase) else {
+        guard let baseUrl = self.nkCommonInstance.getHostName(urlString: urlBase) else {
             return files
         }
-        
+
         let xml = XML.parse(xmlData)
         let elements = xml["d:multistatus", "d:response"]
         for element in elements {
@@ -1100,34 +1104,34 @@ class NKDataFileXML: NSObject {
                 if href.last == "/" {
                     fileNamePath = String(href.dropLast())
                 }
-                
+
                 // Hidden File/Directory/Sub of directoty
                 if !showHiddenFiles {
                     let componentsPath = (href as NSString).pathComponents
                     let componentsFiltered = componentsPath.filter { $0.hasPrefix(".") }
                     if includeHiddenFiles.isEmpty {
-                        if componentsFiltered.count > 0 {
+                        if !componentsFiltered.isEmpty {
                             continue
                         }
                     } else {
                         let includeHiddenFilesFilter = componentsPath.filter { includeHiddenFiles.contains($0) }
-                        if includeHiddenFilesFilter.count == 0 && componentsFiltered.count > 0 {
+                        if includeHiddenFilesFilter.isEmpty && !componentsFiltered.isEmpty {
                             continue
                         }
                     }
                 }
 
                 // account
-                file.account = NKCommon.shared.account
+                file.account = self.nkCommonInstance.account
 
                 // path
                 file.path = (fileNamePath as NSString).deletingLastPathComponent + "/"
                 file.path = file.path.removingPercentEncoding ?? ""
-                
+
                 // fileName
                 file.fileName = (fileNamePath as NSString).lastPathComponent
                 file.fileName = file.fileName.removingPercentEncoding ?? ""
-              
+
                 // ServerUrl
                 if href == rootFiles + user + "/" {
                     file.fileName = "."
@@ -1136,45 +1140,45 @@ class NKDataFileXML: NSObject {
                     file.serverUrl = baseUrl + file.path.dropLast()
                 }
             }
-            
+
             let propstat = element["d:propstat"][0]
-                        
-            if let getlastmodified = propstat["d:prop", "d:getlastmodified"].text, let date = NKCommon.shared.convertDate(getlastmodified, format: "EEE, dd MMM y HH:mm:ss zzz") {
+
+            if let getlastmodified = propstat["d:prop", "d:getlastmodified"].text, let date = self.nkCommonInstance.convertDate(getlastmodified, format: "EEE, dd MMM y HH:mm:ss zzz") {
                 file.date = date
             }
-            
+
             if let creationtime = propstat["d:prop", "nc:creation_time"].double, creationtime > 0 {
                 file.creationDate = NSDate(timeIntervalSince1970: creationtime)
             }
-            
+
             if let uploadtime = propstat["d:prop", "nc:upload_time"].double, uploadtime > 0 {
                 file.uploadDate = NSDate(timeIntervalSince1970: uploadtime)
             }
-            
+
             if let getetag = propstat["d:prop", "d:getetag"].text {
                 file.etag = getetag.replacingOccurrences(of: "\"", with: "")
             }
-            
+
             if let getcontenttype = propstat["d:prop", "d:getcontenttype"].text {
                 file.contentType = getcontenttype
             }
-            
+
             if let dataFingerprint = propstat["d:prop", "d:data-fingerprint"].text {
                 file.dataFingerprint = dataFingerprint
             }
-            
+
             if let downloadURL = propstat["d:prop", "d:downloadURL"].text {
                 file.downloadURL = downloadURL
             }
-            
+
             if let note = propstat["d:prop", "nc:note"].text {
                 file.note = note
             }
-            
+
             if let sharePermissionsCollaborationServices = propstat["d:prop", "x1:share-permissions"].int {
                 file.sharePermissionsCollaborationServices = sharePermissionsCollaborationServices
             }
-            
+
             if let sharePermissionsCloudMesh = propstat["d:prop", "x2:share-permissions"].text {
                 let elements = sharePermissionsCloudMesh.components(separatedBy: ",")
                 for element in elements {
@@ -1182,11 +1186,11 @@ class NKDataFileXML: NSObject {
                     file.sharePermissionsCloudMesh.append(result)
                 }
             }
-                        
+
             if let checksums = propstat["d:prop", "d:checksums"].text {
                 file.checksums = checksums
             }
-            
+
             let resourcetypeElement = propstat["d:prop", "d:resourcetype"]
             if resourcetypeElement["d:collection"].error == nil {
                 file.directory = true
@@ -1196,65 +1200,65 @@ class NKDataFileXML: NSObject {
                     file.resourceType = resourcetype
                 }
             }
-            
+
             if let quotaavailablebytes = propstat["d:prop", "d:quota-available-bytes"].text {
                 file.quotaAvailableBytes = Int64(quotaavailablebytes) ?? 0
             }
-            
+
             if let quotausedbytes = propstat["d:prop", "d:quota-used-bytes"].text {
                 file.quotaUsedBytes = Int64(quotausedbytes) ?? 0
             }
-                       
+
             if let permissions = propstat["d:prop", "oc:permissions"].text {
                 file.permissions = permissions
             }
-            
+
             if let ocId = propstat["d:prop", "oc:id"].text {
                 file.ocId = ocId
             }
-            
+
             if let fileId = propstat["d:prop", "oc:fileid"].text {
                 file.fileId = fileId
             }
-            
+
             if let size = propstat["d:prop", "oc:size"].text {
                 file.size = Int64(size) ?? 0
             }
-            
+
             for shareTypesElement in propstat["d:prop", "oc:share-types"] {
                 if let shareTypes = shareTypesElement["oc:share-type"].int {
                     file.shareType.append(shareTypes)
                 }
             }
-                            
+
             if let favorite = propstat["d:prop", "oc:favorite"].text {
                 file.favorite = (favorite as NSString).boolValue
             }
-            
+
             if let ownerid = propstat["d:prop", "oc:owner-id"].text {
                 file.ownerId = ownerid
             }
-            
+
             if let ownerdisplayname = propstat["d:prop", "oc:owner-display-name"].text {
                 file.ownerDisplayName = ownerdisplayname
             }
-            
+
             if let commentsunread = propstat["d:prop", "oc:comments-unread"].text {
                 file.commentsUnread = (commentsunread as NSString).boolValue
             }
-                        
+
             if let encrypted = propstat["d:prop", "nc:is-encrypted"].text {
                 file.e2eEncrypted = (encrypted as NSString).boolValue
             }
-            
+
             if let haspreview = propstat["d:prop", "nc:has-preview"].text {
                 file.hasPreview = (haspreview as NSString).boolValue
             }
-            
+
             if let mounttype = propstat["d:prop", "nc:mount-type"].text {
                 file.mountType = mounttype
             }
-            
+
             if let richWorkspace = propstat["d:prop", "nc:rich-workspace"].text {
                 file.richWorkspace = richWorkspace
             }
@@ -1281,9 +1285,9 @@ class NKDataFileXML: NSObject {
                     file.lockTimeOut = file.lockTime?.addingTimeInterval(TimeInterval(lockTimeOut))
                 }
             }
-            
-            let results = NKCommon.shared.getInternalType(fileName: file.fileName, mimeType: file.contentType, directory: file.directory)
-            
+
+            let results = self.nkCommonInstance.getInternalType(fileName: file.fileName, mimeType: file.contentType, directory: file.directory)
+
             file.contentType = results.mimeType
             file.iconName = results.iconName
             file.name = "files"
@@ -1291,21 +1295,21 @@ class NKDataFileXML: NSObject {
             file.urlBase = urlBase
             file.user = user
             file.userId = userId
-            
+
             files.append(file)
         }
 
         return files
     }
-    
+
     func convertDataTrash(xmlData: Data, urlBase: String, showHiddenFiles: Bool) -> [NKTrash] {
-        
+
         var files: [NKTrash] = []
         var first: Bool = true
-        guard let baseUrl = NKCommon.shared.getHostName(urlString: urlBase) else {
+        guard let baseUrl = self.nkCommonInstance.getHostName(urlString: urlBase) else {
             return files
         }
-    
+
         let xml = XML.parse(xmlData)
         let elements = xml["d:multistatus", "d:response"]
         for element in elements {
@@ -1316,77 +1320,77 @@ class NKDataFileXML: NSObject {
             let file = NKTrash()
             if let href = element["d:href"].text {
                 var fileNamePath = href
-                
+
                 if href.last == "/" {
                     fileNamePath = String(href.dropLast())
                 }
-                
+
                 // path
                 file.filePath = (fileNamePath as NSString).deletingLastPathComponent + "/"
                 file.filePath = file.filePath.removingPercentEncoding ?? ""
                 file.filePath = baseUrl + file.filePath
-                
+
                 // fileName
                 file.fileName = (fileNamePath as NSString).lastPathComponent
                 file.fileName = file.fileName.removingPercentEncoding ?? ""
             }
-            
+
             let propstat = element["d:propstat"][0]
-                        
-            if let getlastmodified = propstat["d:prop", "d:getlastmodified"].text, let date = NKCommon.shared.convertDate(getlastmodified, format: "EEE, dd MMM y HH:mm:ss zzz") {
+
+            if let getlastmodified = propstat["d:prop", "d:getlastmodified"].text, let date = self.nkCommonInstance.convertDate(getlastmodified, format: "EEE, dd MMM y HH:mm:ss zzz") {
                 file.date = date
             }
-            
+
             if let getcontenttype = propstat["d:prop", "d:getcontenttype"].text {
                 file.contentType = getcontenttype
             }
-            
+
             let resourcetypeElement = propstat["d:prop", "d:resourcetype"]
             if resourcetypeElement["d:collection"].error == nil {
                 file.directory = true
                 file.contentType = "httpd/unix-directory"
             }
-            
+
             if let fileId = propstat["d:prop", "oc:fileid"].text {
                 file.fileId = fileId
             }
-            
+
             if let haspreview = propstat["d:prop", "nc:has-preview"].text {
                 file.hasPreview = (haspreview as NSString).boolValue
             }
-            
+
             if let size = propstat["d:prop", "oc:size"].text {
                 file.size = Int64(size) ?? 0
             }
-            
+
             if let trashbinFileName = propstat["d:prop", "nc:trashbin-filename"].text {
                 file.trashbinFileName = trashbinFileName
             }
-            
+
             if let trashbinOriginalLocation = propstat["d:prop", "nc:trashbin-original-location"].text {
                 file.trashbinOriginalLocation = trashbinOriginalLocation
             }
-            
+
             if let trashbinDeletionTime = propstat["d:prop", "nc:trashbin-deletion-time"].text, let trashbinDeletionTimeDouble = Double(trashbinDeletionTime) {
-                file.trashbinDeletionTime = Date.init(timeIntervalSince1970: trashbinDeletionTimeDouble) as NSDate
+                file.trashbinDeletionTime = Date(timeIntervalSince1970: trashbinDeletionTimeDouble) as NSDate
             }
 
-            let results = NKCommon.shared.getInternalType(fileName: file.trashbinFileName, mimeType: file.contentType, directory: file.directory)
-            
+            let results = self.nkCommonInstance.getInternalType(fileName: file.trashbinFileName, mimeType: file.contentType, directory: file.directory)
+
             file.contentType = results.mimeType
             file.classFile = results.classFile
             file.iconName = results.iconName
 
             files.append(file)
         }
-        
+
         return files
     }
-    
+
     func convertDataComments(xmlData: Data) -> [NKComments] {
-        
+
         var items: [NKComments] = []
-    
+
         let xml = XML.parse(xmlData)
         let elements = xml["d:multistatus", "d:response"]
         for element in elements {
@@ -1395,57 +1399,57 @@ class NKDataFileXML: NSObject {
             if let value = element["d:href"].text {
                 item.path = value
             }
-            
+
             if let value = element["d:propstat", "d:prop", "oc:actorDisplayName"].text {
                 item.actorDisplayName = value
             }
-            
+
             if let value = element["d:propstat", "d:prop", "oc:actorId"].text {
                 item.actorId = value
             }
-            
+
             if let value = element["d:propstat", "d:prop", "oc:actorType"].text {
                 item.actorType = value
             }
-            
-            if let creationDateTime = element["d:propstat", "d:prop", "oc:creationDateTime"].text, let date = NKCommon.shared.convertDate(creationDateTime, format: "EEE, dd MMM y HH:mm:ss zzz") {
+
+            if let creationDateTime = element["d:propstat", "d:prop", "oc:creationDateTime"].text, let date = self.nkCommonInstance.convertDate(creationDateTime, format: "EEE, dd MMM y HH:mm:ss zzz") {
                 item.creationDateTime = date
             }
-           
+
             if let value = element["d:propstat", "d:prop", "oc:isUnread"].text {
                 item.isUnread = (value as NSString).boolValue
             }
-            
+
             if let value = element["d:propstat", "d:prop", "oc:message"].text {
                 item.message = value
             }
-            
+
             if let value = element["d:propstat", "d:prop", "oc:id"].text {
                 item.messageId = value
             }
-            
+
             if let value = element["d:propstat", "d:prop", "oc:objectId"].text {
                 item.objectId = value
             }
-            
+
             if let value = element["d:propstat", "d:prop", "oc:objectType"].text {
                 item.objectType = value
             }
-            
+
             if let value = element["d:propstat", "d:prop", "oc:verb"].text {
                 item.verb = value
             }
-            
+
             if let value = element["d:propstat", "d:status"].text, value.contains("200") {
                 items.append(item)
             }
         }
-        
+
         return items
     }
-    
+
     func convertDataShare(data: Data) -> (shares: [NKShare], statusCode: Int, message: String) {
-        
+
         var items: [NKShare] = []
         var statusCode: Int = 0
         var message = ""
@@ -1464,147 +1468,146 @@ class NKDataFileXML: NSObject {
             if let value = element["can_edit"].int {
                 item.canEdit = (value as NSNumber).boolValue
             }
-            
+
             if let value = element["can_delete"].int {
                 item.canDelete = (value as NSNumber).boolValue
             }
-            
+
             if let value = element["displayname_file_owner"].text {
                 item.displaynameFileOwner = value
             }
-            
+
             if let value = element["displayname_owner"].text {
                 item.displaynameOwner = value
             }
-            
-            if let value = element["expiration"].text, let date = NKCommon.shared.convertDate(value, format: "YYYY-MM-dd HH:mm:ss") {
+
+            if let value = element["expiration"].text, let date = self.nkCommonInstance.convertDate(value, format: "YYYY-MM-dd HH:mm:ss") {
                 item.expirationDate = date
             }
-            
+
             if let value = element["file_parent"].int {
                 item.fileParent = value
             }
-            
+
             if let value = element["file_source"].int {
                 item.fileSource = value
             }
-            
+
             if let value = element["file_target"].text {
                 item.fileTarget = value
             }
-            
+
             if let value = element["hide_download"].int {
                 item.hideDownload = (value as NSNumber).boolValue
             }
-                        
+
             if let value = element["id"].int {
                 item.idShare = value
             }
-            
+
             if let value = element["item_source"].int {
                 item.itemSource = value
             }
-            
+
             if let value = element["item_type"].text {
                 item.itemType = value
             }
-            
+
             if let value = element["label"].text {
                 item.label = value
             }
-            
+
             if let value = element["mail_send"].int {
                 item.mailSend = (value as NSNumber).boolValue
             }
-            
+
             if let value = element["mimetype"].text {
                 item.mimeType = value
             }
-            
+
             if let value = element["note"].text {
                 item.note = value
             }
-            
+
             if let value = element["parent"].text {
                 item.parent = value
             }
-            
+
             if let value = element["password"].text {
                 item.password = value
             }
-            
+
             if let value = element["path"].text {
                 item.path = value
             }
-            
+
             if let value = element["permissions"].int {
                 item.permissions = value
             }
-            
+
             if let value = element["send_password_by_talk"].int {
                 item.sendPasswordByTalk = (value as NSNumber).boolValue
             }
-            
+
             if let value = element["share_type"].int {
                 item.shareType = value
             }
-            
+
             if let value = element["share_with"].text {
                 item.shareWith = value
             }
-                       
+
             if let value = element["share_with_displayname"].text {
                 item.shareWithDisplayname = value
             }
-            
+
             if let value = element["stime"].double, value > 0 {
                 item.date = NSDate(timeIntervalSince1970: value)
             }
-            
+
             if let value = element["storage"].int {
                 item.storage = value
             }
-            
+
             if let value = element["storage_id"].text {
                 item.storageId = value
             }
-            
+
             if let value = element["token"].text {
                 item.token = value
             }
-            
+
             if let value = element["uid_file_owner"].text {
                 item.uidFileOwner = value
             }
-            
+
             if let value = element["uid_owner"].text {
                 item.uidOwner = value
             }
-            
+
             if let value = element["url"].text {
                 item.url = value
             }
-            
-            if let value = element["status","clearAt"].double, value > 0 {
+
+            if let value = element["status", "clearAt"].double, value > 0 {
                 item.userClearAt = NSDate(timeIntervalSince1970: value)
             }
-            
-            if let value = element["status","icon"].text {
+
+            if let value = element["status", "icon"].text {
                 item.userIcon = value
             }
-            
-            if let value = element["status","message"].text {
+
+            if let value = element["status", "message"].text {
                 item.userMessage = value
             }
-            
-            if let value = element["status","status"].text {
+
+            if let value = element["status", "status"].text {
                 item.userStatus = value
             }
-            
+
             items.append(item)
         }
-        
+
         return(items, statusCode, message)
     }
 }
-

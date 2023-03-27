@@ -31,7 +31,7 @@ extension NextcloudKit {
 
         await withUnsafeContinuation({ continuation in
             createFolder(serverUrlFileName: serverUrlFileName, options: options) { account, ocId, date, error in
-                continuation.resume(returning: (account: account, ocId:ocId, date:date, error:error))
+                continuation.resume(returning: (account: account, ocId: ocId, date: date, error: error))
             }
         })
     }
@@ -41,7 +41,7 @@ extension NextcloudKit {
 
         await withUnsafeContinuation({ continuation in
             deleteFileOrFolder(serverUrlFileName: serverUrlFileName, options: options) { account, error in
-                continuation.resume(returning: (account: account, error:error))
+                continuation.resume(returning: (account: account, error: error))
             }
         })
     }
@@ -54,7 +54,7 @@ extension NextcloudKit {
 
         await withUnsafeContinuation({ continuation in
             readFileOrFolder(serverUrlFileName: serverUrlFileName, depth: depth, showHiddenFiles: showHiddenFiles, requestBody: requestBody, options: options) { account, files, data, error in
-                continuation.resume(returning: (account: account, files:files, data:data,error:error))
+                continuation.resume(returning: (account: account, files: files, data: data, error: error))
             }
         })
     }

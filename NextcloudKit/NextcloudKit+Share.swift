@@ -21,7 +21,6 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-
 import Foundation
 import Alamofire
 import SwiftyJSON
@@ -41,7 +40,6 @@ import SwiftyJSON
         self.sharedWithMe = sharedWithMe
     }
 
-
     /// - Parameters:
     ///   - idShare: Identifier of the share to update
     ///   - reshares: If set to false (default), only shares owned by the current user are returned. If set to true, shares owned by any user from the given file are returned.
@@ -54,7 +52,6 @@ import SwiftyJSON
         self.subfiles = subfiles
         self.sharedWithMe = sharedWithMe
     }
-
 
     let path: String?
     let idShare: Int
@@ -86,26 +83,26 @@ extension NextcloudKit {
                                  options: NKRequestOptions = NKRequestOptions(),
                                  completion: @escaping (_ account: String, _ shares: [NKShare]?, _ data: Data?, _ error: NKError) -> Void) {
 
-        let account = NKCommon.shared.account
-        let urlBase = NKCommon.shared.urlBase
+        let account = self.nkCommonInstance.account
+        let urlBase = self.nkCommonInstance.urlBase
 
-        guard let url = NKCommon.shared.createStandardUrl(serverUrl: urlBase, endpoint: parameters.endpoint)
+        guard let url = self.nkCommonInstance.createStandardUrl(serverUrl: urlBase, endpoint: parameters.endpoint)
         else {
             return options.queue.async { completion(account, nil, nil, .urlError) }
         }
 
-        let headers = NKCommon.shared.getStandardHeaders(options.customHeader, customUserAgent: options.customUserAgent, contentType: "application/xml")
+        let headers = self.nkCommonInstance.getStandardHeaders(options.customHeader, customUserAgent: options.customUserAgent, contentType: "application/xml")
 
-        sessionManager.request(url, method: .get, parameters: parameters.queryParameters, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).responseData(queue: NKCommon.shared.backgroundQueue) { (response) in
+        sessionManager.request(url, method: .get, parameters: parameters.queryParameters, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).responseData(queue: self.nkCommonInstance.backgroundQueue) { response in
         debugPrint(response)
-            
+
             switch response.result {
             case .failure(let error):
                 let error = NKError(error: error, afResponse: response)
                 options.queue.async { completion(account, nil, nil, error) }
-            case .success( _):
+            case .success:
                 if let xmlData = response.data {
-                    let shares = NKDataFileXML().convertDataShare(data: xmlData)
+                    let shares = NKDataFileXML(nkCommonInstance: self.nkCommonInstance).convertDataShare(data: xmlData)
                     if shares.statusCode == 200 {
                         options.queue.async { completion(account, shares.shares, xmlData, .success) }
                     } else {
@@ -117,7 +114,7 @@ extension NextcloudKit {
             }
         }
     }
-        
+
     /*
     * @param search         The search string
     * @param itemType       The type which is shared (e.g. file or folder)
@@ -126,16 +123,16 @@ extension NextcloudKit {
     * @param perPage        The number of items per page (default 200)
     * @param lookup         Default false, for global search use true
     */
-    
+
     @objc public func searchSharees(search: String = "",
                                     page: Int = 1, perPage: Int = 200,
                                     itemType: String = "file",
                                     lookup: Bool = false,
                                     options: NKRequestOptions = NKRequestOptions(),
                                     completion: @escaping (_ account: String, _ sharees: [NKSharee]?, _ data: Data?, _ error: NKError) -> Void) {
-           
-        let account = NKCommon.shared.account
-        let urlBase = NKCommon.shared.urlBase
+
+        let account = self.nkCommonInstance.account
+        let urlBase = self.nkCommonInstance.urlBase
 
         let endpoint = "ocs/v2.php/apps/files_sharing/api/v1/sharees"
 
@@ -143,12 +140,12 @@ extension NextcloudKit {
         if lookup {
             lookupString = "true"
         }
-        
-        guard let url = NKCommon.shared.createStandardUrl(serverUrl: urlBase, endpoint: endpoint) else {
+
+        guard let url = self.nkCommonInstance.createStandardUrl(serverUrl: urlBase, endpoint: endpoint) else {
             return options.queue.async { completion(account, nil, nil, .urlError) }
         }
 
-        let headers = NKCommon.shared.getStandardHeaders(options: options)
+        let headers = self.nkCommonInstance.getStandardHeaders(options: options)
 
         let parameters = [
             "search": search,
@@ -157,10 +154,10 @@ extension NextcloudKit {
             "itemType": itemType,
             "lookup": lookupString
         ]
-    
-        sessionManager.request(url, method: .get, parameters: parameters, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).responseData(queue: NKCommon.shared.backgroundQueue) { (response) in
+
+        sessionManager.request(url, method: .get, parameters: parameters, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).responseData(queue: self.nkCommonInstance.backgroundQueue) { response in
             debugPrint(response)
-            
+
             switch response.result {
             case .failure(let error):
                 let error = NKError(error: error, afResponse: response)
@@ -171,19 +168,19 @@ extension NextcloudKit {
                 if json["ocs"]["meta"]["statuscode"].int == 200 {
                     var sharees: [NKSharee] = []
                     for shareType in ["users", "groups", "remotes", "remote_groups", "emails", "circles", "rooms", "lookup"] {
-                        for (_, subJson):(String, JSON) in json["ocs"]["data"]["exact"][shareType] {
+                        for (_, subJson): (String, JSON) in json["ocs"]["data"]["exact"][shareType] {
                             let sharee = NKSharee()
-                            
+
                             sharee.label = subJson["label"].stringValue
                             sharee.name = subJson["name"].stringValue
                             sharee.uuid = subJson["uuid"].stringValue
-                            
+
                             sharee.shareType = subJson["value"]["shareType"].intValue
                             sharee.shareWith = subJson["value"]["shareWith"].stringValue
-                            
+
                             sharee.circleInfo = subJson["value"]["circleInfo"].stringValue
                             sharee.circleOwner = subJson["value"]["circleOwner"].stringValue
-                            
+
                             if let clearAt = subJson["status"]["clearAt"].double {
                                 let date = Date(timeIntervalSince1970: clearAt) as NSDate
                                 sharee.userClearAt = date
@@ -191,22 +188,22 @@ extension NextcloudKit {
                             sharee.userIcon = subJson["status"]["icon"].stringValue
                             sharee.userMessage = subJson["status"]["message"].stringValue
                             sharee.userStatus = subJson["status"]["status"].stringValue
-                            
+
                             sharees.append(sharee)
                         }
-                        for (_, subJson):(String, JSON) in json["ocs"]["data"][shareType] {
+                        for (_, subJson): (String, JSON) in json["ocs"]["data"][shareType] {
                             let sharee = NKSharee()
-                            
+
                             sharee.label = subJson["label"].stringValue
                             sharee.name = subJson["name"].stringValue
                             sharee.uuid = subJson["uuid"].stringValue
-                            
+
                             sharee.shareType = subJson["value"]["shareType"].intValue
                             sharee.shareWith = subJson["value"]["shareWith"].stringValue
-                            
+
                             sharee.circleInfo = subJson["value"]["circleInfo"].stringValue
                             sharee.circleOwner = subJson["value"]["circleOwner"].stringValue
-                            
+
                             if let clearAt = subJson["status"]["clearAt"].double {
                                 let date = Date(timeIntervalSince1970: clearAt) as NSDate
                                 sharee.userClearAt = date
@@ -214,18 +211,18 @@ extension NextcloudKit {
                             sharee.userIcon = subJson["status"]["icon"].stringValue
                             sharee.userMessage = subJson["status"]["message"].stringValue
                             sharee.userStatus = subJson["status"]["status"].stringValue
-                            
+
                             sharees.append(sharee)
                         }
                     }
                     options.queue.async { completion(account, sharees, jsonData, .success) }
-                }  else {
+                } else {
                     options.queue.async { completion(account, nil, jsonData, NKError(rootJson: json, fallbackStatusCode: response.response?.statusCode)) }
                 }
             }
         }
     }
-    
+
     /*
     * @param path           path of the file/folder being shared. Mandatory argument
     * @param shareType      0 = user, 1 = group, 3 = Public link. Mandatory argument
@@ -243,7 +240,7 @@ extension NextcloudKit {
     *                       To obtain combinations, add the desired values together.
     *                       For instance, for Re-Share, delete, read, update, add 16+8+2+1 = 27.
     */
-    
+
     @objc public func createShareLink(path: String,
                                       hideDownload: Bool = false,
                                       publicUpload: Bool = false,
@@ -254,18 +251,18 @@ extension NextcloudKit {
 
         createShare(path: path, shareType: 3, shareWith: nil, publicUpload: publicUpload, hideDownload: hideDownload, password: password, permissions: permissions, options: options, completion: completion)
     }
-    
+
     @objc public func createShare(path: String,
                                   shareType: Int,
                                   shareWith: String,
                                   password: String? = nil,
                                   permissions: Int = 1,
                                   options: NKRequestOptions = NKRequestOptions(),
-                                  completion: @escaping (_ account: String, _ share: NKShare?, _ data: Data?,  _ error: NKError) -> Void) {
-     
+                                  completion: @escaping (_ account: String, _ share: NKShare?, _ data: Data?, _ error: NKError) -> Void) {
+
         createShare(path: path, shareType: shareType, shareWith: shareWith, publicUpload: false, hideDownload: false, password: password, permissions: permissions, options: options, completion: completion)
     }
-    
+
     private func createShare(path: String,
                              shareType: Int,
                              shareWith: String?,
@@ -275,17 +272,17 @@ extension NextcloudKit {
                              permissions: Int = 1,
                              options: NKRequestOptions = NKRequestOptions(),
                              completion: @escaping (_ account: String, _ share: NKShare?, _ data: Data?, _ error: NKError) -> Void) {
-           
-        let account = NKCommon.shared.account
-        let urlBase = NKCommon.shared.urlBase
+
+        let account = self.nkCommonInstance.account
+        let urlBase = self.nkCommonInstance.urlBase
 
         let endpoint = "ocs/v2.php/apps/files_sharing/api/v1/shares"
-                
-        guard let url = NKCommon.shared.createStandardUrl(serverUrl: urlBase, endpoint: endpoint) else {
+
+        guard let url = self.nkCommonInstance.createStandardUrl(serverUrl: urlBase, endpoint: endpoint) else {
             return options.queue.async { completion(account, nil, nil, .urlError) }
         }
 
-        let headers = NKCommon.shared.getStandardHeaders(options: options)
+        let headers = self.nkCommonInstance.getStandardHeaders(options: options)
 
         var parameters = [
             "path": path,
@@ -304,27 +301,27 @@ extension NextcloudKit {
         if password != nil {
             parameters["password"] = password!
         }
-        
-        sessionManager.request(url, method: .post, parameters: parameters, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).responseData(queue: NKCommon.shared.backgroundQueue) { (response) in
+
+        sessionManager.request(url, method: .post, parameters: parameters, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).responseData(queue: self.nkCommonInstance.backgroundQueue) { response in
             debugPrint(response)
-            
+
             switch response.result {
             case .failure(let error):
                 let error = NKError(error: error, afResponse: response)
                 options.queue.async { completion(account, nil, nil, error) }
             case .success(let jsonData):
                 let json = JSON(jsonData)
-                
+
                 let statusCode = json["ocs"]["meta"]["statuscode"].int ?? NKError.internalError
                 if statusCode == 200 {
-                    options.queue.async { completion(account, self.convertResponseShare(json: json),jsonData,  .success) }
-                }  else {
+                    options.queue.async { completion(account, self.convertResponseShare(json: json), jsonData, .success) }
+                } else {
                     options.queue.async { completion(account, nil, jsonData, NKError(rootJson: json, fallbackStatusCode: response.response?.statusCode)) }
                 }
             }
         }
     }
-    
+
     /*
     * @param idShare        Identifier of the share to update
     * @param password       Password to protect a public link share. Only available for public link shares, Empty string clears the current password, Null results in no update applied to the password
@@ -343,7 +340,7 @@ extension NextcloudKit {
     * @param label          Label
     * @param hideDownload   Permission if file can be downloaded via share link (only for single file)
     */
-    
+
     @objc public func updateShare(idShare: Int,
                                   password: String? = nil,
                                   expireDate: String? = nil,
@@ -354,17 +351,17 @@ extension NextcloudKit {
                                   hideDownload: Bool,
                                   options: NKRequestOptions = NKRequestOptions(),
                                   completion: @escaping (_ account: String, _ share: NKShare?, _ data: Data?, _ error: NKError) -> Void) {
-           
-        let account = NKCommon.shared.account
-        let urlBase = NKCommon.shared.urlBase
+
+        let account = self.nkCommonInstance.account
+        let urlBase = self.nkCommonInstance.urlBase
 
         let endpoint = "ocs/v2.php/apps/files_sharing/api/v1/shares/\(idShare)"
 
-        guard let url = NKCommon.shared.createStandardUrl(serverUrl: urlBase, endpoint: endpoint) else {
+        guard let url = self.nkCommonInstance.createStandardUrl(serverUrl: urlBase, endpoint: endpoint) else {
             return options.queue.async { completion(account, nil, nil, .urlError) }
         }
 
-        let headers = NKCommon.shared.getStandardHeaders(options: options)
+        let headers = self.nkCommonInstance.getStandardHeaders(options: options)
 
         var parameters = [
             "permissions": String(permissions)
@@ -383,60 +380,60 @@ extension NextcloudKit {
         }
         parameters["publicUpload"] = publicUpload == true ? "true" : "false"
         parameters["hideDownload"] = hideDownload == true ? "true" : "false"
-        
-        sessionManager.request(url, method: .put, parameters: parameters, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).responseData(queue: NKCommon.shared.backgroundQueue) { (response) in
+
+        sessionManager.request(url, method: .put, parameters: parameters, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).responseData(queue: self.nkCommonInstance.backgroundQueue) { response in
             debugPrint(response)
-            
+
             switch response.result {
             case .failure(let error):
                 let error = NKError(error: error, afResponse: response)
                 options.queue.async { completion(account, nil, nil, error) }
             case .success(let jsonData):
                 let json = JSON(jsonData)
-                
+
                 let statusCode = json["ocs"]["meta"]["statuscode"].int ?? NKError.internalError
                 if statusCode == 200 {
                     options.queue.async { completion(account, self.convertResponseShare(json: json), jsonData, .success) }
-                }  else {
+                } else {
                     options.queue.async { completion(account, nil, jsonData, NKError(rootJson: json, fallbackStatusCode: response.response?.statusCode)) }
                 }
             }
         }
     }
-    
+
     /*
     * @param idShare        Identifier of the share to update
     */
-    
+
     @objc public func deleteShare(idShare: Int,
                                   options: NKRequestOptions = NKRequestOptions(),
                                   completion: @escaping (_ account: String, _ error: NKError) -> Void) {
-              
-        let account = NKCommon.shared.account
-        let urlBase = NKCommon.shared.urlBase
+
+        let account = self.nkCommonInstance.account
+        let urlBase = self.nkCommonInstance.urlBase
 
         let endpoint = "ocs/v2.php/apps/files_sharing/api/v1/shares/\(idShare)"
-                   
-        guard let url = NKCommon.shared.createStandardUrl(serverUrl: urlBase, endpoint: endpoint) else {
+
+        guard let url = self.nkCommonInstance.createStandardUrl(serverUrl: urlBase, endpoint: endpoint) else {
             return options.queue.async { completion(account, .urlError) }
         }
 
-        let headers = NKCommon.shared.getStandardHeaders(options: options)
-       
-        sessionManager.request(url, method: .delete, parameters: nil, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).response(queue: NKCommon.shared.backgroundQueue) { (response) in
+        let headers = self.nkCommonInstance.getStandardHeaders(options: options)
+
+        sessionManager.request(url, method: .delete, parameters: nil, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).response(queue: self.nkCommonInstance.backgroundQueue) { response in
             debugPrint(response)
-            
+
             switch response.result {
             case .failure(let error):
                 let error = NKError(error: error, afResponse: response)
                 options.queue.async { completion(account, error) }
-            case .success( _):
+            case .success:
                 options.queue.async { completion(account, .success) }
             }
         }
     }
-    
-    //MARK: -
+
+    // MARK: -
 
     private func convertResponseShare(json: JSON) -> NKShare {
         let share = NKShare()
@@ -445,7 +442,7 @@ extension NextcloudKit {
         share.canEdit = json["ocs"]["data"]["can_edit"].boolValue
         share.displaynameFileOwner = json["ocs"]["data"]["displayname_file_owner"].stringValue
         share.displaynameOwner = json["ocs"]["data"]["displayname_owner"].stringValue
-        if let expiration = json["ocs"]["data"]["expiration"].string, let date = NKCommon.shared.convertDate(expiration, format: "YYYY-MM-dd HH:mm:ss") {
+        if let expiration = json["ocs"]["data"]["expiration"].string, let date = self.nkCommonInstance.convertDate(expiration, format: "YYYY-MM-dd HH:mm:ss") {
             share.expirationDate = date
         }
         share.fileParent = json["ocs"]["data"]["file_parent"].intValue

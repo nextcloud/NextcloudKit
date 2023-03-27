@@ -22,6 +22,7 @@
 //
 
 import Foundation
+#if os(iOS)
 import UIKit
 
 @objc public class NKShareAccounts: NSObject {
@@ -60,7 +61,7 @@ import UIKit
     ///     - dataAccounts: the accounts data
     @objc public func putShareAccounts(at directory: URL, app: String, dataAccounts: [DataAccounts]) -> Error? {
 
-        var apps: [String : [Account]] = [:]
+        var apps: [String: [Account]] = [:]
         var accounts: [Account] = []
         let url = directory.appendingPathComponent(directoryAccounts + "/" + fileName)
 
@@ -87,7 +88,7 @@ import UIKit
             let json = try JSONDecoder().decode(Apps.self, from: data)
             if let appsDecoder = json.apps {
                 let otherApps = appsDecoder.filter({ $0.key != app })
-                apps.merge(otherApps){(current, _) in current}
+                apps.merge(otherApps) { current, _ in current}
             }
         } catch { }
 
@@ -140,3 +141,4 @@ import UIKit
         return directory.appendingPathComponent(directoryAccounts + "/" + fileName)
     }
 }
+#endif

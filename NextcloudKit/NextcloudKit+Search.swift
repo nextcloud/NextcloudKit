@@ -52,18 +52,18 @@ extension NextcloudKit {
                               update: @escaping (_ account: String, _ searchResult: NKSearchResult?, _ provider: NKSearchProvider, _ error: NKError) -> Void,
                               completion: @escaping (_ account: String, _ data: Data?, _ error: NKError) -> Void) {
 
-        let account = NKCommon.shared.account
-        let urlBase = NKCommon.shared.urlBase
+        let account = self.nkCommonInstance.account
+        let urlBase = self.nkCommonInstance.urlBase
 
         let endpoint = "ocs/v2.php/search/providers"
 
-        guard let url = NKCommon.shared.createStandardUrl(serverUrl: urlBase, endpoint: endpoint) else {
+        guard let url = self.nkCommonInstance.createStandardUrl(serverUrl: urlBase, endpoint: endpoint) else {
             return completion(account, nil, .urlError)
         }
 
-        let headers = NKCommon.shared.getStandardHeaders(options: options)
+        let headers = self.nkCommonInstance.getStandardHeaders(options: options)
 
-        let requestUnifiedSearch = sessionManager.request(url, method: .get, parameters: nil, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).responseData(queue: NKCommon.shared.backgroundQueue) { (response) in
+        let requestUnifiedSearch = sessionManager.request(url, method: .get, parameters: nil, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).responseData(queue: self.nkCommonInstance.backgroundQueue) { response in
             debugPrint(response)
 
             switch response.result {
@@ -81,7 +81,7 @@ extension NextcloudKit {
 
                 for provider in filteredProviders {
                     group.enter()
-                    let requestSearchProvider = self.searchProvider(provider.id, account: account, term: term, options: options, timeout: timeoutProvider) { account, partial, data, error in
+                    let requestSearchProvider = self.searchProvider(provider.id, account: account, term: term, options: options, timeout: timeoutProvider) { account, partial, _, error in
                         update(account, partial, provider, error)
                         group.leave()
                     }
@@ -124,7 +124,7 @@ extension NextcloudKit {
                                timeout: TimeInterval = 60,
                                completion: @escaping (_ accoun: String, NKSearchResult?, _ data: Data?, _ error: NKError) -> Void) -> DataRequest? {
 
-        let urlBase = NKCommon.shared.urlBase
+        let urlBase = self.nkCommonInstance.urlBase
 
         guard let term = term.urlEncoded else {
             completion(account, nil, nil, .urlError)
@@ -140,8 +140,8 @@ extension NextcloudKit {
         if let cursor = cursor {
             endpoint += "&cursor=\(cursor)"
         }
-        
-        guard let url = NKCommon.shared.createStandardUrl(
+
+        guard let url = self.nkCommonInstance.createStandardUrl(
             serverUrl: urlBase,
             endpoint: endpoint)
         else {
@@ -149,7 +149,7 @@ extension NextcloudKit {
             return nil
         }
 
-        let headers = NKCommon.shared.getStandardHeaders(options: options)
+        let headers = self.nkCommonInstance.getStandardHeaders(options: options)
 
         var urlRequest: URLRequest
         do {
@@ -160,7 +160,7 @@ extension NextcloudKit {
             return nil
         }
 
-        let requestSearchProvider = sessionManager.request(urlRequest).validate(statusCode: 200..<300).responseData(queue: NKCommon.shared.backgroundQueue) { (response) in
+        let requestSearchProvider = sessionManager.request(urlRequest).validate(statusCode: 200..<300).responseData(queue: self.nkCommonInstance.backgroundQueue) { response in
             debugPrint(response)
             switch response.result {
             case .success(let jsonData):

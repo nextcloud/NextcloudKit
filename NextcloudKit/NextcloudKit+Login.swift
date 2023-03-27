@@ -26,28 +26,28 @@ import Alamofire
 import SwiftyJSON
 
 extension NextcloudKit {
-        
-    //MARK: - App Password
-    
+
+    // MARK: - App Password
+
     @objc public func getAppPassword(serverUrl: String,
                                      username: String,
                                      password: String,
                                      userAgent: String? = nil,
                                      queue: DispatchQueue = .main,
                                      completion: @escaping (_ token: String?, _ data: Data?, _ error: NKError) -> Void) {
-                
+
         let endpoint = "ocs/v2.php/core/getapppassword"
-        
-        guard let url = NKCommon.shared.createStandardUrl(serverUrl: serverUrl, endpoint: endpoint) else {
+
+        guard let url = self.nkCommonInstance.createStandardUrl(serverUrl: serverUrl, endpoint: endpoint) else {
             return queue.async { completion(nil, nil, .urlError) }
         }
-        
+
         var headers: HTTPHeaders = [.authorization(username: username, password: password)]
         if let userAgent = userAgent {
             headers.update(.userAgent(userAgent))
         }
         headers.update(name: "OCS-APIRequest", value: "true")
-               
+
         var urlRequest: URLRequest
         do {
             try urlRequest = URLRequest(url: url, method: HTTPMethod(rawValue: "GET"), headers: headers)
@@ -55,16 +55,16 @@ extension NextcloudKit {
             return queue.async { completion(nil, nil, NKError(error: error)) }
         }
 
-        sessionManager.request(urlRequest).validate(statusCode: 200..<300).response(queue: NKCommon.shared.backgroundQueue) { (response) in
+        sessionManager.request(urlRequest).validate(statusCode: 200..<300).response(queue: self.nkCommonInstance.backgroundQueue) { response in
             debugPrint(response)
-            
+
             switch response.result {
             case .failure(let error):
                 let error = NKError(error: error, afResponse: response)
                 queue.async { completion(nil, nil, error) }
             case .success(let xmlData):
                 if let data = xmlData {
-                    let apppassword = NKDataFileXML().convertDataAppPassword(data: data)
+                    let apppassword = NKDataFileXML(nkCommonInstance: self.nkCommonInstance).convertDataAppPassword(data: data)
                     queue.async { completion(apppassword, xmlData, .success) }
                 } else {
                     queue.async { completion(nil, nil, .xmlError) }
@@ -72,75 +72,75 @@ extension NextcloudKit {
             }
         }
     }
-    
-    //MARK: - Login Flow V2
-    
+
+    // MARK: - Login Flow V2
+
     @objc public func getLoginFlowV2(serverUrl: String,
                                      userAgent: String? = nil,
                                      queue: DispatchQueue = .main,
-                                     completion: @escaping (_ token: String?, _ endpoint: String? , _ login: String?, _ data: Data?, _ error: NKError) -> Void) {
-                
+                                     completion: @escaping (_ token: String?, _ endpoint: String?, _ login: String?, _ data: Data?, _ error: NKError) -> Void) {
+
         let endpoint = "index.php/login/v2"
-        
-        guard let url = NKCommon.shared.createStandardUrl(serverUrl: serverUrl, endpoint: endpoint) else {
+
+        guard let url = self.nkCommonInstance.createStandardUrl(serverUrl: serverUrl, endpoint: endpoint) else {
             return queue.async { completion(nil, nil, nil, nil, .urlError) }
         }
-        
+
         var headers: HTTPHeaders?
         if let userAgent = userAgent {
             headers = [HTTPHeader.userAgent(userAgent)]
         }
 
-        sessionManager.request(url, method: .post, parameters: nil, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).responseData(queue: NKCommon.shared.backgroundQueue) { (response) in
+        sessionManager.request(url, method: .post, parameters: nil, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).responseData(queue: self.nkCommonInstance.backgroundQueue) { response in
             debugPrint(response)
-            
+
             switch response.result {
             case .failure(let error):
                 let error = NKError(error: error, afResponse: response)
                 queue.async { completion(nil, nil, nil, nil, error) }
             case .success(let jsonData):
                 let json = JSON(jsonData)
-               
+
                 let token = json["poll"]["token"].string
                 let endpoint = json["poll"]["endpoint"].string
                 let login = json["login"].string
-                
+
                 queue.async { completion(token, endpoint, login, jsonData, .success) }
             }
         }
     }
-    
+
     @objc public func getLoginFlowV2Poll(token: String,
                                          endpoint: String,
                                          userAgent: String? = nil,
                                          queue: DispatchQueue = .main,
-                                         completion: @escaping (_ server: String?, _ loginName: String? , _ appPassword: String?, _ data: Data?, _ error: NKError) -> Void) {
-                
+                                         completion: @escaping (_ server: String?, _ loginName: String?, _ appPassword: String?, _ data: Data?, _ error: NKError) -> Void) {
+
         let serverUrl = endpoint + "?token=" + token
-        
+
         guard let url = serverUrl.asUrl else {
             return queue.async { completion(nil, nil, nil, nil, .urlError) }
         }
-        
+
         var headers: HTTPHeaders?
         if let userAgent = userAgent {
             headers = [HTTPHeader.userAgent(userAgent)]
         }
-        
-        sessionManager.request(url, method: .post, parameters: nil, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).responseData(queue: NKCommon.shared.backgroundQueue) { (response) in
+
+        sessionManager.request(url, method: .post, parameters: nil, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).responseData(queue: self.nkCommonInstance.backgroundQueue) { response in
             debugPrint(response)
-            
+
             switch response.result {
             case .failure(let error):
                 let error = NKError(error: error, afResponse: response)
                 queue.async { completion(nil, nil, nil, nil, error) }
             case .success(let jsonData):
                 let json = JSON(jsonData)
-            
+
                 let server = json["server"].string
                 let loginName = json["loginName"].string
                 let appPassword = json["appPassword"].string
-                
+
                 queue.async { completion(server, loginName, appPassword, jsonData, .success) }
             }
         }

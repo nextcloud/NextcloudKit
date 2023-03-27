@@ -30,27 +30,37 @@ import SwiftyJSON
         let instance = NextcloudKit()
         return instance
     }()
-            
-    internal lazy var _sessionManager: Alamofire.Session = {
+
+    internal lazy var internalSessionManager: Alamofire.Session = {
         let configuration = URLSessionConfiguration.af.default
         configuration.requestCachePolicy = .reloadIgnoringLocalCacheData
-        return Alamofire.Session(configuration: configuration, delegate: self, rootQueue: DispatchQueue(label: "com.nextcloud.nextcloudkit.sessionManagerData.rootQueue"), startRequestsImmediately: true, requestQueue: nil, serializationQueue: nil, interceptor: nil, serverTrustManager: nil, redirectHandler: nil, cachedResponseHandler: nil, eventMonitors: [AlamofireLogger()])
+        return Alamofire.Session(configuration: configuration,
+                                 delegate: self,
+                                 rootQueue: DispatchQueue(label: "com.nextcloud.nextcloudkit.sessionManagerData.rootQueue"),
+                                 startRequestsImmediately: true,
+                                 requestQueue: nil,
+                                 serializationQueue: nil,
+                                 interceptor: nil,
+                                 serverTrustManager: nil,
+                                 redirectHandler: nil,
+                                 cachedResponseHandler: nil,
+                                 eventMonitors: [AlamofireLogger(nkCommonInstance: self.nkCommonInstance)])
     }()
 
     public var sessionManager: Alamofire.Session {
-        get {
-            return _sessionManager
-        }
+        return internalSessionManager
     }
-    
+
     private let reachabilityManager = Alamofire.NetworkReachabilityManager()
-    //private var cookies: [String:[HTTPCookie]] = [:]
-    
+    // private var cookies: [String:[HTTPCookie]] = [:]
+
+    @objc public let nkCommonInstance = NKCommon()
+
     override public init(fileManager: FileManager = .default) {
         super.init(fileManager: fileManager)
         startNetworkReachabilityObserver()
     }
-    
+
     deinit {
         stopNetworkReachabilityObserver()
     }
@@ -59,7 +69,7 @@ import SwiftyJSON
 
     @objc public func setup(account: String? = nil, user: String, userId: String, password: String, urlBase: String, userAgent: String, nextcloudVersion: Int, delegate: NKCommonDelegate?) {
 
-        self.setup(account:account, user: user, userId: userId, password: password, urlBase: urlBase)
+        self.setup(account: account, user: user, userId: userId, password: password, urlBase: urlBase)
         self.setup(userAgent: userAgent)
         self.setup(nextcloudVersion: nextcloudVersion)
         self.setup(delegate: delegate)
@@ -67,51 +77,51 @@ import SwiftyJSON
 
     @objc public func setup(account: String? = nil, user: String, userId: String, password: String, urlBase: String) {
 
-        if (NKCommon.shared.account != account) || (NKCommon.shared.urlBase != urlBase && NKCommon.shared.user != user) {
+        if (self.nkCommonInstance.account != account) || (self.nkCommonInstance.urlBase != urlBase && self.nkCommonInstance.user != user) {
             if let cookieStore = sessionManager.session.configuration.httpCookieStorage {
                 for cookie in cookieStore.cookies ?? [] {
                     cookieStore.deleteCookie(cookie)
                 }
             }
-            NKCommon.shared.internalTypeIdentifiers = []
+            self.nkCommonInstance.internalTypeIdentifiers = []
         }
 
         if let account = account {
-            NKCommon.shared._account = account
+            self.nkCommonInstance.internalAccount = account
         } else {
-            NKCommon.shared._account = ""
+            self.nkCommonInstance.internalAccount = ""
         }
-        NKCommon.shared._user = user
-        NKCommon.shared._userId = userId
-        NKCommon.shared._password = password
-        NKCommon.shared._urlBase = urlBase
+        self.nkCommonInstance.internalUser = user
+        self.nkCommonInstance.internalUserId = userId
+        self.nkCommonInstance.internalPassword = password
+        self.nkCommonInstance.internalUrlBase = urlBase
     }
 
     @objc public func setup(delegate: NKCommonDelegate?) {
 
-        NKCommon.shared.delegate = delegate
+        self.nkCommonInstance.delegate = delegate
     }
 
     @objc public func setup(userAgent: String) {
 
-        NKCommon.shared._userAgent = userAgent
+        self.nkCommonInstance.internalUserAgent = userAgent
     }
 
     @objc public func setup(nextcloudVersion: Int) {
 
-        NKCommon.shared._nextcloudVersion = nextcloudVersion
+        self.nkCommonInstance.internalNextcloudVersion = nextcloudVersion
     }
 
     /*
     internal func saveCookies(response : HTTPURLResponse?) {
 
         if let headerFields = response?.allHeaderFields as? [String : String] {
-            if let url = URL(string: NKCommon.shared.urlBase) {
+            if let url = URL(string: self.nkCommonInstance.urlBase) {
                 let HTTPCookie = HTTPCookie.cookies(withResponseHeaderFields: headerFields, for: url)
                 if HTTPCookie.count > 0 {
-                    cookies[NKCommon.shared.account] = HTTPCookie
+                    cookies[self.nkCommonInstance.account] = HTTPCookie
                 } else {
-                    cookies[NKCommon.shared.account] = nil
+                    cookies[self.nkCommonInstance.account] = nil
                 }
             }
         }
@@ -119,51 +129,51 @@ import SwiftyJSON
 
     internal func injectsCookies() {
 
-        if let cookies = cookies[NKCommon.shared.account] {
-            if let url = URL(string: NKCommon.shared.urlBase) {
+        if let cookies = cookies[self.nkCommonInstance.account] {
+            if let url = URL(string: self.nkCommonInstance.urlBase) {
                 sessionManager.session.configuration.httpCookieStorage?.setCookies(cookies, for: url, mainDocumentURL: nil)
             }
         }
     }
     */
 
-    //MARK: - Reachability
-    
+    // MARK: - Reachability
+
     @objc public func isNetworkReachable() -> Bool {
         return reachabilityManager?.isReachable ?? false
     }
-    
+
     private func startNetworkReachabilityObserver() {
-        
-        reachabilityManager?.startListening(onUpdatePerforming: { (status) in
+
+        reachabilityManager?.startListening(onUpdatePerforming: { status in
             switch status {
 
-            case .unknown :
-                NKCommon.shared.delegate?.networkReachabilityObserver?(NKCommon.typeReachability.unknown)
+            case .unknown:
+                self.nkCommonInstance.delegate?.networkReachabilityObserver?(NKCommon.TypeReachability.unknown)
 
             case .notReachable:
-                NKCommon.shared.delegate?.networkReachabilityObserver?(NKCommon.typeReachability.notReachable)
-                
+                self.nkCommonInstance.delegate?.networkReachabilityObserver?(NKCommon.TypeReachability.notReachable)
+
             case .reachable(.ethernetOrWiFi):
-                NKCommon.shared.delegate?.networkReachabilityObserver?(NKCommon.typeReachability.reachableEthernetOrWiFi)
+                self.nkCommonInstance.delegate?.networkReachabilityObserver?(NKCommon.TypeReachability.reachableEthernetOrWiFi)
 
             case .reachable(.cellular):
-                NKCommon.shared.delegate?.networkReachabilityObserver?(NKCommon.typeReachability.reachableCellular)
+                self.nkCommonInstance.delegate?.networkReachabilityObserver?(NKCommon.TypeReachability.reachableCellular)
             }
         })
     }
-    
+
     private func stopNetworkReachabilityObserver() {
-        
+
         reachabilityManager?.stopListening()
     }
-    
-    //MARK: - Session utility
-        
+
+    // MARK: - Session utility
+
     @objc public func getSessionManager() -> URLSession {
        return sessionManager.session
     }
-    
+
     /*
     //MARK: -
     
@@ -186,109 +196,109 @@ import SwiftyJSON
         return [events]
     }
     */
-    
-    //MARK: - download / upload
-    
+
+    // MARK: - download / upload
+
     @objc public func download(serverUrlFileName: Any,
                                fileNameLocalPath: String,
                                customUserAgent: String? = nil,
                                addCustomHeaders: [String: String]? = nil,
                                queue: DispatchQueue = .main,
-                               taskHandler: @escaping (_ task: URLSessionTask) -> () = { _ in },
-                               progressHandler: @escaping (_ progress: Progress) -> () = { _ in },
-                               completionHandler: @escaping (_ account: String, _ etag: String?, _ date: NSDate?, _ lenght: Int64, _ allHeaderFields: [AnyHashable : Any]?, _ nkError: NKError) -> Void) {
-        
-        download(serverUrlFileName: serverUrlFileName, fileNameLocalPath: fileNameLocalPath, customUserAgent: customUserAgent, addCustomHeaders: addCustomHeaders, queue: queue) { (request) in
+                               taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
+                               progressHandler: @escaping (_ progress: Progress) -> Void = { _ in },
+                               completionHandler: @escaping (_ account: String, _ etag: String?, _ date: NSDate?, _ lenght: Int64, _ allHeaderFields: [AnyHashable: Any]?, _ nkError: NKError) -> Void) {
+
+        download(serverUrlFileName: serverUrlFileName, fileNameLocalPath: fileNameLocalPath, customUserAgent: customUserAgent, addCustomHeaders: addCustomHeaders, queue: queue) { _ in
             // not available in objc
-        } taskHandler: { (task) in
+        } taskHandler: { task in
             taskHandler(task)
-        } progressHandler: { (progress) in
+        } progressHandler: { progress in
             progressHandler(progress)
-        } completionHandler: { (account, etag, date, lenght, allHeaderFields, afError, nkError) in
+        } completionHandler: { account, etag, date, lenght, allHeaderFields, _, nkError in
             // error not available in objc
             completionHandler(account, etag, date, lenght, allHeaderFields, nkError)
         }
     }
-    
+
     public func download(serverUrlFileName: Any,
                          fileNameLocalPath: String,
                          customUserAgent: String? = nil,
                          addCustomHeaders: [String: String]? = nil,
                          queue: DispatchQueue = .main,
-                         requestHandler: @escaping (_ request: DownloadRequest) -> () = { _ in },
-                         taskHandler: @escaping (_ task: URLSessionTask) -> () = { _ in },
-                         progressHandler: @escaping (_ progress: Progress) -> () = { _ in },
-                         completionHandler: @escaping (_ account: String, _ etag: String?, _ date: NSDate?, _ lenght: Int64, _ allHeaderFields: [AnyHashable : Any]?, _ afError: AFError?, _ nKError: NKError) -> Void) {
-        
-        let account = NKCommon.shared.account
+                         requestHandler: @escaping (_ request: DownloadRequest) -> Void = { _ in },
+                         taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
+                         progressHandler: @escaping (_ progress: Progress) -> Void = { _ in },
+                         completionHandler: @escaping (_ account: String, _ etag: String?, _ date: NSDate?, _ lenght: Int64, _ allHeaderFields: [AnyHashable: Any]?, _ afError: AFError?, _ nKError: NKError) -> Void) {
+
+        let account = self.nkCommonInstance.account
         var convertible: URLConvertible?
-        
+
         if serverUrlFileName is URL {
             convertible = serverUrlFileName as? URLConvertible
         } else if serverUrlFileName is String || serverUrlFileName is NSString {
-            convertible = (serverUrlFileName as! String).encodedToUrl
+            convertible = (serverUrlFileName as? String)?.encodedToUrl
         }
-        
+
         guard let url = convertible else {
             queue.async { completionHandler(account, nil, nil, 0, nil, nil, .urlError) }
             return
         }
-        
+
         var destination: Alamofire.DownloadRequest.Destination?
         let fileNamePathLocalDestinationURL = NSURL.fileURL(withPath: fileNameLocalPath)
         let destinationFile: DownloadRequest.Destination = { _, _ in
             return (fileNamePathLocalDestinationURL, [.removePreviousFile, .createIntermediateDirectories])
         }
         destination = destinationFile
-        
-        let headers = NKCommon.shared.getStandardHeaders(addCustomHeaders, customUserAgent: customUserAgent)
-        
-        let request = sessionManager.download(url, method: .get, parameters: nil, encoding: URLEncoding.default, headers: headers, interceptor: nil, to: destination).validate(statusCode: 200..<300).onURLSessionTaskCreation { (task) in
-            
+
+        let headers = self.nkCommonInstance.getStandardHeaders(addCustomHeaders, customUserAgent: customUserAgent)
+
+        let request = sessionManager.download(url, method: .get, parameters: nil, encoding: URLEncoding.default, headers: headers, interceptor: nil, to: destination).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
+
             queue.async { taskHandler(task) }
-            
+
         } .downloadProgress { progress in
-            
+
             queue.async { progressHandler(progress) }
-            
-        } .response(queue: NKCommon.shared.backgroundQueue) { response in
-            
+
+        } .response(queue: self.nkCommonInstance.backgroundQueue) { response in
+
             switch response.result {
             case .failure(let error):
                 let resultError = NKError(error: error, afResponse: response)
                 queue.async { completionHandler(account, nil, nil, 0, nil, error, resultError) }
-            case .success( _):
+            case .success:
 
                 var date: NSDate?
                 var etag: String?
                 var length: Int64 = 0
                 let allHeaderFields = response.response?.allHeaderFields
-                                
+
                 if let result = response.response?.allHeaderFields["Content-Length"] as? String {
                     length = Int64(result) ?? 0
                 }
-                
-                if NKCommon.shared.findHeader("oc-etag", allHeaderFields: response.response?.allHeaderFields) != nil {
-                    etag = NKCommon.shared.findHeader("oc-etag", allHeaderFields: response.response?.allHeaderFields)
-                } else if NKCommon.shared.findHeader("etag", allHeaderFields: response.response?.allHeaderFields) != nil {
-                    etag = NKCommon.shared.findHeader("etag", allHeaderFields: response.response?.allHeaderFields)
+
+                if self.nkCommonInstance.findHeader("oc-etag", allHeaderFields: response.response?.allHeaderFields) != nil {
+                    etag = self.nkCommonInstance.findHeader("oc-etag", allHeaderFields: response.response?.allHeaderFields)
+                } else if self.nkCommonInstance.findHeader("etag", allHeaderFields: response.response?.allHeaderFields) != nil {
+                    etag = self.nkCommonInstance.findHeader("etag", allHeaderFields: response.response?.allHeaderFields)
                 }
-                
+
                 if etag != nil {
                     etag = etag!.replacingOccurrences(of: "\"", with: "")
                 }
-                
-                if let dateString = NKCommon.shared.findHeader("Date", allHeaderFields: response.response?.allHeaderFields) {
-                    date = NKCommon.shared.convertDate(dateString, format: "EEE, dd MMM y HH:mm:ss zzz")
+
+                if let dateString = self.nkCommonInstance.findHeader("Date", allHeaderFields: response.response?.allHeaderFields) {
+                    date = self.nkCommonInstance.convertDate(dateString, format: "EEE, dd MMM y HH:mm:ss zzz")
                 }
-                
-                queue.async { completionHandler(account, etag, date, length, allHeaderFields, nil , .success) }
+
+                queue.async { completionHandler(account, etag, date, length, allHeaderFields, nil, .success) }
             }
         }
-        
+
         queue.async { requestHandler(request) }
     }
-    
+
     @objc public func upload(serverUrlFileName: String,
                              fileNameLocalPath: String,
                              dateCreationFile: Date? = nil,
@@ -296,17 +306,17 @@ import SwiftyJSON
                              customUserAgent: String? = nil,
                              addCustomHeaders: [String: String]? = nil,
                              queue: DispatchQueue = .main,
-                             taskHandler: @escaping (_ task: URLSessionTask) -> () = { _ in },
-                             progressHandler: @escaping (_ progress: Progress) -> () = { _ in },
-                             completionHandler: @escaping (_ account: String, _ ocId: String?, _ etag: String?, _ date: NSDate?, _ size: Int64, _ allHeaderFields: [AnyHashable : Any]?, _ nkError: NKError) -> Void) {
-        
-        upload(serverUrlFileName: serverUrlFileName, fileNameLocalPath: fileNameLocalPath, dateCreationFile: dateCreationFile, dateModificationFile: dateModificationFile, customUserAgent: customUserAgent, addCustomHeaders: addCustomHeaders, queue: queue) { (request) in
+                             taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
+                             progressHandler: @escaping (_ progress: Progress) -> Void = { _ in },
+                             completionHandler: @escaping (_ account: String, _ ocId: String?, _ etag: String?, _ date: NSDate?, _ size: Int64, _ allHeaderFields: [AnyHashable: Any]?, _ nkError: NKError) -> Void) {
+
+        upload(serverUrlFileName: serverUrlFileName, fileNameLocalPath: fileNameLocalPath, dateCreationFile: dateCreationFile, dateModificationFile: dateModificationFile, customUserAgent: customUserAgent, addCustomHeaders: addCustomHeaders, queue: queue) { _ in
             // not available in objc
-        } taskHandler: { (task) in
+        } taskHandler: { task in
             taskHandler(task)
-        } progressHandler: { (progress) in
+        } progressHandler: { progress in
             progressHandler(progress)
-        } completionHandler: { (account, ocId, etag, date, size, allHeaderFields, error, nkError) in
+        } completionHandler: { account, ocId, etag, date, size, allHeaderFields, _, nkError in
             // error not available in objc
             completionHandler(account, ocId, etag, date, size, allHeaderFields, nkError)
         }
@@ -319,29 +329,29 @@ import SwiftyJSON
                        customUserAgent: String? = nil,
                        addCustomHeaders: [String: String]? = nil,
                        queue: DispatchQueue = .main,
-                       requestHandler: @escaping (_ request: UploadRequest) -> () = { _ in },
-                       taskHandler: @escaping (_ task: URLSessionTask) -> () = { _ in },
-                       progressHandler: @escaping (_ progress: Progress) -> () = { _ in },
-                       completionHandler: @escaping (_ account: String, _ ocId: String?, _ etag: String?, _ date: NSDate?, _ size: Int64, _ allHeaderFields: [AnyHashable : Any]?, _ afError: AFError?, _ nkError: NKError) -> Void) {
-        
-        let account = NKCommon.shared.account
+                       requestHandler: @escaping (_ request: UploadRequest) -> Void = { _ in },
+                       taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
+                       progressHandler: @escaping (_ progress: Progress) -> Void = { _ in },
+                       completionHandler: @escaping (_ account: String, _ ocId: String?, _ etag: String?, _ date: NSDate?, _ size: Int64, _ allHeaderFields: [AnyHashable: Any]?, _ afError: AFError?, _ nkError: NKError) -> Void) {
+
+        let account = self.nkCommonInstance.account
         var convertible: URLConvertible?
         var size: Int64 = 0
 
         if serverUrlFileName is URL {
             convertible = serverUrlFileName as? URLConvertible
         } else if serverUrlFileName is String || serverUrlFileName is NSString {
-            convertible = (serverUrlFileName as! String).encodedToUrl
+            convertible = (serverUrlFileName as? String)?.encodedToUrl
         }
-        
+
         guard let url = convertible else {
             queue.async { completionHandler(account, nil, nil, nil, 0, nil, nil, .urlError) }
             return
         }
-        
-        let fileNameLocalPathUrl = URL.init(fileURLWithPath: fileNameLocalPath)
-        
-        var headers = NKCommon.shared.getStandardHeaders(addCustomHeaders, customUserAgent: customUserAgent)
+
+        let fileNameLocalPathUrl = URL(fileURLWithPath: fileNameLocalPath)
+
+        var headers = self.nkCommonInstance.getStandardHeaders(addCustomHeaders, customUserAgent: customUserAgent)
         if dateCreationFile != nil {
             let sDate = "\(dateCreationFile?.timeIntervalSince1970 ?? 0)"
             headers.update(name: "X-OC-CTime", value: sDate)
@@ -350,42 +360,42 @@ import SwiftyJSON
             let sDate = "\(dateModificationFile?.timeIntervalSince1970 ?? 0)"
             headers.update(name: "X-OC-MTime", value: sDate)
         }
-        
-        let request = sessionManager.upload(fileNameLocalPathUrl, to: url, method: .put, headers: headers, interceptor: nil, fileManager: .default).validate(statusCode: 200..<300).onURLSessionTaskCreation(perform: { (task) in
-            
+
+        let request = sessionManager.upload(fileNameLocalPathUrl, to: url, method: .put, headers: headers, interceptor: nil, fileManager: .default).validate(statusCode: 200..<300).onURLSessionTaskCreation(perform: { task in
+
             queue.async { taskHandler(task) }
-            
+
         }) .uploadProgress { progress in
-            
+
             queue.async { progressHandler(progress) }
             size = progress.totalUnitCount
-            
-        } .response(queue: NKCommon.shared.backgroundQueue) { response in
-            
+
+        } .response(queue: self.nkCommonInstance.backgroundQueue) { response in
+
             switch response.result {
             case .failure(let error):
                 let resultError = NKError(error: error, afResponse: response)
                 queue.async { completionHandler(account, nil, nil, nil, 0, nil, error, resultError) }
-            case .success( _):
+            case .success:
                 var ocId: String?, etag: String?
                 let allHeaderFields = response.response?.allHeaderFields
 
-                if NKCommon.shared.findHeader("oc-fileid", allHeaderFields: response.response?.allHeaderFields) != nil {
-                    ocId = NKCommon.shared.findHeader("oc-fileid", allHeaderFields: response.response?.allHeaderFields)
-                } else if NKCommon.shared.findHeader("fileid", allHeaderFields: response.response?.allHeaderFields) != nil {
-                    ocId = NKCommon.shared.findHeader("fileid", allHeaderFields: response.response?.allHeaderFields)
+                if self.nkCommonInstance.findHeader("oc-fileid", allHeaderFields: response.response?.allHeaderFields) != nil {
+                    ocId = self.nkCommonInstance.findHeader("oc-fileid", allHeaderFields: response.response?.allHeaderFields)
+                } else if self.nkCommonInstance.findHeader("fileid", allHeaderFields: response.response?.allHeaderFields) != nil {
+                    ocId = self.nkCommonInstance.findHeader("fileid", allHeaderFields: response.response?.allHeaderFields)
                 }
-                
-                if NKCommon.shared.findHeader("oc-etag", allHeaderFields: response.response?.allHeaderFields) != nil {
-                    etag = NKCommon.shared.findHeader("oc-etag", allHeaderFields: response.response?.allHeaderFields)
-                } else if NKCommon.shared.findHeader("etag", allHeaderFields: response.response?.allHeaderFields) != nil {
-                    etag = NKCommon.shared.findHeader("etag", allHeaderFields: response.response?.allHeaderFields)
+
+                if self.nkCommonInstance.findHeader("oc-etag", allHeaderFields: response.response?.allHeaderFields) != nil {
+                    etag = self.nkCommonInstance.findHeader("oc-etag", allHeaderFields: response.response?.allHeaderFields)
+                } else if self.nkCommonInstance.findHeader("etag", allHeaderFields: response.response?.allHeaderFields) != nil {
+                    etag = self.nkCommonInstance.findHeader("etag", allHeaderFields: response.response?.allHeaderFields)
                 }
-                
+
                 if etag != nil { etag = etag!.replacingOccurrences(of: "\"", with: "") }
-                
-                if let dateString = NKCommon.shared.findHeader("date", allHeaderFields: response.response?.allHeaderFields) {
-                    if let date = NKCommon.shared.convertDate(dateString, format: "EEE, dd MMM y HH:mm:ss zzz") {
+
+                if let dateString = self.nkCommonInstance.findHeader("date", allHeaderFields: response.response?.allHeaderFields) {
+                    if let date = self.nkCommonInstance.convertDate(dateString, format: "EEE, dd MMM y HH:mm:ss zzz") {
                         queue.async { completionHandler(account, ocId, etag, date, size, allHeaderFields, nil, .success) }
                     } else {
                         queue.async { completionHandler(account, nil, nil, nil, 0, allHeaderFields, nil, .invalidDate) }
@@ -395,21 +405,21 @@ import SwiftyJSON
                 }
             }
         }
-        
+
         queue.async { requestHandler(request) }
     }
-    
-    //MARK: - SessionDelegate
+
+    // MARK: - SessionDelegate
 
     public func urlSession(_ session: URLSession, didReceive challenge: URLAuthenticationChallenge, completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
-        
-        if NKCommon.shared.delegate == nil {
-            NKCommon.shared.writeLog("[WARNING] URLAuthenticationChallenge, no delegate found, perform with default handling")
+
+        if self.nkCommonInstance.delegate == nil {
+            self.nkCommonInstance.writeLog("[WARNING] URLAuthenticationChallenge, no delegate found, perform with default handling")
             completionHandler(URLSession.AuthChallengeDisposition.performDefaultHandling, nil)
         } else {
-            NKCommon.shared.delegate?.authenticationChallenge?(session, didReceive: challenge, completionHandler: { authChallengeDisposition, credential in
-                if NKCommon.shared.levelLog > 1 {
-                    NKCommon.shared.writeLog("[INFO AUTH] Challenge Disposition: \(authChallengeDisposition.rawValue)")
+            self.nkCommonInstance.delegate?.authenticationChallenge?(session, didReceive: challenge, completionHandler: { authChallengeDisposition, credential in
+                if self.nkCommonInstance.levelLog > 1 {
+                    self.nkCommonInstance.writeLog("[INFO AUTH] Challenge Disposition: \(authChallengeDisposition.rawValue)")
                 }
                 completionHandler(authChallengeDisposition, credential)
             })
@@ -418,46 +428,51 @@ import SwiftyJSON
 }
 
 final class AlamofireLogger: EventMonitor {
+    let nkCommonInstance: NKCommon
+
+    init(nkCommonInstance: NKCommon) {
+        self.nkCommonInstance = nkCommonInstance
+    }
 
     func requestDidResume(_ request: Request) {
-        
-        if NKCommon.shared.levelLog > 0 {
-        
-            NKCommon.shared.writeLog("Network request started: \(request)")
-        
-            if NKCommon.shared.levelLog > 1 {
-                
+
+        if self.nkCommonInstance.levelLog > 0 {
+
+            self.nkCommonInstance.writeLog("Network request started: \(request)")
+
+            if self.nkCommonInstance.levelLog > 1 {
+
                 let allHeaders = request.request.flatMap { $0.allHTTPHeaderFields.map { $0.description } } ?? "None"
                 let body = request.request.flatMap { $0.httpBody.map { String(decoding: $0, as: UTF8.self) } } ?? "None"
-                
-                NKCommon.shared.writeLog("Network request headers: \(allHeaders)")
-                NKCommon.shared.writeLog("Network request body: \(body)")
+
+                self.nkCommonInstance.writeLog("Network request headers: \(allHeaders)")
+                self.nkCommonInstance.writeLog("Network request body: \(body)")
             }
         }
     }
-    
+
     func request<Value>(_ request: DataRequest, didParseResponse response: AFDataResponse<Value>) {
-        
-        guard let date = NKCommon.shared.convertDate(Date(), format: "yyyy-MM-dd' 'HH:mm:ss") else { return }
-        let responseResultString = String.init("\(response.result)")
-        let responseDebugDescription = String.init("\(response.debugDescription)")
-        let responseAllHeaderFields = String.init("\(String(describing: response.response?.allHeaderFields))")
-        
-        if NKCommon.shared.levelLog > 0 {
-            
-            if NKCommon.shared.levelLog == 1 {
-                
+
+        guard let date = self.nkCommonInstance.convertDate(Date(), format: "yyyy-MM-dd' 'HH:mm:ss") else { return }
+        let responseResultString = String("\(response.result)")
+        let responseDebugDescription = String("\(response.debugDescription)")
+        let responseAllHeaderFields = String("\(String(describing: response.response?.allHeaderFields))")
+
+        if self.nkCommonInstance.levelLog > 0 {
+
+            if self.nkCommonInstance.levelLog == 1 {
+
                 if let request = response.request {
                     let requestString = "\(request)"
-                    NKCommon.shared.writeLog("Network response request: " + requestString + ", result: " + responseResultString)
+                    self.nkCommonInstance.writeLog("Network response request: " + requestString + ", result: " + responseResultString)
                 } else {
-                    NKCommon.shared.writeLog("Network response result: " + responseResultString)
+                    self.nkCommonInstance.writeLog("Network response result: " + responseResultString)
                 }
-                
+
             } else {
-                
-                NKCommon.shared.writeLog("Network response result: \(date) " + responseDebugDescription)
-                NKCommon.shared.writeLog("Network response all headers: \(date) " + responseAllHeaderFields)
+
+                self.nkCommonInstance.writeLog("Network response result: \(date) " + responseDebugDescription)
+                self.nkCommonInstance.writeLog("Network response all headers: \(date) " + responseAllHeaderFields)
             }
         }
     }

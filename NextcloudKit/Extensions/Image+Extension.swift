@@ -67,7 +67,7 @@ public extension NSImage {
 
     func jpegData(compressionQuality: Double) -> Data? {
         if let bits = self.representations.first as? NSBitmapImageRep {
-            return bits.representation(using: .jpeg, properties: [.compressionFactor:compressionQuality])
+            return bits.representation(using: .jpeg, properties: [.compressionFactor: compressionQuality])
         }
 
         return nil
@@ -102,4 +102,3 @@ public extension NSImage {
     }
 }
 #endif
-

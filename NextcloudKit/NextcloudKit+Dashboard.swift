@@ -28,27 +28,27 @@ import SwiftyJSON
 extension NextcloudKit {
 
     public func getDashboardWidget(options: NKRequestOptions = NKRequestOptions(),
-                                   request: @escaping (DataRequest?) -> () = { _ in },
+                                   request: @escaping (DataRequest?) -> Void = { _ in },
                                    completion: @escaping (_ account: String, _ dashboardWidgets: [NCCDashboardWidget]?, _ data: Data?, _ error: NKError) -> Void) {
 
-        let account = NKCommon.shared.account
-        let urlBase = NKCommon.shared.urlBase
+        let account = self.nkCommonInstance.account
+        let urlBase = self.nkCommonInstance.urlBase
         var url: URLConvertible?
 
         if let endpoint = options.endpoint {
             url = URL(string: endpoint)
         } else {
             let endpoint = "ocs/v2.php/apps/dashboard/api/v1/widgets"
-            url = NKCommon.shared.createStandardUrl(serverUrl: urlBase, endpoint: endpoint)
+            url = self.nkCommonInstance.createStandardUrl(serverUrl: urlBase, endpoint: endpoint)
         }
 
         guard let url = url else {
             return options.queue.async { completion(account, nil, nil, .urlError) }
         }
 
-        let headers = NKCommon.shared.getStandardHeaders(options: options)
-        
-        let dashboardRequest = sessionManager.request(url, method: .get, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).responseData(queue: NKCommon.shared.backgroundQueue) { (response) in
+        let headers = self.nkCommonInstance.getStandardHeaders(options: options)
+
+        let dashboardRequest = sessionManager.request(url, method: .get, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).responseData(queue: self.nkCommonInstance.backgroundQueue) { response in
             debugPrint(response)
 
             switch response.result {
@@ -69,30 +69,30 @@ extension NextcloudKit {
         }
         options.queue.async { request(dashboardRequest) }
     }
-    
+
     public func getDashboardWidgetsApplication(_ items: String,
                                                options: NKRequestOptions = NKRequestOptions(),
-                                               request: @escaping (DataRequest?) -> () = { _ in },
+                                               request: @escaping (DataRequest?) -> Void = { _ in },
                                                completion: @escaping (_ account: String, _ dashboardApplications: [NCCDashboardApplication]?, _ data: Data?, _ error: NKError) -> Void) {
 
-        let account = NKCommon.shared.account
-        let urlBase = NKCommon.shared.urlBase
+        let account = self.nkCommonInstance.account
+        let urlBase = self.nkCommonInstance.urlBase
         var url: URLConvertible?
 
         if let endpoint = options.endpoint {
             url = URL(string: endpoint)
         } else {
             let endpoint = "ocs/v2.php/apps/dashboard/api/v1/widget-items?widgets[]=\(items)"
-            url = NKCommon.shared.createStandardUrl(serverUrl: urlBase, endpoint: endpoint)
+            url = self.nkCommonInstance.createStandardUrl(serverUrl: urlBase, endpoint: endpoint)
         }
 
         guard let url = url else {
             return options.queue.async { completion(account, nil, nil, .urlError) }
         }
 
-        let headers = NKCommon.shared.getStandardHeaders(options: options)
-        
-        let dashboardRequest = sessionManager.request(url, method: .get, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).responseData(queue: NKCommon.shared.backgroundQueue) { (response) in
+        let headers = self.nkCommonInstance.getStandardHeaders(options: options)
+
+        let dashboardRequest = sessionManager.request(url, method: .get, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).responseData(queue: self.nkCommonInstance.backgroundQueue) { response in
             debugPrint(response)
 
             switch response.result {
