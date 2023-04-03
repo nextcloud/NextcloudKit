@@ -241,6 +241,7 @@ extension NextcloudKit {
 
         var headers = self.nkCommonInstance.getStandardHeaders(options: options)
         if var etag = etag {
+            etag = "\"" + etag + "\""
             headers.update(name: "If-None-Match", value: etag)
         }
 
@@ -296,6 +297,7 @@ extension NextcloudKit {
 
         var headers = self.nkCommonInstance.getStandardHeaders(options: options)
         if var etag = etag {
+            etag = "\"" + etag + "\""
             headers.update(name: "If-None-Match", value: etag)
         }
 
