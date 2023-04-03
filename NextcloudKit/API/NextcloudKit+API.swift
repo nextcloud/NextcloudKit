@@ -242,7 +242,7 @@ extension NextcloudKit {
         var headers = self.nkCommonInstance.getStandardHeaders(options: options)
         if var etag = etag {
             etag = "\"" + etag + "\""
-            headers = ["If-None-Match": etag]
+            headers.update(name: "If-None-Match", value: etag)
         }
 
         sessionManager.request(urlRequest, method: .get, parameters: nil, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).response(queue: self.nkCommonInstance.backgroundQueue) { response in
@@ -298,7 +298,7 @@ extension NextcloudKit {
         var headers = self.nkCommonInstance.getStandardHeaders(options: options)
         if var etag = etag {
             etag = "\"" + etag + "\""
-            headers = ["If-None-Match": etag]
+            headers.update(name: "If-None-Match", value: etag)
         }
 
         sessionManager.request(url, method: .get, parameters: nil, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).response(queue: self.nkCommonInstance.backgroundQueue) { response in
