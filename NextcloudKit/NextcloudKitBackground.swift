@@ -105,12 +105,16 @@ import Foundation
         request.setValue(self.nkCommonInstance.userAgent, forHTTPHeaderField: "User-Agent")
         request.setValue("Basic \(base64LoginString)", forHTTPHeaderField: "Authorization")
         if dateCreationFile != nil {
-            let sDate = "\(dateCreationFile?.timeIntervalSince1970 ?? 0)"
-            request.setValue(sDate, forHTTPHeaderField: "X-OC-CTime")
+            var iDate: TimeInterval = dateCreationFile?.timeIntervalSince1970 ?? 0
+            // Epoch of linux do not permitted negativ value
+            if iDate < 0 { iDate = 0 }
+            request.setValue("\(iDate)", forHTTPHeaderField: "X-OC-CTime")
         }
         if dateModificationFile != nil {
-            let sDate = "\(dateModificationFile?.timeIntervalSince1970 ?? 0)"
-            request.setValue(sDate, forHTTPHeaderField: "X-OC-MTime")
+            var iDate: TimeInterval = dateModificationFile?.timeIntervalSince1970 ?? 0
+            // Epoch of linux do not permitted negativ value
+            if iDate < 0 { iDate = 0 }
+            request.setValue("\(iDate)", forHTTPHeaderField: "X-OC-MTime")
         }
 
         let task = session.uploadTask(with: request, fromFile: URL(fileURLWithPath: fileNameLocalPath))
