@@ -42,8 +42,8 @@ import MobileCoreServices
 }
 
 @objc public class NKCommon: NSObject {
-    @objc public let dav: String = "remote.php/dav"
 
+    @objc public let dav: String = "remote.php/dav"
     @objc public let sessionIdentifierDownload: String = "com.nextcloud.nextcloudkit.session.download"
     @objc public let sessionIdentifierUpload: String = "com.nextcloud.nextcloudkit.session.upload"
 
