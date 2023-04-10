@@ -580,54 +580,60 @@ class NKDataFileXML: NSObject {
     </d:propertyupdate>
     """
 
-    let requestBodyFile =
+    let requestBodyBase =
     """
-    <?xml version=\"1.0\" encoding=\"UTF-8\"?>
-    <d:propfind xmlns:d=\"DAV:\" xmlns:oc=\"http://owncloud.org/ns\" xmlns:nc=\"http://nextcloud.org/ns\">
-        <d:prop>
-            <d:getlastmodified />
-            <d:getetag />
-            <d:getcontenttype />
-            <d:resourcetype />
-            <d:quota-available-bytes />
-            <d:quota-used-bytes />
+    <d:getlastmodified />
+    <d:getetag />
+    <d:getcontenttype />
+    <d:resourcetype />
+    <d:quota-available-bytes />
+    <d:quota-used-bytes />
 
-            <permissions xmlns=\"http://owncloud.org/ns\"/>
-            <id xmlns=\"http://owncloud.org/ns\"/>
-            <fileid xmlns=\"http://owncloud.org/ns\"/>
-            <size xmlns=\"http://owncloud.org/ns\"/>
-            <favorite xmlns=\"http://owncloud.org/ns\"/>
-            <share-types xmlns=\"http://owncloud.org/ns\"/>
-            <owner-id xmlns=\"http://owncloud.org/ns\"/>
-            <owner-display-name xmlns=\"http://owncloud.org/ns\"/>
-            <comments-unread xmlns=\"http://owncloud.org/ns\"/>
-            <checksums xmlns=\"http://owncloud.org/ns\"/>
-            <downloadURL xmlns=\"http://owncloud.org/ns\"/>
-            <data-fingerprint xmlns=\"http://owncloud.org/ns\"/>
+    <permissions xmlns=\"http://owncloud.org/ns\"/>
+    <id xmlns=\"http://owncloud.org/ns\"/>
+    <fileid xmlns=\"http://owncloud.org/ns\"/>
+    <size xmlns=\"http://owncloud.org/ns\"/>
+    <favorite xmlns=\"http://owncloud.org/ns\"/>
+    <share-types xmlns=\"http://owncloud.org/ns\"/>
+    <owner-id xmlns=\"http://owncloud.org/ns\"/>
+    <owner-display-name xmlns=\"http://owncloud.org/ns\"/>
+    <comments-unread xmlns=\"http://owncloud.org/ns\"/>
+    <checksums xmlns=\"http://owncloud.org/ns\"/>
+    <downloadURL xmlns=\"http://owncloud.org/ns\"/>
+    <data-fingerprint xmlns=\"http://owncloud.org/ns\"/>
 
-            <creation_time xmlns=\"http://nextcloud.org/ns\"/>
-            <upload_time xmlns=\"http://nextcloud.org/ns\"/>
-            <is-encrypted xmlns=\"http://nextcloud.org/ns\"/>
-            <has-preview xmlns=\"http://nextcloud.org/ns\"/>
-            <mount-type xmlns=\"http://nextcloud.org/ns\"/>
-            <rich-workspace xmlns=\"http://nextcloud.org/ns\"/>
-            <note xmlns=\"http://nextcloud.org/ns\"/>
-            <lock xmlns=\"http://nextcloud.org/ns\"/>
-            <lock-owner xmlns=\"http://nextcloud.org/ns\"/>
-            <lock-owner-editor xmlns=\"http://nextcloud.org/ns\"/>
-            <lock-owner-displayname xmlns=\"http://nextcloud.org/ns\"/>
-            <lock-owner-type xmlns=\"http://nextcloud.org/ns\"/>
-            <lock-time xmlns=\"http://nextcloud.org/ns\"/>
-            <lock-timeout xmlns=\"http://nextcloud.org/ns\"/>
+    <creation_time xmlns=\"http://nextcloud.org/ns\"/>
+    <upload_time xmlns=\"http://nextcloud.org/ns\"/>
+    <is-encrypted xmlns=\"http://nextcloud.org/ns\"/>
+    <has-preview xmlns=\"http://nextcloud.org/ns\"/>
+    <mount-type xmlns=\"http://nextcloud.org/ns\"/>
+    <rich-workspace xmlns=\"http://nextcloud.org/ns\"/>
+    <note xmlns=\"http://nextcloud.org/ns\"/>
+    <lock xmlns=\"http://nextcloud.org/ns\"/>
+    <lock-owner xmlns=\"http://nextcloud.org/ns\"/>
+    <lock-owner-editor xmlns=\"http://nextcloud.org/ns\"/>
+    <lock-owner-displayname xmlns=\"http://nextcloud.org/ns\"/>
+    <lock-owner-type xmlns=\"http://nextcloud.org/ns\"/>
+    <lock-time xmlns=\"http://nextcloud.org/ns\"/>
+    <lock-timeout xmlns=\"http://nextcloud.org/ns\"/>
 
 
-            <share-permissions xmlns=\"http://open-collaboration-services.org/ns\"/>
-            <share-permissions xmlns=\"http://open-cloud-mesh.org/ns\"/>
+    <share-permissions xmlns=\"http://open-collaboration-services.org/ns\"/>
+    <share-permissions xmlns=\"http://open-cloud-mesh.org/ns\"/>
 
-            <tags xmlns=\"http://nextcloud.org/ns\"/>
-        </d:prop>
-    </d:propfind>
+    <tags xmlns=\"http://nextcloud.org/ns\"/>
     """
+
+    lazy var requestBodyFile: String = {
+        return """
+        <?xml version=\"1.0\" encoding=\"UTF-8\"?>
+        <d:propfind xmlns:d=\"DAV:\" xmlns:oc=\"http://owncloud.org/ns\" xmlns:nc=\"http://nextcloud.org/ns\">
+            <d:prop>
+        """ + requestBodyBase + """
+            </d:prop>
+        </d:propfind>
+        """
+    }()
 
     let requestBodyFileSetFavorite =
     """
@@ -641,143 +647,55 @@ class NKDataFileXML: NSObject {
     </d:propertyupdate>
     """
 
-    let requestBodyFileListingFavorites =
-    """
-    <?xml version=\"1.0\"?>
-    <oc:filter-files xmlns:d=\"DAV:\" xmlns:oc=\"http://owncloud.org/ns\" xmlns:nc=\"http://nextcloud.org/ns\">
-        <d:prop>
-            <d:getlastmodified />
-            <d:getetag />
-            <d:getcontenttype />
-            <d:resourcetype />
-            <d:quota-available-bytes />
-            <d:quota-used-bytes />
-
-            <permissions xmlns=\"http://owncloud.org/ns\"/>
-            <id xmlns=\"http://owncloud.org/ns\"/>
-            <fileid xmlns=\"http://owncloud.org/ns\"/>
-            <size xmlns=\"http://owncloud.org/ns\"/>
-            <favorite xmlns=\"http://owncloud.org/ns\"/>
-            <share-types xmlns=\"http://owncloud.org/ns\"/>
-            <owner-id xmlns=\"http://owncloud.org/ns\"/>
-            <owner-display-name xmlns=\"http://owncloud.org/ns\"/>
-            <comments-unread xmlns=\"http://owncloud.org/ns\"/>
-            <checksums xmlns=\"http://owncloud.org/ns\"/>
-            <downloadURL xmlns=\"http://owncloud.org/ns\"/>
-            <data-fingerprint xmlns=\"http://owncloud.org/ns\"/>
-
-            <creation_time xmlns=\"http://nextcloud.org/ns\"/>
-            <upload_time xmlns=\"http://nextcloud.org/ns\"/>
-            <is-encrypted xmlns=\"http://nextcloud.org/ns\"/>
-            <has-preview xmlns=\"http://nextcloud.org/ns\"/>
-            <mount-type xmlns=\"http://nextcloud.org/ns\"/>
-            <rich-workspace xmlns=\"http://nextcloud.org/ns\"/>
-            <note xmlns=\"http://nextcloud.org/ns\"/>
-            <lock xmlns=\"http://nextcloud.org/ns\"/>
-            <lock-owner xmlns=\"http://nextcloud.org/ns\"/>
-            <lock-owner-editor xmlns=\"http://nextcloud.org/ns\"/>
-            <lock-owner-displayname xmlns=\"http://nextcloud.org/ns\"/>
-            <lock-time xmlns=\"http://nextcloud.org/ns\"/>
-            <lock-timeout xmlns=\"http://nextcloud.org/ns\"/>
-            <lock-owner-editor xmlns=\"http://nextcloud.org/ns\"/>
-            <lock-owner-type xmlns=\"http://nextcloud.org/ns\"/>
-            <lock-token xmlns="http://nextcloud.org/ns"/>
-
-            <share-permissions xmlns=\"http://open-collaboration-services.org/ns\"/>
-            <share-permissions xmlns=\"http://open-cloud-mesh.org/ns\"/>
-
-            <tags xmlns=\"http://nextcloud.org/ns\"/>
-        </d:prop>
-        <oc:filter-rules>
-            <oc:favorite>1</oc:favorite>
-        </oc:filter-rules>
-    </oc:filter-files>
-    """
-
-    let requestBodySearchFileName =
-    """
-    <?xml version=\"1.0\"?>
-    <d:searchrequest xmlns:d=\"DAV:\" xmlns:oc=\"http://owncloud.org/ns\" xmlns:nc=\"http://nextcloud.org/ns\">
-    <d:basicsearch>
-        <d:select>
+    lazy var requestBodyFileListingFavorites: String = {
+        return """
+        <?xml version=\"1.0\"?>
+        <oc:filter-files xmlns:d=\"DAV:\" xmlns:oc=\"http://owncloud.org/ns\" xmlns:nc=\"http://nextcloud.org/ns\">
             <d:prop>
-                <d:displayname/>
-                <d:getcontenttype/>
-                <d:resourcetype/>
-                <d:getcontentlength/>
-                <d:getlastmodified/>
-                <d:getetag/>
-                <d:quota-used-bytes/>
-                <d:quota-available-bytes/>
-                <permissions xmlns=\"http://owncloud.org/ns\"/>
-                <id xmlns=\"http://owncloud.org/ns\"/>
-                <fileid xmlns=\"http://owncloud.org/ns\"/>
-                <size xmlns=\"http://owncloud.org/ns\"/>
-                <favorite xmlns=\"http://owncloud.org/ns\"/>
-                <creation_time xmlns=\"http://nextcloud.org/ns\"/>
-                <upload_time xmlns=\"http://nextcloud.org/ns\"/>
-                <is-encrypted xmlns=\"http://nextcloud.org/ns\"/>
-                <mount-type xmlns=\"http://nextcloud.org/ns\"/>
-                <owner-id xmlns=\"http://owncloud.org/ns\"/>
-                <owner-display-name xmlns=\"http://owncloud.org/ns\"/>
-                <comments-unread xmlns=\"http://owncloud.org/ns\"/>
-                <has-preview xmlns=\"http://nextcloud.org/ns\"/>
-                <trashbin-filename xmlns=\"http://nextcloud.org/ns\"/>
-                <trashbin-original-location xmlns=\"http://nextcloud.org/ns\"/>
-                <trashbin-deletion-time xmlns=\"http://nextcloud.org/ns\"/>
-                <tags xmlns=\"http://nextcloud.org/ns\"/>
+        """ + requestBodyBase + """
             </d:prop>
-        </d:select>
-    <d:from>
-        <d:scope>
-            <d:href>%@</d:href>
-            <d:depth>%@</d:depth>
-        </d:scope>
-    </d:from>
-    <d:where>
-        <d:like>
-            <d:prop>
-                <d:displayname/>
-            </d:prop>
-            <d:literal>%@</d:literal>
-        </d:like>
-    </d:where>
-    </d:basicsearch>
-    </d:searchrequest>
-    """
+            <oc:filter-rules>
+                <oc:favorite>1</oc:favorite>
+            </oc:filter-rules>
+        </oc:filter-files>
+        """
+    }()
 
-    let requestBodySearchFileId =
-    """
-    <?xml version=\"1.0\"?>
-    <d:searchrequest xmlns:d=\"DAV:\" xmlns:oc=\"http://owncloud.org/ns\" xmlns:nc=\"http://nextcloud.org/ns\">
+    lazy var requestBodySearchFileName: String = {
+        return """
+        <?xml version=\"1.0\"?>
+        <d:searchrequest xmlns:d=\"DAV:\" xmlns:oc=\"http://owncloud.org/ns\" xmlns:nc=\"http://nextcloud.org/ns\">
         <d:basicsearch>
             <d:select>
                 <d:prop>
-                    <d:displayname/>
-                    <d:getcontenttype/>
-                    <d:resourcetype/>
-                    <d:getcontentlength/>
-                    <d:getlastmodified/>
-                    <d:getetag/>
-                    <d:quota-used-bytes/>
-                    <d:quota-available-bytes/>
-                    <permissions xmlns=\"http://owncloud.org/ns\"/>
-                    <id xmlns=\"http://owncloud.org/ns\"/>
-                    <fileid xmlns=\"http://owncloud.org/ns\"/>
-                    <size xmlns=\"http://owncloud.org/ns\"/>
-                    <favorite xmlns=\"http://owncloud.org/ns\"/>
-                    <creation_time xmlns=\"http://nextcloud.org/ns\"/>
-                    <upload_time xmlns=\"http://nextcloud.org/ns\"/>
-                    <is-encrypted xmlns=\"http://nextcloud.org/ns\"/>
-                    <mount-type xmlns=\"http://nextcloud.org/ns\"/>
-                    <owner-id xmlns=\"http://owncloud.org/ns\"/>
-                    <owner-display-name xmlns=\"http://owncloud.org/ns\"/>
-                    <comments-unread xmlns=\"http://owncloud.org/ns\"/>
-                    <has-preview xmlns=\"http://nextcloud.org/ns\"/>
-                    <trashbin-filename xmlns=\"http://nextcloud.org/ns\"/>
-                    <trashbin-original-location xmlns=\"http://nextcloud.org/ns\"/>
-                    <trashbin-deletion-time xmlns=\"http://nextcloud.org/ns\"/>
-                    <tags xmlns=\"http://nextcloud.org/ns\"/>
+        """ + requestBodyBase + """
+                </d:prop>
+            </d:select>
+            <d:from>
+                <d:scope>
+                    <d:href>%@</d:href>
+                    <d:depth>%@</d:depth>
+                </d:scope>
+            </d:from>
+            <d:where>
+                <d:like>
+                    <d:prop><d:displayname/></d:prop>
+                    <d:literal>%@</d:literal>
+                </d:like>
+            </d:where>
+        </d:basicsearch>
+        </d:searchrequest>
+        """
+    }()
+
+    lazy var requestBodySearchFileId: String = {
+        return """
+        <?xml version=\"1.0\"?>
+        <d:searchrequest xmlns:d=\"DAV:\" xmlns:oc=\"http://owncloud.org/ns\" xmlns:nc=\"http://nextcloud.org/ns\">
+        <d:basicsearch>
+            <d:select>
+                <d:prop>
+        """ + requestBodyBase + """
                 </d:prop>
             </d:select>
             <d:from>
@@ -788,62 +706,23 @@ class NKDataFileXML: NSObject {
             </d:from>
             <d:where>
                 <d:eq>
-                    <d:prop>
-                        <oc:fileid xmlns:oc=\"http://owncloud.org/ns\"/>
-                    </d:prop>
+                    <d:prop><oc:fileid xmlns:oc=\"http://owncloud.org/ns\"/></d:prop>
                     <d:literal>%@</d:literal>
                 </d:eq>
             </d:where>
         </d:basicsearch>
-    </d:searchrequest>
-    """
+        </d:searchrequest>
+        """
+    }()
 
-    let requestBodySearchLessThan =
-    """
-    <?xml version=\"1.0\"?>
-    <d:searchrequest xmlns:d=\"DAV:\" xmlns:oc=\"http://owncloud.org/ns\" xmlns:nc=\"http://nextcloud.org/ns\">
-    <d:basicsearch>
+    lazy var requestBodySearchLessThan: String = {
+        return """
+        <?xml version=\"1.0\"?>
+        <d:searchrequest xmlns:d=\"DAV:\" xmlns:oc=\"http://owncloud.org/ns\" xmlns:nc=\"http://nextcloud.org/ns\">
+        <d:basicsearch>
         <d:select>
             <d:prop>
-                <d:getlastmodified />
-                <d:getetag />
-                <d:getcontenttype />
-                <d:resourcetype />
-                <d:quota-available-bytes />
-                <d:quota-used-bytes />
-
-                <permissions xmlns=\"http://owncloud.org/ns\"/>
-                <id xmlns=\"http://owncloud.org/ns\"/>
-                <fileid xmlns=\"http://owncloud.org/ns\"/>
-                <size xmlns=\"http://owncloud.org/ns\"/>
-                <favorite xmlns=\"http://owncloud.org/ns\"/>
-                <share-types xmlns=\"http://owncloud.org/ns\"/>
-                <owner-id xmlns=\"http://owncloud.org/ns\"/>
-                <owner-display-name xmlns=\"http://owncloud.org/ns\"/>
-                <comments-unread xmlns=\"http://owncloud.org/ns\"/>
-                <checksums xmlns=\"http://owncloud.org/ns\"/>
-                <downloadURL xmlns=\"http://owncloud.org/ns\"/>
-                <data-fingerprint xmlns=\"http://owncloud.org/ns\"/>
-
-                <creation_time xmlns=\"http://nextcloud.org/ns\"/>
-                <upload_time xmlns=\"http://nextcloud.org/ns\"/>
-                <is-encrypted xmlns=\"http://nextcloud.org/ns\"/>
-                <has-preview xmlns=\"http://nextcloud.org/ns\"/>
-                <mount-type xmlns=\"http://nextcloud.org/ns\"/>
-                <rich-workspace xmlns=\"http://nextcloud.org/ns\"/>
-                <note xmlns=\"http://nextcloud.org/ns\"/>
-                <lock xmlns=\"http://nextcloud.org/ns\"/>
-                <lock-owner xmlns=\"http://nextcloud.org/ns\"/>
-                <lock-owner-editor xmlns=\"http://nextcloud.org/ns\"/>
-                <lock-owner-displayname xmlns=\"http://nextcloud.org/ns\"/>
-                <lock-owner-type xmlns=\"http://nextcloud.org/ns\"/>
-                <lock-time xmlns=\"http://nextcloud.org/ns\"/>
-                <lock-timeout xmlns=\"http://nextcloud.org/ns\"/>
-
-                <share-permissions xmlns=\"http://open-collaboration-services.org/ns\"/>
-                <share-permissions xmlns=\"http://open-cloud-mesh.org/ns\"/>
-
-                <tags xmlns=\"http://nextcloud.org/ns\"/>
+        """ + requestBodyBase + """
             </d:prop>
         </d:select>
         <d:from>
@@ -854,9 +733,7 @@ class NKDataFileXML: NSObject {
         </d:from>
         <d:where>
             <d:lt>
-                <d:prop>
-                    <d:getlastmodified/>
-                </d:prop>
+                <d:prop><d:getlastmodified/></d:prop>
                 <d:literal>%@</d:literal>
             </d:lt>
         </d:where>
@@ -864,228 +741,137 @@ class NKDataFileXML: NSObject {
                 <d:nresults>%@</d:nresults>
             </d:limit>
         </d:basicsearch>
-    </d:searchrequest>
-    """
+        </d:searchrequest>
+        """
+    }()
 
-    let requestBodySearchMedia =
-    """
-    <?xml version=\"1.0\"?>
-    <d:searchrequest xmlns:d=\"DAV:\" xmlns:oc=\"http://owncloud.org/ns\" xmlns:nc=\"http://nextcloud.org/ns\">
-      <d:basicsearch>
+    lazy var requestBodySearchMedia: String = {
+        return """
+        <?xml version=\"1.0\"?>
+        <d:searchrequest xmlns:d=\"DAV:\" xmlns:oc=\"http://owncloud.org/ns\" xmlns:nc=\"http://nextcloud.org/ns\">
+        <d:basicsearch>
         <d:select>
-          <d:prop>
-            <d:displayname/>
-            <d:getcontenttype/>
-            <d:resourcetype/>
-            <d:getcontentlength/>
-            <d:getlastmodified/>
-            <d:getetag/>
-            <d:quota-used-bytes/>
-            <d:quota-available-bytes/>
-            <permissions xmlns=\"http://owncloud.org/ns\"/>
-            <id xmlns=\"http://owncloud.org/ns\"/>
-            <fileid xmlns=\"http://owncloud.org/ns\"/>
-            <size xmlns=\"http://owncloud.org/ns\"/>
-            <favorite xmlns=\"http://owncloud.org/ns\"/>
-            <creation_time xmlns=\"http://nextcloud.org/ns\"/>
-            <upload_time xmlns=\"http://nextcloud.org/ns\"/>
-            <is-encrypted xmlns=\"http://nextcloud.org/ns\"/>
-            <mount-type xmlns=\"http://nextcloud.org/ns\"/>
-            <owner-id xmlns=\"http://owncloud.org/ns\"/>
-            <owner-display-name xmlns=\"http://owncloud.org/ns\"/>
-            <comments-unread xmlns=\"http://owncloud.org/ns\"/>
-            <has-preview xmlns=\"http://nextcloud.org/ns\"/>
-            <trashbin-filename xmlns=\"http://nextcloud.org/ns\"/>
-            <trashbin-original-location xmlns=\"http://nextcloud.org/ns\"/>
-            <trashbin-deletion-time xmlns=\"http://nextcloud.org/ns\"/>
-            <tags xmlns=\"http://nextcloud.org/ns\"/>
-          </d:prop>
-        </d:select>
-        <d:from>
-          <d:scope>
-            <d:href>%@</d:href>
-            <d:depth>infinity</d:depth>
-          </d:scope>
-        </d:from>
-        <d:orderby>
-          <d:order>
-            <d:prop>
-              <%@>
-            </d:prop>
-            <d:descending/>
-          </d:order>
-          <d:order>
-            <d:prop>
-              <d:displayname/>
-            </d:prop>
-            <d:descending/>
-          </d:order>
-        </d:orderby>
-        <d:where>
-          <d:and>
-            <d:or>
-              <d:like>
-                <d:prop>
-                  <d:getcontenttype/>
-                </d:prop>
-                <d:literal>image/%%</d:literal>
-              </d:like>
-              <d:like>
-                <d:prop>
-                  <d:getcontenttype/>
-                </d:prop>
-                <d:literal>video/%%</d:literal>
-              </d:like>
-            </d:or>
-            <d:or>
-              <d:and>
-                <d:lt>
-                  <d:prop>
-                    <%@>
-                  </d:prop>
-                  <d:literal>%@</d:literal>
-                </d:lt>
-                <d:gt>
-                  <d:prop>
-                    <%@>
-                  </d:prop>
-                  <d:literal>%@</d:literal>
-                </d:gt>
-              </d:and>
-            </d:or>
-          </d:and>
-        </d:where>
-      </d:basicsearch>
-    </d:searchrequest>
-    """
-
-    let requestBodySearchMediaWithLimit =
-    """
-    <?xml version=\"1.0\"?>
-    <d:searchrequest xmlns:d=\"DAV:\" xmlns:oc=\"http://owncloud.org/ns\" xmlns:nc=\"http://nextcloud.org/ns\">
-      <d:basicsearch>
-        <d:select>
-          <d:prop>
-            <d:displayname/>
-            <d:getcontenttype/>
-            <d:resourcetype/>
-            <d:getcontentlength/>
-            <d:getlastmodified/>
-            <d:getetag/>
-            <d:quota-used-bytes/>
-            <d:quota-available-bytes/>
-            <permissions xmlns=\"http://owncloud.org/ns\"/>
-            <id xmlns=\"http://owncloud.org/ns\"/>
-            <fileid xmlns=\"http://owncloud.org/ns\"/>
-            <size xmlns=\"http://owncloud.org/ns\"/>
-            <favorite xmlns=\"http://owncloud.org/ns\"/>
-            <creation_time xmlns=\"http://nextcloud.org/ns\"/>
-            <upload_time xmlns=\"http://nextcloud.org/ns\"/>
-            <is-encrypted xmlns=\"http://nextcloud.org/ns\"/>
-            <mount-type xmlns=\"http://nextcloud.org/ns\"/>
-            <owner-id xmlns=\"http://owncloud.org/ns\"/>
-            <owner-display-name xmlns=\"http://owncloud.org/ns\"/>
-            <comments-unread xmlns=\"http://owncloud.org/ns\"/>
-            <has-preview xmlns=\"http://nextcloud.org/ns\"/>
-            <trashbin-filename xmlns=\"http://nextcloud.org/ns\"/>
-            <trashbin-original-location xmlns=\"http://nextcloud.org/ns\"/>
-            <trashbin-deletion-time xmlns=\"http://nextcloud.org/ns\"/>
-            <tags xmlns=\"http://nextcloud.org/ns\"/>
-          </d:prop>
-        </d:select>
-        <d:from>
-          <d:scope>
-            <d:href>%@</d:href>
-            <d:depth>infinity</d:depth>
-          </d:scope>
-        </d:from>
-        <d:orderby>
-          <d:order>
-            <d:prop>
-              <%@>
-            </d:prop>
-            <d:descending/>
-          </d:order>
-          <d:order>
-            <d:prop>
-              <d:displayname/>
-            </d:prop>
-            <d:descending/>
-          </d:order>
-        </d:orderby>
-        <d:where>
-          <d:and>
-            <d:or>
-              <d:like>
-                <d:prop>
-                  <d:getcontenttype/>
-                </d:prop>
-                <d:literal>image/%%</d:literal>
-              </d:like>
-              <d:like>
-                <d:prop>
-                  <d:getcontenttype/>
-                </d:prop>
-                <d:literal>video/%%</d:literal>
-              </d:like>
-            </d:or>
-            <d:or>
-              <d:and>
-                <d:lt>
-                  <d:prop>
-                    <%@>
-                  </d:prop>
-                  <d:literal>%@</d:literal>
-                </d:lt>
-                <d:gt>
-                  <d:prop>
-                    <%@>
-                  </d:prop>
-                  <d:literal>%@</d:literal>
-                </d:gt>
-              </d:and>
-            </d:or>
-          </d:and>
-        </d:where>
-        <d:limit>
-            <d:nresults>%@</d:nresults>
-        </d:limit>
-      </d:basicsearch>
-    </d:searchrequest>
-    """
-
-    let requestBodyTrash =
-    """
-    <?xml version=\"1.0\" encoding=\"UTF-8\"?>
-    <d:propfind xmlns:d=\"DAV:\" xmlns:oc=\"http://owncloud.org/ns\" xmlns:nc=\"http://nextcloud.org/ns\">
         <d:prop>
-            <d:displayname />
-            <d:getcontenttype />
-            <d:resourcetype />
-            <d:getcontentlength />
-            <d:getlastmodified />
-            <d:getetag />
-            <d:quota-used-bytes />
-            <d:quota-available-bytes />
-            <permissions xmlns=\"http://owncloud.org/ns\"/>
-
-            <id xmlns=\"http://owncloud.org/ns\"/>
-            <fileid xmlns=\"http://owncloud.org/ns\"/>
-            <size xmlns=\"http://owncloud.org/ns\"/>
-            <favorite xmlns=\"http://owncloud.org/ns\"/>
-            <is-encrypted xmlns=\"http://nextcloud.org/ns\"/>
-            <mount-type xmlns=\"http://nextcloud.org/ns\"/>
-            <owner-id xmlns=\"http://owncloud.org/ns\"/>
-            <owner-display-name xmlns=\"http://owncloud.org/ns\"/>
-            <comments-unread xmlns=\"http://owncloud.org/ns\"/>
-            <has-preview xmlns=\"http://nextcloud.org/ns\"/>
-            <trashbin-filename xmlns=\"http://nextcloud.org/ns\"/>
-            <trashbin-original-location xmlns=\"http://nextcloud.org/ns\"/>
-            <trashbin-deletion-time xmlns=\"http://nextcloud.org/ns\"/>
-            <tags xmlns=\"http://nextcloud.org/ns\"/>
+        """ + requestBodyBase + """
         </d:prop>
-    </d:propfind>
-    """
+        </d:select>
+        <d:from>
+            <d:scope>
+                <d:href>%@</d:href>
+                <d:depth>infinity</d:depth>
+            </d:scope>
+        </d:from>
+        <d:orderby>
+            <d:order>
+                <d:prop><%@></d:prop>
+                <d:descending/>
+            </d:order>
+            <d:order>
+                <d:prop><d:displayname/></d:prop>
+                <d:descending/>
+            </d:order>
+        </d:orderby>
+        <d:where>
+            <d:and>
+                <d:or>
+                    <d:like>
+                        <d:prop><d:getcontenttype/></d:prop>
+                        <d:literal>image/%%</d:literal>
+                    </d:like>
+                    <d:like>
+                        <d:prop><d:getcontenttype/></d:prop>
+                        <d:literal>video/%%</d:literal>
+                    </d:like>
+                </d:or>
+                <d:or>
+                    <d:and>
+                        <d:lt>
+                            <d:prop><%@></d:prop>
+                            <d:literal>%@</d:literal>
+                        </d:lt>
+                        <d:gt>
+                            <d:prop><%@></d:prop>
+                            <d:literal>%@</d:literal>
+                        </d:gt>
+                    </d:and>
+                </d:or>
+            </d:and>
+        </d:where>
+        </d:basicsearch>
+        </d:searchrequest>
+        """
+    }()
+
+    lazy var requestBodySearchMediaWithLimit: String = {
+        return """
+        <?xml version=\"1.0\"?>
+        <d:searchrequest xmlns:d=\"DAV:\" xmlns:oc=\"http://owncloud.org/ns\" xmlns:nc=\"http://nextcloud.org/ns\">
+        <d:basicsearch>
+        <d:select>
+            <d:prop>
+        """ + requestBodyBase + """
+            </d:prop>
+        </d:select>
+            <d:from>
+                <d:scope>
+                    <d:href>%@</d:href>
+                    <d:depth>infinity</d:depth>
+                </d:scope>
+            </d:from>
+            <d:orderby>
+                <d:order>
+                    <d:prop><%@></d:prop>
+                    <d:descending/>
+                </d:order>
+                <d:order>
+                    <d:prop><d:displayname/></d:prop>
+                    <d:descending/>
+                </d:order>
+            </d:orderby>
+            <d:where>
+                <d:and>
+                <d:or>
+                    <d:like>
+                        <d:prop><d:getcontenttype/></d:prop>
+                        <d:literal>image/%%</d:literal>
+                    </d:like>
+                    <d:like>
+                        <d:prop><d:getcontenttype/></d:prop>
+                        <d:literal>video/%%</d:literal>
+                    </d:like>
+                </d:or>
+                <d:or>
+                    <d:and>
+                        <d:lt>
+                            <d:prop><%@></d:prop>
+                            <d:literal>%@</d:literal>
+                        </d:lt>
+                        <d:gt>
+                            <d:prop><%@></d:prop>
+                            <d:literal>%@</d:literal>
+                        </d:gt>
+                    </d:and>
+                </d:or>
+                </d:and>
+            </d:where>
+            <d:limit>
+                <d:nresults>%@</d:nresults>
+            </d:limit>
+        </d:basicsearch>
+        </d:searchrequest>
+        """
+    }()
+
+    lazy var requestBodyTrash: String = {
+        return """
+        <?xml version=\"1.0\" encoding=\"UTF-8\"?>
+        <d:propfind xmlns:d=\"DAV:\" xmlns:oc=\"http://owncloud.org/ns\" xmlns:nc=\"http://nextcloud.org/ns\">
+            <d:prop>
+        """ + requestBodyBase + """
+            </d:prop>
+        </d:propfind>
+        """
+    }()
 
     init(nkCommonInstance: NKCommon) {
         self.nkCommonInstance = nkCommonInstance
