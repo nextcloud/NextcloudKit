@@ -1084,11 +1084,10 @@ class NKDataFileXML: NSObject {
                 }
             }
 
-            for x in propstat["d:prop", "nc:tags"] {
-                print(x)
-            }
-            if let x = propstat["d:prop", "nc:tags"].element {
-                print(x)
+            for element in propstat["d:prop", "nc:tags"] {
+                if let tag = element["oc:tag"].text {
+                    file.tags.append(tag)
+                }
             }
 
             let results = self.nkCommonInstance.getInternalType(fileName: file.fileName, mimeType: file.contentType, directory: file.directory)
