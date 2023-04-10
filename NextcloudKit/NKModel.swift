@@ -375,6 +375,7 @@ import SwiftyJSON
     @objc public var shareType: [Int] = []
     @objc public var size: Int64 = 0
     @objc public var serverUrl = ""
+    @objc public var tags: [String] = []
     @objc public var trashbinFileName = ""
     @objc public var trashbinOriginalLocation = ""
     @objc public var trashbinDeletionTime = NSDate()
@@ -1081,6 +1082,13 @@ class NKDataFileXML: NSObject {
                 if let lockTimeOut = propstat["d:prop", "nc:lock-timeout"].int {
                     file.lockTimeOut = file.lockTime?.addingTimeInterval(TimeInterval(lockTimeOut))
                 }
+            }
+
+            for x in propstat["d:prop", "nc:tags"] {
+                print(x)
+            }
+            if let x = propstat["d:prop", "nc:tags"].element {
+                print(x)
             }
 
             let results = self.nkCommonInstance.getInternalType(fileName: file.fileName, mimeType: file.contentType, directory: file.directory)
