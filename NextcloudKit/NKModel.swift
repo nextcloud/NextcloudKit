@@ -623,6 +623,8 @@ class NKDataFileXML: NSObject {
 
             <share-permissions xmlns=\"http://open-collaboration-services.org/ns\"/>
             <share-permissions xmlns=\"http://open-cloud-mesh.org/ns\"/>
+
+            <tags xmlns=\"http://nextcloud.org/ns\"/>
         </d:prop>
     </d:propfind>
     """
@@ -683,6 +685,8 @@ class NKDataFileXML: NSObject {
 
             <share-permissions xmlns=\"http://open-collaboration-services.org/ns\"/>
             <share-permissions xmlns=\"http://open-cloud-mesh.org/ns\"/>
+
+            <tags xmlns=\"http://nextcloud.org/ns\"/>
         </d:prop>
         <oc:filter-rules>
             <oc:favorite>1</oc:favorite>
@@ -721,6 +725,7 @@ class NKDataFileXML: NSObject {
                 <trashbin-filename xmlns=\"http://nextcloud.org/ns\"/>
                 <trashbin-original-location xmlns=\"http://nextcloud.org/ns\"/>
                 <trashbin-deletion-time xmlns=\"http://nextcloud.org/ns\"/>
+                <tags xmlns=\"http://nextcloud.org/ns\"/>
             </d:prop>
         </d:select>
     <d:from>
@@ -772,6 +777,7 @@ class NKDataFileXML: NSObject {
                     <trashbin-filename xmlns=\"http://nextcloud.org/ns\"/>
                     <trashbin-original-location xmlns=\"http://nextcloud.org/ns\"/>
                     <trashbin-deletion-time xmlns=\"http://nextcloud.org/ns\"/>
+                    <tags xmlns=\"http://nextcloud.org/ns\"/>
                 </d:prop>
             </d:select>
             <d:from>
@@ -836,6 +842,8 @@ class NKDataFileXML: NSObject {
 
                 <share-permissions xmlns=\"http://open-collaboration-services.org/ns\"/>
                 <share-permissions xmlns=\"http://open-cloud-mesh.org/ns\"/>
+
+                <tags xmlns=\"http://nextcloud.org/ns\"/>
             </d:prop>
         </d:select>
         <d:from>
@@ -890,6 +898,7 @@ class NKDataFileXML: NSObject {
             <trashbin-filename xmlns=\"http://nextcloud.org/ns\"/>
             <trashbin-original-location xmlns=\"http://nextcloud.org/ns\"/>
             <trashbin-deletion-time xmlns=\"http://nextcloud.org/ns\"/>
+            <tags xmlns=\"http://nextcloud.org/ns\"/>
           </d:prop>
         </d:select>
         <d:from>
@@ -981,6 +990,7 @@ class NKDataFileXML: NSObject {
             <trashbin-filename xmlns=\"http://nextcloud.org/ns\"/>
             <trashbin-original-location xmlns=\"http://nextcloud.org/ns\"/>
             <trashbin-deletion-time xmlns=\"http://nextcloud.org/ns\"/>
+            <tags xmlns=\"http://nextcloud.org/ns\"/>
           </d:prop>
         </d:select>
         <d:from>
@@ -1072,6 +1082,7 @@ class NKDataFileXML: NSObject {
             <trashbin-filename xmlns=\"http://nextcloud.org/ns\"/>
             <trashbin-original-location xmlns=\"http://nextcloud.org/ns\"/>
             <trashbin-deletion-time xmlns=\"http://nextcloud.org/ns\"/>
+            <tags xmlns=\"http://nextcloud.org/ns\"/>
         </d:prop>
     </d:propfind>
     """
