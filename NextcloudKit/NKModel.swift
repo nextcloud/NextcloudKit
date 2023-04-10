@@ -580,7 +580,7 @@ class NKDataFileXML: NSObject {
     </d:propertyupdate>
     """
 
-    let requestBodyBase =
+    let propStandard =
     """
     <d:getlastmodified />
     <d:getetag />
@@ -629,7 +629,7 @@ class NKDataFileXML: NSObject {
         <?xml version=\"1.0\" encoding=\"UTF-8\"?>
         <d:propfind xmlns:d=\"DAV:\" xmlns:oc=\"http://owncloud.org/ns\" xmlns:nc=\"http://nextcloud.org/ns\">
             <d:prop>
-        """ + requestBodyBase + """
+        """ + propStandard + """
             </d:prop>
         </d:propfind>
         """
@@ -652,7 +652,7 @@ class NKDataFileXML: NSObject {
         <?xml version=\"1.0\"?>
         <oc:filter-files xmlns:d=\"DAV:\" xmlns:oc=\"http://owncloud.org/ns\" xmlns:nc=\"http://nextcloud.org/ns\">
             <d:prop>
-        """ + requestBodyBase + """
+        """ + propStandard + """
             </d:prop>
             <oc:filter-rules>
                 <oc:favorite>1</oc:favorite>
@@ -668,7 +668,7 @@ class NKDataFileXML: NSObject {
         <d:basicsearch>
             <d:select>
                 <d:prop>
-        """ + requestBodyBase + """
+        """ + propStandard + """
                 </d:prop>
             </d:select>
             <d:from>
@@ -695,7 +695,7 @@ class NKDataFileXML: NSObject {
         <d:basicsearch>
             <d:select>
                 <d:prop>
-        """ + requestBodyBase + """
+        """ + propStandard + """
                 </d:prop>
             </d:select>
             <d:from>
@@ -722,7 +722,7 @@ class NKDataFileXML: NSObject {
         <d:basicsearch>
         <d:select>
             <d:prop>
-        """ + requestBodyBase + """
+        """ + propStandard + """
             </d:prop>
         </d:select>
         <d:from>
@@ -752,7 +752,7 @@ class NKDataFileXML: NSObject {
         <d:basicsearch>
         <d:select>
         <d:prop>
-        """ + requestBodyBase + """
+        """ + propStandard + """
         </d:prop>
         </d:select>
         <d:from>
@@ -809,7 +809,7 @@ class NKDataFileXML: NSObject {
         <d:basicsearch>
         <d:select>
             <d:prop>
-        """ + requestBodyBase + """
+        """ + propStandard + """
             </d:prop>
         </d:select>
             <d:from>
@@ -867,7 +867,7 @@ class NKDataFileXML: NSObject {
         <?xml version=\"1.0\" encoding=\"UTF-8\"?>
         <d:propfind xmlns:d=\"DAV:\" xmlns:oc=\"http://owncloud.org/ns\" xmlns:nc=\"http://nextcloud.org/ns\">
             <d:prop>
-        """ + requestBodyBase + """
+        """ + propStandard + """
             </d:prop>
         </d:propfind>
         """
