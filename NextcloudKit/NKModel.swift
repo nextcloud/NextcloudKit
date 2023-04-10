@@ -1084,7 +1084,7 @@ class NKDataFileXML: NSObject {
                 }
             }
 
-            let tags = propstat["d:prop", "nc:tags"]
+            let tags = propstat["d:prop", "nc:tags", "oc:tag"]
             for element in tags {
                 print(element)
             }
