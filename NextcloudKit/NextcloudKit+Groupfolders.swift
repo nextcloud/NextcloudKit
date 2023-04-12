@@ -77,7 +77,7 @@ extension NextcloudKit {
     @objc public let acl: Bool
     @objc public let size: Int
     @objc public let quota: Int
-    @objc public let manage: [Any]?
+    // @objc public let manage: [Any]?
     @objc public let groups: [String: Any]?
 
     internal init?(json: JSON) {
@@ -93,7 +93,7 @@ extension NextcloudKit {
         self.acl = acl
         self.size = size
         self.quota = quota
-        self.manage = json["manage"].array
+        // self.manage = json["manage"].array
         self.groups = json["groups"].dictionaryObject
     }
 }
