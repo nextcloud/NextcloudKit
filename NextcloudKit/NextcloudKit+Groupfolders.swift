@@ -67,39 +67,6 @@ extension NextcloudKit {
 
 @objc public class NKGroupfolders: NSObject {
     internal init?(jsonData: JSON) {
-        guard let userId = jsonData["userId"].string,
-              let displayName = jsonData["displayName"].string,
-              let actions = jsonData["actions"].array?.compactMap(Action.init)
-        else {
-            return nil
-        }
-        self.userId = userId
-        self.displayName = displayName
-        self.actions = actions
+
     }
-
-    @objc public class Action: NSObject {
-        internal init?(jsonData: JSON) {
-            guard let title = jsonData["title"].string,
-                  let icon = jsonData["icon"].string,
-                  let hyperlink = jsonData["hyperlink"].string,
-                  let appId = jsonData["appId"].string
-            else {
-                return nil
-            }
-            self.title = title
-            self.icon = icon
-            self.hyperlink = hyperlink
-            self.appId = appId
-        }
-
-        @objc public let title: String
-        @objc public let icon: String
-        @objc public let hyperlink: String
-        @objc public var hyperlinkUrl: URL? { URL(string: hyperlink) }
-        @objc public let appId: String
-    }
-
-    @objc public let userId, displayName: String
-    @objc public let actions: [Action]
 }
