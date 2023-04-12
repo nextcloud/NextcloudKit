@@ -28,7 +28,7 @@ import SwiftyJSON
 extension NextcloudKit {
 
     @objc public func getGroupfolders(options: NKRequestOptions = NKRequestOptions(),
-                                      completion: @escaping (_ account: String, _ result: NKGroupfolders?, _ data: Data?, _ error: NKError) -> Void) {
+                                      completion: @escaping (_ account: String, _ results: [NKGroupfolders]?, _ data: Data?, _ error: NKError) -> Void) {
 
         let account = self.nkCommonInstance.account
         let urlBase = self.nkCommonInstance.urlBase
@@ -52,21 +52,48 @@ extension NextcloudKit {
             case .success(let jsonData):
                 let json = JSON(jsonData)
                 let data = json["ocs"]["data"]
-                guard json["ocs"]["meta"]["statuscode"].int == 200,
-                       let result = NKGroupfolders(jsonData: data)
+                guard json["ocs"]["meta"]["statuscode"].int == 200
                 else {
                     let error = NKError(rootJson: json, fallbackStatusCode: response.response?.statusCode)
                     options.queue.async { completion(account, nil, jsonData, error) }
                     return
                 }
-                options.queue.async { completion(account, result, jsonData, .success) }
+                var results = [NKGroupfolders]()
+                for (_, subJson) in data {
+                    if let result = NKGroupfolders(json: subJson) {
+                        results.append(result)
+                    }
+                }
+                options.queue.async { completion(account, results, jsonData, .success) }
             }
         }
     }
 }
 
 @objc public class NKGroupfolders: NSObject {
-    internal init?(jsonData: JSON) {
 
+    @objc public let id: Int
+    @objc public let mountPoint: String
+    @objc public let acl: Bool
+    @objc public let size: Int
+    @objc public let quota: Int
+    @objc public let manage: [Any]?
+    @objc public let groups: [String: Any]?
+
+    internal init?(json: JSON) {
+        guard let id = json["id"].int,
+              let mountPoint = json["mount_point"].string,
+              let acl = json["acl"].bool,
+              let size = json["size"].int,
+              let quota = json["quota"].int
+        else { return nil }
+
+        self.id = id
+        self.mountPoint = mountPoint
+        self.acl = acl
+        self.size = size
+        self.quota = quota
+        self.manage = json["manage"].array
+        self.groups = json["groups"].dictionaryObject
     }
 }
