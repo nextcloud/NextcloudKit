@@ -33,7 +33,7 @@ extension NextcloudKit {
         let account = self.nkCommonInstance.account
         let urlBase = self.nkCommonInstance.urlBase
 
-        let endpoint = "apps/groupfolders/folders"
+        let endpoint = "index.php/apps/groupfolders/folders"
 
         guard let url = self.nkCommonInstance.createStandardUrl(serverUrl: urlBase, endpoint: endpoint)
         else {
