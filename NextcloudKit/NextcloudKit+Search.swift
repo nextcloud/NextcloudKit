@@ -179,3 +179,87 @@ extension NextcloudKit {
         return requestSearchProvider
     }
 }
+
+@objc public class NKSearchResult: NSObject {
+
+    @objc public let id: String
+    @objc public let name: String
+    @objc public let isPaginated: Bool
+    @objc public let entries: [NKSearchEntry]
+    public let cursor: Int?
+
+    init?(json: JSON, id: String) {
+        guard let isPaginated = json["isPaginated"].bool,
+              let name = json["name"].string,
+              let entries = NKSearchEntry.factory(jsonArray: json["entries"])
+        else { return nil }
+        self.id = id
+        self.cursor = json["cursor"].int
+        self.name = name
+        self.isPaginated = isPaginated
+        self.entries = entries
+    }
+}
+
+@objc public class NKSearchEntry: NSObject {
+
+    @objc public let thumbnailURL: String
+    @objc public let title, subline: String
+    @objc public let resourceURL: String
+    @objc public let icon: String
+    @objc public let rounded: Bool
+    @objc public let attributes: [String: Any]?
+
+    public var fileId: Int? {
+        guard let fileAttribute = attributes?["fileId"] as? String else { return nil }
+        return Int(fileAttribute)
+    }
+
+    @objc public var filePath: String? {
+        attributes?["path"] as? String
+    }
+
+    init?(json: JSON) {
+        guard let thumbnailURL = json["thumbnailUrl"].string,
+              let title = json["title"].string,
+              let subline = json["subline"].string,
+              let resourceURL = json["resourceUrl"].string,
+              let icon = json["icon"].string,
+              let rounded = json["rounded"].bool
+        else { return nil }
+
+        self.thumbnailURL = thumbnailURL
+        self.title = title
+        self.subline = subline
+        self.resourceURL = resourceURL
+        self.icon = icon
+        self.rounded = rounded
+        self.attributes = json["attributes"].dictionaryObject
+    }
+
+    static func factory(jsonArray: JSON) -> [NKSearchEntry]? {
+        guard let allProvider = jsonArray.array else { return nil }
+        return allProvider.compactMap(NKSearchEntry.init)
+    }
+}
+
+@objc public class NKSearchProvider: NSObject {
+
+    init?(json: JSON) {
+        guard let id = json["id"].string,
+              let name = json["name"].string,
+              let order = json["order"].int
+        else { return nil }
+        self.id = id
+        self.name = name
+        self.order = order
+    }
+
+    @objc public let id, name: String
+    @objc public let order: Int
+
+    static func factory(jsonArray: JSON) -> [NKSearchProvider]? {
+        guard let allProvider = jsonArray.array else { return nil }
+        return allProvider.compactMap(NKSearchProvider.init)
+    }
+}

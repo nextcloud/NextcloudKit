@@ -28,7 +28,7 @@ import SwiftyJSON
 extension NextcloudKit {
 
     @objc public func getGroupfolders(options: NKRequestOptions = NKRequestOptions(),
-                                      completion: @escaping (_ account: String, _ data: Data?, _ error: NKError) -> Void) {
+                                      completion: @escaping (_ account: String, _ result: NKGroupfolders?, _ data: Data?, _ error: NKError) -> Void) {
 
         let account = self.nkCommonInstance.account
         let urlBase = self.nkCommonInstance.urlBase
@@ -37,7 +37,7 @@ extension NextcloudKit {
 
         guard let url = self.nkCommonInstance.createStandardUrl(serverUrl: urlBase, endpoint: endpoint)
         else {
-            return options.queue.async { completion(account, nil, .urlError) }
+            return options.queue.async { completion(account, nil, nil, .urlError) }
         }
 
         let headers = self.nkCommonInstance.getStandardHeaders(options: options)
@@ -48,19 +48,58 @@ extension NextcloudKit {
             switch response.result {
             case .failure(let error):
                 let error = NKError(error: error, afResponse: response)
-                options.queue.async { completion(account, nil, error) }
+                options.queue.async { completion(account, nil, nil, error) }
             case .success(let jsonData):
                 let json = JSON(jsonData)
                 let data = json["ocs"]["data"]
-                guard json["ocs"]["meta"]["statuscode"].int == 200
-                      // let result = NKHovercard(jsonData: data)
+                guard json["ocs"]["meta"]["statuscode"].int == 200,
+                       let result = NKGroupfolders(jsonData: data)
                 else {
                     let error = NKError(rootJson: json, fallbackStatusCode: response.response?.statusCode)
-                    options.queue.async { completion(account, jsonData, error) }
+                    options.queue.async { completion(account, nil, jsonData, error) }
                     return
                 }
-                options.queue.async { completion(account, jsonData, .success) }
+                options.queue.async { completion(account, result, jsonData, .success) }
             }
         }
     }
+}
+
+@objc public class NKGroupfolders: NSObject {
+    internal init?(jsonData: JSON) {
+        guard let userId = jsonData["userId"].string,
+              let displayName = jsonData["displayName"].string,
+              let actions = jsonData["actions"].array?.compactMap(Action.init)
+        else {
+            return nil
+        }
+        self.userId = userId
+        self.displayName = displayName
+        self.actions = actions
+    }
+
+    @objc public class Action: NSObject {
+        internal init?(jsonData: JSON) {
+            guard let title = jsonData["title"].string,
+                  let icon = jsonData["icon"].string,
+                  let hyperlink = jsonData["hyperlink"].string,
+                  let appId = jsonData["appId"].string
+            else {
+                return nil
+            }
+            self.title = title
+            self.icon = icon
+            self.hyperlink = hyperlink
+            self.appId = appId
+        }
+
+        @objc public let title: String
+        @objc public let icon: String
+        @objc public let hyperlink: String
+        @objc public var hyperlinkUrl: URL? { URL(string: hyperlink) }
+        @objc public let appId: String
+    }
+
+    @objc public let userId, displayName: String
+    @objc public let actions: [Action]
 }
