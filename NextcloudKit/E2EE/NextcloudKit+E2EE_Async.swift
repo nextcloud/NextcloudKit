@@ -28,11 +28,11 @@ extension NextcloudKit {
 
     public func markE2EEFolder(fileId: String,
                                delete: Bool,
-                               options: NKRequestOptions = NKRequestOptions()) async -> (account: String, error: NKError) {
+                               options: NKRequestOptions = NKRequestOptions()) async -> (account: String, data: Data?, error: NKError) {
 
         await withUnsafeContinuation({ continuation in
-            markE2EEFolder(fileId: fileId, delete: delete, options: options) { account, error in
-                continuation.resume(returning: (account: account, error: error))
+            markE2EEFolder(fileId: fileId, delete: delete, options: options) { account, data, error in
+                continuation.resume(returning: (account: account, data: data, error: error))
             }
         })
     }
@@ -121,20 +121,20 @@ extension NextcloudKit {
         })
     }
 
-    public func deleteE2EECertificate(options: NKRequestOptions = NKRequestOptions()) async -> (account: String, error: NKError) {
+    public func deleteE2EECertificate(options: NKRequestOptions = NKRequestOptions()) async -> (account: String, data: Data?, error: NKError) {
 
         await withUnsafeContinuation({ continuation in
-            deleteE2EECertificate(options: options) { account, error in
-                continuation.resume(returning: (account: account, error: error))
+            deleteE2EECertificate(options: options) { account, data, error in
+                continuation.resume(returning: (account: account, data: data, error: error))
             }
         })
     }
 
-    public func deleteE2EEPrivateKey(options: NKRequestOptions = NKRequestOptions()) async -> (account: String, error: NKError) {
+    public func deleteE2EEPrivateKey(options: NKRequestOptions = NKRequestOptions()) async -> (account: String, data: Data?, error: NKError) {
 
         await withUnsafeContinuation({ continuation in
-            deleteE2EEPrivateKey(options: options) { account, error in
-                continuation.resume(returning: (account: account, error: error))
+            deleteE2EEPrivateKey(options: options) { account, data, error in
+                continuation.resume(returning: (account: account, data: data, error: error))
             }
         })
     }

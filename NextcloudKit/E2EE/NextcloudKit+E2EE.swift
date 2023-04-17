@@ -30,7 +30,7 @@ extension NextcloudKit {
     @objc public func markE2EEFolder(fileId: String,
                                      delete: Bool,
                                      options: NKRequestOptions = NKRequestOptions(),
-                                     completion: @escaping (_ account: String, _ error: NKError) -> Void) {
+                                     completion: @escaping (_ account: String, _ data: Data?, _ error: NKError) -> Void) {
 
         let account = self.nkCommonInstance.account
         let urlBase = self.nkCommonInstance.urlBase
@@ -38,7 +38,7 @@ extension NextcloudKit {
         let endpoint = "ocs/v2.php/apps/end_to_end_encryption/api/v1/encrypted/\(fileId)"
 
         guard let url = self.nkCommonInstance.createStandardUrl(serverUrl: urlBase, endpoint: endpoint) else {
-            return options.queue.async { completion(account, .urlError) }
+            return options.queue.async { completion(account, nil, .urlError) }
         }
 
         let method: HTTPMethod = delete ? .delete : .put
@@ -51,14 +51,14 @@ extension NextcloudKit {
             switch response.result {
             case .failure(let error):
                 let error = NKError(error: error, afResponse: response)
-                options.queue.async { completion(account, error) }
+                options.queue.async { completion(account, response.data, error) }
             case .success(let jsonData):
                 let json = JSON(jsonData)
                 let statusCode = json["ocs"]["meta"]["statuscode"].int ?? NKError.internalError
                 if 200..<300 ~= statusCode {
-                    options.queue.async { completion(account, .success) }
+                    options.queue.async { completion(account, jsonData, .success) }
                 } else {
-                    options.queue.async { completion(account, NKError(rootJson: json, fallbackStatusCode: response.response?.statusCode)) }
+                    options.queue.async { completion(account, jsonData, NKError(rootJson: json, fallbackStatusCode: response.response?.statusCode)) }
                 }
             }
         }
@@ -94,7 +94,7 @@ extension NextcloudKit {
             switch response.result {
             case .failure(let error):
                 let error = NKError(error: error, afResponse: response)
-                options.queue.async { completion(account, nil, nil, error) }
+                options.queue.async { completion(account, nil, response.data, error) }
             case .success(let jsonData):
                 let json = JSON(jsonData)
                 let statusCode = json["ocs"]["meta"]["statuscode"].int ?? NKError.internalError
@@ -135,7 +135,7 @@ extension NextcloudKit {
             switch response.result {
             case .failure(let error):
                 let error = NKError(error: error, afResponse: response)
-                options.queue.async { completion(account, nil, nil, error) }
+                options.queue.async { completion(account, nil, response.data, error) }
             case .success(let jsonData):
                 let json = JSON(jsonData)
                 let statusCode = json["ocs"]["meta"]["statuscode"].int ?? NKError.internalError
@@ -182,7 +182,7 @@ extension NextcloudKit {
             switch response.result {
             case .failure(let error):
                 let error = NKError(error: error, afResponse: response)
-                return options.queue.async { completion(account, nil, nil, error) }
+                return options.queue.async { completion(account, nil, response.data, error) }
             case .success(let jsonData):
                 let json = JSON(jsonData)
                 let statusCode = json["ocs"]["meta"]["statuscode"].int ?? NKError.internalError
@@ -229,7 +229,7 @@ extension NextcloudKit {
             switch response.result {
             case .failure(let error):
                 let error = NKError(error: error, afResponse: response)
-                options.queue.async { completion(account, nil, nil, nil, error) }
+                options.queue.async { completion(account, nil, nil, response.data, error) }
             case .success(let jsonData):
                 let json = JSON(jsonData)
                 let statusCode = json["ocs"]["meta"]["statuscode"].int ?? NKError.internalError
@@ -268,7 +268,7 @@ extension NextcloudKit {
             switch response.result {
             case .failure(let error):
                     let error = NKError(error: error, afResponse: response)
-                    options.queue.async { completion(account, nil, nil, error) }
+                    options.queue.async { completion(account, nil, response.data, error) }
             case .success(let jsonData):
                 let json = JSON(jsonData)
                 let statusCode = json["ocs"]["meta"]["statuscode"].int ?? NKError.internalError
@@ -302,7 +302,7 @@ extension NextcloudKit {
             switch response.result {
             case .failure(let error):
                 let error = NKError(error: error, afResponse: response)
-                options.queue.async { completion(account, nil, nil, error) }
+                options.queue.async { completion(account, nil, response.data, error) }
             case .success(let jsonData):
                 let json = JSON(jsonData)
                 let statusCode = json["ocs"]["meta"]["statuscode"].int ?? NKError.internalError
@@ -339,7 +339,7 @@ extension NextcloudKit {
             switch response.result {
             case .failure(let error):
                 let error = NKError(error: error, afResponse: response)
-                options.queue.async { completion(account, nil, nil, error) }
+                options.queue.async { completion(account, nil, response.data, error) }
             case .success(let jsonData):
                 let json = JSON(jsonData)
                 let statusCode = json["ocs"]["meta"]["statuscode"].int ?? NKError.internalError
@@ -377,7 +377,7 @@ extension NextcloudKit {
             switch response.result {
             case .failure(let error):
                 let error = NKError(error: error, afResponse: response)
-                options.queue.async { completion(account, nil, nil, error) }
+                options.queue.async { completion(account, nil, response.data, error) }
             case .success(let jsonData):
                 let json = JSON(jsonData)
                 let statusCode = json["ocs"]["meta"]["statuscode"].int ?? NKError.internalError
@@ -392,7 +392,7 @@ extension NextcloudKit {
     }
 
     @objc public func deleteE2EECertificate(options: NKRequestOptions = NKRequestOptions(),
-                                            completion: @escaping (_ account: String, _ error: NKError) -> Void) {
+                                            completion: @escaping (_ account: String, _ data: Data?, _ error: NKError) -> Void) {
 
         let account = self.nkCommonInstance.account
         let urlBase = self.nkCommonInstance.urlBase
@@ -400,7 +400,7 @@ extension NextcloudKit {
         let endpoint = "ocs/v2.php/apps/end_to_end_encryption/api/v1/public-key"
 
         guard let url = self.nkCommonInstance.createStandardUrl(serverUrl: urlBase, endpoint: endpoint) else {
-            return options.queue.async { completion(account, .urlError) }
+            return options.queue.async { completion(account, nil, .urlError) }
         }
 
         let headers = self.nkCommonInstance.getStandardHeaders(options: options)
@@ -411,15 +411,15 @@ extension NextcloudKit {
             switch response.result {
             case .failure(let error):
                 let error = NKError(error: error, afResponse: response)
-                options.queue.async { completion(account, error) }
+                options.queue.async { completion(account, response.data, error) }
             case .success:
-                options.queue.async { completion(account, .success) }
+                options.queue.async { completion(account, response.data, .success) }
             }
         }
     }
 
     @objc public func deleteE2EEPrivateKey(options: NKRequestOptions = NKRequestOptions(),
-                                           completion: @escaping (_ account: String, _ error: NKError) -> Void) {
+                                           completion: @escaping (_ account: String, _ data: Data?, _ error: NKError) -> Void) {
 
         let account = self.nkCommonInstance.account
         let urlBase = self.nkCommonInstance.urlBase
@@ -427,7 +427,7 @@ extension NextcloudKit {
         let endpoint = "ocs/v2.php/apps/end_to_end_encryption/api/v1/private-key"
 
         guard let url = self.nkCommonInstance.createStandardUrl(serverUrl: urlBase, endpoint: endpoint) else {
-            return options.queue.async { completion(account, .urlError) }
+            return options.queue.async { completion(account, nil, .urlError) }
         }
 
         let headers = self.nkCommonInstance.getStandardHeaders(options: options)
@@ -438,9 +438,9 @@ extension NextcloudKit {
             switch response.result {
             case .failure(let error):
                 let error = NKError(error: error, afResponse: response)
-                options.queue.async { completion(account, error) }
+                options.queue.async { completion(account, response.data, error) }
             case .success:
-                options.queue.async { completion(account, .success) }
+                options.queue.async { completion(account, response.data, .success) }
             }
         }
     }

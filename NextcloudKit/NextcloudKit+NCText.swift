@@ -50,7 +50,7 @@ extension NextcloudKit {
             switch response.result {
             case .failure(let error):
                 let error = NKError(error: error, afResponse: response)
-                options.queue.async { completion(account, editors, creators, nil, error) }
+                options.queue.async { completion(account, editors, creators, response.data, error) }
             case .success(let jsonData):
                 let json = JSON(jsonData)
                 let ocsdataeditors = json["ocs"]["data"]["editors"]
@@ -121,7 +121,7 @@ extension NextcloudKit {
             switch response.result {
             case .failure(let error):
                 let error = NKError(error: error, afResponse: response)
-                options.queue.async { completion(account, nil, nil, error) }
+                options.queue.async { completion(account, nil, response.data, error) }
             case .success(let jsonData):
                 let json = JSON(jsonData)
                 let url = json["ocs"]["data"]["url"].stringValue
@@ -152,7 +152,7 @@ extension NextcloudKit {
             switch response.result {
             case .failure(let error):
                 let error = NKError(error: error, afResponse: response)
-                options.queue.async { completion(account, templates, nil, error) }
+                options.queue.async { completion(account, templates, response.data, error) }
             case .success(let jsonData):
                 let json = JSON(jsonData)
                 let ocsdatatemplates = json["ocs"]["data"]["editors"]
@@ -207,7 +207,7 @@ extension NextcloudKit {
             switch response.result {
             case .failure(let error):
                 let error = NKError(error: error, afResponse: response)
-                options.queue.async { completion(account, nil, nil, error) }
+                options.queue.async { completion(account, nil, response.data, error) }
             case .success(let jsonData):
                 let json = JSON(jsonData)
                 let url = json["ocs"]["data"]["url"].stringValue

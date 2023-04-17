@@ -32,13 +32,13 @@ extension NextcloudKit {
     @objc public func lockUnlockFile(serverUrlFileName: String,
                                      shouldLock: Bool,
                                      options: NKRequestOptions = NKRequestOptions(),
-                                     completion: @escaping (_ account: String, _ error: NKError) -> Void) {
+                                     completion: @escaping (_ account: String, _ data: Data?, _ error: NKError) -> Void) {
 
         let account = self.nkCommonInstance.account
 
         guard let url = serverUrlFileName.encodedToUrl
         else {
-            return options.queue.async { completion(account, .urlError) }
+            return options.queue.async { completion(account, nil, .urlError) }
         }
 
         let method = HTTPMethod(rawValue: shouldLock ? "LOCK" : "UNLOCK")
@@ -52,9 +52,9 @@ extension NextcloudKit {
             switch response.result {
             case .failure(let error):
                 let error = NKError(error: error, afResponse: response)
-                options.queue.async { completion(account, error) }
+                options.queue.async { completion(account, response.data, error) }
             case .success:
-                options.queue.async { completion(account, .success) }
+                options.queue.async { completion(account, response.data, .success) }
             }
         }
     }

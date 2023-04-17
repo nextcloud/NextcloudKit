@@ -50,7 +50,7 @@ extension NextcloudKit {
             switch response.result {
             case .failure(let error):
                 let error = NKError(error: error, afResponse: response)
-                options.queue.async { completion(account, nil, nil, error) }
+                options.queue.async { completion(account, nil, response.data, error) }
             case .success(let jsonData):
                 let json = JSON(jsonData)
                 let data = json["ocs"]["data"]

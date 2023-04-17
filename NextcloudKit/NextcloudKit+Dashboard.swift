@@ -64,7 +64,7 @@ extension NextcloudKit {
                 }
             case .failure(let error):
                 let error = NKError(error: error, afResponse: response)
-                options.queue.async { completion(account, nil, nil, error) }
+                options.queue.async { completion(account, nil, response.data, error) }
             }
         }
         options.queue.async { request(dashboardRequest) }
@@ -108,7 +108,7 @@ extension NextcloudKit {
                 }
             case .failure(let error):
                 let error = NKError(error: error, afResponse: response)
-                options.queue.async { completion(account, nil, nil, error) }
+                options.queue.async { completion(account, nil, response.data, error) }
             }
         }
         options.queue.async { request(dashboardRequest) }

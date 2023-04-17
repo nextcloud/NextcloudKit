@@ -99,17 +99,17 @@ extension NextcloudKit {
             switch response.result {
             case .failure(let error):
                 let error = NKError(error: error, afResponse: response)
-                options.queue.async { completion(account, nil, nil, error) }
+                options.queue.async { completion(account, nil, response.data, error) }
             case .success:
                 if let xmlData = response.data {
                     let shares = NKDataFileXML(nkCommonInstance: self.nkCommonInstance).convertDataShare(data: xmlData)
                     if shares.statusCode == 200 {
                         options.queue.async { completion(account, shares.shares, xmlData, .success) }
                     } else {
-                        options.queue.async { completion(account, nil, nil, NKError(xmlData: xmlData, fallbackStatusCode: response.response?.statusCode)) }
+                        options.queue.async { completion(account, nil, response.data, NKError(xmlData: xmlData, fallbackStatusCode: response.response?.statusCode)) }
                     }
                 } else {
-                    options.queue.async { completion(account, nil, nil, .xmlError) }
+                    options.queue.async { completion(account, nil, response.data, .xmlError) }
                 }
             }
         }
@@ -161,7 +161,7 @@ extension NextcloudKit {
             switch response.result {
             case .failure(let error):
                 let error = NKError(error: error, afResponse: response)
-                options.queue.async { completion(account, nil, nil, error) }
+                options.queue.async { completion(account, nil, response.data, error) }
             case .success(let jsonData):
                 let json = JSON(jsonData)
 
@@ -308,7 +308,7 @@ extension NextcloudKit {
             switch response.result {
             case .failure(let error):
                 let error = NKError(error: error, afResponse: response)
-                options.queue.async { completion(account, nil, nil, error) }
+                options.queue.async { completion(account, nil, response.data, error) }
             case .success(let jsonData):
                 let json = JSON(jsonData)
 
@@ -387,7 +387,7 @@ extension NextcloudKit {
             switch response.result {
             case .failure(let error):
                 let error = NKError(error: error, afResponse: response)
-                options.queue.async { completion(account, nil, nil, error) }
+                options.queue.async { completion(account, nil, response.data, error) }
             case .success(let jsonData):
                 let json = JSON(jsonData)
 
@@ -407,7 +407,7 @@ extension NextcloudKit {
 
     @objc public func deleteShare(idShare: Int,
                                   options: NKRequestOptions = NKRequestOptions(),
-                                  completion: @escaping (_ account: String, _ error: NKError) -> Void) {
+                                  completion: @escaping (_ account: String, _ data: Data?, _ error: NKError) -> Void) {
 
         let account = self.nkCommonInstance.account
         let urlBase = self.nkCommonInstance.urlBase
@@ -415,7 +415,7 @@ extension NextcloudKit {
         let endpoint = "ocs/v2.php/apps/files_sharing/api/v1/shares/\(idShare)"
 
         guard let url = self.nkCommonInstance.createStandardUrl(serverUrl: urlBase, endpoint: endpoint) else {
-            return options.queue.async { completion(account, .urlError) }
+            return options.queue.async { completion(account, nil, .urlError) }
         }
 
         let headers = self.nkCommonInstance.getStandardHeaders(options: options)
@@ -426,9 +426,9 @@ extension NextcloudKit {
             switch response.result {
             case .failure(let error):
                 let error = NKError(error: error, afResponse: response)
-                options.queue.async { completion(account, error) }
+                options.queue.async { completion(account, response.data, error) }
             case .success:
-                options.queue.async { completion(account, .success) }
+                options.queue.async { completion(account, response.data, .success) }
             }
         }
     }
