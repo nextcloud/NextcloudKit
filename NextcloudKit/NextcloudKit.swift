@@ -265,7 +265,7 @@ import SwiftyJSON
 
             switch response.result {
             case .failure(let error):
-                let resultError = NKError(error: error, afResponse: response)
+                let resultError = NKError(error: error, afResponse: response, responseData: nil)
                 queue.async { completionHandler(account, nil, nil, 0, nil, error, resultError) }
             case .success:
 
@@ -378,7 +378,7 @@ import SwiftyJSON
 
             switch response.result {
             case .failure(let error):
-                let resultError = NKError(error: error, afResponse: response)
+                let resultError = NKError(error: error, afResponse: response, responseData: response.data)
                 queue.async { completionHandler(account, nil, nil, nil, 0, nil, error, resultError) }
             case .success:
                 var ocId: String?, etag: String?

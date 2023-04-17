@@ -92,7 +92,7 @@ extension NextcloudKit {
                     completion(account, jsonData, .success)
                 }
             case .failure(let error):
-                let error = NKError(error: error, afResponse: response)
+                let error = NKError(error: error, afResponse: response, responseData: response.data)
                 return completion(account, nil, error)
             }
         }
@@ -171,7 +171,7 @@ extension NextcloudKit {
                 }
                 completion(account, searchResult, jsonData, .success)
             case .failure(let error):
-                let error = NKError(error: error, afResponse: response)
+                let error = NKError(error: error, afResponse: response, responseData: response.data)
                 return completion(account, nil, nil, error)
             }
         }

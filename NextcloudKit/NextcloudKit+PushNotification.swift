@@ -58,7 +58,7 @@ extension NextcloudKit {
 
             switch response.result {
             case .failure(let error):
-                let error = NKError(error: error, afResponse: response)
+                let error = NKError(error: error, afResponse: response, responseData: response.data)
                 queue.async { completion(account, nil, nil, nil, nil, error) }
             case .success(let jsonData):
                 let json = JSON(jsonData)
@@ -97,7 +97,7 @@ extension NextcloudKit {
 
             switch response.result {
             case .failure(let error):
-                let error = NKError(error: error, afResponse: response)
+                let error = NKError(error: error, afResponse: response, responseData: response.data)
                 queue.async { completion(account, error) }
             case .success:
                 queue.async { completion(account, .success) }
@@ -134,7 +134,7 @@ extension NextcloudKit {
 
             switch response.result {
             case .failure(let error):
-                let error = NKError(error: error, afResponse: response)
+                let error = NKError(error: error, afResponse: response, responseData: response.data)
                 queue.async { completion(error) }
             case .success:
                 queue.async { completion(.success) }
@@ -169,7 +169,7 @@ extension NextcloudKit {
 
             switch response.result {
             case .failure(let error):
-                let error = NKError(error: error, afResponse: response)
+                let error = NKError(error: error, afResponse: response, responseData: response.data)
                 queue.async { completion(error) }
             case .success:
                 queue.async { completion(.success) }

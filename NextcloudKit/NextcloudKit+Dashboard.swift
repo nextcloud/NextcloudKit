@@ -63,7 +63,7 @@ extension NextcloudKit {
                     options.queue.async { completion(account, nil, jsonData, NKError(rootJson: json, fallbackStatusCode: response.response?.statusCode)) }
                 }
             case .failure(let error):
-                let error = NKError(error: error, afResponse: response)
+                let error = NKError(error: error, afResponse: response, responseData: response.data)
                 options.queue.async { completion(account, nil, nil, error) }
             }
         }
@@ -107,7 +107,7 @@ extension NextcloudKit {
                     options.queue.async { completion(account, nil, jsonData, NKError(rootJson: json, fallbackStatusCode: response.response?.statusCode)) }
                 }
             case .failure(let error):
-                let error = NKError(error: error, afResponse: response)
+                let error = NKError(error: error, afResponse: response, responseData: response.data)
                 options.queue.async { completion(account, nil, nil, error) }
             }
         }
