@@ -93,7 +93,7 @@ extension NextcloudKit {
                 }
             case .failure(let error):
                 let error = NKError(error: error, afResponse: response)
-                return completion(account, response.data, error)
+                return completion(account, nil, error)
             }
         }
         request(requestUnifiedSearch)
@@ -172,7 +172,7 @@ extension NextcloudKit {
                 completion(account, searchResult, jsonData, .success)
             case .failure(let error):
                 let error = NKError(error: error, afResponse: response)
-                return completion(account, nil, response.data, error)
+                return completion(account, nil, nil, error)
             }
         }
 

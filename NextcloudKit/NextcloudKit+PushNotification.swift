@@ -59,7 +59,7 @@ extension NextcloudKit {
             switch response.result {
             case .failure(let error):
                 let error = NKError(error: error, afResponse: response)
-                queue.async { completion(account, nil, nil, nil, response.data, error) }
+                queue.async { completion(account, nil, nil, nil, nil, error) }
             case .success(let jsonData):
                 let json = JSON(jsonData)
                 let statusCode = json["ocs"]["meta"]["statuscode"].int ?? NKError.internalError
@@ -82,12 +82,12 @@ extension NextcloudKit {
                                                     customUserAgent: String? = nil,
                                                     addCustomHeaders: [String: String]? = nil,
                                                     queue: DispatchQueue = .main,
-                                                    completion: @escaping (_ account: String, _ data: Data?, _ error: NKError) -> Void) {
+                                                    completion: @escaping (_ account: String, _ error: NKError) -> Void) {
 
         let endpoint = "ocs/v2.php/apps/notifications/api/v2/push"
 
         guard let url = self.nkCommonInstance.createStandardUrl(serverUrl: serverUrl, endpoint: endpoint) else {
-            return queue.async { completion(account, nil, .urlError) }
+            return queue.async { completion(account, .urlError) }
         }
 
         let headers = self.nkCommonInstance.getStandardHeaders(user: user, password: password, appendHeaders: addCustomHeaders, customUserAgent: customUserAgent)
@@ -98,9 +98,9 @@ extension NextcloudKit {
             switch response.result {
             case .failure(let error):
                 let error = NKError(error: error, afResponse: response)
-                queue.async { completion(account, response.data, error) }
+                queue.async { completion(account, error) }
             case .success:
-                queue.async { completion(account, response.data, .success) }
+                queue.async { completion(account, .success) }
             }
         }
     }
@@ -112,12 +112,12 @@ extension NextcloudKit {
                                            publicKey: String,
                                            userAgent: String,
                                            queue: DispatchQueue = .main,
-                                           completion: @escaping (_ data: Data?, _ error: NKError) -> Void) {
+                                           completion: @escaping (_ error: NKError) -> Void) {
 
         let endpoint = "devices?format=json"
 
         guard let url = self.nkCommonInstance.createStandardUrl(serverUrl: proxyServerUrl, endpoint: endpoint) else {
-            return queue.async { completion(nil, .urlError) }
+            return queue.async { completion(.urlError) }
         }
 
         let parameters = [
@@ -135,9 +135,9 @@ extension NextcloudKit {
             switch response.result {
             case .failure(let error):
                 let error = NKError(error: error, afResponse: response)
-                queue.async { completion(response.data, error) }
+                queue.async { completion(error) }
             case .success:
-                queue.async { completion(response.data, .success) }
+                queue.async { completion(.success) }
             }
         }
     }
@@ -148,12 +148,12 @@ extension NextcloudKit {
                                              publicKey: String,
                                              userAgent: String,
                                              queue: DispatchQueue = .main,
-                                             completion: @escaping (_ data: Data?, _ error: NKError) -> Void) {
+                                             completion: @escaping (_ error: NKError) -> Void) {
 
         let endpoint = "devices"
 
         guard let url = self.nkCommonInstance.createStandardUrl(serverUrl: proxyServerUrl, endpoint: endpoint) else {
-            return queue.async { completion(nil, .urlError) }
+            return queue.async { completion(.urlError) }
         }
 
         let parameters = [
@@ -170,9 +170,9 @@ extension NextcloudKit {
             switch response.result {
             case .failure(let error):
                 let error = NKError(error: error, afResponse: response)
-                queue.async { completion(response.data, error) }
+                queue.async { completion(error) }
             case .success:
-                queue.async { completion(response.data, .success) }
+                queue.async { completion(.success) }
             }
         }
     }

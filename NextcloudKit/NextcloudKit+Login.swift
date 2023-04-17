@@ -61,13 +61,13 @@ extension NextcloudKit {
             switch response.result {
             case .failure(let error):
                 let error = NKError(error: error, afResponse: response)
-                queue.async { completion(nil, response.data, error) }
+                queue.async { completion(nil, nil, error) }
             case .success(let xmlData):
                 if let data = xmlData {
                     let apppassword = NKDataFileXML(nkCommonInstance: self.nkCommonInstance).convertDataAppPassword(data: data)
                     queue.async { completion(apppassword, xmlData, .success) }
                 } else {
-                    queue.async { completion(nil, response.data, .xmlError) }
+                    queue.async { completion(nil, nil, .xmlError) }
                 }
             }
         }
@@ -97,7 +97,7 @@ extension NextcloudKit {
             switch response.result {
             case .failure(let error):
                 let error = NKError(error: error, afResponse: response)
-                queue.async { completion(nil, nil, nil, response.data, error) }
+                queue.async { completion(nil, nil, nil, nil, error) }
             case .success(let jsonData):
                 let json = JSON(jsonData)
 
@@ -133,7 +133,7 @@ extension NextcloudKit {
             switch response.result {
             case .failure(let error):
                 let error = NKError(error: error, afResponse: response)
-                queue.async { completion(nil, nil, nil, response.data, error) }
+                queue.async { completion(nil, nil, nil, nil, error) }
             case .success(let jsonData):
                 let json = JSON(jsonData)
 
