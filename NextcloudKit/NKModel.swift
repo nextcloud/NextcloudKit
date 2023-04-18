@@ -391,12 +391,10 @@ class NKDataFileXML: NSObject {
     <lock-owner-type xmlns=\"http://nextcloud.org/ns\"/>
     <lock-time xmlns=\"http://nextcloud.org/ns\"/>
     <lock-timeout xmlns=\"http://nextcloud.org/ns\"/>
-
+    <system-tags xmlns=\"http://nextcloud.org/ns\"/>
 
     <share-permissions xmlns=\"http://open-collaboration-services.org/ns\"/>
     <share-permissions xmlns=\"http://open-cloud-mesh.org/ns\"/>
-
-    <system-tags xmlns=\"http://nextcloud.org/ns\"/>
     """
 
     lazy var requestBodyFile: String = {
