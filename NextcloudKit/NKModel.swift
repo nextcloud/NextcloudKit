@@ -396,7 +396,7 @@ class NKDataFileXML: NSObject {
     <share-permissions xmlns=\"http://open-collaboration-services.org/ns\"/>
     <share-permissions xmlns=\"http://open-cloud-mesh.org/ns\"/>
 
-    <tags xmlns=\"http://nextcloud.org/ns\"/>
+    <system-tags xmlns=\"http://nextcloud.org/ns\"/>
     """
 
     lazy var requestBodyFile: String = {
