@@ -856,7 +856,7 @@ class NKDataFileXML: NSObject {
                 }
             }
 
-            let tagsEmelents = propstat["d:prop", "nc:tags", "oc:tag"]
+            let tagsEmelents = propstat["d:prop", "nc:system-tag"]
             for tagElement in tagsEmelents {
                 if let tag = tagElement.text {
                     file.tags.append(tag)
