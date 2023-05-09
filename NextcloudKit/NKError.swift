@@ -59,6 +59,7 @@ public class NKError: NSObject {
     public let errorCode: Int
     public let errorDescription: String
     public let error: Error
+    public let responseData: Data?
 
     public static let urlError = NKError(errorCode: NSURLErrorBadURL, errorDescription: NSLocalizedString("_invalid_url_", value: "Invalid server url", comment: ""))
     public static let xmlError = NKError(errorCode: NSURLErrorBadServerResponse, errorDescription: NSLocalizedString("_error_decode_xml_", value: "Invalid response, error decoding XML", comment: ""))
@@ -128,25 +129,28 @@ public class NKError: NSObject {
         }
     }
 
-    public init(errorCode: Int = 0, errorDescription: String = "") {
+    public init(errorCode: Int = 0, errorDescription: String = "", responseData: Data? = nil) {
         self.errorCode = errorCode
         self.errorDescription = errorDescription
         self.error = NSError(domain: NSCocoaErrorDomain, code: self.errorCode, userInfo: [NSLocalizedDescriptionKey: self.errorDescription])
+        self.responseData = responseData
     }
 
-    public init(error: Error) {
+    public init(error: Error, responseData: Data? = nil) {
         self.errorCode = error._code
         self.errorDescription = error.localizedDescription
         self.error = error
+        self.responseData = responseData
     }
 
-    public init(nsError: NSError) {
+    public init(nsError: NSError, responseData: Data? = nil) {
         self.errorCode = nsError.code
         self.errorDescription = nsError.localizedDescription
         self.error = nsError
+        self.responseData = responseData
     }
 
-    public init(rootJson: JSON, fallbackStatusCode: Int?) {
+    public init(rootJson: JSON, fallbackStatusCode: Int?, responseData: Data? = nil) {
         let statuscode = rootJson[.ocsMetaCode].int ?? fallbackStatusCode ?? NSURLErrorCannotDecodeContentData
         errorCode = 200..<300 ~= statuscode ? 0 : statuscode
 
@@ -157,20 +161,22 @@ public class NKError: NSObject {
         } else {
             errorDescription = NKError.getErrorDescription(for: statuscode) ?? ""
         }
+        self.responseData = responseData
         self.error = NSError(domain: NSCocoaErrorDomain, code: self.errorCode, userInfo: [NSLocalizedDescriptionKey: self.errorDescription])
     }
 
-    public init(statusCode: Int, fallbackDescription: String) {
+    public init(statusCode: Int, fallbackDescription: String, responseData: Data? = nil) {
         self.errorCode = statusCode
         self.errorDescription = "\(statusCode): " + (NKError.getErrorDescription(for: statusCode) ?? fallbackDescription)
         self.error = NSError(domain: NSCocoaErrorDomain, code: self.errorCode, userInfo: [NSLocalizedDescriptionKey: self.errorDescription])
+        self.responseData = responseData
     }
 
     convenience init(httpResponse: HTTPURLResponse) {
         self.init(statusCode: httpResponse.statusCode, fallbackDescription: httpResponse.description)
     }
 
-    init(xmlData: Data, fallbackStatusCode: Int? = nil) {
+    init(xmlData: Data, fallbackStatusCode: Int? = nil, responseData: Data? = nil) {
         let xml = XML.parse(xmlData)
         let statuscode = xml[.ocsMetaCode].int ?? fallbackStatusCode ?? NSURLErrorCannotDecodeContentData
         errorCode = 200..<300 ~= statuscode ? 0 : statuscode
@@ -184,41 +190,42 @@ public class NKError: NSObject {
         } else {
             errorDescription = NKError.getErrorDescription(for: statuscode) ?? ""
         }
+        self.responseData = responseData
         self.error = NSError(domain: NSCocoaErrorDomain, code: self.errorCode, userInfo: [NSLocalizedDescriptionKey: self.errorDescription])
     }
 
-    public convenience init<T: AFResponse>(error: AFError?, afResponse: T) {
+    public convenience init<T: AFResponse>(error: AFError?, afResponse: T, responseData: Data? = nil) {
         if let errorCode = afResponse.response?.statusCode {
             guard let dataResponse = afResponse as? Alamofire.DataResponse<T.Success, T.Failure>,
                   let errorData = dataResponse.data
             else {
-                self.init(statusCode: errorCode, fallbackDescription: afResponse.response?.description ?? "")
+                self.init(statusCode: errorCode, fallbackDescription: afResponse.response?.description ?? "", responseData: responseData)
                 return
             }
 
             if let errorJson = try? JSON(data: errorData) {
-                self.init(rootJson: errorJson, fallbackStatusCode: errorCode)
+                self.init(rootJson: errorJson, fallbackStatusCode: errorCode, responseData: responseData)
             } else {
-                self.init(xmlData: errorData, fallbackStatusCode: errorCode)
+                self.init(xmlData: errorData, fallbackStatusCode: errorCode, responseData: responseData)
             }
 
         } else if let error = error {
             switch error {
             case .createUploadableFailed(let error as NSError):
-                self.init(nsError: error)
+                self.init(nsError: error, responseData: responseData)
             case .createURLRequestFailed(let error as NSError):
-                self.init(nsError: error)
+                self.init(nsError: error, responseData: responseData)
             case .requestAdaptationFailed(let error as NSError):
-                self.init(nsError: error)
+                self.init(nsError: error, responseData: responseData)
             case .sessionInvalidated(let error as NSError):
-                self.init(nsError: error)
+                self.init(nsError: error, responseData: responseData)
             case .sessionTaskFailed(let error as NSError):
-                self.init(nsError: error)
+                self.init(nsError: error, responseData: responseData)
             default:
-                self.init(error: error)
+                self.init(error: error, responseData: responseData)
             }
         } else {
-            self.init(errorCode: 0, errorDescription: "")
+            self.init(errorCode: 0, errorDescription: "", responseData: responseData)
         }
     }
 

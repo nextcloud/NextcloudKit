@@ -54,7 +54,7 @@ extension NextcloudKit {
 
             switch response.result {
             case .failure(let error):
-                let error = NKError(error: error, afResponse: response)
+                let error = NKError(error: error, afResponse: response, responseData: response.data)
                 options.queue.async { completion(account, nil, nil, error) }
             case .success:
                 let ocId = self.nkCommonInstance.findHeader("oc-fileid", allHeaderFields: response.response?.allHeaderFields)
@@ -96,7 +96,7 @@ extension NextcloudKit {
 
             switch response.result {
             case .failure(let error):
-                let error = NKError(error: error, afResponse: response)
+                let error = NKError(error: error, afResponse: response, responseData: response.data)
                 options.queue.async { completion(account, error) }
             case .success:
                 options.queue.async { completion(account, .success) }
@@ -139,7 +139,7 @@ extension NextcloudKit {
 
             switch response.result {
             case .failure(let error):
-                let error = NKError(error: error, afResponse: response)
+                let error = NKError(error: error, afResponse: response, responseData: response.data)
                 options.queue.async { completion(account, error) }
             case .success:
                 options.queue.async { completion(account, .success) }
@@ -182,7 +182,7 @@ extension NextcloudKit {
 
             switch response.result {
             case .failure(let error):
-                let error = NKError(error: error, afResponse: response)
+                let error = NKError(error: error, afResponse: response, responseData: response.data)
                 options.queue.async { completion(account, error) }
             case .success:
                 options.queue.async { completion(account, .success) }
@@ -236,7 +236,7 @@ extension NextcloudKit {
 
             switch response.result {
             case .failure(let error):
-                let error = NKError(error: error, afResponse: response)
+                let error = NKError(error: error, afResponse: response, responseData: response.data)
                 options.queue.async { completion(account, files, nil, error) }
             case .success:
                 if let xmlData = response.data {
@@ -399,7 +399,7 @@ extension NextcloudKit {
 
             switch response.result {
             case .failure(let error):
-                let error = NKError(error: error, afResponse: response)
+                let error = NKError(error: error, afResponse: response, responseData: response.data)
                 options.queue.async { completion(account, files, nil, error) }
             case .success:
                 if let xmlData = response.data {
@@ -446,7 +446,7 @@ extension NextcloudKit {
 
             switch response.result {
             case .failure(let error):
-                let error = NKError(error: error, afResponse: response)
+                let error = NKError(error: error, afResponse: response, responseData: response.data)
                 options.queue.async { completion(account, error) }
             case .success:
                 options.queue.async { completion(account, .success) }
@@ -489,7 +489,7 @@ extension NextcloudKit {
 
             switch response.result {
             case .failure(let error):
-                let error = NKError(error: error, afResponse: response)
+                let error = NKError(error: error, afResponse: response, responseData: response.data)
                 options.queue.async { completion(account, files, nil, error) }
             case .success:
                 if let xmlData = response.data {
@@ -536,7 +536,7 @@ extension NextcloudKit {
 
             switch response.result {
             case .failure(let error):
-                let error = NKError(error: error, afResponse: response)
+                let error = NKError(error: error, afResponse: response, responseData: response.data)
                 options.queue.async { completion(account, items, nil, error) }
             case .success:
                 if let xmlData = response.data {

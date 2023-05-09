@@ -265,7 +265,7 @@ import SwiftyJSON
 
             switch response.result {
             case .failure(let error):
-                let resultError = NKError(error: error, afResponse: response)
+                let resultError = NKError(error: error, afResponse: response, responseData: nil)
                 queue.async { completionHandler(account, nil, nil, 0, nil, error, resultError) }
             case .success:
 
@@ -353,12 +353,16 @@ import SwiftyJSON
 
         var headers = self.nkCommonInstance.getStandardHeaders(addCustomHeaders, customUserAgent: customUserAgent)
         if dateCreationFile != nil {
-            let sDate = "\(dateCreationFile?.timeIntervalSince1970 ?? 0)"
-            headers.update(name: "X-OC-CTime", value: sDate)
+            var iDate: TimeInterval = dateCreationFile?.timeIntervalSince1970 ?? 0
+            // Epoch of linux do not permitted negativ value
+            if iDate < 0 { iDate = 0 }
+            headers.update(name: "X-OC-CTime", value: "\(iDate)")
         }
         if dateModificationFile != nil {
-            let sDate = "\(dateModificationFile?.timeIntervalSince1970 ?? 0)"
-            headers.update(name: "X-OC-MTime", value: sDate)
+            var iDate: TimeInterval = dateModificationFile?.timeIntervalSince1970 ?? 0
+            // Epoch of linux do not permitted negativ value
+            if iDate < 0 { iDate = 0 }
+            headers.update(name: "X-OC-MTime", value: "\(iDate)")
         }
 
         let request = sessionManager.upload(fileNameLocalPathUrl, to: url, method: .put, headers: headers, interceptor: nil, fileManager: .default).validate(statusCode: 200..<300).onURLSessionTaskCreation(perform: { task in
@@ -374,7 +378,7 @@ import SwiftyJSON
 
             switch response.result {
             case .failure(let error):
-                let resultError = NKError(error: error, afResponse: response)
+                let resultError = NKError(error: error, afResponse: response, responseData: response.data)
                 queue.async { completionHandler(account, nil, nil, nil, 0, nil, error, resultError) }
             case .success:
                 var ocId: String?, etag: String?

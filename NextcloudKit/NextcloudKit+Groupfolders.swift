@@ -1,11 +1,10 @@
 //
-//  NextcloudKit+Hovercard.swift
+//  NextcloudKit+Groupfolders.swift
 //  NextcloudKit
 //
-//  Created by Henrik Storch on 04/11/2021.
-//  Copyright © 2021 Henrik Sorch. All rights reserved.
+//  Created by Henrik Storch on 12/04/2023.
+//  Copyright © 2023 Marino Faggiana. All rights reserved.
 //
-//  Author Henrik Storch <henrik.storch@nextcloud.com>
 //  Author Marino Faggiana <marino.faggiana@nextcloud.com>
 //
 //  This program is free software: you can redistribute it and/or modify
@@ -28,14 +27,13 @@ import SwiftyJSON
 
 extension NextcloudKit {
 
-    @objc public func getHovercard(for userId: String,
-                                   options: NKRequestOptions = NKRequestOptions(),
-                                   completion: @escaping (_ account: String, _ result: NKHovercard?, _ data: Data?, _ error: NKError) -> Void) {
+    @objc public func getGroupfolders(options: NKRequestOptions = NKRequestOptions(),
+                                      completion: @escaping (_ account: String, _ results: [NKGroupfolders]?, _ data: Data?, _ error: NKError) -> Void) {
 
         let account = self.nkCommonInstance.account
         let urlBase = self.nkCommonInstance.urlBase
 
-        let endpoint = "ocs/v2.php/hovercard/v1/\(userId)"
+        let endpoint = "index.php/apps/groupfolders/folders?applicable=1"
 
         guard let url = self.nkCommonInstance.createStandardUrl(serverUrl: urlBase, endpoint: endpoint)
         else {
@@ -50,58 +48,57 @@ extension NextcloudKit {
             switch response.result {
             case .failure(let error):
                 let error = NKError(error: error, afResponse: response, responseData: response.data)
-                options.queue.async { completion(account, nil, nil, error) }
+                options.queue.async { completion(account, nil, response.data, error) }
             case .success(let jsonData):
                 let json = JSON(jsonData)
                 let data = json["ocs"]["data"]
-                guard json["ocs"]["meta"]["statuscode"].int == 200,
-                      let result = NKHovercard(jsonData: data)
+                guard json["ocs"]["meta"]["statuscode"].int == 200 || json["ocs"]["meta"]["statuscode"].int == 100
                 else {
                     let error = NKError(rootJson: json, fallbackStatusCode: response.response?.statusCode)
                     options.queue.async { completion(account, nil, jsonData, error) }
                     return
                 }
-                options.queue.async { completion(account, result, jsonData, .success) }
+                var results = [NKGroupfolders]()
+                for (_, subJson) in data {
+                    if let result = NKGroupfolders(json: subJson) {
+                        results.append(result)
+                    }
+                }
+                options.queue.async { completion(account, results, jsonData, .success) }
             }
         }
     }
 }
 
-@objc public class NKHovercard: NSObject {
-    internal init?(jsonData: JSON) {
-        guard let userId = jsonData["userId"].string,
-              let displayName = jsonData["displayName"].string,
-              let actions = jsonData["actions"].array?.compactMap(Action.init)
-        else {
-            return nil
+@objc public class NKGroupfolders: NSObject {
+
+    @objc public let id: Int
+    @objc public let mountPoint: String
+    @objc public let acl: Bool
+    @objc public let size: Int
+    @objc public let quota: Int
+    @objc public let manage: Data?
+    @objc public let groups: [String: Any]?
+
+    internal init?(json: JSON) {
+        guard let id = json["id"].int,
+              let mountPoint = json["mount_point"].string,
+              let acl = json["acl"].bool,
+              let size = json["size"].int,
+              let quota = json["quota"].int
+        else { return nil }
+
+        self.id = id
+        self.mountPoint = mountPoint
+        self.acl = acl
+        self.size = size
+        self.quota = quota
+        do {
+            let data = try json["manage"].rawData()
+            self.manage = data
+        } catch {
+            self.manage = nil
         }
-        self.userId = userId
-        self.displayName = displayName
-        self.actions = actions
+        self.groups = json["groups"].dictionaryObject
     }
-
-    @objc public class Action: NSObject {
-        internal init?(jsonData: JSON) {
-            guard let title = jsonData["title"].string,
-                  let icon = jsonData["icon"].string,
-                  let hyperlink = jsonData["hyperlink"].string,
-                  let appId = jsonData["appId"].string
-            else {
-                return nil
-            }
-            self.title = title
-            self.icon = icon
-            self.hyperlink = hyperlink
-            self.appId = appId
-        }
-
-        @objc public let title: String
-        @objc public let icon: String
-        @objc public let hyperlink: String
-        @objc public var hyperlinkUrl: URL? { URL(string: hyperlink) }
-        @objc public let appId: String
-    }
-
-    @objc public let userId, displayName: String
-    @objc public let actions: [Action]
 }

@@ -63,7 +63,7 @@ extension NextcloudKit {
                     options.queue.async { completion(account, nil, jsonData, NKError(rootJson: json, fallbackStatusCode: response.response?.statusCode)) }
                 }
             case .failure(let error):
-                let error = NKError(error: error, afResponse: response)
+                let error = NKError(error: error, afResponse: response, responseData: response.data)
                 options.queue.async { completion(account, nil, nil, error) }
             }
         }
@@ -107,10 +107,107 @@ extension NextcloudKit {
                     options.queue.async { completion(account, nil, jsonData, NKError(rootJson: json, fallbackStatusCode: response.response?.statusCode)) }
                 }
             case .failure(let error):
-                let error = NKError(error: error, afResponse: response)
+                let error = NKError(error: error, afResponse: response, responseData: response.data)
                 options.queue.async { completion(account, nil, nil, error) }
             }
         }
         options.queue.async { request(dashboardRequest) }
+    }
+}
+
+@objc public class NCCDashboardApplication: NSObject {
+
+    @objc public var application: String?
+    @objc public var items: [NCCDashboardItem]?
+
+    init?(application: String, data: JSON) {
+        self.application = application
+        self.items = NCCDashboardItem.factory(data: data)
+    }
+
+    static func factory(data: JSON) -> [NCCDashboardApplication] {
+        var results = [NCCDashboardApplication]()
+        for (application, data): (String, JSON) in data {
+            if let result = NCCDashboardApplication(application: application, data: data) {
+                results.append(result)
+            }
+        }
+        return results
+    }
+}
+
+@objc public class NCCDashboardItem: NSObject {
+
+    @objc public let title: String?
+    @objc public let subtitle: String?
+    @objc public let link: String?
+    @objc public let iconUrl: String?
+    @objc public let sinceId: Int
+
+    init?(json: JSON) {
+        self.title = json["title"].string
+        self.subtitle = json["subtitle"].string
+        self.link = json["link"].string
+        self.iconUrl = json["iconUrl"].string
+        self.sinceId = json["sinceId"].int ?? 0
+    }
+
+    static func factory(data: JSON) -> [NCCDashboardItem]? {
+        guard let allResults = data.array else { return nil }
+        return allResults.compactMap(NCCDashboardItem.init)
+    }
+}
+
+@objc public class NCCDashboardWidget: NSObject {
+
+    @objc public var id, title: String
+    @objc public let order: Int
+    @objc public let iconClass, iconUrl, widgetUrl: String?
+    @objc public let itemIconsRound: Bool
+    @objc public let button: [NCCDashboardWidgetButton]?
+
+    init?(application: String, data: JSON) {
+        guard let id = data["id"].string,
+              let title = data["title"].string,
+              let order = data["order"].int
+        else { return nil }
+        self.id = id
+        self.title = title
+        self.order = order
+        self.iconClass = data["icon_class"].string
+        self.iconUrl = data["icon_url"].string
+        self.widgetUrl = data["widget_url"].string
+        self.itemIconsRound = data["item_icons_round"].boolValue
+        self.button = NCCDashboardWidgetButton.factory(data: data["buttons"])
+    }
+
+    static func factory(data: JSON) -> [NCCDashboardWidget] {
+        var results = [NCCDashboardWidget]()
+        for (application, data): (String, JSON) in data {
+            if let result = NCCDashboardWidget(application: application, data: data) {
+                results.append(result)
+            }
+        }
+        return results
+    }
+}
+
+@objc public class NCCDashboardWidgetButton: NSObject {
+
+    @objc public let type, text, link: String
+
+    init?(data: JSON) {
+        guard let type = data["type"].string,
+              let text = data["text"].string,
+              let link = data["link"].string
+        else { return nil }
+        self.type = type
+        self.text = text
+        self.link = link
+    }
+
+    static func factory(data: JSON) -> [NCCDashboardWidgetButton]? {
+        guard let allProvider = data.array else { return nil }
+        return allProvider.compactMap(NCCDashboardWidgetButton.init)
     }
 }
