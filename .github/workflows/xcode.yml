@@ -7,17 +7,22 @@ on:
       - develop
   pull_request:
     types: [synchronize, opened, reopened, ready_for_review]
-    branches: 
+    branches:
       - master
       - develop
 
+env:
+  PROJECT: NextcloudKit.xcodeproj
+  DESTINATION: platform=iOS Simulator,name=iPhone 14
+  SCHEME: NextcloudKit
+
 jobs:
-  XCBuild:
+  build:
     runs-on: macOS-latest
-    if: github.event.pull_request.draft == false
-    env:
-      PROJECT: NextcloudKit.xcodeproj
-      DESTINATION: platform=iOS Simulator,name=iPhone 14
+#    if: github.event.pull_request.draft == false
+#    env:
+#      PROJECT: NextcloudKit.xcodeproj
+#      DESTINATION: platform=iOS Simulator,name=iPhone 14
     steps:
     - name: Set env var
       run: echo "DEVELOPER_DIR=$(xcode-select --print-path)" >> $GITHUB_ENV
@@ -25,6 +30,13 @@ jobs:
     - name: Build NextcloudKit
       run: |
         xcodebuild build -project $PROJECT -scheme "$SCHEME" -destination "$DESTINATION"
-      env:
-          SCHEME: NextcloudKit
+#      env:
+  tests:
+    needs: build
+    uses: ./.github/workflows/tests.yml
+    with:
+      project: NextcloudKit.xcodeproj
+      destination: platform=iOS Simulator,name=iPhone 14
+      scheme: NextcloudKit
+
     
