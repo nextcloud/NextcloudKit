@@ -11,6 +11,15 @@
         }
       },
       {
+        "package": "Mocker",
+        "repositoryURL": "https://github.com/WeTransfer/Mocker.git",
+        "state": {
+          "branch": null,
+          "revision": "5d86f27a8f80d4ba388bc1a379a3c2289a1f3d18",
+          "version": "2.6.0"
+        }
+      },
+      {
         "package": "SwiftyJSON",
         "repositoryURL": "https://github.com/SwiftyJSON/SwiftyJSON",
         "state": {

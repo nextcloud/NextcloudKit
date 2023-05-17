@@ -17,6 +17,7 @@ let package = Package(
             targets: ["NextcloudKit"]),
     ],
     dependencies: [
+        .package(url: "https://github.com/WeTransfer/Mocker.git", .upToNextMajor(from: "2.3.0")),
         .package(url: "https://github.com/Alamofire/Alamofire", .upToNextMajor(from: "5.4.1")),
         .package(url: "https://github.com/SwiftyJSON/SwiftyJSON", .upToNextMajor(from: "5.0.0")),
         .package(url: "https://github.com/yahoojapan/SwiftyXMLParser", .upToNextMajor(from: "5.3.0")),
@@ -24,11 +25,15 @@ let package = Package(
     targets: [
         .target(
             name: "NextcloudKit",
-            dependencies: ["Alamofire","SwiftyJSON","SwiftyXMLParser"],
+            dependencies: ["Alamofire","SwiftyJSON","SwiftyXMLParser","Mocker"],
             path: "NextcloudKit"),
         .testTarget(
-            name: "NextcloudKitTests",
+            name: "NextcloudKitUnitTests",
             dependencies: ["NextcloudKit"],
-            path: "NextcloudKitTests")
+            path: "NextcloudKitUnitTests"),
+        .testTarget(
+            name: "NextcloudKitIntegrationTests",
+            dependencies: ["NextcloudKit"],
+            path: "NextcloudKitIntegrationTests")
     ]
 )

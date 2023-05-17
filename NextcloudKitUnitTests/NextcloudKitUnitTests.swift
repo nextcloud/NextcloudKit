@@ -7,8 +7,10 @@
 
 import XCTest
 @testable import NextcloudKit
+import Alamofire
+import Mocker
 
-class NextcloudKitTests: XCTestCase {
+class NextcloudKitUnitTests: XCTestCase {
 
     override func setUpWithError() throws {
         // Put setup code here. This method is called before the invocation of each test method in the class.
