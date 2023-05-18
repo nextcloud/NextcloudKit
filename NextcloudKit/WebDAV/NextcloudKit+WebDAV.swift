@@ -328,10 +328,7 @@ extension NextcloudKit {
         let urlBase = self.nkCommonInstance.urlBase
         let files: [NKFile] = []
         var greaterDateString: String?, lessDateString: String?
-
-        guard let href = ("/files/" + userId + path).urlEncoded else {
-            return options.queue.async { completion(account, files, nil, .urlError) }
-        }
+        let href = "/files/" + userId + path
 
         if let lessDate = lessDate as? Date {
             lessDateString = self.nkCommonInstance.convertDate(lessDate, format: "yyyy-MM-dd'T'HH:mm:ssZZZZZ")
