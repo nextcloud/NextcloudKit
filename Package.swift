@@ -29,11 +29,9 @@ let package = Package(
             path: "NextcloudKit"),
         .testTarget(
             name: "NextcloudKitUnitTests",
-            dependencies: ["NextcloudKit"],
-            path: "NextcloudKitUnitTests"),
+            dependencies: ["NextcloudKit"]),
         .testTarget(
             name: "NextcloudKitIntegrationTests",
-            dependencies: ["NextcloudKit"],
-            path: "NextcloudKitIntegrationTests")
+            dependencies: ["NextcloudKit"])
     ]
 )
