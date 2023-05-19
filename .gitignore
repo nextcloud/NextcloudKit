@@ -25,6 +25,7 @@
 xcuserdata
 profile
 *.moved-aside
+*.xcodeproj/
 DerivedData
 .idea/
 *.hmap

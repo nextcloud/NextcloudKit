@@ -12,7 +12,6 @@ on:
       - develop
 
 env:
-  PROJECT: NextcloudKit.xcodeproj
   DESTINATION: platform=iOS Simulator,name=iPhone 14
   SCHEME: NextcloudKit
 
@@ -29,13 +28,12 @@ jobs:
     - uses: actions/checkout@v2
     - name: Build NextcloudKit
       run: |
-        xcodebuild build -project $PROJECT -scheme "$SCHEME" -destination "$DESTINATION"
+        xcodebuild build -scheme "$SCHEME" -destination "$DESTINATION"
 #      env:
   tests:
     needs: build
     uses: ./.github/workflows/tests.yml
     with:
-      project: NextcloudKit.xcodeproj
       destination: platform=iOS Simulator,name=iPhone 14
       scheme: NextcloudKit
 

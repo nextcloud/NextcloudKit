@@ -3,9 +3,6 @@ name: Tests
 on:
   workflow_call:
     inputs:
-      project:
-        required: true
-        type: string
       scheme:
         required: true
         type: string
@@ -20,5 +17,5 @@ jobs:
     - uses: actions/checkout@v2
     - name: Test NextcloudKit
       run: |
-        xcodebuild test -project ${{ inputs.project }} -scheme "${{ inputs.scheme }}" -destination "${{ inputs.destination }}"
+        xcodebuild test -scheme "${{ inputs.scheme }}" -destination "${{ inputs.destination }}"
     
