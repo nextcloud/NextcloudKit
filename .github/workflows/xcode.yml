@@ -16,25 +16,16 @@ env:
   SCHEME: NextcloudKit
 
 jobs:
-  build:
+  build-and-test:
+    name: Build and Test
     runs-on: macOS-latest
-#    if: github.event.pull_request.draft == false
-#    env:
-#      PROJECT: NextcloudKit.xcodeproj
-#      DESTINATION: platform=iOS Simulator,name=iPhone 14
+    if: github.event.pull_request.draft == false
     steps:
     - name: Set env var
       run: echo "DEVELOPER_DIR=$(xcode-select --print-path)" >> $GITHUB_ENV
     - uses: actions/checkout@v2
     - name: Build NextcloudKit
       run: |
-        xcodebuild build -scheme "$SCHEME" -destination "$DESTINATION"
-#      env:
-  tests:
-    needs: build
-    uses: ./.github/workflows/tests.yml
-    with:
-      destination: platform=iOS Simulator,name=iPhone 14
-      scheme: NextcloudKit
+        xcodebuild build test -scheme "$SCHEME" -destination "$DESTINATION"
 
     
