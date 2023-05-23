@@ -1,6 +1,6 @@
 //
-//  NextcloudKitTests.swift
-//  NextcloudKitTests
+//  NextcloudKitUnitTests.swift
+//  NextcloudKitUnitTests
 //
 //  Created by Marino Faggiana on 17/08/22.
 //

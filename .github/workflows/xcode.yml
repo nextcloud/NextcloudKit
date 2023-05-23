@@ -12,7 +12,8 @@ on:
       - develop
 
 env:
-  DESTINATION: platform=iOS Simulator,name=iPhone 14
+  DESTINATION_IOS: platform=iOS Simulator,name=iPhone 14
+  DESTINATION_MACOS: platform=macOS,arch=x86_64
   SCHEME: NextcloudKit
 
 jobs:
@@ -26,6 +27,6 @@ jobs:
     - uses: actions/checkout@v2
     - name: Build NextcloudKit
       run: |
-        xcodebuild build test -scheme "$SCHEME" -destination "$DESTINATION" -enableCodeCoverage YES
+        xcodebuild build test -scheme "$SCHEME" -destination "$DESTINATION_IOS" -destination "$DESTINATION_MACOS" -enableCodeCoverage YES
 
     
