@@ -31,21 +31,25 @@ class NextcloudKitUnitTests: XCTestCase {
     private lazy var requestExpectation = expectation(description: "Request should finish")
 
     func `test_log_in_poll_successful`() {
+        // Create a mock of Alamofire' session manager
         let configuration = URLSessionConfiguration.af.default
         configuration.protocolClasses = [MockingURLProtocol.self]
-        let sessionManager = Alamofire.Session(configuration: configuration)
+        let mockSessionManager = Alamofire.Session(configuration: configuration)
+
+        // Create a mock of the json we would expect to get from the original call
         let mockJson: Data = try! Data(contentsOf: MockedData.mockJson)
 
-
+        // Create a mock session request and register it
         let mock = Mock(url: url, dataType: .json, statusCode: 200, data: [
             .post: mockJson
         ])
         mock.register()
 
+        // Set our mock session manager as the one this package is going to use
+        NextcloudKit.shared.setCustomSessionManager(sessionManager: mockSessionManager)
 
-        NextcloudKit.shared.setCustomSessionManager(sessionManager: sessionManager)
-
-        NextcloudKit.shared.getLoginFlowV2(serverUrl: serverUrl) { token, endpoint, login, data, error in
+        // Now we call the function we want to set, it will use the mock session and request, and return the mock data
+        NextcloudKit.shared.getLoginFlowV2(serverUrl: serverUrl) { token, endpoint, login, _, _ in
             defer { self.requestExpectation.fulfill() }
             let json = JSON(mockJson)
 
@@ -53,20 +57,13 @@ class NextcloudKitUnitTests: XCTestCase {
             let mockEndpoint = json["poll"]["endpoint"].string
             let mockLogin = json["login"].string
 
+            // Test if the returned response data is what we would expect
             XCTAssertEqual(token, mockToken)
             XCTAssertEqual(endpoint, mockEndpoint)
             XCTAssertEqual(login, mockLogin)
         }
 
         wait(for: [requestExpectation])
-    }
-
-
-    func testPerformanceExample() throws {
-        // This is an example of a performance test case.
-        self.measure {
-            // Put the code you want to measure the time of here.
-        }
     }
 }
 
