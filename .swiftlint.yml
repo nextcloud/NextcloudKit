@@ -45,5 +45,6 @@ excluded:
   - Carthage
   - Pods
   - Package.swift
+  - Tests
 
 reporter: "xcode"
