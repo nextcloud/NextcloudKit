@@ -23,24 +23,44 @@ import XCTest
 @testable import NextcloudKit
 import Alamofire
 import Mocker
+import SwiftyJSON
 
 class NextcloudKitUnitTests: XCTestCase {
+    private let serverUrl = "https://cloud.nextcloud.com"
+    private let url = URL(string: "https://cloud.nextcloud.com/index.php/login/v2")!
+    private lazy var requestExpectation = expectation(description: "Request should finish")
 
-    override func setUpWithError() throws {
-        // Put setup code here. This method is called before the invocation of each test method in the class.
+    func `test_log_in_poll_successful`() {
+        let configuration = URLSessionConfiguration.af.default
+        configuration.protocolClasses = [MockingURLProtocol.self]
+        let sessionManager = Alamofire.Session(configuration: configuration)
+        let mockJson: Data = try! Data(contentsOf: MockedData.mockJson)
+
+
+        let mock = Mock(url: url, dataType: .json, statusCode: 200, data: [
+            .post: mockJson
+        ])
+        mock.register()
+
+
+        NextcloudKit.shared.setCustomSessionManager(sessionManager: sessionManager)
+
+        NextcloudKit.shared.getLoginFlowV2(serverUrl: serverUrl) { token, endpoint, login, data, error in
+            defer { self.requestExpectation.fulfill() }
+            let json = JSON(mockJson)
+
+            let mockToken = json["poll"]["token"].string
+            let mockEndpoint = json["poll"]["endpoint"].string
+            let mockLogin = json["login"].string
+
+            XCTAssertEqual(token, mockToken)
+            XCTAssertEqual(endpoint, mockEndpoint)
+            XCTAssertEqual(login, mockLogin)
+        }
+
+        wait(for: [requestExpectation])
     }
 
-    override func tearDownWithError() throws {
-        // Put teardown code here. This method is called after the invocation of each test method in the class.
-    }
-
-    func testExample() throws {
-        // This is an example of a functional test case.
-        // Use XCTAssert and related functions to verify your tests produce the correct results.
-        // Any test you write for XCTest can be annotated as throws and async.
-        // Mark your test throws to produce an unexpected failure when your test encounters an uncaught error.
-        // Mark your test async to allow awaiting for asynchronous code to complete. Check the results with assertions afterwards.
-    }
 
     func testPerformanceExample() throws {
         // This is an example of a performance test case.
@@ -48,5 +68,8 @@ class NextcloudKitUnitTests: XCTestCase {
             // Put the code you want to measure the time of here.
         }
     }
+}
 
+fileprivate final class MockedData {
+    public static let mockJson: URL = Bundle.module.url(forResource: "PollMock", withExtension: "json")!
 }

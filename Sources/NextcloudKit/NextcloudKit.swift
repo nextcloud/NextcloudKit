@@ -47,9 +47,7 @@ import SwiftyJSON
                                  eventMonitors: [AlamofireLogger(nkCommonInstance: self.nkCommonInstance)])
     }()
 
-    public var sessionManager: Alamofire.Session {
-        return internalSessionManager
-    }
+    private(set) public lazy var sessionManager: Alamofire.Session = internalSessionManager
 
     private let reachabilityManager = Alamofire.NetworkReachabilityManager()
     // private var cookies: [String:[HTTPCookie]] = [:]
@@ -110,6 +108,10 @@ import SwiftyJSON
     @objc public func setup(nextcloudVersion: Int) {
 
         self.nkCommonInstance.internalNextcloudVersion = nextcloudVersion
+    }
+
+    internal func setCustomSessionManager(sessionManager: Alamofire.Session) {
+        self.sessionManager = sessionManager
     }
 
     /*
