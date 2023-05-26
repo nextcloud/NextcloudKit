@@ -31,7 +31,7 @@ class NextcloudKitUnitTests: XCTestCase {
     private lazy var requestExpectation = expectation(description: "Request should finish")
 
     func `test_log_in_poll_successful`() {
-        // Create a mock of Alamofire' session manager
+        // Create a mock of Alamofire's session manager
         let configuration = URLSessionConfiguration.af.default
         configuration.protocolClasses = [MockingURLProtocol.self]
         let mockSessionManager = Alamofire.Session(configuration: configuration)
@@ -45,10 +45,10 @@ class NextcloudKitUnitTests: XCTestCase {
         ])
         mock.register()
 
-        // Set our mock session manager as the one this package is going to use
+        // Set our mock session manager as the one the API is going to use
         NextcloudKit.shared.setCustomSessionManager(sessionManager: mockSessionManager)
 
-        // Now we call the function we want to set, it will use the mock session and request, and return the mock data
+        // Now we call the function we want to test; it will use the mock session and request and return the mock data
         NextcloudKit.shared.getLoginFlowV2(serverUrl: serverUrl) { token, endpoint, login, _, _ in
             defer { self.requestExpectation.fulfill() }
             let json = JSON(mockJson)
