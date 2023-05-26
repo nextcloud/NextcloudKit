@@ -30,6 +30,8 @@ class NextcloudKitUnitTests: XCTestCase {
     private let url = URL(string: "https://cloud.nextcloud.com/index.php/login/v2")!
     private lazy var requestExpectation = expectation(description: "Request should finish")
 
+    private let timeout_seconds = 20.0
+
     func `test_log_in_poll_successful`() {
         // Create a mock of Alamofire's session manager
         let configuration = URLSessionConfiguration.af.default
@@ -63,7 +65,7 @@ class NextcloudKitUnitTests: XCTestCase {
             XCTAssertEqual(login, mockLogin)
         }
 
-        wait(for: [requestExpectation])
+        wait(for: [requestExpectation], timeout: timeout_seconds) //seconds
     }
 }
 
