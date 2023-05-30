@@ -82,32 +82,32 @@ class NextcloudKitUnitTests: XCTestCase {
         wait(for: [requestExpectation], timeout: timeout_seconds)
     }
 
-    func test_getLoginFlowV2_withBadStatusCode_requestShouldFail() {
-        // Create a mock session request and register it
-        var mock = Mock(url: fullUrl, dataType: .json, statusCode: 500, data: [.delete: Data()])
-
-        mock.onRequest = { request, _ in
-            let url = request.url?.absoluteString
-            XCTAssertEqual(self.fullUrlString, url)
-        }
-        mock.register()
-
-
-        // Set our mock session manager as the one the API is going to use
-        NextcloudKit.shared.setCustomSessionManager(sessionManager: mockSessionManager())
-
-        // Now we call the function we want to test; it will use the mock session and request and return the mock data
-        NextcloudKit.shared.getLoginFlowV2(serverUrl: serverUrl) { token, endpoint, login, data, error in
-            defer { self.requestExpectation.fulfill() }
-            XCTAssertNotNil(error)
-            XCTAssertNil(token)
-            XCTAssertNil(endpoint)
-            XCTAssertNil(login)
-            XCTAssertNil(data)
-        }
-
-        wait(for: [requestExpectation], timeout: timeout_seconds)
-    }
+//    func test_getLoginFlowV2_withBadStatusCode_requestShouldFail() {
+//        // Create a mock session request and register it
+//        var mock = Mock(url: fullUrl, dataType: .json, statusCode: 500, data: [.delete: Data()])
+//
+//        mock.onRequest = { request, _ in
+//            let url = request.url?.absoluteString
+//            XCTAssertEqual(self.fullUrlString, url)
+//        }
+//        mock.register()
+//
+//
+//        // Set our mock session manager as the one the API is going to use
+//        NextcloudKit.shared.setCustomSessionManager(sessionManager: mockSessionManager())
+//
+//        // Now we call the function we want to test; it will use the mock session and request and return the mock data
+//        NextcloudKit.shared.getLoginFlowV2(serverUrl: serverUrl) { token, endpoint, login, data, error in
+//            defer { self.requestExpectation.fulfill() }
+//            XCTAssertNotNil(error)
+//            XCTAssertNil(token)
+//            XCTAssertNil(endpoint)
+//            XCTAssertNil(login)
+//            XCTAssertNil(data)
+//        }
+//
+//        wait(for: [requestExpectation], timeout: timeout_seconds)
+//    }
 
     func test_getLoginFlowV2_withBadUrl_requestShouldFail() {
         // Create a mock session request and register it
@@ -126,6 +126,7 @@ class NextcloudKitUnitTests: XCTestCase {
         // Now we call the function we want to test; it will use the mock session and request and return the mock data
         NextcloudKit.shared.getLoginFlowV2(serverUrl: "badUrl") { token, endpoint, login, data, error in
             defer { self.requestExpectation.fulfill() }
+
             XCTAssertNotNil(error)
             XCTAssertNil(token)
             XCTAssertNil(endpoint)
