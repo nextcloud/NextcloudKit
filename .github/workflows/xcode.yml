@@ -25,10 +25,6 @@ jobs:
     - name: Set env var
       run: echo "DEVELOPER_DIR=$(xcode-select --print-path)" >> $GITHUB_ENV
     - uses: actions/checkout@v3
-    - name: Resolve package dependencies
-      # Tries to fix this: https://github.com/apple/swift-package-manager/issues/5767#issuecomment-1382569550
-      run: |
-        xcodebuild -resolvePackageDependencies
     - name: Build NextcloudKit
       run: |
         xcodebuild build test -scheme "$SCHEME" -destination "$DESTINATION_IOS" -destination "$DESTINATION_MACOS" -enableCodeCoverage YES
