@@ -102,6 +102,7 @@ import MobileCoreServices
     internal var mimeTypeCache = NSCache<CFString, NSString>()
     internal var filePropertiesCache = NSCache<CFString, NKFileProperty>()
     internal var delegate: NKCommonDelegate?
+    internal var httpMaximumConnectionsPerHost: Int = 5
 
     private var _filenameLog: String = "communication.log"
     private var _pathLog: String = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true).first!
