@@ -35,10 +35,10 @@ import SwiftyJSON
 
         return Alamofire.Session(configuration: NKCommon().sessionConfiguration,
                                  delegate: self,
-                                 rootQueue: NKCommon().rootQueue,
+                                 rootQueue: nkCommonInstance.rootQueue,
                                  startRequestsImmediately: true,
-                                 requestQueue: NKCommon().requestQueue,
-                                 serializationQueue: NKCommon().serializationQueue,
+                                 requestQueue: nkCommonInstance.requestQueue,
+                                 serializationQueue: nkCommonInstance.serializationQueue,
                                  interceptor: nil,
                                  serverTrustManager: nil,
                                  redirectHandler: nil,
