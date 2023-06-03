@@ -32,12 +32,26 @@ import SwiftyJSON
     }()
 
     internal lazy var internalSessionManager: Alamofire.Session = {
+
+        let rootQueue = DispatchQueue(label: "com.nextcloud.nextcloudkit.sessionManagerData.rootQueue")
+        let queue = OperationQueue()
+        queue.maxConcurrentOperationCount = 100
+        queue.underlyingQueue = rootQueue
+        /*
+        let delegate = SessionDelegate()
+        let configuration = URLSessionConfiguration.af.default
+        let urlSession = URLSession(configuration: configuration,
+                                    delegate: delegate,
+                                    delegateQueue: queue)
+        let session = Session(session: urlSession, delegate: delegate, rootQueue: rootQueue)
+*/
+
         let configuration = URLSessionConfiguration.af.default
         configuration.requestCachePolicy = .reloadIgnoringLocalCacheData
         configuration.httpMaximumConnectionsPerHost = 20
         return Alamofire.Session(configuration: configuration,
                                  delegate: self,
-                                 rootQueue: DispatchQueue(label: "com.nextcloud.nextcloudkit.sessionManagerData.rootQueue"),
+                                 rootQueue: rootQueue,
                                  startRequestsImmediately: true,
                                  requestQueue: nil,
                                  serializationQueue: nil,
