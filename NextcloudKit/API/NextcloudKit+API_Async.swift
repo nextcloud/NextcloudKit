@@ -41,6 +41,17 @@ extension NextcloudKit {
         })
     }
 
+    public func getServerStatus(serverUrl: String,
+                                options: NKRequestOptions = NKRequestOptions()) async -> (installed: Bool, maintenance: Bool, needsDbUpgrade: Bool, serverProductName: String?, serverVersion: String?, versionMajor: Int, versionMinor: Int, versionMicro: Int, extendedSupport: Bool, data: Data?, error: NKError) {
+
+        await withUnsafeContinuation({ continuation in
+            getServerStatus(serverUrl: serverUrl) { installed, maintenance, needsDbUpgrade, serverProductName, serverVersion, versionMajor, versionMinor, versionMicro, extendedSupport, data, error in
+                continuation.resume(returning: (installed: installed, maintenance: maintenance, needsDbUpgrade: needsDbUpgrade, serverProductName: serverProductName, serverVersion: serverVersion, versionMajor:versionMajor, versionMinor: versionMinor, versionMicro: versionMicro, extendedSupport: extendedSupport, data: data, error: error))
+            }
+
+        })
+    }
+
     public func downloadPreview(fileNamePathOrFileId: String,
                                 fileNamePreviewLocalPath: String,
                                 widthPreview: Int,

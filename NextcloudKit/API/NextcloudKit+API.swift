@@ -130,12 +130,12 @@ extension NextcloudKit {
 
     @objc public func getServerStatus(serverUrl: String,
                                       options: NKRequestOptions = NKRequestOptions(),
-                                      completion: @escaping (_ serverProductName: String?, _ serverVersion: String?, _ versionMajor: Int, _ versionMinor: Int, _ versionMicro: Int, _ extendedSupport: Bool, _ data: Data?, _ error: NKError) -> Void) {
+                                      completion: @escaping (_ installed: Bool, _ maintenance: Bool, _ needsDbUpgrade: Bool, _ serverProductName: String?, _ serverVersion: String?, _ versionMajor: Int, _ versionMinor: Int, _ versionMicro: Int, _ extendedSupport: Bool, _ data: Data?, _ error: NKError) -> Void) {
 
         let endpoint = "status.php"
 
         guard let url = self.nkCommonInstance.createStandardUrl(serverUrl: serverUrl, endpoint: endpoint) else {
-            return options.queue.async { completion(nil, nil, 0, 0, 0, false, nil, .urlError) }
+            return options.queue.async { completion(false, false, false, nil, nil, 0, 0, 0, false, nil, .urlError) }
         }
 
         let headers = self.nkCommonInstance.getStandardHeaders(options: options)
@@ -146,11 +146,13 @@ extension NextcloudKit {
             switch response.result {
             case .failure(let error):
                 let error = NKError(error: error, afResponse: response, responseData: response.data)
-                options.queue.async { completion(nil, nil, 0, 0, 0, false, nil, error) }
+                options.queue.async { completion(false, false, false, nil, nil, 0, 0, 0, false, nil, error) }
             case .success(let jsonData):
                 let json = JSON(jsonData)
                 var versionMajor = 0, versionMinor = 0, versionMicro = 0
-
+                let installed = json["installed"].boolValue
+                let maintenance = json["maintenance"].boolValue
+                let needsDbUpgrade = json["needsDbUpgrade"].boolValue
                 let serverProductName = json["productname"].stringValue.lowercased()
                 let serverVersion = json["version"].stringValue
                 let serverVersionString = json["versionstring"].stringValue
@@ -168,7 +170,7 @@ extension NextcloudKit {
                     versionMicro = Int(arrayVersion[2]) ?? 0
                 }
 
-                options.queue.async { completion(serverProductName, serverVersionString, versionMajor, versionMinor, versionMicro, extendedSupport, jsonData, .success) }
+                options.queue.async { completion(installed, maintenance, needsDbUpgrade, serverProductName, serverVersionString, versionMajor, versionMinor, versionMicro, extendedSupport, jsonData, .success) }
             }
         }
     }
