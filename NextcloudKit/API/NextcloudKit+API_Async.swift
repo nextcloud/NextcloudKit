@@ -31,16 +31,6 @@ import UIKit
 @available(iOS 13.0, *)
 extension NextcloudKit {
 
-    public func getPreview(url: URL,
-                           options: NKRequestOptions = NKRequestOptions()) async -> (account: String, data: Data?, error: NKError) {
-
-        await withUnsafeContinuation({ continuation in
-            getPreview(url: url, options: options) { account, data, error in
-                continuation.resume(returning: (account: account, data: data, error: error))
-            }
-        })
-    }
-
     public func getServerStatus(serverUrl: String,
                                 options: NKRequestOptions = NKRequestOptions()) async -> (installed: Bool, maintenance: Bool, needsDbUpgrade: Bool, serverProductName: String?, serverVersion: String?, versionMajor: Int, versionMinor: Int, versionMicro: Int, extendedSupport: Bool, data: Data?, error: NKError) {
 
@@ -49,6 +39,16 @@ extension NextcloudKit {
                 continuation.resume(returning: (installed: installed, maintenance: maintenance, needsDbUpgrade: needsDbUpgrade, serverProductName: serverProductName, serverVersion: serverVersion, versionMajor:versionMajor, versionMinor: versionMinor, versionMicro: versionMicro, extendedSupport: extendedSupport, data: data, error: error))
             }
 
+        })
+    }
+
+    public func getPreview(url: URL,
+                           options: NKRequestOptions = NKRequestOptions()) async -> (account: String, data: Data?, error: NKError) {
+
+        await withUnsafeContinuation({ continuation in
+            getPreview(url: url, options: options) { account, data, error in
+                continuation.resume(returning: (account: account, data: data, error: error))
+            }
         })
     }
 
@@ -66,6 +66,15 @@ extension NextcloudKit {
         await withUnsafeContinuation({ continuation in
             downloadPreview(fileNamePathOrFileId: fileNamePathOrFileId, fileNamePreviewLocalPath: fileNamePreviewLocalPath, widthPreview: widthPreview, heightPreview: heightPreview, fileNameIconLocalPath: fileNameIconLocalPath, sizeIcon: sizeIcon, etag: etag, options: options) { account, imagePreview, imageIcon, imageOriginal, etag, error in
                 continuation.resume(returning: (account: account, imagePreview: imagePreview, imageIcon: imageIcon, imageOriginal: imageOriginal, etag: etag, error: error))
+            }
+        })
+    }
+
+    public func getUserProfile(options: NKRequestOptions = NKRequestOptions()) async -> (account: String, userProfile: NKUserProfile?, data: Data?, error: NKError) {
+
+        await withUnsafeContinuation({ continuation in
+            getUserProfile(options: options) { account, userProfile, data, error in
+                continuation.resume(returning: (account: account, userProfile: userProfile, data: data, error: error))
             }
         })
     }
