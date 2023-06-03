@@ -33,28 +33,12 @@ import SwiftyJSON
 
     internal lazy var internalSessionManager: Alamofire.Session = {
 
-        let rootQueue = DispatchQueue(label: "com.nextcloud.nextcloudkit.sessionManagerData.rootQueue")
-        let queue = OperationQueue()
-        queue.maxConcurrentOperationCount = 100
-        queue.underlyingQueue = rootQueue
-        /*
-        let delegate = SessionDelegate()
-        let configuration = URLSessionConfiguration.af.default
-        let urlSession = URLSession(configuration: configuration,
-                                    delegate: delegate,
-                                    delegateQueue: queue)
-        let session = Session(session: urlSession, delegate: delegate, rootQueue: rootQueue)
-*/
-
-        let configuration = URLSessionConfiguration.af.default
-        configuration.requestCachePolicy = .reloadIgnoringLocalCacheData
-        configuration.httpMaximumConnectionsPerHost = 20
-        return Alamofire.Session(configuration: configuration,
+        return Alamofire.Session(configuration: NKCommon().sessionConfiguration,
                                  delegate: self,
-                                 rootQueue: rootQueue,
+                                 rootQueue: NKCommon().rootQueue,
                                  startRequestsImmediately: true,
-                                 requestQueue: nil,
-                                 serializationQueue: nil,
+                                 requestQueue: NKCommon().requestQueue,
+                                 serializationQueue: NKCommon().serializationQueue,
                                  interceptor: nil,
                                  serverTrustManager: nil,
                                  redirectHandler: nil,
@@ -125,6 +109,25 @@ import SwiftyJSON
     @objc public func setup(nextcloudVersion: Int) {
 
         self.nkCommonInstance.internalNextcloudVersion = nextcloudVersion
+    }
+
+    @objc public func setupSessionManager(sessionConfiguration: URLSessionConfiguration?,
+                                          rootQueue: DispatchQueue?,
+                                          requestQueue: DispatchQueue?,
+                                          serializationQueue:DispatchQueue?) {
+
+        if let sessionConfiguration = sessionConfiguration {
+            self.nkCommonInstance.sessionConfiguration = sessionConfiguration
+        }
+        if let rootQueue = rootQueue {
+            self.nkCommonInstance.rootQueue = rootQueue
+        }
+        if let requestQueue = requestQueue {
+            self.nkCommonInstance.requestQueue = requestQueue
+        }
+        if let serializationQueue = serializationQueue {
+            self.nkCommonInstance.serializationQueue = serializationQueue
+        }
     }
 
     /*
