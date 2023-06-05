@@ -135,8 +135,8 @@ extension NextcloudKit {
         let maintenance: Bool
         let needsDbUpgrade: Bool
         let extendedSupport: Bool
-        let productName: String?
-        let version: String?
+        let productName: String
+        let version: String
         let versionMajor: Int
         let versionMinor: Int
         let versionMicro: Int
