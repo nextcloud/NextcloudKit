@@ -131,16 +131,16 @@ extension NextcloudKit {
     // MARK: - getServerStatus
 
     public struct ServerInfo {
-        let installed: Bool
-        let maintenance: Bool
-        let needsDbUpgrade: Bool
-        let extendedSupport: Bool
-        let productName: String
-        let version: String
-        let versionMajor: Int
-        let versionMinor: Int
-        let versionMicro: Int
-        let data: Data?
+        public let installed: Bool
+        public let maintenance: Bool
+        public let needsDbUpgrade: Bool
+        public let extendedSupport: Bool
+        public let productName: String
+        public let version: String
+        public let versionMajor: Int
+        public let versionMinor: Int
+        public let versionMicro: Int
+        public let data: Data?
     }
 
     public enum ServerInfoResult {
