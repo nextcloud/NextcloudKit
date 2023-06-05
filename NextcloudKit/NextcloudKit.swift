@@ -114,7 +114,7 @@ import SwiftyJSON
     @objc public func setupSessionManager(sessionConfiguration: URLSessionConfiguration?,
                                           rootQueue: DispatchQueue?,
                                           requestQueue: DispatchQueue?,
-                                          serializationQueue:DispatchQueue?) {
+                                          serializationQueue: DispatchQueue?) {
 
         if let sessionConfiguration = sessionConfiguration {
             self.nkCommonInstance.sessionConfiguration = sessionConfiguration
