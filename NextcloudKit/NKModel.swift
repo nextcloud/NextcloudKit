@@ -660,7 +660,7 @@ class NKDataFileXML: NSObject {
             <owner-display-name xmlns=\"http://owncloud.org/ns\"/>
             <comments-unread xmlns=\"http://owncloud.org/ns\"/>
             <has-preview xmlns=\"http://nextcloud.org/ns\"/>
-    
+
             <trashbin-filename xmlns=\"http://nextcloud.org/ns\"/>
             <trashbin-original-location xmlns=\"http://nextcloud.org/ns\"/>
             <trashbin-deletion-time xmlns=\"http://nextcloud.org/ns\"/>

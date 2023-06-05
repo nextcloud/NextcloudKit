@@ -31,6 +31,16 @@ import UIKit
 @available(iOS 13.0, *)
 extension NextcloudKit {
 
+    public func getServerStatus(serverUrl: String,
+                                options: NKRequestOptions = NKRequestOptions()) async -> (ServerInfoResult) {
+
+        await withUnsafeContinuation({ continuation in
+            getServerStatus(serverUrl: serverUrl) { serverInfoResult in
+                continuation.resume(returning: serverInfoResult)
+            }
+        })
+    }
+
     public func getPreview(url: URL,
                            options: NKRequestOptions = NKRequestOptions()) async -> (account: String, data: Data?, error: NKError) {
 
@@ -55,6 +65,15 @@ extension NextcloudKit {
         await withUnsafeContinuation({ continuation in
             downloadPreview(fileNamePathOrFileId: fileNamePathOrFileId, fileNamePreviewLocalPath: fileNamePreviewLocalPath, widthPreview: widthPreview, heightPreview: heightPreview, fileNameIconLocalPath: fileNameIconLocalPath, sizeIcon: sizeIcon, etag: etag, options: options) { account, imagePreview, imageIcon, imageOriginal, etag, error in
                 continuation.resume(returning: (account: account, imagePreview: imagePreview, imageIcon: imageIcon, imageOriginal: imageOriginal, etag: etag, error: error))
+            }
+        })
+    }
+
+    public func getUserProfile(options: NKRequestOptions = NKRequestOptions()) async -> (account: String, userProfile: NKUserProfile?, data: Data?, error: NKError) {
+
+        await withUnsafeContinuation({ continuation in
+            getUserProfile(options: options) { account, userProfile, data, error in
+                continuation.resume(returning: (account: account, userProfile: userProfile, data: data, error: error))
             }
         })
     }

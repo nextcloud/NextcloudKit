@@ -32,14 +32,13 @@ import SwiftyJSON
     }()
 
     internal lazy var internalSessionManager: Alamofire.Session = {
-        let configuration = URLSessionConfiguration.af.default
-        configuration.requestCachePolicy = .reloadIgnoringLocalCacheData
-        return Alamofire.Session(configuration: configuration,
+
+        return Alamofire.Session(configuration: NKCommon().sessionConfiguration,
                                  delegate: self,
-                                 rootQueue: DispatchQueue(label: "com.nextcloud.nextcloudkit.sessionManagerData.rootQueue"),
+                                 rootQueue: nkCommonInstance.rootQueue,
                                  startRequestsImmediately: true,
-                                 requestQueue: nil,
-                                 serializationQueue: nil,
+                                 requestQueue: nkCommonInstance.requestQueue,
+                                 serializationQueue: nkCommonInstance.serializationQueue,
                                  interceptor: nil,
                                  serverTrustManager: nil,
                                  redirectHandler: nil,
@@ -110,6 +109,25 @@ import SwiftyJSON
     @objc public func setup(nextcloudVersion: Int) {
 
         self.nkCommonInstance.internalNextcloudVersion = nextcloudVersion
+    }
+
+    @objc public func setupSessionManager(sessionConfiguration: URLSessionConfiguration?,
+                                          rootQueue: DispatchQueue?,
+                                          requestQueue: DispatchQueue?,
+                                          serializationQueue: DispatchQueue?) {
+
+        if let sessionConfiguration = sessionConfiguration {
+            self.nkCommonInstance.sessionConfiguration = sessionConfiguration
+        }
+        if let rootQueue = rootQueue {
+            self.nkCommonInstance.rootQueue = rootQueue
+        }
+        if let requestQueue = requestQueue {
+            self.nkCommonInstance.requestQueue = requestQueue
+        }
+        if let serializationQueue = serializationQueue {
+            self.nkCommonInstance.serializationQueue = serializationQueue
+        }
     }
 
     /*
