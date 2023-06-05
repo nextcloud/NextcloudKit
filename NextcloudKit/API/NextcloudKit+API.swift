@@ -141,6 +141,18 @@ extension NextcloudKit {
         let versionMinor: Int
         let versionMicro: Int
         let data: Data?
+        public init(installed: Bool, maintenance: Bool, needsDbUpgrade: Bool, extendedSupport: Bool, productName: String, version: String, versionMajor: Int, versionMinor: Int, versionMicro: Int, data: Data?) {
+            self.installed = installed
+            self.maintenance = maintenance
+            self.needsDbUpgrade = needsDbUpgrade
+            self.extendedSupport = extendedSupport
+            self.productName = productName
+            self.version = version
+            self.versionMajor = versionMajor
+            self.versionMinor = versionMinor
+            self.versionMicro = versionMicro
+            self.data = data
+        }
     }
 
     public enum ServerInfoResult {
