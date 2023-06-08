@@ -32,15 +32,19 @@ class LoginUnitTests: XCTestCase {
     private lazy var fullUrl = URL(string: fullUrlString)!
     private lazy var requestExpectation = expectation(description: "Request should finish")
 
-    // Create a mock of Alamofire's session manager
+    // Create a mock of Alamofire's session manager config
     private lazy var mockSessionManager = {
         let config = URLSessionConfiguration.af.default
         config.protocolClasses = [MockingURLProtocol.self]
-
-        return Alamofire.Session(configuration: config)
+        return config
     }
 
     private let timeout_seconds = 20.0
+
+    override func setUp() {
+        // Set our mock session manager as the one the API is going to use
+        NextcloudKit.shared.nkCommonInstance.sessionConfiguration = mockSessionManager()
+    }
 
     // Format of function names should be: func test_functionName_withCircumstances_shouldExpectation() {}
     func test_getLoginFlowV2_withGoodStatusCode_requestShouldBeSuccessful() {
@@ -58,9 +62,7 @@ class LoginUnitTests: XCTestCase {
         }
         mock.register()
 
-
-        // Set our mock session manager as the one the API is going to use
-        NextcloudKit.shared.setCustomSessionManager(sessionManager: mockSessionManager())
+        NextcloudKit.shared.nkCommonInstance.sessionConfiguration = mockSessionManager()
 
         // Now we call the function we want to test; it will use the mock session and request and return the mock data
         NextcloudKit.shared.getLoginFlowV2(serverUrl: serverUrl) { token, endpoint, login, data, error in
@@ -82,32 +84,28 @@ class LoginUnitTests: XCTestCase {
         wait(for: [requestExpectation], timeout: timeout_seconds)
     }
 
-//    func test_getLoginFlowV2_withBadStatusCode_requestShouldFail() {
-//        // Create a mock session request and register it
-//        var mock = Mock(url: fullUrl, dataType: .json, statusCode: 500, data: [.delete: Data()])
-//
-//        mock.onRequest = { request, _ in
-//            let url = request.url?.absoluteString
-//            XCTAssertEqual(self.fullUrlString, url)
-//        }
-//        mock.register()
-//
-//
-//        // Set our mock session manager as the one the API is going to use
-//        NextcloudKit.shared.setCustomSessionManager(sessionManager: mockSessionManager())
-//
-//        // Now we call the function we want to test; it will use the mock session and request and return the mock data
-//        NextcloudKit.shared.getLoginFlowV2(serverUrl: serverUrl) { token, endpoint, login, data, error in
-//            defer { self.requestExpectation.fulfill() }
-//            XCTAssertNotNil(error)
-//            XCTAssertNil(token)
-//            XCTAssertNil(endpoint)
-//            XCTAssertNil(login)
-//            XCTAssertNil(data)
-//        }
-//
-//        wait(for: [requestExpectation], timeout: timeout_seconds)
-//    }
+    func test_getLoginFlowV2_withBadStatusCode_requestShouldFail() {
+        // Create a mock session request and register it
+        var mock = Mock(url: fullUrl, dataType: .json, statusCode: 500, data: [.delete: Data()])
+
+        mock.onRequest = { request, _ in
+            let url = request.url?.absoluteString
+            XCTAssertEqual(self.fullUrlString, url)
+        }
+        mock.register()
+
+        // Now we call the function we want to test; it will use the mock session and request and return the mock data
+        NextcloudKit.shared.getLoginFlowV2(serverUrl: serverUrl) { token, endpoint, login, data, error in
+            defer { self.requestExpectation.fulfill() }
+            XCTAssertNotNil(error)
+            XCTAssertNil(token)
+            XCTAssertNil(endpoint)
+            XCTAssertNil(login)
+            XCTAssertNil(data)
+        }
+
+        wait(for: [requestExpectation], timeout: timeout_seconds)
+    }
 
     func test_getLoginFlowV2_withBadUrl_requestShouldFail() {
         // Create a mock session request and register it
@@ -121,7 +119,7 @@ class LoginUnitTests: XCTestCase {
 
 
         // Set our mock session manager as the one the API is going to use
-        NextcloudKit.shared.setCustomSessionManager(sessionManager: mockSessionManager())
+        NextcloudKit.shared.nkCommonInstance.sessionConfiguration = mockSessionManager()
 
         // Now we call the function we want to test; it will use the mock session and request and return the mock data
         NextcloudKit.shared.getLoginFlowV2(serverUrl: "badUrl") { token, endpoint, login, data, error in
