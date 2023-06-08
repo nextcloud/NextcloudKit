@@ -41,6 +41,9 @@ jobs:
             echo "export TEST_USER=$TEST_USER" >> .env-vars
             echo "export TEST_APP_PASSWORD=$TEST_APP_PASSWORD" >> .env-vars
         fi
+    - name: Generate EnvVars file
+      run: |
+        ./generate-env-vars.sh
     - name: Build & Test NextcloudKit
       run: |
         set -o pipefail && xcodebuild test -scheme "$SCHEME" \
@@ -50,9 +53,10 @@ jobs:
         -test-iterations 3 \
         -retry-tests-on-failure \
         | xcpretty
-    - name: Upload coverage to codecov
-      run: |
-        bundle exec slather
-        bash <(curl -s https://codecov.io/bash) -f ./cobertura.xml -X coveragepy -X gcov -X xcode -t ${{ secrets.CODECOV_TOKEN }}
+# Covecov does not yet support pure swift packages. Check here: https://github.com/SlatherOrg/slather/issues/466
+#    - name: Upload coverage to codecov
+#      run: |
+#        bundle exec slather
+#        bash <(curl -s https://codecov.io/bash) -f ./cobertura.xml -X coveragepy -X gcov -X xcode -t ${{ secrets.CODECOV_TOKEN }}
 
     

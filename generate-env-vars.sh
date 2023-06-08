@@ -11,5 +11,5 @@ fi
 
 source .env-vars
 
-Sourcery/bin/sourcery --templates Sourcery --output Sourcery --sources . --args TEST_USER=$TEST_USER,TEST_APP_PASSWORD=$TEST_APP_PASSWORD,TEST_SERVER_URL=$TEST_SERVER_URL
+Sourcery/bin/sourcery --templates Sourcery --output Sources/NextcloudKit/Generated --sources . --args TEST_USER=$TEST_USER,TEST_APP_PASSWORD=$TEST_APP_PASSWORD,TEST_SERVER_URL=$TEST_SERVER_URL
 
