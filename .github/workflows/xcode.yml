@@ -1,4 +1,4 @@
-name: Build
+name: Build and test
 
 on:
   push:
@@ -17,7 +17,7 @@ env:
   SCHEME: NextcloudKit
 
 jobs:
-  build:
+  build-and-test:
     name: Build and Test
     runs-on: macOS-latest
     if: github.event.pull_request.draft == false
