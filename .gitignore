@@ -38,3 +38,5 @@ Carthage/
 .swiftpm
 Package.resolved
 
+/.env-vars
+*.generated.swift

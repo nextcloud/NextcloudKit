@@ -25,8 +25,32 @@ jobs:
     - name: Set env var
       run: echo "DEVELOPER_DIR=$(xcode-select --print-path)" >> $GITHUB_ENV
     - uses: actions/checkout@v3
-    - name: Build NextcloudKit
+    - name: Setup Bundler and Install Gems
       run: |
-        xcodebuild build test -scheme "$SCHEME" -destination "$DESTINATION_IOS" -destination "$DESTINATION_MACOS" -enableCodeCoverage YES
+        gem install bundler
+        bundle install
+        bundle update
+    - name: Create docker test server and export enviroment variables
+      run: |
+        source ./create-docker-test-server.sh
+        if [ ! -f ".env-vars" ]; then
+            touch .env-vars
+            echo "export TEST_SERVER_URL=$TEST_SERVER_URL" >> .env-vars
+            echo "export TEST_USER=$TEST_USER" >> .env-vars
+            echo "export TEST_APP_PASSWORD=$TEST_APP_PASSWORD" >> .env-vars
+        fi
+    - name: Build & Test NextcloudKit
+      run: |
+        set -o pipefail && xcodebuild test -scheme "$SCHEME" \
+        -destination "$DESTINATION_IOS" \
+        -destination "$DESTINATION_MACOS" \
+        -enableCodeCoverage YES \
+        -test-iterations 3 \
+        -retry-tests-on-failure \
+        | xcpretty
+    - name: Upload coverage to codecov
+      run: |
+        bundle exec slather
+        bash <(curl -s https://codecov.io/bash) -f ./cobertura.xml -X coveragepy -X gcov -X xcode -t ${{ secrets.CODECOV_TOKEN }}
 
     
