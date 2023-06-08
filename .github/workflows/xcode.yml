@@ -30,6 +30,8 @@ jobs:
         gem install bundler
         bundle install
         bundle update
+    - name: Set up Docker
+      uses: douglascamata/setup-docker-macos-action@v1-alpha
     - name: Create docker test server and export enviroment variables
       run: |
         source ./create-docker-test-server.sh
