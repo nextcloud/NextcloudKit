@@ -33,7 +33,7 @@ import SwiftyJSON
 
     internal lazy var internalSessionManager: Alamofire.Session = {
 
-        return Alamofire.Session(configuration: NKCommon().sessionConfiguration,
+        return Alamofire.Session(configuration: nkCommonInstance.sessionConfiguration,
                                  delegate: self,
                                  rootQueue: nkCommonInstance.rootQueue,
                                  startRequestsImmediately: true,
