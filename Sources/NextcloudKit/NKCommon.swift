@@ -89,6 +89,15 @@ import MobileCoreServices
         var name: String
     }
 
+    internal lazy var sessionConfiguration: URLSessionConfiguration = {
+        let configuration = URLSessionConfiguration.af.default
+        configuration.requestCachePolicy = .reloadIgnoringLocalCacheData
+        return configuration
+    }()
+    internal var rootQueue: DispatchQueue = DispatchQueue(label: "com.nextcloud.nextcloudkit.sessionManagerData.rootQueue")
+    internal var requestQueue: DispatchQueue?
+    internal var serializationQueue: DispatchQueue?
+
     internal var internalUser = ""
     internal var internalUserId = ""
     internal var internalPassword = ""

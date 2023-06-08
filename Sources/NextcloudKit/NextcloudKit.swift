@@ -32,14 +32,13 @@ import SwiftyJSON
     }()
 
     internal lazy var internalSessionManager: Alamofire.Session = {
-        let configuration = URLSessionConfiguration.af.default
-        configuration.requestCachePolicy = .reloadIgnoringLocalCacheData
-        return Alamofire.Session(configuration: configuration,
+
+        return Alamofire.Session(configuration: NKCommon().sessionConfiguration,
                                  delegate: self,
-                                 rootQueue: DispatchQueue(label: "com.nextcloud.nextcloudkit.sessionManagerData.rootQueue"),
+                                 rootQueue: nkCommonInstance.rootQueue,
                                  startRequestsImmediately: true,
-                                 requestQueue: nil,
-                                 serializationQueue: nil,
+                                 requestQueue: nkCommonInstance.requestQueue,
+                                 serializationQueue: nkCommonInstance.serializationQueue,
                                  interceptor: nil,
                                  serverTrustManager: nil,
                                  redirectHandler: nil,
@@ -47,7 +46,9 @@ import SwiftyJSON
                                  eventMonitors: [AlamofireLogger(nkCommonInstance: self.nkCommonInstance)])
     }()
 
-    private(set) public lazy var sessionManager: Alamofire.Session = internalSessionManager
+    public var sessionManager: Alamofire.Session {
+        return internalSessionManager
+    }
 
     private let reachabilityManager = Alamofire.NetworkReachabilityManager()
     // private var cookies: [String:[HTTPCookie]] = [:]
@@ -110,8 +111,23 @@ import SwiftyJSON
         self.nkCommonInstance.internalNextcloudVersion = nextcloudVersion
     }
 
-    internal func setCustomSessionManager(sessionManager: Alamofire.Session) {
-        self.sessionManager = sessionManager
+    @objc public func setupSessionManager(sessionConfiguration: URLSessionConfiguration?,
+                                          rootQueue: DispatchQueue?,
+                                          requestQueue: DispatchQueue?,
+                                          serializationQueue: DispatchQueue?) {
+
+        if let sessionConfiguration = sessionConfiguration {
+            self.nkCommonInstance.sessionConfiguration = sessionConfiguration
+        }
+        if let rootQueue = rootQueue {
+            self.nkCommonInstance.rootQueue = rootQueue
+        }
+        if let requestQueue = requestQueue {
+            self.nkCommonInstance.requestQueue = requestQueue
+        }
+        if let serializationQueue = serializationQueue {
+            self.nkCommonInstance.serializationQueue = serializationQueue
+        }
     }
 
     /*
@@ -178,9 +194,9 @@ import SwiftyJSON
 
     /*
     //MARK: -
-    
+
     private func makeEvents() -> [EventMonitor] {
-        
+
         let events = ClosureEventMonitor()
         events.requestDidFinish = { request in
             print("Request finished \(request)")

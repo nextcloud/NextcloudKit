@@ -128,14 +128,34 @@ extension NextcloudKit {
         }
     }
 
-    @objc public func getServerStatus(serverUrl: String,
-                                      options: NKRequestOptions = NKRequestOptions(),
-                                      completion: @escaping (_ serverProductName: String?, _ serverVersion: String?, _ versionMajor: Int, _ versionMinor: Int, _ versionMicro: Int, _ extendedSupport: Bool, _ data: Data?, _ error: NKError) -> Void) {
+    // MARK: - getServerStatus
+
+    public struct ServerInfo {
+        public let installed: Bool
+        public let maintenance: Bool
+        public let needsDbUpgrade: Bool
+        public let extendedSupport: Bool
+        public let productName: String
+        public let version: String
+        public let versionMajor: Int
+        public let versionMinor: Int
+        public let versionMicro: Int
+        public let data: Data?
+    }
+
+    public enum ServerInfoResult {
+        case success(ServerInfo)
+        case failure(NKError)
+    }
+
+    public func getServerStatus(serverUrl: String,
+                                options: NKRequestOptions = NKRequestOptions(),
+                                completion: @escaping (ServerInfoResult) -> Void) {
 
         let endpoint = "status.php"
 
         guard let url = self.nkCommonInstance.createStandardUrl(serverUrl: serverUrl, endpoint: endpoint) else {
-            return options.queue.async { completion(nil, nil, 0, 0, 0, false, nil, .urlError) }
+            return options.queue.async { completion(ServerInfoResult.failure(.urlError)) }
         }
 
         let headers = self.nkCommonInstance.getStandardHeaders(options: options)
@@ -146,17 +166,12 @@ extension NextcloudKit {
             switch response.result {
             case .failure(let error):
                 let error = NKError(error: error, afResponse: response, responseData: response.data)
-                options.queue.async { completion(nil, nil, 0, 0, 0, false, nil, error) }
+                return options.queue.async { completion(ServerInfoResult.failure(error)) }
             case .success(let jsonData):
                 let json = JSON(jsonData)
                 var versionMajor = 0, versionMinor = 0, versionMicro = 0
-
-                let serverProductName = json["productname"].stringValue.lowercased()
-                let serverVersion = json["version"].stringValue
-                let serverVersionString = json["versionstring"].stringValue
-                let extendedSupport = json["extendedSupport"].boolValue
-
-                let arrayVersion = serverVersion.components(separatedBy: ".")
+                let version = json["version"].stringValue
+                let arrayVersion = version.components(separatedBy: ".")
                 if arrayVersion.count == 1 {
                     versionMajor = Int(arrayVersion[0]) ?? 0
                 } else if arrayVersion.count == 2 {
@@ -167,8 +182,18 @@ extension NextcloudKit {
                     versionMinor = Int(arrayVersion[1]) ?? 0
                     versionMicro = Int(arrayVersion[2]) ?? 0
                 }
+                let serverInfo = ServerInfo(installed: json["installed"].boolValue,
+                                            maintenance: json["maintenance"].boolValue,
+                                            needsDbUpgrade: json["needsDbUpgrade"].boolValue,
+                                            extendedSupport: json["extendedSupport"].boolValue,
+                                            productName: json["productname"].stringValue,
+                                            version: json["versionstring"].stringValue,
+                                            versionMajor: versionMajor,
+                                            versionMinor: versionMinor,
+                                            versionMicro: versionMicro,
+                                            data: jsonData)
 
-                options.queue.async { completion(serverProductName, serverVersionString, versionMajor, versionMinor, versionMicro, extendedSupport, jsonData, .success) }
+                options.queue.async { completion(ServerInfoResult.success(serverInfo)) }
             }
         }
     }

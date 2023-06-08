@@ -47,3 +47,4 @@ echo "TEST_SERVER_URL: ${TEST_SERVER_URL}"
 echo "TEST_USER: ${TEST_USER}"
 echo "TEST_APP_PASSWORD: ${TEST_APP_PASSWORD}"
 echo "Env vars exported."
+ 2
