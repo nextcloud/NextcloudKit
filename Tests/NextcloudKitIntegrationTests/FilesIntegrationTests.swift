@@ -22,7 +22,7 @@
 import XCTest
 @testable import NextcloudKit
 
-final class LoginIntegrationTests: XCTestCase {
+final class FilesIntegrationTests: XCTestCase {
     private let baseUrl = EnvVars.testServerUrl
     private let user = EnvVars.testUser
     private let userId = EnvVars.testUser
