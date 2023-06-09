@@ -38,6 +38,7 @@ final class FilesIntegrationTests: XCTestCase {
 
         NextcloudKit.shared.setup(account: account, user: user, userId: userId, password: password, urlBase: baseUrl)
 
+        // Test creating folder
         NextcloudKit.shared.createFolder(serverUrlFileName: serverUrlFileName) { account, ocId, date, error in
             XCTAssertEqual(self.account, account)
 
@@ -46,6 +47,7 @@ final class FilesIntegrationTests: XCTestCase {
 
             Thread.sleep(forTimeInterval: 0.2)
 
+            // Test reading folder, should exist
             NextcloudKit.shared.readFileOrFolder(serverUrlFileName: serverUrlFileName, depth: "0") { account, files, data, error in
                 XCTAssertEqual(self.account, account)
                 XCTAssertEqual(NKError.success.errorCode, error.errorCode)
@@ -54,6 +56,7 @@ final class FilesIntegrationTests: XCTestCase {
 
                 Thread.sleep(forTimeInterval: 0.2)
 
+                // Test deleting folder
                 NextcloudKit.shared.deleteFileOrFolder(serverUrlFileName: serverUrlFileName) { account, error in
                     XCTAssertEqual(self.account, account)
                     XCTAssertEqual(NKError.success.errorCode, error.errorCode)
@@ -61,6 +64,7 @@ final class FilesIntegrationTests: XCTestCase {
 
                     Thread.sleep(forTimeInterval: 0.2)
 
+                    // Test reading folder, should NOT exist
                     NextcloudKit.shared.readFileOrFolder(serverUrlFileName: serverUrlFileName, depth: "0") { account, files, data, error in
                         defer { expectation.fulfill() }
 
