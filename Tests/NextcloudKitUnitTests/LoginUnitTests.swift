@@ -39,8 +39,6 @@ class LoginUnitTests: XCTestCase {
         return config
     }
 
-    private let timeout_seconds = 20.0
-
     override func setUp() {
         // Set our mock session manager as the one the API is going to use
         NextcloudKit.shared.nkCommonInstance.sessionConfiguration = mockSessionManager()
