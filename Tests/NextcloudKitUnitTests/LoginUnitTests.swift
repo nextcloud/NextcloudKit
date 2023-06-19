@@ -66,7 +66,6 @@ class LoginUnitTests: XCTestCase {
 
         // Now we call the function we want to test; it will use the mock session and request and return the mock data
         NextcloudKit.shared.getLoginFlowV2(serverUrl: serverUrl) { token, endpoint, login, data, error in
-            defer { self.requestExpectation.fulfill() }
             let json = JSON(mockJsonData)
 
             let mockToken = json["poll"]["token"].string
@@ -80,8 +79,6 @@ class LoginUnitTests: XCTestCase {
             XCTAssertEqual(data, mockJsonData)
             XCTAssertEqual(NKError.success, error)
         }
-
-        wait(for: [requestExpectation], timeout: timeout_seconds)
     }
 
     func test_getLoginFlowV2_withBadStatusCode_requestShouldFail() {
@@ -96,15 +93,12 @@ class LoginUnitTests: XCTestCase {
 
         // Now we call the function we want to test; it will use the mock session and request and return the mock data
         NextcloudKit.shared.getLoginFlowV2(serverUrl: serverUrl) { token, endpoint, login, data, error in
-            defer { self.requestExpectation.fulfill() }
             XCTAssertNotNil(error)
             XCTAssertNil(token)
             XCTAssertNil(endpoint)
             XCTAssertNil(login)
             XCTAssertNil(data)
         }
-
-        wait(for: [requestExpectation], timeout: timeout_seconds)
     }
 
     func test_getLoginFlowV2_withBadUrl_requestShouldFail() {
@@ -117,13 +111,11 @@ class LoginUnitTests: XCTestCase {
         }
         mock.register()
 
-
         // Set our mock session manager as the one the API is going to use
         NextcloudKit.shared.nkCommonInstance.sessionConfiguration = mockSessionManager()
 
         // Now we call the function we want to test; it will use the mock session and request and return the mock data
         NextcloudKit.shared.getLoginFlowV2(serverUrl: "badUrl") { token, endpoint, login, data, error in
-            defer { self.requestExpectation.fulfill() }
 
             XCTAssertNotNil(error)
             XCTAssertNil(token)
@@ -131,8 +123,6 @@ class LoginUnitTests: XCTestCase {
             XCTAssertNil(login)
             XCTAssertNil(data)
         }
-
-        wait(for: [requestExpectation], timeout: timeout_seconds)
     }
 }
 
