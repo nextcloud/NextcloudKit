@@ -26,7 +26,7 @@ import Mocker
 import SwiftyJSON
 
 class LoginUnitTests: XCTestCase {
-    private lazy var serverUrl = "https://cloud.nextcloud.com"
+    private lazy var serverUrl = "https://localhost:8080"
     private lazy var endpoint = "/index.php/login/v2"
     private lazy var fullUrlString = serverUrl + endpoint
     private lazy var fullUrl = URL(string: fullUrlString)!
