@@ -116,7 +116,6 @@ class LoginUnitTests: XCTestCase {
 
         // Now we call the function we want to test; it will use the mock session and request and return the mock data
         NextcloudKit.shared.getLoginFlowV2(serverUrl: "badUrl") { token, endpoint, login, data, error in
-
             XCTAssertNotNil(error)
             XCTAssertNil(token)
             XCTAssertNil(endpoint)
