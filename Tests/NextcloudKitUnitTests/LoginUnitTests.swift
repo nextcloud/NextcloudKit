@@ -30,7 +30,6 @@ class LoginUnitTests: XCTestCase {
     private lazy var endpoint = "/index.php/login/v2"
     private lazy var fullUrlString = serverUrl + endpoint
     private lazy var fullUrl = URL(string: fullUrlString)!
-    private lazy var requestExpectation = expectation(description: "Request should finish")
 
     // Create a mock of Alamofire's session manager config
     private lazy var mockSessionManager = {
