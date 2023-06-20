@@ -157,7 +157,6 @@ import SwiftyJSON
     @objc public var urlBase = ""
     @objc public var user = ""
     @objc public var userId = ""
-    @objc public var attributes: [String] = []
 }
 
 @objcMembers public class NKFileProperty: NSObject {
@@ -234,6 +233,13 @@ import SwiftyJSON
     @objc public var userIcon = ""
     @objc public var userMessage = ""
     @objc public var userStatus = ""
+    @objc public var attributes: [Attribute] = []
+
+    @objc public class Attribute: NSObject, Codable {
+        let scope: String
+        let key: String
+        let enabled: Bool
+    }
 }
 
 @objc public class NKSharee: NSObject {
@@ -894,6 +900,7 @@ class NKDataFileXML: NSObject {
             file.urlBase = urlBase
             file.user = user
             file.userId = userId
+            
 
             files.append(file)
         }
@@ -1202,6 +1209,10 @@ class NKDataFileXML: NSObject {
 
             if let value = element["status", "status"].text {
                 item.userStatus = value
+            }
+
+            if let value = element["attributes"].text, let attributes = try? JSONDecoder().decode([NKShare.Attribute].self, from: Data(value.utf8)) {
+                print(attributes)
             }
 
             items.append(item)
