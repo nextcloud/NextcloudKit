@@ -78,6 +78,7 @@ import SwiftyJSON
 }
 
 extension NextcloudKit {
+
     @objc public func readShares(parameters: NKShareParameter,
                                  options: NKRequestOptions = NKRequestOptions(),
                                  completion: @escaping (_ account: String, _ shares: [NKShare]?, _ data: Data?, _ error: NKError) -> Void) {
@@ -481,12 +482,9 @@ extension NextcloudKit {
         share.userMessage = json["ocs"]["data"]["status"]["message"].stringValue
         share.userStatus = json["ocs"]["data"]["status"]["status"].stringValue
 
-//        if let attributes = json["ocs"]["data"]["attributes"].string, let object = try? JSONDecoder().decode([NKShare.Attribute].self, from: Data(attributes.utf8)) {
-//        if let attributes = json["ocs"]["data"]["attributes"].string, let object = try? JSONDecoder().decode([String].self, from: Data(attributes.utf8)) {
-//            share.attributes = object
-//        }
-
-        share.attributes = json["ocs"]["data"]["attributes"].stringValue
+        if let attributes = json["ocs"]["data"]["attributes"].string, let object = try? JSONDecoder().decode([NKShare.Attribute].self, from: Data(attributes.utf8)) {
+            share.attributes = object
+        }
 
         return share
     }

@@ -233,21 +233,13 @@ import SwiftyJSON
     @objc public var userIcon = ""
     @objc public var userMessage = ""
     @objc public var userStatus = ""
-//    @objc public var attributes: [Attribute] = []
-    @objc public var attributes = ""
+    @objc public var attributes: [Attribute] = []
 
-//    @objc public class Attribute: NSObject, Codable {
-//        let scope: String
-//        let key: String
-//        let enabled: Bool
-//    }
-//
-//    @objcMembers
-//    public class Attribute: Object, Codable {
-//        dynamic var scope: String = ""
-//        dynamic var key: String = ""
-//        dynamic var enabled: Bool = false
-//    }
+    @objc public class Attribute: NSObject, Codable {
+        let scope: String
+        let key: String
+        let enabled: Bool
+    }
 }
 
 @objc public class NKSharee: NSObject {
@@ -1219,10 +1211,8 @@ class NKDataFileXML: NSObject {
                 item.userStatus = value
             }
 
-//            if let value = element["attributes"].text, let attributes = try? JSONDecoder().decode([Attribute].self, from: Data(value.utf8)) {
-//            if let value = element["attributes"].text, let attributes = try? JSONDecoder().decode([String].self, from: Data(value.utf8)) {
-            if let value = element["attributes"].text {
-                item.attributes = value
+            if let value = element["attributes"].text, let attributes = try? JSONDecoder().decode([NKShare.Attribute].self, from: Data(value.utf8)) {
+                print(attributes)
             }
 
             items.append(item)
