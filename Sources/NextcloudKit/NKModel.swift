@@ -157,6 +157,7 @@ import SwiftyJSON
     @objc public var urlBase = ""
     @objc public var user = ""
     @objc public var userId = ""
+    @objc public var attributes: [String] = []
 }
 
 @objcMembers public class NKFileProperty: NSObject {
