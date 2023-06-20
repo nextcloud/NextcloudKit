@@ -1212,7 +1212,7 @@ class NKDataFileXML: NSObject {
             }
 
             if let value = element["attributes"].text, let attributes = try? JSONDecoder().decode([NKShare.Attribute].self, from: Data(value.utf8)) {
-                print(attributes)
+                item.attributes = attributes
             }
 
             items.append(item)
