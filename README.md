@@ -63,4 +63,5 @@ This is generated from the .env-vars file in the root directory. If there is an 
 ```
 
 Note that you always have to run `./generate-env-vars.sh` if you change the values inside `.env-vars`.
+
 6. You can now run the integration tests. They will use the env vars to connect to the test server to do the testing. 
