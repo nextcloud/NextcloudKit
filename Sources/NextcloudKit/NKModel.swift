@@ -236,9 +236,9 @@ import SwiftyJSON
     @objc public var attributes: [Attribute] = []
 
     @objc public class Attribute: NSObject, Codable {
-        let scope: String
-        let key: String
-        let enabled: Bool
+        public let scope: String
+        public let key: String
+        public let enabled: Bool
     }
 }
 
