@@ -239,6 +239,12 @@ import SwiftyJSON
         public let scope: String
         public let key: String
         public let enabled: Bool
+
+        init(scope: String, key: String, enabled: Bool) {
+            self.scope = scope
+            self.key = key
+            self.enabled = enabled
+        }
     }
 }
 
