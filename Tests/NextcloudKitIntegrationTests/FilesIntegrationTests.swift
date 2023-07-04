@@ -22,13 +22,7 @@
 import XCTest
 @testable import NextcloudKit
 
-final class FilesIntegrationTests: XCTestCase {
-    private let baseUrl = EnvVars.testServerUrl
-    private let user = EnvVars.testUser
-    private let userId = EnvVars.testUser
-    private let password = EnvVars.testAppPassword
-    private lazy var account = "\(userId) \(baseUrl)"
-
+final class FilesIntegrationTests: BaseIntegrationXCTestCase {
     func test_createReadDeleteFolder_withProperParams_shouldCreateReadDeleteFolder() throws {
         let expectation = expectation(description: "Should finish last callback")
 
