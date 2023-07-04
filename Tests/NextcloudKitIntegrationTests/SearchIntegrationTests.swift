@@ -46,7 +46,7 @@ final class SearchIntegrationTests: BaseIntegrationXCTestCase {
                 Thread.sleep(forTimeInterval: 0.2)
 
                 // Check if search returns files
-                NextcloudKit.shared.unifiedSearch(term: "Search", limit: 1) { request in
+                NextcloudKit.shared.unifiedSearch(term: "Search") { request in
 
                 } providers: { account, searchProviders in
                     providerCount = searchProviders!.count
