@@ -198,6 +198,7 @@ import SwiftyJSON
 
 @objc public class NKShare: NSObject {
 
+    @objc public var account = ""
     @objc public var canEdit: Bool = false
     @objc public var canDelete: Bool = false
     @objc public var date: NSDate?
@@ -215,8 +216,8 @@ import SwiftyJSON
     @objc public var mailSend: Bool = false
     @objc public var mimeType = ""
     @objc public var note = ""
-    @objc public var parent: String = ""
-    @objc public var password: String = ""
+    @objc public var parent = ""
+    @objc public var password = ""
     @objc public var path = ""
     @objc public var permissions: Int = 0
     @objc public var sendPasswordByTalk: Bool = false

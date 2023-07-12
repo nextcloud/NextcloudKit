@@ -438,6 +438,7 @@ extension NextcloudKit {
     private func convertResponseShare(json: JSON) -> NKShare {
         let share = NKShare()
 
+        share.account = self.nkCommonInstance.account
         share.canDelete = json["ocs"]["data"]["can_delete"].boolValue
         share.canEdit = json["ocs"]["data"]["can_edit"].boolValue
         share.displaynameFileOwner = json["ocs"]["data"]["displayname_file_owner"].stringValue
