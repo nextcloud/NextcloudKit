@@ -253,7 +253,9 @@ import SwiftyJSON
 //        }
 //    }
 
-    @objc public class Attribute: NSObject, Codable {
+    let attribute = Attribute(scope: "asd", key: "asd", enabled: true)
+
+    @objc public class Attribute: NSObject {
            public let scope: String
            public let key: String
            public let enabled: Bool
@@ -1233,10 +1235,6 @@ class NKDataFileXML: NSObject {
 
             if let value = element["status", "status"].text {
                 item.userStatus = value
-            }
-
-            if let value = element["attributes"].text, let attributes = try? JSONDecoder().decode([NKShare.Attribute].self, from: Data(value.utf8)) {
-                item.attributes = attributes
             }
 
             items.append(item)

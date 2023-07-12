@@ -484,8 +484,9 @@ extension NextcloudKit {
         share.userMessage = json["ocs"]["data"]["status"]["message"].stringValue
         share.userStatus = json["ocs"]["data"]["status"]["status"].stringValue
 
-        if let attributes = json["ocs"]["data"]["attributes"].string, let object = try? JSONDecoder().decode([NKShare.Attribute].self, from: Data(attributes.utf8)) {
-            share.attributes = object
+//        if let attributes = json["ocs"]["data"]["attributes"].string, let object = try? JSONDecoder().decode([NKShare.Attribute].self, from: Data(attributes.utf8)) {
+        if let attributes = json["ocs"]["data"]["attributes"].array {
+            share.attributes = attributes.map({ return NKShare.Attribute(scope: $0["scope"].stringValue, key: $0["key"].stringValue, enabled: $0["enabled"].boolValue) })
         }
 
         return share
