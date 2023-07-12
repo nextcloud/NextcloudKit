@@ -1241,11 +1241,10 @@ class NKDataFileXML: NSObject {
 //                item.attributes = value.map({ return NKShare.Attribute(scope: $0.element["scope"], key: $0.element["key"].stringValue, enabled: $0.element["enabled"].boolValue) })
 //            }
 
-            for attribute in element["attributes"] {
+            for attribute in elements["attributes"] {
                 if let scope = attribute["scope"].text, let key = attribute["key"].text, let enabled = attribute["enabled"].bool {
                     item.attributes.append(NKShare.Attribute(scope: scope, key: key, enabled: enabled)
                 )}
-//                item.attributes = value.map({ return NKShare.Attribute(scope: $0.element["scope"], key: $0.element["key"].stringValue, enabled: $0.element["enabled"].boolValue) })
             }
 
             items.append(item)
