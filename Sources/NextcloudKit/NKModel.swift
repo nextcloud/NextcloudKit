@@ -246,8 +246,7 @@ import SwiftyJSON
         @objc public var key: String = ""
         @objc public var enabled: Bool
 
-
-        init(scope: String, key: String, enabled: Bool) {
+        @objc init(scope: String, key: String, enabled: Bool) {
             self.scope = scope
             self.key = key
             self.enabled = enabled
