@@ -241,17 +241,29 @@ import SwiftyJSON
 //        public let key: String
 //        public let enabled: Bool
 //    }
-    @objc public class Attribute: NSObject, Codable {
-        @objc public var scope: String = ""
-        @objc public var key: String = ""
-        @objc public var enabled: Bool
+//    @objc public class Attribute: NSObject, Codable {
+//        @objc public var scope: String = ""
+//        @objc public var key: String = ""
+//        @objc public var enabled: Bool
+//
+//        convenience init(scope: String, key: String, enabled: Bool) {
+//            self.scope = scope
+//            self.key = key
+//            self.enabled = enabled
+//        }
+//    }
 
-        @objc init(scope: String, key: String, enabled: Bool) {
-            self.scope = scope
-            self.key = key
-            self.enabled = enabled
-        }
-    }
+    @objc public class Attribute: NSObject, Codable {
+           public let scope: String
+           public let key: String
+           public let enabled: Bool
+
+           init(scope: String, key: String, enabled: Bool) {
+               self.scope = scope
+               self.key = key
+               self.enabled = enabled
+           }
+       }
 }
 
 @objc public class NKSharee: NSObject {
