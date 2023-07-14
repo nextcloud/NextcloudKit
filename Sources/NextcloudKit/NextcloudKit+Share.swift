@@ -484,10 +484,7 @@ extension NextcloudKit {
         share.userIcon = json["status"]["icon"].stringValue
         share.userMessage = json["status"]["message"].stringValue
         share.userStatus = json["status"]["status"].stringValue
-        for (_, subJson): (String, JSON) in json["attributes"] {
-            let attribute = NKShare.Attribute(scope: subJson["scope"].stringValue, key: subJson["key"].stringValue, enabled: subJson["enabled"].boolValue)
-            share.attributes.append(attribute)
-        }
+        share.attributes = json["attributes"].string
 
         return share
     }
@@ -531,17 +528,5 @@ extension NextcloudKit {
     @objc public var userIcon = ""
     @objc public var userMessage = ""
     @objc public var userStatus = ""
-    @objc public var attributes: [Attribute] = []
-
-    @objc public class Attribute: NSObject {
-        public let scope: String
-        public let key: String
-        public let enabled: Bool
-
-        init(scope: String, key: String, enabled: Bool) {
-            self.scope = scope
-            self.key = key
-            self.enabled = enabled
-        }
-    }
+    @objc public var attributes: String?
 }
