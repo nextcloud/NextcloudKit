@@ -109,7 +109,13 @@ extension NextcloudKit {
                     options.queue.async { completion(account, nil, jsonData, error) }
                     return
                 }
-                options.queue.async { completion(account, [self.convertResponseShare(json: json)], jsonData, .success) }
+                var shares: [NKShare] = []
+                let ocsdata = json["ocs"]["data"]
+                for (_, subJson): (String, JSON) in ocsdata {
+                    let share = self.convertResponseShare(json: subJson)
+                    shares.append(share)
+                }
+                options.queue.async { completion(account, shares, jsonData, .success) }
             }
         }
     }
