@@ -92,7 +92,7 @@ extension NextcloudKit {
             return options.queue.async { completion(account, nil, nil, .urlError) }
         }
 
-        let headers = self.nkCommonInstance.getStandardHeaders(options.customHeader, customUserAgent: options.customUserAgent, contentType: "application/xml")
+        let headers = self.nkCommonInstance.getStandardHeaders(options: options)
 
         sessionManager.request(url, method: .get, parameters: parameters.queryParameters, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).responseData(queue: self.nkCommonInstance.backgroundQueue) { response in
         debugPrint(response)
@@ -101,7 +101,9 @@ extension NextcloudKit {
             case .failure(let error):
                 let error = NKError(error: error, afResponse: response, responseData: response.data)
                 options.queue.async { completion(account, nil, nil, error) }
-            case .success:
+            case .success(let jsonData):
+                options.queue.async { completion(account, nil, nil, .xmlError) }
+                /*
                 if let xmlData = response.data {
                     let shares = self.convertDataShare(data: xmlData)
                     if shares.statusCode == 200 {
@@ -112,6 +114,7 @@ extension NextcloudKit {
                 } else {
                     options.queue.async { completion(account, nil, nil, .xmlError) }
                 }
+                */
             }
         }
     }
