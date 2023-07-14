@@ -24,7 +24,6 @@
 import Foundation
 import Alamofire
 import SwiftyJSON
-import SwiftyXMLParser
 
 @objc public class NKShareParameter: NSObject {
 
