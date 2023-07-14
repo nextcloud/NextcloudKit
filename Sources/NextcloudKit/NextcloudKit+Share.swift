@@ -102,19 +102,14 @@ extension NextcloudKit {
                 let error = NKError(error: error, afResponse: response, responseData: response.data)
                 options.queue.async { completion(account, nil, nil, error) }
             case .success(let jsonData):
-                options.queue.async { completion(account, nil, nil, .xmlError) }
-                /*
-                if let xmlData = response.data {
-                    let shares = self.convertDataShare(data: xmlData)
-                    if shares.statusCode == 200 {
-                        options.queue.async { completion(account, shares.shares, xmlData, .success) }
-                    } else {
-                        options.queue.async { completion(account, nil, nil, NKError(xmlData: xmlData, fallbackStatusCode: response.response?.statusCode)) }
-                    }
-                } else {
-                    options.queue.async { completion(account, nil, nil, .xmlError) }
+                let json = JSON(jsonData)
+                guard json["ocs"]["meta"]["statuscode"].int == 200
+                else {
+                    let error = NKError(rootJson: json, fallbackStatusCode: response.response?.statusCode)
+                    options.queue.async { completion(account, nil, jsonData, error) }
+                    return
                 }
-                */
+                options.queue.async { completion(account, [self.convertResponseShare(json: json)], jsonData, .success) }
             }
         }
     }
@@ -491,175 +486,6 @@ extension NextcloudKit {
         }
 
         return share
-    }
-
-    func convertDataShare(data: Data) -> (shares: [NKShare], statusCode: Int, message: String) {
-
-        var items: [NKShare] = []
-        var statusCode: Int = 0
-        var message = ""
-
-        let xml = XML.parse(data)
-        if let value = xml["ocs", "meta", "statuscode"].int {
-            statusCode = value
-        }
-        if let value = xml["ocs", "meta", "message"].text {
-            message = value
-        }
-        let elements = xml["ocs", "data", "element"]
-        for element in elements {
-            let item = NKShare()
-
-            if let value = element["can_edit"].int {
-                item.canEdit = (value as NSNumber).boolValue
-            }
-
-            if let value = element["can_delete"].int {
-                item.canDelete = (value as NSNumber).boolValue
-            }
-
-            if let value = element["displayname_file_owner"].text {
-                item.displaynameFileOwner = value
-            }
-
-            if let value = element["displayname_owner"].text {
-                item.displaynameOwner = value
-            }
-
-            if let value = element["expiration"].text, let date = self.nkCommonInstance.convertDate(value, format: "YYYY-MM-dd HH:mm:ss") {
-                item.expirationDate = date
-            }
-
-            if let value = element["file_parent"].int {
-                item.fileParent = value
-            }
-
-            if let value = element["file_source"].int {
-                item.fileSource = value
-            }
-
-            if let value = element["file_target"].text {
-                item.fileTarget = value
-            }
-
-            if let value = element["hide_download"].int {
-                item.hideDownload = (value as NSNumber).boolValue
-            }
-
-            if let value = element["id"].int {
-                item.idShare = value
-            }
-
-            if let value = element["item_source"].int {
-                item.itemSource = value
-            }
-
-            if let value = element["item_type"].text {
-                item.itemType = value
-            }
-
-            if let value = element["label"].text {
-                item.label = value
-            }
-
-            if let value = element["mail_send"].int {
-                item.mailSend = (value as NSNumber).boolValue
-            }
-
-            if let value = element["mimetype"].text {
-                item.mimeType = value
-            }
-
-            if let value = element["note"].text {
-                item.note = value
-            }
-
-            if let value = element["parent"].text {
-                item.parent = value
-            }
-
-            if let value = element["password"].text {
-                item.password = value
-            }
-
-            if let value = element["path"].text {
-                item.path = value
-            }
-
-            if let value = element["permissions"].int {
-                item.permissions = value
-            }
-
-            if let value = element["send_password_by_talk"].int {
-                item.sendPasswordByTalk = (value as NSNumber).boolValue
-            }
-
-            if let value = element["share_type"].int {
-                item.shareType = value
-            }
-
-            if let value = element["share_with"].text {
-                item.shareWith = value
-            }
-
-            if let value = element["share_with_displayname"].text {
-                item.shareWithDisplayname = value
-            }
-
-            if let value = element["stime"].double, value > 0 {
-                item.date = NSDate(timeIntervalSince1970: value)
-            }
-
-            if let value = element["storage"].int {
-                item.storage = value
-            }
-
-            if let value = element["storage_id"].text {
-                item.storageId = value
-            }
-
-            if let value = element["token"].text {
-                item.token = value
-            }
-
-            if let value = element["uid_file_owner"].text {
-                item.uidFileOwner = value
-            }
-
-            if let value = element["uid_owner"].text {
-                item.uidOwner = value
-            }
-
-            if let value = element["url"].text {
-                item.url = value
-            }
-
-            if let value = element["status", "clearAt"].double, value > 0 {
-                item.userClearAt = NSDate(timeIntervalSince1970: value)
-            }
-
-            if let value = element["status", "icon"].text {
-                item.userIcon = value
-            }
-
-            if let value = element["status", "message"].text {
-                item.userMessage = value
-            }
-
-            if let value = element["status", "status"].text {
-                item.userStatus = value
-            }
-
-            for attribute in elements["attributes"] {
-                if let scope = attribute["scope"].text, let key = attribute["key"].text, let enabled = attribute["enabled"].bool {
-                    item.attributes.append(NKShare.Attribute(scope: scope, key: key, enabled: enabled)
-                )}
-            }
-
-            items.append(item)
-        }
-
-        return(items, statusCode, message)
     }
 }
 
