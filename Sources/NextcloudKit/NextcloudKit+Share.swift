@@ -110,8 +110,7 @@ extension NextcloudKit {
                     return
                 }
                 var shares: [NKShare] = []
-                let ocsdata = json["ocs"]["data"]
-                for (_, subJson): (String, JSON) in ocsdata {
+                for (_, subJson): (String, JSON) in json["ocs"]["data"] {
                     let share = self.convertResponseShare(json: subJson)
                     shares.append(share)
                 }
@@ -485,8 +484,9 @@ extension NextcloudKit {
         share.userIcon = json["status"]["icon"].stringValue
         share.userMessage = json["status"]["message"].stringValue
         share.userStatus = json["status"]["status"].stringValue
-        if let attributes = json["attributes"].array {
-            share.attributes = attributes.map({ return NKShare.Attribute(scope: $0["scope"].stringValue, key: $0["key"].stringValue, enabled: $0["enabled"].boolValue) })
+        for (_, subJson): (String, JSON) in json["attributes"] {
+            let attribute = NKShare.Attribute(scope: subJson["scope"].stringValue, key: subJson["key"].stringValue, enabled: subJson["enabled"].boolValue)
+            share.attributes.append(attribute)
         }
 
         return share
