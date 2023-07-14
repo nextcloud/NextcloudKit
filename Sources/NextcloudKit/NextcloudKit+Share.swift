@@ -316,10 +316,9 @@ extension NextcloudKit {
                 options.queue.async { completion(account, nil, nil, error) }
             case .success(let jsonData):
                 let json = JSON(jsonData)
-
                 let statusCode = json["ocs"]["meta"]["statuscode"].int ?? NKError.internalError
                 if statusCode == 200 {
-                    options.queue.async { completion(account, self.convertResponseShare(json: json), jsonData, .success) }
+                    options.queue.async { completion(account, self.convertResponseShare(json: json["ocs"]["data"]), jsonData, .success) }
                 } else {
                     options.queue.async { completion(account, nil, jsonData, NKError(rootJson: json, fallbackStatusCode: response.response?.statusCode)) }
                 }
@@ -395,10 +394,9 @@ extension NextcloudKit {
                 options.queue.async { completion(account, nil, nil, error) }
             case .success(let jsonData):
                 let json = JSON(jsonData)
-
                 let statusCode = json["ocs"]["meta"]["statuscode"].int ?? NKError.internalError
                 if statusCode == 200 {
-                    options.queue.async { completion(account, self.convertResponseShare(json: json), jsonData, .success) }
+                    options.queue.async { completion(account, self.convertResponseShare(json: json["ocs"]["data"]), jsonData, .success) }
                 } else {
                     options.queue.async { completion(account, nil, jsonData, NKError(rootJson: json, fallbackStatusCode: response.response?.statusCode)) }
                 }
