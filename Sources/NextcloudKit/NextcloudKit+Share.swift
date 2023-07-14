@@ -444,50 +444,50 @@ extension NextcloudKit {
         let share = NKShare()
 
         share.account = self.nkCommonInstance.account
-        share.canDelete = json["ocs"]["data"]["can_delete"].boolValue
-        share.canEdit = json["ocs"]["data"]["can_edit"].boolValue
-        share.displaynameFileOwner = json["ocs"]["data"]["displayname_file_owner"].stringValue
-        share.displaynameOwner = json["ocs"]["data"]["displayname_owner"].stringValue
-        if let expiration = json["ocs"]["data"]["expiration"].string, let date = self.nkCommonInstance.convertDate(expiration, format: "YYYY-MM-dd HH:mm:ss") {
+        share.canDelete = json["can_delete"].boolValue
+        share.canEdit = json["can_edit"].boolValue
+        share.displaynameFileOwner = json["displayname_file_owner"].stringValue
+        share.displaynameOwner = json["displayname_owner"].stringValue
+        if let expiration = json["expiration"].string, let date = self.nkCommonInstance.convertDate(expiration, format: "YYYY-MM-dd HH:mm:ss") {
             share.expirationDate = date
         }
-        share.fileParent = json["ocs"]["data"]["file_parent"].intValue
-        share.fileSource = json["ocs"]["data"]["file_source"].intValue
-        share.fileTarget = json["ocs"]["data"]["file_target"].stringValue
-        share.hideDownload = json["ocs"]["data"]["hide_download"].boolValue
-        share.idShare = json["ocs"]["data"]["id"].intValue
-        share.itemSource = json["ocs"]["data"]["item_source"].intValue
-        share.itemType = json["ocs"]["data"]["item_type"].stringValue
-        share.label = json["ocs"]["data"]["label"].stringValue
-        share.mailSend = json["ocs"]["data"]["mail_send"].boolValue
-        share.mimeType = json["ocs"]["data"]["mimetype"].stringValue
-        share.note = json["ocs"]["data"]["note"].stringValue
-        share.parent = json["ocs"]["data"]["parent"].stringValue
-        share.password = json["ocs"]["data"]["password"].stringValue
-        share.path = json["ocs"]["data"]["path"].stringValue
-        share.permissions = json["ocs"]["data"]["permissions"].intValue
-        share.sendPasswordByTalk = json["ocs"]["data"]["send_password_by_talk"].boolValue
-        share.shareType = json["ocs"]["data"]["share_type"].intValue
-        share.shareWith = json["ocs"]["data"]["share_with"].stringValue
-        share.shareWithDisplayname = json["ocs"]["data"]["share_with_displayname"].stringValue
-        if let stime = json["ocs"]["data"]["stime"].double {
+        share.fileParent = json["file_parent"].intValue
+        share.fileSource = json["file_source"].intValue
+        share.fileTarget = json["file_target"].stringValue
+        share.hideDownload = json["hide_download"].boolValue
+        share.idShare = json["id"].intValue
+        share.itemSource = json["item_source"].intValue
+        share.itemType = json["item_type"].stringValue
+        share.label = json["label"].stringValue
+        share.mailSend = json["mail_send"].boolValue
+        share.mimeType = json["mimetype"].stringValue
+        share.note = json["note"].stringValue
+        share.parent = json["parent"].stringValue
+        share.password = json["password"].stringValue
+        share.path = json["path"].stringValue
+        share.permissions = json["permissions"].intValue
+        share.sendPasswordByTalk = json["send_password_by_talk"].boolValue
+        share.shareType = json["share_type"].intValue
+        share.shareWith = json["share_with"].stringValue
+        share.shareWithDisplayname = json["share_with_displayname"].stringValue
+        if let stime = json["stime"].double {
             let date = Date(timeIntervalSince1970: stime) as NSDate
             share.date = date
         }
-        share.storage = json["ocs"]["data"]["storage"].intValue
-        share.storageId = json["ocs"]["data"]["storage_id"].stringValue
-        share.token = json["ocs"]["data"]["token"].stringValue
-        share.uidFileOwner = json["ocs"]["data"]["uid_file_owner"].stringValue
-        share.uidOwner = json["ocs"]["data"]["uid_owner"].stringValue
-        share.url = json["ocs"]["data"]["url"].stringValue
-        if let clearAt = json["ocs"]["data"]["status"]["clearAt"].double {
+        share.storage = json["storage"].intValue
+        share.storageId = json["storage_id"].stringValue
+        share.token = json["token"].stringValue
+        share.uidFileOwner = json["uid_file_owner"].stringValue
+        share.uidOwner = json["uid_owner"].stringValue
+        share.url = json["url"].stringValue
+        if let clearAt = json["status"]["clearAt"].double {
             let date = Date(timeIntervalSince1970: clearAt) as NSDate
             share.userClearAt = date
         }
-        share.userIcon = json["ocs"]["data"]["status"]["icon"].stringValue
-        share.userMessage = json["ocs"]["data"]["status"]["message"].stringValue
-        share.userStatus = json["ocs"]["data"]["status"]["status"].stringValue
-        if let attributes = json["ocs"]["data"]["attributes"].array {
+        share.userIcon = json["status"]["icon"].stringValue
+        share.userMessage = json["status"]["message"].stringValue
+        share.userStatus = json["status"]["status"].stringValue
+        if let attributes = json["attributes"].array {
             share.attributes = attributes.map({ return NKShare.Attribute(scope: $0["scope"].stringValue, key: $0["key"].stringValue, enabled: $0["enabled"].boolValue) })
         }
 
