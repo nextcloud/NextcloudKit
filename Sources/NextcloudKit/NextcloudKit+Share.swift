@@ -261,9 +261,10 @@ extension NextcloudKit {
                                   password: String? = nil,
                                   permissions: Int = 1,
                                   options: NKRequestOptions = NKRequestOptions(),
+                                  attributes: String? = nil,
                                   completion: @escaping (_ account: String, _ share: NKShare?, _ data: Data?, _ error: NKError) -> Void) {
 
-        createShare(path: path, shareType: shareType, shareWith: shareWith, publicUpload: false, hideDownload: false, password: password, permissions: permissions, options: options, completion: completion)
+        createShare(path: path, shareType: shareType, shareWith: shareWith, publicUpload: false, hideDownload: false, password: password, permissions: permissions, attributes: attributes, options: options, completion: completion)
     }
 
     private func createShare(path: String,
@@ -273,6 +274,7 @@ extension NextcloudKit {
                              hideDownload: Bool? = nil,
                              password: String? = nil,
                              permissions: Int = 1,
+                             attributes: String? = nil,
                              options: NKRequestOptions = NKRequestOptions(),
                              completion: @escaping (_ account: String, _ share: NKShare?, _ data: Data?, _ error: NKError) -> Void) {
 
@@ -292,17 +294,20 @@ extension NextcloudKit {
             "shareType": String(shareType),
             "permissions": String(permissions)
         ]
-        if shareWith != nil {
-            parameters["shareWith"] = shareWith!
+        if let shareWith = shareWith {
+            parameters["shareWith"] = shareWith
         }
-        if publicUpload != nil {
+        if let publicUpload = publicUpload {
             parameters["publicUpload"] = publicUpload == true ? "true" : "false"
         }
-        if hideDownload != nil {
+        if let hideDownload = hideDownload {
             parameters["hideDownload"] = hideDownload == true ? "true" : "false"
         }
-        if password != nil {
-            parameters["password"] = password!
+        if let password = password {
+            parameters["password"] = password
+        }
+        if let attributes = attributes {
+            parameters["attributes"] = attributes
         }
 
         sessionManager.request(url, method: .post, parameters: parameters, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).responseData(queue: self.nkCommonInstance.backgroundQueue) { response in
@@ -369,16 +374,16 @@ extension NextcloudKit {
         var parameters = [
             "permissions": String(permissions)
         ]
-        if password != nil {
+        if let password = password {
             parameters["password"] = password
         }
-        if expireDate != nil {
+        if let expireDate = expireDate {
             parameters["expireDate"] = expireDate
         }
-        if note != nil {
+        if let note = note {
             parameters["note"] = note
         }
-        if label != nil {
+        if let label = label {
             parameters["label"] = label
         }
         parameters["publicUpload"] = publicUpload == true ? "true" : "false"
