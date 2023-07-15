@@ -386,7 +386,7 @@ extension NextcloudKit {
         if let attributes = attributes {
             parameters["attributes"] = attributes
         } else {
-            parameters["attributes"] = "null"
+            parameters["attributes"] = "[]"
         }
 
         sessionManager.request(url, method: .put, parameters: parameters, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).responseData(queue: self.nkCommonInstance.backgroundQueue) { response in
