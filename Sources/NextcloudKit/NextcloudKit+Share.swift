@@ -383,11 +383,7 @@ extension NextcloudKit {
         }
         parameters["publicUpload"] = publicUpload == true ? "true" : "false"
         parameters["hideDownload"] = hideDownload == true ? "true" : "false"
-        if let attributes = attributes {
-            parameters["attributes"] = attributes
-        } else {
-            parameters["attributes"] = ""
-        }
+        parameters["attributes"] = attributes
 
         sessionManager.request(url, method: .put, parameters: parameters, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).responseData(queue: self.nkCommonInstance.backgroundQueue) { response in
             debugPrint(response)
