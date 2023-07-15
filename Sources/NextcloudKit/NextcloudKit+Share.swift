@@ -351,7 +351,7 @@ extension NextcloudKit {
                                   note: String? = nil,
                                   label: String? = nil,
                                   hideDownload: Bool,
-                                  attributes: String?,
+                                  attributes: String? = nil,
                                   options: NKRequestOptions = NKRequestOptions(),
                                   completion: @escaping (_ account: String, _ share: NKShare?, _ data: Data?, _ error: NKError) -> Void) {
 
