@@ -242,6 +242,7 @@ extension NextcloudKit {
     *                       For user or group shares.
     *                       To obtain combinations, add the desired values together.
     *                       For instance, for Re-Share, delete, read, update, add 16+8+2+1 = 27.
+    * @param attributes     There is currently only one share attribute “download” from the scope “permissions”. This attribute is only valid for user and group shares, not for public link shares.
     */
 
     @objc public func createShareLink(path: String,
@@ -346,6 +347,7 @@ extension NextcloudKit {
     * @param note           Note
     * @param label          Label
     * @param hideDownload   Permission if file can be downloaded via share link (only for single file)
+    * @param attributes     There is currently only one share attribute “download” from the scope “permissions”. This attribute is only valid for user and group shares, not for public link shares.
     */
 
     @objc public func updateShare(idShare: Int,
