@@ -68,9 +68,9 @@ import SwiftyJSON
 
     internal var queryParameters: [String: String] {
         var parameters = [
-            "reshares": reshares == true ? "true" : "false",
-            "subfiles": subfiles == true ? "true" : "false",
-            "shared_with_me": sharedWithMe == true ? "true" : "false"
+            "reshares": reshares ? "true" : "false",
+            "subfiles": subfiles ? "true" : "false",
+            "shared_with_me": sharedWithMe ? "true" : "false"
         ]
         parameters["path"] = path
         return parameters
@@ -299,10 +299,10 @@ extension NextcloudKit {
             parameters["shareWith"] = shareWith
         }
         if let publicUpload = publicUpload {
-            parameters["publicUpload"] = publicUpload == true ? "true" : "false"
+            parameters["publicUpload"] = publicUpload ? "true" : "false"
         }
         if let hideDownload = hideDownload {
-            parameters["hideDownload"] = hideDownload == true ? "true" : "false"
+            parameters["hideDownload"] = hideDownload ? "true" : "false"
         }
         if let password = password {
             parameters["password"] = password
@@ -388,8 +388,8 @@ extension NextcloudKit {
         if let label = label {
             parameters["label"] = label
         }
-        parameters["publicUpload"] = publicUpload == true ? "true" : "false"
-        parameters["hideDownload"] = hideDownload == true ? "true" : "false"
+        parameters["publicUpload"] = publicUpload ? "true" : "false"
+        parameters["hideDownload"] = hideDownload ? "true" : "false"
         if let attributes = attributes {
             parameters["attributes"] = attributes
         } else {
