@@ -25,6 +25,7 @@
 xcuserdata
 profile
 *.moved-aside
+*.xcodeproj/
 DerivedData
 .idea/
 *.hmap
@@ -37,3 +38,5 @@ Carthage/
 .swiftpm
 Package.resolved
 
+/.env-vars
+*.generated.swift

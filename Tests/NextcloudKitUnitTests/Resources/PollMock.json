@@ -1,0 +1,7 @@
+{
+  "poll": {
+    "token": "EZQzMrlKVAow3wEX0qIIroxzdt7iUNmKhgNHB8AM9FaH4ncSoZKzLECo1S9xmJ0WMjtlsvCjlc0O2Ux4kBatFLVNHxj5YO9CkKikrnSBnPvXu47XIuqkH7LwgKVV5cK2",
+    "endpoint": "https://cloud.nextcloud.com/login/v2/poll"
+  },
+  "login": "https://cloud.nextcloud.com/login/v2/flow/TlydblpLQ5LhBBjM1AYD415Q3drenNota8qRIzbv2xcfbU1t9WgzGyVZeyL6CxEeNVzlfKjIwLPWESmFCw7cMDsiQLkW3TUtcTIFl9M60mfnd0iNOV0Ll33X2DXbvt71"
+}

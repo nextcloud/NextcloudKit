@@ -1,4 +1,4 @@
-name: Build
+name: Build and test
 
 on:
   push:
@@ -7,24 +7,56 @@ on:
       - develop
   pull_request:
     types: [synchronize, opened, reopened, ready_for_review]
-    branches: 
+    branches:
       - master
       - develop
 
+env:
+  DESTINATION_IOS: platform=iOS Simulator,name=iPhone 14
+  DESTINATION_MACOS: platform=macOS,arch=x86_64
+  SCHEME: NextcloudKit
+
 jobs:
-  XCBuild:
+  build-and-test:
+    name: Build and Test
     runs-on: macOS-latest
     if: github.event.pull_request.draft == false
-    env:
-      PROJECT: NextcloudKit.xcodeproj
-      DESTINATION: platform=iOS Simulator,name=iPhone 14
     steps:
     - name: Set env var
       run: echo "DEVELOPER_DIR=$(xcode-select --print-path)" >> $GITHUB_ENV
-    - uses: actions/checkout@v2
-    - name: Build NextcloudKit
+    - uses: actions/checkout@v3
+    - name: Setup Bundler and Install Gems
       run: |
-        xcodebuild build -project $PROJECT -scheme "$SCHEME" -destination "$DESTINATION"
-      env:
-          SCHEME: NextcloudKit
+        gem install bundler
+        bundle install
+        bundle update
+    - name: Set up Docker
+      uses: douglascamata/setup-docker-macos-action@v1-alpha
+    - name: Create docker test server and export enviroment variables
+      run: |
+        source ./create-docker-test-server.sh
+        if [ ! -f ".env-vars" ]; then
+            touch .env-vars
+            echo "export TEST_SERVER_URL=$TEST_SERVER_URL" >> .env-vars
+            echo "export TEST_USER=$TEST_USER" >> .env-vars
+            echo "export TEST_APP_PASSWORD=$TEST_APP_PASSWORD" >> .env-vars
+        fi
+    - name: Generate EnvVars file
+      run: |
+        ./generate-env-vars.sh
+    - name: Build & Test NextcloudKit
+      run: |
+        set -o pipefail && xcodebuild test -scheme "$SCHEME" \
+        -destination "$DESTINATION_IOS" \
+        -destination "$DESTINATION_MACOS" \
+        -enableCodeCoverage YES \
+        -test-iterations 3 \
+        -retry-tests-on-failure \
+        | xcpretty
+# Covecov does not yet support pure swift packages. Check here: https://github.com/SlatherOrg/slather/issues/466
+#    - name: Upload coverage to codecov
+#      run: |
+#        bundle exec slather
+#        bash <(curl -s https://codecov.io/bash) -f ./cobertura.xml -X coveragepy -X gcov -X xcode -t ${{ secrets.CODECOV_TOKEN }}
+
     
