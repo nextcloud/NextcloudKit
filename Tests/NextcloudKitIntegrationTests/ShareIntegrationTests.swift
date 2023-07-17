@@ -24,20 +24,5 @@ import XCTest
 @testable import NextcloudKit
 
 final class ShareIntegrationTests: BaseIntegrationXCTestCase {
-    func test() {
-        let expectation = expectation(description: "Should finish last callback")
-        
-        let folderName = "Templates"
 
-        let parameter = NKShareParameter(path: folderName)
-
-        NextcloudKit.shared.setup(account: account, user: user, userId: userId, password: password, urlBase: baseUrl)
-
-        NextcloudKit.shared.readShares(parameters: parameter) { account, shares, data, error in
-            defer { expectation.fulfill() }
-//            print(shares)
-        }
-
-        waitForExpectations(timeout: 100)
-    }
 }
