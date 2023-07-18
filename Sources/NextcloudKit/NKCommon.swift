@@ -381,7 +381,7 @@ import MobileCoreServices
         var reader: FileHandle?
         var writer: FileHandle?
         var chunk: Int = 0
-        var counter: Int = 0
+        var counter: Int = 1
 
         if !fileManager.fileExists(atPath: outputDirectory, isDirectory: &isDirectory) {
             do {
