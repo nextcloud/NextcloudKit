@@ -413,7 +413,7 @@ import MobileCoreServices
                 let buffer = reader?.readData(ofLength: min(bufferSize, chunkRemaining))
 
                 if writer == nil {
-                    let fileNameChunk = fileName + String(format: "%010d", counter)
+                    let fileNameChunk = String(counter)
                     let outputFileName = outputDirectory + "/" + fileNameChunk
                     fileManager.createFile(atPath: outputFileName, contents: nil, attributes: nil)
                     do {
