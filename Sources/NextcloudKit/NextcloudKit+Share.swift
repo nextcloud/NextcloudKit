@@ -260,20 +260,18 @@ extension NextcloudKit {
                                   shareType: Int,
                                   shareWith: String,
                                   password: String? = nil,
-                                  note: String? = nil,
                                   permissions: Int = 1,
                                   options: NKRequestOptions = NKRequestOptions(),
                                   attributes: String? = nil,
                                   completion: @escaping (_ account: String, _ share: NKShare?, _ data: Data?, _ error: NKError) -> Void) {
 
-        createShare(path: path, shareType: shareType, shareWith: shareWith, publicUpload: false, note: note, hideDownload: false, password: password, permissions: permissions, attributes: attributes, options: options, completion: completion)
+        createShare(path: path, shareType: shareType, shareWith: shareWith, publicUpload: false, hideDownload: false, password: password, permissions: permissions, attributes: attributes, options: options, completion: completion)
     }
 
     private func createShare(path: String,
                              shareType: Int,
                              shareWith: String?,
                              publicUpload: Bool? = nil,
-                             note: String? = nil,
                              hideDownload: Bool? = nil,
                              password: String? = nil,
                              permissions: Int = 1,
@@ -297,22 +295,19 @@ extension NextcloudKit {
             "shareType": String(shareType),
             "permissions": String(permissions)
         ]
-        if let shareWith {
+        if let shareWith = shareWith {
             parameters["shareWith"] = shareWith
         }
-        if let publicUpload {
+        if let publicUpload = publicUpload {
             parameters["publicUpload"] = publicUpload ? "true" : "false"
         }
-        if let note {
-            parameters["note"] = note
-        }
-        if let hideDownload {
+        if let hideDownload = hideDownload {
             parameters["hideDownload"] = hideDownload ? "true" : "false"
         }
-        if let password {
+        if let password = password {
             parameters["password"] = password
         }
-        if let attributes  {
+        if let attributes = attributes {
             parameters["attributes"] = attributes
         }
 
@@ -505,8 +500,6 @@ extension NextcloudKit {
 
         return share
     }
-
-
 }
 
 @objc public class NKShare: NSObject {
