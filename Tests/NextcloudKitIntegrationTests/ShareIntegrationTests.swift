@@ -27,7 +27,7 @@ final class ShareIntegrationTests: BaseIntegrationXCTestCase {
     func test_createShare_withNote_shouldCreateShare() throws {
         let expectation = expectation(description: "Should finish last callback")
         
-        let folderName = "Share\(randomInt())"
+        let folderName = "Share\(randomInt)"
         let serverUrl = "\(baseUrl)/remote.php/dav/files/\(userId)"
         let serverUrlFileName = "\(serverUrl)/\(folderName)"
 
