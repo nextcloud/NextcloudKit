@@ -60,12 +60,24 @@ extension NextcloudKit {
     }
 
     public func copyFileOrFolder(serverUrlFileNameSource: String,
-                                                   serverUrlFileNameDestination: String,
-                                                   overwrite: Bool,
-                                                   options: NKRequestOptions = NKRequestOptions()) async -> (account: String, error: NKError) {
+                                 serverUrlFileNameDestination: String,
+                                 overwrite: Bool,
+                                 options: NKRequestOptions = NKRequestOptions()) async -> (account: String, error: NKError) {
 
         await withUnsafeContinuation({ continuation in
             copyFileOrFolder(serverUrlFileNameSource: serverUrlFileNameSource, serverUrlFileNameDestination: serverUrlFileNameDestination, overwrite: overwrite, options: options) { account, error in
+                continuation.resume(returning: (account: account, error: error))
+            }
+        })
+    }
+
+    public func moveFileOrFolder(serverUrlFileNameSource: String,
+                                 serverUrlFileNameDestination: String,
+                                 overwrite: Bool,
+                                 options: NKRequestOptions = NKRequestOptions()) async -> (account: String, error: NKError) {
+
+        await withUnsafeContinuation({ continuation in
+            moveFileOrFolder(serverUrlFileNameSource: serverUrlFileNameSource, serverUrlFileNameDestination: serverUrlFileNameDestination, overwrite: overwrite, options: options) { account, error in
                 continuation.resume(returning: (account: account, error: error))
             }
         })
