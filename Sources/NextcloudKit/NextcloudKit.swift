@@ -571,13 +571,13 @@ import SwiftyJSON
             self.moveFileOrFolder(serverUrlFileNameSource: serverUrlFileNameSource, serverUrlFileNameDestination: fileNameServerPath, overwrite: true, options: options) { _, error in
 
                 guard error == .success else {
-                    return completion(account, filesOutput, nil, nil, nil, nil, NKError(errorCode: NKError.moveFileOrFolder, errorDescription: ""))
+                    return completion(account, filesOutput, nil, nil, nil, nil, NKError(errorCode: NKError.moveFileChunk, errorDescription: ""))
                 }
 
                 self.readFileOrFolder(serverUrlFileName: chunkFolderPath, depth: "0", options: NKRequestOptions(queue: self.nkCommonInstance.backgroundQueue)) { account, files, _, error in
 
                     guard error == .success, let file = files.first else {
-                        return completion(account, filesOutput, nil, nil, nil, nil, NKError(errorCode: NKError.readFileOrFolder, errorDescription: ""))
+                        return completion(account, filesOutput, nil, nil, nil, nil, NKError(errorCode: NKError.readFileChunk, errorDescription: ""))
                     }
                     return completion(account, filesOutput, file.ocId, file.etag, file.date, nil, error)
                 }
