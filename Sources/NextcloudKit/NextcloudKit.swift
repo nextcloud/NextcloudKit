@@ -454,6 +454,7 @@ import SwiftyJSON
         let fileNameLocalSizeInGB = Double(fileNameLocalSize) / 1e9
         let fileNameServerPath = urlBase + "/" + dav + "/files/" + userId + self.nkCommonInstance.returnPathfromServerUrl(serverUrl) + "/" + fileName
         let destinationHeader: [String: String] = ["Destination" : fileNameServerPath]
+        var files = files
 
         func createChunkedFolder(completion: @escaping (_ errorCode: NKError) -> Void) {
 
@@ -470,18 +471,19 @@ import SwiftyJSON
             }
         }
 
-        var filesChunk = files.map { String($0) }
         var filesSize: [Int64] = []
 
-        if filesChunk.isEmpty {
-            filesChunk = self.nkCommonInstance.chunkedFile(inputDirectory: directory, outputDirectory: directory, fileName: fileName, chunkSizeMB: chunkSize)
+        if files.isEmpty {
+            let filesChunk = self.nkCommonInstance.chunkedFile(inputDirectory: directory, outputDirectory: directory, fileName: fileName, chunkSizeMB: chunkSize)
             if filesChunk.isEmpty {
                 return completion(account, [], nil, nil, nil, .explicitlyCancelled, NKError(errorCode: NKError.internalError, errorDescription: ""))
+            } else {
+                files = filesChunk.map { String($0) }
             }
         }
 
         // calcolo size
-        for file in filesChunk {
+        for file in files {
             let size = self.nkCommonInstance.getFileSize(filePath: directory + "/" + file)
             if size == 0 {
                 return completion(account, [], nil, nil, nil, .explicitlyCancelled, NKError(errorCode: NKError.internalError, errorDescription: ""))
@@ -491,12 +493,12 @@ import SwiftyJSON
         }
 
         // output
-        var filesOutput = filesChunk.map { String($0) }
+        var filesOutput = files
 
         createChunkedFolder() { error in
 
             guard error == .success else {
-                completion(account, filesChunk, nil, nil, nil, nil, error)
+                completion(account, files, nil, nil, nil, nil, error)
                 return
             }
 
@@ -506,7 +508,7 @@ import SwiftyJSON
 
             start()
 
-            for file in filesChunk {
+            for file in files {
 
                 let serverUrlFileName = chunkFolderPath + "/" + file
                 let fileNameLocalPath = directory + "/" + file
