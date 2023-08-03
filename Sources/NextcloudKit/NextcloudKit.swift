@@ -507,7 +507,7 @@ import SwiftyJSON
 
             start()
 
-            for file in files {
+            for file in filesChunk {
 
                 let serverUrlFileName = chunkFolderPath + "/" + file
                 let fileNameLocalPath = directory + "/" + file
