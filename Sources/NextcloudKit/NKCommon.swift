@@ -424,14 +424,13 @@ import MobileCoreServices
                         return 0
                     }
                     fileChunk.filesName.append(fileNameChunk)
-                    let size = self.getFileSize(filePath: outputFileName)
-                    incrementalSize = incrementalSize + size
-                    fileChunk.sizes.append(incrementalSize)
                 }
 
                 if let buffer = buffer {
                     writer?.write(buffer)
                     chunk = chunk + buffer.count
+                    incrementalSize = incrementalSize + Int64(buffer.count)
+                    fileChunk.sizes.append(incrementalSize)
                     return buffer.count
                 }
                 return 0
