@@ -429,10 +429,9 @@ import MobileCoreServices
                 if let buffer = buffer {
                     writer?.write(buffer)
                     chunk = chunk + buffer.count
-                    incrementalSize = incrementalSize + Int64(buffer.count)
-                    fileChunk.sizes.append(incrementalSize)
                     return buffer.count
                 }
+                fileChunk = NextcloudKit.FileChunk(filesName: [], sizes: [])
                 return 0
 
             }) == 0 { break }
@@ -441,6 +440,13 @@ import MobileCoreServices
 
         writer?.closeFile()
         reader?.closeFile()
+
+        for fileName in fileChunk.filesName {
+            let size = getFileSize(filePath: outputDirectory + "/" + fileName)
+            incrementalSize = incrementalSize + size
+            fileChunk.sizes.append(incrementalSize)
+        }
+
         return fileChunk
     }
 
