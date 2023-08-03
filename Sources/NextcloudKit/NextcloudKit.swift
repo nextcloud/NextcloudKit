@@ -432,10 +432,10 @@ import SwiftyJSON
     }
 
     public struct FileChunk {
-        var files: [String]
-        var sizes: [Int64]
-        public init(files: [String], sizes: [Int64]) {
-            self.files = files
+        public var filesName: [String]
+        public var sizes: [Int64]
+        public init(filesName: [String], sizes: [Int64]) {
+            self.filesName = filesName
             self.sizes = sizes
         }
     }
@@ -491,13 +491,13 @@ import SwiftyJSON
             var filesChunk = filesChunk
             var incrementalSize: Int64 = 0
 
-            if filesChunk.files.isEmpty {
-                filesChunk.files = self.nkCommonInstance.chunkedFile(inputDirectory: directory, outputDirectory: directory, fileName: fileName, chunkSizeMB: chunkSize)
-                if filesChunk.files.isEmpty {
+            if filesChunk.filesName.isEmpty {
+                filesChunk.filesName = self.nkCommonInstance.chunkedFile(inputDirectory: directory, outputDirectory: directory, fileName: fileName, chunkSizeMB: chunkSize)
+                if filesChunk.filesName.isEmpty {
                     return completion(account, nil, nil, nil, nil, NKError(errorCode: NKError.chunkFilesNull, errorDescription: ""))
                 }
-                for file in filesChunk.files {
-                    let size = self.nkCommonInstance.getFileSize(filePath: directory + "/" + file)
+                for fileName in filesChunk.filesName {
+                    let size = self.nkCommonInstance.getFileSize(filePath: directory + "/" + fileName)
                     if size == 0 {
                         return completion(account, nil, nil, nil, nil, NKError(errorCode: NKError.internalError, errorDescription: ""))
                     } else {
@@ -512,10 +512,10 @@ import SwiftyJSON
             counter = 0
             start()
 
-            for file in filesChunk.files {
+            for fileName in filesChunk.filesName {
 
-                let serverUrlFileName = chunkFolderPath + "/" + file
-                let fileNameLocalPath = directory + "/" + file
+                let serverUrlFileName = chunkFolderPath + "/" + fileName
+                let fileNameLocalPath = directory + "/" + fileName
 
                 let fileSize = self.nkCommonInstance.getFileSize(filePath: fileNameLocalPath)
                 if fileSize == 0 {
@@ -539,7 +539,7 @@ import SwiftyJSON
                 semaphore.wait()
 
                 if uploadNKError == .success {
-                    filesChunkOutput.files.remove(at: counter)
+                    filesChunkOutput.filesName.remove(at: counter)
                     filesChunkOutput.sizes.remove(at: counter)
                 } else {
                     break
