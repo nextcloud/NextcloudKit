@@ -556,6 +556,12 @@ import MobileCoreServices
         return 0
     }
 
+    public func returnPathfromServerUrl(_ serverUrl: String) -> String {
+
+        let home = urlBase + "/remote.php/dav/files/" + userId
+        return serverUrl.replacingOccurrences(of: home, with: "")
+    }
+
     // MARK: - Log
 
     @objc public func clearFileLog() {

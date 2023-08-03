@@ -432,14 +432,13 @@ import SwiftyJSON
     }
 
     public func uploadChunk(directory: String,
-                            fileNameLocalPath: String,
+                            fileName: String,
                             date: Date,
                             creationDate: Date,
+                            serverUrl: String,
                             chunkFolderServer: String,
                             files: [String],
-                            fileName: String,
                             chunkSize: Int,
-                            serverUrl: String,
                             start: @escaping () -> () = { },
                             progressHandler: @escaping (_ totalBytesExpected: Int64, _ totalBytes: Int64, _ fractionCompleted: Double) -> () = { _, _, _ in },
                             completion: @escaping (_ account: String, _ filesOutput: [String], _ ocId: String?, _ etag: String?, _ date: NSDate?, _ afError: AFError?, _ error: NKError) -> Void) {
@@ -451,9 +450,9 @@ import SwiftyJSON
         let dav = self.nkCommonInstance.dav
 
         let chunkFolderPath = urlBase + "/" + dav + "/uploads/" + userId + "/" + chunkFolderServer
-        let fileNameLocalSize = self.nkCommonInstance.getFileSize(filePath: fileNameLocalPath)
+        let fileNameLocalSize = self.nkCommonInstance.getFileSize(filePath: directory + "/" + fileName)
         let fileNameLocalSizeInGB = Double(fileNameLocalSize) / 1e9
-        let fileNameServerPath = urlBase + "/" + dav + "/files/" + userId + serverUrl + "/" + fileName
+        let fileNameServerPath = urlBase + "/" + dav + "/files/" + userId + self.nkCommonInstance.returnPathfromServerUrl(serverUrl) + "/" + fileName
         let destinationHeader: [String: String] = ["Destination" : fileNameServerPath]
 
         func createChunkedFolder(completion: @escaping (_ errorCode: NKError) -> Void) {
