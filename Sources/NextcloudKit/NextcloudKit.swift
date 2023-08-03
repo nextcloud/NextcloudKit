@@ -454,7 +454,6 @@ import SwiftyJSON
         let fileNameLocalSizeInGB = Double(fileNameLocalSize) / 1e9
         let fileNameServerPath = urlBase + "/" + dav + "/files/" + userId + self.nkCommonInstance.returnPathfromServerUrl(serverUrl) + "/" + fileName
         let destinationHeader: [String: String] = ["Destination" : fileNameServerPath]
-        var files = files
 
         func createChunkedFolder(completion: @escaping (_ errorCode: NKError) -> Void) {
 
@@ -472,15 +471,18 @@ import SwiftyJSON
         }
 
         var filesSize: [Int64] = []
+        var filesChunk: [String] = []
+        var filesOutput: [String] = []
 
         if files.isEmpty {
-            let filesChunk = self.nkCommonInstance.chunkedFile(inputDirectory: directory, outputDirectory: directory, fileName: fileName, chunkSizeMB: chunkSize)
+            filesChunk = self.nkCommonInstance.chunkedFile(inputDirectory: directory, outputDirectory: directory, fileName: fileName, chunkSizeMB: chunkSize)
             if filesChunk.isEmpty {
                 return completion(account, [], nil, nil, nil, .explicitlyCancelled, NKError(errorCode: NKError.internalError, errorDescription: ""))
-            } else {
-                files = filesChunk.map { String($0) }
             }
+        } else {
+            filesChunk = files
         }
+        filesOutput = filesChunk
 
         // calcolo size
         for file in files {
@@ -491,9 +493,6 @@ import SwiftyJSON
                 filesSize.append(size)
             }
         }
-
-        // output
-        var filesOutput = files
 
         createChunkedFolder() { error in
 
