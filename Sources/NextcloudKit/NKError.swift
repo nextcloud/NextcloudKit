@@ -55,7 +55,11 @@ extension OCSPath {
 public class NKError: NSObject {
 
     static let internalError = -9999
-
+    static let resourceSizeZero = -9998
+    static let moveFileOrFolder = -9997
+    static let readFileOrFolder = -9996
+    static let resourceNotFound = 404
+    
     public let errorCode: Int
     public let errorDescription: String
     public let error: Error

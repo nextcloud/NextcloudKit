@@ -431,6 +431,160 @@ import SwiftyJSON
         queue.async { requestHandler(request) }
     }
 
+    public func uploadChunk(directory: String,
+                            fileNameLocalPath: String,
+                            date: Date,
+                            creationDate: Date,
+                            chunkFolderServer: String,
+                            files: [String],
+                            fileName: String,
+                            chunkSize: Int,
+                            serverUrl: String,
+                            start: @escaping () -> () = { },
+                            progressHandler: @escaping (_ totalBytesExpected: Int64, _ totalBytes: Int64, _ fractionCompleted: Double) -> () = { _, _, _ in },
+                            completion: @escaping (_ account: String, _ filesOutput: [String], _ ocId: String?, _ etag: String?, _ date: NSDate?, _ afError: AFError?, _ error: NKError) -> Void) {
+
+
+        let account = self.nkCommonInstance.account
+        let userId = self.nkCommonInstance.userId
+        let urlBase = self.nkCommonInstance.urlBase
+        let dav = self.nkCommonInstance.dav
+
+        let chunkFolderPath = urlBase + "/" + dav + "/uploads/" + userId + "/" + chunkFolderServer
+        let fileNameLocalSize = self.nkCommonInstance.getFileSize(filePath: fileNameLocalPath)
+        let fileNameLocalSizeInGB = Double(fileNameLocalSize) / 1e9
+        let fileNameServerPath = urlBase + "/" + dav + "/files/" + userId + serverUrl + "/" + fileName
+        let destinationHeader: [String: String] = ["Destination" : fileNameServerPath]
+
+        func createChunkedFolder(completion: @escaping (_ errorCode: NKError) -> Void) {
+
+            readFileOrFolder(serverUrlFileName: chunkFolderPath, depth: "0", options: NKRequestOptions(queue: self.nkCommonInstance.backgroundQueue)) { _, _, _, error in
+                if error == .success {
+                    completion(NKError())
+                } else if error.errorCode == NKError.resourceNotFound {
+                    NextcloudKit.shared.createFolder(serverUrlFileName: chunkFolderPath, options: NKRequestOptions(queue: self.nkCommonInstance.backgroundQueue)) { _, _, _, error in
+                        completion(error)
+                    }
+                } else {
+                    completion(error)
+                }
+            }
+        }
+
+        var files = files
+        var filesSize: [Int64] = []
+
+        if files.isEmpty {
+            files = self.nkCommonInstance.chunkedFile(inputDirectory: directory, outputDirectory: directory, fileName: fileName, chunkSizeMB: chunkSize)
+            if files.isEmpty {
+                return completion(account, [], nil, nil, nil, .explicitlyCancelled, NKError(errorCode: NKError.internalError, errorDescription: ""))
+            }
+        }
+
+        // calcolo size
+        for file in files {
+            let size = self.nkCommonInstance.getFileSize(filePath: directory + "/" + file)
+            if size == 0 {
+                return completion(account, [], nil, nil, nil, .explicitlyCancelled, NKError(errorCode: NKError.internalError, errorDescription: ""))
+            } else {
+                filesSize.append(size)
+            }
+        }
+
+        // output
+        var filesOutput = files
+
+        createChunkedFolder() { error in
+
+            guard error == .success else {
+                completion(account, files, nil, nil, nil, nil, error)
+                return
+            }
+
+            var counter: Int = 0
+            var uploadNKError = NKError()
+            var uploadAFError: AFError?
+
+            start()
+
+            for file in files {
+
+                let serverUrlFileName = chunkFolderPath + "/" + file
+                let fileNameLocalPath = directory + "/" + file
+
+                let fileSize = self.nkCommonInstance.getFileSize(filePath: fileNameLocalPath)
+                if fileSize == 0 {
+                    let error = NKError(errorCode: NKError.resourceSizeZero, errorDescription: "")
+                    return completion(account, [], nil, nil, nil, .explicitlyCancelled, error)
+                }
+
+                let semaphore = DispatchSemaphore(value: 0)
+                self.upload(serverUrlFileName: serverUrlFileName, fileNameLocalPath: fileNameLocalPath, addCustomHeaders: destinationHeader, queue: self.nkCommonInstance.backgroundQueue, requestHandler: { request in
+                }, taskHandler: { task in
+                    //NCManageDatabase.shared.setMetadataSession(ocId: ocIdTemp, sessionError: "", sessionTaskIdentifier: task.taskIdentifier, status: NCGlobal.shared.metadataStatusUploading)
+                    //NextcloudKit.shared.nkCommonInstance.writeLog("[INFO] Upload chunk: " + fileName)
+                }, progressHandler: { progress in
+                    let totalBytesExpected = fileNameLocalSize
+                    let totalBytes = filesSize[counter] - fileSize
+                    let fractionCompleted = Double(totalBytes) / Double(totalBytesExpected)
+                    progressHandler(totalBytesExpected, totalBytes, fractionCompleted)
+                }) { _, _, _, _, _, _, afError, error in
+                    uploadNKError = error
+                    uploadAFError = afError
+                    semaphore.signal()
+                }
+                semaphore.wait()
+
+                if uploadNKError == .success {
+                    filesOutput = files.filter { $0 != file }
+                } else {
+                    break
+                }
+
+                counter += 1
+            }
+
+            guard uploadNKError == .success else {
+                return completion(account, filesOutput, nil, nil, nil, uploadAFError, uploadNKError)
+            }
+
+            // Assemble the chunks
+            let serverUrlFileNameSource = chunkFolderPath + "/.file"
+            var customHeaders: [String: String] = [:]
+
+            if creationDate.timeIntervalSince1970 > 0 {
+                customHeaders["X-OC-CTime"] = "\(creationDate.timeIntervalSince1970)"
+            }
+            if date.timeIntervalSince1970 > 0 {
+                customHeaders["X-OC-MTime"] = "\(date.timeIntervalSince1970)"
+            }
+
+            destinationHeader.forEach { customHeaders[$0] = $1 }
+
+            // Calculate Assemble Timeout
+            let ASSEMBLE_TIME_PER_GB: Double    = 3 * 60            // 3  min
+            let ASSEMBLE_TIME_MIN: Double       = 60                // 60 sec
+            let ASSEMBLE_TIME_MAX: Double       = 30 * 60           // 30 min
+            let timeout = max(ASSEMBLE_TIME_MIN, min(ASSEMBLE_TIME_PER_GB * fileNameLocalSizeInGB, ASSEMBLE_TIME_MAX))
+
+            let options = NKRequestOptions(timeout: timeout, queue: self.nkCommonInstance.backgroundQueue)
+            self.moveFileOrFolder(serverUrlFileNameSource: serverUrlFileNameSource, serverUrlFileNameDestination: fileNameServerPath, overwrite: true, options: options) { _, error in
+
+                guard error == .success else {
+                    return completion(account, filesOutput, nil, nil, nil, nil, NKError(errorCode: NKError.moveFileOrFolder, errorDescription: ""))
+                }
+
+                self.readFileOrFolder(serverUrlFileName: chunkFolderPath, depth: "0", options: NKRequestOptions(queue: self.nkCommonInstance.backgroundQueue)) { account, files, _, error in
+
+                    guard error == .success, let file = files.first else {
+                        return completion(account, filesOutput, nil, nil, nil, nil, NKError(errorCode: NKError.readFileOrFolder, errorDescription: ""))
+                    }
+                    return completion(account, filesOutput, file.ocId, file.etag, file.date, nil, error)
+                }
+            }
+        }
+    }
+
     // MARK: - SessionDelegate
 
     public func urlSession(_ session: URLSession, didReceive challenge: URLAuthenticationChallenge, completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {

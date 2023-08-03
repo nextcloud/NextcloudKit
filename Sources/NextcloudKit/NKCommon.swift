@@ -545,6 +545,17 @@ import MobileCoreServices
         return nil
     }
 
+    func getFileSize(filePath: String) -> Int64 {
+
+        do {
+            let attributes = try FileManager.default.attributesOfItem(atPath: filePath)
+            return attributes[FileAttributeKey.size] as? Int64 ?? 0
+        } catch {
+            print(error)
+        }
+        return 0
+    }
+
     // MARK: - Log
 
     @objc public func clearFileLog() {
