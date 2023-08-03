@@ -848,6 +848,8 @@ class NKDataFileXML: NSObject {
                 file.tags.append(tag)
             }
 
+            let test = propstat["d:prop", "nc:file-metadata-gps"]
+
             if let gps = propstat["d:prop", "nc:file-metadata-gps"].text,
                let data = gps.data(using: .utf8),
                let jsonDict = try? JSONSerialization.jsonObject(with: data) as? [String: Double],
