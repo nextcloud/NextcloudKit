@@ -452,7 +452,6 @@ import SwiftyJSON
 
         let chunkFolderPath = urlBase + "/" + dav + "/uploads/" + userId + "/" + chunkFolderServer
         let fileNameLocalSize = self.nkCommonInstance.getFileSize(filePath: directory + "/" + fileName)
-        let fileNameLocalSizeInGB = Double(fileNameLocalSize) / 1e9
         let fileNameServerPath = urlBase + "/" + dav + "/files/" + userId + self.nkCommonInstance.returnPathfromServerUrl(serverUrl) + "/" + fileName
         let destinationHeader: [String: String] = ["Destination" : fileNameServerPath]
 
@@ -559,10 +558,11 @@ import SwiftyJSON
             destinationHeader.forEach { customHeaders[$0] = $1 }
 
             // Calculate Assemble Timeout
+            let assembleSizeInGB = Double(fileNameLocalSize) / 1e9
             let assembleTimePerGB: Double = 3 * 60  // 3  min
             let assembleTimeMin: Double = 60        // 60 sec
             let assembleTimeMax: Double = 30 * 60   // 30 min
-            let timeout = max(assembleTimeMin, min(assembleTimePerGB * fileNameLocalSizeInGB, assembleTimeMax))
+            let timeout = max(assembleTimeMin, min(assembleTimePerGB * assembleSizeInGB, assembleTimeMax))
 
             let options = NKRequestOptions(timeout: timeout, queue: self.nkCommonInstance.backgroundQueue)
             self.moveFileOrFolder(serverUrlFileNameSource: serverUrlFileNameSource, serverUrlFileNameDestination: fileNameServerPath, overwrite: true, options: options) { _, error in
