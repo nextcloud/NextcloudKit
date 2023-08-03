@@ -571,7 +571,7 @@ import SwiftyJSON
                     return completion(account, filesOutput, nil, nil, nil, NKError(errorCode: NKError.moveFileChunk, errorDescription: ""))
                 }
 
-                self.readFileOrFolder(serverUrlFileName: chunkFolderPath, depth: "0", options: NKRequestOptions(queue: self.nkCommonInstance.backgroundQueue)) { _, files, _, error in
+                self.readFileOrFolder(serverUrlFileName: fileNameServerPath, depth: "0", options: NKRequestOptions(queue: self.nkCommonInstance.backgroundQueue)) { _, files, _, error in
 
                     guard error == .success, let file = files.first else {
                         return completion(account, filesOutput, nil, nil, nil, NKError(errorCode: NKError.readFileChunk, errorDescription: ""))
