@@ -528,8 +528,8 @@ import SwiftyJSON
                 semaphore.wait()
 
                 if uploadNKError == .success {
-                    filesChunkOutput.filesName.remove(at: counter)
-                    filesChunkOutput.sizes.remove(at: counter)
+                    filesChunkOutput.filesName.removeFirst()
+                    filesChunkOutput.sizes.removeFirst()
                 } else {
                     break
                 }
