@@ -372,11 +372,11 @@ import MobileCoreServices
 
     // MARK: - Chunked File
 
-    public func chunkedFile(inputDirectory: String, outputDirectory: String, fileName: String, chunkSizeMB: Int, bufferSize: Int = 1000000) -> NextcloudKit.FileChunk {
+    public func chunkedFile(inputDirectory: String, outputDirectory: String, fileName: String, chunkSizeInMB: Int, bufferSize: Int = 1000000) -> NextcloudKit.FileChunk {
 
         let fileManager: FileManager = .default
         var isDirectory: ObjCBool = false
-        let chunkSize = chunkSizeMB * 1000000
+        let chunkSize = chunkSizeInMB * 1000000
         var reader: FileHandle?
         var writer: FileHandle?
         var chunk: Int = 0

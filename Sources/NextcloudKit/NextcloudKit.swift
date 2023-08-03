@@ -452,12 +452,12 @@ import SwiftyJSON
 
     public func uploadChunk(directory: String,
                             fileName: String,
-                            date: Date,
-                            creationDate: Date,
+                            date: Date?,
+                            creationDate: Date?,
                             serverUrl: String,
                             chunkFolderServer: String,
                             filesChunk: FileChunk,
-                            chunkSize: Int,
+                            chunkSizeInMB: Int,
                             start: @escaping () -> Void = { },
                             requestHandler: @escaping (_ request: UploadRequest) -> Void = { _ in },
                             taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
@@ -500,7 +500,7 @@ import SwiftyJSON
             var filesChunk = filesChunk
 
             if filesChunk.isEmpty() {
-                filesChunk = self.nkCommonInstance.chunkedFile(inputDirectory: directory, outputDirectory: directory, fileName: fileName, chunkSizeMB: chunkSize)
+                filesChunk = self.nkCommonInstance.chunkedFile(inputDirectory: directory, outputDirectory: directory, fileName: fileName, chunkSizeInMB: chunkSizeInMB)
                 if filesChunk.isEmpty() {
                     return completion(account, nil, nil, nil, nil, NKError(errorCode: NKError.chunkFilesNull, errorDescription: ""))
                 }
@@ -550,10 +550,10 @@ import SwiftyJSON
             let serverUrlFileNameSource = chunkFolderPath + "/.file"
             var customHeaders: [String: String] = [:]
 
-            if creationDate.timeIntervalSince1970 > 0 {
+            if let creationDate, creationDate.timeIntervalSince1970 > 0 {
                 customHeaders["X-OC-CTime"] = "\(creationDate.timeIntervalSince1970)"
             }
-            if date.timeIntervalSince1970 > 0 {
+            if let date, date.timeIntervalSince1970 > 0 {
                 customHeaders["X-OC-MTime"] = "\(date.timeIntervalSince1970)"
             }
 
