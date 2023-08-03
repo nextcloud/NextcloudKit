@@ -89,6 +89,11 @@ import MobileCoreServices
         var name: String
     }
 
+    public struct FileChunk {
+        var files: [String]
+        var sizes: [Int64]
+    }
+
     internal lazy var sessionConfiguration: URLSessionConfiguration = {
         let configuration = URLSessionConfiguration.af.default
         configuration.requestCachePolicy = .reloadIgnoringLocalCacheData
