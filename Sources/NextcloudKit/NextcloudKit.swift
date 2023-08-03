@@ -434,9 +434,19 @@ import SwiftyJSON
     public struct FileChunk {
         public var filesName: [String]
         public var sizes: [Int64]
+
         public init(filesName: [String], sizes: [Int64]) {
             self.filesName = filesName
             self.sizes = sizes
+        }
+
+        public func isEmpty() -> Bool {
+            return filesName.isEmpty && sizes.isEmpty && filesName.count == sizes.count
+        }
+
+        public mutating func remove() {
+            filesName.removeFirst()
+            sizes.removeFirst()
         }
     }
 
@@ -486,19 +496,17 @@ import SwiftyJSON
                 return
             }
 
-            var counter: Int = 0
             var uploadNKError = NKError()
             var filesChunk = filesChunk
 
-            if filesChunk.filesName.isEmpty {
+            if filesChunk.isEmpty() {
                 filesChunk = self.nkCommonInstance.chunkedFile(inputDirectory: directory, outputDirectory: directory, fileName: fileName, chunkSizeMB: chunkSize)
-                if filesChunk.filesName.isEmpty {
+                if filesChunk.isEmpty() {
                     return completion(account, nil, nil, nil, nil, NKError(errorCode: NKError.chunkFilesNull, errorDescription: ""))
                 }
             }
 
             var filesChunkOutput = filesChunk
-            counter = 0
             start()
 
             for fileName in filesChunk.filesName {
@@ -518,7 +526,7 @@ import SwiftyJSON
                     taskHandler(task)
                 }, progressHandler: { progress in
                     let totalBytesExpected = fileNameLocalSize
-                    let totalBytes = filesChunk.sizes[counter] - fileSize
+                    let totalBytes = filesChunkOutput.sizes.first ?? fileSize - fileSize
                     let fractionCompleted = Double(totalBytes) / Double(totalBytesExpected)
                     progressHandler(totalBytesExpected, totalBytes, fractionCompleted)
                 }) { _, _, _, _, _, _, afError, error in
@@ -528,13 +536,10 @@ import SwiftyJSON
                 semaphore.wait()
 
                 if uploadNKError == .success {
-                    filesChunkOutput.filesName.removeFirst()
-                    filesChunkOutput.sizes.removeFirst()
+                    filesChunkOutput.remove()
                 } else {
                     break
                 }
-
-                counter += 1
             }
 
             guard uploadNKError == .success else {
