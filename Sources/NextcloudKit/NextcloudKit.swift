@@ -559,10 +559,10 @@ import SwiftyJSON
             destinationHeader.forEach { customHeaders[$0] = $1 }
 
             // Calculate Assemble Timeout
-            let AssembleTimePerGB: Double = 3 * 60  // 3  min
-            let AssembleTimeMin: Double = 60        // 60 sec
-            let AssembleTimeMax: Double = 30 * 60   // 30 min
-            let timeout = max(AssembleTimeMin, min(AssembleTimePerGB * fileNameLocalSizeInGB, AssembleTimeMax))
+            let assembleTimePerGB: Double = 3 * 60  // 3  min
+            let assembleTimeMin: Double = 60        // 60 sec
+            let assembleTimeMax: Double = 30 * 60   // 30 min
+            let timeout = max(assembleTimeMin, min(assembleTimePerGB * fileNameLocalSizeInGB, assembleTimeMax))
 
             let options = NKRequestOptions(timeout: timeout, queue: self.nkCommonInstance.backgroundQueue)
             self.moveFileOrFolder(serverUrlFileNameSource: serverUrlFileNameSource, serverUrlFileNameDestination: fileNameServerPath, overwrite: true, options: options) { _, error in
@@ -571,7 +571,7 @@ import SwiftyJSON
                     return completion(account, filesOutput, nil, nil, nil, NKError(errorCode: NKError.moveFileChunk, errorDescription: ""))
                 }
 
-                self.readFileOrFolder(serverUrlFileName: chunkFolderPath, depth: "0", options: NKRequestOptions(queue: self.nkCommonInstance.backgroundQueue)) { account, files, _, error in
+                self.readFileOrFolder(serverUrlFileName: chunkFolderPath, depth: "0", options: NKRequestOptions(queue: self.nkCommonInstance.backgroundQueue)) { _, files, _, error in
 
                     guard error == .success, let file = files.first else {
                         return completion(account, filesOutput, nil, nil, nil, NKError(errorCode: NKError.readFileChunk, errorDescription: ""))
