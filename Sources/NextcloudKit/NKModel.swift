@@ -157,6 +157,8 @@ import SwiftyJSON
     @objc public var urlBase = ""
     @objc public var user = ""
     @objc public var userId = ""
+    @objc public var latitude: Double = 0
+    @objc public var longitude: Double = 0
 }
 
 @objcMembers public class NKFileProperty: NSObject {
@@ -356,6 +358,8 @@ class NKDataFileXML: NSObject {
 
     <share-permissions xmlns=\"http://open-collaboration-services.org/ns\"/>
     <share-permissions xmlns=\"http://open-cloud-mesh.org/ns\"/>
+
+    <file-metadata-gps xmlns=\"http://open-cloud-mesh.org/ns\"/>
     """
 
     lazy var requestBodyFile: String = {
@@ -843,6 +847,15 @@ class NKDataFileXML: NSObject {
             for element in tagsElements["nc:system-tag"] {
                 guard let tag = element.text else { continue }
                 file.tags.append(tag)
+            }
+
+            if let gps = propstat["d:prop", "file-metadata-gps"].text,
+               let data = gps.data(using: .utf8),
+               let jsonDict = try? JSONSerialization.jsonObject(with: data) as? [String: Double],
+               let latitude = jsonDict["latitude"],
+               let longitude = jsonDict["longitude"] {
+                file.latitude = latitude
+                file.longitude = longitude
             }
 
             let results = self.nkCommonInstance.getInternalType(fileName: file.fileName, mimeType: file.contentType, directory: file.directory)
