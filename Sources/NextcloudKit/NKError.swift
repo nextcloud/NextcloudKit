@@ -58,6 +58,9 @@ public class NKError: NSObject {
     static let resourceSizeZero = -9998
     static let moveFileChunk = -9997
     static let readFileChunk = -9996
+    static let createFolderChunk = -9995
+    static let chunkFilesNull = -9994
+    static let chunkFileNull = -9993
     static let resourceNotFound = 404
     
     public let errorCode: Int
