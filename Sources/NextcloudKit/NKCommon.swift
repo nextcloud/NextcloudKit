@@ -90,8 +90,8 @@ import MobileCoreServices
     }
 
     public struct FileChunk {
-        var files: [String]
-        var sizes: [Int64]
+        public var files: [String]
+        public var sizes: [Int64]
     }
 
     internal lazy var sessionConfiguration: URLSessionConfiguration = {
