@@ -355,11 +355,10 @@ class NKDataFileXML: NSObject {
     <lock-time xmlns=\"http://nextcloud.org/ns\"/>
     <lock-timeout xmlns=\"http://nextcloud.org/ns\"/>
     <system-tags xmlns=\"http://nextcloud.org/ns\"/>
+    <file-metadata-gps xmlns=\"http://nextcloud.org/ns\"/>
 
     <share-permissions xmlns=\"http://open-collaboration-services.org/ns\"/>
     <share-permissions xmlns=\"http://open-cloud-mesh.org/ns\"/>
-
-    <file-metadata-gps xmlns=\"http://open-cloud-mesh.org/ns\"/>
     """
 
     lazy var requestBodyFile: String = {
@@ -849,7 +848,7 @@ class NKDataFileXML: NSObject {
                 file.tags.append(tag)
             }
 
-            if let gps = propstat["d:prop", "file-metadata-gps"].text,
+            if let gps = propstat["d:prop", "nc:file-metadata-gps"].text,
                let data = gps.data(using: .utf8),
                let jsonDict = try? JSONSerialization.jsonObject(with: data) as? [String: Double],
                let latitude = jsonDict["latitude"],
