@@ -440,8 +440,8 @@ import SwiftyJSON
                             files: [String],
                             chunkSize: Int,
                             start: @escaping () -> Void = { },
-                            taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
                             requestHandler: @escaping (_ request: UploadRequest) -> Void = { _ in },
+                            taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
                             progressHandler: @escaping (_ totalBytesExpected: Int64, _ totalBytes: Int64, _ fractionCompleted: Double) -> Void = { _, _, _ in },
                             completion: @escaping (_ account: String, _ filesOutput: [String], _ ocId: String?, _ etag: String?, _ date: NSDate?, _ error: NKError) -> Void) {
 
