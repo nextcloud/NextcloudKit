@@ -372,29 +372,30 @@ import MobileCoreServices
 
     // MARK: - Chunked File
 
-    @objc public func chunkedFile(inputDirectory: String, outputDirectory: String, fileName: String, chunkSizeMB: Int, bufferSize: Int = 1000000) -> [String] {
+    public func chunkedFile(inputDirectory: String, outputDirectory: String, fileName: String, chunkSizeMB: Int, bufferSize: Int = 1000000) -> NextcloudKit.FileChunk {
 
         let fileManager: FileManager = .default
         var isDirectory: ObjCBool = false
         let chunkSize = chunkSizeMB * 1000000
-        var outputFilesName: [String] = []
         var reader: FileHandle?
         var writer: FileHandle?
         var chunk: Int = 0
         var counter: Int = 1
+        var incrementalSize: Int64 = 0
+        var fileChunk = NextcloudKit.FileChunk(filesName: [], sizes: [])
 
         if !fileManager.fileExists(atPath: outputDirectory, isDirectory: &isDirectory) {
             do {
                 try fileManager.createDirectory(atPath: outputDirectory, withIntermediateDirectories: true, attributes: nil)
             } catch {
-                return []
+                return fileChunk
             }
         }
 
         do {
             reader = try .init(forReadingFrom: URL(fileURLWithPath: inputDirectory + "/" + fileName))
         } catch {
-            return []
+            return fileChunk
         }
 
         repeat {
@@ -419,10 +420,13 @@ import MobileCoreServices
                     do {
                         writer = try .init(forWritingTo: URL(fileURLWithPath: outputFileName))
                     } catch {
-                        outputFilesName = []
+                        fileChunk = NextcloudKit.FileChunk(filesName: [], sizes: [])
                         return 0
                     }
-                    outputFilesName.append(fileNameChunk)
+                    fileChunk.filesName.append(fileNameChunk)
+                    let size = self.getFileSize(filePath: outputFileName)
+                    incrementalSize = incrementalSize + size
+                    fileChunk.sizes.append(incrementalSize)
                 }
 
                 if let buffer = buffer {
@@ -438,7 +442,7 @@ import MobileCoreServices
 
         writer?.closeFile()
         reader?.closeFile()
-        return outputFilesName
+        return fileChunk
     }
 
     // MARK: - Common

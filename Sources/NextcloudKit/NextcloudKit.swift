@@ -489,22 +489,11 @@ import SwiftyJSON
             var counter: Int = 0
             var uploadNKError = NKError()
             var filesChunk = filesChunk
-            var incrementalSize: Int64 = 0
 
             if filesChunk.filesName.isEmpty {
-                filesChunk.filesName = self.nkCommonInstance.chunkedFile(inputDirectory: directory, outputDirectory: directory, fileName: fileName, chunkSizeMB: chunkSize)
+                filesChunk = self.nkCommonInstance.chunkedFile(inputDirectory: directory, outputDirectory: directory, fileName: fileName, chunkSizeMB: chunkSize)
                 if filesChunk.filesName.isEmpty {
                     return completion(account, nil, nil, nil, nil, NKError(errorCode: NKError.chunkFilesNull, errorDescription: ""))
-                }
-                for fileName in filesChunk.filesName {
-                    let size = self.nkCommonInstance.getFileSize(filePath: directory + "/" + fileName)
-                    if size == 0 {
-                        return completion(account, nil, nil, nil, nil, NKError(errorCode: NKError.internalError, errorDescription: ""))
-                    } else {
-                        incrementalSize = incrementalSize + size
-                        filesChunk.sizes[counter] = incrementalSize
-                    }
-                    counter += 1
                 }
             }
 
