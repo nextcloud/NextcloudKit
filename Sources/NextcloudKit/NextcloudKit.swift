@@ -470,18 +470,18 @@ import SwiftyJSON
             }
         }
 
-        var files = files
+        var filesChunk = files.map { String($0) }
         var filesSize: [Int64] = []
 
-        if files.isEmpty {
-            files = self.nkCommonInstance.chunkedFile(inputDirectory: directory, outputDirectory: directory, fileName: fileName, chunkSizeMB: chunkSize)
-            if files.isEmpty {
+        if filesChunk.isEmpty {
+            filesChunk = self.nkCommonInstance.chunkedFile(inputDirectory: directory, outputDirectory: directory, fileName: fileName, chunkSizeMB: chunkSize)
+            if filesChunk.isEmpty {
                 return completion(account, [], nil, nil, nil, .explicitlyCancelled, NKError(errorCode: NKError.internalError, errorDescription: ""))
             }
         }
 
         // calcolo size
-        for file in files {
+        for file in filesChunk {
             let size = self.nkCommonInstance.getFileSize(filePath: directory + "/" + file)
             if size == 0 {
                 return completion(account, [], nil, nil, nil, .explicitlyCancelled, NKError(errorCode: NKError.internalError, errorDescription: ""))
@@ -491,12 +491,12 @@ import SwiftyJSON
         }
 
         // output
-        var filesOutput = files
+        var filesOutput = filesChunk.map { String($0) }
 
         createChunkedFolder() { error in
 
             guard error == .success else {
-                completion(account, files, nil, nil, nil, nil, error)
+                completion(account, filesChunk, nil, nil, nil, nil, error)
                 return
             }
 
@@ -506,7 +506,7 @@ import SwiftyJSON
 
             start()
 
-            for file in files {
+            for file in filesChunk {
 
                 let serverUrlFileName = chunkFolderPath + "/" + file
                 let fileNameLocalPath = directory + "/" + file
@@ -535,7 +535,7 @@ import SwiftyJSON
                 semaphore.wait()
 
                 if uploadNKError == .success {
-                    filesOutput = files.filter { $0 != file }
+                    filesOutput = filesOutput.filter { $0 != file }
                 } else {
                     break
                 }
