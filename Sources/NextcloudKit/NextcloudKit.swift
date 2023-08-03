@@ -470,30 +470,6 @@ import SwiftyJSON
             }
         }
 
-        var filesSize: [Int64] = []
-        var filesChunk: [String] = []
-        var filesOutput: [String] = []
-
-        if files.isEmpty {
-            filesChunk = self.nkCommonInstance.chunkedFile(inputDirectory: directory, outputDirectory: directory, fileName: fileName, chunkSizeMB: chunkSize)
-            if filesChunk.isEmpty {
-                return completion(account, [], nil, nil, nil, .explicitlyCancelled, NKError(errorCode: NKError.internalError, errorDescription: ""))
-            }
-        } else {
-            filesChunk = files
-        }
-        filesOutput = filesChunk
-
-        // calcolo size
-        for file in files {
-            let size = self.nkCommonInstance.getFileSize(filePath: directory + "/" + file)
-            if size == 0 {
-                return completion(account, [], nil, nil, nil, .explicitlyCancelled, NKError(errorCode: NKError.internalError, errorDescription: ""))
-            } else {
-                filesSize.append(size)
-            }
-        }
-
         createChunkedFolder() { error in
 
             guard error == .success else {
@@ -504,10 +480,31 @@ import SwiftyJSON
             var counter: Int = 0
             var uploadNKError = NKError()
             var uploadAFError: AFError?
+            var filesSize: [Int64] = []
+            var files = files
+            var filesOutput: [String] = []
+
+            if files.isEmpty {
+                files = self.nkCommonInstance.chunkedFile(inputDirectory: directory, outputDirectory: directory, fileName: fileName, chunkSizeMB: chunkSize)
+                if files.isEmpty {
+                    return completion(account, [], nil, nil, nil, .explicitlyCancelled, NKError(errorCode: NKError.internalError, errorDescription: ""))
+                }
+            }
+            filesOutput = files
+
+            // calcolo size
+            for file in files {
+                let size = self.nkCommonInstance.getFileSize(filePath: directory + "/" + file)
+                if size == 0 {
+                    return completion(account, [], nil, nil, nil, .explicitlyCancelled, NKError(errorCode: NKError.internalError, errorDescription: ""))
+                } else {
+                    filesSize.append(size)
+                }
+            }
 
             start()
 
-            for file in filesChunk {
+            for file in files {
 
                 let serverUrlFileName = chunkFolderPath + "/" + file
                 let fileNameLocalPath = directory + "/" + file
