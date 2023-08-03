@@ -431,19 +431,24 @@ import SwiftyJSON
         queue.async { requestHandler(request) }
     }
 
+    public struct FileChunk {
+        public var files: [String]
+        public var sizes: [Int64]
+    }
+
     public func uploadChunk(directory: String,
                             fileName: String,
                             date: Date,
                             creationDate: Date,
                             serverUrl: String,
                             chunkFolderServer: String,
-                            filesChunk: NKCommon.FileChunk,
+                            filesChunk: FileChunk,
                             chunkSize: Int,
                             start: @escaping () -> Void = { },
                             requestHandler: @escaping (_ request: UploadRequest) -> Void = { _ in },
                             taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
                             progressHandler: @escaping (_ totalBytesExpected: Int64, _ totalBytes: Int64, _ fractionCompleted: Double) -> Void = { _, _, _ in },
-                            completion: @escaping (_ account: String, _ filesChunk: NKCommon.FileChunk?, _ ocId: String?, _ etag: String?, _ date: NSDate?, _ error: NKError) -> Void) {
+                            completion: @escaping (_ account: String, _ filesChunk: FileChunk?, _ ocId: String?, _ etag: String?, _ date: NSDate?, _ error: NKError) -> Void) {
 
         let account = self.nkCommonInstance.account
         let userId = self.nkCommonInstance.userId
