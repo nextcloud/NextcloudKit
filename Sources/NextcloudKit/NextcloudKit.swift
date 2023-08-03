@@ -432,8 +432,12 @@ import SwiftyJSON
     }
 
     public struct FileChunk {
-        public var files: [String]
-        public var sizes: [Int64]
+        var files: [String]
+        var sizes: [Int64]
+        public init(files: [String], sizes: [Int64]) {
+            self.files = files
+            self.sizes = sizes
+        }
     }
 
     public func uploadChunk(directory: String,
