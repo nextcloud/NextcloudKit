@@ -450,6 +450,16 @@ import SwiftyJSON
         }
     }
 
+    /// - Parameters:
+    ///     - directory: The local directory where is the file to be split
+    ///     - fileName: The name of the file to be splites
+    ///     - date: If exist the date of file
+    ///     - creationDate: If exist the creation date of file
+    ///     - serverUrl: The serverURL where the file will be deposited once reassembled
+    ///     - chunkFolderServer: The name of temp folder, usually NSUUID().uuidString
+    ///     - filesChunk: the struct it will contain all file names with the increment size example filename: "1","2","3","4" .... size: 10000000, 20000000, 30000000, 40000000 ...
+    ///     - chunkSizeInMB: Size in MB of chunk
+
     public func uploadChunk(directory: String,
                             fileName: String,
                             date: Date?,
