@@ -523,7 +523,7 @@ import SwiftyJSON
                     taskHandler(task)
                 }, progressHandler: { progress in
                     let totalBytesExpected = fileNameLocalSize
-                    let totalBytes = fileChunk.size - fileSize
+                    let totalBytes = fileChunk.size
                     let fractionCompleted = Double(totalBytes) / Double(totalBytesExpected)
                     progressHandler(totalBytesExpected, totalBytes, fractionCompleted)
                 }) { _, _, _, _, _, _, afError, error in
