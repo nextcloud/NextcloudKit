@@ -441,10 +441,11 @@ import MobileCoreServices
         writer?.closeFile()
         reader?.closeFile()
 
-        for var fileChunk in filesChunk {
-            let size = getFileSize(filePath: outputDirectory + "/" + fileChunk.key)
+        for fileChunk in filesChunk {
+            let fileNameChunk = fileChunk.key
+            let size = getFileSize(filePath: outputDirectory + "/" + fileNameChunk)
             incrementalSize = incrementalSize + size
-            fileChunk.value = incrementalSize
+            filesChunk[fileNameChunk] = incrementalSize
         }
 
         return filesChunk
