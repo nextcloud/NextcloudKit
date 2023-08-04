@@ -443,8 +443,7 @@ import MobileCoreServices
 
         counter = 0
         for fileChunk in filesChunk {
-            let fileNameChunk = fileChunk.fileName
-            let size = getFileSize(filePath: outputDirectory + "/" + fileNameChunk)
+            let size = getFileSize(filePath: outputDirectory + "/" + fileChunk.fileName)
             incrementalSize = incrementalSize + size
             filesChunk[counter].size = incrementalSize
             counter += 1
