@@ -448,13 +448,13 @@ import SwiftyJSON
                             creationDate: Date?,
                             serverUrl: String,
                             chunkFolderServer: String,
-                            filesChunk: [String: Int64],
+                            filesChunk: Array<(fileName: String, size: Int64)>,
                             chunkSizeInMB: Int,
                             start: @escaping () -> Void = { },
                             requestHandler: @escaping (_ request: UploadRequest) -> Void = { _ in },
                             taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
                             progressHandler: @escaping (_ totalBytesExpected: Int64, _ totalBytes: Int64, _ fractionCompleted: Double) -> Void = { _, _, _ in },
-                            completion: @escaping (_ account: String, _ filesChunk: [String: Int64]?, _ file: NKFile?, _ error: NKError) -> Void) {
+                            completion: @escaping (_ account: String, _ filesChunk: Array<(fileName: String, size: Int64)>?, _ file: NKFile?, _ error: NKError) -> Void) {
 
         let account = self.nkCommonInstance.account
         let userId = self.nkCommonInstance.userId
@@ -506,6 +506,7 @@ import SwiftyJSON
             var filesChunkOutput = filesChunk
             start()
 
+            var counter = 0
             for fileChunk in filesChunk {
 
                 let serverUrlFileName = chunkFolderPath + "/" + fileName
@@ -523,7 +524,7 @@ import SwiftyJSON
                     taskHandler(task)
                 }, progressHandler: { progress in
                     let totalBytesExpected = fileNameLocalSize
-                    let totalBytes = fileChunk.value - fileSize
+                    let totalBytes = fileChunk.size - fileSize
                     let fractionCompleted = Double(totalBytes) / Double(totalBytesExpected)
                     progressHandler(totalBytesExpected, totalBytes, fractionCompleted)
                 }) { _, _, _, _, _, _, afError, error in
@@ -533,10 +534,12 @@ import SwiftyJSON
                 semaphore.wait()
 
                 if uploadNKError == .success {
-                    filesChunkOutput.removeValue(forKey: fileChunk.key)
+                    filesChunkOutput.remove(at: counter)
                 } else {
                     break
                 }
+
+                counter += 1
             }
 
             guard uploadNKError == .success else {

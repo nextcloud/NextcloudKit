@@ -372,7 +372,7 @@ import MobileCoreServices
 
     // MARK: - Chunked File
 
-    public func chunkedFile(inputDirectory: String, outputDirectory: String, fileName: String, chunkSizeInMB: Int, bufferSize: Int = 1000000) -> [String: Int64] {
+    public func chunkedFile(inputDirectory: String, outputDirectory: String, fileName: String, chunkSizeInMB: Int, bufferSize: Int = 1000000) -> Array<(fileName: String, size: Int64)> {
 
         let fileManager: FileManager = .default
         var isDirectory: ObjCBool = false
@@ -382,7 +382,7 @@ import MobileCoreServices
         var chunk: Int = 0
         var counter: Int = 1
         var incrementalSize: Int64 = 0
-        var filesChunk: [String: Int64] = [:]
+        var filesChunk: Array<(fileName: String, size: Int64)> = []
 
         if !fileManager.fileExists(atPath: outputDirectory, isDirectory: &isDirectory) {
             do {
@@ -420,10 +420,10 @@ import MobileCoreServices
                     do {
                         writer = try .init(forWritingTo: URL(fileURLWithPath: outputFileName))
                     } catch {
-                        filesChunk = [:]
+                        filesChunk = []
                         return 0
                     }
-                    filesChunk[fileNameChunk] = 0
+                    filesChunk.append((fileName: fileNameChunk, size: 0))
                 }
 
                 if let buffer = buffer {
@@ -431,7 +431,7 @@ import MobileCoreServices
                     chunk = chunk + buffer.count
                     return buffer.count
                 }
-                filesChunk = [:]
+                filesChunk = []
                 return 0
 
             }) == 0 { break }
@@ -441,11 +441,13 @@ import MobileCoreServices
         writer?.closeFile()
         reader?.closeFile()
 
+        counter = 0
         for fileChunk in filesChunk {
-            let fileNameChunk = fileChunk.key
+            let fileNameChunk = fileChunk.fileName
             let size = getFileSize(filePath: outputDirectory + "/" + fileNameChunk)
             incrementalSize = incrementalSize + size
-            filesChunk[fileNameChunk] = incrementalSize
+            filesChunk[counter].size = incrementalSize
+            counter += 1
         }
 
         return filesChunk
