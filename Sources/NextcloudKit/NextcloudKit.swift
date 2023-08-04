@@ -506,7 +506,6 @@ import SwiftyJSON
             var filesChunkOutput = filesChunk
             start()
 
-            var counter = 0
             for fileChunk in filesChunk {
 
                 let serverUrlFileName = chunkFolderPath + "/" + fileName
@@ -534,12 +533,10 @@ import SwiftyJSON
                 semaphore.wait()
 
                 if uploadNKError == .success {
-                    filesChunkOutput.remove(at: counter)
+                    filesChunkOutput.removeFirst()
                 } else {
                     break
                 }
-
-                counter += 1
             }
 
             guard uploadNKError == .success else {
