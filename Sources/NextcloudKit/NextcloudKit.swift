@@ -21,7 +21,7 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-import Foundation
+import UIKit
 import Alamofire
 import SwiftyJSON
 
@@ -480,10 +480,16 @@ import SwiftyJSON
         let urlBase = self.nkCommonInstance.urlBase
         let dav = self.nkCommonInstance.dav
 
-        let chunkFolderPath = urlBase + "/" + dav + "/uploads/" + userId + "/" + chunkFolderServer
         let fileNameLocalSize = self.nkCommonInstance.getFileSize(filePath: directory + "/" + fileName)
+        let chunkFolderPath = urlBase + "/" + dav + "/uploads/" + userId + "/" + chunkFolderServer
         let fileNameServerPath = urlBase + "/" + dav + "/files/" + userId + self.nkCommonInstance.returnPathfromServerUrl(serverUrl) + "/" + fileName
         let destinationHeader: [String: String] = ["Destination" : fileNameServerPath]
+
+        // check space
+        let freeDisk = UIDevice.current.freeDiskSpaceInBytes
+        if freeDisk < fileNameLocalSize * Int64(2.5) {
+            return completion(account, nil, nil, NKError(errorCode: NKError.chunkNoEnoughMemory))
+        }
 
         func createFolder(completion: @escaping (_ errorCode: NKError) -> Void) {
 
@@ -503,8 +509,7 @@ import SwiftyJSON
         createFolder() { error in
 
             guard error == .success else {
-                completion(account, nil, nil, NKError(errorCode: NKError.createFolderChunk, errorDescription: ""))
-                return
+                return completion(account, nil, nil, NKError(errorCode: NKError.chunkCreateFolder))
             }
 
             var uploadNKError = NKError()
@@ -513,7 +518,7 @@ import SwiftyJSON
             if filesChunk.isEmpty() {
                 filesChunk = self.nkCommonInstance.chunkedFile(inputDirectory: directory, outputDirectory: directory, fileName: fileName, chunkSizeInMB: chunkSizeInMB)
                 if filesChunk.isEmpty() {
-                    return completion(account, nil, nil, NKError(errorCode: NKError.chunkFilesNull, errorDescription: ""))
+                    return completion(account, nil, nil, NKError(errorCode: NKError.chunkFilesNull))
                 }
             }
 
@@ -527,7 +532,7 @@ import SwiftyJSON
 
                 let fileSize = self.nkCommonInstance.getFileSize(filePath: fileNameLocalPath)
                 if fileSize == 0 {
-                    return completion(account, nil, nil, NKError(errorCode: NKError.chunkFileNull, errorDescription: ""))
+                    return completion(account, nil, nil, NKError(errorCode: NKError.chunkFileNull))
                 }
 
                 let semaphore = DispatchSemaphore(value: 0)
@@ -554,7 +559,7 @@ import SwiftyJSON
             }
 
             guard uploadNKError == .success else {
-                return completion(account, filesChunkOutput, nil, uploadNKError)
+                return completion(account, filesChunkOutput, nil, NKError(errorCode: NKError.chunkFileUpload))
             }
 
             // Assemble the chunks
@@ -581,13 +586,13 @@ import SwiftyJSON
             self.moveFileOrFolder(serverUrlFileNameSource: serverUrlFileNameSource, serverUrlFileNameDestination: fileNameServerPath, overwrite: true, options: options) { _, error in
 
                 guard error == .success else {
-                    return completion(account, filesChunkOutput, nil, NKError(errorCode: NKError.moveFileChunk, errorDescription: ""))
+                    return completion(account, filesChunkOutput, nil, NKError(errorCode: NKError.chunkMoveFile))
                 }
 
                 self.readFileOrFolder(serverUrlFileName: fileNameServerPath, depth: "0", options: NKRequestOptions(queue: self.nkCommonInstance.backgroundQueue)) { _, files, _, error in
 
                     guard error == .success, let file = files.first else {
-                        return completion(account, filesChunkOutput, nil, NKError(errorCode: NKError.readFileChunk, errorDescription: ""))
+                        return completion(account, filesChunkOutput, nil, NKError(errorCode: NKError.chunkReadFile))
                     }
                     return completion(account, filesChunkOutput, file, error)
                 }

@@ -54,15 +54,17 @@ extension OCSPath {
 @objcMembers
 public class NKError: NSObject {
 
+    static let resourceNotFound = 404
     static let internalError = -9999
-    static let resourceSizeZero = -9998
-    static let moveFileChunk = -9997
-    static let readFileChunk = -9996
-    static let createFolderChunk = -9995
+    // Chunk error
+    static let chunkNoEnoughMemory = -9998
+    static let chunkMoveFile = -9997
+    static let chunkReadFile = -9996
+    static let chunkCreateFolder = -9995
     static let chunkFilesNull = -9994
     static let chunkFileNull = -9993
-    static let resourceNotFound = 404
-    
+    static let chunkFileUpload = -9993
+
     public let errorCode: Int
     public let errorDescription: String
     public let error: Error
