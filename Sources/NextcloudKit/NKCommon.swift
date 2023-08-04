@@ -372,7 +372,7 @@ import MobileCoreServices
 
     // MARK: - Chunked File
 
-    public func chunkedFile(inputDirectory: String, outputDirectory: String, fileName: String, chunkSizeInMB: Int, bufferSize: Int = 1000000) -> NextcloudKit.FileChunk {
+    public func chunkedFile(inputDirectory: String, outputDirectory: String, fileName: String, chunkSizeInMB: Int, bufferSize: Int = 1000000) -> [String: Int64] {
 
         let fileManager: FileManager = .default
         var isDirectory: ObjCBool = false
@@ -382,20 +382,20 @@ import MobileCoreServices
         var chunk: Int = 0
         var counter: Int = 1
         var incrementalSize: Int64 = 0
-        var fileChunk = NextcloudKit.FileChunk(filesName: [], sizes: [])
+        var filesChunk: [String: Int64] = [:]
 
         if !fileManager.fileExists(atPath: outputDirectory, isDirectory: &isDirectory) {
             do {
                 try fileManager.createDirectory(atPath: outputDirectory, withIntermediateDirectories: true, attributes: nil)
             } catch {
-                return fileChunk
+                return filesChunk
             }
         }
 
         do {
             reader = try .init(forReadingFrom: URL(fileURLWithPath: inputDirectory + "/" + fileName))
         } catch {
-            return fileChunk
+            return filesChunk
         }
 
         repeat {
@@ -420,10 +420,10 @@ import MobileCoreServices
                     do {
                         writer = try .init(forWritingTo: URL(fileURLWithPath: outputFileName))
                     } catch {
-                        fileChunk = NextcloudKit.FileChunk(filesName: [], sizes: [])
+                        filesChunk = [:]
                         return 0
                     }
-                    fileChunk.filesName.append(fileNameChunk)
+                    filesChunk[fileNameChunk] = 0
                 }
 
                 if let buffer = buffer {
@@ -431,7 +431,7 @@ import MobileCoreServices
                     chunk = chunk + buffer.count
                     return buffer.count
                 }
-                fileChunk = NextcloudKit.FileChunk(filesName: [], sizes: [])
+                filesChunk = [:]
                 return 0
 
             }) == 0 { break }
@@ -441,13 +441,13 @@ import MobileCoreServices
         writer?.closeFile()
         reader?.closeFile()
 
-        for fileName in fileChunk.filesName {
-            let size = getFileSize(filePath: outputDirectory + "/" + fileName)
+        for var fileChunk in filesChunk {
+            let size = getFileSize(filePath: outputDirectory + "/" + fileChunk.key)
             incrementalSize = incrementalSize + size
-            fileChunk.sizes.append(incrementalSize)
+            fileChunk.value = incrementalSize
         }
 
-        return fileChunk
+        return filesChunk
     }
 
     // MARK: - Common

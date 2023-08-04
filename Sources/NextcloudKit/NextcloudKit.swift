@@ -431,25 +431,6 @@ import SwiftyJSON
         queue.async { requestHandler(request) }
     }
 
-    public struct FileChunk {
-        public var filesName: [String]
-        public var sizes: [Int64]
-
-        public init(filesName: [String], sizes: [Int64]) {
-            self.filesName = filesName
-            self.sizes = sizes
-        }
-
-        public func isEmpty() -> Bool {
-            return filesName.isEmpty && sizes.isEmpty && filesName.count == sizes.count
-        }
-
-        public mutating func remove() {
-            filesName.removeFirst()
-            sizes.removeFirst()
-        }
-    }
-
     /// - Parameters:
     ///     - directory: The local directory where is the file to be split
     ///     - fileName: The name of the file to be splites
@@ -467,13 +448,13 @@ import SwiftyJSON
                             creationDate: Date?,
                             serverUrl: String,
                             chunkFolderServer: String,
-                            filesChunk: FileChunk,
+                            filesChunk: [String: Int64],
                             chunkSizeInMB: Int,
                             start: @escaping () -> Void = { },
                             requestHandler: @escaping (_ request: UploadRequest) -> Void = { _ in },
                             taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
                             progressHandler: @escaping (_ totalBytesExpected: Int64, _ totalBytes: Int64, _ fractionCompleted: Double) -> Void = { _, _, _ in },
-                            completion: @escaping (_ account: String, _ filesChunk: FileChunk?, _ file: NKFile?, _ error: NKError) -> Void) {
+                            completion: @escaping (_ account: String, _ filesChunk: [String: Int64]?, _ file: NKFile?, _ error: NKError) -> Void) {
 
         let account = self.nkCommonInstance.account
         let userId = self.nkCommonInstance.userId
@@ -515,9 +496,9 @@ import SwiftyJSON
             var uploadNKError = NKError()
             var filesChunk = filesChunk
 
-            if filesChunk.isEmpty() {
+            if filesChunk.isEmpty {
                 filesChunk = self.nkCommonInstance.chunkedFile(inputDirectory: directory, outputDirectory: directory, fileName: fileName, chunkSizeInMB: chunkSizeInMB)
-                if filesChunk.isEmpty() {
+                if filesChunk.isEmpty {
                     return completion(account, nil, nil, NKError(errorCode: NKError.chunkFilesNull))
                 }
             }
@@ -525,7 +506,7 @@ import SwiftyJSON
             var filesChunkOutput = filesChunk
             start()
 
-            for fileName in filesChunk.filesName {
+            for fileChunk in filesChunk {
 
                 let serverUrlFileName = chunkFolderPath + "/" + fileName
                 let fileNameLocalPath = directory + "/" + fileName
@@ -542,7 +523,7 @@ import SwiftyJSON
                     taskHandler(task)
                 }, progressHandler: { progress in
                     let totalBytesExpected = fileNameLocalSize
-                    let totalBytes = filesChunkOutput.sizes.first ?? fileSize - fileSize
+                    let totalBytes = fileChunk.value - fileSize
                     let fractionCompleted = Double(totalBytes) / Double(totalBytesExpected)
                     progressHandler(totalBytesExpected, totalBytes, fractionCompleted)
                 }) { _, _, _, _, _, _, afError, error in
@@ -552,7 +533,7 @@ import SwiftyJSON
                 semaphore.wait()
 
                 if uploadNKError == .success {
-                    filesChunkOutput.remove()
+                    filesChunkOutput.removeValue(forKey: fileChunk.key)
                 } else {
                     break
                 }
