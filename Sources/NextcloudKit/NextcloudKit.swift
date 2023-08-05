@@ -437,7 +437,7 @@ import SwiftyJSON
     ///     - date: If exist the date of file
     ///     - creationDate: If exist the creation date of file
     ///     - serverUrl: The serverURL where the file will be deposited once reassembled
-    ///     - chunkFolderServer: The name of temp folder, usually NSUUID().uuidString
+    ///     - chunkFolder: The name of temp folder, usually NSUUID().uuidString
     ///     - filesChunk: The struct it will contain all file names with the increment size  still to be sent.
     ///                Example filename: "3","4","5" .... size: 30000000, 40000000, 43000000
     ///     - chunkSizeInMB: Size in MB of chunk
@@ -447,7 +447,7 @@ import SwiftyJSON
                             date: Date?,
                             creationDate: Date?,
                             serverUrl: String,
-                            chunkFolderServer: String,
+                            chunkFolder: String,
                             filesChunk: Array<(fileName: String, size: Int64)>,
                             chunkSizeInMB: Int,
                             start: @escaping (_ filesChunk: Array<(fileName: String, size: Int64)>) -> Void = { _ in },
@@ -463,9 +463,9 @@ import SwiftyJSON
         let dav = self.nkCommonInstance.dav
 
         let fileNameLocalSize = self.nkCommonInstance.getFileSize(filePath: directory + "/" + fileName)
-        let chunkFolderPath = urlBase + "/" + dav + "/uploads/" + userId + "/" + chunkFolderServer
-        let fileNameServerPath = urlBase + "/" + dav + "/files/" + userId + self.nkCommonInstance.returnPathfromServerUrl(serverUrl) + "/" + fileName
-        let destinationHeader: [String: String] = ["Destination" : fileNameServerPath]
+        let serverUrlChunkFolder = urlBase + "/" + dav + "/uploads/" + userId + "/" + chunkFolder
+        let serverUrlFileName = urlBase + "/" + dav + "/files/" + userId + self.nkCommonInstance.returnPathfromServerUrl(serverUrl) + "/" + fileName
+        let destinationHeader: [String: String] = ["Destination" : serverUrlFileName]
 
         // check space
         let freeDisk = UIDevice.current.freeDiskSpaceInBytes
@@ -475,11 +475,11 @@ import SwiftyJSON
 
         func createFolder(completion: @escaping (_ errorCode: NKError) -> Void) {
 
-            readFileOrFolder(serverUrlFileName: chunkFolderPath, depth: "0", options: NKRequestOptions(queue: self.nkCommonInstance.backgroundQueue)) { _, _, _, error in
+            readFileOrFolder(serverUrlFileName: serverUrlChunkFolder, depth: "0", options: NKRequestOptions(queue: self.nkCommonInstance.backgroundQueue)) { _, _, _, error in
                 if error == .success {
                     completion(NKError())
                 } else if error.errorCode == NKError.resourceNotFound {
-                    NextcloudKit.shared.createFolder(serverUrlFileName: chunkFolderPath, options: NKRequestOptions(queue: self.nkCommonInstance.backgroundQueue)) { _, _, _, error in
+                    NextcloudKit.shared.createFolder(serverUrlFileName: serverUrlChunkFolder, options: NKRequestOptions(queue: self.nkCommonInstance.backgroundQueue)) { _, _, _, error in
                         completion(error)
                     }
                 } else {
@@ -509,7 +509,7 @@ import SwiftyJSON
 
             for fileChunk in filesChunk {
 
-                let serverUrlFileName = chunkFolderPath + "/" + fileName
+                let serverUrlFileName = serverUrlChunkFolder + "/" + fileName
                 let fileNameLocalPath = directory + "/" + fileName
 
                 let fileSize = self.nkCommonInstance.getFileSize(filePath: fileNameLocalPath)
@@ -547,7 +547,7 @@ import SwiftyJSON
             }
 
             // Assemble the chunks
-            let serverUrlFileNameSource = chunkFolderPath + "/.file"
+            let serverUrlFileNameSource = serverUrlChunkFolder + "/.file"
             var customHeaders: [String: String] = [:]
 
             if let creationDate, creationDate.timeIntervalSince1970 > 0 {
@@ -567,13 +567,13 @@ import SwiftyJSON
             let timeout = max(assembleTimeMin, min(assembleTimePerGB * assembleSizeInGB, assembleTimeMax))
 
             let options = NKRequestOptions(timeout: timeout, queue: self.nkCommonInstance.backgroundQueue)
-            self.moveFileOrFolder(serverUrlFileNameSource: serverUrlFileNameSource, serverUrlFileNameDestination: fileNameServerPath, overwrite: true, options: options) { _, error in
+            self.moveFileOrFolder(serverUrlFileNameSource: serverUrlFileNameSource, serverUrlFileNameDestination: serverUrlFileName, overwrite: true, options: options) { _, error in
 
                 guard error == .success else {
                     return completion(account, filesChunkOutput, nil, NKError(errorCode: NKError.chunkMoveFile))
                 }
 
-                self.readFileOrFolder(serverUrlFileName: fileNameServerPath, depth: "0", options: NKRequestOptions(queue: self.nkCommonInstance.backgroundQueue)) { _, files, _, error in
+                self.readFileOrFolder(serverUrlFileName: serverUrlFileName, depth: "0", options: NKRequestOptions(queue: self.nkCommonInstance.backgroundQueue)) { _, files, _, error in
 
                     guard error == .success, let file = files.first else {
                         return completion(account, filesChunkOutput, nil, NKError(errorCode: NKError.chunkReadFile))
