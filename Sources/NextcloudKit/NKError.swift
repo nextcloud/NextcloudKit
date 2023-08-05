@@ -56,14 +56,15 @@ public class NKError: NSObject {
 
     static let resourceNotFound = 404
     static let internalError = -9999
+
     // Chunk error
-    static let chunkNoEnoughMemory = -9998
-    static let chunkMoveFile = -9997
-    static let chunkReadFile = -9996
-    static let chunkCreateFolder = -9995
-    static let chunkFilesNull = -9994
-    static let chunkFileNull = -9993
-    static let chunkFileUpload = -9993
+    public static let chunkNoEnoughMemory = -9998
+    public static let chunkMoveFile = -9997
+    public static let chunkReadFile = -9996
+    public static let chunkCreateFolder = -9995
+    public static let chunkFilesNull = -9994
+    public static let chunkFileNull = -9993
+    public static let chunkFileUpload = -9993
 
     public let errorCode: Int
     public let errorDescription: String
