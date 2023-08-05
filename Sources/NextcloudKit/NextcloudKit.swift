@@ -450,10 +450,11 @@ import SwiftyJSON
                             chunkFolderServer: String,
                             filesChunk: Array<(fileName: String, size: Int64)>,
                             chunkSizeInMB: Int,
-                            start: @escaping () -> Void = { },
+                            start: @escaping (_ filesChunk: Array<(fileName: String, size: Int64)>) -> Void = { _ in },
                             requestHandler: @escaping (_ request: UploadRequest) -> Void = { _ in },
                             taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
                             progressHandler: @escaping (_ totalBytesExpected: Int64, _ totalBytes: Int64, _ fractionCompleted: Double) -> Void = { _, _, _ in },
+                            uploaded: @escaping (_ fileChunk: (fileName: String, size: Int64)) -> Void = { _ in },
                             completion: @escaping (_ account: String, _ filesChunk: Array<(fileName: String, size: Int64)>?, _ file: NKFile?, _ error: NKError) -> Void) {
 
         let account = self.nkCommonInstance.account
@@ -493,7 +494,7 @@ import SwiftyJSON
                 return completion(account, nil, nil, NKError(errorCode: NKError.chunkCreateFolder))
             }
 
-            var uploadNKError = NKError()
+            var uploadError = NKError()
             var filesChunk = filesChunk
 
             if filesChunk.isEmpty {
@@ -504,7 +505,7 @@ import SwiftyJSON
             }
 
             var filesChunkOutput = filesChunk
-            start()
+            start(filesChunkOutput)
 
             for fileChunk in filesChunk {
 
@@ -527,19 +528,21 @@ import SwiftyJSON
                     let fractionCompleted = Double(totalBytes) / Double(totalBytesExpected)
                     progressHandler(totalBytesExpected, totalBytes, fractionCompleted)
                 }) { _, _, _, _, _, _, afError, error in
-                    uploadNKError = error
+                    if error == .success {
+                        filesChunkOutput.removeFirst()
+                        uploaded(fileChunk)
+                    }
+                    uploadError = error
                     semaphore.signal()
                 }
                 semaphore.wait()
 
-                if uploadNKError == .success {
-                    filesChunkOutput.removeFirst()
-                } else {
+                if uploadError != .success {
                     break
                 }
             }
 
-            guard uploadNKError == .success else {
+            guard uploadError == .success else {
                 return completion(account, filesChunkOutput, nil, NKError(errorCode: NKError.chunkFileUpload))
             }
 
