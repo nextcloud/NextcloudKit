@@ -372,7 +372,7 @@ import MobileCoreServices
 
     // MARK: - Chunked File
 
-    public func chunkedFile(inputDirectory: String, outputDirectory: String, fileName: String, chunkSizeInMB: Int, bufferSize: Int = 1000000) -> Array<(fileName: String, size: Int64)> {
+    public func chunkedFile(inputDirectory: String, outputDirectory: String, fileName: String, chunkSizeInMB: Int, bufferSize: Int = 1000000) -> [(fileName: String, size: Int64)] {
 
         let fileManager: FileManager = .default
         var isDirectory: ObjCBool = false
@@ -382,7 +382,7 @@ import MobileCoreServices
         var chunk: Int = 0
         var counter: Int = 1
         var incrementalSize: Int64 = 0
-        var filesChunk: Array<(fileName: String, size: Int64)> = []
+        var filesChunk: [(fileName: String, size: Int64)] = []
 
         if !fileManager.fileExists(atPath: outputDirectory, isDirectory: &isDirectory) {
             do {

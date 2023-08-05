@@ -448,14 +448,14 @@ import SwiftyJSON
                             creationDate: Date?,
                             serverUrl: String,
                             chunkFolder: String,
-                            filesChunk: Array<(fileName: String, size: Int64)>,
+                            filesChunk: [(fileName: String, size: Int64)],
                             chunkSizeInMB: Int,
-                            start: @escaping (_ filesChunk: Array<(fileName: String, size: Int64)>) -> Void = { _ in },
+                            start: @escaping (_ filesChunk: [(fileName: String, size: Int64)]) -> Void = { _ in },
                             requestHandler: @escaping (_ request: UploadRequest) -> Void = { _ in },
                             taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
                             progressHandler: @escaping (_ totalBytesExpected: Int64, _ totalBytes: Int64, _ fractionCompleted: Double) -> Void = { _, _, _ in },
                             uploaded: @escaping (_ fileChunk: (fileName: String, size: Int64)) -> Void = { _ in },
-                            completion: @escaping (_ account: String, _ filesChunk: Array<(fileName: String, size: Int64)>?, _ file: NKFile?, _ error: NKError) -> Void) {
+                            completion: @escaping (_ account: String, _ filesChunk: [(fileName: String, size: Int64)]?, _ file: NKFile?, _ error: NKError) -> Void) {
 
         let account = self.nkCommonInstance.account
         let userId = self.nkCommonInstance.userId
