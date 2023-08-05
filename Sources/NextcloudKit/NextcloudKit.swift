@@ -576,7 +576,7 @@ import SwiftyJSON
                 self.readFileOrFolder(serverUrlFileName: serverUrlFileName, depth: "0", options: NKRequestOptions(queue: self.nkCommonInstance.backgroundQueue)) { _, files, _, error in
 
                     guard error == .success, let file = files.first else {
-                        return completion(account, filesChunkOutput, nil, NKError(errorCode: NKError.chunkReadFile))
+                        return completion(account, filesChunkOutput, nil, NKError(errorCode: NKError.chunkMoveFile))
                     }
                     return completion(account, filesChunkOutput, file, error)
                 }
