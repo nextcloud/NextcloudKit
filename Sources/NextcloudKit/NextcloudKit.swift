@@ -455,7 +455,7 @@ import SwiftyJSON
                             taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
                             progressHandler: @escaping (_ totalBytesExpected: Int64, _ totalBytes: Int64, _ fractionCompleted: Double) -> Void = { _, _, _ in },
                             uploaded: @escaping (_ fileChunk: (fileName: String, size: Int64)) -> Void = { _ in },
-                            completion: @escaping (_ account: String, _ filesChunk: [(fileName: String, size: Int64)]?, _ file: NKFile?, _ error: NKError) -> Void) {
+                            completion: @escaping (_ account: String, _ filesChunk: [(fileName: String, size: Int64)]?, _ file: NKFile?, _ afError: AFError?, _ error: NKError) -> Void) {
 
         let account = self.nkCommonInstance.account
         let userId = self.nkCommonInstance.userId
@@ -470,7 +470,7 @@ import SwiftyJSON
         // check space
         let freeDisk = UIDevice.current.freeDiskSpaceInBytes
         if freeDisk < fileNameLocalSize * Int64(2.5) {
-            return completion(account, nil, nil, NKError(errorCode: NKError.chunkNoEnoughMemory))
+            return completion(account, nil, nil, nil, NKError(errorCode: NKError.chunkNoEnoughMemory))
         }
 
         func createFolder(completion: @escaping (_ errorCode: NKError) -> Void) {
@@ -491,16 +491,17 @@ import SwiftyJSON
         createFolder() { error in
 
             guard error == .success else {
-                return completion(account, nil, nil, NKError(errorCode: NKError.chunkCreateFolder, errorDescription: error.errorDescription))
+                return completion(account, nil, nil, nil, NKError(errorCode: NKError.chunkCreateFolder, errorDescription: error.errorDescription))
             }
 
-            var uploadError = NKError()
+            var uploadNKError = NKError()
+            var uploadAFError: AFError?
             var filesChunk = filesChunk
 
             if filesChunk.isEmpty {
                 filesChunk = self.nkCommonInstance.chunkedFile(inputDirectory: directory, outputDirectory: directory, fileName: fileName, chunkSizeInMB: chunkSizeInMB)
                 if filesChunk.isEmpty {
-                    return completion(account, nil, nil, NKError(errorCode: NKError.chunkFilesNull))
+                    return completion(account, nil, nil, nil, NKError(errorCode: NKError.chunkFilesNull))
                 }
             }
 
@@ -514,7 +515,7 @@ import SwiftyJSON
 
                 let fileSize = self.nkCommonInstance.getFileSize(filePath: fileNameLocalPath)
                 if fileSize == 0 {
-                    return completion(account, nil, nil, NKError(errorCode: NKError.chunkFileNull))
+                    return completion(account, nil, nil, .explicitlyCancelled, NKError(errorCode: NKError.chunkFileNull))
                 }
 
                 let semaphore = DispatchSemaphore(value: 0)
@@ -532,18 +533,19 @@ import SwiftyJSON
                         filesChunkOutput.removeFirst()
                         uploaded(fileChunk)
                     }
-                    uploadError = error
+                    uploadAFError = afError
+                    uploadNKError = error
                     semaphore.signal()
                 }
                 semaphore.wait()
 
-                if uploadError != .success {
+                if uploadNKError != .success {
                     break
                 }
             }
 
-            guard uploadError == .success else {
-                return completion(account, filesChunkOutput, nil, NKError(errorCode: NKError.chunkFileUpload, errorDescription: error.errorDescription))
+            guard uploadNKError == .success else {
+                return completion(account, filesChunkOutput, nil, uploadAFError, NKError(errorCode: NKError.chunkFileUpload, errorDescription: uploadNKError.errorDescription))
             }
 
             // Assemble the chunks
@@ -570,15 +572,15 @@ import SwiftyJSON
             self.moveFileOrFolder(serverUrlFileNameSource: serverUrlFileNameSource, serverUrlFileNameDestination: serverUrlFileName, overwrite: true, options: options) { _, error in
 
                 guard error == .success else {
-                    return completion(account, filesChunkOutput, nil, NKError(errorCode: NKError.chunkMoveFile, errorDescription: error.errorDescription))
+                    return completion(account, filesChunkOutput, nil, nil, NKError(errorCode: NKError.chunkMoveFile, errorDescription: error.errorDescription))
                 }
 
                 self.readFileOrFolder(serverUrlFileName: serverUrlFileName, depth: "0", options: NKRequestOptions(queue: self.nkCommonInstance.backgroundQueue)) { _, files, _, error in
 
                     guard error == .success, let file = files.first else {
-                        return completion(account, filesChunkOutput, nil, NKError(errorCode: NKError.chunkMoveFile, errorDescription: error.errorDescription))
+                        return completion(account, filesChunkOutput, nil, nil, NKError(errorCode: NKError.chunkMoveFile, errorDescription: error.errorDescription))
                     }
-                    return completion(account, filesChunkOutput, file, error)
+                    return completion(account, filesChunkOutput, file, nil, error)
                 }
             }
         }
