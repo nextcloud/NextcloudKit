@@ -491,7 +491,7 @@ import SwiftyJSON
         createFolder() { error in
 
             guard error == .success else {
-                return completion(account, nil, nil, NKError(errorCode: NKError.chunkCreateFolder))
+                return completion(account, nil, nil, NKError(errorCode: NKError.chunkCreateFolder, errorDescription: error.errorDescription))
             }
 
             var uploadError = NKError()
@@ -543,7 +543,7 @@ import SwiftyJSON
             }
 
             guard uploadError == .success else {
-                return completion(account, filesChunkOutput, nil, NKError(errorCode: NKError.chunkFileUpload))
+                return completion(account, filesChunkOutput, nil, NKError(errorCode: NKError.chunkFileUpload, errorDescription: error.errorDescription))
             }
 
             // Assemble the chunks
@@ -570,13 +570,13 @@ import SwiftyJSON
             self.moveFileOrFolder(serverUrlFileNameSource: serverUrlFileNameSource, serverUrlFileNameDestination: serverUrlFileName, overwrite: true, options: options) { _, error in
 
                 guard error == .success else {
-                    return completion(account, filesChunkOutput, nil, NKError(errorCode: NKError.chunkMoveFile))
+                    return completion(account, filesChunkOutput, nil, NKError(errorCode: NKError.chunkMoveFile, errorDescription: error.errorDescription))
                 }
 
                 self.readFileOrFolder(serverUrlFileName: serverUrlFileName, depth: "0", options: NKRequestOptions(queue: self.nkCommonInstance.backgroundQueue)) { _, files, _, error in
 
                     guard error == .success, let file = files.first else {
-                        return completion(account, filesChunkOutput, nil, NKError(errorCode: NKError.chunkMoveFile))
+                        return completion(account, filesChunkOutput, nil, NKError(errorCode: NKError.chunkMoveFile, errorDescription: error.errorDescription))
                     }
                     return completion(account, filesChunkOutput, file, error)
                 }
