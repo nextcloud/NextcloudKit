@@ -450,6 +450,7 @@ import SwiftyJSON
                             chunkFolder: String,
                             filesChunk: [(fileName: String, size: Int64)],
                             chunkSizeInMB: Int,
+                            addCustomHeaders: [String: String] = [:],
                             start: @escaping (_ filesChunk: [(fileName: String, size: Int64)]) -> Void = { _ in },
                             requestHandler: @escaping (_ request: UploadRequest) -> Void = { _ in },
                             taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
@@ -465,7 +466,8 @@ import SwiftyJSON
         let fileNameLocalSize = self.nkCommonInstance.getFileSize(filePath: directory + "/" + fileName)
         let serverUrlChunkFolder = urlBase + "/" + dav + "/uploads/" + userId + "/" + chunkFolder
         let serverUrlFileName = urlBase + "/" + dav + "/files/" + userId + self.nkCommonInstance.returnPathfromServerUrl(serverUrl) + "/" + fileName
-        let destinationHeader: [String: String] = ["Destination" : serverUrlFileName]
+        var addCustomHeaders = addCustomHeaders
+        addCustomHeaders["Destination"] = serverUrlFileName
 
         // check space
         let freeDisk = UIDevice.current.freeDiskSpaceInBytes
@@ -519,7 +521,7 @@ import SwiftyJSON
                 }
 
                 let semaphore = DispatchSemaphore(value: 0)
-                self.upload(serverUrlFileName: serverUrlFileName, fileNameLocalPath: fileNameLocalPath, addCustomHeaders: destinationHeader, queue: self.nkCommonInstance.backgroundQueue, requestHandler: { request in
+                self.upload(serverUrlFileName: serverUrlFileName, fileNameLocalPath: fileNameLocalPath, addCustomHeaders: addCustomHeaders, queue: self.nkCommonInstance.backgroundQueue, requestHandler: { request in
                     requestHandler(request)
                 }, taskHandler: { task in
                     taskHandler(task)
@@ -559,7 +561,7 @@ import SwiftyJSON
                 customHeaders["X-OC-MTime"] = "\(date.timeIntervalSince1970)"
             }
 
-            destinationHeader.forEach { customHeaders[$0] = $1 }
+            addCustomHeaders.forEach { customHeaders[$0] = $1 }
 
             // Calculate Assemble Timeout
             let assembleSizeInGB = Double(fileNameLocalSize) / 1e9
