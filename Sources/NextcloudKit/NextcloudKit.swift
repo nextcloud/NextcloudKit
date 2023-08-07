@@ -532,9 +532,6 @@ import SwiftyJSON
                     progressHandler(totalBytesExpected, totalBytes, fractionCompleted)
                 }) { _, _, _, _, _, _, afError, error in
                     if error == .success {
-                        do {
-                            try FileManager.default.removeItem(atPath: fileNameLocalPath)
-                        } catch { }
                         filesChunkOutput.removeFirst()
                         uploaded(fileChunk)
                     }
