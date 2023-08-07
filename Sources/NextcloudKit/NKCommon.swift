@@ -372,7 +372,7 @@ import MobileCoreServices
 
     // MARK: - Chunked File
 
-    public func chunkedFile(inputDirectory: String, outputDirectory: String, fileName: String, chunkSize: Int, bufferSize: Int = 1000000) -> [(fileName: String, size: Int64)] {
+    public func chunkedFile(inputDirectory: String, outputDirectory: String, fileName: String, chunkSize: Int) -> [(fileName: String, size: Int64)] {
 
         let fileManager: FileManager = .default
         var isDirectory: ObjCBool = false
@@ -383,6 +383,7 @@ import MobileCoreServices
         var incrementalSize: Int64 = 0
         var filesChunk: [(fileName: String, size: Int64)] = []
         var chunkSize = chunkSize
+        let bufferSize = 1000000
 
         // If max chunk count is > 10000 (max count), add + 100 MB to the chunk size to reduce the count. This is an edge case.
         let numChunk = getFileSize(filePath: inputDirectory + "/" + fileName) / Int64(chunkSize)
