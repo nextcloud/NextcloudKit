@@ -382,6 +382,13 @@ import MobileCoreServices
         var counter: Int = 1
         var incrementalSize: Int64 = 0
         var filesChunk: [(fileName: String, size: Int64)] = []
+        var chunkSize = chunkSize
+
+        // If max chunk count is > 10000 (max count), add + 100 MB to the chunk size to reduce the count. This is an edge case.
+        let numChunk = getFileSize(filePath: inputDirectory + "/" + fileName) / Int64(chunk)
+        if numChunk > 10000 {
+            chunkSize = chunkSize + 100000000
+        }
 
         if !fileManager.fileExists(atPath: outputDirectory, isDirectory: &isDirectory) {
             do {
