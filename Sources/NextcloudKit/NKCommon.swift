@@ -372,11 +372,10 @@ import MobileCoreServices
 
     // MARK: - Chunked File
 
-    public func chunkedFile(inputDirectory: String, outputDirectory: String, fileName: String, chunkSizeInMB: Int, bufferSize: Int = 1000000) -> [(fileName: String, size: Int64)] {
+    public func chunkedFile(inputDirectory: String, outputDirectory: String, fileName: String, chunkSize: Int, bufferSize: Int = 1000000) -> [(fileName: String, size: Int64)] {
 
         let fileManager: FileManager = .default
         var isDirectory: ObjCBool = false
-        let chunkSize = chunkSizeInMB * 1000000
         var reader: FileHandle?
         var writer: FileHandle?
         var chunk: Int = 0

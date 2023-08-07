@@ -449,7 +449,7 @@ import SwiftyJSON
                             serverUrl: String,
                             chunkFolder: String,
                             filesChunk: [(fileName: String, size: Int64)],
-                            chunkSizeInMB: Int,
+                            chunkSize: Int,
                             addCustomHeaders: [String: String] = [:],
                             start: @escaping (_ filesChunk: [(fileName: String, size: Int64)]) -> Void = { _ in },
                             requestHandler: @escaping (_ request: UploadRequest) -> Void = { _ in },
@@ -501,7 +501,7 @@ import SwiftyJSON
             var filesChunk = filesChunk
 
             if filesChunk.isEmpty {
-                filesChunk = self.nkCommonInstance.chunkedFile(inputDirectory: directory, outputDirectory: directory, fileName: fileName, chunkSizeInMB: chunkSizeInMB)
+                filesChunk = self.nkCommonInstance.chunkedFile(inputDirectory: directory, outputDirectory: directory, fileName: fileName, chunkSize: chunkSize)
                 if filesChunk.isEmpty {
                     return completion(account, nil, nil, nil, NKError(errorCode: NKError.chunkFilesNull))
                 }
