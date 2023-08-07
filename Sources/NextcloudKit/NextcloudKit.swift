@@ -466,8 +466,8 @@ import SwiftyJSON
         let fileNameLocalSize = self.nkCommonInstance.getFileSize(filePath: directory + "/" + fileName)
         let serverUrlChunkFolder = urlBase + "/" + dav + "/uploads/" + userId + "/" + chunkFolder
         let serverUrlFileName = urlBase + "/" + dav + "/files/" + userId + self.nkCommonInstance.returnPathfromServerUrl(serverUrl) + "/" + fileName
-        var addCustomHeaders = addCustomHeaders
-        addCustomHeaders["Destination"] = serverUrlFileName
+        var customHeader = addCustomHeaders
+        customHeader["Destination"] = serverUrlFileName
 
         // check space
         let freeDisk = UIDevice.current.freeDiskSpaceInBytes
@@ -552,16 +552,13 @@ import SwiftyJSON
 
             // Assemble the chunks
             let serverUrlFileNameSource = serverUrlChunkFolder + "/.file"
-            var customHeaders: [String: String] = [:]
 
             if let creationDate, creationDate.timeIntervalSince1970 > 0 {
-                customHeaders["X-OC-CTime"] = "\(creationDate.timeIntervalSince1970)"
+                customHeader["X-OC-CTime"] = "\(creationDate.timeIntervalSince1970)"
             }
             if let date, date.timeIntervalSince1970 > 0 {
-                customHeaders["X-OC-MTime"] = "\(date.timeIntervalSince1970)"
+                customHeader["X-OC-MTime"] = "\(date.timeIntervalSince1970)"
             }
-
-            addCustomHeaders.forEach { customHeaders[$0] = $1 }
 
             // Calculate Assemble Timeout
             let assembleSizeInGB = Double(fileNameLocalSize) / 1e9
@@ -570,7 +567,7 @@ import SwiftyJSON
             let assembleTimeMax: Double = 30 * 60   // 30 min
             let timeout = max(assembleTimeMin, min(assembleTimePerGB * assembleSizeInGB, assembleTimeMax))
 
-            let options = NKRequestOptions(timeout: timeout, queue: self.nkCommonInstance.backgroundQueue)
+            let options = NKRequestOptions(customHeader: customHeader, timeout: timeout, queue: self.nkCommonInstance.backgroundQueue)
             self.moveFileOrFolder(serverUrlFileNameSource: serverUrlFileNameSource, serverUrlFileNameDestination: serverUrlFileName, overwrite: true, options: options) { _, error in
 
                 guard error == .success else {
