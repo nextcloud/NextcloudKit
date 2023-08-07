@@ -521,7 +521,7 @@ import SwiftyJSON
                 }
 
                 let semaphore = DispatchSemaphore(value: 0)
-                self.upload(serverUrlFileName: serverUrlFileName, fileNameLocalPath: fileNameLocalPath, addCustomHeaders: addCustomHeaders, queue: self.nkCommonInstance.backgroundQueue, requestHandler: { request in
+                self.upload(serverUrlFileName: serverUrlFileName, fileNameLocalPath: fileNameLocalPath, addCustomHeaders: customHeader, queue: self.nkCommonInstance.backgroundQueue, requestHandler: { request in
                     requestHandler(request)
                 }, taskHandler: { task in
                     taskHandler(task)
