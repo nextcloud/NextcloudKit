@@ -385,7 +385,7 @@ import MobileCoreServices
         var chunkSize = chunkSize
 
         // If max chunk count is > 10000 (max count), add + 100 MB to the chunk size to reduce the count. This is an edge case.
-        let numChunk = getFileSize(filePath: inputDirectory + "/" + fileName) / Int64(chunk)
+        let numChunk = getFileSize(filePath: inputDirectory + "/" + fileName) / Int64(chunkSize)
         if numChunk > 10000 {
             chunkSize = chunkSize + 100000000
         }
