@@ -512,8 +512,8 @@ import SwiftyJSON
 
             for fileChunk in filesChunk {
 
-                let serverUrlFileName = serverUrlChunkFolder + "/" + fileName
-                let fileNameLocalPath = directory + "/" + fileName
+                let serverUrlFileName = serverUrlChunkFolder + "/" + fileChunk.fileName
+                let fileNameLocalPath = directory + "/" + fileChunk.fileName
 
                 let fileSize = self.nkCommonInstance.getFileSize(filePath: fileNameLocalPath)
                 if fileSize == 0 {
