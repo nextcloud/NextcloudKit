@@ -168,15 +168,14 @@ extension NextcloudKit {
             return options.queue.async { completion(account, nil, nil, .urlError) }
         }
 
-        let headers = self.nkCommonInstance.getStandardHeaders(options: options)
-
         let method = HTTPMethod(rawValue: method)
 
+        let headers = self.nkCommonInstance.getStandardHeaders(options: options)
         var parameters: [String: Any] = [:]
-        if let e2eMetadata = e2eMetadata {
-            parameters = ["metaData": e2eMetadata, "e2e-token": e2eToken]
-        } else {
-            parameters = ["e2e-token": e2eToken]
+
+        parameters["e2e-token"] = e2eToken
+        if let e2eMetadata {
+            parameters["metaData"] = e2eMetadata
         }
 
         sessionManager.request(url, method: method, parameters: parameters, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).responseData(queue: self.nkCommonInstance.backgroundQueue) { response in
