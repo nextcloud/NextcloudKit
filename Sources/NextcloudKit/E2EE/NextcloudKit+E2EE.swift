@@ -82,11 +82,10 @@ extension NextcloudKit {
 
         let method = HTTPMethod(rawValue: method)
 
-        var headers = self.nkCommonInstance.getStandardHeaders(options: options)
+        let headers = self.nkCommonInstance.getStandardHeaders(options: options)
         var parameters: [String: Any] = [:]
 
         if let e2eToken {
-            headers.update(name: "e2e-token", value: e2eToken)
             parameters = ["e2e-token": e2eToken]
         }
         if let e2eCounter {
