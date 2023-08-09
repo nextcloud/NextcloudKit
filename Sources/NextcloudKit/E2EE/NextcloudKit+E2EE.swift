@@ -66,6 +66,7 @@ extension NextcloudKit {
 
     @objc public func lockE2EEFolder(fileId: String,
                                      e2eToken: String?,
+                                     e2eCounter: String?,
                                      method: String,
                                      options: NKRequestOptions = NKRequestOptions(),
                                      completion: @escaping (_ account: String, _ e2eToken: String?, _ data: Data?, _ error: NKError) -> Void) {
@@ -81,11 +82,15 @@ extension NextcloudKit {
 
         let method = HTTPMethod(rawValue: method)
 
-        var parameters: [String: Any] = [:]
         var headers = self.nkCommonInstance.getStandardHeaders(options: options)
-        if let e2eToken = e2eToken {
-            headers.update(name: "e2e-token", value: e2eToken)
+
+        var parameters: [String: Any] = [:]
+
+        if let e2eToken {
             parameters = ["e2e-token": e2eToken]
+        }
+        if let e2eCounter {
+            parameters = ["X-NC-E2EE-COUNTER": e2eCounter]
         }
 
         sessionManager.request(url, method: method, parameters: parameters, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).responseData(queue: self.nkCommonInstance.backgroundQueue) { response in
@@ -125,8 +130,9 @@ extension NextcloudKit {
         let headers = self.nkCommonInstance.getStandardHeaders(options: options)
 
         var parameters: [String: Any] = [:]
-        if let e2eToken = e2eToken {
-            parameters = ["e2e-token": e2eToken]
+
+        if let e2eToken {
+            parameters["e2e-token"] = e2eToken
         }
 
         sessionManager.request(url, method: .get, parameters: parameters, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).responseData(queue: self.nkCommonInstance.backgroundQueue) { response in
@@ -152,6 +158,7 @@ extension NextcloudKit {
     @objc public func putE2EEMetadata(fileId: String,
                                       e2eToken: String,
                                       e2eMetadata: String?,
+                                      signature: String?,
                                       method: String,
                                       options: NKRequestOptions = NKRequestOptions(),
                                       completion: @escaping (_ account: String, _ metadata: String?, _ data: Data?, _ error: NKError) -> Void) {
@@ -170,10 +177,13 @@ extension NextcloudKit {
         let method = HTTPMethod(rawValue: method)
 
         var parameters: [String: Any] = [:]
-        if let e2eMetadata = e2eMetadata {
-            parameters = ["metaData": e2eMetadata, "e2e-token": e2eToken]
-        } else {
-            parameters = ["e2e-token": e2eToken]
+
+        parameters["e2e-token"] = e2eToken
+        if let e2eMetadata {
+            parameters = ["metaData": e2eMetadata]
+        }
+        if let signature {
+            parameters["X-NC-E2EE-SIGNATURE"] = signature
         }
 
         sessionManager.request(url, method: method, parameters: parameters, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).responseData(queue: self.nkCommonInstance.backgroundQueue) { response in
