@@ -83,15 +83,11 @@ extension NextcloudKit {
         let method = HTTPMethod(rawValue: method)
 
         var headers = self.nkCommonInstance.getStandardHeaders(options: options)
-
         var parameters: [String: Any] = [:]
 
         if let e2eToken {
             headers.update(name: "e2e-token", value: e2eToken)
             parameters = ["e2e-token": e2eToken]
-        }
-        if let e2eCounter {
-            parameters = ["X-NC-E2EE-COUNTER": e2eCounter]
         }
 
         sessionManager.request(url, method: method, parameters: parameters, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).responseData(queue: self.nkCommonInstance.backgroundQueue) { response in
@@ -129,7 +125,6 @@ extension NextcloudKit {
         }
 
         let headers = self.nkCommonInstance.getStandardHeaders(options: options)
-
         var parameters: [String: Any] = [:]
 
         if let e2eToken {
