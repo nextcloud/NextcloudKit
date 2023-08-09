@@ -173,13 +173,10 @@ extension NextcloudKit {
         let method = HTTPMethod(rawValue: method)
 
         var parameters: [String: Any] = [:]
-
-        parameters["e2e-token"] = e2eToken
-        if let e2eMetadata {
-            parameters = ["metaData": e2eMetadata]
-        }
-        if let signature {
-            parameters["X-NC-E2EE-SIGNATURE"] = signature
+        if let e2eMetadata = e2eMetadata {
+            parameters = ["metaData": e2eMetadata, "e2e-token": e2eToken]
+        } else {
+            parameters = ["e2e-token": e2eToken]
         }
 
         sessionManager.request(url, method: method, parameters: parameters, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).responseData(queue: self.nkCommonInstance.backgroundQueue) { response in
