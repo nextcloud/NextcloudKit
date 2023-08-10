@@ -177,6 +177,8 @@ extension NextcloudKit {
         var parameters: [String: Any] = [:]
 
         parameters["e2e-token"] = e2eToken
+        headers.update(name: "e2e-token", value: e2eToken)
+
         if let e2eMetadata {
             parameters["metaData"] = e2eMetadata
         }
