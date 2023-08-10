@@ -90,7 +90,7 @@ extension NextcloudKit {
             parameters = ["e2e-token": e2eToken]
         }
         if let e2eCounter {
-            parameters = ["X-NC-E2EE-COUNTER": e2eCounter]
+            headers.update(name: "X-NC-E2EE-COUNTER", value: e2eCounter)
         }
 
         sessionManager.request(url, method: method, parameters: parameters, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).responseData(queue: self.nkCommonInstance.backgroundQueue) { response in
@@ -173,7 +173,7 @@ extension NextcloudKit {
 
         let method = HTTPMethod(rawValue: method)
 
-        let headers = self.nkCommonInstance.getStandardHeaders(options: options)
+        var headers = self.nkCommonInstance.getStandardHeaders(options: options)
         var parameters: [String: Any] = [:]
 
         parameters["e2e-token"] = e2eToken
@@ -181,7 +181,7 @@ extension NextcloudKit {
             parameters["metaData"] = e2eMetadata
         }
         if let signature {
-            parameters["X-NC-E2EE-SIGNATURE"] = signature
+            headers.update(name: "X-NC-E2EE-SIGNATURE", value: signature)
         }
 
         sessionManager.request(url, method: method, parameters: parameters, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).responseData(queue: self.nkCommonInstance.backgroundQueue) { response in
