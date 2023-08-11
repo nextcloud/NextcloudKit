@@ -116,7 +116,7 @@ extension NextcloudKit {
     @objc public func getE2EEMetadata(fileId: String,
                                       e2eToken: String?,
                                       options: NKRequestOptions = NKRequestOptions(),
-                                      completion: @escaping (_ account: String, _ e2eMetadata: String?, _ data: Data?, _ error: NKError) -> Void) {
+                                      completion: @escaping (_ account: String, _ e2eMetadata: String?, _ signature: String?, _ data: Data?, _ error: NKError) -> Void) {
 
         let account = self.nkCommonInstance.account
         let urlBase = self.nkCommonInstance.urlBase
@@ -124,7 +124,7 @@ extension NextcloudKit {
         let endpoint = "ocs/v2.php/apps/end_to_end_encryption/api/v1/meta-data/\(fileId)"
 
         guard let url = self.nkCommonInstance.createStandardUrl(serverUrl: urlBase, endpoint: endpoint) else {
-            return options.queue.async { completion(account, nil, nil, .urlError) }
+            return options.queue.async { completion(account, nil, nil, nil, .urlError) }
         }
 
         let headers = self.nkCommonInstance.getStandardHeaders(options: options)
@@ -140,15 +140,16 @@ extension NextcloudKit {
             switch response.result {
             case .failure(let error):
                 let error = NKError(error: error, afResponse: response, responseData: response.data)
-                options.queue.async { completion(account, nil, nil, error) }
+                options.queue.async { completion(account, nil, nil, nil, error) }
             case .success(let jsonData):
                 let json = JSON(jsonData)
                 let statusCode = json["ocs"]["meta"]["statuscode"].int ?? NKError.internalError
                 if 200..<300 ~= statusCode {
                     let e2eMetadata = json["ocs"]["data"]["meta-data"].string
-                    options.queue.async { completion(account, e2eMetadata, jsonData, .success) }
+                    let signature = response.response?.allHeaderFields["X-NC-E2EE-SIGNATURE"] as? String
+                    options.queue.async { completion(account, e2eMetadata, signature, jsonData, .success) }
                 } else {
-                    options.queue.async { completion(account, nil, jsonData, NKError(rootJson: json, fallbackStatusCode: response.response?.statusCode)) }
+                    options.queue.async { completion(account, nil, nil, jsonData, NKError(rootJson: json, fallbackStatusCode: response.response?.statusCode)) }
                 }
             }
         }

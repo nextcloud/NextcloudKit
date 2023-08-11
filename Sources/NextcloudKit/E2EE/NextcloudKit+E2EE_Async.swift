@@ -53,11 +53,11 @@ extension NextcloudKit {
 
     public func getE2EEMetadata(fileId: String,
                                 e2eToken: String?,
-                                options: NKRequestOptions = NKRequestOptions()) async -> (account: String, e2eMetadata: String?, data: Data?, error: NKError) {
+                                options: NKRequestOptions = NKRequestOptions()) async -> (account: String, e2eMetadata: String?, signature: String?, data: Data?, error: NKError) {
 
         await withUnsafeContinuation({ continuation in
-            getE2EEMetadata(fileId: fileId, e2eToken: e2eToken, options: options) { account, e2eMetadata, data, error in
-                continuation.resume(returning: (account: account, e2eMetadata: e2eMetadata, data: data, error: error))
+            getE2EEMetadata(fileId: fileId, e2eToken: e2eToken, options: options) { account, e2eMetadata, signature, data, error in
+                continuation.resume(returning: (account: account, e2eMetadata: e2eMetadata, signature: signature, data: data, error: error))
             }
         })
     }
