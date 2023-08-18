@@ -89,11 +89,6 @@ import MobileCoreServices
         var name: String
     }
 
-    public struct FileChunk {
-        var files: [String]
-        var sizes: [Int64]
-    }
-
     internal lazy var sessionConfiguration: URLSessionConfiguration = {
         let configuration = URLSessionConfiguration.af.default
         configuration.requestCachePolicy = .reloadIgnoringLocalCacheData
@@ -377,29 +372,37 @@ import MobileCoreServices
 
     // MARK: - Chunked File
 
-    @objc public func chunkedFile(inputDirectory: String, outputDirectory: String, fileName: String, chunkSizeMB: Int, bufferSize: Int = 1000000) -> [String] {
+    public func chunkedFile(inputDirectory: String, outputDirectory: String, fileName: String, chunkSize: Int) -> [(fileName: String, size: Int64)] {
 
         let fileManager: FileManager = .default
         var isDirectory: ObjCBool = false
-        let chunkSize = chunkSizeMB * 1000000
-        var outputFilesName: [String] = []
         var reader: FileHandle?
         var writer: FileHandle?
         var chunk: Int = 0
         var counter: Int = 1
+        var incrementalSize: Int64 = 0
+        var filesChunk: [(fileName: String, size: Int64)] = []
+        var chunkSize = chunkSize
+        let bufferSize = 1000000
+
+        // If max chunk count is > 10000 (max count), add + 100 MB to the chunk size to reduce the count. This is an edge case.
+        let numChunk = getFileSize(filePath: inputDirectory + "/" + fileName) / Int64(chunkSize)
+        if numChunk > 10000 {
+            chunkSize = chunkSize + 100000000
+        }
 
         if !fileManager.fileExists(atPath: outputDirectory, isDirectory: &isDirectory) {
             do {
                 try fileManager.createDirectory(atPath: outputDirectory, withIntermediateDirectories: true, attributes: nil)
             } catch {
-                return []
+                return filesChunk
             }
         }
 
         do {
             reader = try .init(forReadingFrom: URL(fileURLWithPath: inputDirectory + "/" + fileName))
         } catch {
-            return []
+            return filesChunk
         }
 
         repeat {
@@ -424,10 +427,10 @@ import MobileCoreServices
                     do {
                         writer = try .init(forWritingTo: URL(fileURLWithPath: outputFileName))
                     } catch {
-                        outputFilesName = []
+                        filesChunk = []
                         return 0
                     }
-                    outputFilesName.append(fileNameChunk)
+                    filesChunk.append((fileName: fileNameChunk, size: 0))
                 }
 
                 if let buffer = buffer {
@@ -435,6 +438,7 @@ import MobileCoreServices
                     chunk = chunk + buffer.count
                     return buffer.count
                 }
+                filesChunk = []
                 return 0
 
             }) == 0 { break }
@@ -443,7 +447,16 @@ import MobileCoreServices
 
         writer?.closeFile()
         reader?.closeFile()
-        return outputFilesName
+
+        counter = 0
+        for fileChunk in filesChunk {
+            let size = getFileSize(filePath: outputDirectory + "/" + fileChunk.fileName)
+            incrementalSize = incrementalSize + size
+            filesChunk[counter].size = incrementalSize
+            counter += 1
+        }
+
+        return filesChunk
     }
 
     // MARK: - Common

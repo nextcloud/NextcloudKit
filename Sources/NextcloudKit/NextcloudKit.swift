@@ -21,7 +21,7 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-import Foundation
+import UIKit
 import Alamofire
 import SwiftyJSON
 
@@ -431,37 +431,57 @@ import SwiftyJSON
         queue.async { requestHandler(request) }
     }
 
+    /// - Parameters:
+    ///     - directory: The local directory where is the file to be split
+    ///     - fileName: The name of the file to be splites
+    ///     - date: If exist the date of file
+    ///     - creationDate: If exist the creation date of file
+    ///     - serverUrl: The serverURL where the file will be deposited once reassembled
+    ///     - chunkFolder: The name of temp folder, usually NSUUID().uuidString
+    ///     - filesChunk: The struct it will contain all file names with the increment size  still to be sent.
+    ///                Example filename: "3","4","5" .... size: 30000000, 40000000, 43000000
+    ///     - chunkSizeInMB: Size in MB of chunk
+
     public func uploadChunk(directory: String,
                             fileName: String,
-                            date: Date,
-                            creationDate: Date,
+                            date: Date?,
+                            creationDate: Date?,
                             serverUrl: String,
-                            chunkFolderServer: String,
-                            filesChunk: NKCommon.FileChunk,
+                            chunkFolder: String,
+                            filesChunk: [(fileName: String, size: Int64)],
                             chunkSize: Int,
-                            start: @escaping () -> Void = { },
+                            addCustomHeaders: [String: String] = [:],
+                            start: @escaping (_ filesChunk: [(fileName: String, size: Int64)]) -> Void = { _ in },
                             requestHandler: @escaping (_ request: UploadRequest) -> Void = { _ in },
                             taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
                             progressHandler: @escaping (_ totalBytesExpected: Int64, _ totalBytes: Int64, _ fractionCompleted: Double) -> Void = { _, _, _ in },
-                            completion: @escaping (_ account: String, _ filesChunk: NKCommon.FileChunk?, _ ocId: String?, _ etag: String?, _ date: NSDate?, _ error: NKError) -> Void) {
+                            uploaded: @escaping (_ fileChunk: (fileName: String, size: Int64)) -> Void = { _ in },
+                            completion: @escaping (_ account: String, _ filesChunk: [(fileName: String, size: Int64)]?, _ file: NKFile?, _ afError: AFError?, _ error: NKError) -> Void) {
 
         let account = self.nkCommonInstance.account
         let userId = self.nkCommonInstance.userId
         let urlBase = self.nkCommonInstance.urlBase
         let dav = self.nkCommonInstance.dav
 
-        let chunkFolderPath = urlBase + "/" + dav + "/uploads/" + userId + "/" + chunkFolderServer
         let fileNameLocalSize = self.nkCommonInstance.getFileSize(filePath: directory + "/" + fileName)
-        let fileNameServerPath = urlBase + "/" + dav + "/files/" + userId + self.nkCommonInstance.returnPathfromServerUrl(serverUrl) + "/" + fileName
-        let destinationHeader: [String: String] = ["Destination" : fileNameServerPath]
+        let serverUrlChunkFolder = urlBase + "/" + dav + "/uploads/" + userId + "/" + chunkFolder
+        let serverUrlFileName = urlBase + "/" + dav + "/files/" + userId + self.nkCommonInstance.returnPathfromServerUrl(serverUrl) + "/" + fileName
+        var customHeader = addCustomHeaders
+        customHeader["Destination"] = serverUrlFileName
+
+        // check space
+        let freeDisk = UIDevice.current.freeDiskSpaceInBytes
+        if freeDisk < fileNameLocalSize * Int64(2.5) {
+            return completion(account, nil, nil, nil, NKError(errorCode: NKError.chunkNoEnoughMemory))
+        }
 
         func createFolder(completion: @escaping (_ errorCode: NKError) -> Void) {
 
-            readFileOrFolder(serverUrlFileName: chunkFolderPath, depth: "0", options: NKRequestOptions(queue: self.nkCommonInstance.backgroundQueue)) { _, _, _, error in
+            readFileOrFolder(serverUrlFileName: serverUrlChunkFolder, depth: "0", options: NKRequestOptions(queue: self.nkCommonInstance.backgroundQueue)) { _, _, _, error in
                 if error == .success {
                     completion(NKError())
-                } else if error.errorCode == NKError.resourceNotFound {
-                    NextcloudKit.shared.createFolder(serverUrlFileName: chunkFolderPath, options: NKRequestOptions(queue: self.nkCommonInstance.backgroundQueue)) { _, _, _, error in
+                } else if error.errorCode == NKError.chunkResourceNotFound {
+                    NextcloudKit.shared.createFolder(serverUrlFileName: serverUrlChunkFolder, options: NKRequestOptions(queue: self.nkCommonInstance.backgroundQueue)) { _, _, _, error in
                         completion(error)
                     }
                 } else {
@@ -473,88 +493,72 @@ import SwiftyJSON
         createFolder() { error in
 
             guard error == .success else {
-                completion(account, nil, nil, nil, nil, NKError(errorCode: NKError.createFolderChunk, errorDescription: ""))
-                return
+                return completion(account, nil, nil, nil, NKError(errorCode: NKError.chunkCreateFolder, errorDescription: error.errorDescription))
             }
 
-            var counter: Int = 0
             var uploadNKError = NKError()
+            var uploadAFError: AFError?
             var filesChunk = filesChunk
-            var incrementalSize: Int64 = 0
 
-            if filesChunk.files.isEmpty {
-                filesChunk.files = self.nkCommonInstance.chunkedFile(inputDirectory: directory, outputDirectory: directory, fileName: fileName, chunkSizeMB: chunkSize)
-                if filesChunk.files.isEmpty {
-                    return completion(account, nil, nil, nil, nil, NKError(errorCode: NKError.chunkFilesNull, errorDescription: ""))
-                }
-                for file in filesChunk.files {
-                    let size = self.nkCommonInstance.getFileSize(filePath: directory + "/" + file)
-                    if size == 0 {
-                        return completion(account, nil, nil, nil, nil, NKError(errorCode: NKError.internalError, errorDescription: ""))
-                    } else {
-                        incrementalSize = incrementalSize + size
-                        filesChunk.sizes[counter] = incrementalSize
-                    }
-                    counter += 1
+            if filesChunk.isEmpty {
+                filesChunk = self.nkCommonInstance.chunkedFile(inputDirectory: directory, outputDirectory: directory, fileName: fileName, chunkSize: chunkSize)
+                if filesChunk.isEmpty {
+                    return completion(account, nil, nil, nil, NKError(errorCode: NKError.chunkFilesNull))
                 }
             }
 
             var filesChunkOutput = filesChunk
-            counter = 0
-            start()
+            start(filesChunkOutput)
 
-            for file in filesChunk.files {
+            for fileChunk in filesChunk {
 
-                let serverUrlFileName = chunkFolderPath + "/" + file
-                let fileNameLocalPath = directory + "/" + file
+                let serverUrlFileName = serverUrlChunkFolder + "/" + fileChunk.fileName
+                let fileNameLocalPath = directory + "/" + fileChunk.fileName
 
                 let fileSize = self.nkCommonInstance.getFileSize(filePath: fileNameLocalPath)
                 if fileSize == 0 {
-                    return completion(account, nil, nil, nil, nil, NKError(errorCode: NKError.chunkFileNull, errorDescription: ""))
+                    return completion(account, nil, nil, .explicitlyCancelled, NKError(errorCode: NKError.chunkFileNull))
                 }
 
                 let semaphore = DispatchSemaphore(value: 0)
-                self.upload(serverUrlFileName: serverUrlFileName, fileNameLocalPath: fileNameLocalPath, addCustomHeaders: destinationHeader, queue: self.nkCommonInstance.backgroundQueue, requestHandler: { request in
+                self.upload(serverUrlFileName: serverUrlFileName, fileNameLocalPath: fileNameLocalPath, addCustomHeaders: customHeader, queue: self.nkCommonInstance.backgroundQueue, requestHandler: { request in
                     requestHandler(request)
                 }, taskHandler: { task in
                     taskHandler(task)
                 }, progressHandler: { progress in
                     let totalBytesExpected = fileNameLocalSize
-                    let totalBytes = filesChunk.sizes[counter] - fileSize
+                    let totalBytes = fileChunk.size
                     let fractionCompleted = Double(totalBytes) / Double(totalBytesExpected)
                     progressHandler(totalBytesExpected, totalBytes, fractionCompleted)
                 }) { _, _, _, _, _, _, afError, error in
+                    if error == .success {
+                        filesChunkOutput.removeFirst()
+                        uploaded(fileChunk)
+                    }
+                    uploadAFError = afError
                     uploadNKError = error
                     semaphore.signal()
                 }
                 semaphore.wait()
 
-                if uploadNKError == .success {
-                    filesChunkOutput.files.remove(at: counter)
-                    filesChunkOutput.sizes.remove(at: counter)
-                } else {
+                if uploadNKError != .success {
                     break
                 }
-
-                counter += 1
             }
 
             guard uploadNKError == .success else {
-                return completion(account, filesChunkOutput, nil, nil, nil, uploadNKError)
+                return completion(account, filesChunkOutput, nil, uploadAFError, NKError(errorCode: NKError.chunkFileUpload, errorDescription: uploadNKError.errorDescription))
             }
 
             // Assemble the chunks
-            let serverUrlFileNameSource = chunkFolderPath + "/.file"
-            var customHeaders: [String: String] = [:]
+            let serverUrlFileNameSource = serverUrlChunkFolder + "/.file"
 
-            if creationDate.timeIntervalSince1970 > 0 {
-                customHeaders["X-OC-CTime"] = "\(creationDate.timeIntervalSince1970)"
+            if let creationDate, creationDate.timeIntervalSince1970 > 0 {
+                customHeader["X-OC-CTime"] = "\(creationDate.timeIntervalSince1970)"
             }
-            if date.timeIntervalSince1970 > 0 {
-                customHeaders["X-OC-MTime"] = "\(date.timeIntervalSince1970)"
+            if let date, date.timeIntervalSince1970 > 0 {
+                customHeader["X-OC-MTime"] = "\(date.timeIntervalSince1970)"
             }
-
-            destinationHeader.forEach { customHeaders[$0] = $1 }
 
             // Calculate Assemble Timeout
             let assembleSizeInGB = Double(fileNameLocalSize) / 1e9
@@ -563,19 +567,19 @@ import SwiftyJSON
             let assembleTimeMax: Double = 30 * 60   // 30 min
             let timeout = max(assembleTimeMin, min(assembleTimePerGB * assembleSizeInGB, assembleTimeMax))
 
-            let options = NKRequestOptions(timeout: timeout, queue: self.nkCommonInstance.backgroundQueue)
-            self.moveFileOrFolder(serverUrlFileNameSource: serverUrlFileNameSource, serverUrlFileNameDestination: fileNameServerPath, overwrite: true, options: options) { _, error in
+            let options = NKRequestOptions(customHeader: customHeader, timeout: timeout, queue: self.nkCommonInstance.backgroundQueue)
+            self.moveFileOrFolder(serverUrlFileNameSource: serverUrlFileNameSource, serverUrlFileNameDestination: serverUrlFileName, overwrite: true, options: options) { _, error in
 
                 guard error == .success else {
-                    return completion(account, filesChunkOutput, nil, nil, nil, NKError(errorCode: NKError.moveFileChunk, errorDescription: ""))
+                    return completion(account, filesChunkOutput, nil, nil, NKError(errorCode: NKError.chunkMoveFile, errorDescription: error.errorDescription))
                 }
 
-                self.readFileOrFolder(serverUrlFileName: fileNameServerPath, depth: "0", options: NKRequestOptions(queue: self.nkCommonInstance.backgroundQueue)) { _, files, _, error in
+                self.readFileOrFolder(serverUrlFileName: serverUrlFileName, depth: "0", options: NKRequestOptions(queue: self.nkCommonInstance.backgroundQueue)) { _, files, _, error in
 
                     guard error == .success, let file = files.first else {
-                        return completion(account, filesChunkOutput, nil, nil, nil, NKError(errorCode: NKError.readFileChunk, errorDescription: ""))
+                        return completion(account, filesChunkOutput, nil, nil, NKError(errorCode: NKError.chunkMoveFile, errorDescription: error.errorDescription))
                     }
-                    return completion(account, filesChunkOutput, file.ocId, file.etag, file.date, error)
+                    return completion(account, filesChunkOutput, file, nil, error)
                 }
             }
         }
