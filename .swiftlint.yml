@@ -10,8 +10,8 @@ empty_count:
   severity: warning
 
 line_length:
-  warning: 400
-  error: 400
+  warning: 500
+  error: 600
 
 function_body_length:
    warning: 200

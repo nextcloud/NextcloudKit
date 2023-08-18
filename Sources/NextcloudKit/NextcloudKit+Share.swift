@@ -312,7 +312,7 @@ extension NextcloudKit {
         if let password {
             parameters["password"] = password
         }
-        if let attributes  {
+        if let attributes {
             parameters["attributes"] = attributes
         }
 
@@ -505,8 +505,6 @@ extension NextcloudKit {
 
         return share
     }
-
-
 }
 
 @objc public class NKShare: NSObject {

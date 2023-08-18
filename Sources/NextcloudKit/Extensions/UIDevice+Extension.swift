@@ -40,12 +40,12 @@ extension UIDevice {
         return formatter.string(fromByteCount: bytes) as String
     }
 
-    //MARK: Get String Value
+    // MARK: Get String Value
     var totalDiskSpaceInGB: String {
        return ByteCountFormatter.string(fromByteCount: totalDiskSpaceInBytes, countStyle: ByteCountFormatter.CountStyle.decimal)
     }
 
-    var freeDiskSpaceInGB:String {
+    var freeDiskSpaceInGB: String {
         return ByteCountFormatter.string(fromByteCount: freeDiskSpaceInBytes, countStyle: ByteCountFormatter.CountStyle.decimal)
     }
 
@@ -65,7 +65,7 @@ extension UIDevice {
         return MBFormatter(usedDiskSpaceInBytes)
     }
 
-    //MARK: Get raw value
+    // MARK: Get raw value
     var totalDiskSpaceInBytes: Int64 {
         guard let systemAttributes = try? FileManager.default.attributesOfFileSystem(forPath: NSHomeDirectory() as String),
               let space = (systemAttributes[FileAttributeKey.systemSize] as? NSNumber)?.int64Value else { return 0 }

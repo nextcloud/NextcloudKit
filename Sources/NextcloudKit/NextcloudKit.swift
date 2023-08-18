@@ -490,7 +490,7 @@ import SwiftyJSON
             }
         }
 
-        createFolder() { error in
+        createFolder { error in
 
             guard error == .success else {
                 return completion(account, nil, nil, nil, NKError(errorCode: NKError.chunkCreateFolder, errorDescription: error.errorDescription))
@@ -525,7 +525,7 @@ import SwiftyJSON
                     requestHandler(request)
                 }, taskHandler: { task in
                     taskHandler(task)
-                }, progressHandler: { progress in
+                }, progressHandler: { _ in
                     let totalBytesExpected = fileNameLocalSize
                     let totalBytes = fileChunk.size
                     let fractionCompleted = Double(totalBytes) / Double(totalBytesExpected)
