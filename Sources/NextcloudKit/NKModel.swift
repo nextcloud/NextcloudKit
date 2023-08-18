@@ -159,8 +159,8 @@ import SwiftyJSON
     @objc public var userId = ""
     @objc public var latitude: Double = 0
     @objc public var longitude: Double = 0
-    @objc public var height: Int64 = 0
-    @objc public var width: Int64 = 0
+    @objc public var height: Int = 0
+    @objc public var width: Int = 0
 }
 
 @objcMembers public class NKFileProperty: NSObject {
@@ -862,7 +862,7 @@ class NKDataFileXML: NSObject {
 
             if let resolution = propstat["d:prop", "nc:file-metadata-size"].text,
                let data = resolution.data(using: .utf8),
-               let jsonDict = try? JSONSerialization.jsonObject(with: data) as? [String: Int64],
+               let jsonDict = try? JSONSerialization.jsonObject(with: data) as? [String: Int],
                let height = jsonDict["height"],
                let width = jsonDict["width"] {
                 file.height = height
