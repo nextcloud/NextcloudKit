@@ -56,6 +56,7 @@ jobs:
         set -o pipefail && xcodebuild test -scheme "$SCHEME" \
         -destination "$DESTINATION_IOS" \
         -destination "$DESTINATION_MACOS" \
+        -disable-concurrent-destination-testing
         -enableCodeCoverage YES \
         -test-iterations 3 \
         -retry-tests-on-failure \
