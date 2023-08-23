@@ -21,7 +21,12 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 
+#if os(macOS)
+import Foundation
+#else
 import UIKit
+#endif
+
 import Alamofire
 import SwiftyJSON
 
@@ -470,7 +475,18 @@ import SwiftyJSON
         customHeader["Destination"] = serverUrlFileName
 
         // check space
+        #if os(macOS)
+        var fsAttributes: [FileAttributeKey : Any]
+        do {
+            fsAttributes = try FileManager.default.attributesOfFileSystem(forPath: "/")
+        } catch {
+            return completion(account, nil, nil, nil, NKError(errorCode: NKError.chunkNoEnoughMemory))
+        }
+        let freeDisk = (fsAttributes[FileAttributeKey.systemFreeSize] ?? 0) as! Int64
+        #else
         let freeDisk = UIDevice.current.freeDiskSpaceInBytes
+        #endif
+
         if freeDisk < fileNameLocalSize * Int64(2.5) {
             return completion(account, nil, nil, nil, NKError(errorCode: NKError.chunkNoEnoughMemory))
         }
