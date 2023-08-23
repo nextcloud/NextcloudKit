@@ -20,6 +20,7 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 
+#if !os(macOS)
 import UIKit
 
 extension UIDevice {
@@ -90,3 +91,4 @@ extension UIDevice {
        return totalDiskSpaceInBytes - freeDiskSpaceInBytes
     }
 }
+#endif
