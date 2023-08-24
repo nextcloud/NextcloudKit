@@ -878,7 +878,6 @@ class NKDataFileXML: NSObject {
             file.urlBase = urlBase
             file.user = user
             file.userId = userId
-            
 
             files.append(file)
         }
