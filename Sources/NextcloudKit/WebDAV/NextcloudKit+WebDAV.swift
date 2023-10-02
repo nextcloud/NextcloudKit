@@ -206,11 +206,14 @@ extension NextcloudKit {
         var files: [NKFile] = []
         var serverUrlFileName = serverUrlFileName
 
-        if depth == "1" && serverUrlFileName.last != "/" { serverUrlFileName = serverUrlFileName + "/" }
-        if depth == "0" && serverUrlFileName.last == "/" { serverUrlFileName = String(serverUrlFileName.remove(at: serverUrlFileName.index(before: serverUrlFileName.endIndex))) }
-
         guard let url = serverUrlFileName.encodedToUrl else {
             return options.queue.async { completion(account, files, nil, .urlError) }
+        }
+
+        if depth == "0", serverUrlFileName.last == "/" {
+            serverUrlFileName = String(serverUrlFileName.dropLast())
+        } else if (depth == "1" || depth == "2"), serverUrlFileName.last != "/" {
+            serverUrlFileName = serverUrlFileName + "/"
         }
 
         let method = HTTPMethod(rawValue: "PROPFIND")
