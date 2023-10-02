@@ -212,7 +212,7 @@ extension NextcloudKit {
 
         if depth == "0", serverUrlFileName.last == "/" {
             serverUrlFileName = String(serverUrlFileName.dropLast())
-        } else if serverUrlFileName.last != "/" {
+        } else if depth != "0", serverUrlFileName.last != "/" {
             serverUrlFileName = serverUrlFileName + "/"
         }
 
