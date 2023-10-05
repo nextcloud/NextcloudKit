@@ -33,6 +33,7 @@ extension NextcloudKit {
 
         await withUnsafeContinuation({ continuation in
             markE2EEFolder(fileId: fileId, delete: delete, route: route, options: options) { account, error in
+
                 continuation.resume(returning: (account: account, error: error))
             }
         })

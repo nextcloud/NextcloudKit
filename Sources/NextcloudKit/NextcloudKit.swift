@@ -26,7 +26,6 @@ import Foundation
 #else
 import UIKit
 #endif
-
 import Alamofire
 import SwiftyJSON
 
