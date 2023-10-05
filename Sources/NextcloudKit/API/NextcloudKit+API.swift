@@ -533,11 +533,11 @@ extension NextcloudKit {
 
         let parameters: [String: Any] = ["token": token]
 
+        let headers = self.nkCommonInstance.getStandardHeaders(options.customHeader, customUserAgent: options.customUserAgent, contentType: "application/json")
+
         guard let url = self.nkCommonInstance.createStandardUrl(serverUrl: serverUrl, endpoint: endpoint) else {
             return options.queue.async { completion(account, false, nil, .urlError) }
         }
-
-        let headers = self.nkCommonInstance.getStandardHeaders(options: options)
 
         sessionManager.request(url, method: .post, parameters: parameters, encoding: URLEncoding.default, headers: headers).validate(statusCode: 200..<300).responseData(queue: self.nkCommonInstance.backgroundQueue) { response in
             debugPrint(response)
@@ -565,7 +565,7 @@ extension NextcloudKit {
 
         let parameters: [String: Any] = ["token": token]
 
-        let headers = self.nkCommonInstance.getStandardHeaders(options: options)
+        let headers = self.nkCommonInstance.getStandardHeaders(options.customHeader, customUserAgent: options.customUserAgent, contentType: "application/json")
 
         guard let url = self.nkCommonInstance.createStandardUrl(serverUrl: serverUrl, endpoint: endpoint) else {
             return options.queue.async { completion(account, .urlError) }

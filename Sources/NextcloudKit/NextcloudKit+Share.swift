@@ -260,18 +260,20 @@ extension NextcloudKit {
                                   shareType: Int,
                                   shareWith: String,
                                   password: String? = nil,
+                                  note: String? = nil,
                                   permissions: Int = 1,
                                   options: NKRequestOptions = NKRequestOptions(),
                                   attributes: String? = nil,
                                   completion: @escaping (_ account: String, _ share: NKShare?, _ data: Data?, _ error: NKError) -> Void) {
 
-        createShare(path: path, shareType: shareType, shareWith: shareWith, publicUpload: false, hideDownload: false, password: password, permissions: permissions, attributes: attributes, options: options, completion: completion)
+        createShare(path: path, shareType: shareType, shareWith: shareWith, publicUpload: false, note: note, hideDownload: false, password: password, permissions: permissions, attributes: attributes, options: options, completion: completion)
     }
 
     private func createShare(path: String,
                              shareType: Int,
                              shareWith: String?,
                              publicUpload: Bool? = nil,
+                             note: String? = nil,
                              hideDownload: Bool? = nil,
                              password: String? = nil,
                              permissions: Int = 1,
@@ -295,19 +297,22 @@ extension NextcloudKit {
             "shareType": String(shareType),
             "permissions": String(permissions)
         ]
-        if let shareWith = shareWith {
+        if let shareWith {
             parameters["shareWith"] = shareWith
         }
-        if let publicUpload = publicUpload {
+        if let publicUpload {
             parameters["publicUpload"] = publicUpload ? "true" : "false"
         }
-        if let hideDownload = hideDownload {
+        if let note {
+            parameters["note"] = note
+        }
+        if let hideDownload {
             parameters["hideDownload"] = hideDownload ? "true" : "false"
         }
-        if let password = password {
+        if let password {
             parameters["password"] = password
         }
-        if let attributes = attributes {
+        if let attributes {
             parameters["attributes"] = attributes
         }
 

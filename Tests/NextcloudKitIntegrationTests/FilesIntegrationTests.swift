@@ -25,8 +25,7 @@ import XCTest
 final class FilesIntegrationTests: BaseIntegrationXCTestCase {
     func test_createReadDeleteFolder_withProperParams_shouldCreateReadDeleteFolder() throws {
         let expectation = expectation(description: "Should finish last callback")
-
-        let folderName = "TestFolder10"
+        let folderName = "TestFolder\(randomInt)"
         let serverUrl = "\(baseUrl)/remote.php/dav/files/\(userId)"
         let serverUrlFileName = "\(serverUrl)/\(folderName)"
 
