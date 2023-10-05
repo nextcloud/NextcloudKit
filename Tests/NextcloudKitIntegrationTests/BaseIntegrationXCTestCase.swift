@@ -29,7 +29,6 @@ class BaseIntegrationXCTestCase: XCTestCase {
     internal let userId = EnvVars.testUser
     internal let password = EnvVars.testAppPassword
     internal lazy var account = "\(userId) \(baseUrl)"
-
     internal var randomInt: Int {
         get {
             return Int.random(in: 1000...Int.max)
