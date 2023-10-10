@@ -64,7 +64,9 @@ extension NextcloudKit {
         let headers = self.nkCommonInstance.getStandardHeaders(options: options)
 
         let requestUnifiedSearch = sessionManager.request(url, method: .get, parameters: nil, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).responseData(queue: self.nkCommonInstance.backgroundQueue) { response in
-            debugPrint(response)
+            if self.nkCommonInstance.levelLog > 0 {
+                debugPrint(response)
+            }
 
             switch response.result {
             case .success(let jsonData):
@@ -161,7 +163,9 @@ extension NextcloudKit {
         }
 
         let requestSearchProvider = sessionManager.request(urlRequest).validate(statusCode: 200..<300).responseData(queue: self.nkCommonInstance.backgroundQueue) { response in
-            debugPrint(response)
+            if self.nkCommonInstance.levelLog > 0 {
+                debugPrint(response)
+            }
             switch response.result {
             case .success(let jsonData):
                 let json = JSON(jsonData)

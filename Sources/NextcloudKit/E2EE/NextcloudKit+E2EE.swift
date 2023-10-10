@@ -47,7 +47,9 @@ extension NextcloudKit {
         let headers = self.nkCommonInstance.getStandardHeaders(options: options)
 
         sessionManager.request(url, method: method, parameters: nil, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).responseData(queue: self.nkCommonInstance.backgroundQueue) { response in
-            debugPrint(response)
+            if self.nkCommonInstance.levelLog > 0 {
+                debugPrint(response)
+            }
 
             switch response.result {
             case .failure(let error):
@@ -96,7 +98,9 @@ extension NextcloudKit {
         }
 
         sessionManager.request(url, method: method, parameters: parameters, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).responseData(queue: self.nkCommonInstance.backgroundQueue) { response in
-            debugPrint(response)
+            if self.nkCommonInstance.levelLog > 0 {
+                debugPrint(response)
+            }
 
             switch response.result {
             case .failure(let error):
@@ -138,7 +142,9 @@ extension NextcloudKit {
         }
 
         sessionManager.request(url, method: .get, parameters: parameters, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).responseData(queue: self.nkCommonInstance.backgroundQueue) { response in
-            debugPrint(response)
+            if self.nkCommonInstance.levelLog > 0 {
+                debugPrint(response)
+            }
 
             switch response.result {
             case .failure(let error):
@@ -192,7 +198,9 @@ extension NextcloudKit {
         }
 
         sessionManager.request(url, method: method, parameters: parameters, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).responseData(queue: self.nkCommonInstance.backgroundQueue) { response in
-            debugPrint(response)
+            if self.nkCommonInstance.levelLog > 0 {
+                debugPrint(response)
+            }
 
             switch response.result {
             case .failure(let error):
@@ -239,7 +247,9 @@ extension NextcloudKit {
         let headers = self.nkCommonInstance.getStandardHeaders(options: options)
 
         sessionManager.request(url, method: .get, parameters: nil, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).responseData(queue: self.nkCommonInstance.backgroundQueue) { response in
-            debugPrint(response)
+            if self.nkCommonInstance.levelLog > 0 {
+                debugPrint(response)
+            }
 
             switch response.result {
             case .failure(let error):
@@ -278,7 +288,9 @@ extension NextcloudKit {
         let headers = self.nkCommonInstance.getStandardHeaders(options: options)
 
         sessionManager.request(url, method: .get, parameters: nil, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).responseData(queue: self.nkCommonInstance.backgroundQueue) { response in
-            debugPrint(response)
+            if self.nkCommonInstance.levelLog > 0 {
+                debugPrint(response)
+            }
 
             switch response.result {
             case .failure(let error):
@@ -312,7 +324,9 @@ extension NextcloudKit {
         let headers = self.nkCommonInstance.getStandardHeaders(options: options)
 
         sessionManager.request(url, method: .get, parameters: nil, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).responseData(queue: self.nkCommonInstance.backgroundQueue) { response in
-            debugPrint(response)
+            if self.nkCommonInstance.levelLog > 0 {
+                debugPrint(response)
+            }
 
             switch response.result {
             case .failure(let error):
@@ -349,7 +363,9 @@ extension NextcloudKit {
         let parameters = ["csr": certificate]
 
         sessionManager.request(url, method: .post, parameters: parameters, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).responseData(queue: self.nkCommonInstance.backgroundQueue) { response in
-            debugPrint(response)
+            if self.nkCommonInstance.levelLog > 0 {
+                debugPrint(response)
+            }
 
             switch response.result {
             case .failure(let error):
@@ -387,7 +403,9 @@ extension NextcloudKit {
         let parameters = ["privateKey": privateKey]
 
         sessionManager.request(url, method: .post, parameters: parameters, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).responseData(queue: self.nkCommonInstance.backgroundQueue) { response in
-            debugPrint(response)
+            if self.nkCommonInstance.levelLog > 0 {
+                debugPrint(response)
+            }
 
             switch response.result {
             case .failure(let error):
@@ -421,7 +439,9 @@ extension NextcloudKit {
         let headers = self.nkCommonInstance.getStandardHeaders(options: options)
 
         sessionManager.request(url, method: .delete, parameters: nil, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).response(queue: self.nkCommonInstance.backgroundQueue) { response in
-            debugPrint(response)
+            if self.nkCommonInstance.levelLog > 0 {
+                debugPrint(response)
+            }
 
             switch response.result {
             case .failure(let error):
@@ -448,7 +468,9 @@ extension NextcloudKit {
         let headers = self.nkCommonInstance.getStandardHeaders(options: options)
 
         sessionManager.request(url, method: .delete, parameters: nil, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).response(queue: self.nkCommonInstance.backgroundQueue) { response in
-            debugPrint(response)
+            if self.nkCommonInstance.levelLog > 0 {
+                debugPrint(response)
+            }
 
             switch response.result {
             case .failure(let error):
