@@ -56,7 +56,9 @@ extension NextcloudKit {
         }
 
         sessionManager.request(urlRequest).validate(statusCode: 200..<300).response(queue: self.nkCommonInstance.backgroundQueue) { response in
-            debugPrint(response)
+            if self.nkCommonInstance.levelLog > 0 {
+                debugPrint(response)
+            }
 
             switch response.result {
             case .failure(let error):
@@ -92,7 +94,9 @@ extension NextcloudKit {
         }
 
         sessionManager.request(url, method: .post, parameters: nil, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).responseData(queue: self.nkCommonInstance.backgroundQueue) { response in
-            debugPrint(response)
+            if self.nkCommonInstance.levelLog > 0 {
+                debugPrint(response)
+            }
 
             switch response.result {
             case .failure(let error):
@@ -128,7 +132,9 @@ extension NextcloudKit {
         }
 
         sessionManager.request(url, method: .post, parameters: nil, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).responseData(queue: self.nkCommonInstance.backgroundQueue) { response in
-            debugPrint(response)
+            if self.nkCommonInstance.levelLog > 0 {
+                debugPrint(response)
+            }
 
             switch response.result {
             case .failure(let error):
