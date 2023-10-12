@@ -873,14 +873,14 @@ extension NextcloudKit {
 
     // {"problems":{"conflict":{"count":3,"oldest":1695592800},"failed-upload":{"count":1,"oldest":1695592900}}}
 
-    public func sendClientDiagnosticRemoteOperation(problems: String,
-                                                    options: NKRequestOptions = NKRequestOptions(),
-                                                    completion: @escaping (_ account: String, _ error: NKError) -> Void) {
+    public func sendClientDiagnosticsRemoteOperation(problems: String,
+                                                     options: NKRequestOptions = NKRequestOptions(),
+                                                     completion: @escaping (_ account: String, _ error: NKError) -> Void) {
 
         let account = self.nkCommonInstance.account
         let urlBase = self.nkCommonInstance.urlBase
 
-        let endpoint = "ocs/v2.php/apps/settings/diagnostic"
+        let endpoint = "ocs/v2.php/apps/settings/diagnostics"
 
         guard let url = self.nkCommonInstance.createStandardUrl(serverUrl: urlBase, endpoint: endpoint) else {
             return options.queue.async { completion(account, .urlError) }
