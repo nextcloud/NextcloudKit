@@ -871,9 +871,7 @@ extension NextcloudKit {
 
     // MARK: -
 
-    // {"problems":{"conflict":{"count":3,"oldest":1695592800},"failed-upload":{"count":1,"oldest":1695592900}}}
-
-    public func sendClientDiagnosticsRemoteOperation(problems: String,
+    public func sendClientDiagnosticsRemoteOperation(problems: Data,
                                                      options: NKRequestOptions = NKRequestOptions(),
                                                      completion: @escaping (_ account: String, _ error: NKError) -> Void) {
 
@@ -891,7 +889,7 @@ extension NextcloudKit {
         var urlRequest: URLRequest
         do {
             try urlRequest = URLRequest(url: url, method: .put, headers: headers)
-            urlRequest.httpBody = problems.data(using: .utf8)
+            urlRequest.httpBody = problems
         } catch {
             return options.queue.async { completion(account, NKError(error: error)) }
         }
