@@ -868,4 +868,44 @@ extension NextcloudKit {
             }
         }
     }
+
+    // MARK: -
+
+    public func sendClientDiagnosticsRemoteOperation(problems: Data,
+                                                     options: NKRequestOptions = NKRequestOptions(),
+                                                     completion: @escaping (_ account: String, _ error: NKError) -> Void) {
+
+        let account = self.nkCommonInstance.account
+        let urlBase = self.nkCommonInstance.urlBase
+
+        let endpoint = "ocs/v2.php/apps/settings/diagnostics"
+
+        guard let url = self.nkCommonInstance.createStandardUrl(serverUrl: urlBase, endpoint: endpoint) else {
+            return options.queue.async { completion(account, .urlError) }
+        }
+
+        let headers = self.nkCommonInstance.getStandardHeaders(options.customHeader, customUserAgent: options.customUserAgent, contentType: "application/json")
+
+        var urlRequest: URLRequest
+        do {
+            try urlRequest = URLRequest(url: url, method: .put, headers: headers)
+            urlRequest.httpBody = problems
+        } catch {
+            return options.queue.async { completion(account, NKError(error: error)) }
+        }
+
+        sessionManager.request(urlRequest).validate(statusCode: 200..<300).response(queue: self.nkCommonInstance.backgroundQueue) { response in
+            if self.nkCommonInstance.levelLog > 0 {
+                debugPrint(response)
+            }
+
+            switch response.result {
+            case .failure(let error):
+                let error = NKError(error: error, afResponse: response, responseData: response.data)
+                options.queue.async { completion(account, error) }
+            case .success:
+                options.queue.async { completion(account, .success) }
+            }
+        }
+    }
 }
