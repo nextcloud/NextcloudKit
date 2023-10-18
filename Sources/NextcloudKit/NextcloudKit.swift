@@ -486,7 +486,7 @@ import SwiftyJSON
         let freeDisk = UIDevice.current.freeDiskSpaceInBytes
         #endif
 
-        if freeDisk < fileNameLocalSize * Int64(2.5) {
+        if freeDisk < fileNameLocalSize * Int64(3) {
             return completion(account, nil, nil, nil, NKError(errorCode: NKError.chunkNoEnoughMemory))
         }
 

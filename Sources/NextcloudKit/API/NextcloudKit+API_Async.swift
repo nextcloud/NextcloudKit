@@ -77,4 +77,14 @@ extension NextcloudKit {
             }
         })
     }
+
+    public func sendClientDiagnosticsRemoteOperation(problems: Data, 
+                                                     options: NKRequestOptions = NKRequestOptions()) async -> (account: String, error: NKError) {
+
+        await withUnsafeContinuation({ continuation in
+            sendClientDiagnosticsRemoteOperation(problems: problems, options: options) { account, error in
+                continuation.resume(returning: (account: account, error: error))
+            }
+        })
+    }
 }
