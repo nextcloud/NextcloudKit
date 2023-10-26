@@ -49,7 +49,9 @@ extension NextcloudKit {
         let headers = self.nkCommonInstance.getStandardHeaders(options: options)
 
         let dashboardRequest = sessionManager.request(url, method: .get, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).responseData(queue: self.nkCommonInstance.backgroundQueue) { response in
-            debugPrint(response)
+            if self.nkCommonInstance.levelLog > 0 {
+                debugPrint(response)
+            }
 
             switch response.result {
             case .success(let jsonData):
@@ -93,7 +95,9 @@ extension NextcloudKit {
         let headers = self.nkCommonInstance.getStandardHeaders(options: options)
 
         let dashboardRequest = sessionManager.request(url, method: .get, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).responseData(queue: self.nkCommonInstance.backgroundQueue) { response in
-            debugPrint(response)
+            if self.nkCommonInstance.levelLog > 0 {
+                debugPrint(response)
+            }
 
             switch response.result {
             case .success(let jsonData):
