@@ -65,3 +65,17 @@ This is generated from the .env-vars file in the root directory. If there is an 
 Note that you always have to run `./generate-env-vars.sh` if you change the values inside `.env-vars`.
 
 6. You can now run the integration tests. They will use the env vars to connect to the test server to do the testing. 
+
+## Contribution Guidelines & License
+
+[GPLv3](LICENSE.txt) with [Apple app store exception](COPYING.iOS).
+
+Nextcloud doesn't require a CLA (Contributor License Agreement). The copyright belongs to all the individual contributors. Therefore we recommend that every contributor adds following line to the header of a file, if they changed it substantially:
+
+```
+@copyright Copyright (c) <year>, <your name> (<your email address>)
+```
+
+Please read the [Code of Conduct](https://nextcloud.com/code-of-conduct/). This document offers some guidance to ensure Nextcloud participants can cooperate effectively in a positive and inspiring atmosphere, and to explain how together we can strengthen and support each other.
+
+More information how to contribute: [https://nextcloud.com/contribute/](https://nextcloud.com/contribute/)
