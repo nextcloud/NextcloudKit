@@ -226,7 +226,7 @@ extension NextcloudKit {
 
         let method = HTTPMethod(rawValue: "PROPFIND")
 
-        var headers = self.nkCommonInstance.getStandardHeaders(options: options)
+        var headers = self.nkCommonInstance.getStandardHeaders(options.customHeader, customUserAgent: options.customUserAgent, contentType: "text/xml")
         headers.update(name: "Depth", value: depth)
 
         var urlRequest: URLRequest
@@ -441,7 +441,7 @@ extension NextcloudKit {
 
         let method = HTTPMethod(rawValue: "PROPPATCH")
 
-        let headers = self.nkCommonInstance.getStandardHeaders(options: options)
+        let headers = self.nkCommonInstance.getStandardHeaders(options.customHeader, customUserAgent: options.customUserAgent, contentType: "text/xml")
 
         var urlRequest: URLRequest
         do {
@@ -487,7 +487,7 @@ extension NextcloudKit {
 
         let method = HTTPMethod(rawValue: "REPORT")
 
-        let headers = self.nkCommonInstance.getStandardHeaders(options: options)
+        let headers = self.nkCommonInstance.getStandardHeaders(options.customHeader, customUserAgent: options.customUserAgent, contentType: "text/xml")
 
         var urlRequest: URLRequest
         do {
@@ -535,7 +535,7 @@ extension NextcloudKit {
 
         let method = HTTPMethod(rawValue: "PROPFIND")
 
-        var headers = self.nkCommonInstance.getStandardHeaders(options: options)
+        var headers = self.nkCommonInstance.getStandardHeaders(options.customHeader, customUserAgent: options.customUserAgent, contentType: "text/xml")
         headers.update(name: "Depth", value: "1")
 
         var urlRequest: URLRequest
