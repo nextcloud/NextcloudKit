@@ -580,7 +580,7 @@ import MobileCoreServices
         return serverUrl.replacingOccurrences(of: home, with: "")
     }
 
-    public func getSessionErrorFromAFError(_ afError: AFError?) -> Error? {
+    public func getSessionErrorFromAFError(_ afError: AFError?) -> NSError? {
 
         if let afError = afError?.asAFError {
             switch afError {
