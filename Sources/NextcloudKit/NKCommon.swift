@@ -580,6 +580,18 @@ import MobileCoreServices
         return serverUrl.replacingOccurrences(of: home, with: "")
     }
 
+    public func getSessionErrorFromAFError(_ afError: AFError?) -> Error? {
+
+        if let afError = afError?.asAFError {
+            switch afError {
+            case .sessionTaskFailed(let sessionError):
+                return sessionError as NSError
+            default: break
+            }
+        }
+        return nil
+    }
+
     // MARK: - Log
 
     @objc public func clearFileLog() {
