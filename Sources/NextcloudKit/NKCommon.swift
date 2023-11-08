@@ -390,6 +390,11 @@ import MobileCoreServices
         var filesChunk: [(fileName: String, size: Int64)] = []
         var chunkSize = chunkSize
         let bufferSize = 1000000
+        var stop: Bool = false
+
+        NotificationCenter.default.addObserver(forName: NSNotification.Name(rawValue: "NextcloudKit.chunkedFile.stop"), object: nil, queue: nil) { _ in
+            stop = true
+        }
 
         // If max chunk count is > 10000 (max count), add + 100 MB to the chunk size to reduce the count. This is an edge case.
         var num: Int = Int(getFileSize(filePath: inputDirectory + "/" + fileName) / Int64(chunkSize))
