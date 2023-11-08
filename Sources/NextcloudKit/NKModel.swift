@@ -124,7 +124,11 @@ import SwiftyJSON
     @objc public var fileId = ""
     @objc public var fileName = ""
     @objc public var hasPreview: Bool = false
+    @objc public var height: Int = 0
     @objc public var iconName = ""
+    @objc public var latitude: Double = 0
+    @objc public var livePhotoFile = ""
+    @objc public var longitude: Double = 0
     @objc public var mountType = ""
     @objc public var name = ""
     @objc public var note = ""
@@ -157,9 +161,6 @@ import SwiftyJSON
     @objc public var urlBase = ""
     @objc public var user = ""
     @objc public var userId = ""
-    @objc public var latitude: Double = 0
-    @objc public var longitude: Double = 0
-    @objc public var height: Int = 0
     @objc public var width: Int = 0
 }
 
@@ -359,6 +360,7 @@ class NKDataFileXML: NSObject {
     <system-tags xmlns=\"http://nextcloud.org/ns\"/>
     <file-metadata-size xmlns=\"http://nextcloud.org/ns\"/>
     <file-metadata-gps xmlns=\"http://nextcloud.org/ns\"/>
+    <metadata-files-live-photo xmlns=\"http://nextcloud.org/ns\"/>
 
     <share-permissions xmlns=\"http://open-collaboration-services.org/ns\"/>
     <share-permissions xmlns=\"http://open-cloud-mesh.org/ns\"/>
@@ -867,6 +869,10 @@ class NKDataFileXML: NSObject {
                let width = jsonDict["width"] {
                 file.height = height
                 file.width = width
+            }
+
+            if let livePhotoFile = propstat["d:prop", "nc:metadata-files-live-photo"].text {
+                file.livePhotoFile = livePhotoFile
             }
 
             let results = self.nkCommonInstance.getInternalType(fileName: file.fileName, mimeType: file.contentType, directory: file.directory)
