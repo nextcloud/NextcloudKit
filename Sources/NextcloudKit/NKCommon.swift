@@ -373,7 +373,7 @@ import MobileCoreServices
     // MARK: - Chunked File
 
     public func chunkedFile(inputDirectory: String, outputDirectory: String, fileName: String, chunkSize: Int, filesChunk: [(fileName: String, size: Int64)],
-                            numChunks: @escaping (_ num: Int64) -> Void = { _ in },
+                            numChunks: @escaping (_ num: Int) -> Void = { _ in },
                             counterChunk: @escaping (_ counter: Int) -> Void = { _ in },
                             completion: @escaping (_ filesChunk: [(fileName: String, size: Int64)]) -> Void = { _ in }) {
 
@@ -392,11 +392,11 @@ import MobileCoreServices
         let bufferSize = 1000000
 
         // If max chunk count is > 10000 (max count), add + 100 MB to the chunk size to reduce the count. This is an edge case.
-        var num = getFileSize(filePath: inputDirectory + "/" + fileName) / Int64(chunkSize)
+        var num: Int = Int(getFileSize(filePath: inputDirectory + "/" + fileName) / Int64(chunkSize))
         if num > 10000 {
             chunkSize = chunkSize + 100000000
         }
-        num = getFileSize(filePath: inputDirectory + "/" + fileName) / Int64(chunkSize)
+        num = Int(getFileSize(filePath: inputDirectory + "/" + fileName) / Int64(chunkSize))
         numChunks(num)
 
         if !fileManager.fileExists(atPath: outputDirectory, isDirectory: &isDirectory) {

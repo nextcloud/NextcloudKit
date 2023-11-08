@@ -447,7 +447,7 @@ import SwiftyJSON
                             filesChunk: [(fileName: String, size: Int64)],
                             chunkSize: Int,
                             options: NKRequestOptions = NKRequestOptions(),
-                            numChunks: @escaping (_ num: Int64) -> Void = { _ in },
+                            numChunks: @escaping (_ num: Int) -> Void = { _ in },
                             counterChunk: @escaping (_ counter: Int) -> Void = { _ in },
                             start: @escaping (_ filesChunk: [(fileName: String, size: Int64)]) -> Void = { _ in },
                             requestHandler: @escaping (_ request: UploadRequest) -> Void = { _ in },
