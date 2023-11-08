@@ -479,18 +479,14 @@ import SwiftyJSON
         }
         let freeDisk = (fsAttributes[FileAttributeKey.systemFreeSize] ?? 0) as? Int64
         #else
-        let freeDisk = UIDevice.current.freeDiskSpaceInBytes
+        var freeDisk: Int64 = 0
         let fileURL = URL(fileURLWithPath: directory as String)
         do {
             let values = try fileURL.resourceValues(forKeys: [.volumeAvailableCapacityForImportantUsageKey])
             if let capacity = values.volumeAvailableCapacityForImportantUsage {
-                print("Available capacity for important usage: \(capacity)")
-            } else {
-                print("Capacity is unavailable")
+                freeDisk = capacity
             }
-        } catch {
-            print("Error retrieving capacity: \(error.localizedDescription)")
-        }
+        } catch { }
         #endif
 
         if freeDisk < fileNameLocalSize * Int64(3) {
