@@ -489,7 +489,7 @@ import SwiftyJSON
         } catch { }
         #endif
 
-        if freeDisk < fileNameLocalSize * 4 {
+        if freeDisk < fileNameLocalSize * 3 {
             return completion(account, nil, nil, nil, NKError(errorCode: NKError.chunkNoEnoughMemory))
         }
 
