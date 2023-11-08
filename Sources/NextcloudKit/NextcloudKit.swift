@@ -447,6 +447,8 @@ import SwiftyJSON
                             filesChunk: [(fileName: String, size: Int64)],
                             chunkSize: Int,
                             options: NKRequestOptions = NKRequestOptions(),
+                            numChunks: @escaping (_ num: Int64) -> Void = { _ in },
+                            counterChunk: @escaping (_ counter: Int) -> Void = { _ in },
                             start: @escaping (_ filesChunk: [(fileName: String, size: Int64)]) -> Void = { _ in },
                             requestHandler: @escaping (_ request: UploadRequest) -> Void = { _ in },
                             taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
@@ -507,87 +509,89 @@ import SwiftyJSON
 
             var uploadNKError = NKError()
             var uploadAFError: AFError?
-            var filesChunk = filesChunk
 
-            if filesChunk.isEmpty {
-                filesChunk = self.nkCommonInstance.chunkedFile(inputDirectory: directory, outputDirectory: directory, fileName: fileName, chunkSize: chunkSize)
+            self.nkCommonInstance.chunkedFile(inputDirectory: directory, outputDirectory: directory, fileName: fileName, chunkSize: chunkSize, filesChunk: filesChunk) { num in
+                numChunks(num)
+            } counterChunk: { counter in
+                counterChunk(counter)
+            } completion: { filesChunk in
                 if filesChunk.isEmpty {
                     return completion(account, nil, nil, nil, NKError(errorCode: NKError.chunkFilesNull))
                 }
-            }
 
-            var filesChunkOutput = filesChunk
-            start(filesChunkOutput)
+                var filesChunkOutput = filesChunk
+                start(filesChunkOutput)
 
-            for fileChunk in filesChunk {
+                for fileChunk in filesChunk {
 
-                let serverUrlFileName = serverUrlChunkFolder + "/" + fileChunk.fileName
-                let fileNameLocalPath = directory + "/" + fileChunk.fileName
+                    let serverUrlFileName = serverUrlChunkFolder + "/" + fileChunk.fileName
+                    let fileNameLocalPath = directory + "/" + fileChunk.fileName
 
-                let fileSize = self.nkCommonInstance.getFileSize(filePath: fileNameLocalPath)
-                if fileSize == 0 {
-                    return completion(account, nil, nil, .explicitlyCancelled, NKError(errorCode: NKError.chunkFileNull))
-                }
-
-                let semaphore = DispatchSemaphore(value: 0)
-                self.upload(serverUrlFileName: serverUrlFileName, fileNameLocalPath: fileNameLocalPath, options: options, requestHandler: { request in
-                    requestHandler(request)
-                }, taskHandler: { task in
-                    taskHandler(task)
-                }, progressHandler: { _ in
-                    let totalBytesExpected = fileNameLocalSize
-                    let totalBytes = fileChunk.size
-                    let fractionCompleted = Double(totalBytes) / Double(totalBytesExpected)
-                    progressHandler(totalBytesExpected, totalBytes, fractionCompleted)
-                }) { _, _, _, _, _, _, afError, error in
-                    if error == .success {
-                        filesChunkOutput.removeFirst()
-                        uploaded(fileChunk)
+                    let fileSize = self.nkCommonInstance.getFileSize(filePath: fileNameLocalPath)
+                    if fileSize == 0 {
+                        return completion(account, nil, nil, .explicitlyCancelled, NKError(errorCode: NKError.chunkFileNull))
                     }
-                    uploadAFError = afError
-                    uploadNKError = error
-                    semaphore.signal()
-                }
-                semaphore.wait()
 
-                if uploadNKError != .success {
-                    break
-                }
-            }
+                    let semaphore = DispatchSemaphore(value: 0)
+                    self.upload(serverUrlFileName: serverUrlFileName, fileNameLocalPath: fileNameLocalPath, options: options, requestHandler: { request in
+                        requestHandler(request)
+                    }, taskHandler: { task in
+                        taskHandler(task)
+                    }, progressHandler: { _ in
+                        let totalBytesExpected = fileNameLocalSize
+                        let totalBytes = fileChunk.size
+                        let fractionCompleted = Double(totalBytes) / Double(totalBytesExpected)
+                        progressHandler(totalBytesExpected, totalBytes, fractionCompleted)
+                    }) { _, _, _, _, _, _, afError, error in
+                        if error == .success {
+                            filesChunkOutput.removeFirst()
+                            uploaded(fileChunk)
+                        }
+                        uploadAFError = afError
+                        uploadNKError = error
+                        semaphore.signal()
+                    }
+                    semaphore.wait()
 
-            guard uploadNKError == .success else {
-                return completion(account, filesChunkOutput, nil, uploadAFError, NKError(errorCode: NKError.chunkFileUpload, errorDescription: uploadNKError.errorDescription))
-            }
-
-            // Assemble the chunks
-            let serverUrlFileNameSource = serverUrlChunkFolder + "/.file"
-
-            if let creationDate, creationDate.timeIntervalSince1970 > 0 {
-                options.customHeader?["X-OC-CTime"] = "\(creationDate.timeIntervalSince1970)"
-            }
-            if let date, date.timeIntervalSince1970 > 0 {
-                options.customHeader?["X-OC-MTime"] = "\(date.timeIntervalSince1970)"
-            }
-
-            // Calculate Assemble Timeout
-            let assembleSizeInGB = Double(fileNameLocalSize) / 1e9
-            let assembleTimePerGB: Double = 3 * 60  // 3  min
-            let assembleTimeMin: Double = 60        // 60 sec
-            let assembleTimeMax: Double = 30 * 60   // 30 min
-            options.timeout = max(assembleTimeMin, min(assembleTimePerGB * assembleSizeInGB, assembleTimeMax))
-
-            self.moveFileOrFolder(serverUrlFileNameSource: serverUrlFileNameSource, serverUrlFileNameDestination: serverUrlFileName, overwrite: true, options: options) { _, error in
-
-                guard error == .success else {
-                    return completion(account, filesChunkOutput, nil, nil, NKError(errorCode: NKError.chunkMoveFile, errorDescription: error.errorDescription))
+                    if uploadNKError != .success {
+                        break
+                    }
                 }
 
-                self.readFileOrFolder(serverUrlFileName: serverUrlFileName, depth: "0", options: NKRequestOptions(queue: self.nkCommonInstance.backgroundQueue)) { _, files, _, error in
+                guard uploadNKError == .success else {
+                    return completion(account, filesChunkOutput, nil, uploadAFError, NKError(errorCode: NKError.chunkFileUpload, errorDescription: uploadNKError.errorDescription))
+                }
 
-                    guard error == .success, let file = files.first else {
+                // Assemble the chunks
+                let serverUrlFileNameSource = serverUrlChunkFolder + "/.file"
+
+                if let creationDate, creationDate.timeIntervalSince1970 > 0 {
+                    options.customHeader?["X-OC-CTime"] = "\(creationDate.timeIntervalSince1970)"
+                }
+                if let date, date.timeIntervalSince1970 > 0 {
+                    options.customHeader?["X-OC-MTime"] = "\(date.timeIntervalSince1970)"
+                }
+
+                // Calculate Assemble Timeout
+                let assembleSizeInGB = Double(fileNameLocalSize) / 1e9
+                let assembleTimePerGB: Double = 3 * 60  // 3  min
+                let assembleTimeMin: Double = 60        // 60 sec
+                let assembleTimeMax: Double = 30 * 60   // 30 min
+                options.timeout = max(assembleTimeMin, min(assembleTimePerGB * assembleSizeInGB, assembleTimeMax))
+
+                self.moveFileOrFolder(serverUrlFileNameSource: serverUrlFileNameSource, serverUrlFileNameDestination: serverUrlFileName, overwrite: true, options: options) { _, error in
+
+                    guard error == .success else {
                         return completion(account, filesChunkOutput, nil, nil, NKError(errorCode: NKError.chunkMoveFile, errorDescription: error.errorDescription))
                     }
-                    return completion(account, filesChunkOutput, file, nil, error)
+
+                    self.readFileOrFolder(serverUrlFileName: serverUrlFileName, depth: "0", options: NKRequestOptions(queue: self.nkCommonInstance.backgroundQueue)) { _, files, _, error in
+
+                        guard error == .success, let file = files.first else {
+                            return completion(account, filesChunkOutput, nil, nil, NKError(errorCode: NKError.chunkMoveFile, errorDescription: error.errorDescription))
+                        }
+                        return completion(account, filesChunkOutput, file, nil, error)
+                    }
                 }
             }
         }

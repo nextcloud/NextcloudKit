@@ -372,7 +372,13 @@ import MobileCoreServices
 
     // MARK: - Chunked File
 
-    public func chunkedFile(inputDirectory: String, outputDirectory: String, fileName: String, chunkSize: Int) -> [(fileName: String, size: Int64)] {
+    public func chunkedFile(inputDirectory: String, outputDirectory: String, fileName: String, chunkSize: Int, filesChunk: [(fileName: String, size: Int64)],
+                            numChunks: @escaping (_ num: Int64) -> Void = { _ in },
+                            counterChunk: @escaping (_ counter: Int) -> Void = { _ in },
+                            completion: @escaping (_ filesChunk: [(fileName: String, size: Int64)]) -> Void = { _ in }) {
+
+        // Check if filesChunk is empty
+        if !filesChunk.isEmpty { return completion(filesChunk) }
 
         let fileManager: FileManager = .default
         var isDirectory: ObjCBool = false
@@ -386,23 +392,25 @@ import MobileCoreServices
         let bufferSize = 1000000
 
         // If max chunk count is > 10000 (max count), add + 100 MB to the chunk size to reduce the count. This is an edge case.
-        let numChunk = getFileSize(filePath: inputDirectory + "/" + fileName) / Int64(chunkSize)
-        if numChunk > 10000 {
+        var num = getFileSize(filePath: inputDirectory + "/" + fileName) / Int64(chunkSize)
+        if num > 10000 {
             chunkSize = chunkSize + 100000000
         }
+        num = getFileSize(filePath: inputDirectory + "/" + fileName) / Int64(chunkSize)
+        numChunks(num)
 
         if !fileManager.fileExists(atPath: outputDirectory, isDirectory: &isDirectory) {
             do {
                 try fileManager.createDirectory(atPath: outputDirectory, withIntermediateDirectories: true, attributes: nil)
             } catch {
-                return filesChunk
+                return completion(filesChunk)
             }
         }
 
         do {
             reader = try .init(forReadingFrom: URL(fileURLWithPath: inputDirectory + "/" + fileName))
         } catch {
-            return filesChunk
+            return completion(filesChunk)
         }
 
         repeat {
@@ -414,6 +422,7 @@ import MobileCoreServices
                     writer = nil
                     chunk = 0
                     counter += 1
+                    counterChunk(counter)
                     print("Counter: \(counter)")
                 }
 
@@ -456,7 +465,7 @@ import MobileCoreServices
             counter += 1
         }
 
-        return filesChunk
+        return completion(filesChunk)
     }
 
     // MARK: - Common
