@@ -89,6 +89,8 @@ import MobileCoreServices
         var name: String
     }
 
+    public let notificationCenterChunkedFileStop = NSNotification.Name(rawValue: "NextcloudKit.chunkedFile.stop")
+
     internal lazy var sessionConfiguration: URLSessionConfiguration = {
         let configuration = URLSessionConfiguration.af.default
         configuration.requestCachePolicy = .reloadIgnoringLocalCacheData
@@ -380,6 +382,10 @@ import MobileCoreServices
         // Check if filesChunk is empty
         if !filesChunk.isEmpty { return completion(filesChunk) }
 
+        defer {
+            NotificationCenter.default.removeObserver(self, name: notificationCenterChunkedFileStop, object: nil)
+        }
+
         let fileManager: FileManager = .default
         var isDirectory: ObjCBool = false
         var reader: FileHandle?
@@ -392,9 +398,7 @@ import MobileCoreServices
         let bufferSize = 1000000
         var stop: Bool = false
 
-        NotificationCenter.default.addObserver(forName: NSNotification.Name(rawValue: "NextcloudKit.chunkedFile.stop"), object: nil, queue: nil) { _ in
-            stop = true
-        }
+        NotificationCenter.default.addObserver(forName: notificationCenterChunkedFileStop, object: nil, queue: nil) { _ in stop = true }
 
         // If max chunk count is > 10000 (max count), add + 100 MB to the chunk size to reduce the count. This is an edge case.
         var num: Int = Int(getFileSize(filePath: inputDirectory + "/" + fileName) / Int64(chunkSize))
@@ -408,17 +412,21 @@ import MobileCoreServices
             do {
                 try fileManager.createDirectory(atPath: outputDirectory, withIntermediateDirectories: true, attributes: nil)
             } catch {
-                return completion(filesChunk)
+                return completion([])
             }
         }
 
         do {
             reader = try .init(forReadingFrom: URL(fileURLWithPath: inputDirectory + "/" + fileName))
         } catch {
-            return completion(filesChunk)
+            return completion([])
         }
 
         repeat {
+
+            if stop {
+                return completion([])
+            }
 
             if autoreleasepool(invoking: { () -> Int in
 
