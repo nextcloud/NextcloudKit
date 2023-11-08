@@ -421,9 +421,9 @@ import MobileCoreServices
                     writer?.closeFile()
                     writer = nil
                     chunk = 0
-                    counter += 1
                     counterChunk(counter)
                     print("Counter: \(counter)")
+                    counter += 1
                 }
 
                 let chunkRemaining: Int = chunkSize - chunk
