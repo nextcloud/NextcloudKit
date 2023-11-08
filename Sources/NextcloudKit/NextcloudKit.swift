@@ -491,7 +491,7 @@ import SwiftyJSON
             readFileOrFolder(serverUrlFileName: serverUrlChunkFolder, depth: "0", options: NKRequestOptions(queue: self.nkCommonInstance.backgroundQueue)) { _, _, _, error in
                 if error == .success {
                     completion(NKError())
-                } else if error.errorCode == NKError.chunkResourceNotFound {
+                } else if error.errorCode == 404 {
                     NextcloudKit.shared.createFolder(serverUrlFileName: serverUrlChunkFolder, options: NKRequestOptions(queue: self.nkCommonInstance.backgroundQueue)) { _, _, _, error in
                         completion(error)
                     }
