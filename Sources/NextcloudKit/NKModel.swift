@@ -124,11 +124,7 @@ import SwiftyJSON
     @objc public var fileId = ""
     @objc public var fileName = ""
     @objc public var hasPreview: Bool = false
-    @objc public var height: Int = 0
     @objc public var iconName = ""
-    @objc public var latitude: Double = 0
-    @objc public var livePhotoFile = ""
-    @objc public var longitude: Double = 0
     @objc public var mountType = ""
     @objc public var name = ""
     @objc public var note = ""
@@ -161,7 +157,11 @@ import SwiftyJSON
     @objc public var urlBase = ""
     @objc public var user = ""
     @objc public var userId = ""
+    @objc public var latitude: Double = 0
+    @objc public var longitude: Double = 0
+    @objc public var height: Int = 0
     @objc public var width: Int = 0
+    @objc public var livePhotoFile = ""
 }
 
 @objcMembers public class NKFileProperty: NSObject {
