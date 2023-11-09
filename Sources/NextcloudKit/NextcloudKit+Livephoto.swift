@@ -26,18 +26,14 @@ import Alamofire
 
 extension NextcloudKit {
 
-    public func setLivephoto(fileNamePath: String,
-                             livePhoto: String,
+    public func setLivephoto(serverUrlfileNamePath: String,
+                             livePhotoFile: String,
                              options: NKRequestOptions = NKRequestOptions(),
                              completion: @escaping (_ account: String, _ error: NKError) -> Void) {
 
         let account = self.nkCommonInstance.account
-        let urlBase = self.nkCommonInstance.urlBase
-        let dav = self.nkCommonInstance.dav
-        let userId = self.nkCommonInstance.userId
-        let serverUrlEndpoint = urlBase + "/" + dav + "files/" + userId + "/" + fileNamePath
 
-        guard let url = serverUrlEndpoint.encodedToUrl else {
+        guard let url = serverUrlfileNamePath.encodedToUrl else {
             return options.queue.async { completion(account, .urlError) }
         }
 
@@ -47,7 +43,7 @@ extension NextcloudKit {
         var urlRequest: URLRequest
         do {
             try urlRequest = URLRequest(url: url, method: method, headers: headers)
-            let parameters = String(format: NKDataFileXML(nkCommonInstance: self.nkCommonInstance).requestBodyLivephoto, livePhoto)
+            let parameters = String(format: NKDataFileXML(nkCommonInstance: self.nkCommonInstance).requestBodyLivephoto, livePhotoFile)
             urlRequest.httpBody = parameters.data(using: .utf8)
         } catch {
             return options.queue.async { completion(account, NKError(error: error)) }
