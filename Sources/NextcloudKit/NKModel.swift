@@ -637,6 +637,18 @@ class NKDataFileXML: NSObject {
     </d:propfind>
     """
 
+    let requestBodyLivephoto =
+    """
+    <?xml version=\"1.0\" encoding=\"UTF-8\"?>
+    <d:propertyupdate xmlns:d=\"DAV:\" xmlns:oc=\"http://owncloud.org/ns\" xmlns:nc=\"http://nextcloud.org/ns\">
+        <d:set>
+            <d:prop>
+                <nc:metadata-files-live-photo>%@</nc:metadata-files-live-photo>
+            </d:prop>
+        </d:set>
+    </d:propertyupdate>
+    """
+
     init(nkCommonInstance: NKCommon) {
         self.nkCommonInstance = nkCommonInstance
         super.init()
