@@ -63,4 +63,16 @@ extension NextcloudKit {
             }
         }
     }
+
+    @available(iOS 13.0, *)
+    public func setLivephoto(serverUrlfileNamePath: String,
+                             livePhotoFile: String,
+                             options: NKRequestOptions = NKRequestOptions()) async -> (account: String, error: NKError) {
+
+        await withUnsafeContinuation({ continuation in
+            setLivephoto(serverUrlfileNamePath: serverUrlfileNamePath, livePhotoFile: livePhotoFile, options: options) { account, error in
+                continuation.resume(returning: (account: account, error: error))
+            }
+        })
+    }
 }
