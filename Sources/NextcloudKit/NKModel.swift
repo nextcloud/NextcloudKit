@@ -162,6 +162,8 @@ import SwiftyJSON
     @objc public var height: Int = 0
     @objc public var width: Int = 0
     @objc public var livePhotoFile = ""
+    @objc public var hidden = false
+
 }
 
 @objcMembers public class NKFileProperty: NSObject {
@@ -361,6 +363,7 @@ class NKDataFileXML: NSObject {
     <file-metadata-size xmlns=\"http://nextcloud.org/ns\"/>
     <file-metadata-gps xmlns=\"http://nextcloud.org/ns\"/>
     <metadata-files-live-photo xmlns=\"http://nextcloud.org/ns\"/>
+    <hidden xmlns=\"http://nextcloud.org/ns\"/>
 
     <share-permissions xmlns=\"http://open-collaboration-services.org/ns\"/>
     <share-permissions xmlns=\"http://open-cloud-mesh.org/ns\"/>
@@ -885,6 +888,10 @@ class NKDataFileXML: NSObject {
 
             if let livePhotoFile = propstat["d:prop", "nc:metadata-files-live-photo"].text {
                 file.livePhotoFile = livePhotoFile
+            }
+
+            if let hidden = propstat["d:prop", "nc:hidden"].int {
+                file.hidden = NSNumber(integerLiteral: hidden).boolValue
             }
 
             let results = self.nkCommonInstance.getInternalType(fileName: file.fileName, mimeType: file.contentType, directory: file.directory)
