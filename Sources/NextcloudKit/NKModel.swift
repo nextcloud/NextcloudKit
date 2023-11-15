@@ -890,8 +890,8 @@ class NKDataFileXML: NSObject {
                 file.livePhotoFile = livePhotoFile
             }
 
-            if let hidden = propstat["d:prop", "nc:hidden"].int {
-                file.hidden = NSNumber(integerLiteral: hidden).boolValue
+            if let hidden = propstat["d:prop", "nc:hidden"].text {
+                file.hidden = (hidden as NSString).boolValue
             }
 
             let results = self.nkCommonInstance.getInternalType(fileName: file.fileName, mimeType: file.contentType, directory: file.directory)
