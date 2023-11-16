@@ -362,6 +362,8 @@ class NKDataFileXML: NSObject {
     <system-tags xmlns=\"http://nextcloud.org/ns\"/>
     <file-metadata-size xmlns=\"http://nextcloud.org/ns\"/>
     <file-metadata-gps xmlns=\"http://nextcloud.org/ns\"/>
+    <metadata-photos-size xmlns=\"http://nextcloud.org/ns\"/>
+    <metadata-photos-gps xmlns=\"http://nextcloud.org/ns\"/>
     <metadata-files-live-photo xmlns=\"http://nextcloud.org/ns\"/>
     <hidden xmlns=\"http://nextcloud.org/ns\"/>
 
@@ -868,6 +870,7 @@ class NKDataFileXML: NSObject {
                 file.tags.append(tag)
             }
 
+            // NC27 -----
             if let gps = propstat["d:prop", "nc:file-metadata-gps"].text,
                let data = gps.data(using: .utf8),
                let jsonDict = try? JSONSerialization.jsonObject(with: data) as? [String: Double],
@@ -885,6 +888,27 @@ class NKDataFileXML: NSObject {
                 file.height = height
                 file.width = width
             }
+            // ----------
+
+            // ----- NC28
+            if let gps = propstat["d:prop", "nc:metadata-photos-gps"].text,
+               let data = gps.data(using: .utf8),
+               let jsonDict = try? JSONSerialization.jsonObject(with: data) as? [String: Double],
+               let latitude = jsonDict["latitude"],
+               let longitude = jsonDict["longitude"] {
+                file.latitude = latitude
+                file.longitude = longitude
+            }
+
+            if let resolution = propstat["d:prop", "nc:metadata-photos-size"].text,
+               let data = resolution.data(using: .utf8),
+               let jsonDict = try? JSONSerialization.jsonObject(with: data) as? [String: Int],
+               let height = jsonDict["height"],
+               let width = jsonDict["width"] {
+                file.height = height
+                file.width = width
+            }
+            // ----------
 
             if let livePhotoFile = propstat["d:prop", "nc:metadata-files-live-photo"].text {
                 file.livePhotoFile = livePhotoFile
