@@ -161,6 +161,9 @@ import SwiftyJSON
     @objc public var longitude: Double = 0
     @objc public var height: Int = 0
     @objc public var width: Int = 0
+    @objc public var livePhotoFile = ""
+    @objc public var hidden = false
+
 }
 
 @objcMembers public class NKFileProperty: NSObject {
@@ -359,6 +362,10 @@ class NKDataFileXML: NSObject {
     <system-tags xmlns=\"http://nextcloud.org/ns\"/>
     <file-metadata-size xmlns=\"http://nextcloud.org/ns\"/>
     <file-metadata-gps xmlns=\"http://nextcloud.org/ns\"/>
+    <metadata-photos-size xmlns=\"http://nextcloud.org/ns\"/>
+    <metadata-photos-gps xmlns=\"http://nextcloud.org/ns\"/>
+    <metadata-files-live-photo xmlns=\"http://nextcloud.org/ns\"/>
+    <hidden xmlns=\"http://nextcloud.org/ns\"/>
 
     <share-permissions xmlns=\"http://open-collaboration-services.org/ns\"/>
     <share-permissions xmlns=\"http://open-cloud-mesh.org/ns\"/>
@@ -635,6 +642,18 @@ class NKDataFileXML: NSObject {
     </d:propfind>
     """
 
+    let requestBodyLivephoto =
+    """
+    <?xml version=\"1.0\" encoding=\"UTF-8\"?>
+    <d:propertyupdate xmlns:d=\"DAV:\" xmlns:oc=\"http://owncloud.org/ns\" xmlns:nc=\"http://nextcloud.org/ns\">
+        <d:set>
+            <d:prop>
+                <nc:metadata-files-live-photo>%@</nc:metadata-files-live-photo>
+            </d:prop>
+        </d:set>
+    </d:propertyupdate>
+    """
+
     init(nkCommonInstance: NKCommon) {
         self.nkCommonInstance = nkCommonInstance
         super.init()
@@ -851,6 +870,7 @@ class NKDataFileXML: NSObject {
                 file.tags.append(tag)
             }
 
+            // NC27 -----
             if let gps = propstat["d:prop", "nc:file-metadata-gps"].text,
                let data = gps.data(using: .utf8),
                let jsonDict = try? JSONSerialization.jsonObject(with: data) as? [String: Double],
@@ -867,6 +887,35 @@ class NKDataFileXML: NSObject {
                let width = jsonDict["width"] {
                 file.height = height
                 file.width = width
+            }
+            // ----------
+
+            // ----- NC28
+            if let gps = propstat["d:prop", "nc:metadata-photos-gps"].text,
+               let data = gps.data(using: .utf8),
+               let jsonDict = try? JSONSerialization.jsonObject(with: data) as? [String: Double],
+               let latitude = jsonDict["latitude"],
+               let longitude = jsonDict["longitude"] {
+                file.latitude = latitude
+                file.longitude = longitude
+            }
+
+            if let resolution = propstat["d:prop", "nc:metadata-photos-size"].text,
+               let data = resolution.data(using: .utf8),
+               let jsonDict = try? JSONSerialization.jsonObject(with: data) as? [String: Int],
+               let height = jsonDict["height"],
+               let width = jsonDict["width"] {
+                file.height = height
+                file.width = width
+            }
+            // ----------
+
+            if let livePhotoFile = propstat["d:prop", "nc:metadata-files-live-photo"].text {
+                file.livePhotoFile = livePhotoFile
+            }
+
+            if let hidden = propstat["d:prop", "nc:hidden"].text {
+                file.hidden = (hidden as NSString).boolValue
             }
 
             let results = self.nkCommonInstance.getInternalType(fileName: file.fileName, mimeType: file.contentType, directory: file.directory)

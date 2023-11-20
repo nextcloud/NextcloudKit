@@ -89,6 +89,8 @@ import MobileCoreServices
         var name: String
     }
 
+    public let notificationCenterChunkedFileStop = NSNotification.Name(rawValue: "NextcloudKit.chunkedFile.stop")
+
     internal lazy var sessionConfiguration: URLSessionConfiguration = {
         let configuration = URLSessionConfiguration.af.default
         configuration.requestCachePolicy = .reloadIgnoringLocalCacheData
@@ -372,7 +374,17 @@ import MobileCoreServices
 
     // MARK: - Chunked File
 
-    public func chunkedFile(inputDirectory: String, outputDirectory: String, fileName: String, chunkSize: Int) -> [(fileName: String, size: Int64)] {
+    public func chunkedFile(inputDirectory: String, outputDirectory: String, fileName: String, chunkSize: Int, filesChunk: [(fileName: String, size: Int64)],
+                            numChunks: @escaping (_ num: Int) -> Void = { _ in },
+                            counterChunk: @escaping (_ counter: Int) -> Void = { _ in },
+                            completion: @escaping (_ filesChunk: [(fileName: String, size: Int64)]) -> Void = { _ in }) {
+
+        // Check if filesChunk is empty
+        if !filesChunk.isEmpty { return completion(filesChunk) }
+
+        defer {
+            NotificationCenter.default.removeObserver(self, name: notificationCenterChunkedFileStop, object: nil)
+        }
 
         let fileManager: FileManager = .default
         var isDirectory: ObjCBool = false
@@ -384,28 +396,37 @@ import MobileCoreServices
         var filesChunk: [(fileName: String, size: Int64)] = []
         var chunkSize = chunkSize
         let bufferSize = 1000000
+        var stop: Bool = false
+
+        NotificationCenter.default.addObserver(forName: notificationCenterChunkedFileStop, object: nil, queue: nil) { _ in stop = true }
 
         // If max chunk count is > 10000 (max count), add + 100 MB to the chunk size to reduce the count. This is an edge case.
-        let numChunk = getFileSize(filePath: inputDirectory + "/" + fileName) / Int64(chunkSize)
-        if numChunk > 10000 {
+        var num: Int = Int(getFileSize(filePath: inputDirectory + "/" + fileName) / Int64(chunkSize))
+        if num > 10000 {
             chunkSize = chunkSize + 100000000
         }
+        num = Int(getFileSize(filePath: inputDirectory + "/" + fileName) / Int64(chunkSize))
+        numChunks(num)
 
         if !fileManager.fileExists(atPath: outputDirectory, isDirectory: &isDirectory) {
             do {
                 try fileManager.createDirectory(atPath: outputDirectory, withIntermediateDirectories: true, attributes: nil)
             } catch {
-                return filesChunk
+                return completion([])
             }
         }
 
         do {
             reader = try .init(forReadingFrom: URL(fileURLWithPath: inputDirectory + "/" + fileName))
         } catch {
-            return filesChunk
+            return completion([])
         }
 
         repeat {
+
+            if stop {
+                return completion([])
+            }
 
             if autoreleasepool(invoking: { () -> Int in
 
@@ -413,8 +434,9 @@ import MobileCoreServices
                     writer?.closeFile()
                     writer = nil
                     chunk = 0
-                    counter += 1
+                    counterChunk(counter)
                     print("Counter: \(counter)")
+                    counter += 1
                 }
 
                 let chunkRemaining: Int = chunkSize - chunk
@@ -456,7 +478,7 @@ import MobileCoreServices
             counter += 1
         }
 
-        return filesChunk
+        return completion(filesChunk)
     }
 
     // MARK: - Common
@@ -578,6 +600,18 @@ import MobileCoreServices
 
         let home = urlBase + "/remote.php/dav/files/" + userId
         return serverUrl.replacingOccurrences(of: home, with: "")
+    }
+
+    public func getSessionErrorFromAFError(_ afError: AFError?) -> NSError? {
+
+        if let afError = afError?.asAFError {
+            switch afError {
+            case .sessionTaskFailed(let sessionError):
+                return sessionError as NSError
+            default: break
+            }
+        }
+        return nil
     }
 
     // MARK: - Log
