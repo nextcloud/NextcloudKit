@@ -932,12 +932,18 @@ class NKDataFileXML: NSObject {
             files.append(file)
         }
 
-        // Lile photo
+        // Live photo detect
         files = files.sorted {
             return ($0.serverUrl, ($0.fileName as NSString).deletingPathExtension, $0.classFile) < ($1.serverUrl, ($1.fileName as NSString).deletingPathExtension, $1.classFile)
         }
         for index in files.indices {
-            if files[index].livePhoto { continue }
+            if !files[index].livePhotoFile.isEmpty {
+                files[index].livePhoto = true
+                continue
+            }
+            if files[index].livePhoto {
+                continue
+            }
             if index < files.count - 1,
                (files[index].fileName as NSString).deletingPathExtension == (files[index + 1].fileName as NSString) .deletingPathExtension,
                files[index].classFile == NKCommon.TypeClassFile.image.rawValue,
