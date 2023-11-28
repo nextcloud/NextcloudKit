@@ -162,6 +162,7 @@ import SwiftyJSON
     @objc public var height: Int = 0
     @objc public var width: Int = 0
     @objc public var livePhotoFile = ""
+    @objc public var livePhotoMetadata = false
     @objc public var hidden = false
 
 }
@@ -937,6 +938,7 @@ class NKDataFileXML: NSObject {
         }
         for index in files.indices {
             if !files[index].livePhotoFile.isEmpty {
+                files[index].livePhotoMetadata = true
                 continue
             }
             if index < files.count - 1,
