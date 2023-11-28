@@ -936,7 +936,7 @@ class NKDataFileXML: NSObject {
             return ($0.serverUrl, ($0.fileName as NSString).deletingPathExtension, $0.classFile) < ($1.serverUrl, ($1.fileName as NSString).deletingPathExtension, $1.classFile)
         }
         for index in files.indices {
-            if !files[index].livePhotoFile.isEmpty {
+            if !files[index].livePhotoFile.isEmpty || files[index].directory {
                 continue
             }
             if index < files.count - 1,
