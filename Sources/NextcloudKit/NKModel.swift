@@ -913,6 +913,7 @@ class NKDataFileXML: NSObject {
 
             if let livePhotoFile = propstat["d:prop", "nc:metadata-files-live-photo"].text {
                 file.livePhotoFile = livePhotoFile
+                file.livePhotoMetadata = true
             }
 
             if let hidden = propstat["d:prop", "nc:hidden"].text {
@@ -938,7 +939,6 @@ class NKDataFileXML: NSObject {
         }
         for index in files.indices {
             if !files[index].livePhotoFile.isEmpty {
-                files[index].livePhotoMetadata = true
                 continue
             }
             if index < files.count - 1,
