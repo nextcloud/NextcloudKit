@@ -162,6 +162,7 @@ import SwiftyJSON
     @objc public var height: Int = 0
     @objc public var width: Int = 0
     @objc public var livePhotoFile = ""
+    @objc public var livePhotoServer = false
     @objc public var hidden = false
 
 }
@@ -912,6 +913,7 @@ class NKDataFileXML: NSObject {
 
             if let livePhotoFile = propstat["d:prop", "nc:metadata-files-live-photo"].text {
                 file.livePhotoFile = livePhotoFile
+                file.livePhotoServer = true
             }
 
             if let hidden = propstat["d:prop", "nc:hidden"].text {
@@ -929,6 +931,23 @@ class NKDataFileXML: NSObject {
             file.userId = userId
 
             files.append(file)
+        }
+
+        // Live photo detect
+        files = files.sorted {
+            return ($0.serverUrl, ($0.fileName as NSString).deletingPathExtension, $0.classFile) < ($1.serverUrl, ($1.fileName as NSString).deletingPathExtension, $1.classFile)
+        }
+        for index in files.indices {
+            if !files[index].livePhotoFile.isEmpty || files[index].directory {
+                continue
+            }
+            if index < files.count - 1,
+               (files[index].fileName as NSString).deletingPathExtension == (files[index + 1].fileName as NSString) .deletingPathExtension,
+               files[index].classFile == NKCommon.TypeClassFile.image.rawValue,
+               files[index + 1].classFile == NKCommon.TypeClassFile.video.rawValue {
+                files[index].livePhotoFile = files[index + 1].fileName
+                files[index + 1].livePhotoFile = files[index].fileName
+            }
         }
 
         return files
