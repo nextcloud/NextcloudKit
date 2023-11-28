@@ -161,6 +161,7 @@ import SwiftyJSON
     @objc public var longitude: Double = 0
     @objc public var height: Int = 0
     @objc public var width: Int = 0
+    @objc public var livePhoto: Bool = false
     @objc public var livePhotoFile = ""
     @objc public var hidden = false
 
@@ -929,6 +930,21 @@ class NKDataFileXML: NSObject {
             file.userId = userId
 
             files.append(file)
+        }
+
+        // Lile photo
+        files = files.sorted {
+            return ($0.serverUrl, $0.fileName) < ($1.serverUrl, $1.fileName)
+        }
+        for index in files.indices {
+            if files[index].livePhoto { continue }
+            if index < files.count - 1,
+               (files[index].fileName as NSString).deletingPathExtension == (files[index + 1].fileName as NSString) .deletingPathExtension,
+               files[index].classFile == NKCommon.TypeClassFile.image.rawValue,
+               files[index + 1].classFile == NKCommon.TypeClassFile.video.rawValue {
+                files[index].livePhoto = true
+                files[index + 1].livePhoto = true
+            }
         }
 
         return files
