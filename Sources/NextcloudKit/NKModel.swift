@@ -934,7 +934,7 @@ class NKDataFileXML: NSObject {
 
         // Lile photo
         files = files.sorted {
-            return ($0.serverUrl, $0.fileName) < ($1.serverUrl, $1.fileName)
+            return ($0.serverUrl, ($0.fileName as NSString).deletingPathExtension, $0.classFile) < ($1.serverUrl, ($1.fileName as NSString).deletingPathExtension, $1.classFile)
         }
         for index in files.indices {
             if files[index].livePhoto { continue }
