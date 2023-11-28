@@ -949,7 +949,9 @@ class NKDataFileXML: NSObject {
                files[index].classFile == NKCommon.TypeClassFile.image.rawValue,
                files[index + 1].classFile == NKCommon.TypeClassFile.video.rawValue {
                 files[index].livePhoto = true
+                files[index].livePhotoFile = files[index + 1].fileName
                 files[index + 1].livePhoto = true
+                files[index + 1].livePhotoFile = files[index].fileName
             }
         }
 
