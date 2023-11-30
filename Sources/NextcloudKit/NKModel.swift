@@ -162,7 +162,7 @@ import SwiftyJSON
     @objc public var height: Int = 0
     @objc public var width: Int = 0
     @objc public var livePhotoFile = ""
-    @objc public var livePhotoServer = false
+    @objc public var isFlaggedAsLivePhotoByServer = false // A flag indicating if the file is sent as a live photo from the server, or if we should detect it as such and convert it client-side, then send it back to server. (for compatibility NC < 28)
     @objc public var hidden = false
 
 }
@@ -913,7 +913,7 @@ class NKDataFileXML: NSObject {
 
             if let livePhotoFile = propstat["d:prop", "nc:metadata-files-live-photo"].text {
                 file.livePhotoFile = livePhotoFile
-                file.livePhotoServer = true
+                file.isFlaggedAsLivePhotoByServer = true
             }
 
             if let hidden = propstat["d:prop", "nc:hidden"].text {
