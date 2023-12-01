@@ -366,17 +366,14 @@ import SwiftyJSON
         let fileNameLocalPathUrl = URL(fileURLWithPath: fileNameLocalPath)
 
         var headers = self.nkCommonInstance.getStandardHeaders(options: options)
-        if dateCreationFile != nil {
-            var iDate: TimeInterval = dateCreationFile?.timeIntervalSince1970 ?? 0
-            // Epoch of linux do not permitted negativ value
-            if iDate < 0 { iDate = 0 }
-            headers.update(name: "X-OC-CTime", value: "\(iDate)")
+
+        // Epoch of linux do not permitted negativ value
+        if let dateCreationFile, dateCreationFile.timeIntervalSince1970 > 0 {
+            headers.update(name: "X-OC-CTime", value: "\(dateCreationFile.timeIntervalSince1970)")
         }
-        if dateModificationFile != nil {
-            var iDate: TimeInterval = dateModificationFile?.timeIntervalSince1970 ?? 0
-            // Epoch of linux do not permitted negativ value
-            if iDate < 0 { iDate = 0 }
-            headers.update(name: "X-OC-MTime", value: "\(iDate)")
+        // Epoch of linux do not permitted negativ value
+        if let dateModificationFile, dateModificationFile.timeIntervalSince1970 > 0 {
+            headers.update(name: "X-OC-MTime", value: "\(dateModificationFile.timeIntervalSince1970)")
         }
 
         let request = sessionManager.upload(fileNameLocalPathUrl, to: url, method: .put, headers: headers, interceptor: nil, fileManager: .default).validate(statusCode: 200..<300).onURLSessionTaskCreation(perform: { task in
@@ -571,10 +568,11 @@ import SwiftyJSON
 
                 // Assemble the chunks
                 let serverUrlFileNameSource = serverUrlChunkFolder + "/.file"
-
+                // Epoch of linux do not permitted negativ value
                 if let creationDate, creationDate.timeIntervalSince1970 > 0 {
                     options.customHeader?["X-OC-CTime"] = "\(creationDate.timeIntervalSince1970)"
                 }
+                // Epoch of linux do not permitted negativ value
                 if let date, date.timeIntervalSince1970 > 0 {
                     options.customHeader?["X-OC-MTime"] = "\(date.timeIntervalSince1970)"
                 }

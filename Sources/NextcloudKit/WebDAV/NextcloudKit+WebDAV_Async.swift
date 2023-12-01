@@ -82,4 +82,20 @@ extension NextcloudKit {
             }
         })
     }
+
+    public func searchMedia(path: String = "",
+                            lessDate: Any,
+                            greaterDate: Any,
+                            elementDate: String,
+                            limit: Int,
+                            showHiddenFiles: Bool,
+                            includeHiddenFiles: [String] = [],
+                            options: NKRequestOptions = NKRequestOptions()) async -> (account: String, files: [NKFile], data: Data?, error: NKError) {
+
+        await withUnsafeContinuation({ continuation in
+            searchMedia(path: path, lessDate: lessDate, greaterDate: greaterDate, elementDate: elementDate, limit: limit, showHiddenFiles: showHiddenFiles, includeHiddenFiles: includeHiddenFiles, options: options) { account, files, data, error in
+                continuation.resume(returning: (account, files, data, error))
+            }
+        })
+    }
 }
