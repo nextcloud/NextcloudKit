@@ -474,7 +474,7 @@ import SwiftyJSON
         } catch {
             return completion(account, nil, nil, nil, NKError(errorCode: NKError.chunkNoEnoughMemory))
         }
-        let freeDisk = (fsAttributes[FileAttributeKey.systemFreeSize] ?? 0) as? Int64
+        let freeDisk = ((fsAttributes[FileAttributeKey.systemFreeSize] ?? 0) as? Int64) ?? 0
         #else
         var freeDisk: Int64 = 0
         let fileURL = URL(fileURLWithPath: directory as String)
