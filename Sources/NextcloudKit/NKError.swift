@@ -77,6 +77,16 @@ public class NKError: NSObject {
 
     private static func getErrorDescription(for code: Int) -> String? {
         switch code {
+        case chunkNoEnoughMemory:
+            return NSLocalizedString("_chunk_enough_memory_", value: "It seems there is not enough space to send the file", comment: "")
+        case chunkMoveFile:
+            return NSLocalizedString("_chunk_move_", value: "The sent file could not be reassembled, please check the server log", comment: "")
+        case chunkCreateFolder:
+            return NSLocalizedString("_chunk_create_folder_", value: "The file could not be sent, please check the server log", comment: "")
+        case chunkFilesNull:
+            return NSLocalizedString("_chunk_files_null_", value: "The file for sending could not be created", comment: "")
+        case chunkFileNull:
+            return NSLocalizedString("_chunk_file_null_", value: "The file could not be sent", comment: "")
         case -9999:
             return NSLocalizedString("_internal_server_", value: "Internal error", comment: "")
         case -1001:
