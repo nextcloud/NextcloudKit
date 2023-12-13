@@ -487,7 +487,8 @@ import SwiftyJSON
         #endif
 
         if freeDisk < fileNameLocalSize * 3 {
-            return completion(account, nil, nil, nil, NKError(errorCode: NKError.chunkNoEnoughMemory))
+            let error = NKError(errorCode: NKError.chunkNoEnoughMemory, errorDescription: NSLocalizedString("_chunk_enough_memory_", value: "It seems there is not enough space to send the file", comment: ""))
+            return completion(account, nil, nil, nil, error)
         }
 
         func createFolder(completion: @escaping (_ errorCode: NKError) -> Void) {
@@ -520,7 +521,8 @@ import SwiftyJSON
                 counterChunk(counter)
             } completion: { filesChunk in
                 if filesChunk.isEmpty {
-                    return completion(account, nil, nil, nil, NKError(errorCode: NKError.chunkFilesNull))
+                    let error = NKError(errorCode: NKError.chunkFilesNull, errorDescription: NSLocalizedString("_chunk_files_null_", value: "The file for sending could not be created", comment: ""))
+                    return completion(account, nil, nil, nil, error)
                 }
 
                 var filesChunkOutput = filesChunk
@@ -533,7 +535,8 @@ import SwiftyJSON
 
                     let fileSize = self.nkCommonInstance.getFileSize(filePath: fileNameLocalPath)
                     if fileSize == 0 {
-                        return completion(account, nil, nil, .explicitlyCancelled, NKError(errorCode: NKError.chunkFileNull))
+                        let error = NKError(errorCode: NKError.chunkFileNull, errorDescription: NSLocalizedString("_chunk_file_null_", value: "The file could not be sent", comment: ""))
+                        return completion(account, nil, nil, .explicitlyCancelled, error)
                     }
 
                     let semaphore = DispatchSemaphore(value: 0)
