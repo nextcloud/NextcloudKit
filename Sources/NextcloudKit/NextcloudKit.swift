@@ -486,8 +486,9 @@ import SwiftyJSON
         } catch { }
         #endif
 
-        if freeDisk < fileNameLocalSize * 3 {
-            let error = NKError(errorCode: NKError.chunkNoEnoughMemory, errorDescription: NSLocalizedString("_chunk_enough_memory_", value: "It seems there is not enough space to send the file", comment: ""))
+        if freeDisk < fileNameLocalSize * 4 {
+            // It seems there is not enough space to send the file
+            let error = NKError(errorCode: NKError.chunkNoEnoughMemory, errorDescription: "_chunk_enough_memory_")
             return completion(account, nil, nil, nil, error)
         }
 
@@ -521,7 +522,8 @@ import SwiftyJSON
                 counterChunk(counter)
             } completion: { filesChunk in
                 if filesChunk.isEmpty {
-                    let error = NKError(errorCode: NKError.chunkFilesNull, errorDescription: NSLocalizedString("_chunk_files_null_", value: "The file for sending could not be created", comment: ""))
+                    // The file for sending could not be created
+                    let error = NKError(errorCode: NKError.chunkFilesNull, errorDescription: "_chunk_files_null_")
                     return completion(account, nil, nil, nil, error)
                 }
 
@@ -535,7 +537,8 @@ import SwiftyJSON
 
                     let fileSize = self.nkCommonInstance.getFileSize(filePath: fileNameLocalPath)
                     if fileSize == 0 {
-                        let error = NKError(errorCode: NKError.chunkFileNull, errorDescription: NSLocalizedString("_chunk_file_null_", value: "The file could not be sent", comment: ""))
+                        // The file could not be sent
+                        let error = NKError(errorCode: NKError.chunkFileNull, errorDescription: "_chunk_file_null_")
                         return completion(account, nil, nil, .explicitlyCancelled, error)
                     }
 
