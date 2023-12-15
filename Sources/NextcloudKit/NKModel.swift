@@ -161,8 +161,13 @@ import SwiftyJSON
     @objc public var longitude: Double = 0
     @objc public var height: Int = 0
     @objc public var width: Int = 0
-    @objc public var livePhotoFile = "" // If this is not empty, the media is a live photo. New media gets this straight from server, but old media needs to be detected as live photo (look isFlaggedAsLivePhotoByServer)
-    @objc public var isFlaggedAsLivePhotoByServer = false // Indicating if the file is sent as a live photo from the server, or if we should detect it as such and convert it client-side
+
+    /// If this is not empty, the media is a live photo. New media gets this straight from server, but old media needs to be detected as live photo (look isFlaggedAsLivePhotoByServer)
+    @objc public var livePhotoFile = ""
+
+    /// Indicating if the file is sent as a live photo from the server, or if we should detect it as such and convert it client-side
+    @objc public var isFlaggedAsLivePhotoByServer = false
+    
     @objc public var hidden = false
 
 }
