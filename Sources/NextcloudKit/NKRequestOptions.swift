@@ -27,6 +27,7 @@ import Foundation
 public class NKRequestOptions: NSObject {
 
     var endpoint: String?
+    var version: String?
     var customHeader: [String: String]?
     var customUserAgent: String?
     var contentType: String?
@@ -34,8 +35,17 @@ public class NKRequestOptions: NSObject {
     var timeout: TimeInterval
     var queue: DispatchQueue
 
-    public init(endpoint: String? = nil, customHeader: [String: String]? = nil, customUserAgent: String? = nil, contentType: String? = nil, e2eToken: String? = nil, timeout: TimeInterval = 60, queue: DispatchQueue = .main) {
+    public init(endpoint: String? = nil, 
+                version: String? = nil,
+                customHeader: [String: String]? = nil,
+                customUserAgent: String? = nil,
+                contentType: String? = nil,
+                e2eToken: String? = nil,
+                timeout: TimeInterval = 60,
+                queue: DispatchQueue = .main) {
+
         self.endpoint = endpoint
+        self.version = version
         self.customHeader = customHeader
         self.customUserAgent = customUserAgent
         self.contentType = contentType

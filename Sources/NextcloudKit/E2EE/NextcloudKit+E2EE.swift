@@ -35,7 +35,11 @@ extension NextcloudKit {
         let account = self.nkCommonInstance.account
         let urlBase = self.nkCommonInstance.urlBase
 
-        let endpoint = "ocs/v2.php/apps/end_to_end_encryption/api/v1/encrypted/\(fileId)"
+        var version = "v1"
+        if let optionsVesion = options.version {
+            version = optionsVesion
+        }
+        let endpoint = "ocs/v2.php/apps/end_to_end_encryption/api/\(version)/encrypted/\(fileId)"
 
         guard let url = self.nkCommonInstance.createStandardUrl(serverUrl: urlBase, endpoint: endpoint) else {
             return options.queue.async { completion(account, .urlError) }
@@ -76,7 +80,11 @@ extension NextcloudKit {
         let account = self.nkCommonInstance.account
         let urlBase = self.nkCommonInstance.urlBase
 
-        let endpoint = "ocs/v2.php/apps/end_to_end_encryption/api/v1/lock/\(fileId)"
+        var version = "v1"
+        if let optionsVesion = options.version {
+            version = optionsVesion
+        }
+        let endpoint = "ocs/v2.php/apps/end_to_end_encryption/api/\(version)/lock/\(fileId)"
 
         guard let url = self.nkCommonInstance.createStandardUrl(serverUrl: urlBase, endpoint: endpoint) else {
             return options.queue.async { completion(account, nil, nil, .urlError) }
@@ -125,7 +133,11 @@ extension NextcloudKit {
         let account = self.nkCommonInstance.account
         let urlBase = self.nkCommonInstance.urlBase
 
-        let endpoint = "ocs/v2.php/apps/end_to_end_encryption/api/v1/meta-data/\(fileId)"
+        var version = "v1"
+        if let optionsVesion = options.version {
+            version = optionsVesion
+        }
+        let endpoint = "ocs/v2.php/apps/end_to_end_encryption/api/\(version)/meta-data/\(fileId)"
 
         guard let url = self.nkCommonInstance.createStandardUrl(serverUrl: urlBase, endpoint: endpoint) else {
             return options.queue.async { completion(account, nil, nil, nil, .urlError) }
@@ -172,7 +184,11 @@ extension NextcloudKit {
         let account = self.nkCommonInstance.account
         let urlBase = self.nkCommonInstance.urlBase
 
-        let endpoint = "ocs/v2.php/apps/end_to_end_encryption/api/v1/meta-data/\(fileId)"
+        var version = "v1"
+        if let optionsVesion = options.version {
+            version = optionsVesion
+        }
+        let endpoint = "ocs/v2.php/apps/end_to_end_encryption/api/\(version)/meta-data/\(fileId)"
 
         guard let url = self.nkCommonInstance.createStandardUrl(serverUrl: urlBase, endpoint: endpoint) else {
             return options.queue.async { completion(account, nil, nil, .urlError) }
@@ -225,15 +241,19 @@ extension NextcloudKit {
         let urlBase = self.nkCommonInstance.urlBase
         let userId = self.nkCommonInstance.userId
 
+        var version = "v1"
+        if let optionsVesion = options.version {
+            version = optionsVesion
+        }
         var endpoint = ""
 
         if let user = user {
             guard let users = ("[\"" + user + "\"]").urlEncoded else {
                 return options.queue.async { completion(account, nil, nil, nil, .urlError) }
             }
-            endpoint = "ocs/v2.php/apps/end_to_end_encryption/api/v1/public-key?users=" + users
+            endpoint = "ocs/v2.php/apps/end_to_end_encryption/api/\(version)/public-key?users=" + users
         } else {
-            endpoint = "ocs/v2.php/apps/end_to_end_encryption/api/v1/public-key"
+            endpoint = "ocs/v2.php/apps/end_to_end_encryption/api/\(version)/public-key"
         }
 
         guard let url = self.nkCommonInstance.createStandardUrl(serverUrl: urlBase, endpoint: endpoint) else {
@@ -275,7 +295,11 @@ extension NextcloudKit {
         let account = self.nkCommonInstance.account
         let urlBase = self.nkCommonInstance.urlBase
 
-        let endpoint = "ocs/v2.php/apps/end_to_end_encryption/api/v1/private-key"
+        var version = "v1"
+        if let optionsVesion = options.version {
+            version = optionsVesion
+        }
+        let endpoint = "ocs/v2.php/apps/end_to_end_encryption/api/\(version)/private-key"
 
         guard let url = self.nkCommonInstance.createStandardUrl(serverUrl: urlBase, endpoint: endpoint) else {
             return options.queue.async { completion(account, nil, nil, .urlError) }
@@ -311,7 +335,11 @@ extension NextcloudKit {
         let account = self.nkCommonInstance.account
         let urlBase = self.nkCommonInstance.urlBase
 
-        let endpoint = "ocs/v2.php/apps/end_to_end_encryption/api/v1/server-key"
+        var version = "v1"
+        if let optionsVesion = options.version {
+            version = optionsVesion
+        }
+        let endpoint = "ocs/v2.php/apps/end_to_end_encryption/api/\(version)/server-key"
 
         guard let url = self.nkCommonInstance.createStandardUrl(serverUrl: urlBase, endpoint: endpoint) else {
             return options.queue.async { completion(account, nil, nil, .urlError) }
@@ -348,7 +376,11 @@ extension NextcloudKit {
         let account = self.nkCommonInstance.account
         let urlBase = self.nkCommonInstance.urlBase
 
-        let endpoint = "ocs/v2.php/apps/end_to_end_encryption/api/v1/public-key"
+        var version = "v1"
+        if let optionsVesion = options.version {
+            version = optionsVesion
+        }
+        let endpoint = "ocs/v2.php/apps/end_to_end_encryption/api/\(version)/public-key"
 
         guard let url = self.nkCommonInstance.createStandardUrl(serverUrl: urlBase, endpoint: endpoint) else {
             return options.queue.async { completion(account, nil, nil, .urlError) }
@@ -388,7 +420,11 @@ extension NextcloudKit {
         let account = self.nkCommonInstance.account
         let urlBase = self.nkCommonInstance.urlBase
 
-        let endpoint = "ocs/v2.php/apps/end_to_end_encryption/api/v1/private-key"
+        var version = "v1"
+        if let optionsVesion = options.version {
+            version = optionsVesion
+        }
+        let endpoint = "ocs/v2.php/apps/end_to_end_encryption/api/\(version)/private-key"
 
         guard let url = self.nkCommonInstance.createStandardUrl(serverUrl: urlBase, endpoint: endpoint) else {
             return options.queue.async { completion(account, nil, nil, .urlError) }
@@ -426,7 +462,11 @@ extension NextcloudKit {
         let account = self.nkCommonInstance.account
         let urlBase = self.nkCommonInstance.urlBase
 
-        let endpoint = "ocs/v2.php/apps/end_to_end_encryption/api/v1/public-key"
+        var version = "v1"
+        if let optionsVesion = options.version {
+            version = optionsVesion
+        }
+        let endpoint = "ocs/v2.php/apps/end_to_end_encryption/api/\(version)/public-key"
 
         guard let url = self.nkCommonInstance.createStandardUrl(serverUrl: urlBase, endpoint: endpoint) else {
             return options.queue.async { completion(account, .urlError) }
@@ -455,7 +495,11 @@ extension NextcloudKit {
         let account = self.nkCommonInstance.account
         let urlBase = self.nkCommonInstance.urlBase
 
-        let endpoint = "ocs/v2.php/apps/end_to_end_encryption/api/v1/private-key"
+        var version = "v1"
+        if let optionsVesion = options.version {
+            version = optionsVesion
+        }
+        let endpoint = "ocs/v2.php/apps/end_to_end_encryption/api/\(version)/private-key"
 
         guard let url = self.nkCommonInstance.createStandardUrl(serverUrl: urlBase, endpoint: endpoint) else {
             return options.queue.async { completion(account, .urlError) }
