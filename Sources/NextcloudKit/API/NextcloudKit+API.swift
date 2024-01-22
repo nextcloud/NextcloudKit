@@ -871,7 +871,7 @@ extension NextcloudKit {
 
     // MARK: -
 
-    public func sendClientDiagnosticsRemoteOperation(problems: Data,
+    public func sendClientDiagnosticsRemoteOperation(data: Data,
                                                      options: NKRequestOptions = NKRequestOptions(),
                                                      completion: @escaping (_ account: String, _ error: NKError) -> Void) {
 
@@ -889,7 +889,7 @@ extension NextcloudKit {
         var urlRequest: URLRequest
         do {
             try urlRequest = URLRequest(url: url, method: .put, headers: headers)
-            urlRequest.httpBody = problems
+            urlRequest.httpBody = data
         } catch {
             return options.queue.async { completion(account, NKError(error: error)) }
         }
