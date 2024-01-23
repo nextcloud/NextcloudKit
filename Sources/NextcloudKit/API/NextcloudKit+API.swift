@@ -878,7 +878,7 @@ extension NextcloudKit {
         let account = self.nkCommonInstance.account
         let urlBase = self.nkCommonInstance.urlBase
 
-        let endpoint = "ocs/v2.php/apps/settings/diagnostics"
+        let endpoint = "ocs/v2.php/apps/security_guard/diagnostics"
 
         guard let url = self.nkCommonInstance.createStandardUrl(serverUrl: urlBase, endpoint: endpoint) else {
             return options.queue.async { completion(account, .urlError) }
