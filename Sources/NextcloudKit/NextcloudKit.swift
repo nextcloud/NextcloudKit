@@ -499,7 +499,7 @@ import SwiftyJSON
                 if error == .success {
                     completion(NKError())
                 } else if error.errorCode == 404 {
-                    NextcloudKit.shared.createFolder(serverUrlFileName: serverUrlChunkFolder, options: NKRequestOptions(queue: self.nkCommonInstance.backgroundQueue)) { _, _, _, error in
+                    NextcloudKit.shared.createFolder(serverUrlFileName: serverUrlChunkFolder, options: options) { _, _, _, error in
                         completion(error)
                     }
                 } else {
