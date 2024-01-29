@@ -465,6 +465,7 @@ import SwiftyJSON
             options.customHeader = [:]
         }
         options.customHeader?["Destination"] = serverUrlFileName
+        options.customHeader?["OC-Total-Length"] = String(fileNameLocalSize)
 
         // check space
         #if os(macOS)
@@ -494,11 +495,11 @@ import SwiftyJSON
 
         func createFolder(completion: @escaping (_ errorCode: NKError) -> Void) {
 
-            readFileOrFolder(serverUrlFileName: serverUrlChunkFolder, depth: "0", options: NKRequestOptions(queue: self.nkCommonInstance.backgroundQueue)) { _, _, _, error in
+            readFileOrFolder(serverUrlFileName: serverUrlChunkFolder, depth: "0", options: options) { _, _, _, error in
                 if error == .success {
                     completion(NKError())
                 } else if error.errorCode == 404 {
-                    NextcloudKit.shared.createFolder(serverUrlFileName: serverUrlChunkFolder, options: NKRequestOptions(queue: self.nkCommonInstance.backgroundQueue)) { _, _, _, error in
+                    NextcloudKit.shared.createFolder(serverUrlFileName: serverUrlChunkFolder, options: options) { _, _, _, error in
                         completion(error)
                     }
                 } else {
