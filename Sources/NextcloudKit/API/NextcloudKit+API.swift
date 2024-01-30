@@ -871,14 +871,14 @@ extension NextcloudKit {
 
     // MARK: -
 
-    public func sendClientDiagnosticsRemoteOperation(problems: Data,
+    public func sendClientDiagnosticsRemoteOperation(data: Data,
                                                      options: NKRequestOptions = NKRequestOptions(),
                                                      completion: @escaping (_ account: String, _ error: NKError) -> Void) {
 
         let account = self.nkCommonInstance.account
         let urlBase = self.nkCommonInstance.urlBase
 
-        let endpoint = "ocs/v2.php/apps/settings/diagnostics"
+        let endpoint = "ocs/v2.php/apps/security_guard/diagnostics"
 
         guard let url = self.nkCommonInstance.createStandardUrl(serverUrl: urlBase, endpoint: endpoint) else {
             return options.queue.async { completion(account, .urlError) }
@@ -889,7 +889,7 @@ extension NextcloudKit {
         var urlRequest: URLRequest
         do {
             try urlRequest = URLRequest(url: url, method: .put, headers: headers)
-            urlRequest.httpBody = problems
+            urlRequest.httpBody = data
         } catch {
             return options.queue.async { completion(account, NKError(error: error)) }
         }
