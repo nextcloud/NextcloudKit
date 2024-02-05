@@ -531,6 +531,7 @@ import MobileCoreServices
     }
 
     public func convertDate(_ dateString: String, format: String) -> NSDate? {
+
         if dateString.isEmpty { return nil }
 
         let dateFormatter = DateFormatter()
