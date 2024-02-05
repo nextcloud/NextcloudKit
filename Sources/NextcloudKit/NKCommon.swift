@@ -530,7 +530,7 @@ import MobileCoreServices
         return serverUrl.asUrl
     }
 
-    func convertDate(_ dateString: String, format: String) -> NSDate? {
+    public func convertDate(_ dateString: String, format: String) -> NSDate? {
         if dateString.isEmpty { return nil }
 
         let dateFormatter = DateFormatter()
