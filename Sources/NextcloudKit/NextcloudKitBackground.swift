@@ -129,9 +129,7 @@ import Foundation
 
         if let httpResponse = (downloadTask.response as? HTTPURLResponse) {
             if httpResponse.statusCode >= 200 && httpResponse.statusCode < 300 {
-                let parameter = downloadTask.taskDescription?.components(separatedBy: "|")
-                if parameter?.count ?? 0 >= 1 {
-                    let destinationFilePath = parameter![0]
+                if let destinationFilePath = downloadTask.taskDescription {
                     let destinationUrl = NSURL.fileURL(withPath: destinationFilePath)
                     do {
                         try FileManager.default.removeItem(at: destinationUrl)
