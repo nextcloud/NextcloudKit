@@ -35,7 +35,6 @@ import Foundation
 
     @objc public func download(serverUrlFileName: Any,
                                fileNameLocalPath: String,
-                               description: String?,
                                session: URLSession) -> URLSessionDownloadTask? {
 
         var url: URL?
@@ -59,15 +58,8 @@ import Foundation
         request.setValue("Basic \(base64LoginString)", forHTTPHeaderField: "Authorization")
 
         let task = session.downloadTask(with: request)
-
-        if description == nil {
-            task.taskDescription = fileNameLocalPath
-        } else {
-            task.taskDescription = fileNameLocalPath + "|" + description!
-        }
-
+        task.taskDescription = fileNameLocalPath
         task.resume()
-
         self.nkCommonInstance.writeLog("Network start download file: \(serverUrlFileName)")
 
         return task
@@ -79,7 +71,6 @@ import Foundation
                              fileNameLocalPath: String,
                              dateCreationFile: Date?,
                              dateModificationFile: Date?,
-                             description: String?,
                              session: URLSession) -> URLSessionUploadTask? {
 
         var url: URL?
@@ -114,10 +105,8 @@ import Foundation
         }
 
         let task = session.uploadTask(with: request, fromFile: URL(fileURLWithPath: fileNameLocalPath))
-
-        task.taskDescription = description
+        task.taskDescription = fileNameLocalPath
         task.resume()
-
         self.nkCommonInstance.writeLog("Network start upload file: \(serverUrlFileName)")
 
         return task
@@ -211,16 +200,9 @@ import Foundation
         }
 
         if task is URLSessionDownloadTask {
-            var description = task.taskDescription
-            let parameter = task.taskDescription?.components(separatedBy: "|")
-            if parameter?.count == 2 {
-                description = parameter![1]
-            }
-            self.nkCommonInstance.delegate?.downloadComplete?(fileName: fileName, serverUrl: serverUrl, etag: etag, date: date, dateLastModified: dateLastModified, length: length, description: description, task: task, error: nkError)
-        }
-        if task is URLSessionUploadTask {
-
-            self.nkCommonInstance.delegate?.uploadComplete?(fileName: fileName, serverUrl: serverUrl, ocId: ocId, etag: etag, date: date, size: task.countOfBytesExpectedToSend, description: task.taskDescription, task: task, error: nkError)
+            self.nkCommonInstance.delegate?.downloadComplete?(fileName: fileName, serverUrl: serverUrl, etag: etag, date: date, dateLastModified: dateLastModified, length: length, task: task, error: nkError)
+        } else if task is URLSessionUploadTask {
+            self.nkCommonInstance.delegate?.uploadComplete?(fileName: fileName, serverUrl: serverUrl, ocId: ocId, etag: etag, date: date, size: task.countOfBytesExpectedToSend, task: task, error: nkError)
         }
 
         if nkError.errorCode == 0 {
