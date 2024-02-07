@@ -198,9 +198,9 @@ import Foundation
         }
 
         if task is URLSessionDownloadTask {
-            self.nkCommonInstance.delegate?.downloadComplete?(fileName: fileName, serverUrl: serverUrl, etag: etag, date: date, dateLastModified: dateLastModified, length: length, task: task, error: nkError)
+            self.nkCommonInstance.delegate?.downloadComplete?(fileName: fileName, serverUrl: serverUrl, etag: etag, date: date, dateLastModified: dateLastModified, length: length, fileNameLocalPath: task.taskDescription, task: task, error: nkError)
         } else if task is URLSessionUploadTask {
-            self.nkCommonInstance.delegate?.uploadComplete?(fileName: fileName, serverUrl: serverUrl, ocId: ocId, etag: etag, date: date, size: task.countOfBytesExpectedToSend, task: task, error: nkError)
+            self.nkCommonInstance.delegate?.uploadComplete?(fileName: fileName, serverUrl: serverUrl, ocId: ocId, etag: etag, date: date, size: task.countOfBytesExpectedToSend, fileNameLocalPath: task.taskDescription, task: task, error: nkError)
         }
 
         if nkError.errorCode == 0 {
