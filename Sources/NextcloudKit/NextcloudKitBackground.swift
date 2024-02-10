@@ -204,9 +204,9 @@ import Foundation
         }
 
         if nkError.errorCode == 0 {
-            self.nkCommonInstance.writeLog("Network completed upload file: \(serverUrl)/\(fileName)")
+            self.nkCommonInstance.writeLog("Network completed file: \(serverUrl)/\(fileName)")
         } else {
-            self.nkCommonInstance.writeLog("Network completed upload file: \(serverUrl)/\(fileName) with error code \(nkError.errorCode) and error description " + nkError.errorDescription)
+            self.nkCommonInstance.writeLog("Network completed file: \(serverUrl)/\(fileName) with error code \(nkError.errorCode) and error description " + nkError.errorDescription)
         }
     }
 
