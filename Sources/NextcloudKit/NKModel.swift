@@ -897,6 +897,10 @@ class NKDataFileXML: NSObject {
             // ----------
 
             // ----- NC28
+            let gps = propstat["d:prop", "nc:metadata-photos-gps"]
+            if let latitude = gps["latitude"].double {
+                print(latitude)
+            }
             for gpsElement in propstat["d:prop", "nc:metadata-photos-gps"] {
                 print(gpsElement)
             }
