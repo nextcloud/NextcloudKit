@@ -878,22 +878,21 @@ class NKDataFileXML: NSObject {
             }
 
             // NC27 -----
-            if let gps = propstat["d:prop", "nc:file-metadata-gps"].text,
-               let data = gps.data(using: .utf8),
-               let jsonDict = try? JSONSerialization.jsonObject(with: data) as? [String: Double],
-               let latitude = jsonDict["latitude"],
-               let longitude = jsonDict["longitude"] {
+            if let latitude = propstat["d:prop", "nc:file-metadata-gps", "latitude"].double {
                 file.latitude = latitude
+            }
+            if let longitude = propstat["d:prop", "nc:file-metadata-gps", "longitude"].double {
                 file.longitude = longitude
             }
+            if let altitude = propstat["d:prop", "nc:file-metadata-gps", "altitude"].double {
+                file.altitude = altitude
+            }
 
-            if let resolution = propstat["d:prop", "nc:file-metadata-size"].text,
-               let data = resolution.data(using: .utf8),
-               let jsonDict = try? JSONSerialization.jsonObject(with: data) as? [String: Int],
-               let height = jsonDict["height"],
-               let width = jsonDict["width"] {
-                file.height = height
+            if let width = propstat["d:prop", "nc:file-metadata-size", "width"].int {
                 file.width = width
+            }
+            if let height = propstat["d:prop", "nc:file-metadata-size", "height"].int {
+                file.height = height
             }
             // ----------
 
