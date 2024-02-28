@@ -897,6 +897,11 @@ class NKDataFileXML: NSObject {
             // ----------
 
             // ----- NC28
+            let gps = propstat["d:prop", "nc:metadata-photos-gps"]
+            for element in gps["nc:system-tag"] {
+                print(element)
+            }
+            /*
             if let gps = propstat["d:prop", "nc:metadata-photos-gps"].text,
                let data = gps.data(using: .utf8),
                let jsonDict = try? JSONSerialization.jsonObject(with: data) as? [String: Double],
@@ -905,6 +910,7 @@ class NKDataFileXML: NSObject {
                 file.latitude = latitude
                 file.longitude = longitude
             }
+            */
 
             if let resolution = propstat["d:prop", "nc:metadata-photos-size"].text,
                let data = resolution.data(using: .utf8),
