@@ -160,8 +160,8 @@ import SwiftyJSON
     @objc public var latitude: Double = 0
     @objc public var longitude: Double = 0
     @objc public var altitude: Double = 0
-    @objc public var height: Int = 0
-    @objc public var width: Int = 0
+    @objc public var height: Double = 0
+    @objc public var width: Double = 0
 
     /// If this is not empty, the media is a live photo. New media gets this straight from server, but old media needs to be detected as live photo (look isFlaggedAsLivePhotoByServer)
     @objc public var livePhotoFile = ""
@@ -888,10 +888,10 @@ class NKDataFileXML: NSObject {
                 file.altitude = altitude
             }
 
-            if let width = propstat["d:prop", "nc:file-metadata-size", "width"].int {
+            if let width = propstat["d:prop", "nc:file-metadata-size", "width"].double {
                 file.width = width
             }
-            if let height = propstat["d:prop", "nc:file-metadata-size", "height"].int {
+            if let height = propstat["d:prop", "nc:file-metadata-size", "height"].double {
                 file.height = height
             }
             // ----------
@@ -907,10 +907,10 @@ class NKDataFileXML: NSObject {
                 file.altitude = altitude
             }
 
-            if let width = propstat["d:prop", "nc:metadata-photos-size", "width"].int {
+            if let width = propstat["d:prop", "nc:metadata-photos-size", "width"].double {
                 file.width = width
             }
-            if let height = propstat["d:prop", "nc:metadata-photos-size", "height"].int {
+            if let height = propstat["d:prop", "nc:metadata-photos-size", "height"].double {
                 file.height = height
             }
             // ----------
