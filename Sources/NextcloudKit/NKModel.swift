@@ -897,9 +897,8 @@ class NKDataFileXML: NSObject {
             // ----------
 
             // ----- NC28
-            let gps = propstat["d:prop", "nc:metadata-photos-gps"]
-            for element in gps["nc:system-tag"] {
-                print(element)
+            for gpsElement in propstat["d:prop", "nc:metadata-photos-gps"] {
+                print(gpsElement)
             }
             /*
             if let gps = propstat["d:prop", "nc:metadata-photos-gps"].text,
