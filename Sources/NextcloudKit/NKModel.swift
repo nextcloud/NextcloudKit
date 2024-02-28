@@ -159,6 +159,7 @@ import SwiftyJSON
     @objc public var userId = ""
     @objc public var latitude: Double = 0
     @objc public var longitude: Double = 0
+    @objc public var altitude: Double = 0
     @objc public var height: Int = 0
     @objc public var width: Int = 0
 
@@ -899,22 +900,16 @@ class NKDataFileXML: NSObject {
             // ----- NC28
             let gps = propstat["d:prop", "nc:metadata-photos-gps"]
             if let latitude = gps["latitude"].double {
-                print(latitude)
-            }
-            for gpsElement in propstat["d:prop", "nc:metadata-photos-gps"] {
-                print(gpsElement)
-            }
-            /*
-            if let gps = propstat["d:prop", "nc:metadata-photos-gps"].text,
-               let data = gps.data(using: .utf8),
-               let jsonDict = try? JSONSerialization.jsonObject(with: data) as? [String: Double],
-               let latitude = jsonDict["latitude"],
-               let longitude = jsonDict["longitude"] {
                 file.latitude = latitude
+            }
+            if let longitude = gps["longitude"].double {
                 file.longitude = longitude
             }
-            */
+            if let altitude = gps["altitude"].double {
+                file.altitude = altitude
+            }
 
+            let resolution = propstat["d:prop", "nc:metadata-photos-size"]
             if let resolution = propstat["d:prop", "nc:metadata-photos-size"].text,
                let data = resolution.data(using: .utf8),
                let jsonDict = try? JSONSerialization.jsonObject(with: data) as? [String: Int],
