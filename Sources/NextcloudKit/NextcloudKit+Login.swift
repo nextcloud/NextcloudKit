@@ -75,6 +75,47 @@ extension NextcloudKit {
         }
     }
 
+    @objc public func deleteAppPassword(serverUrl: String,
+                                        username: String,
+                                        password: String,
+                                        userAgent: String? = nil,
+                                        queue: DispatchQueue = .main,
+                                        completion: @escaping (_ data: Data?, _ error: NKError) -> Void) {
+
+        let endpoint = "ocs/v2.php/core/apppassword"
+
+        guard let url = self.nkCommonInstance.createStandardUrl(serverUrl: serverUrl, endpoint: endpoint) else {
+            return queue.async { completion(nil, .urlError) }
+        }
+
+        var headers: HTTPHeaders = [.authorization(username: username, password: password)]
+        if let userAgent = userAgent {
+            headers.update(.userAgent(userAgent))
+        }
+        headers.update(name: "OCS-APIRequest", value: "true")
+
+        var urlRequest: URLRequest
+        do {
+            try urlRequest = URLRequest(url: url, method: HTTPMethod(rawValue: "DELETE"), headers: headers)
+        } catch {
+            return queue.async { completion(nil, NKError(error: error)) }
+        }
+
+        sessionManager.request(urlRequest).validate(statusCode: 200..<300).response(queue: self.nkCommonInstance.backgroundQueue) { response in
+            if self.nkCommonInstance.levelLog > 0 {
+                debugPrint(response)
+            }
+
+            switch response.result {
+            case .failure(let error):
+                let error = NKError(error: error, afResponse: response, responseData: response.data)
+                queue.async { completion(nil, error) }
+            case .success(let xmlData):
+                queue.async { completion(xmlData, .success) }
+            }
+        }
+    }
+
     // MARK: - Login Flow V2
 
     @objc public func getLoginFlowV2(serverUrl: String,
