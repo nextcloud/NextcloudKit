@@ -35,6 +35,7 @@ extension NextcloudKit {
                                                   devicePublicKey: String,
                                                   proxyServerUrl: String,
                                                   options: NKRequestOptions = NKRequestOptions(),
+                                                  taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
                                                   completion: @escaping (_ account: String, _ deviceIdentifier: String?, _ signature: String?, _ publicKey: String?, _ data: Data?, _ error: NKError) -> Void) {
 
         let endpoint = "ocs/v2.php/apps/notifications/api/v2/push"
@@ -51,7 +52,9 @@ extension NextcloudKit {
 
         let headers = self.nkCommonInstance.getStandardHeaders(user: user, password: password, appendHeaders: options.customHeader, customUserAgent: options.customUserAgent)
 
-        sessionManager.request(url, method: .post, parameters: parameters, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).responseData(queue: self.nkCommonInstance.backgroundQueue) { response in
+        sessionManager.request(url, method: .post, parameters: parameters, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
+            taskHandler(task)
+        }.responseData(queue: self.nkCommonInstance.backgroundQueue) { response in
             if self.nkCommonInstance.levelLog > 0 {
                 debugPrint(response)
             }
@@ -80,6 +83,7 @@ extension NextcloudKit {
                                                     user: String,
                                                     password: String,
                                                     options: NKRequestOptions = NKRequestOptions(),
+                                                    taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
                                                     completion: @escaping (_ account: String, _ error: NKError) -> Void) {
 
         let endpoint = "ocs/v2.php/apps/notifications/api/v2/push"
@@ -90,7 +94,9 @@ extension NextcloudKit {
 
         let headers = self.nkCommonInstance.getStandardHeaders(user: user, password: password, appendHeaders: options.customHeader, customUserAgent: options.customUserAgent)
 
-        sessionManager.request(url, method: .delete, parameters: nil, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).response(queue: self.nkCommonInstance.backgroundQueue) { response in
+        sessionManager.request(url, method: .delete, parameters: nil, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
+            taskHandler(task)
+        }.response(queue: self.nkCommonInstance.backgroundQueue) { response in
             if self.nkCommonInstance.levelLog > 0 {
                 debugPrint(response)
             }
@@ -111,6 +117,7 @@ extension NextcloudKit {
                                            signature: String,
                                            publicKey: String,
                                            options: NKRequestOptions = NKRequestOptions(),
+                                           taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
                                            completion: @escaping (_ error: NKError) -> Void) {
 
         let endpoint = "devices?format=json"
@@ -129,7 +136,9 @@ extension NextcloudKit {
 
         let headers = HTTPHeaders(arrayLiteral: .userAgent(userAgent))
 
-        sessionManager.request(url, method: .post, parameters: parameters, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).response(queue: self.nkCommonInstance.backgroundQueue) { response in
+        sessionManager.request(url, method: .post, parameters: parameters, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
+            taskHandler(task)
+        }.response(queue: self.nkCommonInstance.backgroundQueue) { response in
             if self.nkCommonInstance.levelLog > 0 {
                 debugPrint(response)
             }
@@ -149,6 +158,7 @@ extension NextcloudKit {
                                              signature: String,
                                              publicKey: String,
                                              options: NKRequestOptions = NKRequestOptions(),
+                                             taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
                                              completion: @escaping (_ error: NKError) -> Void) {
 
         let endpoint = "devices"
@@ -166,7 +176,9 @@ extension NextcloudKit {
 
         let headers = HTTPHeaders(arrayLiteral: .userAgent(userAgent))
 
-        sessionManager.request(url, method: .delete, parameters: parameters, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).response(queue: self.nkCommonInstance.backgroundQueue) { response in
+        sessionManager.request(url, method: .delete, parameters: parameters, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
+            taskHandler(task)
+        }.response(queue: self.nkCommonInstance.backgroundQueue) { response in
             if self.nkCommonInstance.levelLog > 0 {
                 debugPrint(response)
             }
