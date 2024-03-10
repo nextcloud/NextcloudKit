@@ -29,6 +29,7 @@ extension NextcloudKit {
     public func setLivephoto(serverUrlfileNamePath: String,
                              livePhotoFile: String,
                              options: NKRequestOptions = NKRequestOptions(),
+                             taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
                              completion: @escaping (_ account: String, _ error: NKError) -> Void) {
 
         let account = self.nkCommonInstance.account
@@ -49,7 +50,9 @@ extension NextcloudKit {
             return options.queue.async { completion(account, NKError(error: error)) }
         }
 
-        sessionManager.request(urlRequest).validate(statusCode: 200..<300).response(queue: self.nkCommonInstance.backgroundQueue) { response in
+        sessionManager.request(urlRequest).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
+            taskHandler(task)
+        }.response(queue: self.nkCommonInstance.backgroundQueue) { response in
             if self.nkCommonInstance.levelLog > 0 {
                 debugPrint(response)
             }

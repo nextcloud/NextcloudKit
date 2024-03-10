@@ -28,6 +28,7 @@ extension NextcloudKit {
 
     @objc public func getComments(fileId: String,
                                   options: NKRequestOptions = NKRequestOptions(),
+                                  taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
                                   completion: @escaping (_ account: String, _ items: [NKComments]?, _ data: Data?, _ error: NKError) -> Void) {
 
         let account = self.nkCommonInstance.account
@@ -50,7 +51,9 @@ extension NextcloudKit {
             return options.queue.async { completion(account, nil, nil, NKError(error: error)) }
         }
 
-        sessionManager.request(urlRequest).validate(statusCode: 200..<300).responseData(queue: self.nkCommonInstance.backgroundQueue) { response in
+        sessionManager.request(urlRequest).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
+            taskHandler(task)
+        }.responseData(queue: self.nkCommonInstance.backgroundQueue) { response in
             if self.nkCommonInstance.levelLog > 0 {
                 debugPrint(response)
             }
@@ -73,6 +76,7 @@ extension NextcloudKit {
     @objc public func putComments(fileId: String,
                                   message: String,
                                   options: NKRequestOptions = NKRequestOptions(),
+                                  taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
                                   completion: @escaping (_ account: String, _ error: NKError) -> Void) {
 
         let account = self.nkCommonInstance.account
@@ -95,7 +99,9 @@ extension NextcloudKit {
             return options.queue.async { completion(account, NKError(error: error)) }
         }
 
-        sessionManager.request(urlRequest).validate(statusCode: 200..<300).response(queue: self.nkCommonInstance.backgroundQueue) { response in
+        sessionManager.request(urlRequest).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
+            taskHandler(task)
+        }.response(queue: self.nkCommonInstance.backgroundQueue) { response in
             if self.nkCommonInstance.levelLog > 0 {
                 debugPrint(response)
             }
@@ -114,6 +120,7 @@ extension NextcloudKit {
                                      messageId: String,
                                      message: String,
                                      options: NKRequestOptions = NKRequestOptions(),
+                                     taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
                                      completion: @escaping (_ account: String, _ error: NKError) -> Void) {
 
         let account = self.nkCommonInstance.account
@@ -137,7 +144,9 @@ extension NextcloudKit {
             return options.queue.async { completion(account, NKError(error: error)) }
         }
 
-        sessionManager.request(urlRequest).validate(statusCode: 200..<300).response(queue: self.nkCommonInstance.backgroundQueue) { response in
+        sessionManager.request(urlRequest).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
+            taskHandler(task)
+        }.response(queue: self.nkCommonInstance.backgroundQueue) { response in
             if self.nkCommonInstance.levelLog > 0 {
                 debugPrint(response)
             }
@@ -155,6 +164,7 @@ extension NextcloudKit {
     @objc public func deleteComments(fileId: String,
                                      messageId: String,
                                      options: NKRequestOptions = NKRequestOptions(),
+                                     taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
                                      completion: @escaping (_ account: String, _ error: NKError) -> Void) {
 
         let account = self.nkCommonInstance.account
@@ -168,7 +178,9 @@ extension NextcloudKit {
 
         let headers = self.nkCommonInstance.getStandardHeaders(options: options)
 
-        sessionManager.request(url, method: .delete, parameters: nil, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).response(queue: self.nkCommonInstance.backgroundQueue) { response in
+        sessionManager.request(url, method: .delete, parameters: nil, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
+            taskHandler(task)
+        }.response(queue: self.nkCommonInstance.backgroundQueue) { response in
             if self.nkCommonInstance.levelLog > 0 {
                 debugPrint(response)
             }
@@ -185,6 +197,7 @@ extension NextcloudKit {
 
     @objc public func markAsReadComments(fileId: String,
                                          options: NKRequestOptions = NKRequestOptions(),
+                                         taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
                                          completion: @escaping (_ account: String, _ error: NKError) -> Void) {
 
         let account = self.nkCommonInstance.account
@@ -208,7 +221,9 @@ extension NextcloudKit {
             return options.queue.async { completion(account, NKError(error: error)) }
         }
 
-        sessionManager.request(urlRequest).validate(statusCode: 200..<300).response(queue: self.nkCommonInstance.backgroundQueue) { response in
+        sessionManager.request(urlRequest).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
+            taskHandler(task)
+        }.response(queue: self.nkCommonInstance.backgroundQueue) { response in
             if self.nkCommonInstance.levelLog > 0 {
                 debugPrint(response)
             }

@@ -48,6 +48,7 @@ extension NextcloudKit {
                               timeoutProvider: TimeInterval = 60,
                               filter: @escaping (NKSearchProvider) -> Bool = { _ in true },
                               request: @escaping (DataRequest?) -> Void,
+                              taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
                               providers: @escaping (_ account: String, _ searchProviders: [NKSearchProvider]?) -> Void,
                               update: @escaping (_ account: String, _ searchResult: NKSearchResult?, _ provider: NKSearchProvider, _ error: NKError) -> Void,
                               completion: @escaping (_ account: String, _ data: Data?, _ error: NKError) -> Void) {
@@ -63,7 +64,9 @@ extension NextcloudKit {
 
         let headers = self.nkCommonInstance.getStandardHeaders(options: options)
 
-        let requestUnifiedSearch = sessionManager.request(url, method: .get, parameters: nil, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).responseData(queue: self.nkCommonInstance.backgroundQueue) { response in
+        let requestUnifiedSearch = sessionManager.request(url, method: .get, parameters: nil, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
+            taskHandler(task)
+        }.responseData(queue: self.nkCommonInstance.backgroundQueue) { response in
             if self.nkCommonInstance.levelLog > 0 {
                 debugPrint(response)
             }
@@ -124,6 +127,7 @@ extension NextcloudKit {
                                cursor: Int? = nil,
                                options: NKRequestOptions = NKRequestOptions(),
                                timeout: TimeInterval = 60,
+                               taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
                                completion: @escaping (_ accoun: String, NKSearchResult?, _ data: Data?, _ error: NKError) -> Void) -> DataRequest? {
 
         let urlBase = self.nkCommonInstance.urlBase
@@ -162,7 +166,9 @@ extension NextcloudKit {
             return nil
         }
 
-        let requestSearchProvider = sessionManager.request(urlRequest).validate(statusCode: 200..<300).responseData(queue: self.nkCommonInstance.backgroundQueue) { response in
+        let requestSearchProvider = sessionManager.request(urlRequest).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
+            taskHandler(task)
+        }.responseData(queue: self.nkCommonInstance.backgroundQueue) { response in
             if self.nkCommonInstance.levelLog > 0 {
                 debugPrint(response)
             }

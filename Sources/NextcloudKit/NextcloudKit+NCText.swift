@@ -28,6 +28,7 @@ import SwiftyJSON
 extension NextcloudKit {
 
     @objc public func NCTextObtainEditorDetails(options: NKRequestOptions = NKRequestOptions(),
+                                                taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
                                                 completion: @escaping (_ account: String, _  editors: [NKEditorDetailsEditors], _ creators: [NKEditorDetailsCreators], _ data: Data?, _ error: NKError) -> Void) {
 
         let account = self.nkCommonInstance.account
@@ -44,7 +45,9 @@ extension NextcloudKit {
 
         let headers = self.nkCommonInstance.getStandardHeaders(options: options)
 
-        sessionManager.request(url, method: .get, parameters: nil, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).responseData(queue: self.nkCommonInstance.backgroundQueue) { response in
+        sessionManager.request(url, method: .get, parameters: nil, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
+            taskHandler(task)
+        }.responseData(queue: self.nkCommonInstance.backgroundQueue) { response in
             if self.nkCommonInstance.levelLog > 0 {
                 debugPrint(response)
             }
@@ -97,6 +100,7 @@ extension NextcloudKit {
                                      fileId: String? = nil,
                                      editor: String,
                                      options: NKRequestOptions = NKRequestOptions(),
+                                     taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
                                      completion: @escaping (_ account: String, _  url: String?, _ data: Data?, _ error: NKError) -> Void) {
 
         let account = self.nkCommonInstance.account
@@ -117,7 +121,9 @@ extension NextcloudKit {
 
         let headers = self.nkCommonInstance.getStandardHeaders(options: options)
 
-        sessionManager.request(url, method: .post, parameters: nil, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).responseData(queue: self.nkCommonInstance.backgroundQueue) { response in
+        sessionManager.request(url, method: .post, parameters: nil, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
+            taskHandler(task)
+        }.responseData(queue: self.nkCommonInstance.backgroundQueue) { response in
             if self.nkCommonInstance.levelLog > 0 {
                 debugPrint(response)
             }
@@ -135,6 +141,7 @@ extension NextcloudKit {
     }
 
     @objc public func NCTextGetListOfTemplates(options: NKRequestOptions = NKRequestOptions(),
+                                               taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
                                                completion: @escaping (_ account: String, _  templates: [NKEditorTemplates], _ data: Data?, _ error: NKError) -> Void) {
 
         let account = self.nkCommonInstance.account
@@ -150,7 +157,9 @@ extension NextcloudKit {
 
         let headers = self.nkCommonInstance.getStandardHeaders(options: options)
 
-        sessionManager.request(url, method: .get, parameters: nil, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).responseData(queue: self.nkCommonInstance.backgroundQueue) { response in
+        sessionManager.request(url, method: .get, parameters: nil, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
+            taskHandler(task)
+        }.responseData(queue: self.nkCommonInstance.backgroundQueue) { response in
             if self.nkCommonInstance.levelLog > 0 {
                 debugPrint(response)
             }
@@ -184,6 +193,7 @@ extension NextcloudKit {
                                        creatorId: String,
                                        templateId: String,
                                        options: NKRequestOptions = NKRequestOptions(),
+                                       taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
                                        completion: @escaping (_ account: String, _ url: String?, _ data: Data?, _ error: NKError) -> Void) {
 
         let account = self.nkCommonInstance.account
@@ -207,7 +217,9 @@ extension NextcloudKit {
 
         let headers = self.nkCommonInstance.getStandardHeaders(options: options)
 
-        sessionManager.request(url, method: .post, parameters: nil, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).responseData(queue: self.nkCommonInstance.backgroundQueue) { response in
+        sessionManager.request(url, method: .post, parameters: nil, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
+            taskHandler(task)
+        }.responseData(queue: self.nkCommonInstance.backgroundQueue) { response in
             if self.nkCommonInstance.levelLog > 0 {
                 debugPrint(response)
             }

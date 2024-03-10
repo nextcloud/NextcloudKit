@@ -81,6 +81,7 @@ extension NextcloudKit {
 
     @objc public func readShares(parameters: NKShareParameter,
                                  options: NKRequestOptions = NKRequestOptions(),
+                                 taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
                                  completion: @escaping (_ account: String, _ shares: [NKShare]?, _ data: Data?, _ error: NKError) -> Void) {
 
         let account = self.nkCommonInstance.account
@@ -93,7 +94,9 @@ extension NextcloudKit {
 
         let headers = self.nkCommonInstance.getStandardHeaders(options: options)
 
-        sessionManager.request(url, method: .get, parameters: parameters.queryParameters, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).responseData(queue: self.nkCommonInstance.backgroundQueue) { response in
+        sessionManager.request(url, method: .get, parameters: parameters.queryParameters, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
+            taskHandler(task)
+        }.responseData(queue: self.nkCommonInstance.backgroundQueue) { response in
         if self.nkCommonInstance.levelLog > 0 {
                 debugPrint(response)
             }
@@ -134,6 +137,7 @@ extension NextcloudKit {
                                     itemType: String = "file",
                                     lookup: Bool = false,
                                     options: NKRequestOptions = NKRequestOptions(),
+                                    taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
                                     completion: @escaping (_ account: String, _ sharees: [NKSharee]?, _ data: Data?, _ error: NKError) -> Void) {
 
         let account = self.nkCommonInstance.account
@@ -160,7 +164,9 @@ extension NextcloudKit {
             "lookup": lookupString
         ]
 
-        sessionManager.request(url, method: .get, parameters: parameters, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).responseData(queue: self.nkCommonInstance.backgroundQueue) { response in
+        sessionManager.request(url, method: .get, parameters: parameters, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
+            taskHandler(task)
+        }.responseData(queue: self.nkCommonInstance.backgroundQueue) { response in
             if self.nkCommonInstance.levelLog > 0 {
                 debugPrint(response)
             }
@@ -255,9 +261,14 @@ extension NextcloudKit {
                                       password: String? = nil,
                                       permissions: Int = 1,
                                       options: NKRequestOptions = NKRequestOptions(),
+                                      taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
                                       completion: @escaping (_ account: String, _ share: NKShare?, _ data: Data?, _ error: NKError) -> Void) {
 
-        createShare(path: path, shareType: 3, shareWith: nil, publicUpload: publicUpload, hideDownload: hideDownload, password: password, permissions: permissions, options: options, completion: completion)
+        createShare(path: path, shareType: 3, shareWith: nil, publicUpload: publicUpload, hideDownload: hideDownload, password: password, permissions: permissions, options: options) { task in
+            taskHandler(task)
+        } completion: { account, share, data, error in
+            completion(account, share, data, error)
+        }
     }
 
     @objc public func createShare(path: String,
@@ -268,9 +279,14 @@ extension NextcloudKit {
                                   permissions: Int = 1,
                                   options: NKRequestOptions = NKRequestOptions(),
                                   attributes: String? = nil,
+                                  taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
                                   completion: @escaping (_ account: String, _ share: NKShare?, _ data: Data?, _ error: NKError) -> Void) {
 
-        createShare(path: path, shareType: shareType, shareWith: shareWith, publicUpload: false, note: note, hideDownload: false, password: password, permissions: permissions, attributes: attributes, options: options, completion: completion)
+        createShare(path: path, shareType: shareType, shareWith: shareWith, publicUpload: false, note: note, hideDownload: false, password: password, permissions: permissions, attributes: attributes, options: options) { task in
+            taskHandler(task)
+        } completion: { account, share, data, error in
+            completion(account, share, data, error)
+        }
     }
 
     private func createShare(path: String,
@@ -283,6 +299,7 @@ extension NextcloudKit {
                              permissions: Int = 1,
                              attributes: String? = nil,
                              options: NKRequestOptions = NKRequestOptions(),
+                             taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
                              completion: @escaping (_ account: String, _ share: NKShare?, _ data: Data?, _ error: NKError) -> Void) {
 
         let account = self.nkCommonInstance.account
@@ -320,7 +337,9 @@ extension NextcloudKit {
             parameters["attributes"] = attributes
         }
 
-        sessionManager.request(url, method: .post, parameters: parameters, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).responseData(queue: self.nkCommonInstance.backgroundQueue) { response in
+        sessionManager.request(url, method: .post, parameters: parameters, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
+            taskHandler(task)
+        }.responseData(queue: self.nkCommonInstance.backgroundQueue) { response in
             if self.nkCommonInstance.levelLog > 0 {
                 debugPrint(response)
             }
@@ -371,6 +390,7 @@ extension NextcloudKit {
                                   hideDownload: Bool,
                                   attributes: String? = nil,
                                   options: NKRequestOptions = NKRequestOptions(),
+                                  taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
                                   completion: @escaping (_ account: String, _ share: NKShare?, _ data: Data?, _ error: NKError) -> Void) {
 
         let account = self.nkCommonInstance.account
@@ -407,7 +427,9 @@ extension NextcloudKit {
             parameters["attributes"] = "[]"
         }
 
-        sessionManager.request(url, method: .put, parameters: parameters, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).responseData(queue: self.nkCommonInstance.backgroundQueue) { response in
+        sessionManager.request(url, method: .put, parameters: parameters, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
+            taskHandler(task)
+        }.responseData(queue: self.nkCommonInstance.backgroundQueue) { response in
             if self.nkCommonInstance.levelLog > 0 {
                 debugPrint(response)
             }
@@ -434,6 +456,7 @@ extension NextcloudKit {
 
     @objc public func deleteShare(idShare: Int,
                                   options: NKRequestOptions = NKRequestOptions(),
+                                  taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
                                   completion: @escaping (_ account: String, _ error: NKError) -> Void) {
 
         let account = self.nkCommonInstance.account
@@ -447,7 +470,9 @@ extension NextcloudKit {
 
         let headers = self.nkCommonInstance.getStandardHeaders(options: options)
 
-        sessionManager.request(url, method: .delete, parameters: nil, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).response(queue: self.nkCommonInstance.backgroundQueue) { response in
+        sessionManager.request(url, method: .delete, parameters: nil, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
+            taskHandler(task)
+        }.response(queue: self.nkCommonInstance.backgroundQueue) { response in
             if self.nkCommonInstance.levelLog > 0 {
                 debugPrint(response)
             }

@@ -34,6 +34,7 @@ extension NextcloudKit {
                                      password: String,
                                      userAgent: String? = nil,
                                      queue: DispatchQueue = .main,
+                                     taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
                                      completion: @escaping (_ token: String?, _ data: Data?, _ error: NKError) -> Void) {
 
         let endpoint = "ocs/v2.php/core/getapppassword"
@@ -55,7 +56,9 @@ extension NextcloudKit {
             return queue.async { completion(nil, nil, NKError(error: error)) }
         }
 
-        sessionManager.request(urlRequest).validate(statusCode: 200..<300).response(queue: self.nkCommonInstance.backgroundQueue) { response in
+        sessionManager.request(urlRequest).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
+            taskHandler(task)
+        }.response(queue: self.nkCommonInstance.backgroundQueue) { response in
             if self.nkCommonInstance.levelLog > 0 {
                 debugPrint(response)
             }
@@ -75,11 +78,56 @@ extension NextcloudKit {
         }
     }
 
+    @objc public func deleteAppPassword(serverUrl: String,
+                                        username: String,
+                                        password: String,
+                                        userAgent: String? = nil,
+                                        queue: DispatchQueue = .main,
+                                        taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
+                                        completion: @escaping (_ data: Data?, _ error: NKError) -> Void) {
+
+        let endpoint = "ocs/v2.php/core/apppassword"
+
+        guard let url = self.nkCommonInstance.createStandardUrl(serverUrl: serverUrl, endpoint: endpoint) else {
+            return queue.async { completion(nil, .urlError) }
+        }
+
+        var headers: HTTPHeaders = [.authorization(username: username, password: password)]
+        if let userAgent = userAgent {
+            headers.update(.userAgent(userAgent))
+        }
+        headers.update(name: "OCS-APIRequest", value: "true")
+
+        var urlRequest: URLRequest
+        do {
+            try urlRequest = URLRequest(url: url, method: HTTPMethod(rawValue: "DELETE"), headers: headers)
+        } catch {
+            return queue.async { completion(nil, NKError(error: error)) }
+        }
+
+        sessionManager.request(urlRequest).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
+            taskHandler(task)
+        }.response(queue: self.nkCommonInstance.backgroundQueue) { response in
+            if self.nkCommonInstance.levelLog > 0 {
+                debugPrint(response)
+            }
+
+            switch response.result {
+            case .failure(let error):
+                let error = NKError(error: error, afResponse: response, responseData: response.data)
+                queue.async { completion(nil, error) }
+            case .success(let xmlData):
+                queue.async { completion(xmlData, .success) }
+            }
+        }
+    }
+
     // MARK: - Login Flow V2
 
     @objc public func getLoginFlowV2(serverUrl: String,
                                      userAgent: String? = nil,
                                      queue: DispatchQueue = .main,
+                                     taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
                                      completion: @escaping (_ token: String?, _ endpoint: String?, _ login: String?, _ data: Data?, _ error: NKError) -> Void) {
 
         let endpoint = "index.php/login/v2"
@@ -93,7 +141,9 @@ extension NextcloudKit {
             headers = [HTTPHeader.userAgent(userAgent)]
         }
 
-        sessionManager.request(url, method: .post, parameters: nil, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).responseData(queue: self.nkCommonInstance.backgroundQueue) { response in
+        sessionManager.request(url, method: .post, parameters: nil, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
+            taskHandler(task)
+        }.responseData(queue: self.nkCommonInstance.backgroundQueue) { response in
             if self.nkCommonInstance.levelLog > 0 {
                 debugPrint(response)
             }
@@ -118,6 +168,7 @@ extension NextcloudKit {
                                          endpoint: String,
                                          userAgent: String? = nil,
                                          queue: DispatchQueue = .main,
+                                         taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
                                          completion: @escaping (_ server: String?, _ loginName: String?, _ appPassword: String?, _ data: Data?, _ error: NKError) -> Void) {
 
         let serverUrl = endpoint + "?token=" + token
@@ -131,7 +182,9 @@ extension NextcloudKit {
             headers = [HTTPHeader.userAgent(userAgent)]
         }
 
-        sessionManager.request(url, method: .post, parameters: nil, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).responseData(queue: self.nkCommonInstance.backgroundQueue) { response in
+        sessionManager.request(url, method: .post, parameters: nil, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
+            taskHandler(task)
+        }.responseData(queue: self.nkCommonInstance.backgroundQueue) { response in
             if self.nkCommonInstance.levelLog > 0 {
                 debugPrint(response)
             }
