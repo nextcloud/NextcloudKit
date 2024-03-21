@@ -554,7 +554,8 @@ extension NextcloudKit {
         }
     }
 
-    @objc public func listingTrash(showHiddenFiles: Bool,
+    @objc public func listingTrash(filename: String? = nil,
+                                   showHiddenFiles: Bool,
                                    options: NKRequestOptions = NKRequestOptions(),
                                    taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
                                    completion: @escaping (_ account: String, _ items: [NKTrash], _ data: Data?, _ error: NKError) -> Void) {
@@ -563,7 +564,10 @@ extension NextcloudKit {
         let userId = self.nkCommonInstance.userId
         let urlBase = self.nkCommonInstance.urlBase
         let dav = self.nkCommonInstance.dav
-        let serverUrlFileName = urlBase + "/" + dav + "/trashbin/" + userId + "/trash/"
+        var serverUrlFileName = urlBase + "/" + dav + "/trashbin/" + userId + "/trash/"
+        if let filename {
+            serverUrlFileName = serverUrlFileName + filename
+        }
         var items: [NKTrash] = []
 
         guard let url = serverUrlFileName.encodedToUrl else {
