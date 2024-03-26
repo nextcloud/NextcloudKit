@@ -236,9 +236,9 @@ extension NextcloudKit {
 }
 
 public class NKTextProcessingTaskTypes {
-    var id: String?
-    var name: String?
-    var description: String?
+    public var id: String?
+    public var name: String?
+    public var description: String?
 
     init?(json: JSON) {
         self.id = json["id"].string
@@ -253,17 +253,15 @@ public class NKTextProcessingTaskTypes {
 }
 
 public class NKTextProcessingTask {
-    var id: Int?
-    var type: String?
-    var status: Int?
-    var userId: String?
-    var appId: String?
-    var input: String?
-    var output: String?
-    var identifier: String?
-    var completionExpectedAt: Int?
-
-    init() { }
+    public var id: Int?
+    public var type: String?
+    public var status: Int?
+    public var userId: String?
+    public var appId: String?
+    public var input: String?
+    public var output: String?
+    public var identifier: String?
+    public var completionExpectedAt: Int?
 
     init?(json: JSON) {
         self.id = json["id"].int
