@@ -72,7 +72,7 @@ extension NextcloudKit {
                                        identifier: String,
                                        options: NKRequestOptions = NKRequestOptions(),
                                        taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-                                       completion: @escaping (_ account: String, _ types: [NKTextProcessingTaskTypes]?, _ data: Data?, _ error: NKError) -> Void) {
+                                       completion: @escaping (_ account: String, _ task: NKTextProcessingTask?, _ data: Data?, _ error: NKError) -> Void) {
 
         let account = self.nkCommonInstance.account
         let urlBase = self.nkCommonInstance.urlBase
@@ -99,11 +99,20 @@ extension NextcloudKit {
                 options.queue.async { completion(account, nil, nil, error) }
             case .success(let jsonData):
                 let json = JSON(jsonData)
-                let data = json["ocs"]["data"]["types"]
+                let data = json["ocs"]["data"]["task"]
                 let statusCode = json["ocs"]["meta"]["statuscode"].int ?? NKError.internalError
                 if 200..<300 ~= statusCode {
-                    let results = NKTextProcessingTaskTypes.factory(data: data)
-                    options.queue.async { completion(account, results, jsonData, .success) }
+                    let result = NKTextProcessingTask()
+                    result.id = data["id"].int
+                    result.type = data["type"].string
+                    result.status = data["status"].int
+                    result.userId = data["userId"].string
+                    result.appId = data["appId"].string
+                    result.input = data["input"].string
+                    result.output = data["output"].string
+                    result.identifier = data["identifier"].string
+                    result.completionExpectedAt = data["completionExpectedAt"].int
+                    options.queue.async { completion(account, result, jsonData, .success) }
                 } else {
                     options.queue.async { completion(account, nil, jsonData, NKError(rootJson: json, fallbackStatusCode: response.response?.statusCode)) }
                 }
@@ -114,7 +123,7 @@ extension NextcloudKit {
     public func textProcessingGetTask(task: String,
                                       options: NKRequestOptions = NKRequestOptions(),
                                       taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-                                      completion: @escaping (_ account: String, _ types: [NKTextProcessingTaskTypes]?, _ data: Data?, _ error: NKError) -> Void) {
+                                      completion: @escaping (_ account: String, _ task: NKTextProcessingTask?, _ data: Data?, _ error: NKError) -> Void) {
 
         let account = self.nkCommonInstance.account
         let urlBase = self.nkCommonInstance.urlBase
@@ -140,10 +149,110 @@ extension NextcloudKit {
                 options.queue.async { completion(account, nil, nil, error) }
             case .success(let jsonData):
                 let json = JSON(jsonData)
-                let data = json["ocs"]["data"]["types"]
+                let data = json["ocs"]["data"]["task"]
                 let statusCode = json["ocs"]["meta"]["statuscode"].int ?? NKError.internalError
                 if 200..<300 ~= statusCode {
-                    let results = NKTextProcessingTaskTypes.factory(data: data)
+                    let result = NKTextProcessingTask()
+                    result.id = data["id"].int
+                    result.type = data["type"].string
+                    result.status = data["status"].int
+                    result.userId = data["userId"].string
+                    result.appId = data["appId"].string
+                    result.input = data["input"].string
+                    result.output = data["output"].string
+                    result.identifier = data["identifier"].string
+                    result.completionExpectedAt = data["completionExpectedAt"].int
+                    options.queue.async { completion(account, result, jsonData, .success) }
+                } else {
+                    options.queue.async { completion(account, nil, jsonData, NKError(rootJson: json, fallbackStatusCode: response.response?.statusCode)) }
+                }
+            }
+        }
+    }
+
+    public func textProcessingDeleteTask(task: String,
+                                         options: NKRequestOptions = NKRequestOptions(),
+                                         taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
+                                         completion: @escaping (_ account: String, _ task: NKTextProcessingTask?, _ data: Data?, _ error: NKError) -> Void) {
+
+        let account = self.nkCommonInstance.account
+        let urlBase = self.nkCommonInstance.urlBase
+
+        let endpoint = "/ocs/v2.php/textprocessing/task/\(task)"
+
+        guard let url = self.nkCommonInstance.createStandardUrl(serverUrl: urlBase, endpoint: endpoint) else {
+            return options.queue.async { completion(account, nil, nil, .urlError) }
+        }
+
+        let headers = self.nkCommonInstance.getStandardHeaders(options: options)
+
+        sessionManager.request(url, method: .delete, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
+            taskHandler(task)
+        }.responseData(queue: self.nkCommonInstance.backgroundQueue) { response in
+            if self.nkCommonInstance.levelLog > 0 {
+                debugPrint(response)
+            }
+
+            switch response.result {
+            case .failure(let error):
+                let error = NKError(error: error, afResponse: response, responseData: response.data)
+                options.queue.async { completion(account, nil, nil, error) }
+            case .success(let jsonData):
+                let json = JSON(jsonData)
+                let data = json["ocs"]["data"]["task"]
+                let statusCode = json["ocs"]["meta"]["statuscode"].int ?? NKError.internalError
+                if 200..<300 ~= statusCode {
+                    let result = NKTextProcessingTask()
+                    result.id = data["id"].int
+                    result.type = data["type"].string
+                    result.status = data["status"].int
+                    result.userId = data["userId"].string
+                    result.appId = data["appId"].string
+                    result.input = data["input"].string
+                    result.output = data["output"].string
+                    result.identifier = data["identifier"].string
+                    result.completionExpectedAt = data["completionExpectedAt"].int
+                    options.queue.async { completion(account, result, jsonData, .success) }
+                } else {
+                    options.queue.async { completion(account, nil, jsonData, NKError(rootJson: json, fallbackStatusCode: response.response?.statusCode)) }
+                }
+            }
+        }
+    }
+
+    public func textProcessingTaskList(appId: String,
+                                       options: NKRequestOptions = NKRequestOptions(),
+                                       taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
+                                       completion: @escaping (_ account: String, _ task: [NKTextProcessingTask]?, _ data: Data?, _ error: NKError) -> Void) {
+
+        let account = self.nkCommonInstance.account
+        let urlBase = self.nkCommonInstance.urlBase
+
+        let endpoint = "/ocs/v2.php/textprocessing/tasks/app/\(appId)"
+
+        guard let url = self.nkCommonInstance.createStandardUrl(serverUrl: urlBase, endpoint: endpoint) else {
+            return options.queue.async { completion(account, nil, nil, .urlError) }
+        }
+
+        let headers = self.nkCommonInstance.getStandardHeaders(options: options)
+
+        sessionManager.request(url, method: .delete, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
+            taskHandler(task)
+        }.responseData(queue: self.nkCommonInstance.backgroundQueue) { response in
+            if self.nkCommonInstance.levelLog > 0 {
+                debugPrint(response)
+            }
+
+            switch response.result {
+            case .failure(let error):
+                let error = NKError(error: error, afResponse: response, responseData: response.data)
+                options.queue.async { completion(account, nil, nil, error) }
+            case .success(let jsonData):
+                let json = JSON(jsonData)
+                let data = json["ocs"]["data"]["task"]
+                let statusCode = json["ocs"]["meta"]["statuscode"].int ?? NKError.internalError
+                if 200..<300 ~= statusCode {
+                    let results = NKTextProcessingTask.factory(data: data)
                     options.queue.async { completion(account, results, jsonData, .success) }
                 } else {
                     options.queue.async { completion(account, nil, jsonData, NKError(rootJson: json, fallbackStatusCode: response.response?.statusCode)) }
@@ -169,3 +278,35 @@ public class NKTextProcessingTaskTypes {
         return allResults.compactMap(NKTextProcessingTaskTypes.init)
     }
 }
+
+public class NKTextProcessingTask {
+    var id: Int?
+    var type: String?
+    var status: Int?
+    var userId: String?
+    var appId: String?
+    var input: String?
+    var output: String?
+    var identifier: String?
+    var completionExpectedAt: Int?
+
+    init() { }
+
+    init?(json: JSON) {
+        self.id = json["id"].int
+        self.type = json["type"].string
+        self.status = json["status"].int
+        self.userId = json["userId"].string
+        self.appId = json["appId"].string
+        self.input = json["input"].string
+        self.output = json["output"].string
+        self.identifier = json["identifier"].string
+        self.completionExpectedAt = json["completionExpectedAt"].int
+    }
+
+    static func factory(data: JSON) -> [NKTextProcessingTask]? {
+        guard let allResults = data.array else { return nil }
+        return allResults.compactMap(NKTextProcessingTask.init)
+    }
+}
+
