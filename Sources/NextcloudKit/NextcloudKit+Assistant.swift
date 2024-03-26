@@ -54,7 +54,7 @@ extension NextcloudKit {
                 options.queue.async { completion(account, nil, nil, error) }
             case .success(let jsonData):
                 let json = JSON(jsonData)
-                let data = json["ocs"]["data"]
+                let data = json["ocs"]["data"]["types"]
                 let statusCode = json["ocs"]["meta"]["statuscode"].int ?? NKError.internalError
                 if 200..<300 ~= statusCode {
                     let results = NKTextProcessingTaskTypes.factory(data: data)
