@@ -102,16 +102,7 @@ extension NextcloudKit {
                 let data = json["ocs"]["data"]["task"]
                 let statusCode = json["ocs"]["meta"]["statuscode"].int ?? NKError.internalError
                 if 200..<300 ~= statusCode {
-                    let result = NKTextProcessingTask()
-                    result.id = data["id"].int
-                    result.type = data["type"].string
-                    result.status = data["status"].int
-                    result.userId = data["userId"].string
-                    result.appId = data["appId"].string
-                    result.input = data["input"].string
-                    result.output = data["output"].string
-                    result.identifier = data["identifier"].string
-                    result.completionExpectedAt = data["completionExpectedAt"].int
+                    let result = NKTextProcessingTask.factory(data: data)
                     options.queue.async { completion(account, result, jsonData, .success) }
                 } else {
                     options.queue.async { completion(account, nil, jsonData, NKError(rootJson: json, fallbackStatusCode: response.response?.statusCode)) }
@@ -152,16 +143,7 @@ extension NextcloudKit {
                 let data = json["ocs"]["data"]["task"]
                 let statusCode = json["ocs"]["meta"]["statuscode"].int ?? NKError.internalError
                 if 200..<300 ~= statusCode {
-                    let result = NKTextProcessingTask()
-                    result.id = data["id"].int
-                    result.type = data["type"].string
-                    result.status = data["status"].int
-                    result.userId = data["userId"].string
-                    result.appId = data["appId"].string
-                    result.input = data["input"].string
-                    result.output = data["output"].string
-                    result.identifier = data["identifier"].string
-                    result.completionExpectedAt = data["completionExpectedAt"].int
+                    let result = NKTextProcessingTask.factory(data: data)
                     options.queue.async { completion(account, result, jsonData, .success) }
                 } else {
                     options.queue.async { completion(account, nil, jsonData, NKError(rootJson: json, fallbackStatusCode: response.response?.statusCode)) }
@@ -202,16 +184,7 @@ extension NextcloudKit {
                 let data = json["ocs"]["data"]["task"]
                 let statusCode = json["ocs"]["meta"]["statuscode"].int ?? NKError.internalError
                 if 200..<300 ~= statusCode {
-                    let result = NKTextProcessingTask()
-                    result.id = data["id"].int
-                    result.type = data["type"].string
-                    result.status = data["status"].int
-                    result.userId = data["userId"].string
-                    result.appId = data["appId"].string
-                    result.input = data["input"].string
-                    result.output = data["output"].string
-                    result.identifier = data["identifier"].string
-                    result.completionExpectedAt = data["completionExpectedAt"].int
+                    let result = NKTextProcessingTask.factory(data: data)
                     options.queue.async { completion(account, result, jsonData, .success) }
                 } else {
                     options.queue.async { completion(account, nil, jsonData, NKError(rootJson: json, fallbackStatusCode: response.response?.statusCode)) }
@@ -252,7 +225,7 @@ extension NextcloudKit {
                 let data = json["ocs"]["data"]["task"]
                 let statusCode = json["ocs"]["meta"]["statuscode"].int ?? NKError.internalError
                 if 200..<300 ~= statusCode {
-                    let results = NKTextProcessingTask.factory(data: data)
+                    let results = NKTextProcessingTask.factories(data: data)
                     options.queue.async { completion(account, results, jsonData, .success) }
                 } else {
                     options.queue.async { completion(account, nil, jsonData, NKError(rootJson: json, fallbackStatusCode: response.response?.statusCode)) }
@@ -304,9 +277,13 @@ public class NKTextProcessingTask {
         self.completionExpectedAt = json["completionExpectedAt"].int
     }
 
-    static func factory(data: JSON) -> [NKTextProcessingTask]? {
+    static func factories(data: JSON) -> [NKTextProcessingTask]? {
         guard let allResults = data.array else { return nil }
         return allResults.compactMap(NKTextProcessingTask.init)
+    }
+
+    static func factory(data: JSON) -> NKTextProcessingTask? {
+        NKTextProcessingTask.init(json: data)
     }
 }
 
