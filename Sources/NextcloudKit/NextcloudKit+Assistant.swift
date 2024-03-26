@@ -26,8 +26,7 @@ import Alamofire
 import SwiftyJSON
 
 extension NextcloudKit {
-    public func getTextProcessingTaskTypes(fileId: String,
-                                           options: NKRequestOptions = NKRequestOptions(),
+    public func getTextProcessingTaskTypes(options: NKRequestOptions = NKRequestOptions(),
                                            taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
                                            completion: @escaping (_ account: String, _ types: [NKTextProcessingTaskTypes]?, _ data: Data?, _ error: NKError) -> Void) {
 
