@@ -26,14 +26,100 @@ import Alamofire
 import SwiftyJSON
 
 extension NextcloudKit {
-    public func getTextProcessingTaskTypes(options: NKRequestOptions = NKRequestOptions(),
-                                           taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-                                           completion: @escaping (_ account: String, _ types: [NKTextProcessingTaskTypes]?, _ data: Data?, _ error: NKError) -> Void) {
+    public func textProcessingGetTypes(options: NKRequestOptions = NKRequestOptions(),
+                                       taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
+                                       completion: @escaping (_ account: String, _ types: [NKTextProcessingTaskTypes]?, _ data: Data?, _ error: NKError) -> Void) {
 
         let account = self.nkCommonInstance.account
         let urlBase = self.nkCommonInstance.urlBase
 
         let endpoint = "ocs/v2.php/textprocessing/tasktypes"
+
+        guard let url = self.nkCommonInstance.createStandardUrl(serverUrl: urlBase, endpoint: endpoint) else {
+            return options.queue.async { completion(account, nil, nil, .urlError) }
+        }
+
+        let headers = self.nkCommonInstance.getStandardHeaders(options: options)
+
+        sessionManager.request(url, method: .get, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
+            taskHandler(task)
+        }.responseData(queue: self.nkCommonInstance.backgroundQueue) { response in
+            if self.nkCommonInstance.levelLog > 0 {
+                debugPrint(response)
+            }
+
+            switch response.result {
+            case .failure(let error):
+                let error = NKError(error: error, afResponse: response, responseData: response.data)
+                options.queue.async { completion(account, nil, nil, error) }
+            case .success(let jsonData):
+                let json = JSON(jsonData)
+                let data = json["ocs"]["data"]["types"]
+                let statusCode = json["ocs"]["meta"]["statuscode"].int ?? NKError.internalError
+                if 200..<300 ~= statusCode {
+                    let results = NKTextProcessingTaskTypes.factory(data: data)
+                    options.queue.async { completion(account, results, jsonData, .success) }
+                } else {
+                    options.queue.async { completion(account, nil, jsonData, NKError(rootJson: json, fallbackStatusCode: response.response?.statusCode)) }
+                }
+            }
+        }
+    }
+
+    public func textProcessingSchedule(input: String,
+                                       typeId: String,
+                                       appId: String = "assistant",
+                                       identifier: String,
+                                       options: NKRequestOptions = NKRequestOptions(),
+                                       taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
+                                       completion: @escaping (_ account: String, _ types: [NKTextProcessingTaskTypes]?, _ data: Data?, _ error: NKError) -> Void) {
+
+        let account = self.nkCommonInstance.account
+        let urlBase = self.nkCommonInstance.urlBase
+
+        let endpoint = "/ocs/v2.php/textprocessing/schedule"
+
+        guard let url = self.nkCommonInstance.createStandardUrl(serverUrl: urlBase, endpoint: endpoint) else {
+            return options.queue.async { completion(account, nil, nil, .urlError) }
+        }
+
+        let headers = self.nkCommonInstance.getStandardHeaders(options: options)
+        let parameters: [String: Any] = ["input": input, "type": typeId, "appId": appId, "identifier": identifier]
+
+        sessionManager.request(url, method: .post, parameters: parameters, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
+            taskHandler(task)
+        }.responseData(queue: self.nkCommonInstance.backgroundQueue) { response in
+            if self.nkCommonInstance.levelLog > 0 {
+                debugPrint(response)
+            }
+
+            switch response.result {
+            case .failure(let error):
+                let error = NKError(error: error, afResponse: response, responseData: response.data)
+                options.queue.async { completion(account, nil, nil, error) }
+            case .success(let jsonData):
+                let json = JSON(jsonData)
+                let data = json["ocs"]["data"]["types"]
+                let statusCode = json["ocs"]["meta"]["statuscode"].int ?? NKError.internalError
+                if 200..<300 ~= statusCode {
+                    let results = NKTextProcessingTaskTypes.factory(data: data)
+                    options.queue.async { completion(account, results, jsonData, .success) }
+                } else {
+                    options.queue.async { completion(account, nil, jsonData, NKError(rootJson: json, fallbackStatusCode: response.response?.statusCode)) }
+                }
+            }
+        }
+    }
+
+    public func textProcessingGetTask(task: String,
+                                      options: NKRequestOptions = NKRequestOptions(),
+                                      taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
+                                      completion: @escaping (_ account: String, _ types: [NKTextProcessingTaskTypes]?, _ data: Data?, _ error: NKError) -> Void) {
+
+        let account = self.nkCommonInstance.account
+        let urlBase = self.nkCommonInstance.urlBase
+
+        let endpoint = "/ocs/v2.php/textprocessing/task/\(task)"
 
         guard let url = self.nkCommonInstance.createStandardUrl(serverUrl: urlBase, endpoint: endpoint) else {
             return options.queue.async { completion(account, nil, nil, .urlError) }
