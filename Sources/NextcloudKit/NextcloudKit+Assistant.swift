@@ -28,7 +28,7 @@ import SwiftyJSON
 extension NextcloudKit {
     public func textProcessingGetTypes(options: NKRequestOptions = NKRequestOptions(),
                                        taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-                                       completion: @escaping (_ account: String, _ types: [NKTextProcessingTaskTypes]?, _ data: Data?, _ error: NKError) -> Void) {
+                                       completion: @escaping (_ account: String, _ types: [NKTextProcessingTaskType]?, _ data: Data?, _ error: NKError) -> Void) {
 
         let account = self.nkCommonInstance.account
         let urlBase = self.nkCommonInstance.urlBase
@@ -57,7 +57,7 @@ extension NextcloudKit {
                 let data = json["ocs"]["data"]["types"]
                 let statusCode = json["ocs"]["meta"]["statuscode"].int ?? NKError.internalError
                 if 200..<300 ~= statusCode {
-                    let results = NKTextProcessingTaskTypes.factory(data: data)
+                    let results = NKTextProcessingTaskType.factory(data: data)
                     options.queue.async { completion(account, results, jsonData, .success) }
                 } else {
                     options.queue.async { completion(account, nil, jsonData, NKError(rootJson: json, fallbackStatusCode: response.response?.statusCode)) }
@@ -235,7 +235,7 @@ extension NextcloudKit {
     }
 }
 
-public class NKTextProcessingTaskTypes {
+public class NKTextProcessingTaskType {
     public var id: String?
     public var name: String?
     public var description: String?
@@ -246,9 +246,9 @@ public class NKTextProcessingTaskTypes {
         self.description = json["description"].string
     }
 
-    static func factory(data: JSON) -> [NKTextProcessingTaskTypes]? {
+    static func factory(data: JSON) -> [NKTextProcessingTaskType]? {
         guard let allResults = data.array else { return nil }
-        return allResults.compactMap(NKTextProcessingTaskTypes.init)
+        return allResults.compactMap(NKTextProcessingTaskType.init)
     }
 }
 
