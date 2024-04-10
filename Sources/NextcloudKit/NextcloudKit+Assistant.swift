@@ -263,6 +263,18 @@ public class NKTextProcessingTask {
     public var identifier: String?
     public var completionExpectedAt: Int?
 
+    public init(id: Int? = nil, type: String? = nil, status: Int? = nil, userId: String? = nil, appId: String? = nil, input: String? = nil, output: String? = nil, identifier: String? = nil, completionExpectedAt: Int? = nil) {
+        self.id = id
+        self.type = type
+        self.status = status
+        self.userId = userId
+        self.appId = appId
+        self.input = input
+        self.output = output
+        self.identifier = identifier
+        self.completionExpectedAt = completionExpectedAt
+    }
+
     init?(json: JSON) {
         self.id = json["id"].int
         self.type = json["type"].string
