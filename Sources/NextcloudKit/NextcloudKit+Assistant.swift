@@ -261,9 +261,9 @@ public class NKTextProcessingTask {
     public var input: String?
     public var output: String?
     public var identifier: String?
-    public var completionExpectedAt: Int?
+    public var completionExpectedAt: Double?
 
-    public init(id: Int? = nil, type: String? = nil, status: Int? = nil, userId: String? = nil, appId: String? = nil, input: String? = nil, output: String? = nil, identifier: String? = nil, completionExpectedAt: Int? = nil) {
+    public init(id: Int? = nil, type: String? = nil, status: Int? = nil, userId: String? = nil, appId: String? = nil, input: String? = nil, output: String? = nil, identifier: String? = nil, completionExpectedAt: Double? = nil) {
         self.id = id
         self.type = type
         self.status = status
@@ -284,7 +284,7 @@ public class NKTextProcessingTask {
         self.input = json["input"].string
         self.output = json["output"].string
         self.identifier = json["identifier"].string
-        self.completionExpectedAt = json["completionExpectedAt"].int
+        self.completionExpectedAt = json["completionExpectedAt"].double
     }
 
     static func factories(data: JSON) -> [NKTextProcessingTask]? {
