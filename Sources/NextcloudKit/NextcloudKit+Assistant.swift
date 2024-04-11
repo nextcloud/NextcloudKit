@@ -240,6 +240,12 @@ public class NKTextProcessingTaskType {
     public var name: String?
     public var description: String?
 
+    public init(id: String? = nil, name: String? = nil, description: String? = nil) {
+        self.id = id
+        self.name = name
+        self.description = description
+    }
+
     init?(json: JSON) {
         self.id = json["id"].string
         self.name = json["name"].string
