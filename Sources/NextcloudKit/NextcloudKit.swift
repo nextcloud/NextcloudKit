@@ -484,7 +484,7 @@ import SwiftyJSON
             return completion(account, nil, nil, nil, NKError(errorCode: NKError.chunkNoEnoughMemory))
         }
         let freeDisk = ((fsAttributes[FileAttributeKey.systemFreeSize] ?? 0) as? Int64) ?? 0
-        #elseif !os(watchOS)
+        #elseif os(visionOS) || os(iOS)
         var freeDisk: Int64 = 0
         let fileURL = URL(fileURLWithPath: directory as String)
         do {
@@ -495,7 +495,7 @@ import SwiftyJSON
         } catch { }
         #endif
 
-        #if !os(watchOS)
+        #if os(visionOS) || os(iOS)
         if freeDisk < fileNameLocalSize * 4 {
             // It seems there is not enough space to send the file
             let error = NKError(errorCode: NKError.chunkNoEnoughMemory, errorDescription: "_chunk_enough_memory_")
