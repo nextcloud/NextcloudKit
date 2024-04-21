@@ -54,18 +54,24 @@ import SwiftyJSON
         return internalSessionManager
     }
 
+    #if !os(watchOS)
     private let reachabilityManager = Alamofire.NetworkReachabilityManager()
+    #endif
     // private var cookies: [String:[HTTPCookie]] = [:]
 
     @objc public let nkCommonInstance = NKCommon()
 
     override public init(fileManager: FileManager = .default) {
         super.init(fileManager: fileManager)
+        #if !os(watchOS)
         startNetworkReachabilityObserver()
+        #endif
     }
 
     deinit {
+        #if !os(watchOS)
         stopNetworkReachabilityObserver()
+        #endif
     }
 
     // MARK: - Setup
@@ -161,6 +167,7 @@ import SwiftyJSON
 
     // MARK: - Reachability
 
+    #if !os(watchOS)
     @objc public func isNetworkReachable() -> Bool {
         return reachabilityManager?.isReachable ?? false
     }
@@ -189,6 +196,7 @@ import SwiftyJSON
 
         reachabilityManager?.stopListening()
     }
+    #endif
 
     // MARK: - Session utility
 
