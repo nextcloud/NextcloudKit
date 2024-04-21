@@ -395,8 +395,14 @@ extension NextcloudKit {
                             let contextRef = CGContext(data: nil, width: Int(rect.width), height: Int(rect.height), bitsPerComponent: image.cgImage!.bitsPerComponent, bytesPerRow: image.cgImage!.bytesPerRow, space: image.cgImage!.colorSpace!, bitmapInfo: image.cgImage!.bitmapInfo.rawValue)
                             layerToMask.render(in: contextRef!)
                             #else
-                            let rect = CGRect(x: 0, y: 0, width: avatarSizeRounded / Int(UIScreen.main.scale), height: avatarSizeRounded / Int(UIScreen.main.scale))
-                            UIGraphicsBeginImageContextWithOptions(rect.size, false, UIScreen.main.scale)
+
+                            #if os(iOS)
+                            let screenScale = UIScreen.main.scale
+                            #else
+                            let screenScale = 1.0
+                            #endif
+                            let rect = CGRect(x: 0, y: 0, width: avatarSizeRounded / Int(screenScale), height: avatarSizeRounded / Int(screenScale))
+                            UIGraphicsBeginImageContextWithOptions(rect.size, false, screenScale)
                             UIBezierPath(roundedRect: rect, cornerRadius: rect.size.height).addClip()
                             imageAvatar?.draw(in: rect)
                             imageAvatar = UIGraphicsGetImageFromCurrentImageContext() ?? image
