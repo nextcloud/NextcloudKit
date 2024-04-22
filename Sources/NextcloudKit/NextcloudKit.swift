@@ -54,18 +54,24 @@ import SwiftyJSON
         return internalSessionManager
     }
 
+    #if !os(watchOS)
     private let reachabilityManager = Alamofire.NetworkReachabilityManager()
+    #endif
     // private var cookies: [String:[HTTPCookie]] = [:]
 
     @objc public let nkCommonInstance = NKCommon()
 
     override public init(fileManager: FileManager = .default) {
         super.init(fileManager: fileManager)
+        #if !os(watchOS)
         startNetworkReachabilityObserver()
+        #endif
     }
 
     deinit {
+        #if !os(watchOS)
         stopNetworkReachabilityObserver()
+        #endif
     }
 
     // MARK: - Setup
@@ -161,6 +167,7 @@ import SwiftyJSON
 
     // MARK: - Reachability
 
+    #if !os(watchOS)
     @objc public func isNetworkReachable() -> Bool {
         return reachabilityManager?.isReachable ?? false
     }
@@ -189,6 +196,7 @@ import SwiftyJSON
 
         reachabilityManager?.stopListening()
     }
+    #endif
 
     // MARK: - Session utility
 
@@ -476,7 +484,7 @@ import SwiftyJSON
             return completion(account, nil, nil, nil, NKError(errorCode: NKError.chunkNoEnoughMemory))
         }
         let freeDisk = ((fsAttributes[FileAttributeKey.systemFreeSize] ?? 0) as? Int64) ?? 0
-        #else
+        #elseif os(visionOS) || os(iOS)
         var freeDisk: Int64 = 0
         let fileURL = URL(fileURLWithPath: directory as String)
         do {
@@ -487,11 +495,13 @@ import SwiftyJSON
         } catch { }
         #endif
 
+        #if os(visionOS) || os(iOS)
         if freeDisk < fileNameLocalSize * 4 {
             // It seems there is not enough space to send the file
             let error = NKError(errorCode: NKError.chunkNoEnoughMemory, errorDescription: "_chunk_enough_memory_")
             return completion(account, nil, nil, nil, error)
         }
+        #endif
 
         func createFolder(completion: @escaping (_ errorCode: NKError) -> Void) {
 

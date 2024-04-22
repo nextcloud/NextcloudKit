@@ -26,6 +26,8 @@ import Alamofire
 
 #if os(iOS)
 import MobileCoreServices
+#else
+import CoreServices
 #endif
 
 @objc public protocol NKCommonDelegate {
