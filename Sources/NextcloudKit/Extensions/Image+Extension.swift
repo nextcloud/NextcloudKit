@@ -23,33 +23,6 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-#if os(iOS)
-import UIKit
-
-extension UIImage {
-    internal func resizeImage(size: CGSize, isAspectRation: Bool) -> UIImage? {
-        let originRatio = self.size.width / self.size.height
-        let newRatio = size.width / size.height
-        var newSize = size
-
-        if isAspectRation {
-            if originRatio < newRatio {
-                newSize.height = size.height
-                newSize.width = size.height * originRatio
-            } else {
-                newSize.width = size.width
-                newSize.height = size.width / originRatio
-            }
-        }
-
-        UIGraphicsBeginImageContextWithOptions(newSize, false, 1.0)
-        self.draw(in: CGRect(origin: .zero, size: newSize))
-        defer { UIGraphicsEndImageContext() }
-        return UIGraphicsGetImageFromCurrentImageContext()
-    }
-}
-#endif
-
 #if os(macOS)
 import Foundation
 import AppKit
@@ -101,4 +74,30 @@ public extension NSImage {
         return nil
     }
 }
+#else
+import UIKit
+
+extension UIImage {
+    internal func resizeImage(size: CGSize, isAspectRation: Bool) -> UIImage? {
+        let originRatio = self.size.width / self.size.height
+        let newRatio = size.width / size.height
+        var newSize = size
+
+        if isAspectRation {
+            if originRatio < newRatio {
+                newSize.height = size.height
+                newSize.width = size.height * originRatio
+            } else {
+                newSize.width = size.width
+                newSize.height = size.width / originRatio
+            }
+        }
+
+        UIGraphicsBeginImageContextWithOptions(newSize, false, 1.0)
+        self.draw(in: CGRect(origin: .zero, size: newSize))
+        defer { UIGraphicsEndImageContext() }
+        return UIGraphicsGetImageFromCurrentImageContext()
+    }
+}
 #endif
+
