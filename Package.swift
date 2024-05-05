@@ -26,15 +26,15 @@ let package = Package(
     targets: [
         .target(
             name: "NextcloudKit",
-            dependencies: ["Alamofire","SwiftyJSON","SwiftyXMLParser","Mocker"]),
+            dependencies: ["Alamofire", "SwiftyJSON", "SwiftyXMLParser"]),
         .testTarget(
             name: "NextcloudKitUnitTests",
-            dependencies: ["NextcloudKit"],
+            dependencies: ["NextcloudKit", "Mocker"],
             resources: [
                 .process("Resources")
             ]),
         .testTarget(
             name: "NextcloudKitIntegrationTests",
-            dependencies: ["NextcloudKit"])
+            dependencies: ["NextcloudKit", "Mocker"])
     ]
 )
