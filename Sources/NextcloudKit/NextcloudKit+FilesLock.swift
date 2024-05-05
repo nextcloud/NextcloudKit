@@ -48,6 +48,7 @@ extension NextcloudKit {
         headers.update(name: "X-User-Lock", value: "1")
 
         sessionManager.request(url, method: method, parameters: nil, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
+            task.taskDescription = options.taskDescription
             taskHandler(task)
         }.response(queue: self.nkCommonInstance.backgroundQueue) { response in
             if self.nkCommonInstance.levelLog > 0 {

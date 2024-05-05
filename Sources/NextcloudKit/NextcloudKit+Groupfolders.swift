@@ -44,6 +44,7 @@ extension NextcloudKit {
         let headers = self.nkCommonInstance.getStandardHeaders(options: options)
 
         sessionManager.request(url, method: .get, parameters: nil, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
+            task.taskDescription = options.taskDescription
             taskHandler(task)
         }.responseData(queue: self.nkCommonInstance.backgroundQueue) { response in
             if self.nkCommonInstance.levelLog > 0 {

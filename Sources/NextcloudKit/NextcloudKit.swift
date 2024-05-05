@@ -281,6 +281,7 @@ import SwiftyJSON
 
         let request = sessionManager.download(url, method: .get, parameters: nil, encoding: URLEncoding.default, headers: headers, interceptor: nil, to: destination).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
 
+            task.taskDescription = options.taskDescription
             options.queue.async { taskHandler(task) }
 
         } .downloadProgress { progress in
@@ -386,6 +387,7 @@ import SwiftyJSON
 
         let request = sessionManager.upload(fileNameLocalPathUrl, to: url, method: .put, headers: headers, interceptor: nil, fileManager: .default).validate(statusCode: 200..<300).onURLSessionTaskCreation(perform: { task in
 
+            task.taskDescription = options.taskDescription
             options.queue.async { taskHandler(task) }
 
         }) .uploadProgress { progress in
