@@ -139,7 +139,7 @@ import Foundation
             }
         }
 
-        self.nkCommonInstance.delegate?.DownloadingFinish?(session, downloadTask: downloadTask, didFinishDownloadingTo: location)
+        self.nkCommonInstance.delegate?.downloadingFinish?(session, downloadTask: downloadTask, didFinishDownloadingTo: location)
     }
 
     public func urlSession(_ session: URLSession, task: URLSessionTask, didSendBodyData bytesSent: Int64, totalBytesSent: Int64, totalBytesExpectedToSend: Int64) {
