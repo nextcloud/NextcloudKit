@@ -42,8 +42,8 @@ import CoreServices
 
     @objc optional func downloadingFinish(_ session: URLSession, downloadTask: URLSessionDownloadTask, didFinishDownloadingTo location: URL)
     
-    @objc optional func downloadComplete(fileName: String, serverUrl: String, etag: String?, date: NSDate?, dateLastModified: NSDate?, length: Int64, fileNameLocalPath: String?, task: URLSessionTask, error: NKError)
-    @objc optional func uploadComplete(fileName: String, serverUrl: String, ocId: String?, etag: String?, date: NSDate?, size: Int64, fileNameLocalPath: String?, task: URLSessionTask, error: NKError)
+    @objc optional func downloadComplete(fileName: String, serverUrl: String, etag: String?, date: NSDate?, dateLastModified: NSDate?, length: Int64, task: URLSessionTask, error: NKError)
+    @objc optional func uploadComplete(fileName: String, serverUrl: String, ocId: String?, etag: String?, date: NSDate?, size: Int64, task: URLSessionTask, error: NKError)
 }
 
 @objc public class NKCommon: NSObject {
