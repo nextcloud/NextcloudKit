@@ -35,7 +35,7 @@ import Foundation
 
     @objc public func download(serverUrlFileName: Any,
                                fileNameLocalPath: String,
-                               taskDescription: String?,
+                               taskDescription: String? = nil,
                                session: URLSession) -> URLSessionDownloadTask? {
 
         var url: URL?
@@ -72,7 +72,7 @@ import Foundation
                              fileNameLocalPath: String,
                              dateCreationFile: Date?,
                              dateModificationFile: Date?,
-                             taskDescription: String?,
+                             taskDescription: String? = nil,
                              session: URLSession) -> URLSessionUploadTask? {
 
         var url: URL?
