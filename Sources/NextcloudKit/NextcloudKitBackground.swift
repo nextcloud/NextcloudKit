@@ -35,6 +35,7 @@ import Foundation
 
     @objc public func download(serverUrlFileName: Any,
                                fileNameLocalPath: String,
+                               taskDescription: String? = nil,
                                session: URLSession) -> URLSessionDownloadTask? {
 
         var url: URL?
@@ -58,7 +59,7 @@ import Foundation
         request.setValue("Basic \(base64LoginString)", forHTTPHeaderField: "Authorization")
 
         let task = session.downloadTask(with: request)
-        task.taskDescription = fileNameLocalPath
+        task.taskDescription = taskDescription
         task.resume()
         self.nkCommonInstance.writeLog("Network start download file: \(serverUrlFileName)")
 
@@ -71,6 +72,7 @@ import Foundation
                              fileNameLocalPath: String,
                              dateCreationFile: Date?,
                              dateModificationFile: Date?,
+                             taskDescription: String? = nil,
                              session: URLSession) -> URLSessionUploadTask? {
 
         var url: URL?
@@ -105,7 +107,7 @@ import Foundation
         }
 
         let task = session.uploadTask(with: request, fromFile: URL(fileURLWithPath: fileNameLocalPath))
-        task.taskDescription = fileNameLocalPath
+        task.taskDescription = taskDescription
         task.resume()
         self.nkCommonInstance.writeLog("Network start upload file: \(serverUrlFileName)")
 
@@ -126,18 +128,7 @@ import Foundation
     }
 
     public func urlSession(_ session: URLSession, downloadTask: URLSessionDownloadTask, didFinishDownloadingTo location: URL) {
-
-        if let httpResponse = (downloadTask.response as? HTTPURLResponse) {
-            if httpResponse.statusCode >= 200 && httpResponse.statusCode < 300 {
-                if let destinationFilePath = downloadTask.taskDescription {
-                    let destinationUrl = NSURL.fileURL(withPath: destinationFilePath)
-                    do {
-                        try FileManager.default.removeItem(at: destinationUrl)
-                        try FileManager.default.copyItem(at: location, to: destinationUrl)
-                    } catch { }
-                }
-            }
-        }
+        self.nkCommonInstance.delegate?.downloadingFinish?(session, downloadTask: downloadTask, didFinishDownloadingTo: location)
     }
 
     public func urlSession(_ session: URLSession, task: URLSessionTask, didSendBodyData bytesSent: Int64, totalBytesSent: Int64, totalBytesExpectedToSend: Int64) {
@@ -198,9 +189,9 @@ import Foundation
         }
 
         if task is URLSessionDownloadTask {
-            self.nkCommonInstance.delegate?.downloadComplete?(fileName: fileName, serverUrl: serverUrl, etag: etag, date: date, dateLastModified: dateLastModified, length: length, fileNameLocalPath: task.taskDescription, task: task, error: nkError)
+            self.nkCommonInstance.delegate?.downloadComplete?(fileName: fileName, serverUrl: serverUrl, etag: etag, date: date, dateLastModified: dateLastModified, length: length, task: task, error: nkError)
         } else if task is URLSessionUploadTask {
-            self.nkCommonInstance.delegate?.uploadComplete?(fileName: fileName, serverUrl: serverUrl, ocId: ocId, etag: etag, date: date, size: task.countOfBytesExpectedToSend, fileNameLocalPath: task.taskDescription, task: task, error: nkError)
+            self.nkCommonInstance.delegate?.uploadComplete?(fileName: fileName, serverUrl: serverUrl, ocId: ocId, etag: etag, date: date, size: task.countOfBytesExpectedToSend, task: task, error: nkError)
         }
 
         if nkError.errorCode == 0 {
