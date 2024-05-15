@@ -71,19 +71,19 @@ import CoreServices
     }
 
     public enum TypeIconFile: String {
-        case audio = "file_audio"
-        case code = "file_code"
-        case compress = "file_compress"
+        case audio = "audio"
+        case code = "code"
+        case compress = "compress"
         case directory = "directory"
         case document = "document"
-        case image = "file_photo"
-        case movie = "file_movie"
-        case pdf = "file_pdf"
-        case ppt = "file_ppt"
-        case txt = "file_txt"
+        case image = "image"
+        case movie = "movie"
+        case pdf = "pdf"
+        case ppt = "ppt"
+        case txt = "txt"
         case unknow = "file"
         case url = "url"
-        case xls = "file_xls"
+        case xls = "xls"
     }
 
     public struct UTTypeConformsToServer {
