@@ -39,8 +39,11 @@ import CoreServices
 
     @objc optional func downloadProgress(_ progress: Float, totalBytes: Int64, totalBytesExpected: Int64, fileName: String, serverUrl: String, session: URLSession, task: URLSessionTask)
     @objc optional func uploadProgress(_ progress: Float, totalBytes: Int64, totalBytesExpected: Int64, fileName: String, serverUrl: String, session: URLSession, task: URLSessionTask)
-    @objc optional func downloadComplete(fileName: String, serverUrl: String, etag: String?, date: NSDate?, dateLastModified: NSDate?, length: Int64, fileNameLocalPath: String?, task: URLSessionTask, error: NKError)
-    @objc optional func uploadComplete(fileName: String, serverUrl: String, ocId: String?, etag: String?, date: NSDate?, size: Int64, fileNameLocalPath: String?, task: URLSessionTask, error: NKError)
+
+    @objc optional func downloadingFinish(_ session: URLSession, downloadTask: URLSessionDownloadTask, didFinishDownloadingTo location: URL)
+    
+    @objc optional func downloadComplete(fileName: String, serverUrl: String, etag: String?, date: NSDate?, dateLastModified: NSDate?, length: Int64, task: URLSessionTask, error: NKError)
+    @objc optional func uploadComplete(fileName: String, serverUrl: String, ocId: String?, etag: String?, date: NSDate?, size: Int64, task: URLSessionTask, error: NKError)
 }
 
 @objc public class NKCommon: NSObject {
@@ -68,19 +71,19 @@ import CoreServices
     }
 
     public enum TypeIconFile: String {
-        case audio = "file_audio"
-        case code = "file_code"
-        case compress = "file_compress"
+        case audio = "audio"
+        case code = "code"
+        case compress = "compress"
         case directory = "directory"
         case document = "document"
-        case image = "file_photo"
-        case movie = "file_movie"
-        case pdf = "file_pdf"
-        case ppt = "file_ppt"
-        case txt = "file_txt"
+        case image = "image"
+        case movie = "movie"
+        case pdf = "pdf"
+        case ppt = "ppt"
+        case txt = "txt"
         case unknow = "file"
         case url = "url"
-        case xls = "file_xls"
+        case xls = "xls"
     }
 
     public struct UTTypeConformsToServer {

@@ -51,6 +51,7 @@ extension NextcloudKit {
         }
 
         sessionManager.request(urlRequest).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
+            task.taskDescription = options.taskDescription
             taskHandler(task)
         }.response(queue: self.nkCommonInstance.backgroundQueue) { response in
             if self.nkCommonInstance.levelLog > 0 {
@@ -98,6 +99,7 @@ extension NextcloudKit {
         }
 
         sessionManager.request(urlRequest).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
+            task.taskDescription = options.taskDescription
             taskHandler(task)
         }.response(queue: self.nkCommonInstance.backgroundQueue) { response in
             if self.nkCommonInstance.levelLog > 0 {
@@ -146,6 +148,7 @@ extension NextcloudKit {
         }
 
         sessionManager.request(urlRequest).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
+            task.taskDescription = options.taskDescription
             taskHandler(task)
         }.response(queue: self.nkCommonInstance.backgroundQueue) { response in
             if self.nkCommonInstance.levelLog > 0 {
@@ -194,6 +197,7 @@ extension NextcloudKit {
         }
 
         sessionManager.request(urlRequest).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
+            task.taskDescription = options.taskDescription
             taskHandler(task)
         }.response(queue: self.nkCommonInstance.backgroundQueue) { response in
             if self.nkCommonInstance.levelLog > 0 {
@@ -256,6 +260,7 @@ extension NextcloudKit {
         }
 
         sessionManager.request(urlRequest).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
+            task.taskDescription = options.taskDescription
             taskHandler(task)
         }.responseData(queue: self.nkCommonInstance.backgroundQueue) { response in
             if self.nkCommonInstance.levelLog > 0 {
@@ -301,6 +306,7 @@ extension NextcloudKit {
         }
 
         search(serverUrl: urlBase, httpBody: httpBody, showHiddenFiles: true, includeHiddenFiles: [], options: options) { task in
+            task.taskDescription = options.taskDescription
             taskHandler(task)
         } completion: { account, files, data, error in
             options.queue.async { completion(account, files.first, data, error) }
@@ -433,6 +439,7 @@ extension NextcloudKit {
         }
 
         sessionManager.request(urlRequest).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
+            task.taskDescription = options.taskDescription
             taskHandler(task)
         }.responseData(queue: self.nkCommonInstance.backgroundQueue) { response in
             if self.nkCommonInstance.levelLog > 0 {
@@ -485,6 +492,7 @@ extension NextcloudKit {
         }
 
         sessionManager.request(urlRequest).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
+            task.taskDescription = options.taskDescription
             taskHandler(task)
         }.response(queue: self.nkCommonInstance.backgroundQueue) { response in
             if self.nkCommonInstance.levelLog > 0 {
@@ -533,6 +541,7 @@ extension NextcloudKit {
         }
 
         sessionManager.request(urlRequest).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
+            task.taskDescription = options.taskDescription
             taskHandler(task)
         }.responseData(queue: self.nkCommonInstance.backgroundQueue) { response in
             if self.nkCommonInstance.levelLog > 0 {
@@ -589,6 +598,7 @@ extension NextcloudKit {
         }
 
         sessionManager.request(urlRequest).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
+            task.taskDescription = options.taskDescription
             taskHandler(task)
         }.responseData(queue: self.nkCommonInstance.backgroundQueue) { response in
             if self.nkCommonInstance.levelLog > 0 {
