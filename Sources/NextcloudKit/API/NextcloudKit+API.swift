@@ -255,7 +255,7 @@ extension NextcloudKit {
         }
     }
 
-    @objc public func downloadPreview(fileNamePathOrFileId: String,
+    @objc public func downloadPreview(fileId: String,
                                       fileNamePreviewLocalPath: String,
                                       widthPreview: Int,
                                       heightPreview: Int,
@@ -274,21 +274,14 @@ extension NextcloudKit {
         var url: URLConvertible?
 
         if useInternalEndpoint {
-
             if endpointTrashbin {
-                endpoint = "index.php/apps/files_trashbin/preview?fileId=\(fileNamePathOrFileId)&x=\(widthPreview)&y=\(heightPreview)"
+                endpoint = "index.php/apps/files_trashbin/preview?fileId=\(fileId)&x=\(widthPreview)&y=\(heightPreview)"
             } else {
-                guard let fileNamePath = fileNamePathOrFileId.urlEncoded else {
-                    return options.queue.async { completion(account, nil, nil, nil, nil, .urlError) }
-                }
-                endpoint = "index.php/core/preview.png?file=\(fileNamePath)&x=\(widthPreview)&y=\(heightPreview)&a=1&mode=cover"
+                endpoint = "index.php/core/preview.png?fileId=\(fileId)&x=\(widthPreview)&y=\(heightPreview)&a=1&mode=cover"
             }
-
             url = self.nkCommonInstance.createStandardUrl(serverUrl: urlBase, endpoint: endpoint)
-
         } else {
-
-            url = fileNamePathOrFileId.asUrl
+            url = fileId.asUrl
         }
 
         guard let urlRequest = url else {
