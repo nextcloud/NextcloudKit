@@ -277,7 +277,7 @@ extension NextcloudKit {
             if endpointTrashbin {
                 endpoint = "index.php/apps/files_trashbin/preview?fileId=\(fileId)&x=\(widthPreview)&y=\(heightPreview)"
             } else {
-                endpoint = "index.php/core/preview.png?fileId=\(fileId)&x=\(widthPreview)&y=\(heightPreview)&a=1&mode=cover"
+                endpoint = "index.php/core/preview?fileId=\(fileId)&x=\(widthPreview)&y=\(heightPreview)&a=1&mode=cover"
             }
             url = self.nkCommonInstance.createStandardUrl(serverUrl: urlBase, endpoint: endpoint)
         } else {
