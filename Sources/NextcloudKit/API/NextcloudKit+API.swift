@@ -270,7 +270,7 @@ extension NextcloudKit {
                                 taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
                                 completion: @escaping (_ account: String, _ imagePreview: UIImage?, _ imageIcon: UIImage?, _ imageOriginal: UIImage?, _ etag: String?, _ error: NKError) -> Void) {
 
-        let endpoint = "index.php/apps/files_trashbin/preview?fileId=\(fileId)&x=\(widthPreview)&y=\(heightPreview)&a=\(crop)&mode=\(cropMode)&forceIcon=\(forceIcon)&mimeFallback=\(mimeFallback)"
+        let endpoint = "index.php/core/preview?fileId=\(fileId)&x=\(widthPreview)&y=\(heightPreview)&a=\(crop)&mode=\(cropMode)&forceIcon=\(forceIcon)&mimeFallback=\(mimeFallback)"
 
         downloadPreview(fileNamePreviewLocalPath: fileNamePreviewLocalPath, fileNameIconLocalPath: fileNameIconLocalPath, sizeIcon: sizeIcon, etag: etag, endpoint: endpoint, options: options) { task in
             taskHandler(task)
@@ -293,7 +293,7 @@ extension NextcloudKit {
                                      taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
                                      completion: @escaping (_ account: String, _ imagePreview: UIImage?, _ imageIcon: UIImage?, _ imageOriginal: UIImage?, _ etag: String?, _ error: NKError) -> Void) {
 
-        let endpoint = "index.php/core/preview?fileId=\(fileId)&x=\(widthPreview)&y=\(heightPreview)&a=\(crop)&mode=\(cropMode)&forceIcon=\(forceIcon)&mimeFallback=\(mimeFallback)"
+        let endpoint = "index.php/apps/files_trashbin/preview?fileId=\(fileId)&x=\(widthPreview)&y=\(heightPreview)&a=\(crop)&mode=\(cropMode)&forceIcon=\(forceIcon)&mimeFallback=\(mimeFallback)"
 
         downloadPreview(fileNamePreviewLocalPath: fileNamePreviewLocalPath, fileNameIconLocalPath: fileNameIconLocalPath, sizeIcon: sizeIcon, etag: nil, endpoint: endpoint, options: options) { task in
             taskHandler(task)
