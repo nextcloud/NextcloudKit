@@ -51,19 +51,21 @@ extension NextcloudKit {
         })
     }
 
-    public func downloadPreview(fileNamePathOrFileId: String,
+    public func downloadPreview(fileId: String,
                                 fileNamePreviewLocalPath: String,
-                                widthPreview: Int,
-                                heightPreview: Int,
                                 fileNameIconLocalPath: String? = nil,
-                                sizeIcon: Int = 0,
+                                widthPreview: Int = 512,
+                                heightPreview: Int = 512,
+                                sizeIcon: Int = 512,
                                 etag: String? = nil,
-                                endpointTrashbin: Bool = false,
-                                useInternalEndpoint: Bool = true,
+                                crop: Int = 0,
+                                cropMode: String = "fill",
+                                forceIcon: Int = 1,
+                                mimeFallback: Int = 0,
                                 options: NKRequestOptions = NKRequestOptions()) async -> (account: String, imagePreview: UIImage?, imageIcon: UIImage?, imageOriginal: UIImage?, etag: String?, error: NKError) {
 
         await withUnsafeContinuation({ continuation in
-            downloadPreview(fileNamePathOrFileId: fileNamePathOrFileId, fileNamePreviewLocalPath: fileNamePreviewLocalPath, widthPreview: widthPreview, heightPreview: heightPreview, fileNameIconLocalPath: fileNameIconLocalPath, sizeIcon: sizeIcon, etag: etag, options: options) { account, imagePreview, imageIcon, imageOriginal, etag, error in
+            downloadPreview(fileId: fileId, fileNamePreviewLocalPath: fileNamePreviewLocalPath, fileNameIconLocalPath: fileNameIconLocalPath, widthPreview: widthPreview, heightPreview: heightPreview, sizeIcon: sizeIcon, etag: etag, crop: crop, cropMode: cropMode, forceIcon: forceIcon, mimeFallback: mimeFallback, options: options) { account, imagePreview, imageIcon, imageOriginal, etag, error in
                 continuation.resume(returning: (account: account, imagePreview: imagePreview, imageIcon: imageIcon, imageOriginal: imageOriginal, etag: etag, error: error))
             }
         })
