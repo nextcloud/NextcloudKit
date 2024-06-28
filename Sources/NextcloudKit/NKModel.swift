@@ -594,31 +594,32 @@ class NKDataFileXML: NSObject {
     """
     <?xml version=\"1.0\" encoding=\"UTF-8\"?>
     <d:propfind xmlns:d=\"DAV:\" xmlns:oc=\"http://owncloud.org/ns\" xmlns:nc=\"http://nextcloud.org/ns\">
-    <d:prop>
-    """
-    + NKProperties.displayname.rawValue +
-    + NKProperties.getcontenttype.rawValue +
-    + NKProperties.resourcetype.rawValue +
-    + NKProperties.getcontentlength.rawValue +
-    + NKProperties.getetag.rawValue +
-    + NKProperties.quotausedbytes.rawValue +
-    + NKProperties.quotaavailablebytes.rawValue +
-    + NKProperties.permissions.rawValue +
-    + NKProperties.id.rawValue +
-    + NKProperties.fileid.rawValue +
-    + NKProperties.size.rawValue +
-    + NKProperties.favorite.rawValue +
-    + NKProperties.isencrypted.rawValue +
-    + NKProperties.mounttype.rawValue +
-    + NKProperties.ownerid.rawValue +
-    + NKProperties.ownerdisplayname.rawValue +
-    + NKProperties.commentsunread.rawValue +
-    + NKProperties.haspreview.rawValue +
-    + "<trashbin-filename xmlns=\"http://nextcloud.org/ns\"/>" +
-    + "<trashbin-original-location xmlns=\"http://nextcloud.org/ns\"/>" +
-    + "<trashbin-deletion-time xmlns=\"http://nextcloud.org/ns\"/>" +
-    """
-    </d:prop>
+        <d:prop>
+            <d:displayname />
+            <d:getcontenttype />
+            <d:resourcetype />
+            <d:getcontentlength />
+            <d:getlastmodified />
+            <d:getetag />
+            <d:quota-used-bytes />
+            <d:quota-available-bytes />
+            <permissions xmlns=\"http://owncloud.org/ns\"/>
+
+            <id xmlns=\"http://owncloud.org/ns\"/>
+            <fileid xmlns=\"http://owncloud.org/ns\"/>
+            <size xmlns=\"http://owncloud.org/ns\"/>
+            <favorite xmlns=\"http://owncloud.org/ns\"/>
+            <is-encrypted xmlns=\"http://nextcloud.org/ns\"/>
+            <mount-type xmlns=\"http://nextcloud.org/ns\"/>
+            <owner-id xmlns=\"http://owncloud.org/ns\"/>
+            <owner-display-name xmlns=\"http://owncloud.org/ns\"/>
+            <comments-unread xmlns=\"http://owncloud.org/ns\"/>
+            <has-preview xmlns=\"http://nextcloud.org/ns\"/>
+
+            <trashbin-filename xmlns=\"http://nextcloud.org/ns\"/>
+            <trashbin-original-location xmlns=\"http://nextcloud.org/ns\"/>
+            <trashbin-deletion-time xmlns=\"http://nextcloud.org/ns\"/>
+        </d:prop>
     </d:propfind>
     """
 
