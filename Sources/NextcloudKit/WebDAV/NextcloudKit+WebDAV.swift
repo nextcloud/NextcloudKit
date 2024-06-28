@@ -253,7 +253,7 @@ extension NextcloudKit {
                 urlRequest.httpBody = requestBody!
                 urlRequest.timeoutInterval = options.timeout
             } else {
-                urlRequest.httpBody = NKDataFileXML(nkCommonInstance: self.nkCommonInstance).requestBodyFile.data(using: .utf8)
+                urlRequest.httpBody = NKDataFileXML(nkCommonInstance: self.nkCommonInstance).getRequestBodyFile(removeProperties: options.removeProperties).data(using: .utf8)
             }
         } catch {
             return options.queue.async { completion(account, files, nil, NKError(error: error)) }
@@ -294,11 +294,11 @@ extension NextcloudKit {
         var httpBody: Data?
 
         if let fileId = fileId {
-            httpBody = String(format: NKDataFileXML(nkCommonInstance: self.nkCommonInstance).requestBodySearchFileId, userId, fileId).data(using: .utf8)!
+            httpBody = String(format: NKDataFileXML(nkCommonInstance: self.nkCommonInstance).getRequestBodySearchFileId(removeProperties: options.removeProperties), userId, fileId).data(using: .utf8)!
         } else if let link = link {
             let linkArray = link.components(separatedBy: "/")
             if let fileId = linkArray.last {
-                httpBody = String(format: NKDataFileXML(nkCommonInstance: self.nkCommonInstance).requestBodySearchFileId, userId, fileId).data(using: .utf8)!
+                httpBody = String(format: NKDataFileXML(nkCommonInstance: self.nkCommonInstance).getRequestBodySearchFileId(removeProperties: options.removeProperties), userId, fileId).data(using: .utf8)!
             }
         }
         guard let httpBody = httpBody else {
@@ -346,7 +346,7 @@ extension NextcloudKit {
             return options.queue.async { completion(account, [], nil, .urlError) }
         }
 
-        let requestBody = String(format: NKDataFileXML(nkCommonInstance: self.nkCommonInstance).requestBodySearchFileName, href, depth, "%" + literal + "%")
+        let requestBody = String(format: NKDataFileXML(nkCommonInstance: self.nkCommonInstance).getRequestBodySearchFileName(removeProperties: options.removeProperties), href, depth, "%" + literal + "%")
         let httpBody = requestBody.data(using: .utf8)!
 
         search(serverUrl: serverUrl, httpBody: httpBody, showHiddenFiles: showHiddenFiles, includeHiddenFiles: includeHiddenFiles, options: options) { task in
@@ -392,9 +392,9 @@ extension NextcloudKit {
 
         var requestBody = ""
         if limit > 0 {
-            requestBody = String(format: NKDataFileXML(nkCommonInstance: self.nkCommonInstance).requestBodySearchMediaWithLimit, href, elementDate, elementDate, lessDateString!, elementDate, greaterDateString!, String(limit))
+            requestBody = String(format: NKDataFileXML(nkCommonInstance: self.nkCommonInstance).getRequestBodySearchMediaWithLimit(removeProperties: options.removeProperties), href, elementDate, elementDate, lessDateString!, elementDate, greaterDateString!, String(limit))
         } else {
-            requestBody = String(format: NKDataFileXML(nkCommonInstance: self.nkCommonInstance).requestBodySearchMedia, href, elementDate, elementDate, lessDateString!, elementDate, greaterDateString!)
+            requestBody = String(format: NKDataFileXML(nkCommonInstance: self.nkCommonInstance).getRequestBodySearchMedia(removeProperties: options.removeProperties), href, elementDate, elementDate, lessDateString!, elementDate, greaterDateString!)
         }
 
         let httpBody = requestBody.data(using: .utf8)!
@@ -534,7 +534,7 @@ extension NextcloudKit {
         var urlRequest: URLRequest
         do {
             try urlRequest = URLRequest(url: url, method: method, headers: headers)
-            urlRequest.httpBody = NKDataFileXML(nkCommonInstance: self.nkCommonInstance).requestBodyFileListingFavorites.data(using: .utf8)
+            urlRequest.httpBody = NKDataFileXML(nkCommonInstance: self.nkCommonInstance).getRequestBodyFileListingFavorites(removeProperties: options.removeProperties).data(using: .utf8)
             urlRequest.timeoutInterval = options.timeout
         } catch {
             return options.queue.async { completion(account, files, nil, NKError(error: error)) }
