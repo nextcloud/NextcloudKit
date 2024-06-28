@@ -85,7 +85,7 @@ public enum NKProperties: String, CaseIterable {
         return allCases.map { $0.rawValue }.joined()
     }
 
-    static func getPropStandard(removeProperties: [String] = []) -> String {
+    static func properties(removeProperties: [String] = []) -> String {
         var properties = allCases.map { $0.rawValue }.joined()
         for property in removeProperties {
             properties = properties.replacingOccurrences(of: property, with: "")
@@ -381,7 +381,7 @@ class NKDataFileXML: NSObject {
         <?xml version=\"1.0\" encoding=\"UTF-8\"?>
         <d:propfind xmlns:d=\"DAV:\" xmlns:oc=\"http://owncloud.org/ns\" xmlns:nc=\"http://nextcloud.org/ns\">
             <d:prop>
-        """ + NKProperties.getPropStandard(removeProperties: removeProperties) + """
+        """ + NKProperties.properties(removeProperties: removeProperties) + """
             </d:prop>
         </d:propfind>
         """
@@ -405,7 +405,7 @@ class NKDataFileXML: NSObject {
         <?xml version=\"1.0\"?>
         <oc:filter-files xmlns:d=\"DAV:\" xmlns:oc=\"http://owncloud.org/ns\" xmlns:nc=\"http://nextcloud.org/ns\">
             <d:prop>
-        """ + NKProperties.getPropStandard(removeProperties: removeProperties) + """
+        """ + NKProperties.properties(removeProperties: removeProperties) + """
             </d:prop>
             <oc:filter-rules>
                 <oc:favorite>1</oc:favorite>
@@ -422,7 +422,7 @@ class NKDataFileXML: NSObject {
         <d:basicsearch>
             <d:select>
                 <d:prop>
-        """ + NKProperties.getPropStandard(removeProperties: removeProperties) + """
+        """ + NKProperties.properties(removeProperties: removeProperties) + """
                 </d:prop>
             </d:select>
             <d:from>
@@ -450,7 +450,7 @@ class NKDataFileXML: NSObject {
         <d:basicsearch>
             <d:select>
                 <d:prop>
-        """ + NKProperties.getPropStandard(removeProperties: removeProperties) + """
+        """ + NKProperties.properties(removeProperties: removeProperties) + """
                 </d:prop>
             </d:select>
             <d:from>
@@ -478,7 +478,7 @@ class NKDataFileXML: NSObject {
         <d:basicsearch>
         <d:select>
         <d:prop>
-        """ + NKProperties.getPropStandard(removeProperties: removeProperties) + """
+        """ + NKProperties.properties(removeProperties: removeProperties) + """
         </d:prop>
         </d:select>
         <d:from>
@@ -536,7 +536,7 @@ class NKDataFileXML: NSObject {
         <d:basicsearch>
         <d:select>
             <d:prop>
-        """ + NKProperties.getPropStandard(removeProperties: removeProperties) + """
+        """ + NKProperties.properties(removeProperties: removeProperties) + """
             </d:prop>
         </d:select>
             <d:from>
