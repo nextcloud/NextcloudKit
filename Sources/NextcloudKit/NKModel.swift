@@ -33,6 +33,10 @@ import SwiftyJSON
 
 // MARK: -
 
+public enum NKProperties: String {
+    case richworkspace = "<rich-workspace xmlns=\"http://nextcloud.org/ns\"/>"
+}
+
 @objc public class NKActivity: NSObject {
 
     @objc public var app = ""
