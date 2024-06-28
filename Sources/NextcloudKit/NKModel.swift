@@ -480,37 +480,6 @@ class NKDataFileXML: NSObject {
         return request
     }
 
-    func getRequestBodySearchLessThan(removeProperties: [String] = []) -> String {
-        let request =  """
-        <?xml version=\"1.0\"?>
-        <d:searchrequest xmlns:d=\"DAV:\" xmlns:oc=\"http://owncloud.org/ns\" xmlns:nc=\"http://nextcloud.org/ns\">
-        <d:basicsearch>
-        <d:select>
-            <d:prop>
-        """ + getPropStandard(removeProperties: removeProperties) + """
-            </d:prop>
-        </d:select>
-        <d:from>
-            <d:scope>
-                <d:href>%@</d:href>
-                <d:depth>infinity</d:depth>
-            </d:scope>
-        </d:from>
-        <d:where>
-            <d:lt>
-                <d:prop><d:getlastmodified/></d:prop>
-                <d:literal>%@</d:literal>
-            </d:lt>
-        </d:where>
-            <d:limit>
-                <d:nresults>%@</d:nresults>
-            </d:limit>
-        </d:basicsearch>
-        </d:searchrequest>
-        """
-        return request
-    }
-
     func getRequestBodySearchMedia(removeProperties: [String] = []) -> String {
         let request =  """
         <?xml version=\"1.0\"?>
