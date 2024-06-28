@@ -33,12 +33,68 @@ import SwiftyJSON
 
 // MARK: -
 
-public enum NKProperties: String {
+public enum NKProperties: String, CaseIterable {
+    case displayname = "<d:displayname />"
+    case getlastmodified = "<d:getlastmodified />"
+    case getetag = "<d:getetag />"
+    case getcontenttype = "<d:getcontenttype />"
+    case resourcetype = "<d:resourcetype />"
+    case quotaavailablebytes = "<d:quota-available-bytes />"
+    case quotausedbytes = "<d:quota-used-bytes />"
+    case getcontentlength = "<d:getcontentlength />"
+
+    case permissions = "<permissions xmlns=\"http://owncloud.org/ns\"/>"
+    case id = "<id xmlns=\"http://owncloud.org/ns\"/>"
+    case fileid = "<fileid xmlns=\"http://owncloud.org/ns\"/>"
+    case size = "<size xmlns=\"http://owncloud.org/ns\"/>"
+    case favorite = "<favorite xmlns=\"http://owncloud.org/ns\"/>"
+    case sharetypes = "<share-types xmlns=\"http://owncloud.org/ns\"/>"
+    case ownerid = "<owner-id xmlns=\"http://owncloud.org/ns\"/>"
+    case ownerdisplayname = "<owner-display-name xmlns=\"http://owncloud.org/ns\"/>"
+    case commentsunread = "<comments-unread xmlns=\"http://owncloud.org/ns\"/>"
+    case checksums = "<checksums xmlns=\"http://owncloud.org/ns\"/>"
+    case downloadURL = "<downloadURL xmlns=\"http://owncloud.org/ns\"/>"
+    case datafingerprint = "<data-fingerprint xmlns=\"http://owncloud.org/ns\"/>"
+
+    case creationtime = "<creation_time xmlns=\"http://nextcloud.org/ns\"/>"
+    case uploadtime = "<upload_time xmlns=\"http://nextcloud.org/ns\"/>"
+    case isencrypted = "<is-encrypted xmlns=\"http://nextcloud.org/ns\"/>"
+    case haspreview = "<has-preview xmlns=\"http://nextcloud.org/ns\"/>"
+    case mounttype = "<mount-type xmlns=\"http://nextcloud.org/ns\"/>"
     case richworkspace = "<rich-workspace xmlns=\"http://nextcloud.org/ns\"/>"
+    case note = "<note xmlns=\"http://nextcloud.org/ns\"/>"
+    case lock = "<lock xmlns=\"http://nextcloud.org/ns\"/>"
+    case lockowner = "<lock-owner xmlns=\"http://nextcloud.org/ns\"/>"
+    case lockownereditor = "<lock-owner-editor xmlns=\"http://nextcloud.org/ns\"/>"
+    case lockownerdisplayname = "<lock-owner-displayname xmlns=\"http://nextcloud.org/ns\"/>"
+    case lockownertype = "<lock-owner-type xmlns=\"http://nextcloud.org/ns\"/>"
+    case locktime = "<lock-time xmlns=\"http://nextcloud.org/ns\"/>"
+    case locktimeout = "<lock-timeout xmlns=\"http://nextcloud.org/ns\"/>"
+    case systemtags = "<system-tags xmlns=\"http://nextcloud.org/ns\"/>"
+    case filemetadatasize = "<file-metadata-size xmlns=\"http://nextcloud.org/ns\"/>"
+    case filemetadatagps = "<file-metadata-gps xmlns=\"http://nextcloud.org/ns\"/>"
+    case metadataphotossize = "<metadata-photos-size xmlns=\"http://nextcloud.org/ns\"/>"
+    case metadataphotosgps = "<metadata-photos-gps xmlns=\"http://nextcloud.org/ns\"/>"
+    case metadatafileslivephoto = "<metadata-files-live-photo xmlns=\"http://nextcloud.org/ns\"/>"
+    case hidden = "<hidden xmlns=\"http://nextcloud.org/ns\"/>"
+
+    case sharepermissionscollaboration = "<share-permissions xmlns=\"http://open-collaboration-services.org/ns\"/>"
+    case sharepermissionscloudmesh = "<share-permissions xmlns=\"http://open-cloud-mesh.org/ns\"/>"
+
+    static var properties: String {
+        return allCases.map { $0.rawValue }.joined()
+    }
+
+    static func getPropStandard(removeProperties: [String] = []) -> String {
+        var properties = allCases.map { $0.rawValue }.joined()
+        for property in removeProperties {
+            properties = properties.replacingOccurrences(of: property, with: "")
+        }
+        return properties
+    }
 }
 
 @objc public class NKActivity: NSObject {
-
     @objc public var app = ""
     @objc public var date = NSDate()
     @objc public var idActivity: Int = 0
@@ -57,7 +113,6 @@ public enum NKProperties: String {
 }
 
 @objc public class NKComments: NSObject {
-
     @objc public var actorDisplayName = ""
     @objc public var actorId = ""
     @objc public var actorType = ""
@@ -72,7 +127,6 @@ public enum NKProperties: String {
 }
 
 @objc public class NKEditorDetailsCreators: NSObject {
-
     @objc public var editor = ""
     @objc public var ext = ""
     @objc public var identifier = ""
@@ -82,7 +136,6 @@ public enum NKProperties: String {
 }
 
 @objc public class NKEditorDetailsEditors: NSObject {
-
     @objc public var mimetypes: [String] = []
     @objc public var name = ""
     @objc public var optionalMimetypes: [String] = []
@@ -90,7 +143,6 @@ public enum NKProperties: String {
 }
 
 @objc public class NKEditorTemplates: NSObject {
-
     @objc public var delete = ""
     @objc public var ext = ""
     @objc public var identifier = ""
@@ -100,7 +152,6 @@ public enum NKProperties: String {
 }
 
 @objc public class NKExternalSite: NSObject {
-
     @objc public var icon = ""
     @objc public var idExternalSite: Int = 0
     @objc public var lang = ""
@@ -111,7 +162,6 @@ public enum NKProperties: String {
 }
 
 @objc public class NKFile: NSObject {
-
     @objc public var account = ""
     @objc public var classFile = ""
     @objc public var commentsUnread: Bool = false
@@ -178,7 +228,6 @@ public enum NKProperties: String {
 }
 
 @objcMembers public class NKFileProperty: NSObject {
-
     public var classFile: String = ""
     public var iconName: String = ""
     public var name: String = ""
@@ -186,7 +235,6 @@ public enum NKProperties: String {
 }
 
 @objc public class NKNotifications: NSObject {
-
     @objc public var actions: Data?
     @objc public var app = ""
     @objc public var date = NSDate()
@@ -205,7 +253,6 @@ public enum NKProperties: String {
 }
 
 @objc public class NKRichdocumentsTemplate: NSObject {
-
     @objc public var delete = ""
     @objc public var ext = ""
     @objc public var name = ""
@@ -215,7 +262,6 @@ public enum NKProperties: String {
 }
 
 @objc public class NKSharee: NSObject {
-
     @objc public var circleInfo = ""
     @objc public var circleOwner = ""
     @objc public var label = ""
@@ -230,7 +276,6 @@ public enum NKProperties: String {
 }
 
 @objc public class NKTrash: NSObject {
-
     @objc public var contentType = ""
     @objc public var date = NSDate()
     @objc public var directory: Bool = false
@@ -247,7 +292,6 @@ public enum NKProperties: String {
 }
 
 @objc public class NKUserProfile: NSObject {
-
     @objc public var address = ""
     @objc public var backend = ""
     @objc public var backendCapabilitiesSetDisplayName: Bool = false
@@ -274,7 +318,6 @@ public enum NKProperties: String {
 }
 
 @objc public class NKUserStatus: NSObject {
-
     @objc public var clearAt: NSDate?
     @objc public var clearAtTime: String?
     @objc public var clearAtType: String?
@@ -290,7 +333,6 @@ public enum NKProperties: String {
 
 class NKDataFileXML: NSObject {
     let nkCommonInstance: NKCommon
-
     let requestBodyComments =
     """
     <?xml version=\"1.0\" encoding=\"UTF-8\"?>
@@ -334,67 +376,12 @@ class NKDataFileXML: NSObject {
     </d:propertyupdate>
     """
 
-    func getPropStandard(removeProperties: [String] = []) -> String {
-        var request = """
-        <d:getlastmodified />
-        <d:getetag />
-        <d:getcontenttype />
-        <d:resourcetype />
-        <d:quota-available-bytes />
-        <d:quota-used-bytes />
-
-        <permissions xmlns=\"http://owncloud.org/ns\"/>
-        <id xmlns=\"http://owncloud.org/ns\"/>
-        <fileid xmlns=\"http://owncloud.org/ns\"/>
-        <size xmlns=\"http://owncloud.org/ns\"/>
-        <favorite xmlns=\"http://owncloud.org/ns\"/>
-        <share-types xmlns=\"http://owncloud.org/ns\"/>
-        <owner-id xmlns=\"http://owncloud.org/ns\"/>
-        <owner-display-name xmlns=\"http://owncloud.org/ns\"/>
-        <comments-unread xmlns=\"http://owncloud.org/ns\"/>
-        <checksums xmlns=\"http://owncloud.org/ns\"/>
-        <downloadURL xmlns=\"http://owncloud.org/ns\"/>
-        <data-fingerprint xmlns=\"http://owncloud.org/ns\"/>
-
-        <creation_time xmlns=\"http://nextcloud.org/ns\"/>
-        <upload_time xmlns=\"http://nextcloud.org/ns\"/>
-        <is-encrypted xmlns=\"http://nextcloud.org/ns\"/>
-        <has-preview xmlns=\"http://nextcloud.org/ns\"/>
-        <mount-type xmlns=\"http://nextcloud.org/ns\"/>
-        <rich-workspace xmlns=\"http://nextcloud.org/ns\"/>
-        <note xmlns=\"http://nextcloud.org/ns\"/>
-        <lock xmlns=\"http://nextcloud.org/ns\"/>
-        <lock-owner xmlns=\"http://nextcloud.org/ns\"/>
-        <lock-owner-editor xmlns=\"http://nextcloud.org/ns\"/>
-        <lock-owner-displayname xmlns=\"http://nextcloud.org/ns\"/>
-        <lock-owner-type xmlns=\"http://nextcloud.org/ns\"/>
-        <lock-time xmlns=\"http://nextcloud.org/ns\"/>
-        <lock-timeout xmlns=\"http://nextcloud.org/ns\"/>
-        <system-tags xmlns=\"http://nextcloud.org/ns\"/>
-        <file-metadata-size xmlns=\"http://nextcloud.org/ns\"/>
-        <file-metadata-gps xmlns=\"http://nextcloud.org/ns\"/>
-        <metadata-photos-size xmlns=\"http://nextcloud.org/ns\"/>
-        <metadata-photos-gps xmlns=\"http://nextcloud.org/ns\"/>
-        <metadata-files-live-photo xmlns=\"http://nextcloud.org/ns\"/>
-        <hidden xmlns=\"http://nextcloud.org/ns\"/>
-
-        <share-permissions xmlns=\"http://open-collaboration-services.org/ns\"/>
-        <share-permissions xmlns=\"http://open-cloud-mesh.org/ns\"/>
-        """
-
-        for property in removeProperties {
-            request = request.replacingOccurrences(of: property, with: "")
-        }
-
-        return request
-    }
-
     func getRequestBodyFile(removeProperties: [String] = []) -> String {
         let request =  """
         <?xml version=\"1.0\" encoding=\"UTF-8\"?>
         <d:propfind xmlns:d=\"DAV:\" xmlns:oc=\"http://owncloud.org/ns\" xmlns:nc=\"http://nextcloud.org/ns\">
             <d:prop>
-        """ + getPropStandard(removeProperties: removeProperties) + """
+        """ + NKProperties.getPropStandard(removeProperties: removeProperties) + """
             </d:prop>
         </d:propfind>
         """
@@ -418,7 +405,7 @@ class NKDataFileXML: NSObject {
         <?xml version=\"1.0\"?>
         <oc:filter-files xmlns:d=\"DAV:\" xmlns:oc=\"http://owncloud.org/ns\" xmlns:nc=\"http://nextcloud.org/ns\">
             <d:prop>
-        """ + getPropStandard(removeProperties: removeProperties) + """
+        """ + NKProperties.getPropStandard(removeProperties: removeProperties) + """
             </d:prop>
             <oc:filter-rules>
                 <oc:favorite>1</oc:favorite>
@@ -435,7 +422,7 @@ class NKDataFileXML: NSObject {
         <d:basicsearch>
             <d:select>
                 <d:prop>
-        """ + getPropStandard(removeProperties: removeProperties) + """
+        """ + NKProperties.getPropStandard(removeProperties: removeProperties) + """
                 </d:prop>
             </d:select>
             <d:from>
@@ -463,7 +450,7 @@ class NKDataFileXML: NSObject {
         <d:basicsearch>
             <d:select>
                 <d:prop>
-        """ + getPropStandard(removeProperties: removeProperties) + """
+        """ + NKProperties.getPropStandard(removeProperties: removeProperties) + """
                 </d:prop>
             </d:select>
             <d:from>
@@ -491,7 +478,7 @@ class NKDataFileXML: NSObject {
         <d:basicsearch>
         <d:select>
         <d:prop>
-        """ + getPropStandard(removeProperties: removeProperties) + """
+        """ + NKProperties.getPropStandard(removeProperties: removeProperties) + """
         </d:prop>
         </d:select>
         <d:from>
@@ -549,7 +536,7 @@ class NKDataFileXML: NSObject {
         <d:basicsearch>
         <d:select>
             <d:prop>
-        """ + getPropStandard(removeProperties: removeProperties) + """
+        """ + NKProperties.getPropStandard(removeProperties: removeProperties) + """
             </d:prop>
         </d:select>
             <d:from>
@@ -607,32 +594,31 @@ class NKDataFileXML: NSObject {
     """
     <?xml version=\"1.0\" encoding=\"UTF-8\"?>
     <d:propfind xmlns:d=\"DAV:\" xmlns:oc=\"http://owncloud.org/ns\" xmlns:nc=\"http://nextcloud.org/ns\">
-        <d:prop>
-            <d:displayname />
-            <d:getcontenttype />
-            <d:resourcetype />
-            <d:getcontentlength />
-            <d:getlastmodified />
-            <d:getetag />
-            <d:quota-used-bytes />
-            <d:quota-available-bytes />
-            <permissions xmlns=\"http://owncloud.org/ns\"/>
-
-            <id xmlns=\"http://owncloud.org/ns\"/>
-            <fileid xmlns=\"http://owncloud.org/ns\"/>
-            <size xmlns=\"http://owncloud.org/ns\"/>
-            <favorite xmlns=\"http://owncloud.org/ns\"/>
-            <is-encrypted xmlns=\"http://nextcloud.org/ns\"/>
-            <mount-type xmlns=\"http://nextcloud.org/ns\"/>
-            <owner-id xmlns=\"http://owncloud.org/ns\"/>
-            <owner-display-name xmlns=\"http://owncloud.org/ns\"/>
-            <comments-unread xmlns=\"http://owncloud.org/ns\"/>
-            <has-preview xmlns=\"http://nextcloud.org/ns\"/>
-
-            <trashbin-filename xmlns=\"http://nextcloud.org/ns\"/>
-            <trashbin-original-location xmlns=\"http://nextcloud.org/ns\"/>
-            <trashbin-deletion-time xmlns=\"http://nextcloud.org/ns\"/>
-        </d:prop>
+    <d:prop>
+    """
+    + NKProperties.displayname.rawValue +
+    + NKProperties.getcontenttype.rawValue +
+    + NKProperties.resourcetype.rawValue +
+    + NKProperties.getcontentlength.rawValue +
+    + NKProperties.getetag.rawValue +
+    + NKProperties.quotausedbytes.rawValue +
+    + NKProperties.quotaavailablebytes.rawValue +
+    + NKProperties.permissions.rawValue +
+    + NKProperties.id.rawValue +
+    + NKProperties.fileid.rawValue +
+    + NKProperties.size.rawValue +
+    + NKProperties.favorite.rawValue +
+    + NKProperties.isencrypted.rawValue +
+    + NKProperties.mounttype.rawValue +
+    + NKProperties.ownerid.rawValue +
+    + NKProperties.ownerdisplayname.rawValue +
+    + NKProperties.commentsunread.rawValue +
+    + NKProperties.haspreview.rawValue +
+    + "<trashbin-filename xmlns=\"http://nextcloud.org/ns\"/>" +
+    + "<trashbin-original-location xmlns=\"http://nextcloud.org/ns\"/>" +
+    + "<trashbin-deletion-time xmlns=\"http://nextcloud.org/ns\"/>" +
+    """
+    </d:prop>
     </d:propfind>
     """
 
@@ -654,21 +640,19 @@ class NKDataFileXML: NSObject {
     }
 
     func convertDataAppPassword(data: Data) -> String? {
-
         let xml = XML.parse(data)
         return xml["ocs", "data", "apppassword"].text
     }
 
     func convertDataFile(xmlData: Data, dav: String, urlBase: String, user: String, userId: String, showHiddenFiles: Bool, includeHiddenFiles: [String]) -> [NKFile] {
-
         var files: [NKFile] = []
         let rootFiles = "/" + dav + "/files/"
         guard let baseUrl = self.nkCommonInstance.getHostName(urlString: urlBase) else {
             return files
         }
-
         let xml = XML.parse(xmlData)
         let elements = xml["d:multistatus", "d:response"]
+
         for element in elements {
             let file = NKFile()
             if let href = element["d:href"].text {
@@ -945,15 +929,14 @@ class NKDataFileXML: NSObject {
     }
 
     func convertDataTrash(xmlData: Data, urlBase: String, showHiddenFiles: Bool) -> [NKTrash] {
-
         var files: [NKTrash] = []
         var first: Bool = true
         guard let baseUrl = self.nkCommonInstance.getHostName(urlString: urlBase) else {
             return files
         }
-
         let xml = XML.parse(xmlData)
         let elements = xml["d:multistatus", "d:response"]
+
         for element in elements {
             if first {
                 first = false
@@ -1030,11 +1013,10 @@ class NKDataFileXML: NSObject {
     }
 
     func convertDataComments(xmlData: Data) -> [NKComments] {
-
         var items: [NKComments] = []
-
         let xml = XML.parse(xmlData)
         let elements = xml["d:multistatus", "d:response"]
+
         for element in elements {
             let item = NKComments()
 
