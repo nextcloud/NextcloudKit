@@ -249,7 +249,7 @@ public class NKCommon: NSObject {
         return ["mimeType": results.mimeType, "classFile": results.classFile, "iconName": results.iconName, "typeIdentifier": results.typeIdentifier, "fileNameWithoutExt": results.fileNameWithoutExt, "ext": results.ext]
     }
 
-    func getInternalType(fileName: String, mimeType: String, directory: Bool) -> (mimeType: String, classFile: String, iconName: String, typeIdentifier: String, fileNameWithoutExt: String, ext: String) {
+    public func getInternalType(fileName: String, mimeType: String, directory: Bool) -> (mimeType: String, classFile: String, iconName: String, typeIdentifier: String, fileNameWithoutExt: String, ext: String) {
         var ext = (fileName as NSString).pathExtension.lowercased()
         var mimeType = mimeType
         var classFile = "", iconName = "", typeIdentifier = "", fileNameWithoutExt = ""
