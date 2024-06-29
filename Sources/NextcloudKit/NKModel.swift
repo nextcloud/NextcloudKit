@@ -81,10 +81,6 @@ public enum NKProperties: String, CaseIterable {
     case sharepermissionscollaboration = "<share-permissions xmlns=\"http://open-collaboration-services.org/ns\"/>"
     case sharepermissionscloudmesh = "<share-permissions xmlns=\"http://open-cloud-mesh.org/ns\"/>"
 
-    static var properties: String {
-        return allCases.map { $0.rawValue }.joined()
-    }
-
     static func properties(removeProperties: [String] = []) -> String {
         var properties = allCases.map { $0.rawValue }.joined()
         for property in removeProperties {
@@ -221,15 +217,11 @@ public enum NKProperties: String, CaseIterable {
     @objc public var altitude: Double = 0
     @objc public var height: Double = 0
     @objc public var width: Double = 0
-
+    @objc public var hidden = false
     /// If this is not empty, the media is a live photo. New media gets this straight from server, but old media needs to be detected as live photo (look isFlaggedAsLivePhotoByServer)
     @objc public var livePhotoFile = ""
-
     /// Indicating if the file is sent as a live photo from the server, or if we should detect it as such and convert it client-side
     @objc public var isFlaggedAsLivePhotoByServer = false
-    
-    @objc public var hidden = false
-
 }
 
 @objcMembers public class NKFileProperty: NSObject {
