@@ -974,10 +974,10 @@ extension NextcloudKit {
 
     // MARK: -
 
-    func sendClientDiagnosticsRemoteOperation(data: Data,
-                                              options: NKRequestOptions = NKRequestOptions(),
-                                              taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-                                              completion: @escaping (_ account: String, _ error: NKError) -> Void) {
+    public func sendClientDiagnosticsRemoteOperation(data: Data,
+                                                     options: NKRequestOptions = NKRequestOptions(),
+                                                     taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
+                                                     completion: @escaping (_ account: String, _ error: NKError) -> Void) {
 
         let account = self.nkCommonInstance.account
         let urlBase = self.nkCommonInstance.urlBase
