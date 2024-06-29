@@ -168,16 +168,12 @@ open class NextcloudKit: SessionDelegate {
     private func startNetworkReachabilityObserver() {
         reachabilityManager?.startListening(onUpdatePerforming: { status in
             switch status {
-
             case .unknown:
                 self.nkCommonInstance.delegate?.networkReachabilityObserver(NKCommon.TypeReachability.unknown)
-
             case .notReachable:
                 self.nkCommonInstance.delegate?.networkReachabilityObserver(NKCommon.TypeReachability.notReachable)
-
             case .reachable(.ethernetOrWiFi):
                 self.nkCommonInstance.delegate?.networkReachabilityObserver(NKCommon.TypeReachability.reachableEthernetOrWiFi)
-
             case .reachable(.cellular):
                 self.nkCommonInstance.delegate?.networkReachabilityObserver(NKCommon.TypeReachability.reachableCellular)
             }
@@ -227,47 +223,36 @@ open class NextcloudKit: SessionDelegate {
                          taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
                          progressHandler: @escaping (_ progress: Progress) -> Void = { _ in },
                          completionHandler: @escaping (_ account: String, _ etag: String?, _ date: NSDate?, _ lenght: Int64, _ allHeaderFields: [AnyHashable: Any]?, _ afError: AFError?, _ nKError: NKError) -> Void) {
-
         let account = self.nkCommonInstance.account
         var convertible: URLConvertible?
-
         if serverUrlFileName is URL {
             convertible = serverUrlFileName as? URLConvertible
         } else if serverUrlFileName is String || serverUrlFileName is NSString {
             convertible = (serverUrlFileName as? String)?.encodedToUrl
         }
-
         guard let url = convertible else {
             options.queue.async { completionHandler(account, nil, nil, 0, nil, nil, .urlError) }
             return
         }
-
         var destination: Alamofire.DownloadRequest.Destination?
         let fileNamePathLocalDestinationURL = NSURL.fileURL(withPath: fileNameLocalPath)
         let destinationFile: DownloadRequest.Destination = { _, _ in
             return (fileNamePathLocalDestinationURL, [.removePreviousFile, .createIntermediateDirectories])
         }
         destination = destinationFile
-
         let headers = self.nkCommonInstance.getStandardHeaders(options: options)
 
         let request = sessionManager.download(url, method: .get, parameters: nil, encoding: URLEncoding.default, headers: headers, interceptor: nil, to: destination).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
-
             task.taskDescription = options.taskDescription
             options.queue.async { taskHandler(task) }
-
         } .downloadProgress { progress in
-
             options.queue.async { progressHandler(progress) }
-
         } .response(queue: self.nkCommonInstance.backgroundQueue) { response in
-
             switch response.result {
             case .failure(let error):
                 let resultError = NKError(error: error, afResponse: response, responseData: nil)
                 options.queue.async { completionHandler(account, nil, nil, 0, nil, error, resultError) }
             case .success:
-
                 var date: NSDate?
                 var etag: String?
                 var length: Int64 = 0
@@ -276,7 +261,6 @@ open class NextcloudKit: SessionDelegate {
                 if let result = response.response?.allHeaderFields["Content-Length"] as? String {
                     length = Int64(result) ?? 0
                 }
-
                 if self.nkCommonInstance.findHeader("oc-etag", allHeaderFields: response.response?.allHeaderFields) != nil {
                     etag = self.nkCommonInstance.findHeader("oc-etag", allHeaderFields: response.response?.allHeaderFields)
                 } else if self.nkCommonInstance.findHeader("etag", allHeaderFields: response.response?.allHeaderFields) != nil {
@@ -286,7 +270,6 @@ open class NextcloudKit: SessionDelegate {
                 if etag != nil {
                     etag = etag!.replacingOccurrences(of: "\"", with: "")
                 }
-
                 if let dateString = self.nkCommonInstance.findHeader("Date", allHeaderFields: response.response?.allHeaderFields) {
                     date = self.nkCommonInstance.convertDate(dateString, format: "EEE, dd MMM y HH:mm:ss zzz")
                 }

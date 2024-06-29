@@ -30,7 +30,6 @@ extension NextcloudKit {
                              options: NKRequestOptions = NKRequestOptions(),
                              taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
                              completion: @escaping (_ account: String, _ ocId: String?, _ date: NSDate?, _ error: NKError) -> Void) {
-
         let account = self.nkCommonInstance.account
 
         guard let url = serverUrlFileName.encodedToUrl else {
