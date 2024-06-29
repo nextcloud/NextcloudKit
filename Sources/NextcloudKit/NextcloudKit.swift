@@ -266,9 +266,8 @@ open class NextcloudKit: SessionDelegate {
                 } else if self.nkCommonInstance.findHeader("etag", allHeaderFields: response.response?.allHeaderFields) != nil {
                     etag = self.nkCommonInstance.findHeader("etag", allHeaderFields: response.response?.allHeaderFields)
                 }
-
                 if etag != nil {
-                    etag = etag!.replacingOccurrences(of: "\"", with: "")
+                    etag = etag?.replacingOccurrences(of: "\"", with: "")
                 }
                 if let dateString = self.nkCommonInstance.findHeader("Date", allHeaderFields: response.response?.allHeaderFields) {
                     date = self.nkCommonInstance.convertDate(dateString, format: "EEE, dd MMM y HH:mm:ss zzz")
@@ -290,26 +289,20 @@ open class NextcloudKit: SessionDelegate {
                        taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
                        progressHandler: @escaping (_ progress: Progress) -> Void = { _ in },
                        completionHandler: @escaping (_ account: String, _ ocId: String?, _ etag: String?, _ date: NSDate?, _ size: Int64, _ allHeaderFields: [AnyHashable: Any]?, _ afError: AFError?, _ nkError: NKError) -> Void) {
-
         let account = self.nkCommonInstance.account
         var convertible: URLConvertible?
         var size: Int64 = 0
-
         if serverUrlFileName is URL {
             convertible = serverUrlFileName as? URLConvertible
         } else if serverUrlFileName is String || serverUrlFileName is NSString {
             convertible = (serverUrlFileName as? String)?.encodedToUrl
         }
-
         guard let url = convertible else {
             options.queue.async { completionHandler(account, nil, nil, nil, 0, nil, nil, .urlError) }
             return
         }
-
         let fileNameLocalPathUrl = URL(fileURLWithPath: fileNameLocalPath)
-
         var headers = self.nkCommonInstance.getStandardHeaders(options: options)
-
         // Epoch of linux do not permitted negativ value
         if let dateCreationFile, dateCreationFile.timeIntervalSince1970 > 0 {
             headers.update(name: "X-OC-CTime", value: "\(dateCreationFile.timeIntervalSince1970)")
@@ -320,17 +313,12 @@ open class NextcloudKit: SessionDelegate {
         }
 
         let request = sessionManager.upload(fileNameLocalPathUrl, to: url, method: .put, headers: headers, interceptor: nil, fileManager: .default).validate(statusCode: 200..<300).onURLSessionTaskCreation(perform: { task in
-
             task.taskDescription = options.taskDescription
             options.queue.async { taskHandler(task) }
-
         }) .uploadProgress { progress in
-
             options.queue.async { progressHandler(progress) }
             size = progress.totalUnitCount
-
         } .response(queue: self.nkCommonInstance.backgroundQueue) { response in
-
             switch response.result {
             case .failure(let error):
                 let resultError = NKError(error: error, afResponse: response, responseData: response.data)
@@ -338,21 +326,19 @@ open class NextcloudKit: SessionDelegate {
             case .success:
                 var ocId: String?, etag: String?
                 let allHeaderFields = response.response?.allHeaderFields
-
                 if self.nkCommonInstance.findHeader("oc-fileid", allHeaderFields: response.response?.allHeaderFields) != nil {
                     ocId = self.nkCommonInstance.findHeader("oc-fileid", allHeaderFields: response.response?.allHeaderFields)
                 } else if self.nkCommonInstance.findHeader("fileid", allHeaderFields: response.response?.allHeaderFields) != nil {
                     ocId = self.nkCommonInstance.findHeader("fileid", allHeaderFields: response.response?.allHeaderFields)
                 }
-
                 if self.nkCommonInstance.findHeader("oc-etag", allHeaderFields: response.response?.allHeaderFields) != nil {
                     etag = self.nkCommonInstance.findHeader("oc-etag", allHeaderFields: response.response?.allHeaderFields)
                 } else if self.nkCommonInstance.findHeader("etag", allHeaderFields: response.response?.allHeaderFields) != nil {
                     etag = self.nkCommonInstance.findHeader("etag", allHeaderFields: response.response?.allHeaderFields)
                 }
-
-                if etag != nil { etag = etag!.replacingOccurrences(of: "\"", with: "") }
-
+                if etag != nil {
+                    etag = etag?.replacingOccurrences(of: "\"", with: "")
+                }
                 if let dateString = self.nkCommonInstance.findHeader("date", allHeaderFields: response.response?.allHeaderFields) {
                     if let date = self.nkCommonInstance.convertDate(dateString, format: "EEE, dd MMM y HH:mm:ss zzz") {
                         options.queue.async { completionHandler(account, ocId, etag, date, size, allHeaderFields, nil, .success) }
@@ -396,12 +382,10 @@ open class NextcloudKit: SessionDelegate {
                             progressHandler: @escaping (_ totalBytesExpected: Int64, _ totalBytes: Int64, _ fractionCompleted: Double) -> Void = { _, _, _ in },
                             uploaded: @escaping (_ fileChunk: (fileName: String, size: Int64)) -> Void = { _ in },
                             completion: @escaping (_ account: String, _ filesChunk: [(fileName: String, size: Int64)]?, _ file: NKFile?, _ afError: AFError?, _ error: NKError) -> Void) {
-
         let account = self.nkCommonInstance.account
         let userId = self.nkCommonInstance.userId
         let urlBase = self.nkCommonInstance.urlBase
         let dav = self.nkCommonInstance.dav
-
         let fileNameLocalSize = self.nkCommonInstance.getFileSize(filePath: directory + "/" + fileName)
         let serverUrlChunkFolder = urlBase + "/" + dav + "/uploads/" + userId + "/" + chunkFolder
         let serverUrlFileName = urlBase + "/" + dav + "/files/" + userId + self.nkCommonInstance.returnPathfromServerUrl(serverUrl) + "/" + fileName
@@ -440,7 +424,6 @@ open class NextcloudKit: SessionDelegate {
         #endif
 
         func createFolder(completion: @escaping (_ errorCode: NKError) -> Void) {
-
             readFileOrFolder(serverUrlFileName: serverUrlChunkFolder, depth: "0", options: options) { _, _, _, error in
                 if error == .success {
                     completion(NKError())
@@ -455,11 +438,9 @@ open class NextcloudKit: SessionDelegate {
         }
 
         createFolder { error in
-
             guard error == .success else {
                 return completion(account, nil, nil, nil, NKError(errorCode: NKError.chunkCreateFolder, errorDescription: error.errorDescription))
             }
-
             var uploadNKError = NKError()
             var uploadAFError: AFError?
 
@@ -473,22 +454,18 @@ open class NextcloudKit: SessionDelegate {
                     let error = NKError(errorCode: NKError.chunkFilesNull, errorDescription: "_chunk_files_null_")
                     return completion(account, nil, nil, nil, error)
                 }
-
                 var filesChunkOutput = filesChunk
                 start(filesChunkOutput)
 
                 for fileChunk in filesChunk {
-
                     let serverUrlFileName = serverUrlChunkFolder + "/" + fileChunk.fileName
                     let fileNameLocalPath = directory + "/" + fileChunk.fileName
-
                     let fileSize = self.nkCommonInstance.getFileSize(filePath: fileNameLocalPath)
                     if fileSize == 0 {
                         // The file could not be sent
                         let error = NKError(errorCode: NKError.chunkFileNull, errorDescription: "_chunk_file_null_")
                         return completion(account, nil, nil, .explicitlyCancelled, error)
                     }
-
                     let semaphore = DispatchSemaphore(value: 0)
                     self.upload(serverUrlFileName: serverUrlFileName, fileNameLocalPath: fileNameLocalPath, options: options, requestHandler: { request in
                         requestHandler(request)
@@ -529,7 +506,6 @@ open class NextcloudKit: SessionDelegate {
                 if let date, date.timeIntervalSince1970 > 0 {
                     options.customHeader?["X-OC-MTime"] = "\(date.timeIntervalSince1970)"
                 }
-
                 // Calculate Assemble Timeout
                 let assembleSizeInGB = Double(fileNameLocalSize) / 1e9
                 let assembleTimePerGB: Double = 3 * 60  // 3  min
@@ -538,7 +514,6 @@ open class NextcloudKit: SessionDelegate {
                 options.timeout = max(assembleTimeMin, min(assembleTimePerGB * assembleSizeInGB, assembleTimeMax))
 
                 self.moveFileOrFolder(serverUrlFileNameSource: serverUrlFileNameSource, serverUrlFileNameDestination: serverUrlFileName, overwrite: true, options: options) { _, error in
-
                     guard error == .success else {
                         return completion(account, filesChunkOutput, nil, nil, NKError(errorCode: NKError.chunkMoveFile, errorDescription: error.errorDescription))
                     }
@@ -558,7 +533,6 @@ open class NextcloudKit: SessionDelegate {
     // MARK: - SessionDelegate
 
     public func urlSession(_ session: URLSession, didReceive challenge: URLAuthenticationChallenge, completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
-
         if self.nkCommonInstance.delegate == nil {
             self.nkCommonInstance.writeLog("[WARNING] URLAuthenticationChallenge, no delegate found, perform with default handling")
             completionHandler(URLSession.AuthChallengeDisposition.performDefaultHandling, nil)
