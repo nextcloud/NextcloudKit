@@ -26,10 +26,9 @@ import Alamofire
 import SwiftyJSON
 
 extension NextcloudKit {
-
-    @objc public func getGroupfolders(options: NKRequestOptions = NKRequestOptions(),
-                                      taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-                                      completion: @escaping (_ account: String, _ results: [NKGroupfolders]?, _ data: Data?, _ error: NKError) -> Void) {
+    public func getGroupfolders(options: NKRequestOptions = NKRequestOptions(),
+                                taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
+                                completion: @escaping (_ account: String, _ results: [NKGroupfolders]?, _ data: Data?, _ error: NKError) -> Void) {
 
         let account = self.nkCommonInstance.account
         let urlBase = self.nkCommonInstance.urlBase
@@ -76,15 +75,14 @@ extension NextcloudKit {
     }
 }
 
-@objc public class NKGroupfolders: NSObject {
-
-    @objc public let id: Int
-    @objc public let mountPoint: String
-    @objc public let acl: Bool
-    @objc public let size: Int
-    @objc public let quota: Int
-    @objc public let manage: Data?
-    @objc public let groups: [String: Any]?
+public class NKGroupfolders: NSObject {
+    public let id: Int
+    public let mountPoint: String
+    public let acl: Bool
+    public let size: Int
+    public let quota: Int
+    public let manage: Data?
+    public let groups: [String: Any]?
 
     internal init?(json: JSON) {
         guard let id = json["id"].int,

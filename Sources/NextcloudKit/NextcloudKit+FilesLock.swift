@@ -27,13 +27,12 @@ import Alamofire
 import SwiftyJSON
 
 extension NextcloudKit {
-
     // available in NC >= 24
-    @objc public func lockUnlockFile(serverUrlFileName: String,
-                                     shouldLock: Bool,
-                                     options: NKRequestOptions = NKRequestOptions(),
-                                     taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-                                     completion: @escaping (_ account: String, _ error: NKError) -> Void) {
+    public func lockUnlockFile(serverUrlFileName: String,
+                               shouldLock: Bool,
+                               options: NKRequestOptions = NKRequestOptions(),
+                               taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
+                               completion: @escaping (_ account: String, _ error: NKError) -> Void) {
 
         let account = self.nkCommonInstance.account
 

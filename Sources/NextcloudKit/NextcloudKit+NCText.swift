@@ -26,10 +26,9 @@ import Alamofire
 import SwiftyJSON
 
 extension NextcloudKit {
-
-    @objc public func NCTextObtainEditorDetails(options: NKRequestOptions = NKRequestOptions(),
-                                                taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-                                                completion: @escaping (_ account: String, _  editors: [NKEditorDetailsEditors], _ creators: [NKEditorDetailsCreators], _ data: Data?, _ error: NKError) -> Void) {
+    public func NCTextObtainEditorDetails(options: NKRequestOptions = NKRequestOptions(),
+                                          taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
+                                          completion: @escaping (_ account: String, _  editors: [NKEditorDetailsEditors], _ creators: [NKEditorDetailsCreators], _ data: Data?, _ error: NKError) -> Void) {
 
         let account = self.nkCommonInstance.account
         let urlBase = self.nkCommonInstance.urlBase
@@ -97,12 +96,12 @@ extension NextcloudKit {
         }
     }
 
-    @objc public func NCTextOpenFile(fileNamePath: String,
-                                     fileId: String? = nil,
-                                     editor: String,
-                                     options: NKRequestOptions = NKRequestOptions(),
-                                     taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-                                     completion: @escaping (_ account: String, _  url: String?, _ data: Data?, _ error: NKError) -> Void) {
+    public func NCTextOpenFile(fileNamePath: String,
+                               fileId: String? = nil,
+                               editor: String,
+                               options: NKRequestOptions = NKRequestOptions(),
+                               taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
+                               completion: @escaping (_ account: String, _  url: String?, _ data: Data?, _ error: NKError) -> Void) {
 
         let account = self.nkCommonInstance.account
         let urlBase = self.nkCommonInstance.urlBase
@@ -142,9 +141,9 @@ extension NextcloudKit {
         }
     }
 
-    @objc public func NCTextGetListOfTemplates(options: NKRequestOptions = NKRequestOptions(),
-                                               taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-                                               completion: @escaping (_ account: String, _  templates: [NKEditorTemplates], _ data: Data?, _ error: NKError) -> Void) {
+    public func NCTextGetListOfTemplates(options: NKRequestOptions = NKRequestOptions(),
+                                         taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
+                                         completion: @escaping (_ account: String, _  templates: [NKEditorTemplates], _ data: Data?, _ error: NKError) -> Void) {
 
         let account = self.nkCommonInstance.account
         let urlBase = self.nkCommonInstance.urlBase
@@ -191,13 +190,13 @@ extension NextcloudKit {
         }
     }
 
-    @objc public func NCTextCreateFile(fileNamePath: String,
-                                       editorId: String,
-                                       creatorId: String,
-                                       templateId: String,
-                                       options: NKRequestOptions = NKRequestOptions(),
-                                       taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-                                       completion: @escaping (_ account: String, _ url: String?, _ data: Data?, _ error: NKError) -> Void) {
+    public func NCTextCreateFile(fileNamePath: String,
+                                 editorId: String,
+                                 creatorId: String,
+                                 templateId: String,
+                                 options: NKRequestOptions = NKRequestOptions(),
+                                 taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
+                                 completion: @escaping (_ account: String, _ url: String?, _ data: Data?, _ error: NKError) -> Void) {
 
         let account = self.nkCommonInstance.account
         let urlBase = self.nkCommonInstance.urlBase

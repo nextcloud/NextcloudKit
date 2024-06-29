@@ -31,11 +31,10 @@ import Alamofire
 import SwiftyJSON
 
 extension NextcloudKit {
-
-    @objc public func checkServer(serverUrl: String,
-                                  options: NKRequestOptions = NKRequestOptions(),
-                                  taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-                                  completion: @escaping (_ error: NKError) -> Void) {
+    public func checkServer(serverUrl: String,
+                            options: NKRequestOptions = NKRequestOptions(),
+                            taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
+                            completion: @escaping (_ error: NKError) -> Void) {
 
         guard let url = serverUrl.asUrl else {
             return options.queue.async { completion(.urlError) }
@@ -61,11 +60,11 @@ extension NextcloudKit {
 
     // MARK: -
 
-    @objc public func generalWithEndpoint(_ endpoint: String,
-                                          method: String,
-                                          options: NKRequestOptions = NKRequestOptions(),
-                                          taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-                                          completion: @escaping (_ account: String, _ data: Data?, _ error: NKError) -> Void) {
+    public func generalWithEndpoint(_ endpoint: String,
+                                    method: String,
+                                    options: NKRequestOptions = NKRequestOptions(),
+                                    taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
+                                    completion: @escaping (_ account: String, _ data: Data?, _ error: NKError) -> Void) {
 
         let account = self.nkCommonInstance.account
         let urlBase = self.nkCommonInstance.urlBase
@@ -98,9 +97,9 @@ extension NextcloudKit {
 
     // MARK: -
 
-    @objc public func getExternalSite(options: NKRequestOptions = NKRequestOptions(),
-                                      taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-                                      completion: @escaping (_ account: String, _ externalFiles: [NKExternalSite], _ data: Data?, _ error: NKError) -> Void) {
+    public func getExternalSite(options: NKRequestOptions = NKRequestOptions(),
+                                taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
+                                completion: @escaping (_ account: String, _ externalFiles: [NKExternalSite], _ data: Data?, _ error: NKError) -> Void) {
 
         let account = self.nkCommonInstance.account
         let urlBase = self.nkCommonInstance.urlBase
@@ -224,10 +223,10 @@ extension NextcloudKit {
 
     // MARK: -
 
-    @objc public func getPreview(url: URL,
-                                 options: NKRequestOptions = NKRequestOptions(),
-                                 taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-                                 completion: @escaping (_ account: String, _ data: Data?, _ error: NKError) -> Void) {
+    public func getPreview(url: URL,
+                           options: NKRequestOptions = NKRequestOptions(),
+                           taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
+                           completion: @escaping (_ account: String, _ data: Data?, _ error: NKError) -> Void) {
 
         let account = self.nkCommonInstance.account
 
@@ -373,14 +372,14 @@ extension NextcloudKit {
         }
     }
 
-    @objc public func downloadAvatar(user: String,
-                                     fileNameLocalPath: String,
-                                     sizeImage: Int,
-                                     avatarSizeRounded: Int = 0,
-                                     etag: String?,
-                                     options: NKRequestOptions = NKRequestOptions(),
-                                     taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-                                     completion: @escaping (_ account: String, _ imageAvatar: UIImage?, _ imageOriginal: UIImage?, _ etag: String?, _ error: NKError) -> Void) {
+    public func downloadAvatar(user: String,
+                               fileNameLocalPath: String,
+                               sizeImage: Int,
+                               avatarSizeRounded: Int = 0,
+                               etag: String?,
+                               options: NKRequestOptions = NKRequestOptions(),
+                               taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
+                               completion: @escaping (_ account: String, _ imageAvatar: UIImage?, _ imageOriginal: UIImage?, _ etag: String?, _ error: NKError) -> Void) {
 
         let account = self.nkCommonInstance.account
         let urlBase = self.nkCommonInstance.urlBase
@@ -469,10 +468,10 @@ extension NextcloudKit {
         }
     }
 
-    @objc public func downloadContent(serverUrl: String,
-                                      options: NKRequestOptions = NKRequestOptions(),
-                                      taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-                                      completion: @escaping (_ account: String, _ data: Data?, _ error: NKError) -> Void) {
+    public func downloadContent(serverUrl: String,
+                                options: NKRequestOptions = NKRequestOptions(),
+                                taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
+                                completion: @escaping (_ account: String, _ data: Data?, _ error: NKError) -> Void) {
 
         let account = self.nkCommonInstance.account
 
@@ -506,9 +505,9 @@ extension NextcloudKit {
 
     // MARK: -
 
-    @objc public func getUserProfile(options: NKRequestOptions = NKRequestOptions(),
-                                     taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-                                     completion: @escaping (_ account: String, _ userProfile: NKUserProfile?, _ data: Data?, _ error: NKError) -> Void) {
+    public func getUserProfile(options: NKRequestOptions = NKRequestOptions(),
+                               taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
+                               completion: @escaping (_ account: String, _ userProfile: NKUserProfile?, _ data: Data?, _ error: NKError) -> Void) {
 
         let account = self.nkCommonInstance.account
         let urlBase = self.nkCommonInstance.urlBase
@@ -583,9 +582,9 @@ extension NextcloudKit {
         }
     }
 
-    @objc public func getCapabilities(options: NKRequestOptions = NKRequestOptions(),
-                                      taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-                                      completion: @escaping (_ account: String, _ data: Data?, _ error: NKError) -> Void) {
+    public func getCapabilities(options: NKRequestOptions = NKRequestOptions(),
+                                taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
+                                completion: @escaping (_ account: String, _ data: Data?, _ error: NKError) -> Void) {
 
         let account = self.nkCommonInstance.account
         let urlBase = self.nkCommonInstance.urlBase
@@ -622,11 +621,11 @@ extension NextcloudKit {
 
     // MARK: -
 
-    @objc public func getRemoteWipeStatus(serverUrl: String,
-                                          token: String,
-                                          options: NKRequestOptions = NKRequestOptions(),
-                                          taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-                                          completion: @escaping (_ account: String, _ wipe: Bool, _ data: Data?, _ error: NKError) -> Void) {
+    public func getRemoteWipeStatus(serverUrl: String,
+                                    token: String,
+                                    options: NKRequestOptions = NKRequestOptions(),
+                                    taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
+                                    completion: @escaping (_ account: String, _ wipe: Bool, _ data: Data?, _ error: NKError) -> Void) {
 
         let account = self.nkCommonInstance.account
 
@@ -660,11 +659,11 @@ extension NextcloudKit {
         }
     }
 
-    @objc public func setRemoteWipeCompletition(serverUrl: String,
-                                                token: String,
-                                                options: NKRequestOptions = NKRequestOptions(),
-                                                taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-                                                completion: @escaping (_ account: String, _ error: NKError) -> Void) {
+    public func setRemoteWipeCompletition(serverUrl: String,
+                                          token: String,
+                                          options: NKRequestOptions = NKRequestOptions(),
+                                          taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
+                                          completion: @escaping (_ account: String, _ error: NKError) -> Void) {
 
         let account = self.nkCommonInstance.account
 
@@ -698,14 +697,14 @@ extension NextcloudKit {
 
     // MARK: -
 
-    @objc public func getActivity(since: Int,
-                                  limit: Int,
-                                  objectId: String?,
-                                  objectType: String?,
-                                  previews: Bool,
-                                  options: NKRequestOptions = NKRequestOptions(),
-                                  taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-                                  completion: @escaping (_ account: String, _ activities: [NKActivity], _ activityFirstKnown: Int, _ activityLastGiven: Int, _ data: Data?, _ error: NKError) -> Void) {
+    public func getActivity(since: Int,
+                            limit: Int,
+                            objectId: String?,
+                            objectType: String?,
+                            previews: Bool,
+                            options: NKRequestOptions = NKRequestOptions(),
+                            taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
+                            completion: @escaping (_ account: String, _ activities: [NKActivity], _ activityFirstKnown: Int, _ activityLastGiven: Int, _ data: Data?, _ error: NKError) -> Void) {
 
         let account = self.nkCommonInstance.account
         let urlBase = self.nkCommonInstance.urlBase
@@ -805,9 +804,9 @@ extension NextcloudKit {
 
     // MARK: -
 
-    @objc public func getNotifications(options: NKRequestOptions = NKRequestOptions(),
-                                       taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-                                       completion: @escaping (_ account: String, _ notifications: [NKNotifications]?, _ data: Data?, _ error: NKError) -> Void) {
+    public func getNotifications(options: NKRequestOptions = NKRequestOptions(),
+                                 taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
+                                 completion: @escaping (_ account: String, _ notifications: [NKNotifications]?, _ data: Data?, _ error: NKError) -> Void) {
 
         let account = self.nkCommonInstance.account
         let urlBase = self.nkCommonInstance.urlBase
@@ -886,12 +885,12 @@ extension NextcloudKit {
         }
     }
 
-    @objc public func setNotification(serverUrl: String?,
-                                      idNotification: Int,
-                                      method: String,
-                                      options: NKRequestOptions = NKRequestOptions(),
-                                      taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-                                      completion: @escaping (_ account: String, _ error: NKError) -> Void) {
+    public func setNotification(serverUrl: String?,
+                                idNotification: Int,
+                                method: String,
+                                options: NKRequestOptions = NKRequestOptions(),
+                                taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
+                                completion: @escaping (_ account: String, _ error: NKError) -> Void) {
 
         let account = self.nkCommonInstance.account
         let urlBase = self.nkCommonInstance.urlBase
@@ -931,10 +930,10 @@ extension NextcloudKit {
 
     // MARK: -
 
-    @objc public func getDirectDownload(fileId: String,
-                                        options: NKRequestOptions = NKRequestOptions(),
-                                        taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-                                        completion: @escaping (_ account: String, _ url: String?, _ data: Data?, _ error: NKError) -> Void) {
+    public func getDirectDownload(fileId: String,
+                                  options: NKRequestOptions = NKRequestOptions(),
+                                  taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
+                                  completion: @escaping (_ account: String, _ url: String?, _ data: Data?, _ error: NKError) -> Void) {
 
         let account = self.nkCommonInstance.account
         let urlBase = self.nkCommonInstance.urlBase
@@ -975,10 +974,10 @@ extension NextcloudKit {
 
     // MARK: -
 
-    public func sendClientDiagnosticsRemoteOperation(data: Data,
-                                                     options: NKRequestOptions = NKRequestOptions(),
-                                                     taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-                                                     completion: @escaping (_ account: String, _ error: NKError) -> Void) {
+    func sendClientDiagnosticsRemoteOperation(data: Data,
+                                              options: NKRequestOptions = NKRequestOptions(),
+                                              taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
+                                              completion: @escaping (_ account: String, _ error: NKError) -> Void) {
 
         let account = self.nkCommonInstance.account
         let urlBase = self.nkCommonInstance.urlBase

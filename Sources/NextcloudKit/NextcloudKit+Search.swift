@@ -27,7 +27,6 @@ import Alamofire
 import SwiftyJSON
 
 extension NextcloudKit {
-
     /// Available NC >= 20
     /// Search many different datasources in the cloud and combine them into one result.
     ///
@@ -192,12 +191,11 @@ extension NextcloudKit {
     }
 }
 
-@objc public class NKSearchResult: NSObject {
-
-    @objc public let id: String
-    @objc public let name: String
-    @objc public let isPaginated: Bool
-    @objc public let entries: [NKSearchEntry]
+public class NKSearchResult: NSObject {
+    public let id: String
+    public let name: String
+    public let isPaginated: Bool
+    public let entries: [NKSearchEntry]
     public let cursor: Int?
 
     init?(json: JSON, id: String) {
@@ -213,21 +211,18 @@ extension NextcloudKit {
     }
 }
 
-@objc public class NKSearchEntry: NSObject {
-
-    @objc public let thumbnailURL: String
-    @objc public let title, subline: String
-    @objc public let resourceURL: String
-    @objc public let icon: String
-    @objc public let rounded: Bool
-    @objc public let attributes: [String: Any]?
-
+public class NKSearchEntry: NSObject {
+    public let thumbnailURL: String
+    public let title, subline: String
+    public let resourceURL: String
+    public let icon: String
+    public let rounded: Bool
+    public let attributes: [String: Any]?
     public var fileId: Int? {
         guard let fileAttribute = attributes?["fileId"] as? String else { return nil }
         return Int(fileAttribute)
     }
-
-    @objc public var filePath: String? {
+    public var filePath: String? {
         attributes?["path"] as? String
     }
 
@@ -255,7 +250,9 @@ extension NextcloudKit {
     }
 }
 
-@objc public class NKSearchProvider: NSObject {
+public class NKSearchProvider: NSObject {
+    public let id, name: String
+    public let order: Int
 
     init?(json: JSON) {
         guard let id = json["id"].string,
@@ -266,9 +263,6 @@ extension NextcloudKit {
         self.name = name
         self.order = order
     }
-
-    @objc public let id, name: String
-    @objc public let order: Int
 
     static func factory(jsonArray: JSON) -> [NKSearchProvider]? {
         guard let allProvider = jsonArray.array else { return nil }

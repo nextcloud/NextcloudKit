@@ -25,7 +25,6 @@ import Foundation
 
 @available(iOS 13.0, *)
 extension NextcloudKit {
-
     public func createFolder(serverUrlFileName: String,
                              options: NKRequestOptions = NKRequestOptions()) async -> (account: String, ocId: String?, date: NSDate?, error: NKError) {
 

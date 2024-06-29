@@ -26,11 +26,10 @@ import Alamofire
 import SwiftyJSON
 
 extension NextcloudKit {
-
-    @objc public func getUserStatus(userId: String? = nil,
-                                    options: NKRequestOptions = NKRequestOptions(),
-                                    taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-                                    completion: @escaping (_ account: String, _ clearAt: NSDate?, _ icon: String?, _ message: String?, _ messageId: String?, _ messageIsPredefined: Bool, _ status: String?, _ statusIsUserDefined: Bool, _ userId: String?, _ data: Data?, _ error: NKError) -> Void) {
+    public func getUserStatus(userId: String? = nil,
+                              options: NKRequestOptions = NKRequestOptions(),
+                              taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
+                              completion: @escaping (_ account: String, _ clearAt: NSDate?, _ icon: String?, _ message: String?, _ messageId: String?, _ messageIsPredefined: Bool, _ status: String?, _ statusIsUserDefined: Bool, _ userId: String?, _ data: Data?, _ error: NKError) -> Void) {
 
         let account = self.nkCommonInstance.account
         let urlBase = self.nkCommonInstance.urlBase
@@ -83,10 +82,10 @@ extension NextcloudKit {
         }
     }
 
-    @objc public func setUserStatus(status: String,
-                                    options: NKRequestOptions = NKRequestOptions(),
-                                    taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-                                    completion: @escaping (_ account: String, _ error: NKError) -> Void) {
+    public func setUserStatus(status: String,
+                              options: NKRequestOptions = NKRequestOptions(),
+                              taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
+                              completion: @escaping (_ account: String, _ error: NKError) -> Void) {
 
         let account = self.nkCommonInstance.account
         let urlBase = self.nkCommonInstance.urlBase
@@ -127,11 +126,11 @@ extension NextcloudKit {
         }
     }
 
-    @objc public func setCustomMessagePredefined(messageId: String,
-                                                 clearAt: Double,
-                                                 options: NKRequestOptions = NKRequestOptions(),
-                                                 taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-                                                 completion: @escaping (_ account: String, _ error: NKError) -> Void) {
+    public func setCustomMessagePredefined(messageId: String,
+                                           clearAt: Double,
+                                           options: NKRequestOptions = NKRequestOptions(),
+                                           taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
+                                           completion: @escaping (_ account: String, _ error: NKError) -> Void) {
 
         let account = self.nkCommonInstance.account
         let urlBase = self.nkCommonInstance.urlBase
@@ -176,12 +175,12 @@ extension NextcloudKit {
         }
     }
 
-    @objc public func setCustomMessageUserDefined(statusIcon: String?,
-                                                  message: String,
-                                                  clearAt: Double,
-                                                  options: NKRequestOptions = NKRequestOptions(),
-                                                  taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-                                                  completion: @escaping (_ account: String, _ error: NKError) -> Void) {
+    public func setCustomMessageUserDefined(statusIcon: String?,
+                                            message: String,
+                                            clearAt: Double,
+                                            options: NKRequestOptions = NKRequestOptions(),
+                                            taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
+                                            completion: @escaping (_ account: String, _ error: NKError) -> Void) {
 
         let account = self.nkCommonInstance.account
         let urlBase = self.nkCommonInstance.urlBase
@@ -229,9 +228,9 @@ extension NextcloudKit {
         }
     }
 
-    @objc public func clearMessage(options: NKRequestOptions = NKRequestOptions(),
-                                   taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-                                   completion: @escaping (_ account: String, _ error: NKError) -> Void) {
+    public func clearMessage(options: NKRequestOptions = NKRequestOptions(),
+                             taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
+                             completion: @escaping (_ account: String, _ error: NKError) -> Void) {
 
         let account = self.nkCommonInstance.account
         let urlBase = self.nkCommonInstance.urlBase
@@ -269,9 +268,9 @@ extension NextcloudKit {
         }
     }
 
-    @objc public func getUserStatusPredefinedStatuses(options: NKRequestOptions = NKRequestOptions(),
-                                                      taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-                                                      completion: @escaping (_ account: String, _ userStatuses: [NKUserStatus]?, _ data: Data?, _ error: NKError) -> Void) {
+    public func getUserStatusPredefinedStatuses(options: NKRequestOptions = NKRequestOptions(),
+                                                taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
+                                                completion: @escaping (_ account: String, _ userStatuses: [NKUserStatus]?, _ data: Data?, _ error: NKError) -> Void) {
 
         let account = self.nkCommonInstance.account
         let urlBase = self.nkCommonInstance.urlBase
@@ -328,11 +327,11 @@ extension NextcloudKit {
         }
     }
 
-    @objc public func getUserStatusRetrieveStatuses(limit: Int,
-                                                    offset: Int,
-                                                    options: NKRequestOptions = NKRequestOptions(),
-                                                    taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-                                                    completion: @escaping (_ account: String, _ userStatuses: [NKUserStatus]?, _ data: Data?, _ error: NKError) -> Void) {
+    public func getUserStatusRetrieveStatuses(limit: Int,
+                                              offset: Int,
+                                              options: NKRequestOptions = NKRequestOptions(),
+                                              taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
+                                              completion: @escaping (_ account: String, _ userStatuses: [NKUserStatus]?, _ data: Data?, _ error: NKError) -> Void) {
 
         let account = self.nkCommonInstance.account
         let urlBase = self.nkCommonInstance.urlBase

@@ -26,17 +26,16 @@ import Alamofire
 import SwiftyJSON
 
 extension NextcloudKit {
-
-    @objc public func subscribingPushNotification(serverUrl: String,
-                                                  account: String,
-                                                  user: String,
-                                                  password: String,
-                                                  pushTokenHash: String,
-                                                  devicePublicKey: String,
-                                                  proxyServerUrl: String,
-                                                  options: NKRequestOptions = NKRequestOptions(),
-                                                  taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-                                                  completion: @escaping (_ account: String, _ deviceIdentifier: String?, _ signature: String?, _ publicKey: String?, _ data: Data?, _ error: NKError) -> Void) {
+    public func subscribingPushNotification(serverUrl: String,
+                                            account: String,
+                                            user: String,
+                                            password: String,
+                                            pushTokenHash: String,
+                                            devicePublicKey: String,
+                                            proxyServerUrl: String,
+                                            options: NKRequestOptions = NKRequestOptions(),
+                                            taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
+                                            completion: @escaping (_ account: String, _ deviceIdentifier: String?, _ signature: String?, _ publicKey: String?, _ data: Data?, _ error: NKError) -> Void) {
 
         let endpoint = "ocs/v2.php/apps/notifications/api/v2/push"
 
@@ -79,13 +78,13 @@ extension NextcloudKit {
         }
     }
 
-    @objc public func unsubscribingPushNotification(serverUrl: String,
-                                                    account: String,
-                                                    user: String,
-                                                    password: String,
-                                                    options: NKRequestOptions = NKRequestOptions(),
-                                                    taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-                                                    completion: @escaping (_ account: String, _ error: NKError) -> Void) {
+    public func unsubscribingPushNotification(serverUrl: String,
+                                              account: String,
+                                              user: String,
+                                              password: String,
+                                              options: NKRequestOptions = NKRequestOptions(),
+                                              taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
+                                              completion: @escaping (_ account: String, _ error: NKError) -> Void) {
 
         let endpoint = "ocs/v2.php/apps/notifications/api/v2/push"
 
@@ -113,14 +112,14 @@ extension NextcloudKit {
         }
     }
 
-    @objc public func subscribingPushProxy(proxyServerUrl: String,
-                                           pushToken: String,
-                                           deviceIdentifier: String,
-                                           signature: String,
-                                           publicKey: String,
-                                           options: NKRequestOptions = NKRequestOptions(),
-                                           taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-                                           completion: @escaping (_ error: NKError) -> Void) {
+    public func subscribingPushProxy(proxyServerUrl: String,
+                                     pushToken: String,
+                                     deviceIdentifier: String,
+                                     signature: String,
+                                     publicKey: String,
+                                     options: NKRequestOptions = NKRequestOptions(),
+                                     taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
+                                     completion: @escaping (_ error: NKError) -> Void) {
 
         let endpoint = "devices?format=json"
 
@@ -156,13 +155,13 @@ extension NextcloudKit {
         }
     }
 
-    @objc public func unsubscribingPushProxy(proxyServerUrl: String,
-                                             deviceIdentifier: String,
-                                             signature: String,
-                                             publicKey: String,
-                                             options: NKRequestOptions = NKRequestOptions(),
-                                             taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-                                             completion: @escaping (_ error: NKError) -> Void) {
+    public func unsubscribingPushProxy(proxyServerUrl: String,
+                                       deviceIdentifier: String,
+                                       signature: String,
+                                       publicKey: String,
+                                       options: NKRequestOptions = NKRequestOptions(),
+                                       taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
+                                       completion: @escaping (_ error: NKError) -> Void) {
 
         let endpoint = "devices"
 

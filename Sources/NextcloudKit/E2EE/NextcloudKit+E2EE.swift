@@ -27,11 +27,11 @@ import SwiftyJSON
 
 extension NextcloudKit {
 
-    @objc public func markE2EEFolder(fileId: String,
-                                     delete: Bool,
-                                     options: NKRequestOptions = NKRequestOptions(),
-                                     taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-                                     completion: @escaping (_ account: String, _ error: NKError) -> Void) {
+    public func markE2EEFolder(fileId: String,
+                               delete: Bool,
+                               options: NKRequestOptions = NKRequestOptions(),
+                               taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
+                               completion: @escaping (_ account: String, _ error: NKError) -> Void) {
 
         let account = self.nkCommonInstance.account
         let urlBase = self.nkCommonInstance.urlBase
@@ -74,13 +74,13 @@ extension NextcloudKit {
         }
     }
 
-    @objc public func lockE2EEFolder(fileId: String,
-                                     e2eToken: String?,
-                                     e2eCounter: String?,
-                                     method: String,
-                                     options: NKRequestOptions = NKRequestOptions(),
-                                     taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-                                     completion: @escaping (_ account: String, _ e2eToken: String?, _ data: Data?, _ error: NKError) -> Void) {
+    public func lockE2EEFolder(fileId: String,
+                               e2eToken: String?,
+                               e2eCounter: String?,
+                               method: String,
+                               options: NKRequestOptions = NKRequestOptions(),
+                               taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
+                               completion: @escaping (_ account: String, _ e2eToken: String?, _ data: Data?, _ error: NKError) -> Void) {
 
         let account = self.nkCommonInstance.account
         let urlBase = self.nkCommonInstance.urlBase
@@ -133,11 +133,11 @@ extension NextcloudKit {
         }
     }
 
-    @objc public func getE2EEMetadata(fileId: String,
-                                      e2eToken: String?,
-                                      options: NKRequestOptions = NKRequestOptions(),
-                                      taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-                                      completion: @escaping (_ account: String, _ e2eMetadata: String?, _ signature: String?, _ data: Data?, _ error: NKError) -> Void) {
+    public func getE2EEMetadata(fileId: String,
+                                e2eToken: String?,
+                                options: NKRequestOptions = NKRequestOptions(),
+                                taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
+                                completion: @escaping (_ account: String, _ e2eMetadata: String?, _ signature: String?, _ data: Data?, _ error: NKError) -> Void) {
 
         let account = self.nkCommonInstance.account
         let urlBase = self.nkCommonInstance.urlBase
@@ -185,14 +185,14 @@ extension NextcloudKit {
         }
     }
 
-    @objc public func putE2EEMetadata(fileId: String,
-                                      e2eToken: String,
-                                      e2eMetadata: String?,
-                                      signature: String?,
-                                      method: String,
-                                      options: NKRequestOptions = NKRequestOptions(),
-                                      taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-                                      completion: @escaping (_ account: String, _ metadata: String?, _ data: Data?, _ error: NKError) -> Void) {
+    public func putE2EEMetadata(fileId: String,
+                                e2eToken: String,
+                                e2eMetadata: String?,
+                                signature: String?,
+                                method: String,
+                                options: NKRequestOptions = NKRequestOptions(),
+                                taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
+                                completion: @escaping (_ account: String, _ metadata: String?, _ data: Data?, _ error: NKError) -> Void) {
 
         let account = self.nkCommonInstance.account
         let urlBase = self.nkCommonInstance.urlBase
@@ -249,10 +249,10 @@ extension NextcloudKit {
 
     // MARK: -
 
-    @objc public func getE2EECertificate(user: String? = nil,
-                                         options: NKRequestOptions = NKRequestOptions(),
-                                         taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-                                         completion: @escaping (_ account: String, _ certificate: String?, _ certificateUser: String?, _ data: Data?, _ error: NKError) -> Void) {
+    public func getE2EECertificate(user: String? = nil,
+                                   options: NKRequestOptions = NKRequestOptions(),
+                                   taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
+                                   completion: @escaping (_ account: String, _ certificate: String?, _ certificateUser: String?, _ data: Data?, _ error: NKError) -> Void) {
 
         let account = self.nkCommonInstance.account
         let urlBase = self.nkCommonInstance.urlBase
@@ -309,9 +309,9 @@ extension NextcloudKit {
         }
     }
 
-    @objc public func getE2EEPrivateKey(options: NKRequestOptions = NKRequestOptions(),
-                                        taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-                                        completion: @escaping (_ account: String, _ privateKey: String?, _ data: Data?, _ error: NKError) -> Void) {
+    public func getE2EEPrivateKey(options: NKRequestOptions = NKRequestOptions(),
+                                  taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
+                                  completion: @escaping (_ account: String, _ privateKey: String?, _ data: Data?, _ error: NKError) -> Void) {
 
         let account = self.nkCommonInstance.account
         let urlBase = self.nkCommonInstance.urlBase
@@ -353,9 +353,9 @@ extension NextcloudKit {
         }
     }
 
-    @objc public func getE2EEPublicKey(options: NKRequestOptions = NKRequestOptions(),
-                                       taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-                                       completion: @escaping (_ account: String, _ publicKey: String?, _ data: Data?, _ error: NKError) -> Void) {
+    public func getE2EEPublicKey(options: NKRequestOptions = NKRequestOptions(),
+                                 taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
+                                 completion: @escaping (_ account: String, _ publicKey: String?, _ data: Data?, _ error: NKError) -> Void) {
 
         let account = self.nkCommonInstance.account
         let urlBase = self.nkCommonInstance.urlBase
@@ -397,10 +397,10 @@ extension NextcloudKit {
         }
     }
 
-    @objc public func signE2EECertificate(certificate: String,
-                                          options: NKRequestOptions = NKRequestOptions(),
-                                          taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-                                          completion: @escaping (_ account: String, _ certificate: String?, _ data: Data?, _ error: NKError) -> Void) {
+    public func signE2EECertificate(certificate: String,
+                                    options: NKRequestOptions = NKRequestOptions(),
+                                    taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
+                                    completion: @escaping (_ account: String, _ certificate: String?, _ data: Data?, _ error: NKError) -> Void) {
 
         let account = self.nkCommonInstance.account
         let urlBase = self.nkCommonInstance.urlBase
@@ -445,10 +445,10 @@ extension NextcloudKit {
         }
     }
 
-    @objc public func storeE2EEPrivateKey(privateKey: String,
-                                          options: NKRequestOptions = NKRequestOptions(),
-                                          taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-                                          completion: @escaping (_ account: String, _ privateKey: String?, _ data: Data?, _ error: NKError) -> Void) {
+    public func storeE2EEPrivateKey(privateKey: String,
+                                    options: NKRequestOptions = NKRequestOptions(),
+                                    taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
+                                    completion: @escaping (_ account: String, _ privateKey: String?, _ data: Data?, _ error: NKError) -> Void) {
 
         let account = self.nkCommonInstance.account
         let urlBase = self.nkCommonInstance.urlBase
@@ -492,9 +492,9 @@ extension NextcloudKit {
         }
     }
 
-    @objc public func deleteE2EECertificate(options: NKRequestOptions = NKRequestOptions(),
-                                            taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-                                            completion: @escaping (_ account: String, _ error: NKError) -> Void) {
+    public func deleteE2EECertificate(options: NKRequestOptions = NKRequestOptions(),
+                                      taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
+                                      completion: @escaping (_ account: String, _ error: NKError) -> Void) {
 
         let account = self.nkCommonInstance.account
         let urlBase = self.nkCommonInstance.urlBase
@@ -529,9 +529,9 @@ extension NextcloudKit {
         }
     }
 
-    @objc public func deleteE2EEPrivateKey(options: NKRequestOptions = NKRequestOptions(),
-                                           taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-                                           completion: @escaping (_ account: String, _ error: NKError) -> Void) {
+    public func deleteE2EEPrivateKey(options: NKRequestOptions = NKRequestOptions(),
+                                     taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
+                                     completion: @escaping (_ account: String, _ error: NKError) -> Void) {
 
         let account = self.nkCommonInstance.account
         let urlBase = self.nkCommonInstance.urlBase

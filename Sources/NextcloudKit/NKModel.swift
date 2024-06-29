@@ -95,235 +95,235 @@ public enum NKProperties: String, CaseIterable {
     }
 }
 
-@objc public class NKActivity: NSObject {
-    @objc public var app = ""
-    @objc public var date = NSDate()
-    @objc public var idActivity: Int = 0
-    @objc public var icon = ""
-    @objc public var link = ""
-    @objc public var message = ""
-    @objc public var messageRich: Data?
-    @objc public var objectId: Int = 0
-    @objc public var objectName = ""
-    @objc public var objectType = ""
-    @objc public var previews: Data?
-    @objc public var subject = ""
-    @objc public var subjectRich: Data?
-    @objc public var type = ""
-    @objc public var user = ""
+public class NKActivity: NSObject {
+    public var app = ""
+    public var date = NSDate()
+    public var idActivity: Int = 0
+    public var icon = ""
+    public var link = ""
+    public var message = ""
+    public var messageRich: Data?
+    public var objectId: Int = 0
+    public var objectName = ""
+    public var objectType = ""
+    public var previews: Data?
+    public var subject = ""
+    public var subjectRich: Data?
+    public var type = ""
+    public var user = ""
 }
 
-@objc public class NKComments: NSObject {
-    @objc public var actorDisplayName = ""
-    @objc public var actorId = ""
-    @objc public var actorType = ""
-    @objc public var creationDateTime = NSDate()
-    @objc public var isUnread: Bool = false
-    @objc public var message = ""
-    @objc public var messageId = ""
-    @objc public var objectId = ""
-    @objc public var objectType = ""
-    @objc public var path = ""
-    @objc public var verb = ""
+public class NKComments: NSObject {
+    public var actorDisplayName = ""
+    public var actorId = ""
+    public var actorType = ""
+    public var creationDateTime = NSDate()
+    public var isUnread: Bool = false
+    public var message = ""
+    public var messageId = ""
+    public var objectId = ""
+    public var objectType = ""
+    public var path = ""
+    public var verb = ""
 }
 
-@objc public class NKEditorDetailsCreators: NSObject {
-    @objc public var editor = ""
-    @objc public var ext = ""
-    @objc public var identifier = ""
-    @objc public var mimetype = ""
-    @objc public var name = ""
-    @objc public var templates: Int = 0
+public class NKEditorDetailsCreators: NSObject {
+    public var editor = ""
+    public var ext = ""
+    public var identifier = ""
+    public var mimetype = ""
+    public var name = ""
+    public var templates: Int = 0
 }
 
-@objc public class NKEditorDetailsEditors: NSObject {
-    @objc public var mimetypes: [String] = []
-    @objc public var name = ""
-    @objc public var optionalMimetypes: [String] = []
-    @objc public var secure: Int = 0
+public class NKEditorDetailsEditors: NSObject {
+    public var mimetypes: [String] = []
+    public var name = ""
+    public var optionalMimetypes: [String] = []
+    public var secure: Int = 0
 }
 
-@objc public class NKEditorTemplates: NSObject {
-    @objc public var delete = ""
-    @objc public var ext = ""
-    @objc public var identifier = ""
-    @objc public var name = ""
-    @objc public var preview = ""
-    @objc public var type = ""
+public class NKEditorTemplates: NSObject {
+    public var delete = ""
+    public var ext = ""
+    public var identifier = ""
+    public var name = ""
+    public var preview = ""
+    public var type = ""
 }
 
-@objc public class NKExternalSite: NSObject {
-    @objc public var icon = ""
-    @objc public var idExternalSite: Int = 0
-    @objc public var lang = ""
-    @objc public var name = ""
-    @objc public var order: Int = 0
-    @objc public var type = ""
-    @objc public var url = ""
+public class NKExternalSite: NSObject {
+    public var icon = ""
+    public var idExternalSite: Int = 0
+    public var lang = ""
+    public var name = ""
+    public var order: Int = 0
+    public var type = ""
+    public var url = ""
 }
 
-@objc public class NKFile: NSObject {
-    @objc public var account = ""
-    @objc public var classFile = ""
-    @objc public var commentsUnread: Bool = false
-    @objc public var contentType = ""
-    @objc public var checksums = ""
-    @objc public var creationDate: NSDate?
-    @objc public var dataFingerprint = ""
-    @objc public var date = NSDate()
-    @objc public var directory: Bool = false
-    @objc public var downloadURL = ""
-    @objc public var e2eEncrypted: Bool = false
-    @objc public var etag = ""
-    @objc public var favorite: Bool = false
-    @objc public var fileId = ""
-    @objc public var fileName = ""
-    @objc public var hasPreview: Bool = false
-    @objc public var iconName = ""
-    @objc public var mountType = ""
-    @objc public var name = ""
-    @objc public var note = ""
-    @objc public var ocId = ""
-    @objc public var ownerId = ""
-    @objc public var ownerDisplayName = ""
-    @objc public var lock = false
-    @objc public var lockOwner = ""
-    @objc public var lockOwnerEditor = ""
-    @objc public var lockOwnerType = 0
-    @objc public var lockOwnerDisplayName = ""
-    @objc public var lockTime: Date?
-    @objc public var lockTimeOut: Date?
-    @objc public var path = ""
-    @objc public var permissions = ""
-    @objc public var quotaUsedBytes: Int64 = 0
-    @objc public var quotaAvailableBytes: Int64 = 0
-    @objc public var resourceType = ""
-    @objc public var richWorkspace: String?
-    @objc public var sharePermissionsCollaborationServices: Int = 0
-    @objc public var sharePermissionsCloudMesh: [String] = []
-    @objc public var shareType: [Int] = []
-    @objc public var size: Int64 = 0
-    @objc public var serverUrl = ""
-    @objc public var tags: [String] = []
-    @objc public var trashbinFileName = ""
-    @objc public var trashbinOriginalLocation = ""
-    @objc public var trashbinDeletionTime = NSDate()
-    @objc public var uploadDate: NSDate?
-    @objc public var urlBase = ""
-    @objc public var user = ""
-    @objc public var userId = ""
-    @objc public var latitude: Double = 0
-    @objc public var longitude: Double = 0
-    @objc public var altitude: Double = 0
-    @objc public var height: Double = 0
-    @objc public var width: Double = 0
-    @objc public var hidden = false
+public class NKFile: NSObject {
+    public var account = ""
+    public var classFile = ""
+    public var commentsUnread: Bool = false
+    public var contentType = ""
+    public var checksums = ""
+    public var creationDate: NSDate?
+    public var dataFingerprint = ""
+    public var date = NSDate()
+    public var directory: Bool = false
+    public var downloadURL = ""
+    public var e2eEncrypted: Bool = false
+    public var etag = ""
+    public var favorite: Bool = false
+    public var fileId = ""
+    public var fileName = ""
+    public var hasPreview: Bool = false
+    public var iconName = ""
+    public var mountType = ""
+    public var name = ""
+    public var note = ""
+    public var ocId = ""
+    public var ownerId = ""
+    public var ownerDisplayName = ""
+    public var lock = false
+    public var lockOwner = ""
+    public var lockOwnerEditor = ""
+    public var lockOwnerType = 0
+    public var lockOwnerDisplayName = ""
+    public var lockTime: Date?
+    public var lockTimeOut: Date?
+    public var path = ""
+    public var permissions = ""
+    public var quotaUsedBytes: Int64 = 0
+    public var quotaAvailableBytes: Int64 = 0
+    public var resourceType = ""
+    public var richWorkspace: String?
+    public var sharePermissionsCollaborationServices: Int = 0
+    public var sharePermissionsCloudMesh: [String] = []
+    public var shareType: [Int] = []
+    public var size: Int64 = 0
+    public var serverUrl = ""
+    public var tags: [String] = []
+    public var trashbinFileName = ""
+    public var trashbinOriginalLocation = ""
+    public var trashbinDeletionTime = NSDate()
+    public var uploadDate: NSDate?
+    public var urlBase = ""
+    public var user = ""
+    public var userId = ""
+    public var latitude: Double = 0
+    public var longitude: Double = 0
+    public var altitude: Double = 0
+    public var height: Double = 0
+    public var width: Double = 0
+    public var hidden = false
     /// If this is not empty, the media is a live photo. New media gets this straight from server, but old media needs to be detected as live photo (look isFlaggedAsLivePhotoByServer)
-    @objc public var livePhotoFile = ""
+    public var livePhotoFile = ""
     /// Indicating if the file is sent as a live photo from the server, or if we should detect it as such and convert it client-side
-    @objc public var isFlaggedAsLivePhotoByServer = false
+    public var isFlaggedAsLivePhotoByServer = false
 }
 
-@objcMembers public class NKFileProperty: NSObject {
+public class NKFileProperty: NSObject {
     public var classFile: String = ""
     public var iconName: String = ""
     public var name: String = ""
     public var ext: String = ""
 }
 
-@objc public class NKNotifications: NSObject {
-    @objc public var actions: Data?
-    @objc public var app = ""
-    @objc public var date = NSDate()
-    @objc public var icon: String?
-    @objc public var idNotification: Int = 0
-    @objc public var link = ""
-    @objc public var message = ""
-    @objc public var messageRich = ""
-    @objc public var messageRichParameters: Data?
-    @objc public var objectId = ""
-    @objc public var objectType = ""
-    @objc public var subject = ""
-    @objc public var subjectRich = ""
-    @objc public var subjectRichParameters: Data?
-    @objc public var user = ""
+public class NKNotifications: NSObject {
+    public var actions: Data?
+    public var app = ""
+    public var date = NSDate()
+    public var icon: String?
+    public var idNotification: Int = 0
+    public var link = ""
+    public var message = ""
+    public var messageRich = ""
+    public var messageRichParameters: Data?
+    public var objectId = ""
+    public var objectType = ""
+    public var subject = ""
+    public var subjectRich = ""
+    public var subjectRichParameters: Data?
+    public var user = ""
 }
 
-@objc public class NKRichdocumentsTemplate: NSObject {
-    @objc public var delete = ""
-    @objc public var ext = ""
-    @objc public var name = ""
-    @objc public var preview = ""
-    @objc public var templateId: Int = 0
-    @objc public var type = ""
+public class NKRichdocumentsTemplate: NSObject {
+    public var delete = ""
+    public var ext = ""
+    public var name = ""
+    public var preview = ""
+    public var templateId: Int = 0
+    public var type = ""
 }
 
-@objc public class NKSharee: NSObject {
-    @objc public var circleInfo = ""
-    @objc public var circleOwner = ""
-    @objc public var label = ""
-    @objc public var name = ""
-    @objc public var shareType: Int = 0
-    @objc public var shareWith = ""
-    @objc public var uuid = ""
-    @objc public var userClearAt: NSDate?
-    @objc public var userIcon = ""
-    @objc public var userMessage = ""
-    @objc public var userStatus = ""
+public class NKSharee: NSObject {
+    public var circleInfo = ""
+    public var circleOwner = ""
+    public var label = ""
+    public var name = ""
+    public var shareType: Int = 0
+    public var shareWith = ""
+    public var uuid = ""
+    public var userClearAt: NSDate?
+    public var userIcon = ""
+    public var userMessage = ""
+    public var userStatus = ""
 }
 
-@objc public class NKTrash: NSObject {
-    @objc public var contentType = ""
-    @objc public var date = NSDate()
-    @objc public var directory: Bool = false
-    @objc public var fileId = ""
-    @objc public var fileName = ""
-    @objc public var filePath = ""
-    @objc public var hasPreview: Bool = false
-    @objc public var iconName = ""
-    @objc public var size: Int64 = 0
-    @objc public var classFile = ""
-    @objc public var trashbinFileName = ""
-    @objc public var trashbinOriginalLocation = ""
-    @objc public var trashbinDeletionTime = NSDate()
+public class NKTrash: NSObject {
+    public var contentType = ""
+    public var date = NSDate()
+    public var directory: Bool = false
+    public var fileId = ""
+    public var fileName = ""
+    public var filePath = ""
+    public var hasPreview: Bool = false
+    public var iconName = ""
+    public var size: Int64 = 0
+    public var classFile = ""
+    public var trashbinFileName = ""
+    public var trashbinOriginalLocation = ""
+    public var trashbinDeletionTime = NSDate()
 }
 
-@objc public class NKUserProfile: NSObject {
-    @objc public var address = ""
-    @objc public var backend = ""
-    @objc public var backendCapabilitiesSetDisplayName: Bool = false
-    @objc public var backendCapabilitiesSetPassword: Bool = false
-    @objc public var displayName = ""
-    @objc public var email = ""
-    @objc public var enabled: Bool = false
-    @objc public var groups: [String] = []
-    @objc public var language = ""
-    @objc public var lastLogin: Int64 = 0
-    @objc public var locale = ""
-    @objc public var organisation = ""
-    @objc public var phone = ""
-    @objc public var quota: Int64 = 0
-    @objc public var quotaFree: Int64 = 0
-    @objc public var quotaRelative: Double = 0
-    @objc public var quotaTotal: Int64 = 0
-    @objc public var quotaUsed: Int64 = 0
-    @objc public var storageLocation = ""
-    @objc public var subadmin: [String] = []
-    @objc public var twitter = ""
-    @objc public var userId = ""
-    @objc public var website = ""
+public class NKUserProfile: NSObject {
+    public var address = ""
+    public var backend = ""
+    public var backendCapabilitiesSetDisplayName: Bool = false
+    public var backendCapabilitiesSetPassword: Bool = false
+    public var displayName = ""
+    public var email = ""
+    public var enabled: Bool = false
+    public var groups: [String] = []
+    public var language = ""
+    public var lastLogin: Int64 = 0
+    public var locale = ""
+    public var organisation = ""
+    public var phone = ""
+    public var quota: Int64 = 0
+    public var quotaFree: Int64 = 0
+    public var quotaRelative: Double = 0
+    public var quotaTotal: Int64 = 0
+    public var quotaUsed: Int64 = 0
+    public var storageLocation = ""
+    public var subadmin: [String] = []
+    public var twitter = ""
+    public var userId = ""
+    public var website = ""
 }
 
-@objc public class NKUserStatus: NSObject {
-    @objc public var clearAt: NSDate?
-    @objc public var clearAtTime: String?
-    @objc public var clearAtType: String?
-    @objc public var icon: String?
-    @objc public var id: String?
-    @objc public var message: String?
-    @objc public var predefined: Bool = false
-    @objc public var status: String?
-    @objc public var userId: String?
+public class NKUserStatus: NSObject {
+    public var clearAt: NSDate?
+    public var clearAtTime: String?
+    public var clearAtType: String?
+    public var icon: String?
+    public var id: String?
+    public var message: String?
+    public var predefined: Bool = false
+    public var status: String?
+    public var userId: String?
 }
 
 // MARK: - Data File

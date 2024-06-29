@@ -27,11 +27,10 @@ import Alamofire
 import SwiftyJSON
 
 extension NextcloudKit {
-
-    @objc public func getHovercard(for userId: String,
-                                   options: NKRequestOptions = NKRequestOptions(),
-                                   taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-                                   completion: @escaping (_ account: String, _ result: NKHovercard?, _ data: Data?, _ error: NKError) -> Void) {
+    public func getHovercard(for userId: String,
+                             options: NKRequestOptions = NKRequestOptions(),
+                             taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
+                             completion: @escaping (_ account: String, _ result: NKHovercard?, _ data: Data?, _ error: NKError) -> Void) {
 
         let account = self.nkCommonInstance.account
         let urlBase = self.nkCommonInstance.urlBase
@@ -73,7 +72,7 @@ extension NextcloudKit {
     }
 }
 
-@objc public class NKHovercard: NSObject {
+public class NKHovercard: NSObject {
     internal init?(jsonData: JSON) {
         guard let userId = jsonData["userId"].string,
               let displayName = jsonData["displayName"].string,
@@ -86,7 +85,7 @@ extension NextcloudKit {
         self.actions = actions
     }
 
-    @objc public class Action: NSObject {
+    public class Action: NSObject {
         internal init?(jsonData: JSON) {
             guard let title = jsonData["title"].string,
                   let icon = jsonData["icon"].string,
@@ -101,13 +100,13 @@ extension NextcloudKit {
             self.appId = appId
         }
 
-        @objc public let title: String
-        @objc public let icon: String
-        @objc public let hyperlink: String
-        @objc public var hyperlinkUrl: URL? { URL(string: hyperlink) }
-        @objc public let appId: String
+        public let title: String
+        public let icon: String
+        public let hyperlink: String
+        public var hyperlinkUrl: URL? { URL(string: hyperlink) }
+        public let appId: String
     }
 
-    @objc public let userId, displayName: String
-    @objc public let actions: [Action]
+    public let userId, displayName: String
+    public let actions: [Action]
 }

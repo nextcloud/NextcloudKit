@@ -26,11 +26,10 @@ import Alamofire
 import SwiftyJSON
 
 extension NextcloudKit {
-
-    @objc public func createUrlRichdocuments(fileID: String,
-                                             options: NKRequestOptions = NKRequestOptions(),
-                                             taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-                                             completion: @escaping (_ account: String, _  url: String?, _ data: Data?, _ error: NKError) -> Void) {
+    public func createUrlRichdocuments(fileID: String,
+                                       options: NKRequestOptions = NKRequestOptions(),
+                                       taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
+                                       completion: @escaping (_ account: String, _  url: String?, _ data: Data?, _ error: NKError) -> Void) {
 
         let account = self.nkCommonInstance.account
         let urlBase = self.nkCommonInstance.urlBase
@@ -69,10 +68,10 @@ extension NextcloudKit {
         }
     }
 
-    @objc public func getTemplatesRichdocuments(typeTemplate: String,
-                                                options: NKRequestOptions = NKRequestOptions(),
-                                                taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-                                                completion: @escaping (_ account: String, _ templates: [NKRichdocumentsTemplate]?, _ data: Data?, _ error: NKError) -> Void) {
+    public func getTemplatesRichdocuments(typeTemplate: String,
+                                          options: NKRequestOptions = NKRequestOptions(),
+                                          taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
+                                          completion: @escaping (_ account: String, _ templates: [NKRichdocumentsTemplate]?, _ data: Data?, _ error: NKError) -> Void) {
 
         let account = self.nkCommonInstance.account
         let urlBase = self.nkCommonInstance.urlBase
@@ -122,11 +121,11 @@ extension NextcloudKit {
         }
     }
 
-    @objc public func createRichdocuments(path: String,
-                                          templateId: String,
-                                          options: NKRequestOptions = NKRequestOptions(),
-                                          taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-                                          completion: @escaping (_ account: String, _  url: String?, _ data: Data?, _ error: NKError) -> Void) {
+    public func createRichdocuments(path: String,
+                                    templateId: String,
+                                    options: NKRequestOptions = NKRequestOptions(),
+                                    taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
+                                    completion: @escaping (_ account: String, _  url: String?, _ data: Data?, _ error: NKError) -> Void) {
 
         let account = self.nkCommonInstance.account
         let urlBase = self.nkCommonInstance.urlBase
@@ -165,10 +164,10 @@ extension NextcloudKit {
         }
     }
 
-    @objc public func createAssetRichdocuments(path: String,
-                                               options: NKRequestOptions = NKRequestOptions(),
-                                               taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-                                               completion: @escaping (_ account: String, _  url: String?, _ data: Data?, _ error: NKError) -> Void) {
+    public func createAssetRichdocuments(path: String,
+                                         options: NKRequestOptions = NKRequestOptions(),
+                                         taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
+                                         completion: @escaping (_ account: String, _  url: String?, _ data: Data?, _ error: NKError) -> Void) {
 
         let account = self.nkCommonInstance.account
         let urlBase = self.nkCommonInstance.urlBase

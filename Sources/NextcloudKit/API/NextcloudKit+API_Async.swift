@@ -30,7 +30,6 @@ import UIKit
 
 @available(iOS 13.0, *)
 extension NextcloudKit {
-
     public func getServerStatus(serverUrl: String,
                                 options: NKRequestOptions = NKRequestOptions()) async -> (ServerInfoResult) {
 

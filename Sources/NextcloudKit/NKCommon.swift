@@ -30,29 +30,27 @@ import MobileCoreServices
 import CoreServices
 #endif
 
-@objc public protocol NKCommonDelegate {
+public protocol NKCommonDelegate {
+    func authenticationChallenge(_ session: URLSession, didReceive challenge: URLAuthenticationChallenge, completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void)
+    func urlSessionDidFinishEvents(forBackgroundURLSession session: URLSession)
 
-    @objc optional func authenticationChallenge(_ session: URLSession, didReceive challenge: URLAuthenticationChallenge, completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void)
-    @objc optional func urlSessionDidFinishEvents(forBackgroundURLSession session: URLSession)
+    func networkReachabilityObserver(_ typeReachability: NKCommon.TypeReachability)
 
-    @objc optional func networkReachabilityObserver(_ typeReachability: NKCommon.TypeReachability)
+    func downloadProgress(_ progress: Float, totalBytes: Int64, totalBytesExpected: Int64, fileName: String, serverUrl: String, session: URLSession, task: URLSessionTask)
+    func uploadProgress(_ progress: Float, totalBytes: Int64, totalBytesExpected: Int64, fileName: String, serverUrl: String, session: URLSession, task: URLSessionTask)
 
-    @objc optional func downloadProgress(_ progress: Float, totalBytes: Int64, totalBytesExpected: Int64, fileName: String, serverUrl: String, session: URLSession, task: URLSessionTask)
-    @objc optional func uploadProgress(_ progress: Float, totalBytes: Int64, totalBytesExpected: Int64, fileName: String, serverUrl: String, session: URLSession, task: URLSessionTask)
-
-    @objc optional func downloadingFinish(_ session: URLSession, downloadTask: URLSessionDownloadTask, didFinishDownloadingTo location: URL)
+    func downloadingFinish(_ session: URLSession, downloadTask: URLSessionDownloadTask, didFinishDownloadingTo location: URL)
     
-    @objc optional func downloadComplete(fileName: String, serverUrl: String, etag: String?, date: NSDate?, dateLastModified: NSDate?, length: Int64, task: URLSessionTask, error: NKError)
-    @objc optional func uploadComplete(fileName: String, serverUrl: String, ocId: String?, etag: String?, date: NSDate?, size: Int64, task: URLSessionTask, error: NKError)
+    func downloadComplete(fileName: String, serverUrl: String, etag: String?, date: NSDate?, dateLastModified: NSDate?, length: Int64, task: URLSessionTask, error: NKError)
+    func uploadComplete(fileName: String, serverUrl: String, ocId: String?, etag: String?, date: NSDate?, size: Int64, task: URLSessionTask, error: NKError)
 }
 
-@objc public class NKCommon: NSObject {
+public class NKCommon: NSObject {
+    public let dav: String = "remote.php/dav"
+    public let sessionIdentifierDownload: String = "com.nextcloud.nextcloudkit.session.download"
+    public let sessionIdentifierUpload: String = "com.nextcloud.nextcloudkit.session.upload"
 
-    @objc public let dav: String = "remote.php/dav"
-    @objc public let sessionIdentifierDownload: String = "com.nextcloud.nextcloudkit.session.download"
-    @objc public let sessionIdentifierUpload: String = "com.nextcloud.nextcloudkit.session.upload"
-
-    @objc public enum TypeReachability: Int {
+    public enum TypeReachability: Int {
         case unknown = 0
         case notReachable = 1
         case reachableEthernetOrWiFi = 2
@@ -127,37 +125,37 @@ import CoreServices
     private var _copyLogToDocumentDirectory: Bool = false
     private let queueLog = DispatchQueue(label: "com.nextcloud.nextcloudkit.queuelog", attributes: .concurrent )
 
-    @objc public var user: String {
+    public var user: String {
         return internalUser
     }
 
-    @objc public var userId: String {
+    public var userId: String {
         return internalUserId
     }
 
-    @objc public var password: String {
+    public var password: String {
         return internalPassword
     }
 
-    @objc public var account: String {
+    public var account: String {
         return internalAccount
     }
 
-    @objc public var urlBase: String {
+    public var urlBase: String {
         return internalUrlBase
     }
 
-    @objc public var userAgent: String? {
+    public var userAgent: String? {
         return internalUserAgent
     }
 
-    @objc public var nextcloudVersion: Int {
+    public var nextcloudVersion: Int {
         return internalNextcloudVersion
     }
 
-    @objc public let backgroundQueue = DispatchQueue(label: "com.nextcloud.nextcloudkit.backgroundqueue", qos: .background, attributes: .concurrent)
+    public let backgroundQueue = DispatchQueue(label: "com.nextcloud.nextcloudkit.backgroundqueue", qos: .background, attributes: .concurrent)
 
-    @objc public var filenameLog: String {
+    public var filenameLog: String {
         get {
             return _filenameLog
         }
@@ -169,7 +167,7 @@ import CoreServices
         }
     }
 
-    @objc public var pathLog: String {
+    public var pathLog: String {
         get {
             return _pathLog
         }
@@ -185,11 +183,11 @@ import CoreServices
         }
     }
 
-    @objc public var filenamePathLog: String {
+    public var filenamePathLog: String {
         return _filenamePathLog
     }
 
-    @objc public var levelLog: Int {
+    public var levelLog: Int {
         get {
             return _levelLog
         }
@@ -198,7 +196,7 @@ import CoreServices
         }
     }
 
-    @objc public var printLog: Bool {
+    public var printLog: Bool {
         get {
             return _printLog
         }
@@ -207,7 +205,7 @@ import CoreServices
         }
     }
 
-    @objc public var copyLogToDocumentDirectory: Bool {
+    public var copyLogToDocumentDirectory: Bool {
         get {
             return _copyLogToDocumentDirectory
         }
@@ -239,27 +237,22 @@ import CoreServices
         return results
     }
 
-    @objc public func addInternalTypeIdentifier(typeIdentifier: String, classFile: String, editor: String, iconName: String, name: String) {
-
+    public func addInternalTypeIdentifier(typeIdentifier: String, classFile: String, editor: String, iconName: String, name: String) {
         if !internalTypeIdentifiers.contains(where: { $0.typeIdentifier == typeIdentifier && $0.editor == editor}) {
             let newUTI = UTTypeConformsToServer(typeIdentifier: typeIdentifier, classFile: classFile, editor: editor, iconName: iconName, name: name)
             internalTypeIdentifiers.append(newUTI)
         }
     }
 
-    @objc public func objcGetInternalType(fileName: String, mimeType: String, directory: Bool) -> [String: String] {
-
+    public func objcGetInternalType(fileName: String, mimeType: String, directory: Bool) -> [String: String] {
         let results = getInternalType(fileName: fileName, mimeType: mimeType, directory: directory)
-
         return ["mimeType": results.mimeType, "classFile": results.classFile, "iconName": results.iconName, "typeIdentifier": results.typeIdentifier, "fileNameWithoutExt": results.fileNameWithoutExt, "ext": results.ext]
     }
 
-    public func getInternalType(fileName: String, mimeType: String, directory: Bool) -> (mimeType: String, classFile: String, iconName: String, typeIdentifier: String, fileNameWithoutExt: String, ext: String) {
-
+    func getInternalType(fileName: String, mimeType: String, directory: Bool) -> (mimeType: String, classFile: String, iconName: String, typeIdentifier: String, fileNameWithoutExt: String, ext: String) {
         var ext = (fileName as NSString).pathExtension.lowercased()
         var mimeType = mimeType
         var classFile = "", iconName = "", typeIdentifier = "", fileNameWithoutExt = ""
-
         var inUTI: CFString?
 
         if let cachedUTI = utiCache.object(forKey: ext as NSString) {
@@ -315,7 +308,6 @@ import CoreServices
     }
 
     public func getFileProperties(inUTI: CFString) -> NKFileProperty {
-
         let fileProperty = NKFileProperty()
         let typeIdentifier: String = inUTI as String
 
@@ -497,7 +489,6 @@ import CoreServices
     }
 
     public func getStandardHeaders(user: String?, password: String?, appendHeaders: [String: String]?, customUserAgent: String?, contentType: String? = nil) -> HTTPHeaders {
-
         var headers: HTTPHeaders = []
 
         if let username = user, let password = password {
@@ -526,19 +517,15 @@ import CoreServices
     }
 
     public func createStandardUrl(serverUrl: String, endpoint: String) -> URLConvertible? {
-
         guard var serverUrl = serverUrl.urlEncoded else { return nil }
         if serverUrl.last != "/" { serverUrl = serverUrl + "/" }
 
         serverUrl = serverUrl + endpoint
-
         return serverUrl.asUrl
     }
 
     public func convertDate(_ dateString: String, format: String) -> NSDate? {
-
         if dateString.isEmpty { return nil }
-
         let dateFormatter = DateFormatter()
 
         dateFormatter.locale = Locale(identifier: "en_US_POSIX")
@@ -549,7 +536,6 @@ import CoreServices
     }
 
     func convertDate(_ date: Date, format: String) -> String? {
-
         let dateFormatter = DateFormatter()
 
         dateFormatter.locale = Locale(identifier: "en_US_POSIX")
@@ -559,7 +545,6 @@ import CoreServices
     }
 
     func findHeader(_ header: String, allHeaderFields: [AnyHashable: Any]?) -> String? {
-
         guard let allHeaderFields = allHeaderFields else { return nil }
         let keyValues = allHeaderFields.map { (String(describing: $0.key).lowercased(), String(describing: $0.value)) }
 
@@ -570,7 +555,6 @@ import CoreServices
     }
 
     func getHostName(urlString: String) -> String? {
-
         if let url = URL(string: urlString) {
             guard let hostName = url.host else { return nil }
             guard let scheme = url.scheme else { return nil }
@@ -583,7 +567,6 @@ import CoreServices
     }
 
     func getHostNameComponent(urlString: String) -> String? {
-
         if let url = URL(string: urlString) {
             let components = url.pathComponents
             return components.joined(separator: "")
@@ -592,7 +575,6 @@ import CoreServices
     }
 
     func getFileSize(filePath: String) -> Int64 {
-
         do {
             let attributes = try FileManager.default.attributesOfItem(atPath: filePath)
             return attributes[FileAttributeKey.size] as? Int64 ?? 0
@@ -603,13 +585,11 @@ import CoreServices
     }
 
     public func returnPathfromServerUrl(_ serverUrl: String) -> String {
-
         let home = urlBase + "/remote.php/dav/files/" + userId
         return serverUrl.replacingOccurrences(of: home, with: "")
     }
 
     public func getSessionErrorFromAFError(_ afError: AFError?) -> NSError? {
-
         if let afError = afError?.asAFError {
             switch afError {
             case .sessionTaskFailed(let sessionError):
@@ -622,8 +602,7 @@ import CoreServices
 
     // MARK: - Log
 
-    @objc public func clearFileLog() {
-
+    public func clearFileLog() {
         FileManager.default.createFile(atPath: filenamePathLog, contents: nil, attributes: nil)
         if copyLogToDocumentDirectory {
             let filenameCopyToDocumentDirectory = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true).first! + "/" + filenameLog
@@ -632,8 +611,7 @@ import CoreServices
         }
     }
 
-    @objc public func writeLog(_ text: String?) {
-
+    public func writeLog(_ text: String?) {
         guard let text = text else { return }
         guard let date = self.convertDate(Date(), format: "yyyy-MM-dd' 'HH:mm:ss") else { return }
         let textToWrite = "\(date) " + text + "\n"
@@ -656,12 +634,12 @@ import CoreServices
     }
 
     private func writeLogToDisk(filename: String, text: String) {
-
         guard let data = text.data(using: .utf8) else { return }
 
         if !FileManager.default.fileExists(atPath: filename) {
             FileManager.default.createFile(atPath: filename, contents: nil, attributes: nil)
         }
+
         if let fileHandle = FileHandle(forWritingAtPath: filename) {
             fileHandle.seekToEndOfFile()
             fileHandle.write(data)

@@ -26,16 +26,14 @@ import Alamofire
 import SwiftyJSON
 
 extension NextcloudKit {
-
     // MARK: - App Password
-
-    @objc public func getAppPassword(serverUrl: String,
-                                     username: String,
-                                     password: String,
-                                     userAgent: String? = nil,
-                                     options: NKRequestOptions = NKRequestOptions(),
-                                     taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-                                     completion: @escaping (_ token: String?, _ data: Data?, _ error: NKError) -> Void) {
+    public func getAppPassword(serverUrl: String,
+                               username: String,
+                               password: String,
+                               userAgent: String? = nil,
+                               options: NKRequestOptions = NKRequestOptions(),
+                               taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
+                               completion: @escaping (_ token: String?, _ data: Data?, _ error: NKError) -> Void) {
 
         let endpoint = "ocs/v2.php/core/getapppassword"
 
@@ -79,13 +77,13 @@ extension NextcloudKit {
         }
     }
 
-    @objc public func deleteAppPassword(serverUrl: String,
-                                        username: String,
-                                        password: String,
-                                        userAgent: String? = nil,
-                                        options: NKRequestOptions = NKRequestOptions(),
-                                        taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-                                        completion: @escaping (_ data: Data?, _ error: NKError) -> Void) {
+    public func deleteAppPassword(serverUrl: String,
+                                  username: String,
+                                  password: String,
+                                  userAgent: String? = nil,
+                                  options: NKRequestOptions = NKRequestOptions(),
+                                  taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
+                                  completion: @escaping (_ data: Data?, _ error: NKError) -> Void) {
 
         let endpoint = "ocs/v2.php/core/apppassword"
 
@@ -126,11 +124,11 @@ extension NextcloudKit {
 
     // MARK: - Login Flow V2
 
-    @objc public func getLoginFlowV2(serverUrl: String,
-                                     userAgent: String? = nil,
-                                     options: NKRequestOptions = NKRequestOptions(),
-                                     taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-                                     completion: @escaping (_ token: String?, _ endpoint: String?, _ login: String?, _ data: Data?, _ error: NKError) -> Void) {
+    public func getLoginFlowV2(serverUrl: String,
+                               userAgent: String? = nil,
+                               options: NKRequestOptions = NKRequestOptions(),
+                               taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
+                               completion: @escaping (_ token: String?, _ endpoint: String?, _ login: String?, _ data: Data?, _ error: NKError) -> Void) {
 
         let endpoint = "index.php/login/v2"
 
@@ -167,12 +165,12 @@ extension NextcloudKit {
         }
     }
 
-    @objc public func getLoginFlowV2Poll(token: String,
-                                         endpoint: String,
-                                         userAgent: String? = nil,
-                                         options: NKRequestOptions = NKRequestOptions(),
-                                         taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-                                         completion: @escaping (_ server: String?, _ loginName: String?, _ appPassword: String?, _ data: Data?, _ error: NKError) -> Void) {
+    public func getLoginFlowV2Poll(token: String,
+                                   endpoint: String,
+                                   userAgent: String? = nil,
+                                   options: NKRequestOptions = NKRequestOptions(),
+                                   taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
+                                   completion: @escaping (_ server: String?, _ loginName: String?, _ appPassword: String?, _ data: Data?, _ error: NKError) -> Void) {
 
         let serverUrl = endpoint + "?token=" + token
 

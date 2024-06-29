@@ -25,7 +25,6 @@ import Foundation
 
 @available(iOS 13.0, *)
 extension NextcloudKit {
-
     public func markE2EEFolder(fileId: String,
                                delete: Bool,
                                options: NKRequestOptions = NKRequestOptions()) async -> (account: String, error: NKError) {

@@ -26,11 +26,10 @@ import Alamofire
 import SwiftyJSON
 
 extension NextcloudKit {
-
-    @objc public func createFolder(serverUrlFileName: String,
-                                   options: NKRequestOptions = NKRequestOptions(),
-                                   taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-                                   completion: @escaping (_ account: String, _ ocId: String?, _ date: NSDate?, _ error: NKError) -> Void) {
+    public func createFolder(serverUrlFileName: String,
+                             options: NKRequestOptions = NKRequestOptions(),
+                             taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
+                             completion: @escaping (_ account: String, _ ocId: String?, _ date: NSDate?, _ error: NKError) -> Void) {
 
         let account = self.nkCommonInstance.account
 
@@ -77,10 +76,10 @@ extension NextcloudKit {
         }
     }
 
-    @objc public func deleteFileOrFolder(serverUrlFileName: String,
-                                         options: NKRequestOptions = NKRequestOptions(),
-                                         taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-                                         completion: @escaping (_ account: String, _ error: NKError) -> Void) {
+    public func deleteFileOrFolder(serverUrlFileName: String,
+                                   options: NKRequestOptions = NKRequestOptions(),
+                                   taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
+                                   completion: @escaping (_ account: String, _ error: NKError) -> Void) {
 
         let account = self.nkCommonInstance.account
 
@@ -116,12 +115,12 @@ extension NextcloudKit {
         }
     }
 
-    @objc public func moveFileOrFolder(serverUrlFileNameSource: String,
-                                       serverUrlFileNameDestination: String,
-                                       overwrite: Bool,
-                                       options: NKRequestOptions = NKRequestOptions(),
-                                       taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-                                       completion: @escaping (_ account: String, _ error: NKError) -> Void) {
+    public func moveFileOrFolder(serverUrlFileNameSource: String,
+                                 serverUrlFileNameDestination: String,
+                                 overwrite: Bool,
+                                 options: NKRequestOptions = NKRequestOptions(),
+                                 taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
+                                 completion: @escaping (_ account: String, _ error: NKError) -> Void) {
 
         let account = self.nkCommonInstance.account
 
@@ -165,12 +164,12 @@ extension NextcloudKit {
         }
     }
 
-    @objc public func copyFileOrFolder(serverUrlFileNameSource: String,
-                                       serverUrlFileNameDestination: String,
-                                       overwrite: Bool,
-                                       options: NKRequestOptions = NKRequestOptions(),
-                                       taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-                                       completion: @escaping (_ account: String, _ error: NKError) -> Void) {
+    public func copyFileOrFolder(serverUrlFileNameSource: String,
+                                 serverUrlFileNameDestination: String,
+                                 overwrite: Bool,
+                                 options: NKRequestOptions = NKRequestOptions(),
+                                 taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
+                                 completion: @escaping (_ account: String, _ error: NKError) -> Void) {
 
         let account = self.nkCommonInstance.account
 
@@ -214,14 +213,14 @@ extension NextcloudKit {
         }
     }
 
-    @objc public func readFileOrFolder(serverUrlFileName: String,
-                                       depth: String,
-                                       showHiddenFiles: Bool = true,
-                                       includeHiddenFiles: [String] = [],
-                                       requestBody: Data? = nil,
-                                       options: NKRequestOptions = NKRequestOptions(),
-                                       taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-                                       completion: @escaping (_ account: String, _ files: [NKFile], _ data: Data?, _ error: NKError) -> Void) {
+    public func readFileOrFolder(serverUrlFileName: String,
+                                 depth: String,
+                                 showHiddenFiles: Bool = true,
+                                 includeHiddenFiles: [String] = [],
+                                 requestBody: Data? = nil,
+                                 options: NKRequestOptions = NKRequestOptions(),
+                                 taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
+                                 completion: @escaping (_ account: String, _ files: [NKFile], _ data: Data?, _ error: NKError) -> Void) {
 
         let account = self.nkCommonInstance.account
         let user = self.nkCommonInstance.user
@@ -282,11 +281,11 @@ extension NextcloudKit {
         }
     }
 
-    @objc public func getFileFromFileId(fileId: String? = nil,
-                                        link: String? = nil,
-                                        options: NKRequestOptions = NKRequestOptions(),
-                                        taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-                                        completion: @escaping (_ account: String, _ file: NKFile?, _ data: Data?, _ error: NKError) -> Void) {
+    public func getFileFromFileId(fileId: String? = nil,
+                                  link: String? = nil,
+                                  options: NKRequestOptions = NKRequestOptions(),
+                                  taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
+                                  completion: @escaping (_ account: String, _ file: NKFile?, _ data: Data?, _ error: NKError) -> Void) {
 
         let account = self.nkCommonInstance.account
         let userId = self.nkCommonInstance.userId
@@ -313,13 +312,13 @@ extension NextcloudKit {
         }
     }
 
-    @objc public func searchBodyRequest(serverUrl: String,
-                                        requestBody: String,
-                                        showHiddenFiles: Bool,
-                                        includeHiddenFiles: [String] = [],
-                                        options: NKRequestOptions = NKRequestOptions(),
-                                        taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-                                        completion: @escaping (_ account: String, _ files: [NKFile], _ data: Data?, _ error: NKError) -> Void) {
+    public func searchBodyRequest(serverUrl: String,
+                                  requestBody: String,
+                                  showHiddenFiles: Bool,
+                                  includeHiddenFiles: [String] = [],
+                                  options: NKRequestOptions = NKRequestOptions(),
+                                  taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
+                                  completion: @escaping (_ account: String, _ files: [NKFile], _ data: Data?, _ error: NKError) -> Void) {
 
         let httpBody = requestBody.data(using: .utf8)!
 
@@ -330,14 +329,14 @@ extension NextcloudKit {
         }
     }
 
-    @objc public func searchLiteral(serverUrl: String,
-                                    depth: String,
-                                    literal: String,
-                                    showHiddenFiles: Bool,
-                                    includeHiddenFiles: [String] = [],
-                                    options: NKRequestOptions = NKRequestOptions(),
-                                    taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-                                    completion: @escaping (_ account: String, _ files: [NKFile], _ data: Data?, _ error: NKError) -> Void) {
+    public func searchLiteral(serverUrl: String,
+                              depth: String,
+                              literal: String,
+                              showHiddenFiles: Bool,
+                              includeHiddenFiles: [String] = [],
+                              options: NKRequestOptions = NKRequestOptions(),
+                              taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
+                              completion: @escaping (_ account: String, _ files: [NKFile], _ data: Data?, _ error: NKError) -> Void) {
 
         let account = self.nkCommonInstance.account
         let userId = self.nkCommonInstance.userId
@@ -356,16 +355,16 @@ extension NextcloudKit {
         }
     }
 
-    @objc public func searchMedia(path: String = "",
-                                  lessDate: Any,
-                                  greaterDate: Any,
-                                  elementDate: String,
-                                  limit: Int,
-                                  showHiddenFiles: Bool,
-                                  includeHiddenFiles: [String] = [],
-                                  options: NKRequestOptions = NKRequestOptions(),
-                                  taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-                                  completion: @escaping (_ account: String, _ files: [NKFile], _ data: Data?, _ error: NKError) -> Void) {
+    public func searchMedia(path: String = "",
+                            lessDate: Any,
+                            greaterDate: Any,
+                            elementDate: String,
+                            limit: Int,
+                            showHiddenFiles: Bool,
+                            includeHiddenFiles: [String] = [],
+                            options: NKRequestOptions = NKRequestOptions(),
+                            taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
+                            completion: @escaping (_ account: String, _ files: [NKFile], _ data: Data?, _ error: NKError) -> Void) {
 
         let account = self.nkCommonInstance.account
         let userId = self.nkCommonInstance.userId
@@ -406,13 +405,13 @@ extension NextcloudKit {
         }
     }
 
-    private func search(serverUrl: String,
-                        httpBody: Data,
-                        showHiddenFiles: Bool,
-                        includeHiddenFiles: [String],
-                        options: NKRequestOptions = NKRequestOptions(),
-                        taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-                        completion: @escaping (_ account: String, _ files: [NKFile], _ data: Data?, _ error: NKError) -> Void) {
+    func search(serverUrl: String,
+                httpBody: Data,
+                showHiddenFiles: Bool,
+                includeHiddenFiles: [String],
+                options: NKRequestOptions = NKRequestOptions(),
+                taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
+                completion: @escaping (_ account: String, _ files: [NKFile], _ data: Data?, _ error: NKError) -> Void) {
 
         let account = self.nkCommonInstance.account
         let user = self.nkCommonInstance.user
@@ -461,11 +460,11 @@ extension NextcloudKit {
         }
     }
 
-    @objc public func setFavorite(fileName: String,
-                                  favorite: Bool,
-                                  options: NKRequestOptions = NKRequestOptions(),
-                                  taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-                                  completion: @escaping (_ account: String, _ error: NKError) -> Void) {
+    public func setFavorite(fileName: String,
+                            favorite: Bool,
+                            options: NKRequestOptions = NKRequestOptions(),
+                            taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
+                            completion: @escaping (_ account: String, _ error: NKError) -> Void) {
 
         let account = self.nkCommonInstance.account
         let userId = self.nkCommonInstance.userId
@@ -509,11 +508,11 @@ extension NextcloudKit {
         }
     }
 
-    @objc public func listingFavorites(showHiddenFiles: Bool,
-                                       includeHiddenFiles: [String] = [],
-                                       options: NKRequestOptions = NKRequestOptions(),
-                                       taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-                                       completion: @escaping (_ account: String, _ files: [NKFile], _ data: Data?, _ error: NKError) -> Void) {
+    public func listingFavorites(showHiddenFiles: Bool,
+                                 includeHiddenFiles: [String] = [],
+                                 options: NKRequestOptions = NKRequestOptions(),
+                                 taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
+                                 completion: @escaping (_ account: String, _ files: [NKFile], _ data: Data?, _ error: NKError) -> Void) {
 
         let account = self.nkCommonInstance.account
         let user = self.nkCommonInstance.user
@@ -563,11 +562,11 @@ extension NextcloudKit {
         }
     }
 
-    @objc public func listingTrash(filename: String? = nil,
-                                   showHiddenFiles: Bool,
-                                   options: NKRequestOptions = NKRequestOptions(),
-                                   taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-                                   completion: @escaping (_ account: String, _ items: [NKTrash], _ data: Data?, _ error: NKError) -> Void) {
+    public func listingTrash(filename: String? = nil,
+                             showHiddenFiles: Bool,
+                             options: NKRequestOptions = NKRequestOptions(),
+                             taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
+                             completion: @escaping (_ account: String, _ items: [NKTrash], _ data: Data?, _ error: NKError) -> Void) {
 
         let account = self.nkCommonInstance.account
         let userId = self.nkCommonInstance.userId

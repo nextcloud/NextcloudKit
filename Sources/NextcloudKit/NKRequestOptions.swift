@@ -23,9 +23,7 @@
 
 import Foundation
 
-@objcMembers
 public class NKRequestOptions: NSObject {
-
     var endpoint: String?
     var version: String?
     var customHeader: [String: String]?

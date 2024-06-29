@@ -25,11 +25,10 @@ import Foundation
 import Alamofire
 
 extension NextcloudKit {
-
-    @objc public func getComments(fileId: String,
-                                  options: NKRequestOptions = NKRequestOptions(),
-                                  taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-                                  completion: @escaping (_ account: String, _ items: [NKComments]?, _ data: Data?, _ error: NKError) -> Void) {
+    public func getComments(fileId: String,
+                            options: NKRequestOptions = NKRequestOptions(),
+                            taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
+                            completion: @escaping (_ account: String, _ items: [NKComments]?, _ data: Data?, _ error: NKError) -> Void) {
 
         let account = self.nkCommonInstance.account
         let urlBase = self.nkCommonInstance.urlBase
@@ -74,11 +73,11 @@ extension NextcloudKit {
         }
     }
 
-    @objc public func putComments(fileId: String,
-                                  message: String,
-                                  options: NKRequestOptions = NKRequestOptions(),
-                                  taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-                                  completion: @escaping (_ account: String, _ error: NKError) -> Void) {
+    public func putComments(fileId: String,
+                            message: String,
+                            options: NKRequestOptions = NKRequestOptions(),
+                            taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
+                            completion: @escaping (_ account: String, _ error: NKError) -> Void) {
 
         let account = self.nkCommonInstance.account
         let urlBase = self.nkCommonInstance.urlBase
@@ -118,12 +117,12 @@ extension NextcloudKit {
         }
     }
 
-    @objc public func updateComments(fileId: String,
-                                     messageId: String,
-                                     message: String,
-                                     options: NKRequestOptions = NKRequestOptions(),
-                                     taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-                                     completion: @escaping (_ account: String, _ error: NKError) -> Void) {
+    public func updateComments(fileId: String,
+                               messageId: String,
+                               message: String,
+                               options: NKRequestOptions = NKRequestOptions(),
+                               taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
+                               completion: @escaping (_ account: String, _ error: NKError) -> Void) {
 
         let account = self.nkCommonInstance.account
         let urlBase = self.nkCommonInstance.urlBase
@@ -164,11 +163,11 @@ extension NextcloudKit {
         }
     }
 
-    @objc public func deleteComments(fileId: String,
-                                     messageId: String,
-                                     options: NKRequestOptions = NKRequestOptions(),
-                                     taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-                                     completion: @escaping (_ account: String, _ error: NKError) -> Void) {
+    public func deleteComments(fileId: String,
+                               messageId: String,
+                               options: NKRequestOptions = NKRequestOptions(),
+                               taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
+                               completion: @escaping (_ account: String, _ error: NKError) -> Void) {
 
         let account = self.nkCommonInstance.account
         let urlBase = self.nkCommonInstance.urlBase
@@ -199,10 +198,10 @@ extension NextcloudKit {
         }
     }
 
-    @objc public func markAsReadComments(fileId: String,
-                                         options: NKRequestOptions = NKRequestOptions(),
-                                         taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-                                         completion: @escaping (_ account: String, _ error: NKError) -> Void) {
+    public func markAsReadComments(fileId: String,
+                                   options: NKRequestOptions = NKRequestOptions(),
+                                   taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
+                                   completion: @escaping (_ account: String, _ error: NKError) -> Void) {
 
         let account = self.nkCommonInstance.account
         let urlBase = self.nkCommonInstance.urlBase

@@ -25,7 +25,6 @@ import Foundation
 import Alamofire
 
 extension NextcloudKit {
-
     public func setLivephoto(serverUrlfileNamePath: String,
                              livePhotoFile: String,
                              options: NKRequestOptions = NKRequestOptions(),

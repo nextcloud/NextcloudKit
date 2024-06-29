@@ -29,14 +29,13 @@ import UIKit
 import Alamofire
 import SwiftyJSON
 
-@objc open class NextcloudKit: SessionDelegate {
-    @objc public static let shared: NextcloudKit = {
+open class NextcloudKit: SessionDelegate {
+    public static let shared: NextcloudKit = {
         let instance = NextcloudKit()
         return instance
     }()
 
     internal lazy var internalSessionManager: Alamofire.Session = {
-
         return Alamofire.Session(configuration: nkCommonInstance.sessionConfiguration,
                                  delegate: self,
                                  rootQueue: nkCommonInstance.rootQueue,
@@ -59,7 +58,7 @@ import SwiftyJSON
     #endif
     // private var cookies: [String:[HTTPCookie]] = [:]
 
-    @objc public let nkCommonInstance = NKCommon()
+    public let nkCommonInstance = NKCommon()
 
     override public init(fileManager: FileManager = .default) {
         super.init(fileManager: fileManager)
@@ -76,16 +75,14 @@ import SwiftyJSON
 
     // MARK: - Setup
 
-    @objc public func setup(account: String? = nil, user: String, userId: String, password: String, urlBase: String, userAgent: String, nextcloudVersion: Int, delegate: NKCommonDelegate?) {
-
+    public func setup(account: String? = nil, user: String, userId: String, password: String, urlBase: String, userAgent: String, nextcloudVersion: Int, delegate: NKCommonDelegate?) {
         self.setup(account: account, user: user, userId: userId, password: password, urlBase: urlBase)
         self.setup(userAgent: userAgent)
         self.setup(nextcloudVersion: nextcloudVersion)
         self.setup(delegate: delegate)
     }
 
-    @objc public func setup(account: String? = nil, user: String, userId: String, password: String, urlBase: String) {
-
+    public func setup(account: String? = nil, user: String, userId: String, password: String, urlBase: String) {
         if (self.nkCommonInstance.account != account) || (self.nkCommonInstance.urlBase != urlBase && self.nkCommonInstance.user != user) {
             if let cookieStore = sessionManager.session.configuration.httpCookieStorage {
                 for cookie in cookieStore.cookies ?? [] {
@@ -106,26 +103,22 @@ import SwiftyJSON
         self.nkCommonInstance.internalUrlBase = urlBase
     }
 
-    @objc public func setup(delegate: NKCommonDelegate?) {
-
+    public func setup(delegate: NKCommonDelegate?) {
         self.nkCommonInstance.delegate = delegate
     }
 
-    @objc public func setup(userAgent: String) {
-
+    public func setup(userAgent: String) {
         self.nkCommonInstance.internalUserAgent = userAgent
     }
 
-    @objc public func setup(nextcloudVersion: Int) {
-
+    public func setup(nextcloudVersion: Int) {
         self.nkCommonInstance.internalNextcloudVersion = nextcloudVersion
     }
 
-    @objc public func setupSessionManager(sessionConfiguration: URLSessionConfiguration?,
-                                          rootQueue: DispatchQueue?,
-                                          requestQueue: DispatchQueue?,
-                                          serializationQueue: DispatchQueue?) {
-
+    public func setupSessionManager(sessionConfiguration: URLSessionConfiguration?,
+                                    rootQueue: DispatchQueue?,
+                                    requestQueue: DispatchQueue?,
+                                    serializationQueue: DispatchQueue?) {
         if let sessionConfiguration = sessionConfiguration {
             self.nkCommonInstance.sessionConfiguration = sessionConfiguration
         }
@@ -168,39 +161,37 @@ import SwiftyJSON
     // MARK: - Reachability
 
     #if !os(watchOS)
-    @objc public func isNetworkReachable() -> Bool {
+    public func isNetworkReachable() -> Bool {
         return reachabilityManager?.isReachable ?? false
     }
 
     private func startNetworkReachabilityObserver() {
-
         reachabilityManager?.startListening(onUpdatePerforming: { status in
             switch status {
 
             case .unknown:
-                self.nkCommonInstance.delegate?.networkReachabilityObserver?(NKCommon.TypeReachability.unknown)
+                self.nkCommonInstance.delegate?.networkReachabilityObserver(NKCommon.TypeReachability.unknown)
 
             case .notReachable:
-                self.nkCommonInstance.delegate?.networkReachabilityObserver?(NKCommon.TypeReachability.notReachable)
+                self.nkCommonInstance.delegate?.networkReachabilityObserver(NKCommon.TypeReachability.notReachable)
 
             case .reachable(.ethernetOrWiFi):
-                self.nkCommonInstance.delegate?.networkReachabilityObserver?(NKCommon.TypeReachability.reachableEthernetOrWiFi)
+                self.nkCommonInstance.delegate?.networkReachabilityObserver(NKCommon.TypeReachability.reachableEthernetOrWiFi)
 
             case .reachable(.cellular):
-                self.nkCommonInstance.delegate?.networkReachabilityObserver?(NKCommon.TypeReachability.reachableCellular)
+                self.nkCommonInstance.delegate?.networkReachabilityObserver(NKCommon.TypeReachability.reachableCellular)
             }
         })
     }
 
     private func stopNetworkReachabilityObserver() {
-
         reachabilityManager?.stopListening()
     }
     #endif
 
     // MARK: - Session utility
 
-    @objc public func getSessionManager() -> URLSession {
+    public func getSessionManager() -> URLSession {
        return sessionManager.session
     }
 
@@ -228,25 +219,6 @@ import SwiftyJSON
     */
 
     // MARK: - download / upload
-
-    @objc public func download(serverUrlFileName: Any,
-                               fileNameLocalPath: String,
-                               options: NKRequestOptions = NKRequestOptions(),
-                               taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-                               progressHandler: @escaping (_ progress: Progress) -> Void = { _ in },
-                               completionHandler: @escaping (_ account: String, _ etag: String?, _ date: NSDate?, _ lenght: Int64, _ allHeaderFields: [AnyHashable: Any]?, _ nkError: NKError) -> Void) {
-
-        download(serverUrlFileName: serverUrlFileName, fileNameLocalPath: fileNameLocalPath, options: options) { _ in
-            // not available in objc
-        } taskHandler: { task in
-            taskHandler(task)
-        } progressHandler: { progress in
-            progressHandler(progress)
-        } completionHandler: { account, etag, date, lenght, allHeaderFields, _, nkError in
-            // error not available in objc
-            completionHandler(account, etag, date, lenght, allHeaderFields, nkError)
-        }
-    }
 
     public func download(serverUrlFileName: Any,
                          fileNameLocalPath: String,
@@ -324,27 +296,6 @@ import SwiftyJSON
         }
 
         options.queue.async { requestHandler(request) }
-    }
-
-    @objc public func upload(serverUrlFileName: String,
-                             fileNameLocalPath: String,
-                             dateCreationFile: Date? = nil,
-                             dateModificationFile: Date? = nil,
-                             options: NKRequestOptions = NKRequestOptions(),
-                             taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-                             progressHandler: @escaping (_ progress: Progress) -> Void = { _ in },
-                             completionHandler: @escaping (_ account: String, _ ocId: String?, _ etag: String?, _ date: NSDate?, _ size: Int64, _ allHeaderFields: [AnyHashable: Any]?, _ nkError: NKError) -> Void) {
-
-        upload(serverUrlFileName: serverUrlFileName, fileNameLocalPath: fileNameLocalPath, dateCreationFile: dateCreationFile, dateModificationFile: dateModificationFile, options: options) { _ in
-            // not available in objc
-        } taskHandler: { task in
-            taskHandler(task)
-        } progressHandler: { progress in
-            progressHandler(progress)
-        } completionHandler: { account, ocId, etag, date, size, allHeaderFields, _, nkError in
-            // error not available in objc
-            completionHandler(account, ocId, etag, date, size, allHeaderFields, nkError)
-        }
     }
 
     public func upload(serverUrlFileName: Any,
@@ -629,7 +580,7 @@ import SwiftyJSON
             self.nkCommonInstance.writeLog("[WARNING] URLAuthenticationChallenge, no delegate found, perform with default handling")
             completionHandler(URLSession.AuthChallengeDisposition.performDefaultHandling, nil)
         } else {
-            self.nkCommonInstance.delegate?.authenticationChallenge?(session, didReceive: challenge, completionHandler: { authChallengeDisposition, credential in
+            self.nkCommonInstance.delegate?.authenticationChallenge(session, didReceive: challenge, completionHandler: { authChallengeDisposition, credential in
                 if self.nkCommonInstance.levelLog > 1 {
                     self.nkCommonInstance.writeLog("[INFO AUTH] Challenge Disposition: \(authChallengeDisposition.rawValue)")
                 }
@@ -647,13 +598,9 @@ final class AlamofireLogger: EventMonitor {
     }
 
     func requestDidResume(_ request: Request) {
-
         if self.nkCommonInstance.levelLog > 0 {
-
             self.nkCommonInstance.writeLog("Network request started: \(request)")
-
             if self.nkCommonInstance.levelLog > 1 {
-
                 let allHeaders = request.request.flatMap { $0.allHTTPHeaderFields.map { $0.description } } ?? "None"
                 let body = request.request.flatMap { $0.httpBody.map { String(decoding: $0, as: UTF8.self) } } ?? "None"
 
@@ -664,25 +611,20 @@ final class AlamofireLogger: EventMonitor {
     }
 
     func request<Value>(_ request: DataRequest, didParseResponse response: AFDataResponse<Value>) {
-
         guard let date = self.nkCommonInstance.convertDate(Date(), format: "yyyy-MM-dd' 'HH:mm:ss") else { return }
         let responseResultString = String("\(response.result)")
         let responseDebugDescription = String("\(response.debugDescription)")
         let responseAllHeaderFields = String("\(String(describing: response.response?.allHeaderFields))")
 
         if self.nkCommonInstance.levelLog > 0 {
-
             if self.nkCommonInstance.levelLog == 1 {
-
                 if let request = response.request {
                     let requestString = "\(request)"
                     self.nkCommonInstance.writeLog("Network response request: " + requestString + ", result: " + responseResultString)
                 } else {
                     self.nkCommonInstance.writeLog("Network response result: " + responseResultString)
                 }
-
             } else {
-
                 self.nkCommonInstance.writeLog("Network response result: \(date) " + responseDebugDescription)
                 self.nkCommonInstance.writeLog("Network response all headers: \(date) " + responseAllHeaderFields)
             }
