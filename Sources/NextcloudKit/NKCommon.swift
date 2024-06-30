@@ -41,8 +41,8 @@ public protocol NKCommonDelegate {
 
     func downloadingFinish(_ session: URLSession, downloadTask: URLSessionDownloadTask, didFinishDownloadingTo location: URL)
     
-    func downloadComplete(fileName: String, serverUrl: String, etag: String?, date: NSDate?, dateLastModified: NSDate?, length: Int64, task: URLSessionTask, error: NKError)
-    func uploadComplete(fileName: String, serverUrl: String, ocId: String?, etag: String?, date: NSDate?, size: Int64, task: URLSessionTask, error: NKError)
+    func downloadComplete(fileName: String, serverUrl: String, etag: String?, date: Date?, dateLastModified: Date?, length: Int64, task: URLSessionTask, error: NKError)
+    func uploadComplete(fileName: String, serverUrl: String, ocId: String?, etag: String?, date: Date?, size: Int64, task: URLSessionTask, error: NKError)
 }
 
 public class NKCommon: NSObject {
@@ -524,14 +524,14 @@ public class NKCommon: NSObject {
         return serverUrl.asUrl
     }
 
-    public func convertDate(_ dateString: String, format: String) -> NSDate? {
+    public func convertDate(_ dateString: String, format: String) -> Date? {
         if dateString.isEmpty { return nil }
         let dateFormatter = DateFormatter()
 
         dateFormatter.locale = Locale(identifier: "en_US_POSIX")
         dateFormatter.dateFormat = format
 
-        guard let date = dateFormatter.date(from: dateString) as? NSDate else { return nil }
+        guard let date = dateFormatter.date(from: dateString) else { return nil }
         return date
     }
 

@@ -218,7 +218,7 @@ open class NextcloudKit: SessionDelegate {
                          requestHandler: @escaping (_ request: DownloadRequest) -> Void = { _ in },
                          taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
                          progressHandler: @escaping (_ progress: Progress) -> Void = { _ in },
-                         completionHandler: @escaping (_ account: String, _ etag: String?, _ date: NSDate?, _ lenght: Int64, _ allHeaderFields: [AnyHashable: Any]?, _ afError: AFError?, _ nKError: NKError) -> Void) {
+                         completionHandler: @escaping (_ account: String, _ etag: String?, _ date: Date?, _ lenght: Int64, _ allHeaderFields: [AnyHashable: Any]?, _ afError: AFError?, _ nKError: NKError) -> Void) {
         let account = self.nkCommonInstance.account
         var convertible: URLConvertible?
         if serverUrlFileName is URL {
@@ -249,7 +249,7 @@ open class NextcloudKit: SessionDelegate {
                 let resultError = NKError(error: error, afResponse: response, responseData: nil)
                 options.queue.async { completionHandler(account, nil, nil, 0, nil, error, resultError) }
             case .success:
-                var date: NSDate?
+                var date: Date?
                 var etag: String?
                 var length: Int64 = 0
                 let allHeaderFields = response.response?.allHeaderFields
@@ -284,7 +284,7 @@ open class NextcloudKit: SessionDelegate {
                        requestHandler: @escaping (_ request: UploadRequest) -> Void = { _ in },
                        taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
                        progressHandler: @escaping (_ progress: Progress) -> Void = { _ in },
-                       completionHandler: @escaping (_ account: String, _ ocId: String?, _ etag: String?, _ date: NSDate?, _ size: Int64, _ allHeaderFields: [AnyHashable: Any]?, _ afError: AFError?, _ nkError: NKError) -> Void) {
+                       completionHandler: @escaping (_ account: String, _ ocId: String?, _ etag: String?, _ date: Date?, _ size: Int64, _ allHeaderFields: [AnyHashable: Any]?, _ afError: AFError?, _ nkError: NKError) -> Void) {
         let account = self.nkCommonInstance.account
         var convertible: URLConvertible?
         var size: Int64 = 0

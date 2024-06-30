@@ -332,7 +332,7 @@ public extension NextcloudKit {
 
                         if let value = subJson["clearAt"].double {
                             if value > 0 {
-                                userStatus.clearAt = NSDate(timeIntervalSince1970: value)
+                                userStatus.clearAt = Date(timeIntervalSince1970: value)
                             }
                         }
                         userStatus.icon = subJson["icon"].string

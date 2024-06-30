@@ -97,7 +97,7 @@ public enum NKProperties: String, CaseIterable {
 
 public class NKActivity: NSObject {
     public var app = ""
-    public var date = NSDate()
+    public var date = Date()
     public var idActivity: Int = 0
     public var icon = ""
     public var link = ""
@@ -117,7 +117,7 @@ public class NKComments: NSObject {
     public var actorDisplayName = ""
     public var actorId = ""
     public var actorType = ""
-    public var creationDateTime = NSDate()
+    public var creationDateTime = Date()
     public var isUnread: Bool = false
     public var message = ""
     public var messageId = ""
@@ -168,9 +168,9 @@ public class NKFile: NSObject {
     public var commentsUnread: Bool = false
     public var contentType = ""
     public var checksums = ""
-    public var creationDate: NSDate?
+    public var creationDate: Date?
     public var dataFingerprint = ""
-    public var date = NSDate()
+    public var date = Date()
     public var directory: Bool = false
     public var downloadURL = ""
     public var e2eEncrypted: Bool = false
@@ -207,8 +207,8 @@ public class NKFile: NSObject {
     public var tags: [String] = []
     public var trashbinFileName = ""
     public var trashbinOriginalLocation = ""
-    public var trashbinDeletionTime = NSDate()
-    public var uploadDate: NSDate?
+    public var trashbinDeletionTime = Date()
+    public var uploadDate: Date?
     public var urlBase = ""
     public var user = ""
     public var userId = ""
@@ -231,24 +231,6 @@ public class NKFileProperty: NSObject {
     public var ext: String = ""
 }
 
-public class NKNotifications: NSObject {
-    public var actions: Data?
-    public var app = ""
-    public var date = NSDate()
-    public var icon: String?
-    public var idNotification: Int = 0
-    public var link = ""
-    public var message = ""
-    public var messageRich = ""
-    public var messageRichParameters: Data?
-    public var objectId = ""
-    public var objectType = ""
-    public var subject = ""
-    public var subjectRich = ""
-    public var subjectRichParameters: Data?
-    public var user = ""
-}
-
 public class NKRichdocumentsTemplate: NSObject {
     public var delete = ""
     public var ext = ""
@@ -266,7 +248,7 @@ public class NKSharee: NSObject {
     public var shareType: Int = 0
     public var shareWith = ""
     public var uuid = ""
-    public var userClearAt: NSDate?
+    public var userClearAt: Date?
     public var userIcon = ""
     public var userMessage = ""
     public var userStatus = ""
@@ -274,7 +256,7 @@ public class NKSharee: NSObject {
 
 public class NKTrash: NSObject {
     public var contentType = ""
-    public var date = NSDate()
+    public var date = Date()
     public var directory: Bool = false
     public var fileId = ""
     public var fileName = ""
@@ -285,7 +267,7 @@ public class NKTrash: NSObject {
     public var classFile = ""
     public var trashbinFileName = ""
     public var trashbinOriginalLocation = ""
-    public var trashbinDeletionTime = NSDate()
+    public var trashbinDeletionTime = Date()
 }
 
 public class NKUserProfile: NSObject {
@@ -315,7 +297,7 @@ public class NKUserProfile: NSObject {
 }
 
 public class NKUserStatus: NSObject {
-    public var clearAt: NSDate?
+    public var clearAt: Date?
     public var clearAtTime: String?
     public var clearAtType: String?
     public var icon: String?
@@ -679,11 +661,11 @@ class NKDataFileXML: NSObject {
             }
 
             if let creationtime = propstat["d:prop", "nc:creation_time"].double, creationtime > 0 {
-                file.creationDate = NSDate(timeIntervalSince1970: creationtime)
+                file.creationDate = Date(timeIntervalSince1970: creationtime)
             }
 
             if let uploadtime = propstat["d:prop", "nc:upload_time"].double, uploadtime > 0 {
-                file.uploadDate = NSDate(timeIntervalSince1970: uploadtime)
+                file.uploadDate = Date(timeIntervalSince1970: uploadtime)
             }
 
             if let getetag = propstat["d:prop", "d:getetag"].text {
@@ -972,7 +954,7 @@ class NKDataFileXML: NSObject {
             }
 
             if let trashbinDeletionTime = propstat["d:prop", "nc:trashbin-deletion-time"].text, let trashbinDeletionTimeDouble = Double(trashbinDeletionTime) {
-                file.trashbinDeletionTime = Date(timeIntervalSince1970: trashbinDeletionTimeDouble) as NSDate
+                file.trashbinDeletionTime = Date(timeIntervalSince1970: trashbinDeletionTimeDouble)
             }
 
             let results = self.nkCommonInstance.getInternalType(fileName: file.trashbinFileName, mimeType: file.contentType, directory: file.directory)

@@ -133,7 +133,7 @@ public class NKBackground: NSObject, URLSessionTaskDelegate, URLSessionDelegate,
     }
 
     public func urlSession(_ session: URLSession, task: URLSessionTask, didCompleteWithError error: Error?) {
-        var fileName: String = "", serverUrl: String = "", etag: String?, ocId: String?, date: NSDate?, dateLastModified: NSDate?, length: Int64 = 0
+        var fileName: String = "", serverUrl: String = "", etag: String?, ocId: String?, date: Date?, dateLastModified: Date?, length: Int64 = 0
         let url = task.currentRequest?.url?.absoluteString.removingPercentEncoding
         if url != nil {
             fileName = (url! as NSString).lastPathComponent

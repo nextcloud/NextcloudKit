@@ -30,6 +30,24 @@ import UIKit
 import Alamofire
 import SwiftyJSON
 
+public class NKNotifications: NSObject {
+    public var actions: Data?
+    public var app = ""
+    public var date = Date()
+    public var icon: String?
+    public var idNotification: Int = 0
+    public var link = ""
+    public var message = ""
+    public var messageRich = ""
+    public var messageRichParameters: Data?
+    public var objectId = ""
+    public var objectType = ""
+    public var subject = ""
+    public var subjectRich = ""
+    public var subjectRichParameters: Data?
+    public var user = ""
+}
+
 public extension NextcloudKit {
     func checkServer(serverUrl: String,
                      options: NKRequestOptions = NKRequestOptions(),
@@ -774,7 +792,7 @@ public extension NextcloudKit {
                         notification.app = subJson["app"].stringValue
                         if let datetime = subJson["datetime"].string {
                             if let date = self.nkCommonInstance.convertDate(datetime, format: "yyyy-MM-dd'T'HH:mm:ssZZZZZ") {
-                                notification.date = date
+                                notification.date = date as Date
                             }
                         }
                         notification.icon = subJson["icon"].string

@@ -181,7 +181,7 @@ public extension NextcloudKit {
                             sharee.circleOwner = subJson["value"]["circleOwner"].stringValue
 
                             if let clearAt = subJson["status"]["clearAt"].double {
-                                let date = Date(timeIntervalSince1970: clearAt) as NSDate
+                                let date = Date(timeIntervalSince1970: clearAt)
                                 sharee.userClearAt = date
                             }
                             sharee.userIcon = subJson["status"]["icon"].stringValue
@@ -204,7 +204,7 @@ public extension NextcloudKit {
                             sharee.circleOwner = subJson["value"]["circleOwner"].stringValue
 
                             if let clearAt = subJson["status"]["clearAt"].double {
-                                let date = Date(timeIntervalSince1970: clearAt) as NSDate
+                                let date = Date(timeIntervalSince1970: clearAt)
                                 sharee.userClearAt = date
                             }
                             sharee.userIcon = subJson["status"]["icon"].stringValue
@@ -521,7 +521,7 @@ public class NKShare: NSObject {
     public var date: NSDate?
     public var displaynameFileOwner = ""
     public var displaynameOwner = ""
-    public var expirationDate: NSDate?
+    public var expirationDate: Date?
     public var fileParent: Int = 0
     public var fileSource: Int = 0
     public var fileTarget = ""
