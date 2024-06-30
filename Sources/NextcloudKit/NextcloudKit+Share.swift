@@ -470,7 +470,7 @@ public extension NextcloudKit {
         share.displaynameFileOwner = json["displayname_file_owner"].stringValue
         share.displaynameOwner = json["displayname_owner"].stringValue
         if let expiration = json["expiration"].string, let date = self.nkCommonInstance.convertDate(expiration, format: "YYYY-MM-dd HH:mm:ss") {
-            share.expirationDate = date
+            share.expirationDate = date as NSDate
         }
         share.fileParent = json["file_parent"].intValue
         share.fileSource = json["file_source"].intValue
@@ -521,7 +521,7 @@ public class NKShare: NSObject {
     public var date: Date?
     public var displaynameFileOwner = ""
     public var displaynameOwner = ""
-    public var expirationDate: Date?
+    public var expirationDate: NSDate?
     public var fileParent: Int = 0
     public var fileSource: Int = 0
     public var fileTarget = ""
