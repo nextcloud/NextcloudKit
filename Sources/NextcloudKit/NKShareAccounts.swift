@@ -32,7 +32,7 @@ public class NKShareAccounts: NSObject {
         public var name: String?
         public var image: UIImage?
 
-        init(withUrl url: String, user: String, name: String? = nil, image: UIImage? = nil) {
+        public init(withUrl url: String, user: String, name: String? = nil, image: UIImage? = nil) {
             self.url = url
             self.user = user
             self.name = name
