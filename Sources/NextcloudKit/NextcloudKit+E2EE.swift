@@ -25,29 +25,23 @@ import Foundation
 import Alamofire
 import SwiftyJSON
 
-extension NextcloudKit {
-
-    public func markE2EEFolder(fileId: String,
-                               delete: Bool,
-                               options: NKRequestOptions = NKRequestOptions(),
-                               taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-                               completion: @escaping (_ account: String, _ error: NKError) -> Void) {
-
+public extension NextcloudKit {
+    func markE2EEFolder(fileId: String,
+                        delete: Bool,
+                        options: NKRequestOptions = NKRequestOptions(),
+                        taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
+                        completion: @escaping (_ account: String, _ error: NKError) -> Void) {
         let account = self.nkCommonInstance.account
         let urlBase = self.nkCommonInstance.urlBase
-
         var version = "v1"
         if let optionsVesion = options.version {
             version = optionsVesion
         }
         let endpoint = "ocs/v2.php/apps/end_to_end_encryption/api/\(version)/encrypted/\(fileId)"
-
         guard let url = self.nkCommonInstance.createStandardUrl(serverUrl: urlBase, endpoint: endpoint) else {
             return options.queue.async { completion(account, .urlError) }
         }
-
         let method: HTTPMethod = delete ? .delete : .put
-
         let headers = self.nkCommonInstance.getStandardHeaders(options: options)
 
         sessionManager.request(url, method: method, parameters: nil, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
@@ -57,7 +51,6 @@ extension NextcloudKit {
             if self.nkCommonInstance.levelLog > 0 {
                 debugPrint(response)
             }
-
             switch response.result {
             case .failure(let error):
                 let error = NKError(error: error, afResponse: response, responseData: response.data)
@@ -74,29 +67,24 @@ extension NextcloudKit {
         }
     }
 
-    public func lockE2EEFolder(fileId: String,
-                               e2eToken: String?,
-                               e2eCounter: String?,
-                               method: String,
-                               options: NKRequestOptions = NKRequestOptions(),
-                               taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-                               completion: @escaping (_ account: String, _ e2eToken: String?, _ data: Data?, _ error: NKError) -> Void) {
-
+    func lockE2EEFolder(fileId: String,
+                        e2eToken: String?,
+                        e2eCounter: String?,
+                        method: String,
+                        options: NKRequestOptions = NKRequestOptions(),
+                        taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
+                        completion: @escaping (_ account: String, _ e2eToken: String?, _ data: Data?, _ error: NKError) -> Void) {
         let account = self.nkCommonInstance.account
         let urlBase = self.nkCommonInstance.urlBase
-
         var version = "v1"
         if let optionsVesion = options.version {
             version = optionsVesion
         }
         let endpoint = "ocs/v2.php/apps/end_to_end_encryption/api/\(version)/lock/\(fileId)"
-
         guard let url = self.nkCommonInstance.createStandardUrl(serverUrl: urlBase, endpoint: endpoint) else {
             return options.queue.async { completion(account, nil, nil, .urlError) }
         }
-
         let method = HTTPMethod(rawValue: method)
-
         var headers = self.nkCommonInstance.getStandardHeaders(options: options)
         var parameters: [String: Any] = [:]
 
@@ -115,7 +103,6 @@ extension NextcloudKit {
             if self.nkCommonInstance.levelLog > 0 {
                 debugPrint(response)
             }
-
             switch response.result {
             case .failure(let error):
                 let error = NKError(error: error, afResponse: response, responseData: response.data)
@@ -133,25 +120,21 @@ extension NextcloudKit {
         }
     }
 
-    public func getE2EEMetadata(fileId: String,
-                                e2eToken: String?,
-                                options: NKRequestOptions = NKRequestOptions(),
-                                taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-                                completion: @escaping (_ account: String, _ e2eMetadata: String?, _ signature: String?, _ data: Data?, _ error: NKError) -> Void) {
-
+    func getE2EEMetadata(fileId: String,
+                         e2eToken: String?,
+                         options: NKRequestOptions = NKRequestOptions(),
+                         taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
+                         completion: @escaping (_ account: String, _ e2eMetadata: String?, _ signature: String?, _ data: Data?, _ error: NKError) -> Void) {
         let account = self.nkCommonInstance.account
         let urlBase = self.nkCommonInstance.urlBase
-
         var version = "v1"
         if let optionsVesion = options.version {
             version = optionsVesion
         }
         let endpoint = "ocs/v2.php/apps/end_to_end_encryption/api/\(version)/meta-data/\(fileId)"
-
         guard let url = self.nkCommonInstance.createStandardUrl(serverUrl: urlBase, endpoint: endpoint) else {
             return options.queue.async { completion(account, nil, nil, nil, .urlError) }
         }
-
         let headers = self.nkCommonInstance.getStandardHeaders(options: options)
         var parameters: [String: Any] = [:]
 
@@ -166,7 +149,6 @@ extension NextcloudKit {
             if self.nkCommonInstance.levelLog > 0 {
                 debugPrint(response)
             }
-
             switch response.result {
             case .failure(let error):
                 let error = NKError(error: error, afResponse: response, responseData: response.data)
@@ -185,30 +167,25 @@ extension NextcloudKit {
         }
     }
 
-    public func putE2EEMetadata(fileId: String,
-                                e2eToken: String,
-                                e2eMetadata: String?,
-                                signature: String?,
-                                method: String,
-                                options: NKRequestOptions = NKRequestOptions(),
-                                taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-                                completion: @escaping (_ account: String, _ metadata: String?, _ data: Data?, _ error: NKError) -> Void) {
-
+    func putE2EEMetadata(fileId: String,
+                         e2eToken: String,
+                         e2eMetadata: String?,
+                         signature: String?,
+                         method: String,
+                         options: NKRequestOptions = NKRequestOptions(),
+                         taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
+                         completion: @escaping (_ account: String, _ metadata: String?, _ data: Data?, _ error: NKError) -> Void) {
         let account = self.nkCommonInstance.account
         let urlBase = self.nkCommonInstance.urlBase
-
         var version = "v1"
         if let optionsVesion = options.version {
             version = optionsVesion
         }
         let endpoint = "ocs/v2.php/apps/end_to_end_encryption/api/\(version)/meta-data/\(fileId)"
-
         guard let url = self.nkCommonInstance.createStandardUrl(serverUrl: urlBase, endpoint: endpoint) else {
             return options.queue.async { completion(account, nil, nil, .urlError) }
         }
-
         let method = HTTPMethod(rawValue: method)
-
         var headers = self.nkCommonInstance.getStandardHeaders(options: options)
         var parameters: [String: Any] = [:]
 
@@ -229,7 +206,6 @@ extension NextcloudKit {
             if self.nkCommonInstance.levelLog > 0 {
                 debugPrint(response)
             }
-
             switch response.result {
             case .failure(let error):
                 let error = NKError(error: error, afResponse: response, responseData: response.data)
@@ -249,21 +225,18 @@ extension NextcloudKit {
 
     // MARK: -
 
-    public func getE2EECertificate(user: String? = nil,
-                                   options: NKRequestOptions = NKRequestOptions(),
-                                   taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-                                   completion: @escaping (_ account: String, _ certificate: String?, _ certificateUser: String?, _ data: Data?, _ error: NKError) -> Void) {
-
+    func getE2EECertificate(user: String? = nil,
+                            options: NKRequestOptions = NKRequestOptions(),
+                            taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
+                            completion: @escaping (_ account: String, _ certificate: String?, _ certificateUser: String?, _ data: Data?, _ error: NKError) -> Void) {
         let account = self.nkCommonInstance.account
         let urlBase = self.nkCommonInstance.urlBase
         let userId = self.nkCommonInstance.userId
-
         var version = "v1"
         if let optionsVesion = options.version {
             version = optionsVesion
         }
         var endpoint = ""
-
         if let user = user {
             guard let users = ("[\"" + user + "\"]").urlEncoded else {
                 return options.queue.async { completion(account, nil, nil, nil, .urlError) }
@@ -272,11 +245,9 @@ extension NextcloudKit {
         } else {
             endpoint = "ocs/v2.php/apps/end_to_end_encryption/api/\(version)/public-key"
         }
-
         guard let url = self.nkCommonInstance.createStandardUrl(serverUrl: urlBase, endpoint: endpoint) else {
             return options.queue.async { completion(account, nil, nil, nil, .urlError) }
         }
-
         let headers = self.nkCommonInstance.getStandardHeaders(options: options)
 
         sessionManager.request(url, method: .get, parameters: nil, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
@@ -286,7 +257,6 @@ extension NextcloudKit {
             if self.nkCommonInstance.levelLog > 0 {
                 debugPrint(response)
             }
-
             switch response.result {
             case .failure(let error):
                 let error = NKError(error: error, afResponse: response, responseData: response.data)
@@ -309,23 +279,19 @@ extension NextcloudKit {
         }
     }
 
-    public func getE2EEPrivateKey(options: NKRequestOptions = NKRequestOptions(),
-                                  taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-                                  completion: @escaping (_ account: String, _ privateKey: String?, _ data: Data?, _ error: NKError) -> Void) {
-
+    func getE2EEPrivateKey(options: NKRequestOptions = NKRequestOptions(),
+                           taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
+                           completion: @escaping (_ account: String, _ privateKey: String?, _ data: Data?, _ error: NKError) -> Void) {
         let account = self.nkCommonInstance.account
         let urlBase = self.nkCommonInstance.urlBase
-
         var version = "v1"
         if let optionsVesion = options.version {
             version = optionsVesion
         }
         let endpoint = "ocs/v2.php/apps/end_to_end_encryption/api/\(version)/private-key"
-
         guard let url = self.nkCommonInstance.createStandardUrl(serverUrl: urlBase, endpoint: endpoint) else {
             return options.queue.async { completion(account, nil, nil, .urlError) }
         }
-
         let headers = self.nkCommonInstance.getStandardHeaders(options: options)
 
         sessionManager.request(url, method: .get, parameters: nil, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
@@ -335,7 +301,6 @@ extension NextcloudKit {
             if self.nkCommonInstance.levelLog > 0 {
                 debugPrint(response)
             }
-
             switch response.result {
             case .failure(let error):
                     let error = NKError(error: error, afResponse: response, responseData: response.data)
@@ -353,23 +318,19 @@ extension NextcloudKit {
         }
     }
 
-    public func getE2EEPublicKey(options: NKRequestOptions = NKRequestOptions(),
-                                 taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-                                 completion: @escaping (_ account: String, _ publicKey: String?, _ data: Data?, _ error: NKError) -> Void) {
-
+    func getE2EEPublicKey(options: NKRequestOptions = NKRequestOptions(),
+                          taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
+                          completion: @escaping (_ account: String, _ publicKey: String?, _ data: Data?, _ error: NKError) -> Void) {
         let account = self.nkCommonInstance.account
         let urlBase = self.nkCommonInstance.urlBase
-
         var version = "v1"
         if let optionsVesion = options.version {
             version = optionsVesion
         }
         let endpoint = "ocs/v2.php/apps/end_to_end_encryption/api/\(version)/server-key"
-
         guard let url = self.nkCommonInstance.createStandardUrl(serverUrl: urlBase, endpoint: endpoint) else {
             return options.queue.async { completion(account, nil, nil, .urlError) }
         }
-
         let headers = self.nkCommonInstance.getStandardHeaders(options: options)
 
         sessionManager.request(url, method: .get, parameters: nil, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
@@ -379,7 +340,6 @@ extension NextcloudKit {
             if self.nkCommonInstance.levelLog > 0 {
                 debugPrint(response)
             }
-
             switch response.result {
             case .failure(let error):
                 let error = NKError(error: error, afResponse: response, responseData: response.data)
@@ -397,26 +357,21 @@ extension NextcloudKit {
         }
     }
 
-    public func signE2EECertificate(certificate: String,
-                                    options: NKRequestOptions = NKRequestOptions(),
-                                    taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-                                    completion: @escaping (_ account: String, _ certificate: String?, _ data: Data?, _ error: NKError) -> Void) {
-
+    func signE2EECertificate(certificate: String,
+                             options: NKRequestOptions = NKRequestOptions(),
+                             taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
+                             completion: @escaping (_ account: String, _ certificate: String?, _ data: Data?, _ error: NKError) -> Void) {
         let account = self.nkCommonInstance.account
         let urlBase = self.nkCommonInstance.urlBase
-
         var version = "v1"
         if let optionsVesion = options.version {
             version = optionsVesion
         }
         let endpoint = "ocs/v2.php/apps/end_to_end_encryption/api/\(version)/public-key"
-
         guard let url = self.nkCommonInstance.createStandardUrl(serverUrl: urlBase, endpoint: endpoint) else {
             return options.queue.async { completion(account, nil, nil, .urlError) }
         }
-
         let headers = self.nkCommonInstance.getStandardHeaders(options: options)
-
         let parameters = ["csr": certificate]
 
         sessionManager.request(url, method: .post, parameters: parameters, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
@@ -426,7 +381,6 @@ extension NextcloudKit {
             if self.nkCommonInstance.levelLog > 0 {
                 debugPrint(response)
             }
-
             switch response.result {
             case .failure(let error):
                 let error = NKError(error: error, afResponse: response, responseData: response.data)
@@ -445,26 +399,21 @@ extension NextcloudKit {
         }
     }
 
-    public func storeE2EEPrivateKey(privateKey: String,
-                                    options: NKRequestOptions = NKRequestOptions(),
-                                    taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-                                    completion: @escaping (_ account: String, _ privateKey: String?, _ data: Data?, _ error: NKError) -> Void) {
-
+    func storeE2EEPrivateKey(privateKey: String,
+                             options: NKRequestOptions = NKRequestOptions(),
+                             taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
+                             completion: @escaping (_ account: String, _ privateKey: String?, _ data: Data?, _ error: NKError) -> Void) {
         let account = self.nkCommonInstance.account
         let urlBase = self.nkCommonInstance.urlBase
-
         var version = "v1"
         if let optionsVesion = options.version {
             version = optionsVesion
         }
         let endpoint = "ocs/v2.php/apps/end_to_end_encryption/api/\(version)/private-key"
-
         guard let url = self.nkCommonInstance.createStandardUrl(serverUrl: urlBase, endpoint: endpoint) else {
             return options.queue.async { completion(account, nil, nil, .urlError) }
         }
-
         let headers = self.nkCommonInstance.getStandardHeaders(options: options)
-
         let parameters = ["privateKey": privateKey]
 
         sessionManager.request(url, method: .post, parameters: parameters, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
@@ -474,7 +423,6 @@ extension NextcloudKit {
             if self.nkCommonInstance.levelLog > 0 {
                 debugPrint(response)
             }
-
             switch response.result {
             case .failure(let error):
                 let error = NKError(error: error, afResponse: response, responseData: response.data)
@@ -492,23 +440,19 @@ extension NextcloudKit {
         }
     }
 
-    public func deleteE2EECertificate(options: NKRequestOptions = NKRequestOptions(),
-                                      taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-                                      completion: @escaping (_ account: String, _ error: NKError) -> Void) {
-
+    func deleteE2EECertificate(options: NKRequestOptions = NKRequestOptions(),
+                               taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
+                               completion: @escaping (_ account: String, _ error: NKError) -> Void) {
         let account = self.nkCommonInstance.account
         let urlBase = self.nkCommonInstance.urlBase
-
         var version = "v1"
         if let optionsVesion = options.version {
             version = optionsVesion
         }
         let endpoint = "ocs/v2.php/apps/end_to_end_encryption/api/\(version)/public-key"
-
         guard let url = self.nkCommonInstance.createStandardUrl(serverUrl: urlBase, endpoint: endpoint) else {
             return options.queue.async { completion(account, .urlError) }
         }
-
         let headers = self.nkCommonInstance.getStandardHeaders(options: options)
 
         sessionManager.request(url, method: .delete, parameters: nil, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
@@ -518,7 +462,6 @@ extension NextcloudKit {
             if self.nkCommonInstance.levelLog > 0 {
                 debugPrint(response)
             }
-
             switch response.result {
             case .failure(let error):
                 let error = NKError(error: error, afResponse: response, responseData: response.data)
@@ -529,23 +472,19 @@ extension NextcloudKit {
         }
     }
 
-    public func deleteE2EEPrivateKey(options: NKRequestOptions = NKRequestOptions(),
-                                     taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-                                     completion: @escaping (_ account: String, _ error: NKError) -> Void) {
-
+    func deleteE2EEPrivateKey(options: NKRequestOptions = NKRequestOptions(),
+                              taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
+                              completion: @escaping (_ account: String, _ error: NKError) -> Void) {
         let account = self.nkCommonInstance.account
         let urlBase = self.nkCommonInstance.urlBase
-
         var version = "v1"
         if let optionsVesion = options.version {
             version = optionsVesion
         }
         let endpoint = "ocs/v2.php/apps/end_to_end_encryption/api/\(version)/private-key"
-
         guard let url = self.nkCommonInstance.createStandardUrl(serverUrl: urlBase, endpoint: endpoint) else {
             return options.queue.async { completion(account, .urlError) }
         }
-
         let headers = self.nkCommonInstance.getStandardHeaders(options: options)
 
         sessionManager.request(url, method: .delete, parameters: nil, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
@@ -555,7 +494,6 @@ extension NextcloudKit {
             if self.nkCommonInstance.levelLog > 0 {
                 debugPrint(response)
             }
-
             switch response.result {
             case .failure(let error):
                 let error = NKError(error: error, afResponse: response, responseData: response.data)

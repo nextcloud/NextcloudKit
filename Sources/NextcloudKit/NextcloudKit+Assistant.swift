@@ -25,10 +25,10 @@ import Foundation
 import Alamofire
 import SwiftyJSON
 
-extension NextcloudKit {
-    public func textProcessingGetTypes(options: NKRequestOptions = NKRequestOptions(),
-                                       taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-                                       completion: @escaping (_ account: String, _ types: [NKTextProcessingTaskType]?, _ data: Data?, _ error: NKError) -> Void) {
+public extension NextcloudKit {
+    func textProcessingGetTypes(options: NKRequestOptions = NKRequestOptions(),
+                                taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
+                                completion: @escaping (_ account: String, _ types: [NKTextProcessingTaskType]?, _ data: Data?, _ error: NKError) -> Void) {
         let account = self.nkCommonInstance.account
         let urlBase = self.nkCommonInstance.urlBase
         let endpoint = "ocs/v2.php/textprocessing/tasktypes"
@@ -62,13 +62,13 @@ extension NextcloudKit {
         }
     }
 
-    public func textProcessingSchedule(input: String,
-                                       typeId: String,
-                                       appId: String = "assistant",
-                                       identifier: String,
-                                       options: NKRequestOptions = NKRequestOptions(),
-                                       taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-                                       completion: @escaping (_ account: String, _ task: NKTextProcessingTask?, _ data: Data?, _ error: NKError) -> Void) {
+    func textProcessingSchedule(input: String,
+                                typeId: String,
+                                appId: String = "assistant",
+                                identifier: String,
+                                options: NKRequestOptions = NKRequestOptions(),
+                                taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
+                                completion: @escaping (_ account: String, _ task: NKTextProcessingTask?, _ data: Data?, _ error: NKError) -> Void) {
         let account = self.nkCommonInstance.account
         let urlBase = self.nkCommonInstance.urlBase
         let endpoint = "/ocs/v2.php/textprocessing/schedule"
@@ -103,10 +103,10 @@ extension NextcloudKit {
         }
     }
 
-    public func textProcessingGetTask(taskId: Int,
-                                      options: NKRequestOptions = NKRequestOptions(),
-                                      taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-                                      completion: @escaping (_ account: String, _ task: NKTextProcessingTask?, _ data: Data?, _ error: NKError) -> Void) {
+    func textProcessingGetTask(taskId: Int,
+                               options: NKRequestOptions = NKRequestOptions(),
+                               taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
+                               completion: @escaping (_ account: String, _ task: NKTextProcessingTask?, _ data: Data?, _ error: NKError) -> Void) {
         let account = self.nkCommonInstance.account
         let urlBase = self.nkCommonInstance.urlBase
         let endpoint = "/ocs/v2.php/textprocessing/task/\(taskId)"
@@ -140,10 +140,10 @@ extension NextcloudKit {
         }
     }
 
-    public func textProcessingDeleteTask(taskId: Int,
-                                         options: NKRequestOptions = NKRequestOptions(),
-                                         taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-                                         completion: @escaping (_ account: String, _ task: NKTextProcessingTask?, _ data: Data?, _ error: NKError) -> Void) {
+    func textProcessingDeleteTask(taskId: Int,
+                                  options: NKRequestOptions = NKRequestOptions(),
+                                  taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
+                                  completion: @escaping (_ account: String, _ task: NKTextProcessingTask?, _ data: Data?, _ error: NKError) -> Void) {
         let account = self.nkCommonInstance.account
         let urlBase = self.nkCommonInstance.urlBase
         let endpoint = "/ocs/v2.php/textprocessing/task/\(taskId)"
@@ -177,10 +177,10 @@ extension NextcloudKit {
         }
     }
 
-    public func textProcessingTaskList(appId: String,
-                                       options: NKRequestOptions = NKRequestOptions(),
-                                       taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-                                       completion: @escaping (_ account: String, _ task: [NKTextProcessingTask]?, _ data: Data?, _ error: NKError) -> Void) {
+    func textProcessingTaskList(appId: String,
+                                options: NKRequestOptions = NKRequestOptions(),
+                                taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
+                                completion: @escaping (_ account: String, _ task: [NKTextProcessingTask]?, _ data: Data?, _ error: NKError) -> Void) {
         let account = self.nkCommonInstance.account
         let urlBase = self.nkCommonInstance.urlBase
         let endpoint = "/ocs/v2.php/textprocessing/tasks/app/\(appId)"
@@ -220,7 +220,7 @@ public class NKTextProcessingTaskType {
     public var name: String?
     public var description: String?
 
-    public init(id: String? = nil, name: String? = nil, description: String? = nil) {
+    init(id: String? = nil, name: String? = nil, description: String? = nil) {
         self.id = id
         self.name = name
         self.description = description
@@ -249,7 +249,7 @@ public class NKTextProcessingTask {
     public var identifier: String?
     public var completionExpectedAt: Double?
 
-    public init(id: Int? = nil, type: String? = nil, status: Int? = nil, userId: String? = nil, appId: String? = nil, input: String? = nil, output: String? = nil, identifier: String? = nil, completionExpectedAt: Double? = nil) {
+    init(id: Int? = nil, type: String? = nil, status: Int? = nil, userId: String? = nil, appId: String? = nil, input: String? = nil, output: String? = nil, identifier: String? = nil, completionExpectedAt: Double? = nil) {
         self.id = id
         self.type = type
         self.status = status
