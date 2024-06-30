@@ -33,10 +33,10 @@ public class NKBackground: NSObject, URLSessionTaskDelegate, URLSessionDelegate,
 
     // MARK: - Download
 
-    func download(serverUrlFileName: Any,
-                  fileNameLocalPath: String,
-                  taskDescription: String? = nil,
-                  session: URLSession) -> URLSessionDownloadTask? {
+    public func download(serverUrlFileName: Any,
+                         fileNameLocalPath: String,
+                         taskDescription: String? = nil,
+                         session: URLSession) -> URLSessionDownloadTask? {
         var url: URL?
         if serverUrlFileName is URL {
             url = serverUrlFileName as? URL
@@ -64,12 +64,12 @@ public class NKBackground: NSObject, URLSessionTaskDelegate, URLSessionDelegate,
 
     // MARK: - Upload
 
-    func upload(serverUrlFileName: Any,
-                fileNameLocalPath: String,
-                dateCreationFile: Date?,
-                dateModificationFile: Date?,
-                taskDescription: String? = nil,
-                session: URLSession) -> URLSessionUploadTask? {
+    public func upload(serverUrlFileName: Any,
+                       fileNameLocalPath: String,
+                       dateCreationFile: Date?,
+                       dateModificationFile: Date?,
+                       taskDescription: String? = nil,
+                       session: URLSession) -> URLSessionUploadTask? {
         var url: URL?
         if serverUrlFileName is URL {
             url = serverUrlFileName as? URL
