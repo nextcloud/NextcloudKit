@@ -220,13 +220,13 @@ public class NKTextProcessingTaskType {
     public var name: String?
     public var description: String?
 
-    init(id: String? = nil, name: String? = nil, description: String? = nil) {
+    public init(id: String? = nil, name: String? = nil, description: String? = nil) {
         self.id = id
         self.name = name
         self.description = description
     }
 
-    init?(json: JSON) {
+    public init?(json: JSON) {
         self.id = json["id"].string
         self.name = json["name"].string
         self.description = json["description"].string
@@ -249,7 +249,7 @@ public class NKTextProcessingTask {
     public var identifier: String?
     public var completionExpectedAt: Double?
 
-    init(id: Int? = nil, type: String? = nil, status: Int? = nil, userId: String? = nil, appId: String? = nil, input: String? = nil, output: String? = nil, identifier: String? = nil, completionExpectedAt: Double? = nil) {
+    public init(id: Int? = nil, type: String? = nil, status: Int? = nil, userId: String? = nil, appId: String? = nil, input: String? = nil, output: String? = nil, identifier: String? = nil, completionExpectedAt: Double? = nil) {
         self.id = id
         self.type = type
         self.status = status
@@ -261,7 +261,7 @@ public class NKTextProcessingTask {
         self.completionExpectedAt = completionExpectedAt
     }
 
-    init?(json: JSON) {
+    public init?(json: JSON) {
         self.id = json["id"].int
         self.type = json["type"].string
         self.status = json["status"].int
