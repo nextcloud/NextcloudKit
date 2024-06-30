@@ -492,7 +492,7 @@ public extension NextcloudKit {
         share.shareWith = json["share_with"].stringValue
         share.shareWithDisplayname = json["share_with_displayname"].stringValue
         if let stime = json["stime"].double {
-            let date = Date(timeIntervalSince1970: stime) as NSDate
+            let date = Date(timeIntervalSince1970: stime)
             share.date = date
         }
         share.storage = json["storage"].intValue
@@ -502,7 +502,7 @@ public extension NextcloudKit {
         share.uidOwner = json["uid_owner"].stringValue
         share.url = json["url"].stringValue
         if let clearAt = json["status"]["clearAt"].double {
-            let date = Date(timeIntervalSince1970: clearAt) as NSDate
+            let date = Date(timeIntervalSince1970: clearAt)
             share.userClearAt = date
         }
         share.userIcon = json["status"]["icon"].stringValue
@@ -518,7 +518,7 @@ public class NKShare: NSObject {
     public var account = ""
     public var canEdit: Bool = false
     public var canDelete: Bool = false
-    public var date: NSDate?
+    public var date: Date?
     public var displaynameFileOwner = ""
     public var displaynameOwner = ""
     public var expirationDate: Date?
@@ -547,7 +547,7 @@ public class NKShare: NSObject {
     public var uidFileOwner = ""
     public var uidOwner = ""
     public var url = ""
-    public var userClearAt: NSDate?
+    public var userClearAt: Date?
     public var userIcon = ""
     public var userMessage = ""
     public var userStatus = ""

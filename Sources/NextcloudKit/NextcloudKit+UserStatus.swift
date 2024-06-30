@@ -29,7 +29,7 @@ public extension NextcloudKit {
     func getUserStatus(userId: String? = nil,
                        options: NKRequestOptions = NKRequestOptions(),
                        taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-                       completion: @escaping (_ account: String, _ clearAt: NSDate?, _ icon: String?, _ message: String?, _ messageId: String?, _ messageIsPredefined: Bool, _ status: String?, _ statusIsUserDefined: Bool, _ userId: String?, _ data: Data?, _ error: NKError) -> Void) {
+                       completion: @escaping (_ account: String, _ clearAt: Date?, _ icon: String?, _ message: String?, _ messageId: String?, _ messageIsPredefined: Bool, _ status: String?, _ statusIsUserDefined: Bool, _ userId: String?, _ data: Data?, _ error: NKError) -> Void) {
         let account = self.nkCommonInstance.account
         let urlBase = self.nkCommonInstance.urlBase
         var endpoint = "ocs/v2.php/apps/user_status/api/v1/user_status"
@@ -57,9 +57,9 @@ public extension NextcloudKit {
                 let statusCode = json["ocs"]["meta"]["statuscode"].int ?? NKError.internalError
                 if statusCode == 200 {
 
-                    var clearAt: NSDate?
+                    var clearAt: Date?
                     if let clearAtDouble = json["ocs"]["data"]["clearAt"].double {
-                        clearAt = Date(timeIntervalSince1970: clearAtDouble) as NSDate
+                        clearAt = Date(timeIntervalSince1970: clearAtDouble)
                     }
                     let icon = json["ocs"]["data"]["icon"].string
                     let message = json["ocs"]["data"]["message"].string
