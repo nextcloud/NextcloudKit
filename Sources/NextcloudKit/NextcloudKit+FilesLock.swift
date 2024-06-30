@@ -26,23 +26,18 @@ import Foundation
 import Alamofire
 import SwiftyJSON
 
-extension NextcloudKit {
-    // available in NC >= 24
-    public func lockUnlockFile(serverUrlFileName: String,
-                               shouldLock: Bool,
-                               options: NKRequestOptions = NKRequestOptions(),
-                               taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-                               completion: @escaping (_ account: String, _ error: NKError) -> Void) {
-
+public extension NextcloudKit {
+    func lockUnlockFile(serverUrlFileName: String,
+                        shouldLock: Bool,
+                        options: NKRequestOptions = NKRequestOptions(),
+                        taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
+                        completion: @escaping (_ account: String, _ error: NKError) -> Void) {
         let account = self.nkCommonInstance.account
-
         guard let url = serverUrlFileName.encodedToUrl
         else {
             return options.queue.async { completion(account, .urlError) }
         }
-
         let method = HTTPMethod(rawValue: shouldLock ? "LOCK" : "UNLOCK")
-
         var headers = self.nkCommonInstance.getStandardHeaders(options: options)
         headers.update(name: "X-User-Lock", value: "1")
 
@@ -53,7 +48,6 @@ extension NextcloudKit {
             if self.nkCommonInstance.levelLog > 0 {
                 debugPrint(response)
             }
-
             switch response.result {
             case .failure(let error):
                 let error = NKError(error: error, afResponse: response, responseData: response.data)

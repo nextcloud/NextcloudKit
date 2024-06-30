@@ -25,29 +25,26 @@ import Foundation
 import Alamofire
 import SwiftyJSON
 
-extension NextcloudKit {
+public extension NextcloudKit {
     // MARK: - App Password
-    public func getAppPassword(serverUrl: String,
-                               username: String,
-                               password: String,
-                               userAgent: String? = nil,
-                               options: NKRequestOptions = NKRequestOptions(),
-                               taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-                               completion: @escaping (_ token: String?, _ data: Data?, _ error: NKError) -> Void) {
-
+    func getAppPassword(serverUrl: String,
+                        username: String,
+                        password: String,
+                        userAgent: String? = nil,
+                        options: NKRequestOptions = NKRequestOptions(),
+                        taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
+                        completion: @escaping (_ token: String?, _ data: Data?, _ error: NKError) -> Void) {
         let endpoint = "ocs/v2.php/core/getapppassword"
-
         guard let url = self.nkCommonInstance.createStandardUrl(serverUrl: serverUrl, endpoint: endpoint) else {
             return options.queue.async { completion(nil, nil, .urlError) }
         }
-
         var headers: HTTPHeaders = [.authorization(username: username, password: password)]
         if let userAgent = userAgent {
             headers.update(.userAgent(userAgent))
         }
         headers.update(name: "OCS-APIRequest", value: "true")
-
         var urlRequest: URLRequest
+
         do {
             try urlRequest = URLRequest(url: url, method: HTTPMethod(rawValue: "GET"), headers: headers)
         } catch {
@@ -61,7 +58,6 @@ extension NextcloudKit {
             if self.nkCommonInstance.levelLog > 0 {
                 debugPrint(response)
             }
-
             switch response.result {
             case .failure(let error):
                 let error = NKError(error: error, afResponse: response, responseData: response.data)
@@ -77,27 +73,24 @@ extension NextcloudKit {
         }
     }
 
-    public func deleteAppPassword(serverUrl: String,
-                                  username: String,
-                                  password: String,
-                                  userAgent: String? = nil,
-                                  options: NKRequestOptions = NKRequestOptions(),
-                                  taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-                                  completion: @escaping (_ data: Data?, _ error: NKError) -> Void) {
-
+    func deleteAppPassword(serverUrl: String,
+                           username: String,
+                           password: String,
+                           userAgent: String? = nil,
+                           options: NKRequestOptions = NKRequestOptions(),
+                           taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
+                           completion: @escaping (_ data: Data?, _ error: NKError) -> Void) {
         let endpoint = "ocs/v2.php/core/apppassword"
-
         guard let url = self.nkCommonInstance.createStandardUrl(serverUrl: serverUrl, endpoint: endpoint) else {
             return options.queue.async { completion(nil, .urlError) }
         }
-
         var headers: HTTPHeaders = [.authorization(username: username, password: password)]
         if let userAgent = userAgent {
             headers.update(.userAgent(userAgent))
         }
         headers.update(name: "OCS-APIRequest", value: "true")
-
         var urlRequest: URLRequest
+
         do {
             try urlRequest = URLRequest(url: url, method: HTTPMethod(rawValue: "DELETE"), headers: headers)
         } catch {
@@ -111,7 +104,6 @@ extension NextcloudKit {
             if self.nkCommonInstance.levelLog > 0 {
                 debugPrint(response)
             }
-
             switch response.result {
             case .failure(let error):
                 let error = NKError(error: error, afResponse: response, responseData: response.data)
@@ -124,20 +116,16 @@ extension NextcloudKit {
 
     // MARK: - Login Flow V2
 
-    public func getLoginFlowV2(serverUrl: String,
-                               userAgent: String? = nil,
-                               options: NKRequestOptions = NKRequestOptions(),
-                               taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-                               completion: @escaping (_ token: String?, _ endpoint: String?, _ login: String?, _ data: Data?, _ error: NKError) -> Void) {
-
+    func getLoginFlowV2(serverUrl: String,
+                        options: NKRequestOptions = NKRequestOptions(),
+                        taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
+                        completion: @escaping (_ token: String?, _ endpoint: String?, _ login: String?, _ data: Data?, _ error: NKError) -> Void) {
         let endpoint = "index.php/login/v2"
-
         guard let url = self.nkCommonInstance.createStandardUrl(serverUrl: serverUrl, endpoint: endpoint) else {
             return options.queue.async { completion(nil, nil, nil, nil, .urlError) }
         }
-
         var headers: HTTPHeaders?
-        if let userAgent = userAgent {
+        if let userAgent = options.customUserAgent {
             headers = [HTTPHeader.userAgent(userAgent)]
         }
 
@@ -148,7 +136,6 @@ extension NextcloudKit {
             if self.nkCommonInstance.levelLog > 0 {
                 debugPrint(response)
             }
-
             switch response.result {
             case .failure(let error):
                 let error = NKError(error: error, afResponse: response, responseData: response.data)
@@ -165,21 +152,17 @@ extension NextcloudKit {
         }
     }
 
-    public func getLoginFlowV2Poll(token: String,
-                                   endpoint: String,
-                                   userAgent: String? = nil,
-                                   options: NKRequestOptions = NKRequestOptions(),
-                                   taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-                                   completion: @escaping (_ server: String?, _ loginName: String?, _ appPassword: String?, _ data: Data?, _ error: NKError) -> Void) {
-
+    func getLoginFlowV2Poll(token: String,
+                            endpoint: String,
+                            options: NKRequestOptions = NKRequestOptions(),
+                            taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
+                            completion: @escaping (_ server: String?, _ loginName: String?, _ appPassword: String?, _ data: Data?, _ error: NKError) -> Void) {
         let serverUrl = endpoint + "?token=" + token
-
         guard let url = serverUrl.asUrl else {
             return options.queue.async { completion(nil, nil, nil, nil, .urlError) }
         }
-
         var headers: HTTPHeaders?
-        if let userAgent = userAgent {
+        if let userAgent = options.customUserAgent {
             headers = [HTTPHeader.userAgent(userAgent)]
         }
 
@@ -190,14 +173,12 @@ extension NextcloudKit {
             if self.nkCommonInstance.levelLog > 0 {
                 debugPrint(response)
             }
-
             switch response.result {
             case .failure(let error):
                 let error = NKError(error: error, afResponse: response, responseData: response.data)
                 options.queue.async { completion(nil, nil, nil, nil, error) }
             case .success(let jsonData):
                 let json = JSON(jsonData)
-
                 let server = json["server"].string
                 let loginName = json["loginName"].string
                 let appPassword = json["appPassword"].string

@@ -25,21 +25,17 @@ import Foundation
 import Alamofire
 import SwiftyJSON
 
-extension NextcloudKit {
-    public func getGroupfolders(options: NKRequestOptions = NKRequestOptions(),
-                                taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-                                completion: @escaping (_ account: String, _ results: [NKGroupfolders]?, _ data: Data?, _ error: NKError) -> Void) {
-
+public extension NextcloudKit {
+    func getGroupfolders(options: NKRequestOptions = NKRequestOptions(),
+                         taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
+                         completion: @escaping (_ account: String, _ results: [NKGroupfolders]?, _ data: Data?, _ error: NKError) -> Void) {
         let account = self.nkCommonInstance.account
         let urlBase = self.nkCommonInstance.urlBase
-
         let endpoint = "index.php/apps/groupfolders/folders?applicable=1"
-
         guard let url = self.nkCommonInstance.createStandardUrl(serverUrl: urlBase, endpoint: endpoint)
         else {
             return options.queue.async { completion(account, nil, nil, .urlError) }
         }
-
         let headers = self.nkCommonInstance.getStandardHeaders(options: options)
 
         sessionManager.request(url, method: .get, parameters: nil, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
@@ -49,7 +45,6 @@ extension NextcloudKit {
             if self.nkCommonInstance.levelLog > 0 {
                 debugPrint(response)
             }
-
             switch response.result {
             case .failure(let error):
                 let error = NKError(error: error, afResponse: response, responseData: response.data)
@@ -84,7 +79,7 @@ public class NKGroupfolders: NSObject {
     public let manage: Data?
     public let groups: [String: Any]?
 
-    internal init?(json: JSON) {
+    init?(json: JSON) {
         guard let id = json["id"].int,
               let mountPoint = json["mount_point"].string,
               let acl = json["acl"].bool,

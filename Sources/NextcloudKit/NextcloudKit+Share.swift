@@ -74,20 +74,17 @@ public class NKShareParameter: NSObject {
     }
 }
 
-extension NextcloudKit {
-    public func readShares(parameters: NKShareParameter,
-                           options: NKRequestOptions = NKRequestOptions(),
-                           taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-                           completion: @escaping (_ account: String, _ shares: [NKShare]?, _ data: Data?, _ error: NKError) -> Void) {
-
+public extension NextcloudKit {
+    func readShares(parameters: NKShareParameter,
+                    options: NKRequestOptions = NKRequestOptions(),
+                    taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
+                    completion: @escaping (_ account: String, _ shares: [NKShare]?, _ data: Data?, _ error: NKError) -> Void) {
         let account = self.nkCommonInstance.account
         let urlBase = self.nkCommonInstance.urlBase
-
         guard let url = self.nkCommonInstance.createStandardUrl(serverUrl: urlBase, endpoint: parameters.endpoint)
         else {
             return options.queue.async { completion(account, nil, nil, .urlError) }
         }
-
         let headers = self.nkCommonInstance.getStandardHeaders(options: options)
 
         sessionManager.request(url, method: .get, parameters: parameters.queryParameters, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
@@ -97,7 +94,6 @@ extension NextcloudKit {
         if self.nkCommonInstance.levelLog > 0 {
                 debugPrint(response)
             }
-
             switch response.result {
             case .failure(let error):
                 let error = NKError(error: error, afResponse: response, responseData: response.data)
@@ -128,31 +124,24 @@ extension NextcloudKit {
     * @param perPage        The number of items per page (default 200)
     * @param lookup         Default false, for global search use true
     */
-
-    public func searchSharees(search: String = "",
-                              page: Int = 1, perPage: Int = 200,
-                              itemType: String = "file",
-                              lookup: Bool = false,
-                              options: NKRequestOptions = NKRequestOptions(),
-                              taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-                              completion: @escaping (_ account: String, _ sharees: [NKSharee]?, _ data: Data?, _ error: NKError) -> Void) {
-
+    func searchSharees(search: String = "",
+                       page: Int = 1, perPage: Int = 200,
+                       itemType: String = "file",
+                       lookup: Bool = false,
+                       options: NKRequestOptions = NKRequestOptions(),
+                       taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
+                       completion: @escaping (_ account: String, _ sharees: [NKSharee]?, _ data: Data?, _ error: NKError) -> Void) {
         let account = self.nkCommonInstance.account
         let urlBase = self.nkCommonInstance.urlBase
-
         let endpoint = "ocs/v2.php/apps/files_sharing/api/v1/sharees"
-
         var lookupString = "false"
         if lookup {
             lookupString = "true"
         }
-
         guard let url = self.nkCommonInstance.createStandardUrl(serverUrl: urlBase, endpoint: endpoint) else {
             return options.queue.async { completion(account, nil, nil, .urlError) }
         }
-
         let headers = self.nkCommonInstance.getStandardHeaders(options: options)
-
         let parameters = [
             "search": search,
             "page": String(page),
@@ -168,7 +157,6 @@ extension NextcloudKit {
             if self.nkCommonInstance.levelLog > 0 {
                 debugPrint(response)
             }
-
             switch response.result {
             case .failure(let error):
                 let error = NKError(error: error, afResponse: response, responseData: response.data)
@@ -253,15 +241,14 @@ extension NextcloudKit {
     * @param attributes     There is currently only one share attribute “download” from the scope “permissions”. This attribute is only valid for user and group shares, not for public link shares.
     */
 
-    public func createShareLink(path: String,
-                                hideDownload: Bool = false,
-                                publicUpload: Bool = false,
-                                password: String? = nil,
-                                permissions: Int = 1,
-                                options: NKRequestOptions = NKRequestOptions(),
-                                taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-                                completion: @escaping (_ account: String, _ share: NKShare?, _ data: Data?, _ error: NKError) -> Void) {
-
+    func createShareLink(path: String,
+                         hideDownload: Bool = false,
+                         publicUpload: Bool = false,
+                         password: String? = nil,
+                         permissions: Int = 1,
+                         options: NKRequestOptions = NKRequestOptions(),
+                         taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
+                         completion: @escaping (_ account: String, _ share: NKShare?, _ data: Data?, _ error: NKError) -> Void) {
         createShare(path: path, shareType: 3, shareWith: nil, publicUpload: publicUpload, hideDownload: hideDownload, password: password, permissions: permissions, options: options) { task in
             task.taskDescription = options.taskDescription
             taskHandler(task)
@@ -270,17 +257,16 @@ extension NextcloudKit {
         }
     }
 
-    public func createShare(path: String,
-                            shareType: Int,
-                            shareWith: String,
-                            password: String? = nil,
-                            note: String? = nil,
-                            permissions: Int = 1,
-                            options: NKRequestOptions = NKRequestOptions(),
-                            attributes: String? = nil,
-                            taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-                            completion: @escaping (_ account: String, _ share: NKShare?, _ data: Data?, _ error: NKError) -> Void) {
-
+    func createShare(path: String,
+                     shareType: Int,
+                     shareWith: String,
+                     password: String? = nil,
+                     note: String? = nil,
+                     permissions: Int = 1,
+                     attributes: String? = nil,
+                     options: NKRequestOptions = NKRequestOptions(),
+                     taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
+                     completion: @escaping (_ account: String, _ share: NKShare?, _ data: Data?, _ error: NKError) -> Void) {
         createShare(path: path, shareType: shareType, shareWith: shareWith, publicUpload: false, note: note, hideDownload: false, password: password, permissions: permissions, attributes: attributes, options: options) { task in
             task.taskDescription = options.taskDescription
             taskHandler(task)
@@ -304,15 +290,11 @@ extension NextcloudKit {
 
         let account = self.nkCommonInstance.account
         let urlBase = self.nkCommonInstance.urlBase
-
         let endpoint = "ocs/v2.php/apps/files_sharing/api/v1/shares"
-
         guard let url = self.nkCommonInstance.createStandardUrl(serverUrl: urlBase, endpoint: endpoint) else {
             return options.queue.async { completion(account, nil, nil, .urlError) }
         }
-
         let headers = self.nkCommonInstance.getStandardHeaders(options: options)
-
         var parameters = [
             "path": path,
             "shareType": String(shareType),
@@ -344,7 +326,6 @@ extension NextcloudKit {
             if self.nkCommonInstance.levelLog > 0 {
                 debugPrint(response)
             }
-
             switch response.result {
             case .failure(let error):
                 let error = NKError(error: error, afResponse: response, responseData: response.data)
@@ -381,30 +362,25 @@ extension NextcloudKit {
     * @param attributes     There is currently only one share attribute “download” from the scope “permissions”. This attribute is only valid for user and group shares, not for public link shares.
     */
 
-    public func updateShare(idShare: Int,
-                            password: String? = nil,
-                            expireDate: String? = nil,
-                            permissions: Int = 1,
-                            publicUpload: Bool = false,
-                            note: String? = nil,
-                            label: String? = nil,
-                            hideDownload: Bool,
-                            attributes: String? = nil,
-                            options: NKRequestOptions = NKRequestOptions(),
-                            taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-                            completion: @escaping (_ account: String, _ share: NKShare?, _ data: Data?, _ error: NKError) -> Void) {
-
+    func updateShare(idShare: Int,
+                     password: String? = nil,
+                     expireDate: String? = nil,
+                     permissions: Int = 1,
+                     publicUpload: Bool = false,
+                     note: String? = nil,
+                     label: String? = nil,
+                     hideDownload: Bool,
+                     attributes: String? = nil,
+                     options: NKRequestOptions = NKRequestOptions(),
+                     taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
+                     completion: @escaping (_ account: String, _ share: NKShare?, _ data: Data?, _ error: NKError) -> Void) {
         let account = self.nkCommonInstance.account
         let urlBase = self.nkCommonInstance.urlBase
-
         let endpoint = "ocs/v2.php/apps/files_sharing/api/v1/shares/\(idShare)"
-
         guard let url = self.nkCommonInstance.createStandardUrl(serverUrl: urlBase, endpoint: endpoint) else {
             return options.queue.async { completion(account, nil, nil, .urlError) }
         }
-
         let headers = self.nkCommonInstance.getStandardHeaders(options: options)
-
         var parameters = [
             "permissions": String(permissions)
         ]
@@ -435,7 +411,6 @@ extension NextcloudKit {
             if self.nkCommonInstance.levelLog > 0 {
                 debugPrint(response)
             }
-
             switch response.result {
             case .failure(let error):
                 let error = NKError(error: error, afResponse: response, responseData: response.data)
@@ -455,21 +430,16 @@ extension NextcloudKit {
     /*
     * @param idShare        Identifier of the share to update
     */
-
-    public func deleteShare(idShare: Int,
-                            options: NKRequestOptions = NKRequestOptions(),
-                            taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-                            completion: @escaping (_ account: String, _ error: NKError) -> Void) {
-
+    func deleteShare(idShare: Int,
+                     options: NKRequestOptions = NKRequestOptions(),
+                     taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
+                     completion: @escaping (_ account: String, _ error: NKError) -> Void) {
         let account = self.nkCommonInstance.account
         let urlBase = self.nkCommonInstance.urlBase
-
         let endpoint = "ocs/v2.php/apps/files_sharing/api/v1/shares/\(idShare)"
-
         guard let url = self.nkCommonInstance.createStandardUrl(serverUrl: urlBase, endpoint: endpoint) else {
             return options.queue.async { completion(account, .urlError) }
         }
-
         let headers = self.nkCommonInstance.getStandardHeaders(options: options)
 
         sessionManager.request(url, method: .delete, parameters: nil, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
@@ -479,7 +449,6 @@ extension NextcloudKit {
             if self.nkCommonInstance.levelLog > 0 {
                 debugPrint(response)
             }
-
             switch response.result {
             case .failure(let error):
                 let error = NKError(error: error, afResponse: response, responseData: response.data)
