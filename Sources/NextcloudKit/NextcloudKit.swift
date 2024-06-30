@@ -34,7 +34,6 @@ open class NextcloudKit: SessionDelegate {
         let instance = NextcloudKit()
         return instance
     }()
-
     internal lazy var internalSessionManager: Alamofire.Session = {
         return Alamofire.Session(configuration: nkCommonInstance.sessionConfiguration,
                                  delegate: self,
@@ -48,16 +47,13 @@ open class NextcloudKit: SessionDelegate {
                                  cachedResponseHandler: nil,
                                  eventMonitors: [AlamofireLogger(nkCommonInstance: self.nkCommonInstance)])
     }()
-
     public var sessionManager: Alamofire.Session {
         return internalSessionManager
     }
-
     #if !os(watchOS)
     private let reachabilityManager = Alamofire.NetworkReachabilityManager()
     #endif
     // private var cookies: [String:[HTTPCookie]] = [:]
-
     public let nkCommonInstance = NKCommon()
 
     override public init(fileManager: FileManager = .default) {
