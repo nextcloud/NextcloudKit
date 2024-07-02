@@ -23,9 +23,7 @@
 
 import Foundation
 
-@objcMembers
 public class NKRequestOptions: NSObject {
-
     var endpoint: String?
     var version: String?
     var customHeader: [String: String]?
@@ -34,6 +32,7 @@ public class NKRequestOptions: NSObject {
     var e2eToken: String?
     var timeout: TimeInterval
     var taskDescription: String?
+    var removeProperties: [String]
     var queue: DispatchQueue
 
     public init(endpoint: String? = nil, 
@@ -44,6 +43,7 @@ public class NKRequestOptions: NSObject {
                 e2eToken: String? = nil,
                 timeout: TimeInterval = 60,
                 taskDescription: String? = nil,
+                removeProperties: [String] = [],
                 queue: DispatchQueue = .main) {
 
         self.endpoint = endpoint
@@ -54,6 +54,7 @@ public class NKRequestOptions: NSObject {
         self.e2eToken = e2eToken
         self.timeout = timeout
         self.taskDescription = taskDescription
+        self.removeProperties = removeProperties
         self.queue = queue
     }
 }

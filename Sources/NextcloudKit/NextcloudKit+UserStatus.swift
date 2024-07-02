@@ -25,25 +25,20 @@ import Foundation
 import Alamofire
 import SwiftyJSON
 
-extension NextcloudKit {
-
-    @objc public func getUserStatus(userId: String? = nil,
-                                    options: NKRequestOptions = NKRequestOptions(),
-                                    taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-                                    completion: @escaping (_ account: String, _ clearAt: NSDate?, _ icon: String?, _ message: String?, _ messageId: String?, _ messageIsPredefined: Bool, _ status: String?, _ statusIsUserDefined: Bool, _ userId: String?, _ data: Data?, _ error: NKError) -> Void) {
-
+public extension NextcloudKit {
+    func getUserStatus(userId: String? = nil,
+                       options: NKRequestOptions = NKRequestOptions(),
+                       taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
+                       completion: @escaping (_ account: String, _ clearAt: Date?, _ icon: String?, _ message: String?, _ messageId: String?, _ messageIsPredefined: Bool, _ status: String?, _ statusIsUserDefined: Bool, _ userId: String?, _ data: Data?, _ error: NKError) -> Void) {
         let account = self.nkCommonInstance.account
         let urlBase = self.nkCommonInstance.urlBase
-
         var endpoint = "ocs/v2.php/apps/user_status/api/v1/user_status"
         if let userId = userId {
             endpoint = "ocs/v2.php/apps/user_status/api/v1/user_status/\(userId)"
         }
-
         guard let url = self.nkCommonInstance.createStandardUrl(serverUrl: urlBase, endpoint: endpoint) else {
             return options.queue.async { completion(account, nil, nil, nil, nil, false, nil, false, nil, nil, .urlError) }
         }
-
         let headers = self.nkCommonInstance.getStandardHeaders(options: options)
 
         sessionManager.request(url, method: .get, parameters: nil, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
@@ -53,7 +48,6 @@ extension NextcloudKit {
             if self.nkCommonInstance.levelLog > 0 {
                 debugPrint(response)
             }
-
             switch response.result {
             case .failure(let error):
                 let error = NKError(error: error, afResponse: response, responseData: response.data)
@@ -63,9 +57,9 @@ extension NextcloudKit {
                 let statusCode = json["ocs"]["meta"]["statuscode"].int ?? NKError.internalError
                 if statusCode == 200 {
 
-                    var clearAt: NSDate?
+                    var clearAt: Date?
                     if let clearAtDouble = json["ocs"]["data"]["clearAt"].double {
-                        clearAt = Date(timeIntervalSince1970: clearAtDouble) as NSDate
+                        clearAt = Date(timeIntervalSince1970: clearAtDouble)
                     }
                     let icon = json["ocs"]["data"]["icon"].string
                     let message = json["ocs"]["data"]["message"].string
@@ -83,22 +77,17 @@ extension NextcloudKit {
         }
     }
 
-    @objc public func setUserStatus(status: String,
-                                    options: NKRequestOptions = NKRequestOptions(),
-                                    taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-                                    completion: @escaping (_ account: String, _ error: NKError) -> Void) {
-
+    func setUserStatus(status: String,
+                       options: NKRequestOptions = NKRequestOptions(),
+                       taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
+                       completion: @escaping (_ account: String, _ error: NKError) -> Void) {
         let account = self.nkCommonInstance.account
         let urlBase = self.nkCommonInstance.urlBase
-
         let endpoint = "ocs/v2.php/apps/user_status/api/v1/user_status/status"
-
         guard let url = self.nkCommonInstance.createStandardUrl(serverUrl: urlBase, endpoint: endpoint) else {
             return options.queue.async { completion(account, .urlError) }
         }
-
         let headers = self.nkCommonInstance.getStandardHeaders(options: options)
-
         let parameters = [
             "statusType": String(status)
         ]
@@ -110,7 +99,6 @@ extension NextcloudKit {
             if self.nkCommonInstance.levelLog > 0 {
                 debugPrint(response)
             }
-
             switch response.result {
             case .failure(let error):
                 let error = NKError(error: error, afResponse: response, responseData: response.data)
@@ -127,23 +115,18 @@ extension NextcloudKit {
         }
     }
 
-    @objc public func setCustomMessagePredefined(messageId: String,
-                                                 clearAt: Double,
-                                                 options: NKRequestOptions = NKRequestOptions(),
-                                                 taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-                                                 completion: @escaping (_ account: String, _ error: NKError) -> Void) {
-
+    func setCustomMessagePredefined(messageId: String,
+                                    clearAt: Double,
+                                    options: NKRequestOptions = NKRequestOptions(),
+                                    taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
+                                    completion: @escaping (_ account: String, _ error: NKError) -> Void) {
         let account = self.nkCommonInstance.account
         let urlBase = self.nkCommonInstance.urlBase
-
         let endpoint = "ocs/v2.php/apps/user_status/api/v1/user_status/message/predefined"
-
         guard let url = self.nkCommonInstance.createStandardUrl(serverUrl: urlBase, endpoint: endpoint) else {
             return options.queue.async { completion(account, .urlError) }
         }
-
         let headers = self.nkCommonInstance.getStandardHeaders(options: options)
-
         var parameters = [
             "messageId": String(messageId)
         ]
@@ -158,7 +141,6 @@ extension NextcloudKit {
             if self.nkCommonInstance.levelLog > 0 {
                 debugPrint(response)
             }
-
             switch response.result {
             case .failure(let error):
                 let error = NKError(error: error, afResponse: response, responseData: response.data)
@@ -176,24 +158,19 @@ extension NextcloudKit {
         }
     }
 
-    @objc public func setCustomMessageUserDefined(statusIcon: String?,
-                                                  message: String,
-                                                  clearAt: Double,
-                                                  options: NKRequestOptions = NKRequestOptions(),
-                                                  taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-                                                  completion: @escaping (_ account: String, _ error: NKError) -> Void) {
-
+    func setCustomMessageUserDefined(statusIcon: String?,
+                                     message: String,
+                                     clearAt: Double,
+                                     options: NKRequestOptions = NKRequestOptions(),
+                                     taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
+                                     completion: @escaping (_ account: String, _ error: NKError) -> Void) {
         let account = self.nkCommonInstance.account
         let urlBase = self.nkCommonInstance.urlBase
-
         let endpoint = "ocs/v2.php/apps/user_status/api/v1/user_status/message/custom"
-
         guard let url = self.nkCommonInstance.createStandardUrl(serverUrl: urlBase, endpoint: endpoint) else {
             return options.queue.async { completion(account, .urlError) }
         }
-
         let headers = self.nkCommonInstance.getStandardHeaders(options: options)
-
         var parameters = [
             "message": String(message)
         ]
@@ -211,15 +188,14 @@ extension NextcloudKit {
             if self.nkCommonInstance.levelLog > 0 {
                 debugPrint(response)
             }
-
             switch response.result {
             case .failure(let error):
                 let error = NKError(error: error, afResponse: response, responseData: response.data)
                 options.queue.async { completion(account, error) }
             case .success(let jsonData):
                 let json = JSON(jsonData)
-
                 let statusCode = json["ocs"]["meta"]["statuscode"].int ?? NKError.internalError
+
                 if statusCode == 200 {
                     options.queue.async { completion(account, .success) }
                 } else {
@@ -229,19 +205,15 @@ extension NextcloudKit {
         }
     }
 
-    @objc public func clearMessage(options: NKRequestOptions = NKRequestOptions(),
-                                   taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-                                   completion: @escaping (_ account: String, _ error: NKError) -> Void) {
-
+    func clearMessage(options: NKRequestOptions = NKRequestOptions(),
+                      taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
+                      completion: @escaping (_ account: String, _ error: NKError) -> Void) {
         let account = self.nkCommonInstance.account
         let urlBase = self.nkCommonInstance.urlBase
-
         let endpoint = "ocs/v2.php/apps/user_status/api/v1/user_status/message"
-
         guard let url = self.nkCommonInstance.createStandardUrl(serverUrl: urlBase, endpoint: endpoint) else {
             return options.queue.async { completion(account, .urlError) }
         }
-
         let headers = self.nkCommonInstance.getStandardHeaders(options: options)
 
         sessionManager.request(url, method: .delete, parameters: nil, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
@@ -251,15 +223,14 @@ extension NextcloudKit {
             if self.nkCommonInstance.levelLog > 0 {
                 debugPrint(response)
             }
-
             switch response.result {
             case .failure(let error):
                 let error = NKError(error: error, afResponse: response, responseData: response.data)
                 options.queue.async { completion(account, error) }
             case .success(let jsonData):
                 let json = JSON(jsonData)
-
                 let statusCode = json["ocs"]["meta"]["statuscode"].int ?? NKError.internalError
+
                 if statusCode == 200 {
                     options.queue.async { completion(account, .success) }
                 } else {
@@ -269,20 +240,16 @@ extension NextcloudKit {
         }
     }
 
-    @objc public func getUserStatusPredefinedStatuses(options: NKRequestOptions = NKRequestOptions(),
-                                                      taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-                                                      completion: @escaping (_ account: String, _ userStatuses: [NKUserStatus]?, _ data: Data?, _ error: NKError) -> Void) {
-
+    func getUserStatusPredefinedStatuses(options: NKRequestOptions = NKRequestOptions(),
+                                         taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
+                                         completion: @escaping (_ account: String, _ userStatuses: [NKUserStatus]?, _ data: Data?, _ error: NKError) -> Void) {
         let account = self.nkCommonInstance.account
         let urlBase = self.nkCommonInstance.urlBase
         var userStatuses: [NKUserStatus] = []
-
         let endpoint = "ocs/v2.php/apps/user_status/api/v1/predefined_statuses"
-
         guard let url = self.nkCommonInstance.createStandardUrl(serverUrl: urlBase, endpoint: endpoint) else {
             return options.queue.async { completion(account, nil, nil, .urlError) }
         }
-
         let headers = self.nkCommonInstance.getStandardHeaders(options: options)
 
         sessionManager.request(url, method: .get, parameters: nil, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
@@ -292,7 +259,6 @@ extension NextcloudKit {
             if self.nkCommonInstance.levelLog > 0 {
                 debugPrint(response)
             }
-
             switch response.result {
             case .failure(let error):
                 let error = NKError(error: error, afResponse: response, responseData: response.data)
@@ -301,8 +267,8 @@ extension NextcloudKit {
                 let json = JSON(jsonData)
                 let statusCode = json["ocs"]["meta"]["statuscode"].int ?? NKError.internalError
                 if statusCode == 200 {
-
                     let ocsdata = json["ocs"]["data"]
+
                     for (_, subJson): (String, JSON) in ocsdata {
                         let userStatus = NKUserStatus()
 
@@ -316,10 +282,8 @@ extension NextcloudKit {
                         userStatus.id = subJson["id"].string
                         userStatus.message = subJson["message"].string
                         userStatus.predefined = true
-
                         userStatuses.append(userStatus)
                     }
-
                     options.queue.async { completion(account, userStatuses, jsonData, .success) }
                 } else {
                     options.queue.async { completion(account, nil, jsonData, NKError(rootJson: json, fallbackStatusCode: response.response?.statusCode)) }
@@ -328,24 +292,19 @@ extension NextcloudKit {
         }
     }
 
-    @objc public func getUserStatusRetrieveStatuses(limit: Int,
-                                                    offset: Int,
-                                                    options: NKRequestOptions = NKRequestOptions(),
-                                                    taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-                                                    completion: @escaping (_ account: String, _ userStatuses: [NKUserStatus]?, _ data: Data?, _ error: NKError) -> Void) {
-
+    func getUserStatusRetrieveStatuses(limit: Int,
+                                       offset: Int,
+                                       options: NKRequestOptions = NKRequestOptions(),
+                                       taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
+                                       completion: @escaping (_ account: String, _ userStatuses: [NKUserStatus]?, _ data: Data?, _ error: NKError) -> Void) {
         let account = self.nkCommonInstance.account
         let urlBase = self.nkCommonInstance.urlBase
         var userStatuses: [NKUserStatus] = []
-
         let endpoint = "ocs/v2.php/apps/user_status/api/v1/statuses"
-
         guard let url = self.nkCommonInstance.createStandardUrl(serverUrl: urlBase, endpoint: endpoint) else {
             return options.queue.async { completion(account, nil, nil, .urlError) }
         }
-
         let headers = self.nkCommonInstance.getStandardHeaders(options: options)
-
         let parameters = [
             "limit": String(limit),
             "offset": String(offset)
@@ -358,7 +317,6 @@ extension NextcloudKit {
             if self.nkCommonInstance.levelLog > 0 {
                 debugPrint(response)
             }
-
             switch response.result {
             case .failure(let error):
                 let error = NKError(error: error, afResponse: response, responseData: response.data)
@@ -367,28 +325,24 @@ extension NextcloudKit {
                 let json = JSON(jsonData)
                 let statusCode = json["ocs"]["meta"]["statuscode"].int ?? NKError.internalError
                 if statusCode == 200 {
-
                     let ocsdata = json["ocs"]["data"]
+
                     for (_, subJson): (String, JSON) in ocsdata {
                         let userStatus = NKUserStatus()
 
                         if let value = subJson["clearAt"].double {
                             if value > 0 {
-                                userStatus.clearAt = NSDate(timeIntervalSince1970: value)
+                                userStatus.clearAt = Date(timeIntervalSince1970: value)
                             }
                         }
                         userStatus.icon = subJson["icon"].string
                         userStatus.message = subJson["message"].string
                         userStatus.predefined = false
                         userStatus.userId = subJson["userId"].string
-
                         userStatuses.append(userStatus)
                     }
-
                     options.queue.async { completion(account, userStatuses, jsonData, .success) }
-
                 } else {
-
                     options.queue.async { completion(account, nil, jsonData, NKError(rootJson: json, fallbackStatusCode: response.response?.statusCode)) }
                 }
             }

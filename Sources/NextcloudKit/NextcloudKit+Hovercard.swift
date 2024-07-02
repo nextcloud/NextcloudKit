@@ -26,23 +26,18 @@ import Foundation
 import Alamofire
 import SwiftyJSON
 
-extension NextcloudKit {
-
-    @objc public func getHovercard(for userId: String,
-                                   options: NKRequestOptions = NKRequestOptions(),
-                                   taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-                                   completion: @escaping (_ account: String, _ result: NKHovercard?, _ data: Data?, _ error: NKError) -> Void) {
-
+public extension NextcloudKit {
+    func getHovercard(for userId: String,
+                      options: NKRequestOptions = NKRequestOptions(),
+                      taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
+                      completion: @escaping (_ account: String, _ result: NKHovercard?, _ data: Data?, _ error: NKError) -> Void) {
         let account = self.nkCommonInstance.account
         let urlBase = self.nkCommonInstance.urlBase
-
         let endpoint = "ocs/v2.php/hovercard/v1/\(userId)"
-
         guard let url = self.nkCommonInstance.createStandardUrl(serverUrl: urlBase, endpoint: endpoint)
         else {
             return options.queue.async { completion(account, nil, nil, .urlError) }
         }
-
         let headers = self.nkCommonInstance.getStandardHeaders(options: options)
 
         sessionManager.request(url, method: .get, parameters: nil, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
@@ -52,7 +47,6 @@ extension NextcloudKit {
             if self.nkCommonInstance.levelLog > 0 {
                 debugPrint(response)
             }
-
             switch response.result {
             case .failure(let error):
                 let error = NKError(error: error, afResponse: response, responseData: response.data)
@@ -73,8 +67,11 @@ extension NextcloudKit {
     }
 }
 
-@objc public class NKHovercard: NSObject {
-    internal init?(jsonData: JSON) {
+public class NKHovercard: NSObject {
+    public let userId, displayName: String
+    public let actions: [Action]
+    
+    init?(jsonData: JSON) {
         guard let userId = jsonData["userId"].string,
               let displayName = jsonData["displayName"].string,
               let actions = jsonData["actions"].array?.compactMap(Action.init)
@@ -86,8 +83,14 @@ extension NextcloudKit {
         self.actions = actions
     }
 
-    @objc public class Action: NSObject {
-        internal init?(jsonData: JSON) {
+    public class Action: NSObject {
+        public let title: String
+        public let icon: String
+        public let hyperlink: String
+        public var hyperlinkUrl: URL? { URL(string: hyperlink) }
+        public let appId: String
+
+        init?(jsonData: JSON) {
             guard let title = jsonData["title"].string,
                   let icon = jsonData["icon"].string,
                   let hyperlink = jsonData["hyperlink"].string,
@@ -100,14 +103,5 @@ extension NextcloudKit {
             self.hyperlink = hyperlink
             self.appId = appId
         }
-
-        @objc public let title: String
-        @objc public let icon: String
-        @objc public let hyperlink: String
-        @objc public var hyperlinkUrl: URL? { URL(string: hyperlink) }
-        @objc public let appId: String
     }
-
-    @objc public let userId, displayName: String
-    @objc public let actions: [Action]
 }

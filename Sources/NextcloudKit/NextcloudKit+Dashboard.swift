@@ -25,28 +25,23 @@ import Foundation
 import Alamofire
 import SwiftyJSON
 
-extension NextcloudKit {
-
-    public func getDashboardWidget(options: NKRequestOptions = NKRequestOptions(),
-                                   request: @escaping (DataRequest?) -> Void = { _ in },
-                                   taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-                                   completion: @escaping (_ account: String, _ dashboardWidgets: [NCCDashboardWidget]?, _ data: Data?, _ error: NKError) -> Void) {
-
+public extension NextcloudKit {
+    func getDashboardWidget(options: NKRequestOptions = NKRequestOptions(),
+                            request: @escaping (DataRequest?) -> Void = { _ in },
+                            taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
+                            completion: @escaping (_ account: String, _ dashboardWidgets: [NCCDashboardWidget]?, _ data: Data?, _ error: NKError) -> Void) {
         let account = self.nkCommonInstance.account
         let urlBase = self.nkCommonInstance.urlBase
         var url: URLConvertible?
-
         if let endpoint = options.endpoint {
             url = URL(string: endpoint)
         } else {
             let endpoint = "ocs/v2.php/apps/dashboard/api/v1/widgets"
             url = self.nkCommonInstance.createStandardUrl(serverUrl: urlBase, endpoint: endpoint)
         }
-
         guard let url = url else {
             return options.queue.async { completion(account, nil, nil, .urlError) }
         }
-
         let headers = self.nkCommonInstance.getStandardHeaders(options: options)
 
         let dashboardRequest = sessionManager.request(url, method: .get, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
@@ -56,7 +51,6 @@ extension NextcloudKit {
             if self.nkCommonInstance.levelLog > 0 {
                 debugPrint(response)
             }
-
             switch response.result {
             case .success(let jsonData):
                 let json = JSON(jsonData)
@@ -76,27 +70,23 @@ extension NextcloudKit {
         options.queue.async { request(dashboardRequest) }
     }
 
-    public func getDashboardWidgetsApplication(_ items: String,
-                                               options: NKRequestOptions = NKRequestOptions(),
-                                               request: @escaping (DataRequest?) -> Void = { _ in },
-                                               taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-                                               completion: @escaping (_ account: String, _ dashboardApplications: [NCCDashboardApplication]?, _ data: Data?, _ error: NKError) -> Void) {
-
+    func getDashboardWidgetsApplication(_ items: String,
+                                        options: NKRequestOptions = NKRequestOptions(),
+                                        request: @escaping (DataRequest?) -> Void = { _ in },
+                                        taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
+                                        completion: @escaping (_ account: String, _ dashboardApplications: [NCCDashboardApplication]?, _ data: Data?, _ error: NKError) -> Void) {
         let account = self.nkCommonInstance.account
         let urlBase = self.nkCommonInstance.urlBase
         var url: URLConvertible?
-
         if let endpoint = options.endpoint {
             url = URL(string: endpoint)
         } else {
             let endpoint = "ocs/v2.php/apps/dashboard/api/v1/widget-items?widgets[]=\(items)"
             url = self.nkCommonInstance.createStandardUrl(serverUrl: urlBase, endpoint: endpoint)
         }
-
         guard let url = url else {
             return options.queue.async { completion(account, nil, nil, .urlError) }
         }
-
         let headers = self.nkCommonInstance.getStandardHeaders(options: options)
 
         let dashboardRequest = sessionManager.request(url, method: .get, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
@@ -106,7 +96,6 @@ extension NextcloudKit {
             if self.nkCommonInstance.levelLog > 0 {
                 debugPrint(response)
             }
-
             switch response.result {
             case .success(let jsonData):
                 let json = JSON(jsonData)
@@ -127,10 +116,10 @@ extension NextcloudKit {
     }
 }
 
-@objc public class NCCDashboardApplication: NSObject {
+public class NCCDashboardApplication: NSObject {
 
-    @objc public var application: String?
-    @objc public var items: [NCCDashboardItem]?
+    public var application: String?
+    public var items: [NCCDashboardItem]?
 
     init?(application: String, data: JSON) {
         self.application = application
@@ -148,13 +137,12 @@ extension NextcloudKit {
     }
 }
 
-@objc public class NCCDashboardItem: NSObject {
-
-    @objc public let title: String?
-    @objc public let subtitle: String?
-    @objc public let link: String?
-    @objc public let iconUrl: String?
-    @objc public let sinceId: Int
+public class NCCDashboardItem: NSObject {
+    public let title: String?
+    public let subtitle: String?
+    public let link: String?
+    public let iconUrl: String?
+    public let sinceId: Int
 
     init?(json: JSON) {
         self.title = json["title"].string
@@ -170,13 +158,12 @@ extension NextcloudKit {
     }
 }
 
-@objc public class NCCDashboardWidget: NSObject {
-
-    @objc public var id, title: String
-    @objc public let order: Int
-    @objc public let iconClass, iconUrl, widgetUrl: String?
-    @objc public let itemIconsRound: Bool
-    @objc public let button: [NCCDashboardWidgetButton]?
+public class NCCDashboardWidget: NSObject {
+    public var id, title: String
+    public let order: Int
+    public let iconClass, iconUrl, widgetUrl: String?
+    public let itemIconsRound: Bool
+    public let button: [NCCDashboardWidgetButton]?
 
     init?(application: String, data: JSON) {
         guard let id = data["id"].string,
@@ -204,9 +191,8 @@ extension NextcloudKit {
     }
 }
 
-@objc public class NCCDashboardWidgetButton: NSObject {
-
-    @objc public let type, text, link: String
+public class NCCDashboardWidgetButton: NSObject {
+    public let type, text, link: String
 
     init?(data: JSON) {
         guard let type = data["type"].string,

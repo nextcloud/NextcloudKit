@@ -26,8 +26,7 @@ import Foundation
 import Alamofire
 import SwiftyJSON
 
-extension NextcloudKit {
-
+public extension NextcloudKit {
     /// Available NC >= 20
     /// Search many different datasources in the cloud and combine them into one result.
     ///
@@ -42,26 +41,22 @@ extension NextcloudKit {
     ///   - filter: Filter search provider that should be searched. Default is all available provider..
     ///   - update: Callback, notifying that a search provider return its result. Does not include previous results.
     ///   - completion: Callback, notifying that all search providers have been searched. The search is done. Includes all search results.
-    public func unifiedSearch(term: String,
-                              options: NKRequestOptions = NKRequestOptions(),
-                              timeout: TimeInterval = 30,
-                              timeoutProvider: TimeInterval = 60,
-                              filter: @escaping (NKSearchProvider) -> Bool = { _ in true },
-                              request: @escaping (DataRequest?) -> Void,
-                              taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-                              providers: @escaping (_ account: String, _ searchProviders: [NKSearchProvider]?) -> Void,
-                              update: @escaping (_ account: String, _ searchResult: NKSearchResult?, _ provider: NKSearchProvider, _ error: NKError) -> Void,
-                              completion: @escaping (_ account: String, _ data: Data?, _ error: NKError) -> Void) {
-
+    func unifiedSearch(term: String,
+                       timeout: TimeInterval = 30,
+                       timeoutProvider: TimeInterval = 60,
+                       options: NKRequestOptions = NKRequestOptions(),
+                       filter: @escaping (NKSearchProvider) -> Bool = { _ in true },
+                       request: @escaping (DataRequest?) -> Void,
+                       taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
+                       providers: @escaping (_ account: String, _ searchProviders: [NKSearchProvider]?) -> Void,
+                       update: @escaping (_ account: String, _ searchResult: NKSearchResult?, _ provider: NKSearchProvider, _ error: NKError) -> Void,
+                       completion: @escaping (_ account: String, _ data: Data?, _ error: NKError) -> Void) {
         let account = self.nkCommonInstance.account
         let urlBase = self.nkCommonInstance.urlBase
-
         let endpoint = "ocs/v2.php/search/providers"
-
         guard let url = self.nkCommonInstance.createStandardUrl(serverUrl: urlBase, endpoint: endpoint) else {
             return completion(account, nil, .urlError)
         }
-
         let headers = self.nkCommonInstance.getStandardHeaders(options: options)
 
         let requestUnifiedSearch = sessionManager.request(url, method: .get, parameters: nil, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
@@ -71,7 +66,6 @@ extension NextcloudKit {
             if self.nkCommonInstance.levelLog > 0 {
                 debugPrint(response)
             }
-
             switch response.result {
             case .success(let jsonData):
                 let json = JSON(jsonData)
@@ -79,7 +73,6 @@ extension NextcloudKit {
                 guard let allProvider = NKSearchProvider.factory(jsonArray: providerData) else {
                     return completion(account, jsonData, NKError(rootJson: json, fallbackStatusCode: response.response?.statusCode))
                 }
-
                 providers(account, allProvider)
 
                 let filteredProviders = allProvider.filter(filter)
@@ -120,34 +113,27 @@ extension NextcloudKit {
     ///   - timeout: Filter search provider that should be searched. Default is all available provider..
     ///   - update: Callback, notifying that a search provider return its result. Does not include previous results.
     ///   - completion: Callback, notifying that all search results.
-    @discardableResult
-    public func searchProvider(_ id: String,
-                               account: String,
-                               term: String,
-                               limit: Int? = nil,
-                               cursor: Int? = nil,
-                               options: NKRequestOptions = NKRequestOptions(),
-                               timeout: TimeInterval = 60,
-                               taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-                               completion: @escaping (_ accoun: String, NKSearchResult?, _ data: Data?, _ error: NKError) -> Void) -> DataRequest? {
-
+    func searchProvider(_ id: String,
+                        account: String,
+                        term: String,
+                        limit: Int? = nil,
+                        cursor: Int? = nil,
+                        options: NKRequestOptions = NKRequestOptions(),
+                        timeout: TimeInterval = 60,
+                        taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
+                        completion: @escaping (_ accoun: String, NKSearchResult?, _ data: Data?, _ error: NKError) -> Void) -> DataRequest? {
         let urlBase = self.nkCommonInstance.urlBase
-
         guard let term = term.urlEncoded else {
             completion(account, nil, nil, .urlError)
             return nil
         }
-
         var endpoint = "ocs/v2.php/search/providers/\(id)/search?term=\(term)"
-
         if let limit = limit {
             endpoint += "&limit=\(limit)"
         }
-
         if let cursor = cursor {
             endpoint += "&cursor=\(cursor)"
         }
-
         guard let url = self.nkCommonInstance.createStandardUrl(
             serverUrl: urlBase,
             endpoint: endpoint)
@@ -155,10 +141,9 @@ extension NextcloudKit {
             completion(account, nil, nil, .urlError)
             return nil
         }
-
         let headers = self.nkCommonInstance.getStandardHeaders(options: options)
-
         var urlRequest: URLRequest
+
         do {
             try urlRequest = URLRequest(url: url, method: .get, headers: headers)
             urlRequest.timeoutInterval = timeout
@@ -192,12 +177,11 @@ extension NextcloudKit {
     }
 }
 
-@objc public class NKSearchResult: NSObject {
-
-    @objc public let id: String
-    @objc public let name: String
-    @objc public let isPaginated: Bool
-    @objc public let entries: [NKSearchEntry]
+public class NKSearchResult: NSObject {
+    public let id: String
+    public let name: String
+    public let isPaginated: Bool
+    public let entries: [NKSearchEntry]
     public let cursor: Int?
 
     init?(json: JSON, id: String) {
@@ -213,21 +197,18 @@ extension NextcloudKit {
     }
 }
 
-@objc public class NKSearchEntry: NSObject {
-
-    @objc public let thumbnailURL: String
-    @objc public let title, subline: String
-    @objc public let resourceURL: String
-    @objc public let icon: String
-    @objc public let rounded: Bool
-    @objc public let attributes: [String: Any]?
-
+public class NKSearchEntry: NSObject {
+    public let thumbnailURL: String
+    public let title, subline: String
+    public let resourceURL: String
+    public let icon: String
+    public let rounded: Bool
+    public let attributes: [String: Any]?
     public var fileId: Int? {
         guard let fileAttribute = attributes?["fileId"] as? String else { return nil }
         return Int(fileAttribute)
     }
-
-    @objc public var filePath: String? {
+    public var filePath: String? {
         attributes?["path"] as? String
     }
 
@@ -255,7 +236,9 @@ extension NextcloudKit {
     }
 }
 
-@objc public class NKSearchProvider: NSObject {
+public class NKSearchProvider: NSObject {
+    public let id, name: String
+    public let order: Int
 
     init?(json: JSON) {
         guard let id = json["id"].string,
@@ -266,9 +249,6 @@ extension NextcloudKit {
         self.name = name
         self.order = order
     }
-
-    @objc public let id, name: String
-    @objc public let order: Int
 
     static func factory(jsonArray: JSON) -> [NKSearchProvider]? {
         guard let allProvider = jsonArray.array else { return nil }

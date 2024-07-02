@@ -51,11 +51,8 @@ extension OCSPath {
     static var ocsXMLMsg: Self { ["d:error", "s:message"] }
 }
 
-@objcMembers
 public class NKError: NSObject {
-
     static let internalError = -9999
-
     // Chunk error
     public static let chunkNoEnoughMemory = -9998
     public static let chunkMoveFile = -9997

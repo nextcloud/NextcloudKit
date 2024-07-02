@@ -25,16 +25,14 @@ import Foundation
 #if os(iOS)
 import UIKit
 
-@objc public class NKShareAccounts: NSObject {
+public class NKShareAccounts: NSObject {
+    public class DataAccounts: NSObject {
+        public var url: String
+        public var user: String
+        public var name: String?
+        public var image: UIImage?
 
-    @objc public class DataAccounts: NSObject {
-
-        @objc public var url: String
-        @objc public var user: String
-        @objc public var name: String?
-        @objc public var image: UIImage?
-
-        @objc public init(withUrl url: String, user: String, name: String? = nil, image: UIImage? = nil) {
+        public init(withUrl url: String, user: String, name: String? = nil, image: UIImage? = nil) {
             self.url = url
             self.user = user
             self.name = name
@@ -59,7 +57,7 @@ import UIKit
     ///     - directory: the group directory of share the accounts (group.com.nextcloud.apps), use the  func containerURL(forSecurityApplicationGroupIdentifier groupIdentifier: String) -> URL? // Available for OS X in 10.8.3.
     ///     - app: the name of app
     ///     - dataAccounts: the accounts data
-    @objc public func putShareAccounts(at directory: URL, app: String, dataAccounts: [DataAccounts]) -> Error? {
+    public func putShareAccounts(at directory: URL, app: String, dataAccounts: [DataAccounts]) -> Error? {
 
         var apps: [String: [Account]] = [:]
         var accounts: [Account] = []
@@ -105,7 +103,7 @@ import UIKit
     /// - Parameters:
     ///     - directory: the group directory of share the accounts (group.com.nextcloud.apps), use the  func containerURL(forSecurityApplicationGroupIdentifier groupIdentifier: String) -> URL? // Available for OS X in 10.8.3.
     ///     - application: the UIApplication used for verify if the app(s) is still installed
-    @objc public func getShareAccount(at directory: URL, application: UIApplication) -> [DataAccounts]? {
+    public func getShareAccount(at directory: URL, application: UIApplication) -> [DataAccounts]? {
 
         var dataAccounts: [DataAccounts] = []
         let url = directory.appendingPathComponent(directoryAccounts + "/" + fileName)
