@@ -135,9 +135,9 @@ public class NKBackground: NSObject, URLSessionTaskDelegate, URLSessionDelegate,
     public func urlSession(_ session: URLSession, task: URLSessionTask, didCompleteWithError error: Error?) {
         var fileName: String = "", serverUrl: String = "", etag: String?, ocId: String?, date: Date?, dateLastModified: Date?, length: Int64 = 0
         let url = task.currentRequest?.url?.absoluteString.removingPercentEncoding
-        if url != nil {
-            fileName = (url! as NSString).lastPathComponent
-            serverUrl = url!.replacingOccurrences(of: "/" + fileName, with: "")
+        if let url {
+            fileName = (url as NSString).lastPathComponent
+            serverUrl = url.replacingOccurrences(of: "/" + fileName, with: "")
         }
         var nkError: NKError = .success
 
@@ -166,7 +166,7 @@ public class NKBackground: NSObject, URLSessionTaskDelegate, URLSessionDelegate,
             } else if self.nkCommonInstance.findHeader("etag", allHeaderFields: header) != nil {
                 etag = self.nkCommonInstance.findHeader("etag", allHeaderFields: header)
             }
-            if etag != nil { etag = etag!.replacingOccurrences(of: "\"", with: "") }
+            if etag != nil { etag = etag?.replacingOccurrences(of: "\"", with: "") }
             if let dateString = self.nkCommonInstance.findHeader("date", allHeaderFields: header) {
                 date = self.nkCommonInstance.convertDate(dateString, format: "EEE, dd MMM y HH:mm:ss zzz")
             }

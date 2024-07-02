@@ -54,7 +54,7 @@ public extension NSImage {
         return nil
     }
 
-    func resizeImage(size: CGSize, isAspectRation: Bool) -> NSImage? {
+    func resizeImage(size: CGSize, isAspectRation: Bool = true) -> NSImage? {
         if let bitmapRep = NSBitmapImageRep(
             bitmapDataPlanes: nil, pixelsWide: Int(size.width), pixelsHigh: Int(size.height),
             bitsPerSample: 8, samplesPerPixel: 4, hasAlpha: true, isPlanar: false,
@@ -78,7 +78,7 @@ public extension NSImage {
 import UIKit
 
 extension UIImage {
-    internal func resizeImage(size: CGSize, isAspectRation: Bool) -> UIImage? {
+    internal func resizeImage(size: CGSize, isAspectRation: Bool = true) -> UIImage? {
         let originRatio = self.size.width / self.size.height
         let newRatio = size.width / size.height
         var newSize = size

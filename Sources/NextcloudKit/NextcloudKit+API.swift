@@ -346,11 +346,11 @@ public extension NextcloudKit {
                         try data.write(to: URL(fileURLWithPath: fileNamePreviewLocalPath), options: .atomic)
                         imagePreview = UIImage(data: data)
                     }
-                    if fileNameIconLocalPath != nil && sizeIcon > 0 {
-                        imageIcon = imageOriginal.resizeImage(size: CGSize(width: sizeIcon, height: sizeIcon), isAspectRation: true)
+                    if let fileNameIconLocalPath, sizeIcon > 0 {
+                        imageIcon = imageOriginal.resizeImage(size: CGSize(width: sizeIcon, height: sizeIcon))
                         if let data = imageIcon?.jpegData(compressionQuality: compressionQualityIcon) {
-                            try data.write(to: URL(fileURLWithPath: fileNameIconLocalPath!), options: .atomic)
-                            imageIcon = UIImage(data: data)!
+                            try data.write(to: URL(fileURLWithPath: fileNameIconLocalPath), options: .atomic)
+                            imageIcon = UIImage(data: data)
                         }
                     }
                     options.queue.async { completion(account, imagePreview, imageIcon, imageOriginal, etag, .success) }
@@ -838,7 +838,7 @@ public extension NextcloudKit {
             let endpoint = "ocs/v2.php/apps/notifications/api/v2/notifications/\(idNotification)"
             url = self.nkCommonInstance.createStandardUrl(serverUrl: urlBase, endpoint: endpoint)
         } else {
-            url = serverUrl!.asUrl
+            url = serverUrl?.asUrl
         }
         guard let urlRequest = url else {
             return options.queue.async { completion(account, .urlError) }

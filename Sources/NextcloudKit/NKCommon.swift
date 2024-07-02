@@ -260,7 +260,9 @@ public class NKCommon: NSObject {
         } else {
             if let unmanagedFileUTI = UTTypeCreatePreferredIdentifierForTag(kUTTagClassFilenameExtension, ext as CFString, nil) {
                 inUTI = unmanagedFileUTI.takeRetainedValue()
-                utiCache.setObject(inUTI!, forKey: ext as NSString)
+                if let inUTI {
+                    utiCache.setObject(inUTI, forKey: ext as NSString)
+                }
             }
         }
 
@@ -604,8 +606,8 @@ public class NKCommon: NSObject {
 
     public func clearFileLog() {
         FileManager.default.createFile(atPath: filenamePathLog, contents: nil, attributes: nil)
-        if copyLogToDocumentDirectory {
-            let filenameCopyToDocumentDirectory = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true).first! + "/" + filenameLog
+        if copyLogToDocumentDirectory, let path = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true).first {
+            let filenameCopyToDocumentDirectory = path + "/" + filenameLog
             FileManager.default.createFile(atPath: filenameCopyToDocumentDirectory, contents: nil, attributes: nil)
 
         }
@@ -616,17 +618,12 @@ public class NKCommon: NSObject {
         guard let date = self.convertDate(Date(), format: "yyyy-MM-dd' 'HH:mm:ss") else { return }
         let textToWrite = "\(date) " + text + "\n"
 
-        if printLog {
-            print(textToWrite)
-        }
-
+        if printLog { print(textToWrite) }
         if levelLog > 0 {
-
             queueLog.async(flags: .barrier) {
                 self.writeLogToDisk(filename: self.filenamePathLog, text: textToWrite)
-
-                if self.copyLogToDocumentDirectory {
-                    let filenameCopyToDocumentDirectory = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true).first! + "/" + self.filenameLog
+                if self.copyLogToDocumentDirectory, let path = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true).first {
+                    let filenameCopyToDocumentDirectory = path + "/" + self.filenameLog
                     self.writeLogToDisk(filename: filenameCopyToDocumentDirectory, text: textToWrite)
                 }
             }

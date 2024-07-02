@@ -224,8 +224,8 @@ public extension NextcloudKit {
 
         do {
             try urlRequest = URLRequest(url: url, method: method, headers: headers)
-            if requestBody != nil {
-                urlRequest.httpBody = requestBody!
+            if let requestBody {
+                urlRequest.httpBody = requestBody
                 urlRequest.timeoutInterval = options.timeout
             } else {
                 urlRequest.httpBody = NKDataFileXML(nkCommonInstance: self.nkCommonInstance).getRequestBodyFile(removeProperties: options.removeProperties).data(using: .utf8)
@@ -266,11 +266,11 @@ public extension NextcloudKit {
         let urlBase = self.nkCommonInstance.urlBase
         var httpBody: Data?
         if let fileId = fileId {
-            httpBody = String(format: NKDataFileXML(nkCommonInstance: self.nkCommonInstance).getRequestBodySearchFileId(removeProperties: options.removeProperties), userId, fileId).data(using: .utf8)!
+            httpBody = String(format: NKDataFileXML(nkCommonInstance: self.nkCommonInstance).getRequestBodySearchFileId(removeProperties: options.removeProperties), userId, fileId).data(using: .utf8)
         } else if let link = link {
             let linkArray = link.components(separatedBy: "/")
             if let fileId = linkArray.last {
-                httpBody = String(format: NKDataFileXML(nkCommonInstance: self.nkCommonInstance).getRequestBodySearchFileId(removeProperties: options.removeProperties), userId, fileId).data(using: .utf8)!
+                httpBody = String(format: NKDataFileXML(nkCommonInstance: self.nkCommonInstance).getRequestBodySearchFileId(removeProperties: options.removeProperties), userId, fileId).data(using: .utf8)
             }
         }
         guard let httpBody = httpBody else {
@@ -292,12 +292,12 @@ public extension NextcloudKit {
                            options: NKRequestOptions = NKRequestOptions(),
                            taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
                            completion: @escaping (_ account: String, _ files: [NKFile], _ data: Data?, _ error: NKError) -> Void) {
-        let httpBody = requestBody.data(using: .utf8)!
-
-        search(serverUrl: serverUrl, httpBody: httpBody, showHiddenFiles: showHiddenFiles, includeHiddenFiles: includeHiddenFiles, options: options) { task in
-            taskHandler(task)
-        } completion: { account, files, data, error in
-            options.queue.async { completion(account, files, data, error) }
+        if let httpBody = requestBody.data(using: .utf8) {
+            search(serverUrl: serverUrl, httpBody: httpBody, showHiddenFiles: showHiddenFiles, includeHiddenFiles: includeHiddenFiles, options: options) { task in
+                taskHandler(task)
+            } completion: { account, files, data, error in
+                options.queue.async { completion(account, files, data, error) }
+            }
         }
     }
 
@@ -315,12 +315,12 @@ public extension NextcloudKit {
             return options.queue.async { completion(account, [], nil, .urlError) }
         }
         let requestBody = String(format: NKDataFileXML(nkCommonInstance: self.nkCommonInstance).getRequestBodySearchFileName(removeProperties: options.removeProperties), href, depth, "%" + literal + "%")
-        let httpBody = requestBody.data(using: .utf8)!
-
-        search(serverUrl: serverUrl, httpBody: httpBody, showHiddenFiles: showHiddenFiles, includeHiddenFiles: includeHiddenFiles, options: options) { task in
-            taskHandler(task)
-        } completion: { account, files, data, error in
-            options.queue.async { completion(account, files, data, error) }
+        if let httpBody = requestBody.data(using: .utf8) {
+            search(serverUrl: serverUrl, httpBody: httpBody, showHiddenFiles: showHiddenFiles, includeHiddenFiles: includeHiddenFiles, options: options) { task in
+                taskHandler(task)
+            } completion: { account, files, data, error in
+                options.queue.async { completion(account, files, data, error) }
+            }
         }
     }
 
@@ -354,17 +354,21 @@ public extension NextcloudKit {
             return options.queue.async { completion(account, files, nil, .invalidDate) }
         }
         var requestBody = ""
-        if limit > 0 {
-            requestBody = String(format: NKDataFileXML(nkCommonInstance: self.nkCommonInstance).getRequestBodySearchMediaWithLimit(removeProperties: options.removeProperties), href, elementDate, elementDate, lessDateString!, elementDate, greaterDateString!, String(limit))
-        } else {
-            requestBody = String(format: NKDataFileXML(nkCommonInstance: self.nkCommonInstance).getRequestBodySearchMedia(removeProperties: options.removeProperties), href, elementDate, elementDate, lessDateString!, elementDate, greaterDateString!)
-        }
-        let httpBody = requestBody.data(using: .utf8)!
 
-        search(serverUrl: urlBase, httpBody: httpBody, showHiddenFiles: showHiddenFiles, includeHiddenFiles: includeHiddenFiles, options: options) { task in
-            taskHandler(task)
-        } completion: { account, files, data, error in
-            options.queue.async { completion(account, files, data, error) }
+        if let lessDateString, let greaterDateString {
+            if limit > 0 {
+                requestBody = String(format: NKDataFileXML(nkCommonInstance: self.nkCommonInstance).getRequestBodySearchMediaWithLimit(removeProperties: options.removeProperties), href, elementDate, elementDate, lessDateString, elementDate, greaterDateString, String(limit))
+            } else {
+                requestBody = String(format: NKDataFileXML(nkCommonInstance: self.nkCommonInstance).getRequestBodySearchMedia(removeProperties: options.removeProperties), href, elementDate, elementDate, lessDateString, elementDate, greaterDateString)
+            }
+        }
+
+        if let httpBody = requestBody.data(using: .utf8) {
+            search(serverUrl: urlBase, httpBody: httpBody, showHiddenFiles: showHiddenFiles, includeHiddenFiles: includeHiddenFiles, options: options) { task in
+                taskHandler(task)
+            } completion: { account, files, data, error in
+                options.queue.async { completion(account, files, data, error) }
+            }
         }
     }
 
