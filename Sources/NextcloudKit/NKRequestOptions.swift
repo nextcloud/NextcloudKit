@@ -32,7 +32,8 @@ public class NKRequestOptions: NSObject {
     var e2eToken: String?
     var timeout: TimeInterval
     var taskDescription: String?
-    var removeProperties: [String]
+    var addProperties: [NKProperties]
+    var removeProperties: [NKProperties]
     var queue: DispatchQueue
 
     public init(endpoint: String? = nil, 
@@ -43,7 +44,8 @@ public class NKRequestOptions: NSObject {
                 e2eToken: String? = nil,
                 timeout: TimeInterval = 60,
                 taskDescription: String? = nil,
-                removeProperties: [String] = [],
+                addProperties: [NKProperties] = [],
+                removeProperties: [NKProperties] = [],
                 queue: DispatchQueue = .main) {
 
         self.endpoint = endpoint
@@ -54,6 +56,7 @@ public class NKRequestOptions: NSObject {
         self.e2eToken = e2eToken
         self.timeout = timeout
         self.taskDescription = taskDescription
+        self.addProperties = addProperties
         self.removeProperties = removeProperties
         self.queue = queue
     }
