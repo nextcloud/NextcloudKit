@@ -34,6 +34,7 @@ import SwiftyJSON
 // MARK: -
 
 public enum NKProperties: String, CaseIterable {
+    /// DAV
     case displayname = "<d:displayname />"
     case getlastmodified = "<d:getlastmodified />"
     case getetag = "<d:getetag />"
@@ -42,7 +43,7 @@ public enum NKProperties: String, CaseIterable {
     case quotaavailablebytes = "<d:quota-available-bytes />"
     case quotausedbytes = "<d:quota-used-bytes />"
     case getcontentlength = "<d:getcontentlength />"
-
+    /// owncloud.org
     case permissions = "<permissions xmlns=\"http://owncloud.org/ns\"/>"
     case id = "<id xmlns=\"http://owncloud.org/ns\"/>"
     case fileid = "<fileid xmlns=\"http://owncloud.org/ns\"/>"
@@ -55,7 +56,7 @@ public enum NKProperties: String, CaseIterable {
     case checksums = "<checksums xmlns=\"http://owncloud.org/ns\"/>"
     case downloadURL = "<downloadURL xmlns=\"http://owncloud.org/ns\"/>"
     case datafingerprint = "<data-fingerprint xmlns=\"http://owncloud.org/ns\"/>"
-
+    /// nextcloud.org
     case creationtime = "<creation_time xmlns=\"http://nextcloud.org/ns\"/>"
     case uploadtime = "<upload_time xmlns=\"http://nextcloud.org/ns\"/>"
     case isencrypted = "<is-encrypted xmlns=\"http://nextcloud.org/ns\"/>"
@@ -77,8 +78,9 @@ public enum NKProperties: String, CaseIterable {
     case metadataphotosgps = "<metadata-photos-gps xmlns=\"http://nextcloud.org/ns\"/>"
     case metadatafileslivephoto = "<metadata-files-live-photo xmlns=\"http://nextcloud.org/ns\"/>"
     case hidden = "<hidden xmlns=\"http://nextcloud.org/ns\"/>"
-
+    /// open-collaboration-services.org
     case sharepermissionscollaboration = "<share-permissions xmlns=\"http://open-collaboration-services.org/ns\"/>"
+    /// open-cloud-mesh.org
     case sharepermissionscloudmesh = "<share-permissions xmlns=\"http://open-cloud-mesh.org/ns\"/>"
 
     static func properties(add: [NKProperties] = [], remove: [NKProperties] = []) -> String {
