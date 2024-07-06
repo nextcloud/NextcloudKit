@@ -83,13 +83,13 @@ public enum NKProperties: String, CaseIterable {
     /// open-cloud-mesh.org
     case sharepermissionscloudmesh = "<share-permissions xmlns=\"http://open-cloud-mesh.org/ns\"/>"
 
-    static func properties(add: [NKProperties] = [], remove: [NKProperties] = []) -> String {
+    static func properties(createProperties: [NKProperties]?, removeProperties: [NKProperties] = []) -> String {
         var properties = allCases.map { $0.rawValue }.joined()
-        if !add.isEmpty {
+        if let createProperties {
             properties = ""
-            properties = add.map { $0.rawValue }.joined(separator: "")
+            properties = createProperties.map { $0.rawValue }.joined(separator: "")
         }
-        for removeProperty in remove {
+        for removeProperty in removeProperties {
             properties = properties.replacingOccurrences(of: removeProperty.rawValue, with: "")
         }
         return properties
@@ -361,12 +361,12 @@ class NKDataFileXML: NSObject {
     </d:propertyupdate>
     """
 
-    func getRequestBodyFile(add: [NKProperties] = [], remove: [NKProperties] = []) -> String {
+    func getRequestBodyFile(createProperties: [NKProperties]?, removeProperties: [NKProperties] = []) -> String {
         let request =  """
         <?xml version=\"1.0\" encoding=\"UTF-8\"?>
         <d:propfind xmlns:d=\"DAV:\" xmlns:oc=\"http://owncloud.org/ns\" xmlns:nc=\"http://nextcloud.org/ns\">
             <d:prop>
-        """ + NKProperties.properties(add: add, remove: remove) + """
+        """ + NKProperties.properties(createProperties: createProperties, removeProperties: removeProperties) + """
             </d:prop>
         </d:propfind>
         """
@@ -385,12 +385,12 @@ class NKDataFileXML: NSObject {
     </d:propertyupdate>
     """
 
-    func getRequestBodyFileListingFavorites(add: [NKProperties] = [], remove: [NKProperties] = []) -> String {
+    func getRequestBodyFileListingFavorites(createProperties: [NKProperties]?, removeProperties: [NKProperties] = []) -> String {
         let request =  """
         <?xml version=\"1.0\"?>
         <oc:filter-files xmlns:d=\"DAV:\" xmlns:oc=\"http://owncloud.org/ns\" xmlns:nc=\"http://nextcloud.org/ns\">
             <d:prop>
-        """ + NKProperties.properties(add: add, remove: remove) + """
+        """ + NKProperties.properties(createProperties: createProperties, removeProperties: removeProperties) + """
             </d:prop>
             <oc:filter-rules>
                 <oc:favorite>1</oc:favorite>
@@ -400,14 +400,14 @@ class NKDataFileXML: NSObject {
         return request
     }
 
-    func getRequestBodySearchFileName(add: [NKProperties] = [], remove: [NKProperties] = []) -> String {
+    func getRequestBodySearchFileName(createProperties: [NKProperties]?, removeProperties: [NKProperties] = []) -> String {
         let request =  """
         <?xml version=\"1.0\"?>
         <d:searchrequest xmlns:d=\"DAV:\" xmlns:oc=\"http://owncloud.org/ns\" xmlns:nc=\"http://nextcloud.org/ns\">
         <d:basicsearch>
             <d:select>
                 <d:prop>
-        """ + NKProperties.properties(add: add, remove: remove) + """
+        """ + NKProperties.properties(createProperties: createProperties, removeProperties: removeProperties) + """
                 </d:prop>
             </d:select>
             <d:from>
@@ -428,14 +428,14 @@ class NKDataFileXML: NSObject {
         return request
     }
 
-    func getRequestBodySearchFileId(add: [NKProperties] = [], remove: [NKProperties] = []) -> String {
+    func getRequestBodySearchFileId(createProperties: [NKProperties]?, removeProperties: [NKProperties] = []) -> String {
         let request =  """
         <?xml version=\"1.0\"?>
         <d:searchrequest xmlns:d=\"DAV:\" xmlns:oc=\"http://owncloud.org/ns\" xmlns:nc=\"http://nextcloud.org/ns\">
         <d:basicsearch>
             <d:select>
                 <d:prop>
-        """ + NKProperties.properties(add: add, remove: remove) + """
+        """ + NKProperties.properties(createProperties: createProperties, removeProperties: removeProperties) + """
                 </d:prop>
             </d:select>
             <d:from>
@@ -456,14 +456,14 @@ class NKDataFileXML: NSObject {
         return request
     }
 
-    func getRequestBodySearchMedia(add: [NKProperties] = [], remove: [NKProperties] = []) -> String {
+    func getRequestBodySearchMedia(createProperties: [NKProperties]?, removeProperties: [NKProperties] = []) -> String {
         let request =  """
         <?xml version=\"1.0\"?>
         <d:searchrequest xmlns:d=\"DAV:\" xmlns:oc=\"http://owncloud.org/ns\" xmlns:nc=\"http://nextcloud.org/ns\">
         <d:basicsearch>
         <d:select>
         <d:prop>
-        """ + NKProperties.properties(add: add, remove: remove) + """
+        """ + NKProperties.properties(createProperties: createProperties, removeProperties: removeProperties) + """
         </d:prop>
         </d:select>
         <d:from>
@@ -514,14 +514,14 @@ class NKDataFileXML: NSObject {
         return request
     }
 
-    func getRequestBodySearchMediaWithLimit(add: [NKProperties] = [], remove: [NKProperties] = []) -> String {
+    func getRequestBodySearchMediaWithLimit(createProperties: [NKProperties]?, removeProperties: [NKProperties] = []) -> String {
         let request =  """
         <?xml version=\"1.0\"?>
         <d:searchrequest xmlns:d=\"DAV:\" xmlns:oc=\"http://owncloud.org/ns\" xmlns:nc=\"http://nextcloud.org/ns\">
         <d:basicsearch>
         <d:select>
             <d:prop>
-        """ + NKProperties.properties(add: add, remove: remove) + """
+        """ + NKProperties.properties(createProperties: createProperties, removeProperties: removeProperties) + """
             </d:prop>
         </d:select>
             <d:from>

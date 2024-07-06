@@ -228,7 +228,7 @@ public extension NextcloudKit {
                 urlRequest.httpBody = requestBody
                 urlRequest.timeoutInterval = options.timeout
             } else {
-                urlRequest.httpBody = NKDataFileXML(nkCommonInstance: self.nkCommonInstance).getRequestBodyFile(add: options.addProperties, remove: options.removeProperties).data(using: .utf8)
+                urlRequest.httpBody = NKDataFileXML(nkCommonInstance: self.nkCommonInstance).getRequestBodyFile(createProperties: options.createProperties, removeProperties: options.removeProperties).data(using: .utf8)
             }
         } catch {
             return options.queue.async { completion(account, files, nil, NKError(error: error)) }
@@ -266,11 +266,11 @@ public extension NextcloudKit {
         let urlBase = self.nkCommonInstance.urlBase
         var httpBody: Data?
         if let fileId = fileId {
-            httpBody = String(format: NKDataFileXML(nkCommonInstance: self.nkCommonInstance).getRequestBodySearchFileId(add: options.addProperties, remove: options.removeProperties), userId, fileId).data(using: .utf8)
+            httpBody = String(format: NKDataFileXML(nkCommonInstance: self.nkCommonInstance).getRequestBodySearchFileId(createProperties: options.createProperties, removeProperties: options.removeProperties), userId, fileId).data(using: .utf8)
         } else if let link = link {
             let linkArray = link.components(separatedBy: "/")
             if let fileId = linkArray.last {
-                httpBody = String(format: NKDataFileXML(nkCommonInstance: self.nkCommonInstance).getRequestBodySearchFileId(add: options.addProperties, remove: options.removeProperties), userId, fileId).data(using: .utf8)
+                httpBody = String(format: NKDataFileXML(nkCommonInstance: self.nkCommonInstance).getRequestBodySearchFileId(createProperties: options.createProperties, removeProperties: options.removeProperties), userId, fileId).data(using: .utf8)
             }
         }
         guard let httpBody = httpBody else {
@@ -314,7 +314,7 @@ public extension NextcloudKit {
         guard let href = ("/files/" + userId).urlEncoded else {
             return options.queue.async { completion(account, [], nil, .urlError) }
         }
-        let requestBody = String(format: NKDataFileXML(nkCommonInstance: self.nkCommonInstance).getRequestBodySearchFileName(add: options.addProperties, remove: options.removeProperties), href, depth, "%" + literal + "%")
+        let requestBody = String(format: NKDataFileXML(nkCommonInstance: self.nkCommonInstance).getRequestBodySearchFileName(createProperties: options.createProperties, removeProperties: options.removeProperties), href, depth, "%" + literal + "%")
         if let httpBody = requestBody.data(using: .utf8) {
             search(serverUrl: serverUrl, httpBody: httpBody, showHiddenFiles: showHiddenFiles, includeHiddenFiles: includeHiddenFiles, options: options) { task in
                 taskHandler(task)
@@ -357,9 +357,9 @@ public extension NextcloudKit {
 
         if let lessDateString, let greaterDateString {
             if limit > 0 {
-                requestBody = String(format: NKDataFileXML(nkCommonInstance: self.nkCommonInstance).getRequestBodySearchMediaWithLimit(add: options.addProperties, remove: options.removeProperties), href, elementDate, elementDate, lessDateString, elementDate, greaterDateString, String(limit))
+                requestBody = String(format: NKDataFileXML(nkCommonInstance: self.nkCommonInstance).getRequestBodySearchMediaWithLimit(createProperties: options.createProperties, removeProperties: options.removeProperties), href, elementDate, elementDate, lessDateString, elementDate, greaterDateString, String(limit))
             } else {
-                requestBody = String(format: NKDataFileXML(nkCommonInstance: self.nkCommonInstance).getRequestBodySearchMedia(add: options.addProperties, remove: options.removeProperties), href, elementDate, elementDate, lessDateString, elementDate, greaterDateString)
+                requestBody = String(format: NKDataFileXML(nkCommonInstance: self.nkCommonInstance).getRequestBodySearchMedia(createProperties: options.createProperties, removeProperties: options.removeProperties), href, elementDate, elementDate, lessDateString, elementDate, greaterDateString)
             }
         }
 
@@ -485,7 +485,7 @@ public extension NextcloudKit {
 
         do {
             try urlRequest = URLRequest(url: url, method: method, headers: headers)
-            urlRequest.httpBody = NKDataFileXML(nkCommonInstance: self.nkCommonInstance).getRequestBodyFileListingFavorites(add: options.addProperties, remove: options.removeProperties).data(using: .utf8)
+            urlRequest.httpBody = NKDataFileXML(nkCommonInstance: self.nkCommonInstance).getRequestBodyFileListingFavorites(createProperties: options.createProperties, removeProperties: options.removeProperties).data(using: .utf8)
             urlRequest.timeoutInterval = options.timeout
         } catch {
             return options.queue.async { completion(account, files, nil, NKError(error: error)) }
