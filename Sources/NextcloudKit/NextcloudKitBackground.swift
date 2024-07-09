@@ -23,7 +23,7 @@
 
 import Foundation
 
-@objc public class NKBackground: NSObject, URLSessionTaskDelegate, URLSessionDelegate, URLSessionDownloadDelegate {
+public class NKBackground: NSObject, URLSessionTaskDelegate, URLSessionDelegate, URLSessionDownloadDelegate {
     let nkCommonInstance: NKCommon
 
     public init(nkCommonInstance: NKCommon) {
@@ -33,21 +33,17 @@ import Foundation
 
     // MARK: - Download
 
-    @objc public func download(serverUrlFileName: Any,
-                               fileNameLocalPath: String,
-                               taskDescription: String? = nil,
-                               session: URLSession) -> URLSessionDownloadTask? {
-
+    public func download(serverUrlFileName: Any,
+                         fileNameLocalPath: String,
+                         taskDescription: String? = nil,
+                         session: URLSession) -> URLSessionDownloadTask? {
         var url: URL?
-
         if serverUrlFileName is URL {
             url = serverUrlFileName as? URL
         } else if serverUrlFileName is String || serverUrlFileName is NSString {
             url = (serverUrlFileName as? String)?.encodedToUrl as? URL
         }
-
         guard let urlForRequest = url else { return nil }
-
         var request = URLRequest(url: urlForRequest)
         let loginString = "\(self.nkCommonInstance.user):\(self.nkCommonInstance.password)"
         guard let loginData = loginString.data(using: String.Encoding.utf8) else {
@@ -68,26 +64,22 @@ import Foundation
 
     // MARK: - Upload
 
-    @objc public func upload(serverUrlFileName: Any,
-                             fileNameLocalPath: String,
-                             dateCreationFile: Date?,
-                             dateModificationFile: Date?,
-                             taskDescription: String? = nil,
-                             session: URLSession) -> URLSessionUploadTask? {
-
+    public func upload(serverUrlFileName: Any,
+                       fileNameLocalPath: String,
+                       dateCreationFile: Date?,
+                       dateModificationFile: Date?,
+                       taskDescription: String? = nil,
+                       session: URLSession) -> URLSessionUploadTask? {
         var url: URL?
-
         if serverUrlFileName is URL {
             url = serverUrlFileName as? URL
         } else if serverUrlFileName is String || serverUrlFileName is NSString {
             url = (serverUrlFileName as? String)?.encodedToUrl as? URL
         }
-
         guard let urlForRequest = url else {
             return nil
         }
         var request = URLRequest(url: urlForRequest)
-
         let loginString = "\(self.nkCommonInstance.user):\(self.nkCommonInstance.password)"
         guard let loginData = loginString.data(using: String.Encoding.utf8) else {
             return nil
@@ -117,40 +109,36 @@ import Foundation
     // MARK: - SessionDelegate
 
     public func urlSession(_ session: URLSession, downloadTask: URLSessionDownloadTask, didWriteData bytesWritten: Int64, totalBytesWritten: Int64, totalBytesExpectedToWrite: Int64) {
-
         guard totalBytesExpectedToWrite != NSURLSessionTransferSizeUnknown else { return }
         guard let url = downloadTask.currentRequest?.url?.absoluteString.removingPercentEncoding else { return }
         let fileName = (url as NSString).lastPathComponent
         let serverUrl = url.replacingOccurrences(of: "/" + fileName, with: "")
         let progress = Float(totalBytesWritten) / Float(totalBytesExpectedToWrite)
 
-        self.nkCommonInstance.delegate?.downloadProgress?(progress, totalBytes: totalBytesWritten, totalBytesExpected: totalBytesExpectedToWrite, fileName: fileName, serverUrl: serverUrl, session: session, task: downloadTask)
+        self.nkCommonInstance.delegate?.downloadProgress(progress, totalBytes: totalBytesWritten, totalBytesExpected: totalBytesExpectedToWrite, fileName: fileName, serverUrl: serverUrl, session: session, task: downloadTask)
     }
 
     public func urlSession(_ session: URLSession, downloadTask: URLSessionDownloadTask, didFinishDownloadingTo location: URL) {
-        self.nkCommonInstance.delegate?.downloadingFinish?(session, downloadTask: downloadTask, didFinishDownloadingTo: location)
+        self.nkCommonInstance.delegate?.downloadingFinish(session, downloadTask: downloadTask, didFinishDownloadingTo: location)
     }
 
     public func urlSession(_ session: URLSession, task: URLSessionTask, didSendBodyData bytesSent: Int64, totalBytesSent: Int64, totalBytesExpectedToSend: Int64) {
-
         guard totalBytesExpectedToSend != NSURLSessionTransferSizeUnknown else { return }
         guard let url = task.currentRequest?.url?.absoluteString.removingPercentEncoding else { return }
         let fileName = (url as NSString).lastPathComponent
         let serverUrl = url.replacingOccurrences(of: "/" + fileName, with: "")
         let progress = Float(totalBytesSent) / Float(totalBytesExpectedToSend)
 
-        self.nkCommonInstance.delegate?.uploadProgress?(progress, totalBytes: totalBytesSent, totalBytesExpected: totalBytesExpectedToSend, fileName: fileName, serverUrl: serverUrl, session: session, task: task)
+        self.nkCommonInstance.delegate?.uploadProgress(progress, totalBytes: totalBytesSent, totalBytesExpected: totalBytesExpectedToSend, fileName: fileName, serverUrl: serverUrl, session: session, task: task)
     }
 
     public func urlSession(_ session: URLSession, task: URLSessionTask, didCompleteWithError error: Error?) {
-
-        var fileName: String = "", serverUrl: String = "", etag: String?, ocId: String?, date: NSDate?, dateLastModified: NSDate?, length: Int64 = 0
+        var fileName: String = "", serverUrl: String = "", etag: String?, ocId: String?, date: Date?, dateLastModified: Date?, length: Int64 = 0
         let url = task.currentRequest?.url?.absoluteString.removingPercentEncoding
-        if url != nil {
-            fileName = (url! as NSString).lastPathComponent
-            serverUrl = url!.replacingOccurrences(of: "/" + fileName, with: "")
+        if let url {
+            fileName = (url as NSString).lastPathComponent
+            serverUrl = url.replacingOccurrences(of: "/" + fileName, with: "")
         }
-
         var nkError: NKError = .success
 
         if let httpResponse = (task.response as? HTTPURLResponse) {
@@ -178,7 +166,7 @@ import Foundation
             } else if self.nkCommonInstance.findHeader("etag", allHeaderFields: header) != nil {
                 etag = self.nkCommonInstance.findHeader("etag", allHeaderFields: header)
             }
-            if etag != nil { etag = etag!.replacingOccurrences(of: "\"", with: "") }
+            if etag != nil { etag = etag?.replacingOccurrences(of: "\"", with: "") }
             if let dateString = self.nkCommonInstance.findHeader("date", allHeaderFields: header) {
                 date = self.nkCommonInstance.convertDate(dateString, format: "EEE, dd MMM y HH:mm:ss zzz")
             }
@@ -189,9 +177,9 @@ import Foundation
         }
 
         if task is URLSessionDownloadTask {
-            self.nkCommonInstance.delegate?.downloadComplete?(fileName: fileName, serverUrl: serverUrl, etag: etag, date: date, dateLastModified: dateLastModified, length: length, task: task, error: nkError)
+            self.nkCommonInstance.delegate?.downloadComplete(fileName: fileName, serverUrl: serverUrl, etag: etag, date: date, dateLastModified: dateLastModified, length: length, task: task, error: nkError)
         } else if task is URLSessionUploadTask {
-            self.nkCommonInstance.delegate?.uploadComplete?(fileName: fileName, serverUrl: serverUrl, ocId: ocId, etag: etag, date: date, size: task.countOfBytesExpectedToSend, task: task, error: nkError)
+            self.nkCommonInstance.delegate?.uploadComplete(fileName: fileName, serverUrl: serverUrl, ocId: ocId, etag: etag, date: date, size: task.countOfBytesExpectedToSend, task: task, error: nkError)
         }
 
         if nkError.errorCode == 0 {
@@ -202,12 +190,11 @@ import Foundation
     }
 
     public func urlSession(_ session: URLSession, didReceive challenge: URLAuthenticationChallenge, completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
-
         if self.nkCommonInstance.delegate == nil {
             self.nkCommonInstance.writeLog("[WARNING] URLAuthenticationChallenge, no delegate found, perform with default handling")
             completionHandler(URLSession.AuthChallengeDisposition.performDefaultHandling, nil)
         } else {
-            self.nkCommonInstance.delegate?.authenticationChallenge?(session, didReceive: challenge, completionHandler: { authChallengeDisposition, credential in
+            self.nkCommonInstance.delegate?.authenticationChallenge(session, didReceive: challenge, completionHandler: { authChallengeDisposition, credential in
                 if self.nkCommonInstance.levelLog > 1 {
                     self.nkCommonInstance.writeLog("[INFO AUTH] Challenge Disposition: \(authChallengeDisposition.rawValue)")
                 }
@@ -217,6 +204,6 @@ import Foundation
     }
 
     public func urlSessionDidFinishEvents(forBackgroundURLSession session: URLSession) {
-        self.nkCommonInstance.delegate?.urlSessionDidFinishEvents?(forBackgroundURLSession: session)
+        self.nkCommonInstance.delegate?.urlSessionDidFinishEvents(forBackgroundURLSession: session)
     }
 }

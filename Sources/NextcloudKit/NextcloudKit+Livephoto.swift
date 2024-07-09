@@ -24,24 +24,20 @@
 import Foundation
 import Alamofire
 
-extension NextcloudKit {
-
-    public func setLivephoto(serverUrlfileNamePath: String,
-                             livePhotoFile: String,
-                             options: NKRequestOptions = NKRequestOptions(),
-                             taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-                             completion: @escaping (_ account: String, _ error: NKError) -> Void) {
-
+public extension NextcloudKit {
+    func setLivephoto(serverUrlfileNamePath: String,
+                      livePhotoFile: String,
+                      options: NKRequestOptions = NKRequestOptions(),
+                      taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
+                      completion: @escaping (_ account: String, _ error: NKError) -> Void) {
         let account = self.nkCommonInstance.account
-
         guard let url = serverUrlfileNamePath.encodedToUrl else {
             return options.queue.async { completion(account, .urlError) }
         }
-
         let method = HTTPMethod(rawValue: "PROPPATCH")
         let headers = self.nkCommonInstance.getStandardHeaders(options.customHeader, customUserAgent: options.customUserAgent, contentType: "application/xml")
-
         var urlRequest: URLRequest
+
         do {
             try urlRequest = URLRequest(url: url, method: method, headers: headers)
             let parameters = String(format: NKDataFileXML(nkCommonInstance: self.nkCommonInstance).requestBodyLivephoto, livePhotoFile)
@@ -57,7 +53,6 @@ extension NextcloudKit {
             if self.nkCommonInstance.levelLog > 0 {
                 debugPrint(response)
             }
-
             switch response.result {
             case .failure(let error):
                 let error = NKError(error: error, afResponse: response, responseData: response.data)
@@ -66,17 +61,5 @@ extension NextcloudKit {
                 options.queue.async { completion(account, .success) }
             }
         }
-    }
-
-    @available(iOS 13.0, *)
-    public func setLivephoto(serverUrlfileNamePath: String,
-                             livePhotoFile: String,
-                             options: NKRequestOptions = NKRequestOptions()) async -> (account: String, error: NKError) {
-
-        await withUnsafeContinuation({ continuation in
-            setLivephoto(serverUrlfileNamePath: serverUrlfileNamePath, livePhotoFile: livePhotoFile, options: options) { account, error in
-                continuation.resume(returning: (account: account, error: error))
-            }
-        })
     }
 }

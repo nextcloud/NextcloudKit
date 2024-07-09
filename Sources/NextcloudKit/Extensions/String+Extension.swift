@@ -24,7 +24,6 @@ import Foundation
 import Alamofire
 
 extension String {
-
     public var urlEncoded: String? {
         // +        for historical reason, most web servers treat + as a replacement of whitespace
         // ?, &     mark query pararmeter which should not be part of a url string, but added seperately

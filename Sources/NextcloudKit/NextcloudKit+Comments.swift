@@ -24,26 +24,22 @@
 import Foundation
 import Alamofire
 
-extension NextcloudKit {
-
-    @objc public func getComments(fileId: String,
-                                  options: NKRequestOptions = NKRequestOptions(),
-                                  taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-                                  completion: @escaping (_ account: String, _ items: [NKComments]?, _ data: Data?, _ error: NKError) -> Void) {
-
+public extension NextcloudKit {
+    func getComments(fileId: String,
+                     options: NKRequestOptions = NKRequestOptions(),
+                     taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
+                     completion: @escaping (_ account: String, _ items: [NKComments]?, _ data: Data?, _ error: NKError) -> Void) {
         let account = self.nkCommonInstance.account
         let urlBase = self.nkCommonInstance.urlBase
         let dav = self.nkCommonInstance.dav
         let serverUrlEndpoint = urlBase + "/" + dav + "/comments/files/\(fileId)"
-
         guard let url = serverUrlEndpoint.encodedToUrl else {
             return options.queue.async { completion(account, nil, nil, .urlError) }
         }
-
         let method = HTTPMethod(rawValue: "PROPFIND")
         let headers = self.nkCommonInstance.getStandardHeaders(options.customHeader, customUserAgent: options.customUserAgent, contentType: "application/xml")
-
         var urlRequest: URLRequest
+
         do {
             try urlRequest = URLRequest(url: url, method: method, headers: headers)
             urlRequest.httpBody = NKDataFileXML(nkCommonInstance: self.nkCommonInstance).requestBodyComments.data(using: .utf8)
@@ -74,24 +70,21 @@ extension NextcloudKit {
         }
     }
 
-    @objc public func putComments(fileId: String,
-                                  message: String,
-                                  options: NKRequestOptions = NKRequestOptions(),
-                                  taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-                                  completion: @escaping (_ account: String, _ error: NKError) -> Void) {
-
+    func putComments(fileId: String,
+                     message: String,
+                     options: NKRequestOptions = NKRequestOptions(),
+                     taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
+                     completion: @escaping (_ account: String, _ error: NKError) -> Void) {
         let account = self.nkCommonInstance.account
         let urlBase = self.nkCommonInstance.urlBase
         let dav = self.nkCommonInstance.dav
         let serverUrlEndpoint = urlBase + "/" + dav + "/comments/files/\(fileId)"
-
         guard let url = serverUrlEndpoint.encodedToUrl else {
             return options.queue.async { completion(account, .urlError) }
         }
-
         let headers = self.nkCommonInstance.getStandardHeaders(options.customHeader, customUserAgent: options.customUserAgent, contentType: "application/json")
-
         var urlRequest: URLRequest
+
         do {
             try urlRequest = URLRequest(url: url, method: .post, headers: headers)
             let parameters = "{\"actorType\":\"users\",\"verb\":\"comment\",\"message\":\"" + message + "\"}"
@@ -118,26 +111,23 @@ extension NextcloudKit {
         }
     }
 
-    @objc public func updateComments(fileId: String,
-                                     messageId: String,
-                                     message: String,
-                                     options: NKRequestOptions = NKRequestOptions(),
-                                     taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-                                     completion: @escaping (_ account: String, _ error: NKError) -> Void) {
-
+    func updateComments(fileId: String,
+                        messageId: String,
+                        message: String,
+                        options: NKRequestOptions = NKRequestOptions(),
+                        taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
+                        completion: @escaping (_ account: String, _ error: NKError) -> Void) {
         let account = self.nkCommonInstance.account
         let urlBase = self.nkCommonInstance.urlBase
         let dav = self.nkCommonInstance.dav
         let serverUrlEndpoint = urlBase + "/" + dav + "/comments/files/\(fileId)/\(messageId)"
-
         guard let url = serverUrlEndpoint.encodedToUrl else {
             return options.queue.async { completion(account, .urlError) }
         }
-
         let method = HTTPMethod(rawValue: "PROPPATCH")
         let headers = self.nkCommonInstance.getStandardHeaders(options.customHeader, customUserAgent: options.customUserAgent, contentType: "application/xml")
-
         var urlRequest: URLRequest
+
         do {
             try urlRequest = URLRequest(url: url, method: method, headers: headers)
             let parameters = String(format: NKDataFileXML(nkCommonInstance: self.nkCommonInstance).requestBodyCommentsUpdate, message)
@@ -164,21 +154,18 @@ extension NextcloudKit {
         }
     }
 
-    @objc public func deleteComments(fileId: String,
-                                     messageId: String,
-                                     options: NKRequestOptions = NKRequestOptions(),
-                                     taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-                                     completion: @escaping (_ account: String, _ error: NKError) -> Void) {
-
+    func deleteComments(fileId: String,
+                        messageId: String,
+                        options: NKRequestOptions = NKRequestOptions(),
+                        taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
+                        completion: @escaping (_ account: String, _ error: NKError) -> Void) {
         let account = self.nkCommonInstance.account
         let urlBase = self.nkCommonInstance.urlBase
         let dav = self.nkCommonInstance.dav
         let serverUrlEndpoint = urlBase + "/" + dav + "/comments/files/\(fileId)/\(messageId)"
-
         guard let url = serverUrlEndpoint.encodedToUrl else {
             return options.queue.async { completion(account, .urlError) }
         }
-
         let headers = self.nkCommonInstance.getStandardHeaders(options: options)
 
         sessionManager.request(url, method: .delete, parameters: nil, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
@@ -199,24 +186,21 @@ extension NextcloudKit {
         }
     }
 
-    @objc public func markAsReadComments(fileId: String,
-                                         options: NKRequestOptions = NKRequestOptions(),
-                                         taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-                                         completion: @escaping (_ account: String, _ error: NKError) -> Void) {
-
+    func markAsReadComments(fileId: String,
+                            options: NKRequestOptions = NKRequestOptions(),
+                            taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
+                            completion: @escaping (_ account: String, _ error: NKError) -> Void) {
         let account = self.nkCommonInstance.account
         let urlBase = self.nkCommonInstance.urlBase
         let dav = self.nkCommonInstance.dav
         let serverUrlEndpoint = urlBase + "/" + dav + "/comments/files/\(fileId)"
-
         guard let url = serverUrlEndpoint.encodedToUrl else {
             return options.queue.async { completion(account, .urlError) }
         }
-
         let method = HTTPMethod(rawValue: "PROPPATCH")
         let headers = self.nkCommonInstance.getStandardHeaders(options.customHeader, customUserAgent: options.customUserAgent, contentType: "application/xml")
-
         var urlRequest: URLRequest
+
         do {
             try urlRequest = URLRequest(url: url, method: method, headers: headers)
             let parameters = String(format: NKDataFileXML(nkCommonInstance: self.nkCommonInstance).requestBodyCommentsMarkAsRead)
