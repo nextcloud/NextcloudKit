@@ -222,14 +222,30 @@ public extension NextcloudKit {
 
     // MARK: -
 
-    func getPreview(url: URL,
-                    options: NKRequestOptions = NKRequestOptions(),
-                    taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-                    completion: @escaping (_ account: String, _ data: Data?, _ error: NKError) -> Void) {
+    func downloadPreview(fileId: String,
+                         widthPreview: Int = 512,
+                         heightPreview: Int = 512,
+                         etag: String? = nil,
+                         crop: Int = 1,
+                         cropMode: String = "cover",
+                         forceIcon: Int = 0,
+                         mimeFallback: Int = 0,
+                         options: NKRequestOptions = NKRequestOptions(),
+                         taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
+                         completion: @escaping (_ account: String, _ data: Data?, _ error: NKError) -> Void) {
         let account = self.nkCommonInstance.account
-        let headers = self.nkCommonInstance.getStandardHeaders(options: options)
-
-        sessionManager.request(url, method: .get, parameters: nil, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
+        let urlBase = self.nkCommonInstance.urlBase
+        let endpoint = "index.php/core/preview?fileId=\(fileId)&x=\(widthPreview)&y=\(heightPreview)&a=\(crop)&mode=\(cropMode)&forceIcon=\(forceIcon)&mimeFallback=\(mimeFallback)"
+        let url = self.nkCommonInstance.createStandardUrl(serverUrl: urlBase, endpoint: endpoint)
+        guard let urlRequest = url else {
+            return options.queue.async { completion(account, nil, .urlError) }
+        }
+        var headers = self.nkCommonInstance.getStandardHeaders(options: options)
+        if var etag = etag {
+            etag = "\"" + etag + "\""
+            headers.update(name: "If-None-Match", value: etag)
+        }
+        sessionManager.request(urlRequest, method: .get, parameters: nil, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
             task.taskDescription = options.taskDescription
             taskHandler(task)
         }.response(queue: self.nkCommonInstance.backgroundQueue) { response in
