@@ -222,6 +222,40 @@ public extension NextcloudKit {
 
     // MARK: -
 
+    func downloadPreview(url: URL,
+                         etag: String? = nil,
+                         options: NKRequestOptions = NKRequestOptions(),
+                         taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
+                         completion: @escaping (_ account: String, _ data: Data?, _ error: NKError) -> Void) {
+        let account = self.nkCommonInstance.account
+        var headers = self.nkCommonInstance.getStandardHeaders(options: options)
+        if var etag = etag {
+            etag = "\"" + etag + "\""
+            headers.update(name: "If-None-Match", value: etag)
+        }
+
+        sessionManager.request(url, method: .get, parameters: nil, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
+            task.taskDescription = options.taskDescription
+            taskHandler(task)
+        }.response(queue: self.nkCommonInstance.backgroundQueue) { response in
+            if self.nkCommonInstance.levelLog > 0 {
+                debugPrint(response)
+            }
+
+            switch response.result {
+            case .failure(let error):
+                let error = NKError(error: error, afResponse: response, responseData: response.data)
+                options.queue.async { completion(account, nil, error) }
+            case .success:
+                if let data = response.data {
+                    options.queue.async { completion(account, data, .success) }
+                } else {
+                    options.queue.async { completion(account, nil, .invalidData) }
+                }
+            }
+        }
+    }
+
     func downloadPreview(fileId: String,
                          widthPreview: Int = 512,
                          heightPreview: Int = 512,
@@ -245,6 +279,7 @@ public extension NextcloudKit {
             etag = "\"" + etag + "\""
             headers.update(name: "If-None-Match", value: etag)
         }
+
         sessionManager.request(urlRequest, method: .get, parameters: nil, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
             task.taskDescription = options.taskDescription
             taskHandler(task)
