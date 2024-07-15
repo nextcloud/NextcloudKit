@@ -37,36 +37,36 @@ class FileNameValidatorTests: XCTestCase {
 
     func testInvalidCharacter() {
         let result = FileNameValidator.checkFileName("file<name", capability: capability)
-        XCTAssertEqual(result?.error as? NKError, FileNameValidator.emptyFilenameError)
+        XCTAssertEqual(result?.errorDescription, FileNameValidator.fileInvalidCharacterError.errorDescription)
     }
 
     func testReservedName() {
         let result = FileNameValidator.checkFileName("CON", capability: capability)
-        XCTAssertEqual(result?.error as? NKError, FileNameValidator.fileReservedNameError)
+        XCTAssertEqual(result?.errorDescription, FileNameValidator.fileReservedNameError.errorDescription)
     }
 
     func testEndsWithSpaceOrPeriod() {
         let result = FileNameValidator.checkFileName("filename ", capability: capability)
-        XCTAssertEqual(result?.error as? NKError, FileNameValidator.fileEndsWithSpacePeriodError)
+        XCTAssertEqual(result?.errorDescription, FileNameValidator.fileEndsWithSpacePeriodError.errorDescription)
 
         let result2 = FileNameValidator.checkFileName("filename.", capability: capability)
-        XCTAssertEqual(result?.error as? NKError, FileNameValidator.fileEndsWithSpacePeriodError)
+        XCTAssertEqual(result?.errorDescription, FileNameValidator.fileEndsWithSpacePeriodError.errorDescription)
     }
 
     func testEmptyFileName() {
         let result = FileNameValidator.checkFileName("", capability: capability)
-        XCTAssertEqual(result?.error as? NKError, FileNameValidator.emptyFilenameError)
+        XCTAssertEqual(result?.errorDescription, FileNameValidator.emptyFilenameError.errorDescription)
     }
 
     func testFileAlreadyExists() {
         let existingFiles: Set<String> = ["existingFile"]
         let result = FileNameValidator.checkFileName("existingFile", capability: capability, existedFileNames: existingFiles)
-        XCTAssertEqual(result?.error as? NKError, FileNameValidator.fileAlreadyExistsError)
+        XCTAssertEqual(result?.errorDescription, FileNameValidator.fileAlreadyExistsError.errorDescription)
     }
 
     func testValidFileName() {
         let result = FileNameValidator.checkFileName("validFileName", capability: capability)
-        XCTAssertNil(result)
+        XCTAssertNil(result?.errorDescription)
     }
 
     func testIsFileHidden() {

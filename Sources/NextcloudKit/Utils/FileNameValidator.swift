@@ -23,8 +23,8 @@
 import Foundation
 
 struct FileNameValidator {
-    static let reservedWindowsChars = "[<>:\"/\\\\|?*]"
-    static let reservedUnixChars = "[/<>|:&]"
+    static let reservedWindowsChars = try! NSRegularExpression(pattern: "[<>:\"/\\\\|?*]", options: [])
+    static let reservedUnixChars = try! NSRegularExpression(pattern: "[/<>|:&]", options: [])
     static let reservedWindowsNames = [
         "CON", "PRN", "AUX", "NUL",
         "COM0", "COM1", "COM2", "COM3", "COM4", "COM5", "COM6", "COM7", "COM8", "COM9",
@@ -36,8 +36,8 @@ struct FileNameValidator {
     public static let emptyFilenameError = NKError(errorCode: NSURLErrorCannotCreateFile, errorDescription: NSLocalizedString("_filename_empty_", value: "File name is empty", comment: ""))
     public static let fileAlreadyExistsError = NKError(errorCode: NSURLErrorCannotCreateFile, errorDescription: NSLocalizedString("_file_already_exists_", value: "Unable to complete the operation, a file with the same name exists", comment: ""))
     public static let fileEndsWithSpacePeriodError = NKError(errorCode: NSURLErrorCannotCreateFile, errorDescription: NSLocalizedString("_file_name_validator_error_ends_with_space_period_", value: "File name ends with a space or a period", comment: ""))
-    public static let fileReservedNameError = NKError(errorCode: NSURLErrorCannotCreateFile, errorDescription: NSLocalizedString("_file_name_validator_error_reserved_names_", value: "File name ends with a space or a period", comment: ""))
-    public static let fileInvalidCharacterError = NKError(errorCode: NSURLErrorCannotCreateFile, errorDescription: NSLocalizedString("_file_name_validator_error_invalid_character_", value: "File name ends with a space or a period", comment: ""))
+    public static let fileReservedNameError = NKError(errorCode: NSURLErrorCannotCreateFile, errorDescription: NSLocalizedString("_file_name_validator_error_reserved_names_", value: "%s is a reserved name", comment: ""))
+    public static let fileInvalidCharacterError = NKError(errorCode: NSURLErrorCannotCreateFile, errorDescription: NSLocalizedString("_file_name_validator_error_invalid_character_", value: "File name contains invalid characters: %s", comment: ""))
 
     static func checkFileName(_ filename: String, capability: OCCapability, existedFileNames: Set<String>? = nil) -> NKError? {
         if filename.isEmpty {
@@ -86,12 +86,21 @@ struct FileNameValidator {
     private static func checkInvalidCharacters(name: String, capability: OCCapability) -> NKError? {
         if !capability.forbiddenFilenameCharacters { return nil }
 
-        if let invalidCharacter = name.first(where: { String($0).range(of: reservedWindowsChars) != nil || String($0).range(of: reservedUnixChars) != nil }) {
-//            return String(format: NSLocalizedString("file_name_validator_error_invalid_character", comment: ""), String(invalidCharacter))
-            return fileInvalidCharacterError
-        }
+//        if let invalidCharacter = name.first(where: { String($0).range(of: reservedWindowsChars, options: .regularExpression) != nil || String($0).range(of: reservedUnixChars, options: .regularExpression) != nil }) {
+////            return String(format: NSLocalizedString("file_name_validator_error_invalid_character", comment: ""), String(invalidCharacter))
+//            return fileInvalidCharacterError
+//        }
 
-        return nil
+        for char in name {
+                let charAsString = String(char)
+                let range = NSRange(location: 0, length: charAsString.utf16.count)
+
+                if reservedWindowsChars.firstMatch(in: charAsString, options: [], range: range) != nil ||
+                   reservedUnixChars.firstMatch(in: charAsString, options: [], range: range) != nil {
+                    return fileInvalidCharacterError
+                }
+            }
+            return nil
     }
 
     static func isFileHidden(name: String) -> Bool {
