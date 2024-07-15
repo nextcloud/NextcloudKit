@@ -57,8 +57,8 @@ struct FileNameValidator {
         }
 
         if capability.forbiddenFilenames,
-           reservedWindowsNames.contains(filename.uppercased()) || reservedWindowsNames.contains(filename.removeFileExtension().uppercased()) {
-//            return String(format: NSLocalizedString("file_name_validator_error_reserved_names", comment: ""), filename.split(separator: ".").first ?? "")
+           reservedWindowsNames.contains(filename.uppercased()) || reservedWindowsNames.contains(filename.withRemovedFileExtension.uppercased()) {
+            //            return String(format: NSLocalizedString("file_name_validator_error_reserved_names", comment: ""), filename.split(separator: ".").first ?? "")
             return fileReservedNameError
         }
 
@@ -86,21 +86,16 @@ struct FileNameValidator {
     private static func checkInvalidCharacters(name: String, capability: OCCapability) -> NKError? {
         if !capability.forbiddenFilenameCharacters { return nil }
 
-//        if let invalidCharacter = name.first(where: { String($0).range(of: reservedWindowsChars, options: .regularExpression) != nil || String($0).range(of: reservedUnixChars, options: .regularExpression) != nil }) {
-////            return String(format: NSLocalizedString("file_name_validator_error_invalid_character", comment: ""), String(invalidCharacter))
-//            return fileInvalidCharacterError
-//        }
-
         for char in name {
-                let charAsString = String(char)
-                let range = NSRange(location: 0, length: charAsString.utf16.count)
+            let charAsString = String(char)
+            let range = NSRange(location: 0, length: charAsString.utf16.count)
 
-                if reservedWindowsChars.firstMatch(in: charAsString, options: [], range: range) != nil ||
-                   reservedUnixChars.firstMatch(in: charAsString, options: [], range: range) != nil {
-                    return fileInvalidCharacterError
-                }
+            if reservedWindowsChars.firstMatch(in: charAsString, options: [], range: range) != nil ||
+                reservedUnixChars.firstMatch(in: charAsString, options: [], range: range) != nil {
+                return fileInvalidCharacterError
             }
-            return nil
+        }
+        return nil
     }
 
     static func isFileHidden(name: String) -> Bool {
@@ -112,25 +107,8 @@ struct FileNameValidator {
     }
 }
 
-extension String {
-    func toRegex() -> NSRegularExpression {
-        return try! NSRegularExpression(pattern: self, options: [])
-    }
-
-    func removeFileExtension() -> String {
-        return NSString(string: self).deletingPathExtension
-    }
-}
-
 class OCCapability {
     var forbiddenFilenames: Bool = false
     var forbiddenFilenameCharacters: Bool = false
     var forbiddenFilenameExtension: Bool = false
 }
-
-class Context {
-    func getString(_ key: String) -> String {
-        return NSLocalizedString(key, comment: "")
-    }
-}
-

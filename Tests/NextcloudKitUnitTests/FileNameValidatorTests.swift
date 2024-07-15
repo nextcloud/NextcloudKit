@@ -50,7 +50,7 @@ class FileNameValidatorTests: XCTestCase {
         XCTAssertEqual(result?.errorDescription, FileNameValidator.fileEndsWithSpacePeriodError.errorDescription)
 
         let result2 = FileNameValidator.checkFileName("filename.", capability: capability)
-        XCTAssertEqual(result?.errorDescription, FileNameValidator.fileEndsWithSpacePeriodError.errorDescription)
+        XCTAssertEqual(result2?.errorDescription, FileNameValidator.fileEndsWithSpacePeriodError.errorDescription)
     }
 
     func testEmptyFileName() {
