@@ -22,13 +22,18 @@
 
 import Foundation
 
-struct FileNameValidator {
-    public static var forbiddenFileNames: [String] = []
-    public static var forbiddenFileNameBasenames: [String] = []
+class FileNameValidator {
+    static let shared: FileNameValidator = {
+        let instance = FileNameValidator()
+        return instance
+    }()
 
-    private static var forbiddenFileNameCharactersRegex: NSRegularExpression?
+    public var forbiddenFileNames: [String] = []
+    public var forbiddenFileNameBasenames: [String] = []
 
-    public static var forbiddenFileNameCharacters: [String] = [] {
+    private var forbiddenFileNameCharactersRegex: NSRegularExpression?
+
+    public var forbiddenFileNameCharacters: [String] = [] {
         didSet {
             forbiddenFileNameCharactersRegex = try? NSRegularExpression(pattern: "[\(forbiddenFileNameCharacters.joined())]")
         }
@@ -36,7 +41,7 @@ struct FileNameValidator {
 
 //    private static var forbiddenFileNameExtensionsRegex: NSRegularExpression?
 
-    public static var forbiddenFileNameExtensions: [String] = []
+    public var forbiddenFileNameExtensions: [String] = []
 //    {
 //        didSet {
 //            forbiddenFileNameExtensionsRegex = try? NSRegularExpression(pattern: forbiddenFileNameExtensions.joined())
@@ -54,21 +59,23 @@ struct FileNameValidator {
 //        "LPT¹", "LPT²", "LPT³"
 //    ]
 
-    public static let emptyFilenameError = NKError(errorCode: NSURLErrorCannotCreateFile, errorDescription: NSLocalizedString("_filename_empty_", value: "File name is empty", comment: ""))
-    public static let fileAlreadyExistsError = NKError(errorCode: NSURLErrorCannotCreateFile, errorDescription: NSLocalizedString("_file_already_exists_", value: "Unable to complete the operation, a file with the same name exists", comment: ""))
-    public static let fileEndsWithSpacePeriodError = NKError(errorCode: NSURLErrorCannotCreateFile, errorDescription: NSLocalizedString("_file_name_validator_error_ends_with_space_period_", value: "File name ends with a space or a period", comment: ""))
-    public static let fileReservedNameError = NKError(errorCode: NSURLErrorCannotCreateFile, errorDescription: NSLocalizedString("_file_name_validator_error_reserved_names_", value: "%s is a reserved name", comment: ""))
-    public static let fileForbiddenFileExtensionError = NKError(errorCode: NSURLErrorCannotCreateFile, errorDescription: NSLocalizedString("_file_name_validator_error_reserved_names_", value: ".%s is a forbidden file extension", comment: ""))
-    public static let fileInvalidCharacterError = NKError(errorCode: NSURLErrorCannotCreateFile, errorDescription: NSLocalizedString("_file_name_validator_error_invalid_character_", value: "File name contains invalid characters: %s", comment: ""))
+    public let emptyFilenameError = NKError(errorCode: NSURLErrorCannotCreateFile, errorDescription: NSLocalizedString("_filename_empty_", value: "File name is empty", comment: ""))
+    public let fileAlreadyExistsError = NKError(errorCode: NSURLErrorCannotCreateFile, errorDescription: NSLocalizedString("_file_already_exists_", value: "Unable to complete the operation, a file with the same name exists", comment: ""))
+    public let fileEndsWithSpacePeriodError = NKError(errorCode: NSURLErrorCannotCreateFile, errorDescription: NSLocalizedString("_file_name_validator_error_ends_with_space_period_", value: "File name ends with a space or a period", comment: ""))
+    public let fileReservedNameError = NKError(errorCode: NSURLErrorCannotCreateFile, errorDescription: NSLocalizedString("_file_name_validator_error_reserved_names_", value: "%s is a reserved name", comment: ""))
+    public let fileForbiddenFileExtensionError = NKError(errorCode: NSURLErrorCannotCreateFile, errorDescription: NSLocalizedString("_file_name_validator_error_reserved_names_", value: ".%s is a forbidden file extension", comment: ""))
+    public let fileInvalidCharacterError = NKError(errorCode: NSURLErrorCannotCreateFile, errorDescription: NSLocalizedString("_file_name_validator_error_invalid_character_", value: "File name contains invalid characters: %s", comment: ""))
 
-    public static func setup(forbiddenFileNames: [String], forbiddenFileNameBasenames: [String], forbiddenFileNameCharacters: [String], forbiddenFileNameExtensions: [String]) {
+    private init() {}
+
+    public func setup(forbiddenFileNames: [String], forbiddenFileNameBasenames: [String], forbiddenFileNameCharacters: [String], forbiddenFileNameExtensions: [String]) {
         self.forbiddenFileNames = forbiddenFileNames
         self.forbiddenFileNameBasenames = forbiddenFileNameBasenames
         self.forbiddenFileNameCharacters = forbiddenFileNameCharacters
         self.forbiddenFileNameExtensions = forbiddenFileNameExtensions
     }
 
-    static func checkFileName(_ filename: String, existedFileNames: Set<String>? = nil) -> NKError? {
+    func checkFileName(_ filename: String, existedFileNames: Set<String>? = nil) -> NKError? {
         if filename.isEmpty {
             return emptyFilenameError
         }
@@ -101,21 +108,21 @@ struct FileNameValidator {
         return nil
     }
 
-    static func checkFolderAndFilePaths(folderPath: String, filePaths: [String]) -> Bool {
+    func checkFolderAndFilePaths(folderPath: String, filePaths: [String]) -> Bool {
         return checkFolderPath(folderPath: folderPath) &&
         checkFilePaths(filePaths: filePaths)
     }
 
-    static func checkFilePaths(filePaths: [String]) -> Bool {
+    func checkFilePaths(filePaths: [String]) -> Bool {
         return filePaths.allSatisfy { checkFileName($0) == nil }
     }
 
-    static func checkFolderPath(folderPath: String) -> Bool {
+    func checkFolderPath(folderPath: String) -> Bool {
         return folderPath.split { $0 == "/" || $0 == "\\" }
             .allSatisfy { checkFileName(String($0)) == nil }
     }
 
-    private static func checkInvalidCharacters(string: String) -> NKError? {
+    private func checkInvalidCharacters(string: String) -> NKError? {
         for char in string {
             let charAsString = String(char)
             let range = NSRange(location: 0, length: charAsString.utf16.count)
@@ -127,12 +134,12 @@ struct FileNameValidator {
         return nil
     }
 
-    public static func isFileHidden(name: String) -> Bool {
+    public func isFileHidden(name: String) -> Bool {
         return !name.isEmpty && name.first == "."
     }
 
     // TODO: Check if we cant use available API
-    public static func fileNameAlreadyExists(_ name: String, fileNames: Set<String>) -> Bool {
+    public func fileNameAlreadyExists(_ name: String, fileNames: Set<String>) -> Bool {
         return fileNames.contains(name)
     }
 }
