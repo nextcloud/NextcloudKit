@@ -23,20 +23,20 @@
 import Foundation
 
 struct FileNameValidator {
-    static var forbiddenFileNames: [String] = []
-    static var forbiddenFileNameBasenames: [String] = []
+    public static var forbiddenFileNames: [String] = []
+    public static var forbiddenFileNameBasenames: [String] = []
 
     private static var forbiddenFileNameCharactersRegex: NSRegularExpression?
 
-    static var forbiddenFileNameCharacters: [String] = [] {
+    public static var forbiddenFileNameCharacters: [String] = [] {
         didSet {
-            forbiddenFileNameCharactersRegex = try? NSRegularExpression(pattern: forbiddenFileNameCharacters.joined())
+            forbiddenFileNameCharactersRegex = try? NSRegularExpression(pattern: "[\(forbiddenFileNameCharacters.joined())]")
         }
     }
 
 //    private static var forbiddenFileNameExtensionsRegex: NSRegularExpression?
 
-    static var forbiddenFileNameExtensions: [String] = []
+    public static var forbiddenFileNameExtensions: [String] = []
 //    {
 //        didSet {
 //            forbiddenFileNameExtensionsRegex = try? NSRegularExpression(pattern: forbiddenFileNameExtensions.joined())
@@ -58,14 +58,22 @@ struct FileNameValidator {
     public static let fileAlreadyExistsError = NKError(errorCode: NSURLErrorCannotCreateFile, errorDescription: NSLocalizedString("_file_already_exists_", value: "Unable to complete the operation, a file with the same name exists", comment: ""))
     public static let fileEndsWithSpacePeriodError = NKError(errorCode: NSURLErrorCannotCreateFile, errorDescription: NSLocalizedString("_file_name_validator_error_ends_with_space_period_", value: "File name ends with a space or a period", comment: ""))
     public static let fileReservedNameError = NKError(errorCode: NSURLErrorCannotCreateFile, errorDescription: NSLocalizedString("_file_name_validator_error_reserved_names_", value: "%s is a reserved name", comment: ""))
+    public static let fileForbiddenFileExtensionError = NKError(errorCode: NSURLErrorCannotCreateFile, errorDescription: NSLocalizedString("_file_name_validator_error_reserved_names_", value: ".%s is a forbidden file extension", comment: ""))
     public static let fileInvalidCharacterError = NKError(errorCode: NSURLErrorCannotCreateFile, errorDescription: NSLocalizedString("_file_name_validator_error_invalid_character_", value: "File name contains invalid characters: %s", comment: ""))
+
+    public static func setup(forbiddenFileNames: [String], forbiddenFileNameBasenames: [String], forbiddenFileNameCharacters: [String], forbiddenFileNameExtensions: [String]) {
+        self.forbiddenFileNames = forbiddenFileNames
+        self.forbiddenFileNameBasenames = forbiddenFileNameBasenames
+        self.forbiddenFileNameCharacters = forbiddenFileNameCharacters
+        self.forbiddenFileNameExtensions = forbiddenFileNameExtensions
+    }
 
     static func checkFileName(_ filename: String, existedFileNames: Set<String>? = nil) -> NKError? {
         if filename.isEmpty {
             return emptyFilenameError
         }
 
-        if isFileNameAlreadyExist(filename, fileNames: existedFileNames ?? Set()) {
+        if fileNameAlreadyExists(filename, fileNames: existedFileNames ?? Set()) {
             return fileAlreadyExistsError
         }
 
@@ -80,6 +88,10 @@ struct FileNameValidator {
         if forbiddenFileNames.contains(filename.uppercased()) || forbiddenFileNames.contains(filename.withRemovedFileExtension.uppercased()) {
             //            return String(format: NSLocalizedString("file_name_validator_error_reserved_names", comment: ""), filename.split(separator: ".").first ?? "")
             return fileReservedNameError
+        }
+
+        if forbiddenFileNameExtensions.contains(where: { filename.lowercased().hasSuffix($0.lowercased()) }) {
+            return fileForbiddenFileExtensionError
         }
 
 //        if capability.forbiddenFilenameExtension {
@@ -108,8 +120,6 @@ struct FileNameValidator {
             let charAsString = String(char)
             let range = NSRange(location: 0, length: charAsString.utf16.count)
 
-            let joinedChars = forbiddenFileNameCharacters.joined()
-
             if forbiddenFileNameCharactersRegex?.firstMatch(in: charAsString, options: [], range: range) != nil {
                 return fileInvalidCharacterError
             }
@@ -117,17 +127,12 @@ struct FileNameValidator {
         return nil
     }
 
-    static func isFileHidden(name: String) -> Bool {
+    public static func isFileHidden(name: String) -> Bool {
         return !name.isEmpty && name.first == "."
     }
 
-    static func isFileNameAlreadyExist(_ name: String, fileNames: Set<String>) -> Bool {
+    // TODO: Check if we cant use available API
+    public static func fileNameAlreadyExists(_ name: String, fileNames: Set<String>) -> Bool {
         return fileNames.contains(name)
     }
-}
-
-class OCCapability {
-    var forbiddenFilenames: Bool = false
-    var forbiddenFilenameCharacters: Bool = false
-    var forbiddenFilenameExtension: Bool = false
 }

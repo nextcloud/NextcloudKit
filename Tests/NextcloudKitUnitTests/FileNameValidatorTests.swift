@@ -24,48 +24,55 @@ import XCTest
 @testable import NextcloudKit
 
 class FileNameValidatorTests: XCTestCase {
-
-    var capability: OCCapability!
-
     override func setUp() {
+        FileNameValidator.setup(
+            forbiddenFileNames: ["CON", "PRN", "AUX", "NUL", "COM0", "COM1", "COM2", "COM3", "COM4",
+                                 "COM5", "COM6", "COM7", "COM8", "COM9", "COM¹", "COM²", "COM³",
+                                 "LPT0", "LPT1", "LPT2", "LPT3", "LPT4", "LPT5", "LPT6", "LPT7",
+                                 "LPT8", "LPT9", "LPT¹", "LPT²", "LPT³"],
+            forbiddenFileNameBasenames: [],
+            forbiddenFileNameCharacters: ["<", ">", ":", "\\\\", "/", "|", "?", "*", "&"],
+            forbiddenFileNameExtensions: [".filepart",".part"]
+        )
         super.setUp()
-        capability = OCCapability()
-        capability.forbiddenFilenames = true
-        capability.forbiddenFilenameExtension = true
-        capability.forbiddenFilenameCharacters = true
     }
 
     func testInvalidCharacter() {
-        let result = FileNameValidator.checkFileName("file<name", capability: capability)
+        let result = FileNameValidator.checkFileName("file<name")
         XCTAssertEqual(result?.errorDescription, FileNameValidator.fileInvalidCharacterError.errorDescription)
     }
 
     func testReservedName() {
-        let result = FileNameValidator.checkFileName("CON", capability: capability)
+        let result = FileNameValidator.checkFileName("CON")
         XCTAssertEqual(result?.errorDescription, FileNameValidator.fileReservedNameError.errorDescription)
     }
 
+    func testForbiddenFilenameExtension() {
+        let result = FileNameValidator.checkFileName("my_fav_file.filepart")
+        XCTAssertEqual(result?.errorDescription, FileNameValidator.fileForbiddenFileExtensionError.errorDescription)
+    }
+
     func testEndsWithSpaceOrPeriod() {
-        let result = FileNameValidator.checkFileName("filename ", capability: capability)
+        let result = FileNameValidator.checkFileName("filename ")
         XCTAssertEqual(result?.errorDescription, FileNameValidator.fileEndsWithSpacePeriodError.errorDescription)
 
-        let result2 = FileNameValidator.checkFileName("filename.", capability: capability)
+        let result2 = FileNameValidator.checkFileName("filename.")
         XCTAssertEqual(result2?.errorDescription, FileNameValidator.fileEndsWithSpacePeriodError.errorDescription)
     }
 
     func testEmptyFileName() {
-        let result = FileNameValidator.checkFileName("", capability: capability)
+        let result = FileNameValidator.checkFileName("")
         XCTAssertEqual(result?.errorDescription, FileNameValidator.emptyFilenameError.errorDescription)
     }
 
     func testFileAlreadyExists() {
         let existingFiles: Set<String> = ["existingFile"]
-        let result = FileNameValidator.checkFileName("existingFile", capability: capability, existedFileNames: existingFiles)
+        let result = FileNameValidator.checkFileName("existingFile", existedFileNames: existingFiles)
         XCTAssertEqual(result?.errorDescription, FileNameValidator.fileAlreadyExistsError.errorDescription)
     }
 
     func testValidFileName() {
-        let result = FileNameValidator.checkFileName("validFileName", capability: capability)
+        let result = FileNameValidator.checkFileName("validFileName")
         XCTAssertNil(result?.errorDescription)
     }
 
@@ -74,17 +81,17 @@ class FileNameValidatorTests: XCTestCase {
         XCTAssertFalse(FileNameValidator.isFileHidden(name: "visibleFile"))
     }
 
-    func testIsFileNameAlreadyExist() {
+    func testIsFileNameAlreadyExists() {
         let existingFiles: Set<String> = ["existingFile"]
-        XCTAssertTrue(FileNameValidator.isFileNameAlreadyExist("existingFile", fileNames: existingFiles))
-        XCTAssertFalse(FileNameValidator.isFileNameAlreadyExist("newFile", fileNames: existingFiles))
+        XCTAssertTrue(FileNameValidator.fileNameAlreadyExists("existingFile", fileNames: existingFiles))
+        XCTAssertFalse(FileNameValidator.fileNameAlreadyExists("newFile", fileNames: existingFiles))
     }
 
     func testValidFolderAndFilePaths() {
         let folderPath = "validFolder"
         let filePaths = ["file1.txt", "file2.doc", "file3.jpg"]
 
-        let result = FileNameValidator.checkFolderAndFilePaths(folderPath: folderPath, filePaths: filePaths, capability: capability)
+        let result = FileNameValidator.checkFolderAndFilePaths(folderPath: folderPath, filePaths: filePaths)
         XCTAssertTrue(result)
     }
 
@@ -92,7 +99,7 @@ class FileNameValidatorTests: XCTestCase {
         let folderPath = "CON"
         let filePaths = ["file1.txt", "file2.doc", "file3.jpg"]
 
-        let result = FileNameValidator.checkFolderAndFilePaths(folderPath: folderPath, filePaths: filePaths, capability: capability)
+        let result = FileNameValidator.checkFolderAndFilePaths(folderPath: folderPath, filePaths: filePaths)
         XCTAssertFalse(result)
     }
 
@@ -100,7 +107,7 @@ class FileNameValidatorTests: XCTestCase {
         let folderPath = "validFolder"
         let filePaths = ["file1.txt", "PRN.doc", "file3.jpg"]
 
-        let result = FileNameValidator.checkFolderAndFilePaths(folderPath: folderPath, filePaths: filePaths, capability: capability)
+        let result = FileNameValidator.checkFolderAndFilePaths(folderPath: folderPath, filePaths: filePaths)
         XCTAssertFalse(result)
     }
 
@@ -108,7 +115,7 @@ class FileNameValidatorTests: XCTestCase {
         let folderPath = "invalid<Folder"
         let filePaths = ["file1.txt", "file2.doc", "file3.jpg"]
 
-        let result = FileNameValidator.checkFolderAndFilePaths(folderPath: folderPath, filePaths: filePaths, capability: capability)
+        let result = FileNameValidator.checkFolderAndFilePaths(folderPath: folderPath, filePaths: filePaths)
         XCTAssertFalse(result)
     }
 
@@ -116,7 +123,7 @@ class FileNameValidatorTests: XCTestCase {
         let folderPath = "validFolder"
         let filePaths = ["file1.txt", "file|2.doc", "file3.jpg"]
 
-        let result = FileNameValidator.checkFolderAndFilePaths(folderPath: folderPath, filePaths: filePaths, capability: capability)
+        let result = FileNameValidator.checkFolderAndFilePaths(folderPath: folderPath, filePaths: filePaths)
         XCTAssertFalse(result)
     }
 
@@ -124,7 +131,7 @@ class FileNameValidatorTests: XCTestCase {
         let folderPath = "folderWithSpace "
         let filePaths = ["file1.txt", "file2.doc", "file3.jpg"]
 
-        let result = FileNameValidator.checkFolderAndFilePaths(folderPath: folderPath, filePaths: filePaths, capability: capability)
+        let result = FileNameValidator.checkFolderAndFilePaths(folderPath: folderPath, filePaths: filePaths)
         XCTAssertFalse(result)
     }
 
@@ -132,7 +139,7 @@ class FileNameValidatorTests: XCTestCase {
         let folderPath = "validFolder"
         let filePaths = ["file1.txt", "file2.doc", "file3."]
 
-        let result = FileNameValidator.checkFolderAndFilePaths(folderPath: folderPath, filePaths: filePaths, capability: capability)
+        let result = FileNameValidator.checkFolderAndFilePaths(folderPath: folderPath, filePaths: filePaths)
         XCTAssertFalse(result)
     }
 
@@ -140,21 +147,21 @@ class FileNameValidatorTests: XCTestCase {
         let folderPath = "validFolder/secondValidFolder/CON"
         let filePaths = ["file1.txt", "file2.doc", "file3."]
 
-        let result = FileNameValidator.checkFolderAndFilePaths(folderPath: folderPath, filePaths: filePaths, capability: capability)
+        let result = FileNameValidator.checkFolderAndFilePaths(folderPath: folderPath, filePaths: filePaths)
         XCTAssertFalse(result)
     }
 
     func testOnlyFolderPath() {
         let folderPath = "/A1/Aaaww/W/C2/"
 
-        let result = FileNameValidator.checkFolderAndFilePaths(folderPath: folderPath, filePaths: [], capability: capability)
+        let result = FileNameValidator.checkFolderAndFilePaths(folderPath: folderPath, filePaths: [])
         XCTAssertTrue(result)
     }
 
     func testOnlyFolderPathWithOneReservedName() {
         let folderPath = "/A1/Aaaww/CON/W/C2/"
 
-        let result = FileNameValidator.checkFolderAndFilePaths(folderPath: folderPath, filePaths: [], capability: capability)
+        let result = FileNameValidator.checkFolderAndFilePaths(folderPath: folderPath, filePaths: [])
         XCTAssertFalse(result)
     }
 }
