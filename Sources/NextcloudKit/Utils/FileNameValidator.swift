@@ -23,7 +23,7 @@
 import Foundation
 
 public class FileNameValidator {
-    static let shared: FileNameValidator = {
+    public static let shared: FileNameValidator = {
         let instance = FileNameValidator()
         return instance
     }()
