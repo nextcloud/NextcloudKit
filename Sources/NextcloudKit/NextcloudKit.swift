@@ -80,11 +80,13 @@ open class NextcloudKit: SessionDelegate {
 
     public func setup(account: String? = nil, user: String, userId: String, password: String, urlBase: String) {
         if (self.nkCommonInstance.account != account) || (self.nkCommonInstance.urlBase != urlBase && self.nkCommonInstance.user != user) {
+            /*
             if let cookieStore = sessionManager.session.configuration.httpCookieStorage {
                 for cookie in cookieStore.cookies ?? [] {
                     cookieStore.deleteCookie(cookie)
                 }
             }
+            */
             self.nkCommonInstance.internalTypeIdentifiers = []
         }
 
