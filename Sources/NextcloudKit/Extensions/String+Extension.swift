@@ -40,6 +40,6 @@ extension String {
     }
 
     public var withRemovedFileExtension: String {
-        return NSString(string: self).deletingPathExtension
+        return String(NSString(string: self).deletingPathExtension)
     }
 }

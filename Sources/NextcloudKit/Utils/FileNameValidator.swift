@@ -23,15 +23,36 @@
 import Foundation
 
 struct FileNameValidator {
-    static let reservedWindowsChars = try! NSRegularExpression(pattern: "[<>:\"/\\\\|?*]", options: [])
-    static let reservedUnixChars = try! NSRegularExpression(pattern: "[/<>|:&]", options: [])
-    static let reservedWindowsNames = [
-        "CON", "PRN", "AUX", "NUL",
-        "COM0", "COM1", "COM2", "COM3", "COM4", "COM5", "COM6", "COM7", "COM8", "COM9",
-        "COM¹", "COM²", "COM³",
-        "LPT0", "LPT1", "LPT2", "LPT3", "LPT4", "LPT5", "LPT6", "LPT7", "LPT8", "LPT9",
-        "LPT¹", "LPT²", "LPT³"
-    ]
+    static var forbiddenFileNames: [String] = []
+    static var forbiddenFileNameBasenames: [String] = []
+
+    private static var forbiddenFileNameCharactersRegex: NSRegularExpression?
+
+    static var forbiddenFileNameCharacters: [String] = [] {
+        didSet {
+            forbiddenFileNameCharactersRegex = try? NSRegularExpression(pattern: forbiddenFileNameCharacters.joined())
+        }
+    }
+
+//    private static var forbiddenFileNameExtensionsRegex: NSRegularExpression?
+
+    static var forbiddenFileNameExtensions: [String] = []
+//    {
+//        didSet {
+//            forbiddenFileNameExtensionsRegex = try? NSRegularExpression(pattern: forbiddenFileNameExtensions.joined())
+//        }
+//    }
+    ////    static let reservedWindowsChars = try! NSRegularExpression(pattern: "[<>:\"/\\\\|?*]", options: [])
+    //    static var reservedWindowsChars: [String] = []
+    ////    static let reservedUnixChars = try! NSRegularExpression(pattern: "[/<>|:&]", options: [])
+    //    static var reservedUnixChars: [String] = []
+    //    static let reservedWindowsNames = [
+    //        "CON", "PRN", "AUX", "NUL",
+    //        "COM0", "COM1", "COM2", "COM3", "COM4", "COM5", "COM6", "COM7", "COM8", "COM9",
+    //        "COM¹", "COM²", "COM³",
+    //        "LPT0", "LPT1", "LPT2", "LPT3", "LPT4", "LPT5", "LPT6", "LPT7", "LPT8", "LPT9",
+//        "LPT¹", "LPT²", "LPT³"
+//    ]
 
     public static let emptyFilenameError = NKError(errorCode: NSURLErrorCannotCreateFile, errorDescription: NSLocalizedString("_filename_empty_", value: "File name is empty", comment: ""))
     public static let fileAlreadyExistsError = NKError(errorCode: NSURLErrorCannotCreateFile, errorDescription: NSLocalizedString("_file_already_exists_", value: "Unable to complete the operation, a file with the same name exists", comment: ""))
@@ -39,7 +60,7 @@ struct FileNameValidator {
     public static let fileReservedNameError = NKError(errorCode: NSURLErrorCannotCreateFile, errorDescription: NSLocalizedString("_file_name_validator_error_reserved_names_", value: "%s is a reserved name", comment: ""))
     public static let fileInvalidCharacterError = NKError(errorCode: NSURLErrorCannotCreateFile, errorDescription: NSLocalizedString("_file_name_validator_error_invalid_character_", value: "File name contains invalid characters: %s", comment: ""))
 
-    static func checkFileName(_ filename: String, capability: OCCapability, existedFileNames: Set<String>? = nil) -> NKError? {
+    static func checkFileName(_ filename: String, existedFileNames: Set<String>? = nil) -> NKError? {
         if filename.isEmpty {
             return emptyFilenameError
         }
@@ -52,46 +73,44 @@ struct FileNameValidator {
             return fileEndsWithSpacePeriodError
         }
 
-        if let invalidCharacterError = checkInvalidCharacters(name: filename, capability: capability) {
+        if let invalidCharacterError = checkInvalidCharacters(string: filename) {
             return invalidCharacterError
         }
 
-        if capability.forbiddenFilenames,
-           reservedWindowsNames.contains(filename.uppercased()) || reservedWindowsNames.contains(filename.withRemovedFileExtension.uppercased()) {
+        if forbiddenFileNames.contains(filename.uppercased()) || forbiddenFileNames.contains(filename.withRemovedFileExtension.uppercased()) {
             //            return String(format: NSLocalizedString("file_name_validator_error_reserved_names", comment: ""), filename.split(separator: ".").first ?? "")
             return fileReservedNameError
         }
 
-        if capability.forbiddenFilenameExtension {
-            // TODO add logic
-        }
+//        if capability.forbiddenFilenameExtension {
+//            // TODO add logic
+//        }
 
         return nil
     }
 
-    static func checkFolderAndFilePaths(folderPath: String, filePaths: [String], capability: OCCapability) -> Bool {
-        return checkFolderPath(folderPath: folderPath, capability: capability) &&
-        checkFilePaths(filePaths: filePaths, capability: capability)
+    static func checkFolderAndFilePaths(folderPath: String, filePaths: [String]) -> Bool {
+        return checkFolderPath(folderPath: folderPath) &&
+        checkFilePaths(filePaths: filePaths)
     }
 
-    static func checkFilePaths(filePaths: [String], capability: OCCapability) -> Bool {
-        return filePaths.allSatisfy { checkFileName($0, capability: capability) == nil }
+    static func checkFilePaths(filePaths: [String]) -> Bool {
+        return filePaths.allSatisfy { checkFileName($0) == nil }
     }
 
-    static func checkFolderPath(folderPath: String, capability: OCCapability) -> Bool {
+    static func checkFolderPath(folderPath: String) -> Bool {
         return folderPath.split { $0 == "/" || $0 == "\\" }
-            .allSatisfy { checkFileName(String($0), capability: capability) == nil }
+            .allSatisfy { checkFileName(String($0)) == nil }
     }
 
-    private static func checkInvalidCharacters(name: String, capability: OCCapability) -> NKError? {
-        if !capability.forbiddenFilenameCharacters { return nil }
-
-        for char in name {
+    private static func checkInvalidCharacters(string: String) -> NKError? {
+        for char in string {
             let charAsString = String(char)
             let range = NSRange(location: 0, length: charAsString.utf16.count)
 
-            if reservedWindowsChars.firstMatch(in: charAsString, options: [], range: range) != nil ||
-                reservedUnixChars.firstMatch(in: charAsString, options: [], range: range) != nil {
+            let joinedChars = forbiddenFileNameCharacters.joined()
+
+            if forbiddenFileNameCharactersRegex?.firstMatch(in: charAsString, options: [], range: range) != nil {
                 return fileInvalidCharacterError
             }
         }
