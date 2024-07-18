@@ -71,22 +71,24 @@ open class NextcloudKit: SessionDelegate {
 
     // MARK: - Setup
 
-    public func setup(account: String? = nil, user: String, userId: String, password: String, urlBase: String, userAgent: String, nextcloudVersion: Int, delegate: NKCommonDelegate?) {
-        self.setup(account: account, user: user, userId: userId, password: password, urlBase: urlBase)
+    public func setup(account: String? = nil, user: String, userId: String, password: String, urlBase: String, userAgent: String, nextcloudVersion: Int, groupContainerIdentifier: String? = nil, delegate: NKCommonDelegate?) {
+        self.setup(account: account, user: user, userId: userId, password: password, urlBase: urlBase, groupContainerIdentifier: groupContainerIdentifier)
         self.setup(userAgent: userAgent)
         self.setup(nextcloudVersion: nextcloudVersion)
         self.setup(delegate: delegate)
     }
 
-    public func setup(account: String? = nil, user: String, userId: String, password: String, urlBase: String) {
+    public func setup(account: String? = nil, user: String, userId: String, password: String, urlBase: String, groupContainerIdentifier: String? = nil) {
         if (self.nkCommonInstance.account != account) || (self.nkCommonInstance.urlBase != urlBase && self.nkCommonInstance.user != user) {
-            /*
             if let cookieStore = sessionManager.session.configuration.httpCookieStorage {
                 for cookie in cookieStore.cookies ?? [] {
                     cookieStore.deleteCookie(cookie)
                 }
             }
-            */
+            if let groupContainerIdentifier {
+                let cookieStorage = HTTPCookieStorage.sharedCookieStorage(forGroupContainerIdentifier: groupContainerIdentifier)
+                sessionManager.session.configuration.httpCookieStorage = cookieStorage
+            }
             self.nkCommonInstance.internalTypeIdentifiers = []
         }
 
