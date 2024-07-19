@@ -97,6 +97,10 @@ public class NKCommon: NSObject {
     internal lazy var sessionConfiguration: URLSessionConfiguration = {
         let configuration = URLSessionConfiguration.af.default
         configuration.requestCachePolicy = .reloadIgnoringLocalCacheData
+        if let groupIdentifier {
+            let cookieStorage = HTTPCookieStorage.sharedCookieStorage(forGroupContainerIdentifier: groupIdentifier)
+            configuration.httpCookieStorage = cookieStorage
+        }
         return configuration
     }()
     internal var rootQueue: DispatchQueue = DispatchQueue(label: "com.nextcloud.nextcloudkit.sessionManagerData.rootQueue")
@@ -110,6 +114,7 @@ public class NKCommon: NSObject {
     internal var internalUrlBase = ""
     internal var internalUserAgent: String?
     internal var internalNextcloudVersion: Int = 0
+    internal var internalGroupIdentifier: String?
 
     internal var internalTypeIdentifiers: [UTTypeConformsToServer] = []
     internal var utiCache = NSCache<NSString, CFString>()
@@ -151,6 +156,10 @@ public class NKCommon: NSObject {
 
     public var nextcloudVersion: Int {
         return internalNextcloudVersion
+    }
+
+    public var groupIdentifier: String? {
+        return internalGroupIdentifier
     }
 
     public let backgroundQueue = DispatchQueue(label: "com.nextcloud.nextcloudkit.backgroundqueue", qos: .background, attributes: .concurrent)

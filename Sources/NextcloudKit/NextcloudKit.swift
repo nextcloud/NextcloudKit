@@ -71,24 +71,21 @@ open class NextcloudKit: SessionDelegate {
 
     // MARK: - Setup
 
-    public func setup(account: String? = nil, user: String, userId: String, password: String, urlBase: String, userAgent: String, nextcloudVersion: Int, groupContainerIdentifier: String? = nil, delegate: NKCommonDelegate?) {
-        self.setup(account: account, user: user, userId: userId, password: password, urlBase: urlBase, groupContainerIdentifier: groupContainerIdentifier)
+    public func setup(account: String? = nil, user: String, userId: String, password: String, urlBase: String, userAgent: String, nextcloudVersion: Int, groupIdentifier: String? = nil, delegate: NKCommonDelegate?) {
+        self.setup(account: account, user: user, userId: userId, password: password, urlBase: urlBase, groupIdentifier: groupIdentifier)
         self.setup(userAgent: userAgent)
         self.setup(nextcloudVersion: nextcloudVersion)
         self.setup(delegate: delegate)
     }
 
-    public func setup(account: String? = nil, user: String, userId: String, password: String, urlBase: String, groupContainerIdentifier: String? = nil) {
+    public func setup(account: String? = nil, user: String, userId: String, password: String, urlBase: String, groupIdentifier: String? = nil) {
         if (self.nkCommonInstance.account != account) || (self.nkCommonInstance.urlBase != urlBase && self.nkCommonInstance.user != user) {
             if let cookieStore = sessionManager.session.configuration.httpCookieStorage {
                 for cookie in cookieStore.cookies ?? [] {
                     cookieStore.deleteCookie(cookie)
                 }
             }
-            if let groupContainerIdentifier {
-                let cookieStorage = HTTPCookieStorage.sharedCookieStorage(forGroupContainerIdentifier: groupContainerIdentifier)
-                self.nkCommonInstance.sessionConfiguration.httpCookieStorage = cookieStorage
-            }
+
             self.nkCommonInstance.internalTypeIdentifiers = []
         }
 
@@ -101,6 +98,7 @@ open class NextcloudKit: SessionDelegate {
         self.nkCommonInstance.internalUserId = userId
         self.nkCommonInstance.internalPassword = password
         self.nkCommonInstance.internalUrlBase = urlBase
+        self.nkCommonInstance.internalGroupIdentifier = groupIdentifier
     }
 
     public func setup(delegate: NKCommonDelegate?) {
