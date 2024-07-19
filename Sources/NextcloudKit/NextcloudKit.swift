@@ -79,6 +79,7 @@ open class NextcloudKit: SessionDelegate {
     }
 
     public func setup(account: String? = nil, user: String, userId: String, password: String, urlBase: String, groupIdentifier: String? = nil) {
+        self.nkCommonInstance.internalGroupIdentifier = groupIdentifier
         if (self.nkCommonInstance.account != account) || (self.nkCommonInstance.urlBase != urlBase && self.nkCommonInstance.user != user) {
             if let cookieStore = sessionManager.session.configuration.httpCookieStorage {
                 for cookie in cookieStore.cookies ?? [] {
@@ -98,7 +99,6 @@ open class NextcloudKit: SessionDelegate {
         self.nkCommonInstance.internalUserId = userId
         self.nkCommonInstance.internalPassword = password
         self.nkCommonInstance.internalUrlBase = urlBase
-        self.nkCommonInstance.internalGroupIdentifier = groupIdentifier
     }
 
     public func setup(delegate: NKCommonDelegate?) {
