@@ -100,6 +100,8 @@ public class NKCommon: NSObject {
         if let groupIdentifier {
             let cookieStorage = HTTPCookieStorage.sharedCookieStorage(forGroupContainerIdentifier: groupIdentifier)
             configuration.httpCookieStorage = cookieStorage
+        } else {
+            configuration.httpCookieStorage = nil
         }
         return configuration
     }()
@@ -107,14 +109,14 @@ public class NKCommon: NSObject {
     internal var requestQueue: DispatchQueue?
     internal var serializationQueue: DispatchQueue?
 
-    internal var internalUser = ""
-    internal var internalUserId = ""
-    internal var internalPassword = ""
-    internal var internalAccount = ""
-    internal var internalUrlBase = ""
-    internal var internalUserAgent: String?
-    internal var internalNextcloudVersion: Int = 0
-    internal var internalGroupIdentifier: String?
+    internal var _user = ""
+    internal var _userId = ""
+    internal var _password = ""
+    internal var _account = ""
+    internal var _urlBase = ""
+    internal var _userAgent: String?
+    internal var _nextcloudVersion: Int = 0
+    internal var _groupIdentifier: String?
 
     internal var internalTypeIdentifiers: [UTTypeConformsToServer] = []
     internal var utiCache = NSCache<NSString, CFString>()
@@ -131,35 +133,35 @@ public class NKCommon: NSObject {
     private let queueLog = DispatchQueue(label: "com.nextcloud.nextcloudkit.queuelog", attributes: .concurrent )
 
     public var user: String {
-        return internalUser
+        return _user
     }
 
     public var userId: String {
-        return internalUserId
+        return _userId
     }
 
     public var password: String {
-        return internalPassword
+        return _password
     }
 
     public var account: String {
-        return internalAccount
+        return _account
     }
 
     public var urlBase: String {
-        return internalUrlBase
+        return _urlBase
     }
 
     public var userAgent: String? {
-        return internalUserAgent
+        return _userAgent
     }
 
     public var nextcloudVersion: Int {
-        return internalNextcloudVersion
+        return _nextcloudVersion
     }
 
     public var groupIdentifier: String? {
-        return internalGroupIdentifier
+        return _groupIdentifier
     }
 
     public let backgroundQueue = DispatchQueue(label: "com.nextcloud.nextcloudkit.backgroundqueue", qos: .background, attributes: .concurrent)
@@ -234,7 +236,6 @@ public class NKCommon: NSObject {
     // MARK: - Type Identifier
 
     public func getInternalTypeIdentifier(typeIdentifier: String) -> [UTTypeConformsToServer] {
-
         var results: [UTTypeConformsToServer] = []
 
         for internalTypeIdentifier in internalTypeIdentifiers {
@@ -242,7 +243,6 @@ public class NKCommon: NSObject {
                 results.append(internalTypeIdentifier)
             }
         }
-
         return results
     }
 

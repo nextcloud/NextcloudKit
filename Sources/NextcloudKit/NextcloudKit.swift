@@ -79,26 +79,25 @@ open class NextcloudKit: SessionDelegate {
     }
 
     public func setup(account: String? = nil, user: String, userId: String, password: String, urlBase: String, groupIdentifier: String? = nil) {
-        self.nkCommonInstance.internalGroupIdentifier = groupIdentifier
+        self.nkCommonInstance._groupIdentifier = groupIdentifier
         if (self.nkCommonInstance.account != account) || (self.nkCommonInstance.urlBase != urlBase && self.nkCommonInstance.user != user) {
             if let cookieStore = sessionManager.session.configuration.httpCookieStorage {
                 for cookie in cookieStore.cookies ?? [] {
                     cookieStore.deleteCookie(cookie)
                 }
             }
-
             self.nkCommonInstance.internalTypeIdentifiers = []
         }
 
-        if let account = account {
-            self.nkCommonInstance.internalAccount = account
+        if let account {
+            self.nkCommonInstance._account = account
         } else {
-            self.nkCommonInstance.internalAccount = ""
+            self.nkCommonInstance._account = ""
         }
-        self.nkCommonInstance.internalUser = user
-        self.nkCommonInstance.internalUserId = userId
-        self.nkCommonInstance.internalPassword = password
-        self.nkCommonInstance.internalUrlBase = urlBase
+        self.nkCommonInstance._user = user
+        self.nkCommonInstance._userId = userId
+        self.nkCommonInstance._password = password
+        self.nkCommonInstance._urlBase = urlBase
     }
 
     public func setup(delegate: NKCommonDelegate?) {
@@ -106,32 +105,12 @@ open class NextcloudKit: SessionDelegate {
     }
 
     public func setup(userAgent: String) {
-        self.nkCommonInstance.internalUserAgent = userAgent
+        self.nkCommonInstance._userAgent = userAgent
     }
 
     public func setup(nextcloudVersion: Int) {
-        self.nkCommonInstance.internalNextcloudVersion = nextcloudVersion
+        self.nkCommonInstance._nextcloudVersion = nextcloudVersion
     }
-
-    /*
-    public func setupSessionManager(sessionConfiguration: URLSessionConfiguration?,
-                                    rootQueue: DispatchQueue?,
-                                    requestQueue: DispatchQueue?,
-                                    serializationQueue: DispatchQueue?) {
-        if let sessionConfiguration = sessionConfiguration {
-            self.nkCommonInstance.sessionConfiguration = sessionConfiguration
-        }
-        if let rootQueue = rootQueue {
-            self.nkCommonInstance.rootQueue = rootQueue
-        }
-        if let requestQueue = requestQueue {
-            self.nkCommonInstance.requestQueue = requestQueue
-        }
-        if let serializationQueue = serializationQueue {
-            self.nkCommonInstance.serializationQueue = serializationQueue
-        }
-    }
-    */
 
     /*
     internal func saveCookies(response : HTTPURLResponse?) {
