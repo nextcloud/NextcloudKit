@@ -47,7 +47,11 @@ public class FileNameValidator {
         }
     }
 
-    public var forbiddenFileNameExtensions: [String] = []
+    public var forbiddenFileNameExtensions: [String] = [] {
+        didSet {
+            forbiddenFileNameExtensions = forbiddenFileNameExtensions.map({$0.uppercased()})
+        }
+    }
 
     public let emptyFilenameError = NKError(errorCode: NSURLErrorCannotCreateFile, errorDescription: NSLocalizedString("_filename_empty_", value: "File name is empty", comment: ""))
     public let fileAlreadyExistsError = NKError(errorCode: NSURLErrorCannotCreateFile, errorDescription: NSLocalizedString("_file_already_exists_", value: "Unable to complete the operation, a file with the same name exists", comment: ""))
@@ -87,7 +91,7 @@ public class FileNameValidator {
             return fileReservedNameError
         }
 
-        if forbiddenFileNameExtensions.contains(where: { filename.lowercased().hasSuffix($0.lowercased()) }) {
+        if forbiddenFileNameExtensions.contains(where: { filename.uppercased().hasSuffix($0.uppercased()) }) {
             return fileForbiddenFileExtensionError
         }
 
