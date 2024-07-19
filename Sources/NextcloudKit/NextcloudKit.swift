@@ -87,7 +87,7 @@ open class NextcloudKit: SessionDelegate {
             }
             if let groupContainerIdentifier {
                 let cookieStorage = HTTPCookieStorage.sharedCookieStorage(forGroupContainerIdentifier: groupContainerIdentifier)
-                sessionManager.session.configuration.httpCookieStorage = cookieStorage
+                self.nkCommonInstance.sessionConfiguration.httpCookieStorage = cookieStorage
             }
             self.nkCommonInstance.internalTypeIdentifiers = []
         }
@@ -115,6 +115,7 @@ open class NextcloudKit: SessionDelegate {
         self.nkCommonInstance.internalNextcloudVersion = nextcloudVersion
     }
 
+    /*
     public func setupSessionManager(sessionConfiguration: URLSessionConfiguration?,
                                     rootQueue: DispatchQueue?,
                                     requestQueue: DispatchQueue?,
@@ -132,6 +133,7 @@ open class NextcloudKit: SessionDelegate {
             self.nkCommonInstance.serializationQueue = serializationQueue
         }
     }
+    */
 
     /*
     internal func saveCookies(response : HTTPURLResponse?) {
