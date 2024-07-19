@@ -314,7 +314,6 @@ public class NKCommon: NSObject {
                 iconName = fileProperties.iconName
             }
         }
-
         return(mimeType: mimeType, classFile: classFile, iconName: iconName, typeIdentifier: typeIdentifier, fileNameWithoutExt: fileNameWithoutExt, ext: ext)
     }
 
@@ -376,17 +375,19 @@ public class NKCommon: NSObject {
                 }
             }
         }
-
         return fileProperty
     }
 
     // MARK: - Chunked File
 
-    public func chunkedFile(inputDirectory: String, outputDirectory: String, fileName: String, chunkSize: Int, filesChunk: [(fileName: String, size: Int64)],
+    public func chunkedFile(inputDirectory: String, 
+                            outputDirectory: String,
+                            fileName: String,
+                            chunkSize: Int,
+                            filesChunk: [(fileName: String, size: Int64)],
                             numChunks: @escaping (_ num: Int) -> Void = { _ in },
                             counterChunk: @escaping (_ counter: Int) -> Void = { _ in },
                             completion: @escaping (_ filesChunk: [(fileName: String, size: Int64)]) -> Void = { _ in }) {
-
         // Check if filesChunk is empty
         if !filesChunk.isEmpty { return completion(filesChunk) }
 
@@ -431,13 +432,10 @@ public class NKCommon: NSObject {
         }
 
         repeat {
-
             if stop {
                 return completion([])
             }
-
             if autoreleasepool(invoking: { () -> Int in
-
                 if chunk >= chunkSize {
                     writer?.closeFile()
                     writer = nil
@@ -470,9 +468,7 @@ public class NKCommon: NSObject {
                 }
                 filesChunk = []
                 return 0
-
             }) == 0 { break }
-
         } while true
 
         writer?.closeFile()
@@ -485,7 +481,6 @@ public class NKCommon: NSObject {
             filesChunk[counter].size = incrementalSize
             counter += 1
         }
-
         return completion(filesChunk)
     }
 
@@ -519,18 +514,16 @@ public class NKCommon: NSObject {
             headers.update(name: "Accept", value: "application/json")
         }
         headers.update(name: "OCS-APIRequest", value: "true")
-
         for (key, value) in appendHeaders ?? [:] {
             headers.update(name: key, value: value)
         }
-
         return headers
     }
 
     public func createStandardUrl(serverUrl: String, endpoint: String) -> URLConvertible? {
         guard var serverUrl = serverUrl.urlEncoded else { return nil }
-        if serverUrl.last != "/" { serverUrl = serverUrl + "/" }
 
+        if serverUrl.last != "/" { serverUrl = serverUrl + "/" }
         serverUrl = serverUrl + endpoint
         return serverUrl.asUrl
     }
@@ -541,7 +534,6 @@ public class NKCommon: NSObject {
 
         dateFormatter.locale = Locale(identifier: "en_US_POSIX")
         dateFormatter.dateFormat = format
-
         guard let date = dateFormatter.date(from: dateString) else { return nil }
         return date
     }
@@ -551,7 +543,6 @@ public class NKCommon: NSObject {
 
         dateFormatter.locale = Locale(identifier: "en_US_POSIX")
         dateFormatter.dateFormat = format
-
         return dateFormatter.string(from: date)
     }
 
