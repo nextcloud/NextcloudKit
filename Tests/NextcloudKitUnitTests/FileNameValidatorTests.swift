@@ -28,11 +28,11 @@ class FileNameValidatorTests: XCTestCase {
 
     override func setUp() {
         fileNameValidator.setup(
-            forbiddenFileNames: ["CON", "PRN", "AUX", "NUL", "COM0", "COM1", "COM2", "COM3", "COM4",
-                                 "COM5", "COM6", "COM7", "COM8", "COM9", "COM¹", "COM²", "COM³",
-                                 "LPT0", "LPT1", "LPT2", "LPT3", "LPT4", "LPT5", "LPT6", "LPT7",
-                                 "LPT8", "LPT9", "LPT¹", "LPT²", "LPT³"],
-            forbiddenFileNameBasenames: [],
+            forbiddenFileNames: [".htaccess",".htaccess"],
+            forbiddenFileNameBasenames: ["con", "prn", "aux", "nul", "com0", "com1", "com2", "com3", "com4",
+                                         "com5", "com6", "com7", "com8", "com9", "com¹", "com²", "com³",
+                                         "lpt0", "lpt1", "lpt2", "lpt3", "lpt4", "lpt5", "lpt6", "lpt7",
+                                         "lpt8", "lpt9", "lpt¹", "lpt²", "lpt³"],
             forbiddenFileNameCharacters: ["<", ">", ":", "\\\\", "/", "|", "?", "*", "&"],
             forbiddenFileNameExtensions: [".filepart",".part"]
         )

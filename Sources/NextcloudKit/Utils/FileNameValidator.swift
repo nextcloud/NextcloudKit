@@ -28,8 +28,16 @@ public class FileNameValidator {
         return instance
     }()
 
-    public var forbiddenFileNames: [String] = []
-    public var forbiddenFileNameBasenames: [String] = []
+    public var forbiddenFileNames: [String] = [] {
+        didSet {
+            forbiddenFileNames = forbiddenFileNames.map({$0.uppercased()})
+        }
+    }
+    public var forbiddenFileNameBasenames: [String] = [] {
+        didSet {
+            forbiddenFileNameBasenames = forbiddenFileNameBasenames.map({$0.uppercased()})
+        }
+    }
 
     private var forbiddenFileNameCharactersRegex: NSRegularExpression?
 
@@ -39,25 +47,7 @@ public class FileNameValidator {
         }
     }
 
-//    private static var forbiddenFileNameExtensionsRegex: NSRegularExpression?
-
     public var forbiddenFileNameExtensions: [String] = []
-//    {
-//        didSet {
-//            forbiddenFileNameExtensionsRegex = try? NSRegularExpression(pattern: forbiddenFileNameExtensions.joined())
-//        }
-//    }
-    ////    static let reservedWindowsChars = try! NSRegularExpression(pattern: "[<>:\"/\\\\|?*]", options: [])
-    //    static var reservedWindowsChars: [String] = []
-    ////    static let reservedUnixChars = try! NSRegularExpression(pattern: "[/<>|:&]", options: [])
-    //    static var reservedUnixChars: [String] = []
-    //    static let reservedWindowsNames = [
-    //        "CON", "PRN", "AUX", "NUL",
-    //        "COM0", "COM1", "COM2", "COM3", "COM4", "COM5", "COM6", "COM7", "COM8", "COM9",
-    //        "COM¹", "COM²", "COM³",
-    //        "LPT0", "LPT1", "LPT2", "LPT3", "LPT4", "LPT5", "LPT6", "LPT7", "LPT8", "LPT9",
-//        "LPT¹", "LPT²", "LPT³"
-//    ]
 
     public let emptyFilenameError = NKError(errorCode: NSURLErrorCannotCreateFile, errorDescription: NSLocalizedString("_filename_empty_", value: "File name is empty", comment: ""))
     public let fileAlreadyExistsError = NKError(errorCode: NSURLErrorCannotCreateFile, errorDescription: NSLocalizedString("_file_already_exists_", value: "Unable to complete the operation, a file with the same name exists", comment: ""))
@@ -92,18 +82,14 @@ public class FileNameValidator {
             return invalidCharacterError
         }
 
-        if forbiddenFileNames.contains(filename.uppercased()) || forbiddenFileNames.contains(filename.withRemovedFileExtension.uppercased()) {
-            //            return String(format: NSLocalizedString("file_name_validator_error_reserved_names", comment: ""), filename.split(separator: ".").first ?? "")
+        if forbiddenFileNames.contains(filename.uppercased()) || forbiddenFileNames.contains(filename.withRemovedFileExtension.uppercased()) ||
+            forbiddenFileNameBasenames.contains(filename.uppercased()) || forbiddenFileNameBasenames.contains(filename.withRemovedFileExtension.uppercased()) {
             return fileReservedNameError
         }
 
         if forbiddenFileNameExtensions.contains(where: { filename.lowercased().hasSuffix($0.lowercased()) }) {
             return fileForbiddenFileExtensionError
         }
-
-//        if capability.forbiddenFilenameExtension {
-//            // TODO add logic
-//        }
 
         return nil
     }
