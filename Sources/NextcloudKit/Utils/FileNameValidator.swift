@@ -75,7 +75,7 @@ public class FileNameValidator {
         self.forbiddenFileNameExtensions = forbiddenFileNameExtensions
     }
 
-    func checkFileName(_ filename: String, existedFileNames: Set<String>? = nil) -> NKError? {
+    public func checkFileName(_ filename: String, existedFileNames: Set<String>? = nil) -> NKError? {
         if filename.isEmpty {
             return emptyFilenameError
         }
@@ -108,16 +108,16 @@ public class FileNameValidator {
         return nil
     }
 
-    func checkFolderAndFilePaths(folderPath: String, filePaths: [String]) -> Bool {
+    public func checkFolderAndFilePaths(folderPath: String, filePaths: [String]) -> Bool {
         return checkFolderPath(folderPath: folderPath) &&
         checkFilePaths(filePaths: filePaths)
     }
 
-    func checkFilePaths(filePaths: [String]) -> Bool {
+    public func checkFilePaths(filePaths: [String]) -> Bool {
         return filePaths.allSatisfy { checkFileName($0) == nil }
     }
 
-    func checkFolderPath(folderPath: String) -> Bool {
+    public func checkFolderPath(folderPath: String) -> Bool {
         return folderPath.split { $0 == "/" || $0 == "\\" }
             .allSatisfy { checkFileName(String($0)) == nil }
     }
