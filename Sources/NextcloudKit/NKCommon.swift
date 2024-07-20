@@ -497,15 +497,15 @@ public class NKCommon: NSObject {
     public func getStandardHeaders(user: String?, password: String?, appendHeaders: [String: String]?, customUserAgent: String?, contentType: String? = nil) -> HTTPHeaders {
         var headers: HTTPHeaders = []
 
-        if let username = user, let password = password {
-            headers.update(.authorization(username: username, password: password))
+        if let user, let password {
+            headers.update(.authorization(username: user, password: password))
         }
-        if let customUserAgent = customUserAgent {
+        if let customUserAgent {
             headers.update(.userAgent(customUserAgent))
         } else if let userAgent = userAgent {
             headers.update(.userAgent(userAgent))
         }
-        if let contentType = contentType {
+        if let contentType {
             headers.update(.contentType(contentType))
         } else {
             headers.update(.contentType("application/x-www-form-urlencoded"))
