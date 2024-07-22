@@ -27,18 +27,18 @@ import SwiftyJSON
 
 public extension NextcloudKit {
     // MARK: - App Password
-    func getAppPassword(serverUrl: String,
-                        username: String,
+    func getAppPassword(url: String,
+                        user: String,
                         password: String,
                         userAgent: String? = nil,
                         options: NKRequestOptions = NKRequestOptions(),
                         taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
                         completion: @escaping (_ token: String?, _ data: Data?, _ error: NKError) -> Void) {
         let endpoint = "ocs/v2.php/core/getapppassword"
-        guard let url = self.nkCommonInstance.createStandardUrl(serverUrl: serverUrl, endpoint: endpoint) else {
+        guard let url = self.nkCommonInstance.createStandardUrl(serverUrl: url, endpoint: endpoint) else {
             return options.queue.async { completion(nil, nil, .urlError) }
         }
-        var headers: HTTPHeaders = [.authorization(username: username, password: password)]
+        var headers: HTTPHeaders = [.authorization(username: user, password: password)]
         if let userAgent = userAgent {
             headers.update(.userAgent(userAgent))
         }

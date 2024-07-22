@@ -71,14 +71,15 @@ open class NextcloudKit: SessionDelegate {
 
     // MARK: - Setup
 
-    public func setup(account: String? = nil, user: String, userId: String, password: String, urlBase: String, userAgent: String, nextcloudVersion: Int, delegate: NKCommonDelegate?) {
-        self.setup(account: account, user: user, userId: userId, password: password, urlBase: urlBase)
+    public func setup(account: String? = nil, user: String, userId: String, password: String, urlBase: String, userAgent: String, nextcloudVersion: Int, groupIdentifier: String? = nil, delegate: NKCommonDelegate?) {
+        self.setup(account: account, user: user, userId: userId, password: password, urlBase: urlBase, groupIdentifier: groupIdentifier)
         self.setup(userAgent: userAgent)
         self.setup(nextcloudVersion: nextcloudVersion)
         self.setup(delegate: delegate)
     }
 
-    public func setup(account: String? = nil, user: String, userId: String, password: String, urlBase: String) {
+    public func setup(account: String? = nil, user: String, userId: String, password: String, urlBase: String, groupIdentifier: String? = nil) {
+        self.nkCommonInstance._groupIdentifier = groupIdentifier
         if (self.nkCommonInstance.account != account) || (self.nkCommonInstance.urlBase != urlBase && self.nkCommonInstance.user != user) {
             if let cookieStore = sessionManager.session.configuration.httpCookieStorage {
                 for cookie in cookieStore.cookies ?? [] {
@@ -88,15 +89,15 @@ open class NextcloudKit: SessionDelegate {
             self.nkCommonInstance.internalTypeIdentifiers = []
         }
 
-        if let account = account {
-            self.nkCommonInstance.internalAccount = account
+        if let account {
+            self.nkCommonInstance._account = account
         } else {
-            self.nkCommonInstance.internalAccount = ""
+            self.nkCommonInstance._account = ""
         }
-        self.nkCommonInstance.internalUser = user
-        self.nkCommonInstance.internalUserId = userId
-        self.nkCommonInstance.internalPassword = password
-        self.nkCommonInstance.internalUrlBase = urlBase
+        self.nkCommonInstance._user = user
+        self.nkCommonInstance._userId = userId
+        self.nkCommonInstance._password = password
+        self.nkCommonInstance._urlBase = urlBase
     }
 
     public func setup(delegate: NKCommonDelegate?) {
@@ -104,29 +105,11 @@ open class NextcloudKit: SessionDelegate {
     }
 
     public func setup(userAgent: String) {
-        self.nkCommonInstance.internalUserAgent = userAgent
+        self.nkCommonInstance._userAgent = userAgent
     }
 
     public func setup(nextcloudVersion: Int) {
-        self.nkCommonInstance.internalNextcloudVersion = nextcloudVersion
-    }
-
-    public func setupSessionManager(sessionConfiguration: URLSessionConfiguration?,
-                                    rootQueue: DispatchQueue?,
-                                    requestQueue: DispatchQueue?,
-                                    serializationQueue: DispatchQueue?) {
-        if let sessionConfiguration = sessionConfiguration {
-            self.nkCommonInstance.sessionConfiguration = sessionConfiguration
-        }
-        if let rootQueue = rootQueue {
-            self.nkCommonInstance.rootQueue = rootQueue
-        }
-        if let requestQueue = requestQueue {
-            self.nkCommonInstance.requestQueue = requestQueue
-        }
-        if let serializationQueue = serializationQueue {
-            self.nkCommonInstance.serializationQueue = serializationQueue
-        }
+        self.nkCommonInstance._nextcloudVersion = nextcloudVersion
     }
 
     /*

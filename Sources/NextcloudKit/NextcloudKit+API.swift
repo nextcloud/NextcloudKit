@@ -536,6 +536,25 @@ public extension NextcloudKit {
 
     // MARK: -
 
+    func getUserProfile(url: String,
+                        user: String,
+                        password: String,
+                        userAgent: String,
+                        taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
+                        completion: @escaping (_ userProfile: NKUserProfile?, _ data: Data?, _ error: NKError) -> Void) {
+        let endpoint = "ocs/v2.php/cloud/user"
+        guard let url = self.nkCommonInstance.createStandardUrl(serverUrl: url, endpoint: endpoint) else {
+            return completion(nil, nil, .urlError)
+        }
+        let headers = self.nkCommonInstance.getStandardHeaders(user: user, password: password, appendHeaders: nil, customUserAgent: userAgent)
+
+        getUserProfile(url: url, headers: headers, options: NKRequestOptions()) { task in
+            taskHandler(task)
+        } completion: { userProfile, data, error in
+            completion(userProfile, data, error)
+        }
+    }
+
     func getUserProfile(options: NKRequestOptions = NKRequestOptions(),
                         taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
                         completion: @escaping (_ account: String, _ userProfile: NKUserProfile?, _ data: Data?, _ error: NKError) -> Void) {
@@ -547,6 +566,18 @@ public extension NextcloudKit {
         }
         let headers = self.nkCommonInstance.getStandardHeaders(options: options)
 
+        getUserProfile(url: url, headers: headers, options: options) { task in
+            taskHandler(task)
+        } completion: { userProfile, data, error in
+            completion(account, userProfile, data, error)
+        }
+    }
+
+    private func getUserProfile(url: URLConvertible,
+                                headers: HTTPHeaders,
+                                options: NKRequestOptions = NKRequestOptions(),
+                                taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
+                                completion: @escaping (_ userProfile: NKUserProfile?, _ data: Data?, _ error: NKError) -> Void) {
         sessionManager.request(url, method: .get, parameters: nil, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
             task.taskDescription = options.taskDescription
             taskHandler(task)
@@ -557,7 +588,7 @@ public extension NextcloudKit {
             switch response.result {
             case .failure(let error):
                 let error = NKError(error: error, afResponse: response, responseData: response.data)
-                options.queue.async { completion(account, nil, nil, error) }
+                options.queue.async { completion(nil, nil, error) }
             case .success(let jsonData):
                 let json = JSON(jsonData)
                 let ocs = json["ocs"]
@@ -597,9 +628,9 @@ public extension NextcloudKit {
                     userProfile.twitter = data["twitter"].stringValue
                     userProfile.website = data["website"].stringValue
 
-                    options.queue.async { completion(account, userProfile, jsonData, .success) }
+                    options.queue.async { completion(userProfile, jsonData, .success) }
                 } else {
-                    options.queue.async { completion(account, nil, jsonData, NKError(rootJson: json, fallbackStatusCode: response.response?.statusCode)) }
+                    options.queue.async { completion(nil, jsonData, NKError(rootJson: json, fallbackStatusCode: response.response?.statusCode)) }
                 }
             }
         }

@@ -97,19 +97,26 @@ public class NKCommon: NSObject {
     internal lazy var sessionConfiguration: URLSessionConfiguration = {
         let configuration = URLSessionConfiguration.af.default
         configuration.requestCachePolicy = .reloadIgnoringLocalCacheData
+        if let groupIdentifier {
+            let cookieStorage = HTTPCookieStorage.sharedCookieStorage(forGroupContainerIdentifier: groupIdentifier)
+            configuration.httpCookieStorage = cookieStorage
+        } else {
+            configuration.httpCookieStorage = nil
+        }
         return configuration
     }()
     internal var rootQueue: DispatchQueue = DispatchQueue(label: "com.nextcloud.nextcloudkit.sessionManagerData.rootQueue")
     internal var requestQueue: DispatchQueue?
     internal var serializationQueue: DispatchQueue?
 
-    internal var internalUser = ""
-    internal var internalUserId = ""
-    internal var internalPassword = ""
-    internal var internalAccount = ""
-    internal var internalUrlBase = ""
-    internal var internalUserAgent: String?
-    internal var internalNextcloudVersion: Int = 0
+    internal var _user = ""
+    internal var _userId = ""
+    internal var _password = ""
+    internal var _account = ""
+    internal var _urlBase = ""
+    internal var _userAgent: String?
+    internal var _nextcloudVersion: Int = 0
+    internal var _groupIdentifier: String?
 
     internal var internalTypeIdentifiers: [UTTypeConformsToServer] = []
     internal var utiCache = NSCache<NSString, CFString>()
@@ -126,31 +133,35 @@ public class NKCommon: NSObject {
     private let queueLog = DispatchQueue(label: "com.nextcloud.nextcloudkit.queuelog", attributes: .concurrent )
 
     public var user: String {
-        return internalUser
+        return _user
     }
 
     public var userId: String {
-        return internalUserId
+        return _userId
     }
 
     public var password: String {
-        return internalPassword
+        return _password
     }
 
     public var account: String {
-        return internalAccount
+        return _account
     }
 
     public var urlBase: String {
-        return internalUrlBase
+        return _urlBase
     }
 
     public var userAgent: String? {
-        return internalUserAgent
+        return _userAgent
     }
 
     public var nextcloudVersion: Int {
-        return internalNextcloudVersion
+        return _nextcloudVersion
+    }
+
+    public var groupIdentifier: String? {
+        return _groupIdentifier
     }
 
     public let backgroundQueue = DispatchQueue(label: "com.nextcloud.nextcloudkit.backgroundqueue", qos: .background, attributes: .concurrent)
@@ -225,7 +236,6 @@ public class NKCommon: NSObject {
     // MARK: - Type Identifier
 
     public func getInternalTypeIdentifier(typeIdentifier: String) -> [UTTypeConformsToServer] {
-
         var results: [UTTypeConformsToServer] = []
 
         for internalTypeIdentifier in internalTypeIdentifiers {
@@ -233,7 +243,6 @@ public class NKCommon: NSObject {
                 results.append(internalTypeIdentifier)
             }
         }
-
         return results
     }
 
@@ -305,7 +314,6 @@ public class NKCommon: NSObject {
                 iconName = fileProperties.iconName
             }
         }
-
         return(mimeType: mimeType, classFile: classFile, iconName: iconName, typeIdentifier: typeIdentifier, fileNameWithoutExt: fileNameWithoutExt, ext: ext)
     }
 
@@ -367,17 +375,19 @@ public class NKCommon: NSObject {
                 }
             }
         }
-
         return fileProperty
     }
 
     // MARK: - Chunked File
 
-    public func chunkedFile(inputDirectory: String, outputDirectory: String, fileName: String, chunkSize: Int, filesChunk: [(fileName: String, size: Int64)],
+    public func chunkedFile(inputDirectory: String, 
+                            outputDirectory: String,
+                            fileName: String,
+                            chunkSize: Int,
+                            filesChunk: [(fileName: String, size: Int64)],
                             numChunks: @escaping (_ num: Int) -> Void = { _ in },
                             counterChunk: @escaping (_ counter: Int) -> Void = { _ in },
                             completion: @escaping (_ filesChunk: [(fileName: String, size: Int64)]) -> Void = { _ in }) {
-
         // Check if filesChunk is empty
         if !filesChunk.isEmpty { return completion(filesChunk) }
 
@@ -422,13 +432,10 @@ public class NKCommon: NSObject {
         }
 
         repeat {
-
             if stop {
                 return completion([])
             }
-
             if autoreleasepool(invoking: { () -> Int in
-
                 if chunk >= chunkSize {
                     writer?.closeFile()
                     writer = nil
@@ -461,9 +468,7 @@ public class NKCommon: NSObject {
                 }
                 filesChunk = []
                 return 0
-
             }) == 0 { break }
-
         } while true
 
         writer?.closeFile()
@@ -476,7 +481,6 @@ public class NKCommon: NSObject {
             filesChunk[counter].size = incrementalSize
             counter += 1
         }
-
         return completion(filesChunk)
     }
 
@@ -493,15 +497,15 @@ public class NKCommon: NSObject {
     public func getStandardHeaders(user: String?, password: String?, appendHeaders: [String: String]?, customUserAgent: String?, contentType: String? = nil) -> HTTPHeaders {
         var headers: HTTPHeaders = []
 
-        if let username = user, let password = password {
-            headers.update(.authorization(username: username, password: password))
+        if let user, let password {
+            headers.update(.authorization(username: user, password: password))
         }
-        if let customUserAgent = customUserAgent {
+        if let customUserAgent {
             headers.update(.userAgent(customUserAgent))
         } else if let userAgent = userAgent {
             headers.update(.userAgent(userAgent))
         }
-        if let contentType = contentType {
+        if let contentType {
             headers.update(.contentType(contentType))
         } else {
             headers.update(.contentType("application/x-www-form-urlencoded"))
@@ -510,18 +514,16 @@ public class NKCommon: NSObject {
             headers.update(name: "Accept", value: "application/json")
         }
         headers.update(name: "OCS-APIRequest", value: "true")
-
         for (key, value) in appendHeaders ?? [:] {
             headers.update(name: key, value: value)
         }
-
         return headers
     }
 
     public func createStandardUrl(serverUrl: String, endpoint: String) -> URLConvertible? {
         guard var serverUrl = serverUrl.urlEncoded else { return nil }
-        if serverUrl.last != "/" { serverUrl = serverUrl + "/" }
 
+        if serverUrl.last != "/" { serverUrl = serverUrl + "/" }
         serverUrl = serverUrl + endpoint
         return serverUrl.asUrl
     }
@@ -532,7 +534,6 @@ public class NKCommon: NSObject {
 
         dateFormatter.locale = Locale(identifier: "en_US_POSIX")
         dateFormatter.dateFormat = format
-
         guard let date = dateFormatter.date(from: dateString) else { return nil }
         return date
     }
@@ -542,7 +543,6 @@ public class NKCommon: NSObject {
 
         dateFormatter.locale = Locale(identifier: "en_US_POSIX")
         dateFormatter.dateFormat = format
-
         return dateFormatter.string(from: date)
     }
 
