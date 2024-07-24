@@ -53,8 +53,7 @@ public class FileNameValidator {
         }
     }
 
-    public let emptyFilenameError = NKError(errorCode: NSURLErrorCannotCreateFile, errorDescription: NSLocalizedString("_filename_empty_", value: "File name is empty", comment: ""))
-    public let fileAlreadyExistsError = NKError(errorCode: NSURLErrorCannotCreateFile, errorDescription: NSLocalizedString("_file_already_exists_", value: "Unable to complete the operation, a file with the same name exists", comment: ""))
+    public let folderInvalidNameError = NKError(errorCode: NSURLErrorCannotCreateFile, errorDescription: NSLocalizedString("_file_name_validator_error_contains_reserved_names_or_invalid_characters_", value: "Folder path contains forbidden names or invalid characters", comment: ""))
     public let fileEndsWithSpacePeriodError = NKError(errorCode: NSURLErrorCannotCreateFile, errorDescription: NSLocalizedString("_file_name_validator_error_ends_with_space_period_", value: "File name ends with a space or a period", comment: ""))
     public let fileReservedNameError = NKError(errorCode: NSURLErrorCannotCreateFile, errorDescription: NSLocalizedString("_file_name_validator_error_reserved_names_", value: "%s is a reserved name", comment: ""))
     public let fileForbiddenFileExtensionError = NKError(errorCode: NSURLErrorCannotCreateFile, errorDescription: NSLocalizedString("_file_name_validator_error_reserved_names_", value: ".%s is a forbidden file extension", comment: ""))
@@ -70,13 +69,13 @@ public class FileNameValidator {
     }
 
     public func checkFileName(_ filename: String, existedFileNames: Set<String>? = nil) -> NKError? {
-        if filename.isEmpty {
-            return emptyFilenameError
-        }
-
-        if fileNameAlreadyExists(filename, fileNames: existedFileNames ?? Set()) {
-            return fileAlreadyExistsError
-        }
+//        if filename.isEmpty {
+//            return emptyFilenameError
+//        }
+//
+//        if fileNameAlreadyExists(filename, fileNames: existedFileNames ?? Set()) {
+//            return fileAlreadyExistsError
+//        }
 
         if filename.hasSuffix(" ") || filename.hasSuffix(".") {
             return fileEndsWithSpacePeriodError

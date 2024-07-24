@@ -62,16 +62,16 @@ class FileNameValidatorTests: XCTestCase {
         XCTAssertEqual(result2?.errorDescription, fileNameValidator.fileEndsWithSpacePeriodError.errorDescription)
     }
 
-    func testEmptyFileName() {
-        let result = fileNameValidator.checkFileName("")
-        XCTAssertEqual(result?.errorDescription, fileNameValidator.emptyFilenameError.errorDescription)
-    }
-
-    func testFileAlreadyExists() {
-        let existingFiles: Set<String> = ["existingFile"]
-        let result = fileNameValidator.checkFileName("existingFile", existedFileNames: existingFiles)
-        XCTAssertEqual(result?.errorDescription, fileNameValidator.fileAlreadyExistsError.errorDescription)
-    }
+//    func testEmptyFileName() {
+//        let result = fileNameValidator.checkFileName("")
+//        XCTAssertEqual(result?.errorDescription, fileNameValidator.emptyFilenameError.errorDescription)
+//    }
+//
+//    func testFileAlreadyExists() {
+//        let existingFiles: Set<String> = ["existingFile"]
+//        let result = fileNameValidator.checkFileName("existingFile", existedFileNames: existingFiles)
+//        XCTAssertEqual(result?.errorDescription, fileNameValidator.fileAlreadyExistsError.errorDescription)
+//    }
 
     func testValidFileName() {
         let result = fileNameValidator.checkFileName("validFileName")
