@@ -28,10 +28,10 @@ import SwiftyJSON
 
 public extension NextcloudKit {
     func getHovercard(for userId: String,
+                      account: String,
                       options: NKRequestOptions = NKRequestOptions(),
                       taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
                       completion: @escaping (_ account: String, _ result: NKHovercard?, _ data: Data?, _ error: NKError) -> Void) {
-        let account = self.nkCommonInstance.account
         let urlBase = self.nkCommonInstance.urlBase
         let endpoint = "ocs/v2.php/hovercard/v1/\(userId)"
         guard let url = self.nkCommonInstance.createStandardUrl(serverUrl: urlBase, endpoint: endpoint)

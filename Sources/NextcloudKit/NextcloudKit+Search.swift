@@ -44,6 +44,7 @@ public extension NextcloudKit {
     func unifiedSearch(term: String,
                        timeout: TimeInterval = 30,
                        timeoutProvider: TimeInterval = 60,
+                       account: String,
                        options: NKRequestOptions = NKRequestOptions(),
                        filter: @escaping (NKSearchProvider) -> Bool = { _ in true },
                        request: @escaping (DataRequest?) -> Void,
@@ -51,7 +52,6 @@ public extension NextcloudKit {
                        providers: @escaping (_ account: String, _ searchProviders: [NKSearchProvider]?) -> Void,
                        update: @escaping (_ account: String, _ searchResult: NKSearchResult?, _ provider: NKSearchProvider, _ error: NKError) -> Void,
                        completion: @escaping (_ account: String, _ data: Data?, _ error: NKError) -> Void) {
-        let account = self.nkCommonInstance.account
         let urlBase = self.nkCommonInstance.urlBase
         let endpoint = "ocs/v2.php/search/providers"
         guard let url = self.nkCommonInstance.createStandardUrl(serverUrl: urlBase, endpoint: endpoint) else {
@@ -80,7 +80,7 @@ public extension NextcloudKit {
 
                 for provider in filteredProviders {
                     group.enter()
-                    let requestSearchProvider = self.searchProvider(provider.id, account: account, term: term, options: options, timeout: timeoutProvider) { account, partial, _, error in
+                    let requestSearchProvider = self.searchProvider(provider.id, term: term, account: account, options: options, timeout: timeoutProvider) { account, partial, _, error in
                         update(account, partial, provider, error)
                         group.leave()
                     }
@@ -114,14 +114,14 @@ public extension NextcloudKit {
     ///   - update: Callback, notifying that a search provider return its result. Does not include previous results.
     ///   - completion: Callback, notifying that all search results.
     func searchProvider(_ id: String,
-                        account: String,
                         term: String,
                         limit: Int? = nil,
                         cursor: Int? = nil,
+                        account: String,
                         options: NKRequestOptions = NKRequestOptions(),
                         timeout: TimeInterval = 60,
                         taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-                        completion: @escaping (_ accoun: String, NKSearchResult?, _ data: Data?, _ error: NKError) -> Void) -> DataRequest? {
+                        completion: @escaping (_ account: String, NKSearchResult?, _ data: Data?, _ error: NKError) -> Void) -> DataRequest? {
         let urlBase = self.nkCommonInstance.urlBase
         guard let term = term.urlEncoded else {
             completion(account, nil, nil, .urlError)

@@ -28,10 +28,10 @@ import SwiftyJSON
 public extension NextcloudKit {
     func markE2EEFolder(fileId: String,
                         delete: Bool,
+                        account: String,
                         options: NKRequestOptions = NKRequestOptions(),
                         taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
                         completion: @escaping (_ account: String, _ error: NKError) -> Void) {
-        let account = self.nkCommonInstance.account
         let urlBase = self.nkCommonInstance.urlBase
         var version = "v1"
         if let optionsVesion = options.version {
@@ -71,10 +71,10 @@ public extension NextcloudKit {
                         e2eToken: String?,
                         e2eCounter: String?,
                         method: String,
+                        account: String,
                         options: NKRequestOptions = NKRequestOptions(),
                         taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
                         completion: @escaping (_ account: String, _ e2eToken: String?, _ data: Data?, _ error: NKError) -> Void) {
-        let account = self.nkCommonInstance.account
         let urlBase = self.nkCommonInstance.urlBase
         var version = "v1"
         if let optionsVesion = options.version {
@@ -122,10 +122,10 @@ public extension NextcloudKit {
 
     func getE2EEMetadata(fileId: String,
                          e2eToken: String?,
+                         account: String,
                          options: NKRequestOptions = NKRequestOptions(),
                          taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
                          completion: @escaping (_ account: String, _ e2eMetadata: String?, _ signature: String?, _ data: Data?, _ error: NKError) -> Void) {
-        let account = self.nkCommonInstance.account
         let urlBase = self.nkCommonInstance.urlBase
         var version = "v1"
         if let optionsVesion = options.version {
@@ -172,10 +172,10 @@ public extension NextcloudKit {
                          e2eMetadata: String?,
                          signature: String?,
                          method: String,
+                         account: String,
                          options: NKRequestOptions = NKRequestOptions(),
                          taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
                          completion: @escaping (_ account: String, _ metadata: String?, _ data: Data?, _ error: NKError) -> Void) {
-        let account = self.nkCommonInstance.account
         let urlBase = self.nkCommonInstance.urlBase
         var version = "v1"
         if let optionsVesion = options.version {
@@ -226,10 +226,10 @@ public extension NextcloudKit {
     // MARK: -
 
     func getE2EECertificate(user: String? = nil,
+                            account: String,
                             options: NKRequestOptions = NKRequestOptions(),
                             taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
                             completion: @escaping (_ account: String, _ certificate: String?, _ certificateUser: String?, _ data: Data?, _ error: NKError) -> Void) {
-        let account = self.nkCommonInstance.account
         let urlBase = self.nkCommonInstance.urlBase
         let userId = self.nkCommonInstance.userId
         var version = "v1"
@@ -279,10 +279,10 @@ public extension NextcloudKit {
         }
     }
 
-    func getE2EEPrivateKey(options: NKRequestOptions = NKRequestOptions(),
+    func getE2EEPrivateKey(account: String,
+                           options: NKRequestOptions = NKRequestOptions(),
                            taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
                            completion: @escaping (_ account: String, _ privateKey: String?, _ data: Data?, _ error: NKError) -> Void) {
-        let account = self.nkCommonInstance.account
         let urlBase = self.nkCommonInstance.urlBase
         var version = "v1"
         if let optionsVesion = options.version {
@@ -318,10 +318,10 @@ public extension NextcloudKit {
         }
     }
 
-    func getE2EEPublicKey(options: NKRequestOptions = NKRequestOptions(),
+    func getE2EEPublicKey(account: String,
+                          options: NKRequestOptions = NKRequestOptions(),
                           taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
                           completion: @escaping (_ account: String, _ publicKey: String?, _ data: Data?, _ error: NKError) -> Void) {
-        let account = self.nkCommonInstance.account
         let urlBase = self.nkCommonInstance.urlBase
         var version = "v1"
         if let optionsVesion = options.version {
@@ -358,10 +358,10 @@ public extension NextcloudKit {
     }
 
     func signE2EECertificate(certificate: String,
+                             account: String,
                              options: NKRequestOptions = NKRequestOptions(),
                              taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
                              completion: @escaping (_ account: String, _ certificate: String?, _ data: Data?, _ error: NKError) -> Void) {
-        let account = self.nkCommonInstance.account
         let urlBase = self.nkCommonInstance.urlBase
         var version = "v1"
         if let optionsVesion = options.version {
@@ -400,10 +400,10 @@ public extension NextcloudKit {
     }
 
     func storeE2EEPrivateKey(privateKey: String,
+                             account: String,
                              options: NKRequestOptions = NKRequestOptions(),
                              taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
                              completion: @escaping (_ account: String, _ privateKey: String?, _ data: Data?, _ error: NKError) -> Void) {
-        let account = self.nkCommonInstance.account
         let urlBase = self.nkCommonInstance.urlBase
         var version = "v1"
         if let optionsVesion = options.version {
@@ -440,10 +440,10 @@ public extension NextcloudKit {
         }
     }
 
-    func deleteE2EECertificate(options: NKRequestOptions = NKRequestOptions(),
+    func deleteE2EECertificate(account: String,
+                               options: NKRequestOptions = NKRequestOptions(),
                                taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
                                completion: @escaping (_ account: String, _ error: NKError) -> Void) {
-        let account = self.nkCommonInstance.account
         let urlBase = self.nkCommonInstance.urlBase
         var version = "v1"
         if let optionsVesion = options.version {
@@ -472,10 +472,10 @@ public extension NextcloudKit {
         }
     }
 
-    func deleteE2EEPrivateKey(options: NKRequestOptions = NKRequestOptions(),
+    func deleteE2EEPrivateKey(account: String,
+                              options: NKRequestOptions = NKRequestOptions(),
                               taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
                               completion: @escaping (_ account: String, _ error: NKError) -> Void) {
-        let account = self.nkCommonInstance.account
         let urlBase = self.nkCommonInstance.urlBase
         var version = "v1"
         if let optionsVesion = options.version {

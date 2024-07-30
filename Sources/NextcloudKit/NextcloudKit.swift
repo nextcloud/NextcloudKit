@@ -197,12 +197,12 @@ open class NextcloudKit: SessionDelegate {
 
     public func download(serverUrlFileName: Any,
                          fileNameLocalPath: String,
+                         account: String,
                          options: NKRequestOptions = NKRequestOptions(),
                          requestHandler: @escaping (_ request: DownloadRequest) -> Void = { _ in },
                          taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
                          progressHandler: @escaping (_ progress: Progress) -> Void = { _ in },
                          completionHandler: @escaping (_ account: String, _ etag: String?, _ date: Date?, _ lenght: Int64, _ allHeaderFields: [AnyHashable: Any]?, _ afError: AFError?, _ nKError: NKError) -> Void) {
-        let account = self.nkCommonInstance.account
         var convertible: URLConvertible?
         if serverUrlFileName is URL {
             convertible = serverUrlFileName as? URLConvertible
@@ -263,12 +263,12 @@ open class NextcloudKit: SessionDelegate {
                        fileNameLocalPath: String,
                        dateCreationFile: Date? = nil,
                        dateModificationFile: Date? = nil,
+                       account: String,
                        options: NKRequestOptions = NKRequestOptions(),
                        requestHandler: @escaping (_ request: UploadRequest) -> Void = { _ in },
                        taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
                        progressHandler: @escaping (_ progress: Progress) -> Void = { _ in },
                        completionHandler: @escaping (_ account: String, _ ocId: String?, _ etag: String?, _ date: Date?, _ size: Int64, _ allHeaderFields: [AnyHashable: Any]?, _ afError: AFError?, _ nkError: NKError) -> Void) {
-        let account = self.nkCommonInstance.account
         var convertible: URLConvertible?
         var size: Int64 = 0
         if serverUrlFileName is URL {
@@ -352,6 +352,7 @@ open class NextcloudKit: SessionDelegate {
                             chunkFolder: String,
                             filesChunk: [(fileName: String, size: Int64)],
                             chunkSize: Int,
+                            account: String,
                             options: NKRequestOptions = NKRequestOptions(),
                             numChunks: @escaping (_ num: Int) -> Void = { _ in },
                             counterChunk: @escaping (_ counter: Int) -> Void = { _ in },
@@ -361,7 +362,6 @@ open class NextcloudKit: SessionDelegate {
                             progressHandler: @escaping (_ totalBytesExpected: Int64, _ totalBytes: Int64, _ fractionCompleted: Double) -> Void = { _, _, _ in },
                             uploaded: @escaping (_ fileChunk: (fileName: String, size: Int64)) -> Void = { _ in },
                             completion: @escaping (_ account: String, _ filesChunk: [(fileName: String, size: Int64)]?, _ file: NKFile?, _ afError: AFError?, _ error: NKError) -> Void) {
-        let account = self.nkCommonInstance.account
         let userId = self.nkCommonInstance.userId
         let urlBase = self.nkCommonInstance.urlBase
         let dav = self.nkCommonInstance.dav
@@ -403,11 +403,11 @@ open class NextcloudKit: SessionDelegate {
         #endif
 
         func createFolder(completion: @escaping (_ errorCode: NKError) -> Void) {
-            readFileOrFolder(serverUrlFileName: serverUrlChunkFolder, depth: "0", options: options) { _, _, _, error in
+            readFileOrFolder(serverUrlFileName: serverUrlChunkFolder, depth: "0", account: account, options: options) { _, _, _, error in
                 if error == .success {
                     completion(NKError())
                 } else if error.errorCode == 404 {
-                    NextcloudKit.shared.createFolder(serverUrlFileName: serverUrlChunkFolder, options: options) { _, _, _, error in
+                    NextcloudKit.shared.createFolder(serverUrlFileName: serverUrlChunkFolder, account: account, options: options) { _, _, _, error in
                         completion(error)
                     }
                 } else {
@@ -446,7 +446,7 @@ open class NextcloudKit: SessionDelegate {
                         return completion(account, nil, nil, .explicitlyCancelled, error)
                     }
                     let semaphore = DispatchSemaphore(value: 0)
-                    self.upload(serverUrlFileName: serverUrlFileName, fileNameLocalPath: fileNameLocalPath, options: options, requestHandler: { request in
+                    self.upload(serverUrlFileName: serverUrlFileName, fileNameLocalPath: fileNameLocalPath, account: account, options: options, requestHandler: { request in
                         requestHandler(request)
                     }, taskHandler: { task in
                         taskHandler(task)
@@ -492,12 +492,12 @@ open class NextcloudKit: SessionDelegate {
                 let assembleTimeMax: Double = 30 * 60   // 30 min
                 options.timeout = max(assembleTimeMin, min(assembleTimePerGB * assembleSizeInGB, assembleTimeMax))
 
-                self.moveFileOrFolder(serverUrlFileNameSource: serverUrlFileNameSource, serverUrlFileNameDestination: serverUrlFileName, overwrite: true, options: options) { _, error in
+                self.moveFileOrFolder(serverUrlFileNameSource: serverUrlFileNameSource, serverUrlFileNameDestination: serverUrlFileName, overwrite: true, account: account, options: options) { _, error in
                     guard error == .success else {
                         return completion(account, filesChunkOutput, nil, nil, NKError(errorCode: NKError.chunkMoveFile, errorDescription: error.errorDescription))
                     }
 
-                    self.readFileOrFolder(serverUrlFileName: serverUrlFileName, depth: "0", options: NKRequestOptions(queue: self.nkCommonInstance.backgroundQueue)) { _, files, _, error in
+                    self.readFileOrFolder(serverUrlFileName: serverUrlFileName, depth: "0", account: account, options: NKRequestOptions(queue: self.nkCommonInstance.backgroundQueue)) { _, files, _, error in
 
                         guard error == .success, let file = files.first else {
                             return completion(account, filesChunkOutput, nil, nil, NKError(errorCode: NKError.chunkMoveFile, errorDescription: error.errorDescription))
