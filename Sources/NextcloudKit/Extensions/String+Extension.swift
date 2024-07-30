@@ -42,4 +42,8 @@ extension String {
     public var withRemovedFileExtension: String {
         return String(NSString(string: self).deletingPathExtension)
     }
+
+    public var fileExtension: String {
+        return String(NSString(string: self).pathExtension)
+    }
 }
