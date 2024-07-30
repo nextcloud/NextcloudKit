@@ -80,7 +80,7 @@ public extension NextcloudKit {
 
                 for provider in filteredProviders {
                     group.enter()
-                    let requestSearchProvider = self.searchProvider(provider.id, term: term, account: account, options: options, timeout: timeoutProvider) { account, partial, _, error in
+                    let requestSearchProvider = self.searchProvider(provider.id, term: term, timeout: timeoutProvider, account: account, options: options) { account, partial, _, error in
                         update(account, partial, provider, error)
                         group.leave()
                     }
@@ -117,9 +117,9 @@ public extension NextcloudKit {
                         term: String,
                         limit: Int? = nil,
                         cursor: Int? = nil,
+                        timeout: TimeInterval = 60,
                         account: String,
                         options: NKRequestOptions = NKRequestOptions(),
-                        timeout: TimeInterval = 60,
                         taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
                         completion: @escaping (_ account: String, NKSearchResult?, _ data: Data?, _ error: NKError) -> Void) -> DataRequest? {
         let urlBase = self.nkCommonInstance.urlBase
