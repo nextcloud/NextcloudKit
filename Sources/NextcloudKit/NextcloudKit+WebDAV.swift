@@ -247,7 +247,7 @@ public extension NextcloudKit {
                 options.queue.async { completion(account, files, nil, error) }
             case .success:
                 if let xmlData = response.data {
-                    files = NKDataFileXML(nkCommonInstance: self.nkCommonInstance).convertDataFile(xmlData: xmlData, dav: dav, urlBase: urlBase, user: user, userId: userId, showHiddenFiles: showHiddenFiles, includeHiddenFiles: includeHiddenFiles)
+                    files = NKDataFileXML(nkCommonInstance: self.nkCommonInstance).convertDataFile(xmlData: xmlData, dav: dav, urlBase: urlBase, user: user, userId: userId, account: account, showHiddenFiles: showHiddenFiles, includeHiddenFiles: includeHiddenFiles)
                     options.queue.async { completion(account, files, xmlData, .success) }
                 } else {
                     options.queue.async { completion(account, files, nil, .xmlError) }
@@ -413,7 +413,7 @@ public extension NextcloudKit {
                 options.queue.async { completion(account, files, nil, error) }
             case .success:
                 if let xmlData = response.data {
-                    files = NKDataFileXML(nkCommonInstance: self.nkCommonInstance).convertDataFile(xmlData: xmlData, dav: dav, urlBase: urlBase, user: user, userId: userId, showHiddenFiles: showHiddenFiles, includeHiddenFiles: includeHiddenFiles)
+                    files = NKDataFileXML(nkCommonInstance: self.nkCommonInstance).convertDataFile(xmlData: xmlData, dav: dav, urlBase: urlBase, user: user, userId: userId, account: account, showHiddenFiles: showHiddenFiles, includeHiddenFiles: includeHiddenFiles)
                     options.queue.async { completion(account, files, xmlData, .success) }
                 } else {
                     options.queue.async { completion(account, files, nil, .xmlError) }
@@ -505,7 +505,7 @@ public extension NextcloudKit {
                 options.queue.async { completion(account, files, nil, error) }
             case .success:
                 if let xmlData = response.data {
-                    files = NKDataFileXML(nkCommonInstance: self.nkCommonInstance).convertDataFile(xmlData: xmlData, dav: dav, urlBase: urlBase, user: user, userId: userId, showHiddenFiles: showHiddenFiles, includeHiddenFiles: includeHiddenFiles)
+                    files = NKDataFileXML(nkCommonInstance: self.nkCommonInstance).convertDataFile(xmlData: xmlData, dav: dav, urlBase: urlBase, user: user, userId: userId, account: account, showHiddenFiles: showHiddenFiles, includeHiddenFiles: includeHiddenFiles)
                     options.queue.async { completion(account, files, xmlData, .success) }
                 } else {
                     options.queue.async { completion(account, files, nil, .xmlError) }
