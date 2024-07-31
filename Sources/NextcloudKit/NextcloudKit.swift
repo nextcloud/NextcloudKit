@@ -34,22 +34,6 @@ open class NextcloudKit: SessionDelegate {
         let instance = NextcloudKit()
         return instance
     }()
-    internal lazy var internalSessionManager: Alamofire.Session = {
-        return Alamofire.Session(configuration: nkCommonInstance.sessionConfiguration,
-                                 delegate: self,
-                                 rootQueue: nkCommonInstance.rootQueue,
-                                 startRequestsImmediately: true,
-                                 requestQueue: nkCommonInstance.requestQueue,
-                                 serializationQueue: nkCommonInstance.serializationQueue,
-                                 interceptor: nil,
-                                 serverTrustManager: nil,
-                                 redirectHandler: nil,
-                                 cachedResponseHandler: nil,
-                                 eventMonitors: [AlamofireLogger(nkCommonInstance: self.nkCommonInstance)])
-    }()
-    public var sessionManager: Alamofire.Session {
-        return internalSessionManager
-    }
     #if !os(watchOS)
     private let reachabilityManager = Alamofire.NetworkReachabilityManager()
     #endif
@@ -71,50 +55,58 @@ open class NextcloudKit: SessionDelegate {
 
     // MARK: - Setup
 
-    public func setup(account: String? = nil, user: String, userId: String, password: String, urlBase: String, userAgent: String, nextcloudVersion: Int, groupIdentifier: String? = nil, delegate: NKCommonDelegate?) {
-        self.setup(account: account, user: user, userId: userId, password: password, urlBase: urlBase, groupIdentifier: groupIdentifier)
-        self.setup(userAgent: userAgent)
-        self.setup(nextcloudVersion: nextcloudVersion)
-        self.setup(delegate: delegate)
-    }
-
-    public func setup(account: String? = nil, user: String, userId: String, password: String, urlBase: String, groupIdentifier: String? = nil) {
-        self.nkCommonInstance._groupIdentifier = groupIdentifier
-        if (self.nkCommonInstance.account != account) || (self.nkCommonInstance.urlBase != urlBase && self.nkCommonInstance.user != user) {
-            if let cookieStore = sessionManager.session.configuration.httpCookieStorage {
-                for cookie in cookieStore.cookies ?? [] {
-                    cookieStore.deleteCookie(cookie)
-                }
-            }
-            self.nkCommonInstance.internalTypeIdentifiers = []
-        }
-
-        if let account {
-            self.nkCommonInstance._account = account
-        } else {
-            self.nkCommonInstance._account = ""
-        }
-        self.nkCommonInstance._user = user
-        self.nkCommonInstance._userId = userId
-        self.nkCommonInstance._password = password
-        self.nkCommonInstance._urlBase = urlBase
-    }
-
-    public func setup(delegate: NKCommonDelegate?) {
+    public func setup(delegate: NextcloudKitDelegate?) {
         self.nkCommonInstance.delegate = delegate
     }
 
-    public func setup(userAgent: String) {
-        self.nkCommonInstance._userAgent = userAgent
+    public func appendAccount(_ account: String,
+                              urlBase: String,
+                              user: String,
+                              userId: String,
+                              password: String,
+                              userAgent: String,
+                              nextcloudVersion: Int,
+                              groupIdentifier: String) {
+        if nkCommonInstance.nksessions.filter({ $0.account == account }).first != nil {
+            return updateAccount(account, urlBase: urlBase, userId: userId, password: password, userAgent: userAgent, nextcloudVersion: nextcloudVersion)
+        }
+        let nkSession = NKSession(urlBase: urlBase, user: user, userId: userId, password: password, account: account, userAgent: userAgent, nextcloudVersion: nextcloudVersion, groupIdentifier: groupIdentifier)
+
+        nkCommonInstance.nksessions.append(nkSession)
     }
 
-    public func setup(nextcloudVersion: Int) {
-        self.nkCommonInstance._nextcloudVersion = nextcloudVersion
+    public func removeAccount(_ account: String) {
+        if let index = nkCommonInstance.nksessions.index(where: { $0.account == account}) {
+            nkCommonInstance.nksessions.remove(at: index)
+        }
+    }
+
+    public func updateAccount(_ account: String,
+                              urlBase: String? = nil,
+                              userId: String? = nil,
+                              password: String? = nil,
+                              userAgent: String? = nil,
+                              nextcloudVersion: Int? = nil) {
+        guard let session = nkCommonInstance.nksessions.filter({ $0.account == account }).first else { return }
+        if let urlBase {
+            session.urlBase = urlBase
+        }
+        if let userId {
+            session.userId = userId
+        }
+        if let password {
+            session.password = password
+        }
+        if let userAgent {
+            session.userAgent = userAgent
+        }
+        if let nextcloudVersion {
+            session.nextcloudVersion = nextcloudVersion
+        }
     }
 
     /*
     internal func saveCookies(response : HTTPURLResponse?) {
-
         if let headerFields = response?.allHeaderFields as? [String : String] {
             if let url = URL(string: self.nkCommonInstance.urlBase) {
                 let HTTPCookie = HTTPCookie.cookies(withResponseHeaderFields: headerFields, for: url)
@@ -128,7 +120,6 @@ open class NextcloudKit: SessionDelegate {
     }
 
     internal func injectsCookies() {
-
         if let cookies = cookies[self.nkCommonInstance.account] {
             if let url = URL(string: self.nkCommonInstance.urlBase) {
                 sessionManager.session.configuration.httpCookieStorage?.setCookies(cookies, for: url, mainDocumentURL: nil)
@@ -145,6 +136,7 @@ open class NextcloudKit: SessionDelegate {
     }
 
     private func startNetworkReachabilityObserver() {
+        /*
         reachabilityManager?.startListening(onUpdatePerforming: { status in
             switch status {
             case .unknown:
@@ -157,6 +149,7 @@ open class NextcloudKit: SessionDelegate {
                 self.nkCommonInstance.delegate?.networkReachabilityObserver(NKCommon.TypeReachability.reachableCellular)
             }
         })
+        */
     }
 
     private func stopNetworkReachabilityObserver() {
@@ -164,15 +157,7 @@ open class NextcloudKit: SessionDelegate {
     }
     #endif
 
-    // MARK: - Session utility
-
-    public func getSessionManager() -> URLSession {
-       return sessionManager.session
-    }
-
     /*
-    //MARK: -
-
     private func makeEvents() -> [EventMonitor] {
 
         let events = ClosureEventMonitor()
@@ -209,9 +194,10 @@ open class NextcloudKit: SessionDelegate {
         } else if serverUrlFileName is String || serverUrlFileName is NSString {
             convertible = (serverUrlFileName as? String)?.encodedToUrl
         }
-        guard let url = convertible else {
-            options.queue.async { completionHandler(account, nil, nil, 0, nil, nil, .urlError) }
-            return
+        guard let url = convertible,
+              let nkSession = nkCommonInstance.getSession(account: account),
+              let headers = nkCommonInstance.getStandardHeaders(account: account, options: options) else {
+            return options.queue.async { completionHandler(account, nil, nil, 0, nil, nil, .urlError) }
         }
         var destination: Alamofire.DownloadRequest.Destination?
         let fileNamePathLocalDestinationURL = NSURL.fileURL(withPath: fileNameLocalPath)
@@ -219,9 +205,8 @@ open class NextcloudKit: SessionDelegate {
             return (fileNamePathLocalDestinationURL, [.removePreviousFile, .createIntermediateDirectories])
         }
         destination = destinationFile
-        let headers = self.nkCommonInstance.getStandardHeaders(options: options)
 
-        let request = sessionManager.download(url, method: .get, parameters: nil, encoding: URLEncoding.default, headers: headers, interceptor: nil, to: destination).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
+        let request = nkSession.sessionData.download(url, method: .get, parameters: nil, encoding: URLEncoding.default, headers: headers, interceptor: nil, to: destination).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
             task.taskDescription = options.taskDescription
             options.queue.async { taskHandler(task) }
         } .downloadProgress { progress in
@@ -276,12 +261,12 @@ open class NextcloudKit: SessionDelegate {
         } else if serverUrlFileName is String || serverUrlFileName is NSString {
             convertible = (serverUrlFileName as? String)?.encodedToUrl
         }
-        guard let url = convertible else {
-            options.queue.async { completionHandler(account, nil, nil, nil, 0, nil, nil, .urlError) }
-            return
+        guard let url = convertible,
+              let nkSession = nkCommonInstance.getSession(account: account),
+              var headers = nkCommonInstance.getStandardHeaders(account: account, options: options) else {
+            return options.queue.async { completionHandler(account, nil, nil, nil, 0, nil, nil, .urlError) }
         }
         let fileNameLocalPathUrl = URL(fileURLWithPath: fileNameLocalPath)
-        var headers = self.nkCommonInstance.getStandardHeaders(options: options)
         // Epoch of linux do not permitted negativ value
         if let dateCreationFile, dateCreationFile.timeIntervalSince1970 > 0 {
             headers.update(name: "X-OC-CTime", value: "\(dateCreationFile.timeIntervalSince1970)")
@@ -291,7 +276,7 @@ open class NextcloudKit: SessionDelegate {
             headers.update(name: "X-OC-MTime", value: "\(dateModificationFile.timeIntervalSince1970)")
         }
 
-        let request = sessionManager.upload(fileNameLocalPathUrl, to: url, method: .put, headers: headers, interceptor: nil, fileManager: .default).validate(statusCode: 200..<300).onURLSessionTaskCreation(perform: { task in
+        let request = nkSession.sessionData.upload(fileNameLocalPathUrl, to: url, method: .put, headers: headers, interceptor: nil, fileManager: .default).validate(statusCode: 200..<300).onURLSessionTaskCreation(perform: { task in
             task.taskDescription = options.taskDescription
             options.queue.async { taskHandler(task) }
         }) .uploadProgress { progress in
@@ -362,12 +347,13 @@ open class NextcloudKit: SessionDelegate {
                             progressHandler: @escaping (_ totalBytesExpected: Int64, _ totalBytes: Int64, _ fractionCompleted: Double) -> Void = { _, _, _ in },
                             uploaded: @escaping (_ fileChunk: (fileName: String, size: Int64)) -> Void = { _ in },
                             completion: @escaping (_ account: String, _ filesChunk: [(fileName: String, size: Int64)]?, _ file: NKFile?, _ afError: AFError?, _ error: NKError) -> Void) {
-        let userId = self.nkCommonInstance.userId
-        let urlBase = self.nkCommonInstance.urlBase
-        let dav = self.nkCommonInstance.dav
+
+        guard let nkSession = nkCommonInstance.getSession(account: account) else {
+            return completion(account, nil, nil, nil, .urlError)
+        }
         let fileNameLocalSize = self.nkCommonInstance.getFileSize(filePath: directory + "/" + fileName)
-        let serverUrlChunkFolder = urlBase + "/" + dav + "/uploads/" + userId + "/" + chunkFolder
-        let serverUrlFileName = urlBase + "/" + dav + "/files/" + userId + self.nkCommonInstance.returnPathfromServerUrl(serverUrl) + "/" + fileName
+        let serverUrlChunkFolder = nkSession.urlBase + "/" + nkSession.dav + "/uploads/" + nkSession.userId + "/" + chunkFolder
+        let serverUrlFileName = nkSession.urlBase + "/" + nkSession.dav + "/files/" + nkSession.userId + self.nkCommonInstance.returnPathfromServerUrl(serverUrl, urlBase: nkSession.urlBase, userId: nkSession.userId) + "/" + fileName
         if options.customHeader == nil {
             options.customHeader = [:]
         }
@@ -492,14 +478,12 @@ open class NextcloudKit: SessionDelegate {
                 let assembleTimeMax: Double = 30 * 60   // 30 min
                 options.timeout = max(assembleTimeMin, min(assembleTimePerGB * assembleSizeInGB, assembleTimeMax))
 
-                self.moveFileOrFolder(serverUrlFileNameSource: serverUrlFileNameSource, serverUrlFileNameDestination: serverUrlFileName, overwrite: true, account: account, options: options) { _, error in
+                self.moveFileOrFolder(serverUrlFileNameSource: serverUrlFileNameSource, serverUrlFileNameDestination: serverUrlFileName, overwrite: true, account: account,options: options) { _, error in
                     guard error == .success else {
                         return completion(account, filesChunkOutput, nil, nil, NKError(errorCode: NKError.chunkMoveFile, errorDescription: error.errorDescription))
                     }
-
                     self.readFileOrFolder(serverUrlFileName: serverUrlFileName, depth: "0", account: account, options: NKRequestOptions(queue: self.nkCommonInstance.backgroundQueue)) { _, files, _, error in
-
-                        guard error == .success, let file = files.first else {
+                        guard error == .success, let file = files?.first else {
                             return completion(account, filesChunkOutput, nil, nil, NKError(errorCode: NKError.chunkMoveFile, errorDescription: error.errorDescription))
                         }
                         return completion(account, filesChunkOutput, file, nil, error)

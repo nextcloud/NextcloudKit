@@ -29,7 +29,7 @@ final class FilesIntegrationTests: BaseIntegrationXCTestCase {
         let serverUrl = "\(baseUrl)/remote.php/dav/files/\(userId)"
         let serverUrlFileName = "\(serverUrl)/\(folderName)"
 
-        NextcloudKit.shared.setup(account: account, user: user, userId: userId, password: password, urlBase: baseUrl)
+        NextcloudKit.shared.appendAccount(account, urlBase: baseUrl, user: user, userId: userId, password: password, userAgent: "", nextcloudVersion: 0, groupIdentifier: "")
 
         // Test creating folder
         NextcloudKit.shared.createFolder(serverUrlFileName: serverUrlFileName, account: account) { account, ocId, date, error in
@@ -45,7 +45,7 @@ final class FilesIntegrationTests: BaseIntegrationXCTestCase {
                 XCTAssertEqual(self.account, account)
                 XCTAssertEqual(NKError.success.errorCode, error.errorCode)
                 XCTAssertEqual(NKError.success.errorDescription, error.errorDescription)
-                XCTAssertEqual(files[0].fileName, folderName)
+                XCTAssertEqual(files?[0].fileName, folderName)
 
                 Thread.sleep(forTimeInterval: 0.2)
 
@@ -63,7 +63,7 @@ final class FilesIntegrationTests: BaseIntegrationXCTestCase {
 
                         XCTAssertEqual(404, error.errorCode)
                         XCTAssertEqual(self.account, account)
-                        XCTAssertTrue(files.isEmpty)
+                        XCTAssertTrue(files?.isEmpty ?? false)
                     }
                 }
             }

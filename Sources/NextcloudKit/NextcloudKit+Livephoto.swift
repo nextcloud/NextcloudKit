@@ -31,13 +31,18 @@ public extension NextcloudKit {
                       options: NKRequestOptions = NKRequestOptions(),
                       taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
                       completion: @escaping (_ account: String, _ error: NKError) -> Void) {
-        guard let url = serverUrlfileNamePath.encodedToUrl else {
+        guard let url = serverUrlfileNamePath.encodedToUrl,
+              let nkSession = nkCommonInstance.getSession(account: account) else {
             return options.queue.async { completion(account, .urlError) }
         }
         let method = HTTPMethod(rawValue: "PROPPATCH")
-        let headers = self.nkCommonInstance.getStandardHeaders(options.customHeader, customUserAgent: options.customUserAgent, contentType: "application/xml")
+        ///
+        options.contentType = "application/xml"
+        ///
+        guard let headers = nkCommonInstance.getStandardHeaders(account: account, options: options) else {
+            return options.queue.async { completion(account, .urlError) }
+        }
         var urlRequest: URLRequest
-
         do {
             try urlRequest = URLRequest(url: url, method: method, headers: headers)
             let parameters = String(format: NKDataFileXML(nkCommonInstance: self.nkCommonInstance).requestBodyLivephoto, livePhotoFile)
@@ -46,7 +51,7 @@ public extension NextcloudKit {
             return options.queue.async { completion(account, NKError(error: error)) }
         }
 
-        sessionManager.request(urlRequest).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
+        nkSession.sessionData.request(urlRequest).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
             task.taskDescription = options.taskDescription
             taskHandler(task)
         }.response(queue: self.nkCommonInstance.backgroundQueue) { response in

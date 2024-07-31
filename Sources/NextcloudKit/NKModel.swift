@@ -607,10 +607,10 @@ class NKDataFileXML: NSObject {
         return xml["ocs", "data", "apppassword"].text
     }
 
-    func convertDataFile(xmlData: Data, dav: String, urlBase: String, user: String, userId: String, account: String, showHiddenFiles: Bool, includeHiddenFiles: [String]) -> [NKFile] {
+    func convertDataFile(xmlData: Data, nkSession: NKSession, showHiddenFiles: Bool, includeHiddenFiles: [String]) -> [NKFile] {
         var files: [NKFile] = []
-        let rootFiles = "/" + dav + "/files/"
-        guard let baseUrl = self.nkCommonInstance.getHostName(urlString: urlBase) else {
+        let rootFiles = "/" + nkSession.dav + "/files/"
+        guard let baseUrl = self.nkCommonInstance.getHostName(urlString: nkSession.urlBase) else {
             return files
         }
         let xml = XML.parse(xmlData)
@@ -641,7 +641,7 @@ class NKDataFileXML: NSObject {
                 }
 
                 // account
-                file.account = account
+                file.account = nkSession.account
 
                 // path
                 file.path = (fileNamePath as NSString).deletingLastPathComponent + "/"
@@ -652,7 +652,7 @@ class NKDataFileXML: NSObject {
                 file.fileName = file.fileName.removingPercentEncoding ?? ""
 
                 // ServerUrl
-                if href == rootFiles + user + "/" {
+                if href == rootFiles + nkSession.user + "/" {
                     file.fileName = "."
                     file.serverUrl = ".."
                 } else {
@@ -864,9 +864,9 @@ class NKDataFileXML: NSObject {
             file.iconName = results.iconName
             file.name = "files"
             file.classFile = results.classFile
-            file.urlBase = urlBase
-            file.user = user
-            file.userId = userId
+            file.urlBase = nkSession.urlBase
+            file.user = nkSession.user
+            file.userId = nkSession.userId
 
             files.append(file)
         }
@@ -891,10 +891,10 @@ class NKDataFileXML: NSObject {
         return files
     }
 
-    func convertDataTrash(xmlData: Data, urlBase: String, showHiddenFiles: Bool) -> [NKTrash] {
+    func convertDataTrash(xmlData: Data, nkSession: NKSession, showHiddenFiles: Bool) -> [NKTrash] {
         var files: [NKTrash] = []
         var first: Bool = true
-        guard let baseUrl = self.nkCommonInstance.getHostName(urlString: urlBase) else {
+        guard let baseUrl = self.nkCommonInstance.getHostName(urlString: nkSession.urlBase) else {
             return files
         }
         let xml = XML.parse(xmlData)
