@@ -30,18 +30,14 @@ public extension NextcloudKit {
                      options: NKRequestOptions = NKRequestOptions(),
                      taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
                      completion: @escaping (_ account: String, _ items: [NKComments]?, _ data: Data?, _ error: NKError) -> Void) {
-        ///
-        options.contentType = "application/xml"
-        ///
-        guard let nkSession = nkCommonInstance.getSession(account: account),
-              let headers = nkCommonInstance.getStandardHeaders(account: account, options: options) else {
-            return options.queue.async { completion(account, nil,nil, .urlError) }
-        }
-        let serverUrlEndpoint = nkSession.urlBase + "/" + nkSession.dav + "/comments/files/\(fileId)"
+        let urlBase = self.nkCommonInstance.urlBase
+        let dav = self.nkCommonInstance.dav
+        let serverUrlEndpoint = urlBase + "/" + dav + "/comments/files/\(fileId)"
         guard let url = serverUrlEndpoint.encodedToUrl else {
             return options.queue.async { completion(account, nil, nil, .urlError) }
         }
         let method = HTTPMethod(rawValue: "PROPFIND")
+        let headers = self.nkCommonInstance.getStandardHeaders(options.customHeader, customUserAgent: options.customUserAgent, contentType: "application/xml")
         var urlRequest: URLRequest
 
         do {
@@ -51,7 +47,7 @@ public extension NextcloudKit {
             return options.queue.async { completion(account, nil, nil, NKError(error: error)) }
         }
 
-        nkSession.sessionData.request(urlRequest).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
+        sessionManager.request(urlRequest).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
             task.taskDescription = options.taskDescription
             taskHandler(task)
         }.responseData(queue: self.nkCommonInstance.backgroundQueue) { response in
@@ -80,17 +76,13 @@ public extension NextcloudKit {
                      options: NKRequestOptions = NKRequestOptions(),
                      taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
                      completion: @escaping (_ account: String, _ error: NKError) -> Void) {
-        ///
-        options.contentType = "application/json"
-        ///
-        guard let nkSession = nkCommonInstance.getSession(account: account),
-              let headers = nkCommonInstance.getStandardHeaders(account: account, options: options) else {
-            return options.queue.async { completion(account, .urlError) }
-        }
-        let serverUrlEndpoint = nkSession.urlBase + "/" + nkSession.dav + "/comments/files/\(fileId)"
+        let urlBase = self.nkCommonInstance.urlBase
+        let dav = self.nkCommonInstance.dav
+        let serverUrlEndpoint = urlBase + "/" + dav + "/comments/files/\(fileId)"
         guard let url = serverUrlEndpoint.encodedToUrl else {
             return options.queue.async { completion(account, .urlError) }
         }
+        let headers = self.nkCommonInstance.getStandardHeaders(options.customHeader, customUserAgent: options.customUserAgent, contentType: "application/json")
         var urlRequest: URLRequest
 
         do {
@@ -101,7 +93,7 @@ public extension NextcloudKit {
             return options.queue.async { completion(account, NKError(error: error)) }
         }
 
-        nkSession.sessionData.request(urlRequest).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
+        sessionManager.request(urlRequest).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
             task.taskDescription = options.taskDescription
             taskHandler(task)
         }.response(queue: self.nkCommonInstance.backgroundQueue) { response in
@@ -126,18 +118,14 @@ public extension NextcloudKit {
                         options: NKRequestOptions = NKRequestOptions(),
                         taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
                         completion: @escaping (_ account: String, _ error: NKError) -> Void) {
-        ///
-        options.contentType = "application/xml"
-        ///
-        guard let nkSession = nkCommonInstance.getSession(account: account),
-              let headers = nkCommonInstance.getStandardHeaders(account: account, options: options) else {
-            return options.queue.async { completion(account, .urlError) }
-        }
-        let serverUrlEndpoint = nkSession.urlBase + "/" + nkSession.dav + "/comments/files/\(fileId)/\(messageId)"
+        let urlBase = self.nkCommonInstance.urlBase
+        let dav = self.nkCommonInstance.dav
+        let serverUrlEndpoint = urlBase + "/" + dav + "/comments/files/\(fileId)/\(messageId)"
         guard let url = serverUrlEndpoint.encodedToUrl else {
             return options.queue.async { completion(account, .urlError) }
         }
         let method = HTTPMethod(rawValue: "PROPPATCH")
+        let headers = self.nkCommonInstance.getStandardHeaders(options.customHeader, customUserAgent: options.customUserAgent, contentType: "application/xml")
         var urlRequest: URLRequest
 
         do {
@@ -148,7 +136,7 @@ public extension NextcloudKit {
             return options.queue.async { completion(account, NKError(error: error)) }
         }
 
-        nkSession.sessionData.request(urlRequest).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
+        sessionManager.request(urlRequest).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
             task.taskDescription = options.taskDescription
             taskHandler(task)
         }.response(queue: self.nkCommonInstance.backgroundQueue) { response in
@@ -172,16 +160,15 @@ public extension NextcloudKit {
                         options: NKRequestOptions = NKRequestOptions(),
                         taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
                         completion: @escaping (_ account: String, _ error: NKError) -> Void) {
-        guard let nkSession = nkCommonInstance.getSession(account: account),
-              let headers = nkCommonInstance.getStandardHeaders(account: account, options: options) else {
-            return options.queue.async { completion(account, .urlError) }
-        }
-        let serverUrlEndpoint = nkSession.urlBase + "/" + nkSession.dav + "/comments/files/\(fileId)/\(messageId)"
+        let urlBase = self.nkCommonInstance.urlBase
+        let dav = self.nkCommonInstance.dav
+        let serverUrlEndpoint = urlBase + "/" + dav + "/comments/files/\(fileId)/\(messageId)"
         guard let url = serverUrlEndpoint.encodedToUrl else {
             return options.queue.async { completion(account, .urlError) }
         }
+        let headers = self.nkCommonInstance.getStandardHeaders(options: options)
 
-        nkSession.sessionData.request(url, method: .delete, parameters: nil, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
+        sessionManager.request(url, method: .delete, parameters: nil, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
             task.taskDescription = options.taskDescription
             taskHandler(task)
         }.response(queue: self.nkCommonInstance.backgroundQueue) { response in
@@ -204,18 +191,14 @@ public extension NextcloudKit {
                             options: NKRequestOptions = NKRequestOptions(),
                             taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
                             completion: @escaping (_ account: String, _ error: NKError) -> Void) {
-        ///
-        options.contentType = "application/xml"
-        ///
-        guard let nkSession = nkCommonInstance.getSession(account: account),
-              let headers = nkCommonInstance.getStandardHeaders(account: account, options: options) else {
-            return options.queue.async { completion(account, .urlError) }
-        }
-        let serverUrlEndpoint = nkSession.urlBase + "/" + nkSession.dav + "/comments/files/\(fileId)"
+        let urlBase = self.nkCommonInstance.urlBase
+        let dav = self.nkCommonInstance.dav
+        let serverUrlEndpoint = urlBase + "/" + dav + "/comments/files/\(fileId)"
         guard let url = serverUrlEndpoint.encodedToUrl else {
             return options.queue.async { completion(account, .urlError) }
         }
         let method = HTTPMethod(rawValue: "PROPPATCH")
+        let headers = self.nkCommonInstance.getStandardHeaders(options.customHeader, customUserAgent: options.customUserAgent, contentType: "application/xml")
         var urlRequest: URLRequest
 
         do {
@@ -226,7 +209,7 @@ public extension NextcloudKit {
             return options.queue.async { completion(account, NKError(error: error)) }
         }
 
-        nkSession.sessionData.request(urlRequest).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
+        sessionManager.request(urlRequest).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
             task.taskDescription = options.taskDescription
             taskHandler(task)
         }.response(queue: self.nkCommonInstance.backgroundQueue) { response in

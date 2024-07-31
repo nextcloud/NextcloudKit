@@ -36,28 +36,26 @@ public class NKBackground: NSObject, URLSessionTaskDelegate, URLSessionDelegate,
     public func download(serverUrlFileName: Any,
                          fileNameLocalPath: String,
                          taskDescription: String? = nil,
-                         account: String) -> URLSessionDownloadTask? {
+                         account: String,
+                         session: URLSession) -> URLSessionDownloadTask? {
         var url: URL?
         if serverUrlFileName is URL {
             url = serverUrlFileName as? URL
         } else if serverUrlFileName is String || serverUrlFileName is NSString {
             url = (serverUrlFileName as? String)?.encodedToUrl as? URL
         }
-        guard let nkSession = nkCommonInstance.getSession(account: account) else {
-            return nil
-        }
         guard let urlForRequest = url else { return nil }
         var request = URLRequest(url: urlForRequest)
-        let loginString = "\(nkSession.user):\(nkSession.password)"
+        let loginString = "\(self.nkCommonInstance.user):\(self.nkCommonInstance.password)"
         guard let loginData = loginString.data(using: String.Encoding.utf8) else {
             return nil
         }
         let base64LoginString = loginData.base64EncodedString()
 
-        request.setValue(nkSession.userAgent, forHTTPHeaderField: "User-Agent")
+        request.setValue(self.nkCommonInstance.userAgent, forHTTPHeaderField: "User-Agent")
         request.setValue("Basic \(base64LoginString)", forHTTPHeaderField: "Authorization")
 
-        let task = nkSession.sessionDownloadBackground.downloadTask(with: request)
+        let task = session.downloadTask(with: request)
         task.taskDescription = taskDescription
         task.resume()
         self.nkCommonInstance.writeLog("Network start download file: \(serverUrlFileName)")
@@ -73,10 +71,8 @@ public class NKBackground: NSObject, URLSessionTaskDelegate, URLSessionDelegate,
                        dateModificationFile: Date?,
                        taskDescription: String? = nil,
                        account: String,
-                       sessionIdentifier: String) -> URLSessionUploadTask? {
+                       session: URLSession) -> URLSessionUploadTask? {
         var url: URL?
-        var uploadSession: URLSession?
-        guard let nkSession = nkCommonInstance.getSession(account: account) else { return nil }
         if serverUrlFileName is URL {
             url = serverUrlFileName as? URL
         } else if serverUrlFileName is String || serverUrlFileName is NSString {
@@ -86,14 +82,14 @@ public class NKBackground: NSObject, URLSessionTaskDelegate, URLSessionDelegate,
             return nil
         }
         var request = URLRequest(url: urlForRequest)
-        let loginString = "\(nkSession.user):\(nkSession.password)"
+        let loginString = "\(self.nkCommonInstance.user):\(self.nkCommonInstance.password)"
         guard let loginData = loginString.data(using: String.Encoding.utf8) else {
             return nil
         }
         let base64LoginString = loginData.base64EncodedString()
 
         request.httpMethod = "PUT"
-        request.setValue(nkSession.userAgent, forHTTPHeaderField: "User-Agent")
+        request.setValue(self.nkCommonInstance.userAgent, forHTTPHeaderField: "User-Agent")
         request.setValue("Basic \(base64LoginString)", forHTTPHeaderField: "Authorization")
         // Epoch of linux do not permitted negativ value
         if let dateCreationFile, dateCreationFile.timeIntervalSince1970 > 0 {
@@ -104,18 +100,11 @@ public class NKBackground: NSObject, URLSessionTaskDelegate, URLSessionDelegate,
             request.setValue("\(dateModificationFile.timeIntervalSince1970)", forHTTPHeaderField: "X-OC-MTime")
         }
 
-        if sessionIdentifier == nkCommonInstance.identifierSessionUploadBackground {
-            uploadSession = nkSession.sessionUploadBackground
-        } else if sessionIdentifier == nkCommonInstance.identifierSessionUploadBackgroundWWan {
-            uploadSession = nkSession.sessionUploadBackgroundWWan
-        } else if sessionIdentifier == nkCommonInstance.identifierSessionUploadBackgroundExt {
-            uploadSession = nkSession.sessionUploadBackgroundExt
-        }
-
-        let task = uploadSession?.uploadTask(with: request, fromFile: URL(fileURLWithPath: fileNameLocalPath))
-        task?.taskDescription = taskDescription
-        task?.resume()
+        let task = session.uploadTask(with: request, fromFile: URL(fileURLWithPath: fileNameLocalPath))
+        task.taskDescription = taskDescription
+        task.resume()
         self.nkCommonInstance.writeLog("Network start upload file: \(serverUrlFileName)")
+
         return task
     }
 

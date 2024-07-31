@@ -21,7 +21,6 @@
 //
 
 import XCTest
-import Alamofire
 @testable import NextcloudKit
 
 final class ShareIntegrationTests: BaseIntegrationXCTestCase {
@@ -32,7 +31,7 @@ final class ShareIntegrationTests: BaseIntegrationXCTestCase {
         let serverUrl = "\(baseUrl)/remote.php/dav/files/\(userId)"
         let serverUrlFileName = "\(serverUrl)/\(folderName)"
 
-        NextcloudKit.shared.appendAccount(account, urlBase: baseUrl, user: user, userId: userId, password: password, userAgent: "", nextcloudVersion: 0, groupIdentifier: "")
+        NextcloudKit.shared.setup(account: account, user: user, userId: userId, password: password, urlBase: baseUrl)
 
         NextcloudKit.shared.createFolder(serverUrlFileName: serverUrlFileName, account: account) { account, ocId, date, error in
             XCTAssertEqual(self.account, account)
@@ -44,7 +43,7 @@ final class ShareIntegrationTests: BaseIntegrationXCTestCase {
 
             let note = "Test note"
 
-            NextcloudKit.shared.createShare(path: folderName, shareType: 0, shareWith: "nextcloud", note: note, account: "") { account, share, data, error in
+            NextcloudKit.shared.createShare(path: folderName, shareType: 0, shareWith: "nextcloud", note: note, account: account) { account, share, data, error in
                 defer { expectation.fulfill() }
 
                 XCTAssertEqual(self.account, account)

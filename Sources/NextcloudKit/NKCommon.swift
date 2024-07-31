@@ -30,7 +30,7 @@ import MobileCoreServices
 import CoreServices
 #endif
 
-public protocol NextcloudKitDelegate {
+public protocol NKCommonDelegate {
     func authenticationChallenge(_ session: URLSession, didReceive challenge: URLAuthenticationChallenge, completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void)
     func urlSessionDidFinishEvents(forBackgroundURLSession session: URLSession)
 
@@ -40,19 +40,15 @@ public protocol NextcloudKitDelegate {
     func uploadProgress(_ progress: Float, totalBytes: Int64, totalBytesExpected: Int64, fileName: String, serverUrl: String, session: URLSession, task: URLSessionTask)
 
     func downloadingFinish(_ session: URLSession, downloadTask: URLSessionDownloadTask, didFinishDownloadingTo location: URL)
-
+    
     func downloadComplete(fileName: String, serverUrl: String, etag: String?, date: Date?, dateLastModified: Date?, length: Int64, task: URLSessionTask, error: NKError)
     func uploadComplete(fileName: String, serverUrl: String, ocId: String?, etag: String?, date: Date?, size: Int64, task: URLSessionTask, error: NKError)
 }
 
 public class NKCommon: NSObject {
     public let dav: String = "remote.php/dav"
-    public let identifierSessionDownload: String = "com.nextcloud.nextcloudkit.session.download"
-    public let identifierSessionUpload: String = "com.nextcloud.nextcloudkit.session.upload"
-    public let identifierSessionDownloadBackground: String = "com.nextcloud.session.download.background"
-    public let identifierSessionUploadBackground: String = "com.nextcloud.session.upload.background"
-    public let identifierSessionUploadBackgroundWWan: String = "com.nextcloud.session.upload.backgroundWWan"
-    public let identifierSessionUploadBackgroundExt: String = "com.nextcloud.session.upload.extension"
+    public let sessionIdentifierDownload: String = "com.nextcloud.nextcloudkit.session.download"
+    public let sessionIdentifierUpload: String = "com.nextcloud.nextcloudkit.session.upload"
 
     public enum TypeReachability: Int {
         case unknown = 0
@@ -96,11 +92,37 @@ public class NKCommon: NSObject {
         var name: String
     }
 
+    public let notificationCenterChunkedFileStop = NSNotification.Name(rawValue: "NextcloudKit.chunkedFile.stop")
+
+    internal lazy var sessionConfiguration: URLSessionConfiguration = {
+        let configuration = URLSessionConfiguration.af.default
+        configuration.requestCachePolicy = .reloadIgnoringLocalCacheData
+        if let groupIdentifier {
+            let cookieStorage = HTTPCookieStorage.sharedCookieStorage(forGroupContainerIdentifier: groupIdentifier)
+            configuration.httpCookieStorage = cookieStorage
+        } else {
+            configuration.httpCookieStorage = nil
+        }
+        return configuration
+    }()
+    internal var rootQueue: DispatchQueue = DispatchQueue(label: "com.nextcloud.nextcloudkit.sessionManagerData.rootQueue")
+    internal var requestQueue: DispatchQueue?
+    internal var serializationQueue: DispatchQueue?
+
+    internal var _user = ""
+    internal var _userId = ""
+    internal var _password = ""
+    internal var _account = ""
+    internal var _urlBase = ""
+    internal var _userAgent: String?
+    internal var _nextcloudVersion: Int = 0
+    internal var _groupIdentifier: String?
+
+    internal var internalTypeIdentifiers: [UTTypeConformsToServer] = []
     internal var utiCache = NSCache<NSString, CFString>()
     internal var mimeTypeCache = NSCache<CFString, NSString>()
     internal var filePropertiesCache = NSCache<CFString, NKFileProperty>()
-    internal var internalTypeIdentifiers: [UTTypeConformsToServer] = []
-    internal var delegate: NextcloudKitDelegate?
+    internal var delegate: NKCommonDelegate?
 
     private var _filenameLog: String = "communication.log"
     private var _pathLog: String = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true).first!
@@ -110,9 +132,39 @@ public class NKCommon: NSObject {
     private var _copyLogToDocumentDirectory: Bool = false
     private let queueLog = DispatchQueue(label: "com.nextcloud.nextcloudkit.queuelog", attributes: .concurrent )
 
+    public var user: String {
+        return _user
+    }
+
+    public var userId: String {
+        return _userId
+    }
+
+    public var password: String {
+        return _password
+    }
+
+    public var account: String {
+        return _account
+    }
+
+    public var urlBase: String {
+        return _urlBase
+    }
+
+    public var userAgent: String? {
+        return _userAgent
+    }
+
+    public var nextcloudVersion: Int {
+        return _nextcloudVersion
+    }
+
+    public var groupIdentifier: String? {
+        return _groupIdentifier
+    }
+
     public let backgroundQueue = DispatchQueue(label: "com.nextcloud.nextcloudkit.backgroundqueue", qos: .background, attributes: .concurrent)
-    public let notificationCenterChunkedFileStop = NSNotification.Name(rawValue: "NextcloudKit.chunkedFile.stop")
-    public var nksessions = ThreadSafeArray<NKSession>()
 
     public var filenameLog: String {
         get {
@@ -434,44 +486,41 @@ public class NKCommon: NSObject {
 
     // MARK: - Common
 
-    public func getSession(account: String) -> NKSession? {
-        var session: NKSession?
-        nksessions.forEach { result in
-            if result.account == account {
-                session = result
-            }
-        }
-        return session
+    public func getStandardHeaders(options: NKRequestOptions) -> HTTPHeaders {
+        return getStandardHeaders(user: user, password: password, appendHeaders: options.customHeader, customUserAgent: options.customUserAgent, contentType: options.contentType)
     }
 
-    public func getStandardHeaders(account: String, options: NKRequestOptions? = nil) -> HTTPHeaders? {
-        guard let session = nksessions.filter({ $0.account == account }).first else { return nil}
+    public func getStandardHeaders(_ appendHeaders: [String: String]? = nil, customUserAgent: String? = nil, contentType: String? = nil) -> HTTPHeaders {
+        return getStandardHeaders(user: user, password: password, appendHeaders: appendHeaders, customUserAgent: customUserAgent, contentType: contentType)
+    }
+
+    public func getStandardHeaders(user: String?, password: String?, appendHeaders: [String: String]?, customUserAgent: String?, contentType: String? = nil) -> HTTPHeaders {
         var headers: HTTPHeaders = []
 
-        headers.update(.authorization(username: session.user, password: session.password))
-        headers.update(.userAgent(session.userAgent))
-        if let customUserAgent = options?.customUserAgent {
-            headers.update(.userAgent(customUserAgent))
+        if let user, let password {
+            headers.update(.authorization(username: user, password: password))
         }
-        if let contentType = options?.contentType {
+        if let customUserAgent {
+            headers.update(.userAgent(customUserAgent))
+        } else if let userAgent = userAgent {
+            headers.update(.userAgent(userAgent))
+        }
+        if let contentType {
             headers.update(.contentType(contentType))
         } else {
             headers.update(.contentType("application/x-www-form-urlencoded"))
         }
-        if options?.contentType != "application/xml" {
+        if contentType != "application/xml" {
             headers.update(name: "Accept", value: "application/json")
         }
         headers.update(name: "OCS-APIRequest", value: "true")
-        for (key, value) in options?.customHeader ?? [:] {
+        for (key, value) in appendHeaders ?? [:] {
             headers.update(name: key, value: value)
         }
         return headers
     }
 
-    public func createStandardUrl(serverUrl: String, endpoint: String, options: NKRequestOptions) -> URLConvertible? {
-        if let endpoint = options.endpoint {
-            return URL(string: endpoint)
-        }
+    public func createStandardUrl(serverUrl: String, endpoint: String) -> URLConvertible? {
         guard var serverUrl = serverUrl.urlEncoded else { return nil }
 
         if serverUrl.last != "/" { serverUrl = serverUrl + "/" }
@@ -537,7 +586,7 @@ public class NKCommon: NSObject {
         return 0
     }
 
-    public func returnPathfromServerUrl(_ serverUrl: String, urlBase: String, userId: String) -> String {
+    public func returnPathfromServerUrl(_ serverUrl: String) -> String {
         let home = urlBase + "/remote.php/dav/files/" + userId
         return serverUrl.replacingOccurrences(of: home, with: "")
     }
