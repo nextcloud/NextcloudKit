@@ -36,6 +36,7 @@ public class NKBackground: NSObject, URLSessionTaskDelegate, URLSessionDelegate,
     public func download(serverUrlFileName: Any,
                          fileNameLocalPath: String,
                          taskDescription: String? = nil,
+                         account: String,
                          session: URLSession) -> URLSessionDownloadTask? {
         var url: URL?
         if serverUrlFileName is URL {
@@ -69,6 +70,7 @@ public class NKBackground: NSObject, URLSessionTaskDelegate, URLSessionDelegate,
                        dateCreationFile: Date?,
                        dateModificationFile: Date?,
                        taskDescription: String? = nil,
+                       account: String,
                        session: URLSession) -> URLSessionUploadTask? {
         var url: URL?
         if serverUrlFileName is URL {

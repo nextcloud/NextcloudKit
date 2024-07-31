@@ -26,10 +26,10 @@ import Alamofire
 
 public extension NextcloudKit {
     func getComments(fileId: String,
+                     account: String,
                      options: NKRequestOptions = NKRequestOptions(),
                      taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
                      completion: @escaping (_ account: String, _ items: [NKComments]?, _ data: Data?, _ error: NKError) -> Void) {
-        let account = self.nkCommonInstance.account
         let urlBase = self.nkCommonInstance.urlBase
         let dav = self.nkCommonInstance.dav
         let serverUrlEndpoint = urlBase + "/" + dav + "/comments/files/\(fileId)"
@@ -72,10 +72,10 @@ public extension NextcloudKit {
 
     func putComments(fileId: String,
                      message: String,
+                     account: String,
                      options: NKRequestOptions = NKRequestOptions(),
                      taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
                      completion: @escaping (_ account: String, _ error: NKError) -> Void) {
-        let account = self.nkCommonInstance.account
         let urlBase = self.nkCommonInstance.urlBase
         let dav = self.nkCommonInstance.dav
         let serverUrlEndpoint = urlBase + "/" + dav + "/comments/files/\(fileId)"
@@ -114,10 +114,10 @@ public extension NextcloudKit {
     func updateComments(fileId: String,
                         messageId: String,
                         message: String,
+                        account: String,
                         options: NKRequestOptions = NKRequestOptions(),
                         taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
                         completion: @escaping (_ account: String, _ error: NKError) -> Void) {
-        let account = self.nkCommonInstance.account
         let urlBase = self.nkCommonInstance.urlBase
         let dav = self.nkCommonInstance.dav
         let serverUrlEndpoint = urlBase + "/" + dav + "/comments/files/\(fileId)/\(messageId)"
@@ -156,10 +156,10 @@ public extension NextcloudKit {
 
     func deleteComments(fileId: String,
                         messageId: String,
+                        account: String,
                         options: NKRequestOptions = NKRequestOptions(),
                         taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
                         completion: @escaping (_ account: String, _ error: NKError) -> Void) {
-        let account = self.nkCommonInstance.account
         let urlBase = self.nkCommonInstance.urlBase
         let dav = self.nkCommonInstance.dav
         let serverUrlEndpoint = urlBase + "/" + dav + "/comments/files/\(fileId)/\(messageId)"
@@ -187,10 +187,10 @@ public extension NextcloudKit {
     }
 
     func markAsReadComments(fileId: String,
+                            account: String,
                             options: NKRequestOptions = NKRequestOptions(),
                             taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
                             completion: @escaping (_ account: String, _ error: NKError) -> Void) {
-        let account = self.nkCommonInstance.account
         let urlBase = self.nkCommonInstance.urlBase
         let dav = self.nkCommonInstance.dav
         let serverUrlEndpoint = urlBase + "/" + dav + "/comments/files/\(fileId)"

@@ -607,7 +607,7 @@ class NKDataFileXML: NSObject {
         return xml["ocs", "data", "apppassword"].text
     }
 
-    func convertDataFile(xmlData: Data, dav: String, urlBase: String, user: String, userId: String, showHiddenFiles: Bool, includeHiddenFiles: [String]) -> [NKFile] {
+    func convertDataFile(xmlData: Data, dav: String, urlBase: String, user: String, userId: String, account: String, showHiddenFiles: Bool, includeHiddenFiles: [String]) -> [NKFile] {
         var files: [NKFile] = []
         let rootFiles = "/" + dav + "/files/"
         guard let baseUrl = self.nkCommonInstance.getHostName(urlString: urlBase) else {
@@ -641,7 +641,7 @@ class NKDataFileXML: NSObject {
                 }
 
                 // account
-                file.account = self.nkCommonInstance.account
+                file.account = account
 
                 // path
                 file.path = (fileNamePath as NSString).deletingLastPathComponent + "/"
