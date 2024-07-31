@@ -105,6 +105,16 @@ open class NextcloudKit: SessionDelegate {
         }
     }
 
+    public func deleteCookieStorageForAccount(_ account: String) {
+        guard let session = nkCommonInstance.nksessions.filter({ $0.account == account }).first else { return }
+
+        if let cookieStore = session.sessionData.session.configuration.httpCookieStorage {
+            for cookie in cookieStore.cookies ?? [] {
+                cookieStore.deleteCookie(cookie)
+            }
+        }
+    }
+
     /*
     internal func saveCookies(response : HTTPURLResponse?) {
         if let headerFields = response?.allHeaderFields as? [String : String] {
