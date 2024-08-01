@@ -26,10 +26,10 @@ import Alamofire
 import SwiftyJSON
 
 public extension NextcloudKit {
-    func textProcessingGetTypes(options: NKRequestOptions = NKRequestOptions(),
+    func textProcessingGetTypes(account: String,
+                                options: NKRequestOptions = NKRequestOptions(),
                                 taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
                                 completion: @escaping (_ account: String, _ types: [NKTextProcessingTaskType]?, _ data: Data?, _ error: NKError) -> Void) {
-        let account = self.nkCommonInstance.account
         let urlBase = self.nkCommonInstance.urlBase
         let endpoint = "ocs/v2.php/textprocessing/tasktypes"
         guard let url = self.nkCommonInstance.createStandardUrl(serverUrl: urlBase, endpoint: endpoint) else {
@@ -66,10 +66,10 @@ public extension NextcloudKit {
                                 typeId: String,
                                 appId: String = "assistant",
                                 identifier: String,
+                                account: String,
                                 options: NKRequestOptions = NKRequestOptions(),
                                 taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
                                 completion: @escaping (_ account: String, _ task: NKTextProcessingTask?, _ data: Data?, _ error: NKError) -> Void) {
-        let account = self.nkCommonInstance.account
         let urlBase = self.nkCommonInstance.urlBase
         let endpoint = "/ocs/v2.php/textprocessing/schedule"
         guard let url = self.nkCommonInstance.createStandardUrl(serverUrl: urlBase, endpoint: endpoint) else {
@@ -104,10 +104,10 @@ public extension NextcloudKit {
     }
 
     func textProcessingGetTask(taskId: Int,
+                               account: String,
                                options: NKRequestOptions = NKRequestOptions(),
                                taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
                                completion: @escaping (_ account: String, _ task: NKTextProcessingTask?, _ data: Data?, _ error: NKError) -> Void) {
-        let account = self.nkCommonInstance.account
         let urlBase = self.nkCommonInstance.urlBase
         let endpoint = "/ocs/v2.php/textprocessing/task/\(taskId)"
         guard let url = self.nkCommonInstance.createStandardUrl(serverUrl: urlBase, endpoint: endpoint) else {
@@ -141,10 +141,10 @@ public extension NextcloudKit {
     }
 
     func textProcessingDeleteTask(taskId: Int,
+                                  account: String,
                                   options: NKRequestOptions = NKRequestOptions(),
                                   taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
                                   completion: @escaping (_ account: String, _ task: NKTextProcessingTask?, _ data: Data?, _ error: NKError) -> Void) {
-        let account = self.nkCommonInstance.account
         let urlBase = self.nkCommonInstance.urlBase
         let endpoint = "/ocs/v2.php/textprocessing/task/\(taskId)"
         guard let url = self.nkCommonInstance.createStandardUrl(serverUrl: urlBase, endpoint: endpoint) else {
@@ -178,10 +178,10 @@ public extension NextcloudKit {
     }
 
     func textProcessingTaskList(appId: String,
+                                account: String,
                                 options: NKRequestOptions = NKRequestOptions(),
                                 taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
                                 completion: @escaping (_ account: String, _ task: [NKTextProcessingTask]?, _ data: Data?, _ error: NKError) -> Void) {
-        let account = self.nkCommonInstance.account
         let urlBase = self.nkCommonInstance.urlBase
         let endpoint = "/ocs/v2.php/textprocessing/tasks/app/\(appId)"
         guard let url = self.nkCommonInstance.createStandardUrl(serverUrl: urlBase, endpoint: endpoint) else {

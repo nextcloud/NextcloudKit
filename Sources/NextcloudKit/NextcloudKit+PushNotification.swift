@@ -27,12 +27,12 @@ import SwiftyJSON
 
 public extension NextcloudKit {
     func subscribingPushNotification(serverUrl: String,
-                                     account: String,
                                      user: String,
                                      password: String,
                                      pushTokenHash: String,
                                      devicePublicKey: String,
                                      proxyServerUrl: String,
+                                     account: String,
                                      options: NKRequestOptions = NKRequestOptions(),
                                      taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
                                      completion: @escaping (_ account: String, _ deviceIdentifier: String?, _ signature: String?, _ publicKey: String?, _ data: Data?, _ error: NKError) -> Void) {
@@ -74,9 +74,9 @@ public extension NextcloudKit {
     }
 
     func unsubscribingPushNotification(serverUrl: String,
-                                       account: String,
                                        user: String,
                                        password: String,
+                                       account: String,
                                        options: NKRequestOptions = NKRequestOptions(),
                                        taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
                                        completion: @escaping (_ account: String, _ error: NKError) -> Void) {
@@ -108,13 +108,14 @@ public extension NextcloudKit {
                               deviceIdentifier: String,
                               signature: String,
                               publicKey: String,
+                              account: String,
                               options: NKRequestOptions = NKRequestOptions(),
                               taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-                              completion: @escaping (_ error: NKError) -> Void) {
+                              completion: @escaping (_ account: String, _ error: NKError) -> Void) {
         let endpoint = "devices?format=json"
         guard let url = self.nkCommonInstance.createStandardUrl(serverUrl: proxyServerUrl, endpoint: endpoint),
               let userAgent = options.customUserAgent else {
-            return options.queue.async { completion(.urlError) }
+            return options.queue.async { completion(account, .urlError) }
         }
         let parameters = [
             "pushToken": pushToken,
@@ -134,9 +135,9 @@ public extension NextcloudKit {
             switch response.result {
             case .failure(let error):
                 let error = NKError(error: error, afResponse: response, responseData: response.data)
-                options.queue.async { completion(error) }
+                options.queue.async { completion(account, error) }
             case .success:
-                options.queue.async { completion(.success) }
+                options.queue.async { completion(account, .success) }
             }
         }
     }
@@ -145,13 +146,14 @@ public extension NextcloudKit {
                                 deviceIdentifier: String,
                                 signature: String,
                                 publicKey: String,
+                                account: String,
                                 options: NKRequestOptions = NKRequestOptions(),
                                 taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-                                completion: @escaping (_ error: NKError) -> Void) {
+                                completion: @escaping (_ account: String, _ error: NKError) -> Void) {
         let endpoint = "devices"
         guard let url = self.nkCommonInstance.createStandardUrl(serverUrl: proxyServerUrl, endpoint: endpoint),
               let userAgent = options.customUserAgent else {
-            return options.queue.async { completion(.urlError) }
+            return options.queue.async { completion(account, .urlError) }
         }
         let parameters = [
             "deviceIdentifier": deviceIdentifier,
@@ -170,9 +172,9 @@ public extension NextcloudKit {
             switch response.result {
             case .failure(let error):
                 let error = NKError(error: error, afResponse: response, responseData: response.data)
-                options.queue.async { completion(error) }
+                options.queue.async { completion(account, error) }
             case .success:
-                options.queue.async { completion(.success) }
+                options.queue.async { completion(account, .success) }
             }
         }
     }

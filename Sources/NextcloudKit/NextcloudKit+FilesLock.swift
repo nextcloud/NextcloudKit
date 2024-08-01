@@ -29,10 +29,10 @@ import SwiftyJSON
 public extension NextcloudKit {
     func lockUnlockFile(serverUrlFileName: String,
                         shouldLock: Bool,
+                        account: String,
                         options: NKRequestOptions = NKRequestOptions(),
                         taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
                         completion: @escaping (_ account: String, _ error: NKError) -> Void) {
-        let account = self.nkCommonInstance.account
         guard let url = serverUrlFileName.encodedToUrl
         else {
             return options.queue.async { completion(account, .urlError) }

@@ -26,10 +26,10 @@ import Alamofire
 import SwiftyJSON
 
 public extension NextcloudKit {
-    func getGroupfolders(options: NKRequestOptions = NKRequestOptions(),
+    func getGroupfolders(account: String,
+                         options: NKRequestOptions = NKRequestOptions(),
                          taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
                          completion: @escaping (_ account: String, _ results: [NKGroupfolders]?, _ data: Data?, _ error: NKError) -> Void) {
-        let account = self.nkCommonInstance.account
         let urlBase = self.nkCommonInstance.urlBase
         let endpoint = "index.php/apps/groupfolders/folders?applicable=1"
         guard let url = self.nkCommonInstance.createStandardUrl(serverUrl: urlBase, endpoint: endpoint)

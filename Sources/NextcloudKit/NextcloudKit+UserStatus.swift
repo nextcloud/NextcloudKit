@@ -27,10 +27,10 @@ import SwiftyJSON
 
 public extension NextcloudKit {
     func getUserStatus(userId: String? = nil,
+                       account: String,
                        options: NKRequestOptions = NKRequestOptions(),
                        taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
                        completion: @escaping (_ account: String, _ clearAt: Date?, _ icon: String?, _ message: String?, _ messageId: String?, _ messageIsPredefined: Bool, _ status: String?, _ statusIsUserDefined: Bool, _ userId: String?, _ data: Data?, _ error: NKError) -> Void) {
-        let account = self.nkCommonInstance.account
         let urlBase = self.nkCommonInstance.urlBase
         var endpoint = "ocs/v2.php/apps/user_status/api/v1/user_status"
         if let userId = userId {
@@ -78,10 +78,10 @@ public extension NextcloudKit {
     }
 
     func setUserStatus(status: String,
+                       account: String,
                        options: NKRequestOptions = NKRequestOptions(),
                        taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
                        completion: @escaping (_ account: String, _ error: NKError) -> Void) {
-        let account = self.nkCommonInstance.account
         let urlBase = self.nkCommonInstance.urlBase
         let endpoint = "ocs/v2.php/apps/user_status/api/v1/user_status/status"
         guard let url = self.nkCommonInstance.createStandardUrl(serverUrl: urlBase, endpoint: endpoint) else {
@@ -117,10 +117,10 @@ public extension NextcloudKit {
 
     func setCustomMessagePredefined(messageId: String,
                                     clearAt: Double,
+                                    account: String,
                                     options: NKRequestOptions = NKRequestOptions(),
                                     taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
                                     completion: @escaping (_ account: String, _ error: NKError) -> Void) {
-        let account = self.nkCommonInstance.account
         let urlBase = self.nkCommonInstance.urlBase
         let endpoint = "ocs/v2.php/apps/user_status/api/v1/user_status/message/predefined"
         guard let url = self.nkCommonInstance.createStandardUrl(serverUrl: urlBase, endpoint: endpoint) else {
@@ -161,10 +161,10 @@ public extension NextcloudKit {
     func setCustomMessageUserDefined(statusIcon: String?,
                                      message: String,
                                      clearAt: Double,
+                                     account: String,
                                      options: NKRequestOptions = NKRequestOptions(),
                                      taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
                                      completion: @escaping (_ account: String, _ error: NKError) -> Void) {
-        let account = self.nkCommonInstance.account
         let urlBase = self.nkCommonInstance.urlBase
         let endpoint = "ocs/v2.php/apps/user_status/api/v1/user_status/message/custom"
         guard let url = self.nkCommonInstance.createStandardUrl(serverUrl: urlBase, endpoint: endpoint) else {
@@ -205,10 +205,10 @@ public extension NextcloudKit {
         }
     }
 
-    func clearMessage(options: NKRequestOptions = NKRequestOptions(),
+    func clearMessage(account: String,
+                      options: NKRequestOptions = NKRequestOptions(),
                       taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
                       completion: @escaping (_ account: String, _ error: NKError) -> Void) {
-        let account = self.nkCommonInstance.account
         let urlBase = self.nkCommonInstance.urlBase
         let endpoint = "ocs/v2.php/apps/user_status/api/v1/user_status/message"
         guard let url = self.nkCommonInstance.createStandardUrl(serverUrl: urlBase, endpoint: endpoint) else {
@@ -240,10 +240,10 @@ public extension NextcloudKit {
         }
     }
 
-    func getUserStatusPredefinedStatuses(options: NKRequestOptions = NKRequestOptions(),
+    func getUserStatusPredefinedStatuses(account: String,
+                                         options: NKRequestOptions = NKRequestOptions(),
                                          taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
                                          completion: @escaping (_ account: String, _ userStatuses: [NKUserStatus]?, _ data: Data?, _ error: NKError) -> Void) {
-        let account = self.nkCommonInstance.account
         let urlBase = self.nkCommonInstance.urlBase
         var userStatuses: [NKUserStatus] = []
         let endpoint = "ocs/v2.php/apps/user_status/api/v1/predefined_statuses"
@@ -294,10 +294,10 @@ public extension NextcloudKit {
 
     func getUserStatusRetrieveStatuses(limit: Int,
                                        offset: Int,
+                                       account: String,
                                        options: NKRequestOptions = NKRequestOptions(),
                                        taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
                                        completion: @escaping (_ account: String, _ userStatuses: [NKUserStatus]?, _ data: Data?, _ error: NKError) -> Void) {
-        let account = self.nkCommonInstance.account
         let urlBase = self.nkCommonInstance.urlBase
         var userStatuses: [NKUserStatus] = []
         let endpoint = "ocs/v2.php/apps/user_status/api/v1/statuses"

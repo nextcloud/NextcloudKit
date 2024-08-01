@@ -27,6 +27,7 @@ import SwiftyJSON
 
 public extension NextcloudKit {
     func createFolder(serverUrlFileName: String,
+                      account: String,
                       options: NKRequestOptions = NKRequestOptions(),
                       taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
                       completion: @escaping (_ account: String, _ ocId: String?, _ date: Date?, _ error: NKError) -> Void) {
@@ -73,10 +74,10 @@ public extension NextcloudKit {
     }
 
     func deleteFileOrFolder(serverUrlFileName: String,
+                            account: String,
                             options: NKRequestOptions = NKRequestOptions(),
                             taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
                             completion: @escaping (_ account: String, _ error: NKError) -> Void) {
-        let account = self.nkCommonInstance.account
         guard let url = serverUrlFileName.encodedToUrl else {
             return options.queue.async { completion(account, .urlError) }
         }
@@ -110,6 +111,7 @@ public extension NextcloudKit {
     func moveFileOrFolder(serverUrlFileNameSource: String,
                           serverUrlFileNameDestination: String,
                           overwrite: Bool,
+                          account: String,
                           options: NKRequestOptions = NKRequestOptions(),
                           taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
                           completion: @escaping (_ account: String, _ error: NKError) -> Void) {
@@ -155,6 +157,7 @@ public extension NextcloudKit {
     func copyFileOrFolder(serverUrlFileNameSource: String,
                           serverUrlFileNameDestination: String,
                           overwrite: Bool,
+                          account: String,
                           options: NKRequestOptions = NKRequestOptions(),
                           taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
                           completion: @escaping (_ account: String, _ error: NKError) -> Void) {
@@ -202,10 +205,10 @@ public extension NextcloudKit {
                           showHiddenFiles: Bool = true,
                           includeHiddenFiles: [String] = [],
                           requestBody: Data? = nil,
+                          account: String,
                           options: NKRequestOptions = NKRequestOptions(),
                           taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
                           completion: @escaping (_ account: String, _ files: [NKFile], _ data: Data?, _ error: NKError) -> Void) {
-        let account = self.nkCommonInstance.account
         let user = self.nkCommonInstance.user
         let userId = self.nkCommonInstance.userId
         let urlBase = self.nkCommonInstance.urlBase
@@ -250,7 +253,7 @@ public extension NextcloudKit {
                 options.queue.async { completion(account, files, nil, error) }
             case .success:
                 if let xmlData = response.data {
-                    files = NKDataFileXML(nkCommonInstance: self.nkCommonInstance).convertDataFile(xmlData: xmlData, dav: dav, urlBase: urlBase, user: user, userId: userId, showHiddenFiles: showHiddenFiles, includeHiddenFiles: includeHiddenFiles)
+                    files = NKDataFileXML(nkCommonInstance: self.nkCommonInstance).convertDataFile(xmlData: xmlData, dav: dav, urlBase: urlBase, user: user, userId: userId, account: account, showHiddenFiles: showHiddenFiles, includeHiddenFiles: includeHiddenFiles)
                     options.queue.async { completion(account, files, xmlData, .success) }
                 } else {
                     options.queue.async { completion(account, files, nil, .xmlError) }
@@ -261,10 +264,10 @@ public extension NextcloudKit {
 
     func getFileFromFileId(fileId: String? = nil,
                            link: String? = nil,
+                           account: String,
                            options: NKRequestOptions = NKRequestOptions(),
                            taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
                            completion: @escaping (_ account: String, _ file: NKFile?, _ data: Data?, _ error: NKError) -> Void) {
-        let account = self.nkCommonInstance.account
         let userId = self.nkCommonInstance.userId
         let urlBase = self.nkCommonInstance.urlBase
         var httpBody: Data?
@@ -280,7 +283,7 @@ public extension NextcloudKit {
             return options.queue.async { completion(account, nil, nil, .urlError) }
         }
 
-        search(serverUrl: urlBase, httpBody: httpBody, showHiddenFiles: true, includeHiddenFiles: [], options: options) { task in
+        search(serverUrl: urlBase, httpBody: httpBody, showHiddenFiles: true, includeHiddenFiles: [], account: account, options: options) { task in
             task.taskDescription = options.taskDescription
             taskHandler(task)
         } completion: { account, files, data, error in
@@ -292,11 +295,12 @@ public extension NextcloudKit {
                            requestBody: String,
                            showHiddenFiles: Bool,
                            includeHiddenFiles: [String] = [],
+                           account: String,
                            options: NKRequestOptions = NKRequestOptions(),
                            taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
                            completion: @escaping (_ account: String, _ files: [NKFile], _ data: Data?, _ error: NKError) -> Void) {
         if let httpBody = requestBody.data(using: .utf8) {
-            search(serverUrl: serverUrl, httpBody: httpBody, showHiddenFiles: showHiddenFiles, includeHiddenFiles: includeHiddenFiles, options: options) { task in
+            search(serverUrl: serverUrl, httpBody: httpBody, showHiddenFiles: showHiddenFiles, includeHiddenFiles: includeHiddenFiles, account: account, options: options) { task in
                 taskHandler(task)
             } completion: { account, files, data, error in
                 options.queue.async { completion(account, files, data, error) }
@@ -309,17 +313,17 @@ public extension NextcloudKit {
                        literal: String,
                        showHiddenFiles: Bool,
                        includeHiddenFiles: [String] = [],
+                       account: String,
                        options: NKRequestOptions = NKRequestOptions(),
                        taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
                        completion: @escaping (_ account: String, _ files: [NKFile], _ data: Data?, _ error: NKError) -> Void) {
-        let account = self.nkCommonInstance.account
         let userId = self.nkCommonInstance.userId
         guard let href = ("/files/" + userId).urlEncoded else {
             return options.queue.async { completion(account, [], nil, .urlError) }
         }
         let requestBody = String(format: NKDataFileXML(nkCommonInstance: self.nkCommonInstance).getRequestBodySearchFileName(createProperties: options.createProperties, removeProperties: options.removeProperties), href, depth, "%" + literal + "%")
         if let httpBody = requestBody.data(using: .utf8) {
-            search(serverUrl: serverUrl, httpBody: httpBody, showHiddenFiles: showHiddenFiles, includeHiddenFiles: includeHiddenFiles, options: options) { task in
+            search(serverUrl: serverUrl, httpBody: httpBody, showHiddenFiles: showHiddenFiles, includeHiddenFiles: includeHiddenFiles, account: account, options: options) { task in
                 taskHandler(task)
             } completion: { account, files, data, error in
                 options.queue.async { completion(account, files, data, error) }
@@ -334,10 +338,10 @@ public extension NextcloudKit {
                      limit: Int,
                      showHiddenFiles: Bool,
                      includeHiddenFiles: [String] = [],
+                     account: String,
                      options: NKRequestOptions = NKRequestOptions(),
                      taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
                      completion: @escaping (_ account: String, _ files: [NKFile], _ data: Data?, _ error: NKError) -> Void) {
-        let account = self.nkCommonInstance.account
         let userId = self.nkCommonInstance.userId
         let urlBase = self.nkCommonInstance.urlBase
         let files: [NKFile] = []
@@ -367,7 +371,7 @@ public extension NextcloudKit {
         }
 
         if let httpBody = requestBody.data(using: .utf8) {
-            search(serverUrl: urlBase, httpBody: httpBody, showHiddenFiles: showHiddenFiles, includeHiddenFiles: includeHiddenFiles, options: options) { task in
+            search(serverUrl: urlBase, httpBody: httpBody, showHiddenFiles: showHiddenFiles, includeHiddenFiles: includeHiddenFiles, account: account, options: options) { task in
                 taskHandler(task)
             } completion: { account, files, data, error in
                 options.queue.async { completion(account, files, data, error) }
@@ -379,10 +383,10 @@ public extension NextcloudKit {
                         httpBody: Data,
                         showHiddenFiles: Bool,
                         includeHiddenFiles: [String],
+                        account: String,
                         options: NKRequestOptions = NKRequestOptions(),
                         taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
                         completion: @escaping (_ account: String, _ files: [NKFile], _ data: Data?, _ error: NKError) -> Void) {
-        let account = self.nkCommonInstance.account
         let user = self.nkCommonInstance.user
         let userId = self.nkCommonInstance.userId
         let urlBase = self.nkCommonInstance.urlBase
@@ -415,7 +419,7 @@ public extension NextcloudKit {
                 options.queue.async { completion(account, files, nil, error) }
             case .success:
                 if let xmlData = response.data {
-                    files = NKDataFileXML(nkCommonInstance: self.nkCommonInstance).convertDataFile(xmlData: xmlData, dav: dav, urlBase: urlBase, user: user, userId: userId, showHiddenFiles: showHiddenFiles, includeHiddenFiles: includeHiddenFiles)
+                    files = NKDataFileXML(nkCommonInstance: self.nkCommonInstance).convertDataFile(xmlData: xmlData, dav: dav, urlBase: urlBase, user: user, userId: userId, account: account, showHiddenFiles: showHiddenFiles, includeHiddenFiles: includeHiddenFiles)
                     options.queue.async { completion(account, files, xmlData, .success) }
                 } else {
                     options.queue.async { completion(account, files, nil, .xmlError) }
@@ -426,10 +430,10 @@ public extension NextcloudKit {
 
     func setFavorite(fileName: String,
                      favorite: Bool,
+                     account: String,
                      options: NKRequestOptions = NKRequestOptions(),
                      taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
                      completion: @escaping (_ account: String, _ error: NKError) -> Void) {
-        let account = self.nkCommonInstance.account
         let userId = self.nkCommonInstance.userId
         let urlBase = self.nkCommonInstance.urlBase
         let dav = self.nkCommonInstance.dav
@@ -469,10 +473,10 @@ public extension NextcloudKit {
 
     func listingFavorites(showHiddenFiles: Bool,
                           includeHiddenFiles: [String] = [],
+                          account: String,
                           options: NKRequestOptions = NKRequestOptions(),
                           taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
                           completion: @escaping (_ account: String, _ files: [NKFile], _ data: Data?, _ error: NKError) -> Void) {
-        let account = self.nkCommonInstance.account
         let user = self.nkCommonInstance.user
         let userId = self.nkCommonInstance.userId
         let urlBase = self.nkCommonInstance.urlBase
@@ -507,7 +511,7 @@ public extension NextcloudKit {
                 options.queue.async { completion(account, files, nil, error) }
             case .success:
                 if let xmlData = response.data {
-                    files = NKDataFileXML(nkCommonInstance: self.nkCommonInstance).convertDataFile(xmlData: xmlData, dav: dav, urlBase: urlBase, user: user, userId: userId, showHiddenFiles: showHiddenFiles, includeHiddenFiles: includeHiddenFiles)
+                    files = NKDataFileXML(nkCommonInstance: self.nkCommonInstance).convertDataFile(xmlData: xmlData, dav: dav, urlBase: urlBase, user: user, userId: userId, account: account, showHiddenFiles: showHiddenFiles, includeHiddenFiles: includeHiddenFiles)
                     options.queue.async { completion(account, files, xmlData, .success) }
                 } else {
                     options.queue.async { completion(account, files, nil, .xmlError) }
@@ -518,10 +522,10 @@ public extension NextcloudKit {
 
     func listingTrash(filename: String? = nil,
                       showHiddenFiles: Bool,
+                      account: String,
                       options: NKRequestOptions = NKRequestOptions(),
                       taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
                       completion: @escaping (_ account: String, _ items: [NKTrash], _ data: Data?, _ error: NKError) -> Void) {
-        let account = self.nkCommonInstance.account
         let userId = self.nkCommonInstance.userId
         let urlBase = self.nkCommonInstance.urlBase
         let dav = self.nkCommonInstance.dav
