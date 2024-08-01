@@ -53,8 +53,6 @@ public class FileNameValidator {
         }
     }
 
-//    public let uploadInvalidNameError = NKError(errorCode: NSURLErrorCannotCreateFile, errorDescription: NSLocalizedString("_file_name_validator_error_upload_invalid_name_", value: "Some files could not be uploaded as they contain forbidden names or invalid characters", comment: ""))
-//    public let folderInvalidNameError = NKError(errorCode: NSURLErrorCannotCreateFile, errorDescription: NSLocalizedString("_file_name_validator_error_folder_invalid_name_", value: "Folder path contains forbidden names or invalid characters", comment: ""))
     public let fileEndsWithSpacePeriodError = NKError(errorCode: NSURLErrorCannotCreateFile, errorDescription: NSLocalizedString("_file_name_validator_error_ends_with_space_period_", value: "File name ends with a space or a period", comment: ""))
 
     public var fileReservedNameError: NKError {
@@ -74,10 +72,6 @@ public class FileNameValidator {
         let errorMessage = String(format: errorMessageTemplate, templateString)
         return NKError(errorCode: NSURLErrorCannotCreateFile, errorDescription: errorMessage)
     }
-//
-//    //    public let fileReservedNameError = NKError(errorCode: NSURLErrorCannotCreateFile, errorDescription: NSLocalizedString("_file_name_validator_error_reserved_name_", value: "%@ is a reserved name", comment: ""))
-//    public let fileForbiddenFileExtensionError = NKError(errorCode: NSURLErrorCannotCreateFile, errorDescription: )
-//    public let fileInvalidCharacterError = NKError(errorCode: NSURLErrorCannotCreateFile, errorDescription: NSLocalizedString("file_name_validator_error_invalid_character_", value: "File name contains an invalid character: %@", comment: ""))
 
     private var templateString = ""
 
@@ -91,14 +85,6 @@ public class FileNameValidator {
     }
 
     public func checkFileName(_ filename: String, existedFileNames: Set<String>? = nil) -> NKError? {
-        //        if filename.isEmpty {
-        //            return emptyFilenameError
-        //        }
-        //
-        //        if fileNameAlreadyExists(filename, fileNames: existedFileNames ?? Set()) {
-        //            return fileAlreadyExistsError
-        //        }
-
         if filename.hasSuffix(" ") || filename.hasSuffix(".") {
             return fileEndsWithSpacePeriodError
         }
@@ -121,20 +107,6 @@ public class FileNameValidator {
         return nil
     }
 
-//    public func checkFolderAndFilePaths(folderPath: String, filePaths: [String]) -> Bool {
-//        return checkFolderPath(folderPath: folderPath) &&
-//        checkFilePaths(filePaths: filePaths)
-//    }
-//
-//    public func checkFilePaths(filePaths: [String]) -> Bool {
-//        return filePaths.allSatisfy { checkFileName($0) == nil }
-//    }
-//
-//    public func checkFolderPath(folderPath: String) -> Bool {
-//        return folderPath.split { $0 == "/" || $0 == "\\" }
-//            .allSatisfy { checkFileName(String($0)) == nil }
-//    }
-
     private func checkInvalidCharacters(string: String) -> NKError? {
         for char in string {
             let charAsString = String(char)
@@ -147,13 +119,4 @@ public class FileNameValidator {
         }
         return nil
     }
-
-//    public func isFileHidden(name: String) -> Bool {
-//        return !name.isEmpty && name.first == "."
-//    }
-//
-//    // TODO: Check if we cant use available API
-//    public func fileNameAlreadyExists(_ name: String, fileNames: Set<String>) -> Bool {
-//        return fileNames.contains(name)
-//    }
 }

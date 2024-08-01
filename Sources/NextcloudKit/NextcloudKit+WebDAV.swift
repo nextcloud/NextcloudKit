@@ -32,10 +32,6 @@ public extension NextcloudKit {
                       completion: @escaping (_ account: String, _ ocId: String?, _ date: Date?, _ error: NKError) -> Void) {
         let account = self.nkCommonInstance.account
 
-//        if !FileNameValidator.shared.checkFolderPath(folderPath: serverUrlFileName) {
-//            return options.queue.async { completion(account, nil, nil, FileNameValidator.shared.folderInvalidNameError) }
-//        }
-
         guard let url = serverUrlFileName.encodedToUrl else {
             return options.queue.async { completion(account, nil, nil, .urlError) }
         }
@@ -119,10 +115,6 @@ public extension NextcloudKit {
                           completion: @escaping (_ account: String, _ error: NKError) -> Void) {
         let account = self.nkCommonInstance.account
 
-//        if !FileNameValidator.shared.checkFolderPath(folderPath: serverUrlFileNameDestination) {
-//            return options.queue.async { completion(account, FileNameValidator.shared.folderInvalidNameError) }
-//        }
-
         guard let url = serverUrlFileNameSource.encodedToUrl else {
             return options.queue.async { completion(account, .urlError) }
         }
@@ -167,10 +159,6 @@ public extension NextcloudKit {
                           taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
                           completion: @escaping (_ account: String, _ error: NKError) -> Void) {
         let account = self.nkCommonInstance.account
-
-//        if !FileNameValidator.shared.checkFolderPath(folderPath: serverUrlFileNameDestination) {
-//            return options.queue.async { completion(account, FileNameValidator.shared.folderInvalidNameError) }
-//        }
 
         guard let url = serverUrlFileNameSource.encodedToUrl else {
             return options.queue.async { completion(account, .urlError) }
