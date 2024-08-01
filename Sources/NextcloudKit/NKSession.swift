@@ -66,33 +66,12 @@ public class NKSession {
         let configuration = URLSessionConfiguration.af.default
         configuration.requestCachePolicy = .reloadIgnoringLocalCacheData
         configuration.httpCookieStorage = HTTPCookieStorage.sharedCookieStorage(forGroupContainerIdentifier: sharedCookieStorage)
-        let queue = OperationQueue()
-        queue.maxConcurrentOperationCount = 1
-        queue.underlyingQueue = NextcloudKit.shared.nkCommonInstance.rootQueue
-        let urlSession = URLSession(configuration: configuration, delegate: NextcloudKit.shared, delegateQueue: queue)
-        sessionData = Session(session: urlSession, delegate: NextcloudKit.shared, rootQueue: NextcloudKit.shared.nkCommonInstance.rootQueue)
-
-        /*
-         let rootQueue = DispatchQueue(label: "org.alamofire.customQueue")
-         let queue = OperationQueue()
-         queue.maxConcurrentOperationCount = 1
-         queue.underlyingQueue = rootQueue
-         let delegate = SessionDelegate()
-         let configuration = URLSessionConfiguration.af.default
-         let urlSession = URLSession(configuration: configuration,
-                                     delegate: delegate,
-                                     delegateQueue: queue)
-         let session = Session(session: urlSession, delegate: delegate, rootQueue: rootQueue)
-         */
-
-        /*
         sessionData = Alamofire.Session(configuration: configuration,
                                         delegate: NextcloudKit.shared,
                                         rootQueue: NextcloudKit.shared.nkCommonInstance.rootQueue,
                                         requestQueue: NextcloudKit.shared.nkCommonInstance.requestQueue,
                                         serializationQueue: NextcloudKit.shared.nkCommonInstance.serializationQueue,
                                         eventMonitors: [AlamofireLogger(nkCommonInstance: NextcloudKit.shared.nkCommonInstance)])
-         */
 
         /// Session Download Background
         let configurationDownloadBackground = URLSessionConfiguration.background(withIdentifier: NKCommon().identifierSessionDownloadBackground)
