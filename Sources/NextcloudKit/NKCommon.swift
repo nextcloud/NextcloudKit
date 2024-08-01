@@ -54,7 +54,7 @@ public class NKCommon: NSObject {
     public let identifierSessionUploadBackgroundWWan: String = "com.nextcloud.session.upload.backgroundWWan"
     public let identifierSessionUploadBackgroundExt: String = "com.nextcloud.session.upload.extension"
 
-    public let rootQueue = DispatchQueue(label: "com.nextcloud.session.rootQueue")
+    public let rootQueue = DispatchQueue.global()//.(label: "com.nextcloud.session.rootQueue")
     public let requestQueue = DispatchQueue(label: "com.nextcloud.session.requestQueue")
     public let serializationQueue = DispatchQueue(label: "com.nextcloud.session.serializationQueue")
 
