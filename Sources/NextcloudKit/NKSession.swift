@@ -60,14 +60,19 @@ public class NKSession {
 
         let backgroundSessionDelegate = NKBackground(nkCommonInstance: NextcloudKit.shared.nkCommonInstance)
         /// Strange but works ?!?!
-        let sharedCookieStorage = UUID().uuidString + "_" + user + "@" + urlBase
+        let uuid = UUID().uuidString + "_" + user + "@" + urlBase
+        let sharedCookieStorage = uuid
 
         /// Session Alamofire
         let configuration = URLSessionConfiguration.default
         configuration.requestCachePolicy = .reloadIgnoringLocalCacheData
         configuration.httpCookieStorage = HTTPCookieStorage.sharedCookieStorage(forGroupContainerIdentifier: sharedCookieStorage)
-        sessionData = Alamofire.Session(configuration: configuration, 
+
+        sessionData = Alamofire.Session(configuration: configuration,
                                         delegate: NextcloudKit.shared,
+                                        rootQueue: DispatchQueue(label: "com.nextcloud.session.rootQueue."+uuid),
+                                        requestQueue: DispatchQueue(label: "com.nextcloud.session.requestQueue."+uuid),
+                                        serializationQueue: DispatchQueue(label: "com.nextcloud.session.serializationQueue."+uuid),
                                         eventMonitors: [AlamofireLogger(nkCommonInstance: NextcloudKit.shared.nkCommonInstance)])
 
         /// Session Download Background
