@@ -83,6 +83,7 @@ open class NextcloudKit: SessionDelegate {
 
     public func updateAccount(_ account: String,
                               urlBase: String? = nil,
+                              user: String? = nil,
                               userId: String? = nil,
                               password: String? = nil,
                               userAgent: String? = nil,
@@ -91,6 +92,9 @@ open class NextcloudKit: SessionDelegate {
         guard let session = nkCommonInstance.nksessions.filter({ $0.account == account }).first else { return }
         if let urlBase {
             session.urlBase = urlBase
+        }
+        if let user {
+            session.user = user
         }
         if let userId {
             session.userId = userId
