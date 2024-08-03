@@ -29,7 +29,7 @@ public class NKSession {
     public var user: String
     public var userId: String
     public var password: String
-    public let account: String
+    public var account: String
     public var userAgent: String
     public var nextcloudVersion: Int
     public let groupIdentifier: String?

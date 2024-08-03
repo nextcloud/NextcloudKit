@@ -86,7 +86,8 @@ open class NextcloudKit: SessionDelegate {
                               userId: String? = nil,
                               password: String? = nil,
                               userAgent: String? = nil,
-                              nextcloudVersion: Int? = nil) {
+                              nextcloudVersion: Int? = nil,
+                              replaceAccount: String? = nil) {
         guard let session = nkCommonInstance.nksessions.filter({ $0.account == account }).first else { return }
         if let urlBase {
             session.urlBase = urlBase
@@ -102,6 +103,9 @@ open class NextcloudKit: SessionDelegate {
         }
         if let nextcloudVersion {
             session.nextcloudVersion = nextcloudVersion
+        }
+        if let replaceAccount {
+            session.account = replaceAccount
         }
     }
 
