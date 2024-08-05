@@ -235,6 +235,28 @@ public extension NextcloudKit {
             return options.queue.async { completion(account, files, nil, NKError(error: error)) }
         }
 
+        let task = nkSession.sessionDatas.dataTask(with: urlRequest) { data, response, error in
+            if let error {
+                return completion(account, nil, data, NKError(error: error, responseData: data))
+            }
+            guard let httpResponse = response as? HTTPURLResponse else {
+                return completion(account, nil, data, .invalidResponseError)
+            }
+            guard (200..<300).contains(httpResponse.statusCode) else {
+                let error = NKError(errorCode: httpResponse.statusCode, errorDescription: NSLocalizedString("_error_response_", value: "Invalid response", comment: ""))
+                return completion(account, nil, data, .invalidResponseError)
+            }
+
+            if let data  {
+                files = NKDataFileXML(nkCommonInstance: self.nkCommonInstance).convertDataFile(xmlData: data, nkSession: nkSession, showHiddenFiles: showHiddenFiles, includeHiddenFiles: includeHiddenFiles)
+                options.queue.async { completion(account, files, data, .success) }
+            }
+        }
+        task.taskDescription = options.taskDescription
+        taskHandler(task)
+
+
+/*
         nkSession.sessionData.request(urlRequest).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
             task.taskDescription = options.taskDescription
             taskHandler(task)
@@ -255,6 +277,7 @@ public extension NextcloudKit {
                 }
             }
         }
+ */
     }
 
     func getFileFromFileId(fileId: String? = nil,
