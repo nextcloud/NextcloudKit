@@ -26,11 +26,11 @@ import Alamofire
 import SwiftyJSON
 
 public extension NextcloudKit {
-    func getDashboardWidget(options: NKRequestOptions = NKRequestOptions(),
+    func getDashboardWidget(account: String,
+                            options: NKRequestOptions = NKRequestOptions(),
                             request: @escaping (DataRequest?) -> Void = { _ in },
                             taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
                             completion: @escaping (_ account: String, _ dashboardWidgets: [NCCDashboardWidget]?, _ data: Data?, _ error: NKError) -> Void) {
-        let account = self.nkCommonInstance.account
         let urlBase = self.nkCommonInstance.urlBase
         var url: URLConvertible?
         if let endpoint = options.endpoint {
@@ -71,11 +71,11 @@ public extension NextcloudKit {
     }
 
     func getDashboardWidgetsApplication(_ items: String,
+                                        account: String,
                                         options: NKRequestOptions = NKRequestOptions(),
                                         request: @escaping (DataRequest?) -> Void = { _ in },
                                         taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
                                         completion: @escaping (_ account: String, _ dashboardApplications: [NCCDashboardApplication]?, _ data: Data?, _ error: NKError) -> Void) {
-        let account = self.nkCommonInstance.account
         let urlBase = self.nkCommonInstance.urlBase
         var url: URLConvertible?
         if let endpoint = options.endpoint {

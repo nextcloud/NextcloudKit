@@ -33,7 +33,7 @@ final class ShareIntegrationTests: BaseIntegrationXCTestCase {
 
         NextcloudKit.shared.setup(account: account, user: user, userId: userId, password: password, urlBase: baseUrl)
 
-        NextcloudKit.shared.createFolder(serverUrlFileName: serverUrlFileName) { account, ocId, date, error in
+        NextcloudKit.shared.createFolder(serverUrlFileName: serverUrlFileName, account: account) { account, ocId, date, error in
             XCTAssertEqual(self.account, account)
 
             XCTAssertEqual(NKError.success.errorCode, error.errorCode)
@@ -43,7 +43,7 @@ final class ShareIntegrationTests: BaseIntegrationXCTestCase {
 
             let note = "Test note"
 
-            NextcloudKit.shared.createShare(path: folderName, shareType: 0, shareWith: "nextcloud", note: note) { account, share, data, error in
+            NextcloudKit.shared.createShare(path: folderName, shareType: 0, shareWith: "nextcloud", note: note, account: account) { account, share, data, error in
                 defer { expectation.fulfill() }
 
                 XCTAssertEqual(self.account, account)

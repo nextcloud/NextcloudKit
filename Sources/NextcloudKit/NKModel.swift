@@ -607,7 +607,7 @@ class NKDataFileXML: NSObject {
         return xml["ocs", "data", "apppassword"].text
     }
 
-    func convertDataFile(xmlData: Data, dav: String, urlBase: String, user: String, userId: String, showHiddenFiles: Bool, includeHiddenFiles: [String]) -> [NKFile] {
+    func convertDataFile(xmlData: Data, dav: String, urlBase: String, user: String, userId: String, account: String, showHiddenFiles: Bool, includeHiddenFiles: [String]) -> [NKFile] {
         var files: [NKFile] = []
         let rootFiles = "/" + dav + "/files/"
         guard let baseUrl = self.nkCommonInstance.getHostName(urlString: urlBase) else {
@@ -641,7 +641,7 @@ class NKDataFileXML: NSObject {
                 }
 
                 // account
-                file.account = self.nkCommonInstance.account
+                file.account = account
 
                 // path
                 file.path = (fileNamePath as NSString).deletingLastPathComponent + "/"
@@ -873,14 +873,14 @@ class NKDataFileXML: NSObject {
 
         // Live photo detect
         files = files.sorted {
-            return ($0.serverUrl, ($0.fileName as NSString).deletingPathExtension, $0.classFile) < ($1.serverUrl, ($1.fileName as NSString).deletingPathExtension, $1.classFile)
+            return ($0.serverUrl, $0.fileName.withRemovedFileExtension, $0.classFile) < ($1.serverUrl, $1.fileName.withRemovedFileExtension, $1.classFile)
         }
         for index in files.indices {
             if !files[index].livePhotoFile.isEmpty || files[index].directory {
                 continue
             }
             if index < files.count - 1,
-               (files[index].fileName as NSString).deletingPathExtension == (files[index + 1].fileName as NSString) .deletingPathExtension,
+               files[index].fileName.withRemovedFileExtension == files[index + 1].fileName.withRemovedFileExtension,
                files[index].classFile == NKCommon.TypeClassFile.image.rawValue,
                files[index + 1].classFile == NKCommon.TypeClassFile.video.rawValue {
                 files[index].livePhotoFile = files[index + 1].fileId

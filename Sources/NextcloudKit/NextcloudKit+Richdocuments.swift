@@ -27,10 +27,10 @@ import SwiftyJSON
 
 public extension NextcloudKit {
      func createUrlRichdocuments(fileID: String,
+                                 account: String,
                                  options: NKRequestOptions = NKRequestOptions(),
                                  taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
                                  completion: @escaping (_ account: String, _  url: String?, _ data: Data?, _ error: NKError) -> Void) {
-        let account = self.nkCommonInstance.account
         let urlBase = self.nkCommonInstance.urlBase
         let endpoint = "ocs/v2.php/apps/richdocuments/api/v1/document"
         let parameters: [String: Any] = ["fileId": fileID]
@@ -63,10 +63,10 @@ public extension NextcloudKit {
     }
 
     func getTemplatesRichdocuments(typeTemplate: String,
+                                   account: String,
                                    options: NKRequestOptions = NKRequestOptions(),
                                    taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
                                    completion: @escaping (_ account: String, _ templates: [NKRichdocumentsTemplate]?, _ data: Data?, _ error: NKError) -> Void) {
-        let account = self.nkCommonInstance.account
         let urlBase = self.nkCommonInstance.urlBase
         let endpoint = "ocs/v2.php/apps/richdocuments/api/v1/templates/\(typeTemplate)"
         guard let url = self.nkCommonInstance.createStandardUrl(serverUrl: urlBase, endpoint: endpoint) else {
@@ -111,10 +111,10 @@ public extension NextcloudKit {
 
     func createRichdocuments(path: String,
                              templateId: String,
+                             account: String,
                              options: NKRequestOptions = NKRequestOptions(),
                              taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
                              completion: @escaping (_ account: String, _  url: String?, _ data: Data?, _ error: NKError) -> Void) {
-        let account = self.nkCommonInstance.account
         let urlBase = self.nkCommonInstance.urlBase
         let endpoint = "ocs/v2.php/apps/richdocuments/api/v1/templates/new"
         let parameters: [String: Any] = ["path": path, "template": templateId]
@@ -147,10 +147,10 @@ public extension NextcloudKit {
     }
 
     func createAssetRichdocuments(path: String,
+                                  account: String,
                                   options: NKRequestOptions = NKRequestOptions(),
                                   taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
                                   completion: @escaping (_ account: String, _  url: String?, _ data: Data?, _ error: NKError) -> Void) {
-        let account = self.nkCommonInstance.account
         let urlBase = self.nkCommonInstance.urlBase
         let endpoint = "index.php/apps/richdocuments/assets"
         let parameters: [String: Any] = ["path": path]

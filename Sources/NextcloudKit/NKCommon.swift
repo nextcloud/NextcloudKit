@@ -277,7 +277,7 @@ public class NKCommon: NSObject {
 
         if let inUTI = inUTI {
             typeIdentifier = inUTI as String
-            fileNameWithoutExt = (fileName as NSString).deletingPathExtension
+            fileNameWithoutExt = fileName.withRemovedFileExtension
 
             // contentType detect
             if mimeType.isEmpty {

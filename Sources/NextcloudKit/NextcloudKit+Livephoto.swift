@@ -27,10 +27,10 @@ import Alamofire
 public extension NextcloudKit {
     func setLivephoto(serverUrlfileNamePath: String,
                       livePhotoFile: String,
+                      account: String,
                       options: NKRequestOptions = NKRequestOptions(),
                       taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
                       completion: @escaping (_ account: String, _ error: NKError) -> Void) {
-        let account = self.nkCommonInstance.account
         guard let url = serverUrlfileNamePath.encodedToUrl else {
             return options.queue.async { completion(account, .urlError) }
         }
