@@ -38,4 +38,12 @@ extension String {
     public var asUrl: URLConvertible? {
         return try? asURL()
     }
+
+    public var withRemovedFileExtension: String {
+        return String(NSString(string: self).deletingPathExtension)
+    }
+
+    public var fileExtension: String {
+        return String(NSString(string: self).pathExtension)
+    }
 }

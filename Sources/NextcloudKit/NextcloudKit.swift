@@ -170,29 +170,6 @@ open class NextcloudKit: SessionDelegate {
        return sessionManager.session
     }
 
-    /*
-    //MARK: -
-
-    private func makeEvents() -> [EventMonitor] {
-
-        let events = ClosureEventMonitor()
-        events.requestDidFinish = { request in
-            print("Request finished \(request)")
-        }
-        events.taskDidComplete = { session, task, error in
-            print("Request failed \(session) \(task) \(String(describing: error))")
-            /*
-            if  let urlString = (error as NSError?)?.userInfo["NSErrorFailingURLStringKey"] as? String,
-                let resumedata = (error as NSError?)?.userInfo[NSURLSessionDownloadTaskResumeData] as? Data {
-                print("Found resume data for url \(urlString)")
-                //self.startDownload(urlString, resumeData: resumedata)
-            }
-            */
-        }
-        return [events]
-    }
-    */
-
     // MARK: - download / upload
 
     public func download(serverUrlFileName: Any,

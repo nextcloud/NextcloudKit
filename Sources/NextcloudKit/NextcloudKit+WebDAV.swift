@@ -31,6 +31,8 @@ public extension NextcloudKit {
                       options: NKRequestOptions = NKRequestOptions(),
                       taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
                       completion: @escaping (_ account: String, _ ocId: String?, _ date: Date?, _ error: NKError) -> Void) {
+        let account = self.nkCommonInstance.account
+
         guard let url = serverUrlFileName.encodedToUrl else {
             return options.queue.async { completion(account, nil, nil, .urlError) }
         }
@@ -113,6 +115,8 @@ public extension NextcloudKit {
                           options: NKRequestOptions = NKRequestOptions(),
                           taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
                           completion: @escaping (_ account: String, _ error: NKError) -> Void) {
+        let account = self.nkCommonInstance.account
+
         guard let url = serverUrlFileNameSource.encodedToUrl else {
             return options.queue.async { completion(account, .urlError) }
         }
@@ -157,6 +161,8 @@ public extension NextcloudKit {
                           options: NKRequestOptions = NKRequestOptions(),
                           taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
                           completion: @escaping (_ account: String, _ error: NKError) -> Void) {
+        let account = self.nkCommonInstance.account
+
         guard let url = serverUrlFileNameSource.encodedToUrl else {
             return options.queue.async { completion(account, .urlError) }
         }
