@@ -107,6 +107,20 @@ public class FileNameValidator {
         return nil
     }
 
+    public func checkFolderAndFilePaths(folderPath: String, filePaths: [String]) -> Bool {
+        return checkFolderPath(folderPath: folderPath) &&
+        checkFilePaths(filePaths: filePaths)
+    }
+
+    public func checkFilePaths(filePaths: [String]) -> Bool {
+        return filePaths.allSatisfy { checkFileName($0) == nil }
+    }
+
+    public func checkFolderPath(folderPath: String) -> Bool {
+        return folderPath.split { $0 == "/" || $0 == "\\" }
+            .allSatisfy { checkFileName(String($0)) == nil }
+    }
+
     private func checkInvalidCharacters(string: String) -> NKError? {
         for char in string {
             let charAsString = String(char)
