@@ -187,27 +187,11 @@ public class NKCommon: NSObject {
 
     // MARK: - Type Identifier
 
-    public func getInternalTypeIdentifier(typeIdentifier: String) -> [UTTypeConformsToServer] {
-        var results: [UTTypeConformsToServer] = []
-
-        for internalTypeIdentifier in internalTypeIdentifiers {
-            if internalTypeIdentifier.typeIdentifier == typeIdentifier {
-                results.append(internalTypeIdentifier)
-            }
-        }
-        return results
-    }
-
     public func addInternalTypeIdentifier(typeIdentifier: String, classFile: String, editor: String, iconName: String, name: String) {
         if !internalTypeIdentifiers.contains(where: { $0.typeIdentifier == typeIdentifier && $0.editor == editor}) {
             let newUTI = UTTypeConformsToServer(typeIdentifier: typeIdentifier, classFile: classFile, editor: editor, iconName: iconName, name: name)
             internalTypeIdentifiers.append(newUTI)
         }
-    }
-
-    public func objcGetInternalType(fileName: String, mimeType: String, directory: Bool) -> [String: String] {
-        let results = getInternalType(fileName: fileName, mimeType: mimeType, directory: directory)
-        return ["mimeType": results.mimeType, "classFile": results.classFile, "iconName": results.iconName, "typeIdentifier": results.typeIdentifier, "fileNameWithoutExt": results.fileNameWithoutExt, "ext": results.ext]
     }
 
     public func getInternalType(fileName: String, mimeType: String, directory: Bool) -> (mimeType: String, classFile: String, iconName: String, typeIdentifier: String, fileNameWithoutExt: String, ext: String) {
