@@ -29,7 +29,7 @@ import UIKit
 import Alamofire
 import SwiftyJSON
 
-open class NextcloudKit: SessionDelegate {
+open class NextcloudKit {
     public static let shared: NextcloudKit = {
         let instance = NextcloudKit()
         return instance
@@ -40,11 +40,11 @@ open class NextcloudKit: SessionDelegate {
     // private var cookies: [String:[HTTPCookie]] = [:]
     public let nkCommonInstance = NKCommon()
 
-    override public init(fileManager: FileManager = .default) {
-        super.init(fileManager: fileManager)
+    init() {
         #if !os(watchOS)
         startNetworkReachabilityObserver()
         #endif
+
     }
 
     deinit {
@@ -508,22 +508,6 @@ open class NextcloudKit: SessionDelegate {
                     }
                 }
             }
-        }
-    }
-
-    // MARK: - SessionDelegate
-
-    public func urlSession(_ session: URLSession, didReceive challenge: URLAuthenticationChallenge, completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
-        if self.nkCommonInstance.delegate == nil {
-            self.nkCommonInstance.writeLog("[WARNING] URLAuthenticationChallenge, no delegate found, perform with default handling")
-            completionHandler(URLSession.AuthChallengeDisposition.performDefaultHandling, nil)
-        } else {
-            self.nkCommonInstance.delegate?.authenticationChallenge(session, didReceive: challenge, completionHandler: { authChallengeDisposition, credential in
-                if self.nkCommonInstance.levelLog > 1 {
-                    self.nkCommonInstance.writeLog("[INFO AUTH] Challenge Disposition: \(authChallengeDisposition.rawValue)")
-                }
-                completionHandler(authChallengeDisposition, credential)
-            })
         }
     }
 }

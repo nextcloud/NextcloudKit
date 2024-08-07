@@ -67,7 +67,7 @@ public class NKSession {
         configuration.requestCachePolicy = .reloadIgnoringLocalCacheData
         configuration.httpCookieStorage = HTTPCookieStorage.sharedCookieStorage(forGroupContainerIdentifier: sharedCookieStorage)
         sessionData = Alamofire.Session(configuration: configuration,
-                                        delegate: NextcloudKit.shared,
+                                        delegate: NextcloudKitSessionDelegate(),
                                         rootQueue: NextcloudKit.shared.nkCommonInstance.rootQueue,
                                         requestQueue: NextcloudKit.shared.nkCommonInstance.requestQueue,
                                         serializationQueue: NextcloudKit.shared.nkCommonInstance.serializationQueue,
