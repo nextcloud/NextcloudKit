@@ -36,7 +36,6 @@ public class NKSession {
     public let dav: String = "remote.php/dav"
     public var internalTypeIdentifiers: [NKCommon.UTTypeConformsToServer] = []
     public let sessionData: Alamofire.Session
-    public let sessionDatas: URLSession
     public let sessionDownloadBackground: URLSession
     public let sessionUploadBackground: URLSession
     public let sessionUploadBackgroundWWan: URLSession
@@ -73,8 +72,6 @@ public class NKSession {
                                         requestQueue: NextcloudKit.shared.nkCommonInstance.requestQueue,
                                         serializationQueue: NextcloudKit.shared.nkCommonInstance.serializationQueue,
                                         eventMonitors: [AlamofireLogger(nkCommonInstance: NextcloudKit.shared.nkCommonInstance)])
-
-        sessionDatas = URLSession(configuration: configuration, delegate: NextcloudKit.shared, delegateQueue: nil)
 
         /// Session Download Background
         let configurationDownloadBackground = URLSessionConfiguration.background(withIdentifier: NKCommon().identifierSessionDownloadBackground)
