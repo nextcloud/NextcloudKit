@@ -37,14 +37,12 @@ open class NextcloudKit {
     #if !os(watchOS)
     private let reachabilityManager = Alamofire.NetworkReachabilityManager()
     #endif
-    // private var cookies: [String:[HTTPCookie]] = [:]
     public let nkCommonInstance = NKCommon()
 
     init() {
         #if !os(watchOS)
         startNetworkReachabilityObserver()
         #endif
-
     }
 
     deinit {
@@ -123,29 +121,6 @@ open class NextcloudKit {
         }
     }
 
-    /*
-    internal func saveCookies(response : HTTPURLResponse?) {
-        if let headerFields = response?.allHeaderFields as? [String : String] {
-            if let url = URL(string: self.nkCommonInstance.urlBase) {
-                let HTTPCookie = HTTPCookie.cookies(withResponseHeaderFields: headerFields, for: url)
-                if HTTPCookie.count > 0 {
-                    cookies[self.nkCommonInstance.account] = HTTPCookie
-                } else {
-                    cookies[self.nkCommonInstance.account] = nil
-                }
-            }
-        }
-    }
-
-    internal func injectsCookies() {
-        if let cookies = cookies[self.nkCommonInstance.account] {
-            if let url = URL(string: self.nkCommonInstance.urlBase) {
-                sessionManager.session.configuration.httpCookieStorage?.setCookies(cookies, for: url, mainDocumentURL: nil)
-            }
-        }
-    }
-    */
-
     // MARK: - Reachability
 
     #if !os(watchOS)
@@ -154,7 +129,6 @@ open class NextcloudKit {
     }
 
     private func startNetworkReachabilityObserver() {
-        /*
         reachabilityManager?.startListening(onUpdatePerforming: { status in
             switch status {
             case .unknown:
@@ -167,34 +141,12 @@ open class NextcloudKit {
                 self.nkCommonInstance.delegate?.networkReachabilityObserver(NKCommon.TypeReachability.reachableCellular)
             }
         })
-        */
     }
 
     private func stopNetworkReachabilityObserver() {
         reachabilityManager?.stopListening()
     }
     #endif
-
-    /*
-    private func makeEvents() -> [EventMonitor] {
-
-        let events = ClosureEventMonitor()
-        events.requestDidFinish = { request in
-            print("Request finished \(request)")
-        }
-        events.taskDidComplete = { session, task, error in
-            print("Request failed \(session) \(task) \(String(describing: error))")
-            /*
-            if  let urlString = (error as NSError?)?.userInfo["NSErrorFailingURLStringKey"] as? String,
-                let resumedata = (error as NSError?)?.userInfo[NSURLSessionDownloadTaskResumeData] as? Data {
-                print("Found resume data for url \(urlString)")
-                //self.startDownload(urlString, resumeData: resumedata)
-            }
-            */
-        }
-        return [events]
-    }
-    */
 
     // MARK: - download / upload
 
