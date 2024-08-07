@@ -187,6 +187,10 @@ public class NKCommon: NSObject {
 
     // MARK: - Type Identifier
 
+    public func clearInternalTypeIdentifier() {
+        internalTypeIdentifiers = []
+    }
+
     public func addInternalTypeIdentifier(typeIdentifier: String, classFile: String, editor: String, iconName: String, name: String) {
         if !internalTypeIdentifiers.contains(where: { $0.typeIdentifier == typeIdentifier && $0.editor == editor}) {
             let newUTI = UTTypeConformsToServer(typeIdentifier: typeIdentifier, classFile: classFile, editor: editor, iconName: iconName, name: name)
