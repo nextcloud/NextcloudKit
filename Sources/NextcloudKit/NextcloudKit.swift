@@ -73,12 +73,6 @@ open class NextcloudKit {
         nkCommonInstance.nksessions.append(nkSession)
     }
 
-    public func removeDomain(account: String) {
-        if let index = nkCommonInstance.nksessions.index(where: { $0.account == account}) {
-            nkCommonInstance.nksessions.remove(at: index)
-        }
-    }
-
     public func updateDomain(account: String,
                              urlBase: String? = nil,
                              user: String? = nil,
@@ -108,6 +102,12 @@ open class NextcloudKit {
         }
         if let replaceWithAccount {
             session.account = replaceWithAccount
+        }
+    }
+
+    public func removeDomain(account: String) {
+        if let index = nkCommonInstance.nksessions.index(where: { $0.account == account}) {
+            nkCommonInstance.nksessions.remove(at: index)
         }
     }
 
