@@ -60,7 +60,7 @@ public class NKSession {
 
         let backgroundSessionDelegate = NKBackground(nkCommonInstance: NextcloudKit.shared.nkCommonInstance)
         /// Strange but works ?!?!
-        let sharedCookieStorage = UUID().uuidString + "_" + user + "@" + urlBase
+        let sharedCookieStorage = user + "@" + urlBase
 
         /// Session Alamofire
         let configuration = URLSessionConfiguration.af.default
