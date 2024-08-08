@@ -57,30 +57,30 @@ open class NextcloudKit {
         self.nkCommonInstance.delegate = delegate
     }
 
-    public func appendDomain(account: String,
-                             urlBase: String,
-                             user: String,
-                             userId: String,
-                             password: String,
-                             userAgent: String,
-                             nextcloudVersion: Int,
-                             groupIdentifier: String) {
+    public func appendSession(account: String,
+                              urlBase: String,
+                              user: String,
+                              userId: String,
+                              password: String,
+                              userAgent: String,
+                              nextcloudVersion: Int,
+                              groupIdentifier: String) {
         if nkCommonInstance.nksessions.filter({ $0.account == account }).first != nil {
-            return updateDomain(account: account, urlBase: urlBase, userId: userId, password: password, userAgent: userAgent, nextcloudVersion: nextcloudVersion)
+            return updateSession(account: account, urlBase: urlBase, userId: userId, password: password, userAgent: userAgent, nextcloudVersion: nextcloudVersion)
         }
         let nkSession = NKSession(urlBase: urlBase, user: user, userId: userId, password: password, account: account, userAgent: userAgent, nextcloudVersion: nextcloudVersion, groupIdentifier: groupIdentifier)
 
         nkCommonInstance.nksessions.append(nkSession)
     }
 
-    public func updateDomain(account: String,
-                             urlBase: String? = nil,
-                             user: String? = nil,
-                             userId: String? = nil,
-                             password: String? = nil,
-                             userAgent: String? = nil,
-                             nextcloudVersion: Int? = nil,
-                             replaceWithAccount: String? = nil) {
+    public func updateSession(account: String,
+                               urlBase: String? = nil,
+                               user: String? = nil,
+                               userId: String? = nil,
+                               password: String? = nil,
+                               userAgent: String? = nil,
+                               nextcloudVersion: Int? = nil,
+                               replaceWithAccount: String? = nil) {
         guard let session = nkCommonInstance.nksessions.filter({ $0.account == account }).first else { return }
         if let urlBase {
             session.urlBase = urlBase
@@ -105,7 +105,7 @@ open class NextcloudKit {
         }
     }
 
-    public func removeDomain(account: String) {
+    public func removeSession(account: String) {
         if let index = nkCommonInstance.nksessions.index(where: { $0.account == account}) {
             nkCommonInstance.nksessions.remove(at: index)
         }
