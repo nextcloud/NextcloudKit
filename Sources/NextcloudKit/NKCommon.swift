@@ -189,7 +189,7 @@ public class NKCommon: NSObject {
     // MARK: - Type Identifier
 
     public func clearInternalTypeIdentifier(account: String) {
-        internalTypeIdentifiers = []
+        internalTypeIdentifiers = internalTypeIdentifiers.filter({ $0.account != account })
     }
 
     public func addInternalTypeIdentifier(typeIdentifier: String, classFile: String, editor: String, iconName: String, name: String, account: String) {
