@@ -38,6 +38,11 @@ open class NextcloudKit {
     private let reachabilityManager = Alamofire.NetworkReachabilityManager()
     #endif
     public let nkCommonInstance = NKCommon()
+    internal lazy var internalSession: Alamofire.Session = {
+        return Alamofire.Session(configuration: URLSessionConfiguration.af.default,
+                                 delegate: NextcloudKitSessionDelegate(),
+                                 eventMonitors: [AlamofireLogger(nkCommonInstance: self.nkCommonInstance)])
+    }()
 
     init() {
         #if !os(watchOS)

@@ -51,7 +51,7 @@ public extension NextcloudKit {
             return options.queue.async { completion(nil, nil, NKError(error: error)) }
         }
 
-        AF.request(urlRequest).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
+        internalSession.request(urlRequest).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
             task.taskDescription = options.taskDescription
             taskHandler(task)
         }.response(queue: self.nkCommonInstance.backgroundQueue) { response in
@@ -131,7 +131,7 @@ public extension NextcloudKit {
             headers = [HTTPHeader.userAgent(userAgent)]
         }
 
-        AF.request(url, method: .post, parameters: nil, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
+        internalSession.request(url, method: .post, parameters: nil, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
             task.taskDescription = options.taskDescription
             taskHandler(task)
         }.responseData(queue: self.nkCommonInstance.backgroundQueue) { response in
@@ -168,7 +168,7 @@ public extension NextcloudKit {
             headers = [HTTPHeader.userAgent(userAgent)]
         }
 
-        AF.request(url, method: .post, parameters: nil, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
+        internalSession.request(url, method: .post, parameters: nil, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
             task.taskDescription = options.taskDescription
             taskHandler(task)
         }.responseData(queue: self.nkCommonInstance.backgroundQueue) { response in
