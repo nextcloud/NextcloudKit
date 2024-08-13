@@ -103,6 +103,7 @@ public class NKCommon: NSObject {
         } else {
             configuration.httpCookieStorage = nil
         }
+        configuration.multipathServiceType = .handover
         return configuration
     }()
     internal var rootQueue: DispatchQueue = DispatchQueue(label: "com.nextcloud.nextcloudkit.sessionManagerData.rootQueue")

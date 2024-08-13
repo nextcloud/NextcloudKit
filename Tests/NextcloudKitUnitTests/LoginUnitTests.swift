@@ -35,6 +35,7 @@ class LoginUnitTests: XCTestCase {
     private lazy var mockSessionManager = {
         let config = URLSessionConfiguration.af.default
         config.protocolClasses = [MockingURLProtocol.self]
+        config.multipathServiceType = .handover
         return config
     }
 
