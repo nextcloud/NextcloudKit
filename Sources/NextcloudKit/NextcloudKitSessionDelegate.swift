@@ -32,25 +32,31 @@ import Alamofire
 import SwiftyJSON
 
 open class NextcloudKitSessionDelegate: SessionDelegate {
-    public let nkCommonInstance = NKCommon()
+    public var nkCommonInstance: NKCommon? = nil
 
     override public init(fileManager: FileManager = .default) {
         super.init(fileManager: fileManager)
     }
 
+    convenience init(nkCommonInstance: NKCommon?) {
+        self.init()
+        self.nkCommonInstance = nkCommonInstance
+    }
+
     // MARK: - SessionDelegate
 
     public func urlSession(_ session: URLSession, didReceive challenge: URLAuthenticationChallenge, completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
-        if self.nkCommonInstance.delegate == nil {
-            self.nkCommonInstance.writeLog("[WARNING] URLAuthenticationChallenge, no delegate found, perform with default handling")
-            completionHandler(URLSession.AuthChallengeDisposition.performDefaultHandling, nil)
-        } else {
-            self.nkCommonInstance.delegate?.authenticationChallenge(session, didReceive: challenge, completionHandler: { authChallengeDisposition, credential in
-                if self.nkCommonInstance.levelLog > 1 {
-                    self.nkCommonInstance.writeLog("[INFO AUTH] Challenge Disposition: \(authChallengeDisposition.rawValue)")
+        if let nkCommon = self.nkCommonInstance,
+           let delegate = nkCommon.delegate {
+            delegate.authenticationChallenge(session, didReceive: challenge) { authChallengeDisposition, credential in
+                if nkCommon.levelLog > 1 {
+                    nkCommon.writeLog("[INFO AUTH] Challenge Disposition: \(authChallengeDisposition.rawValue)")
                 }
                 completionHandler(authChallengeDisposition, credential)
-            })
+            }
+        } else {
+            self.nkCommonInstance?.writeLog("[WARNING] URLAuthenticationChallenge, no delegate found, perform with default handling")
+            completionHandler(URLSession.AuthChallengeDisposition.performDefaultHandling, nil)
         }
     }
 }

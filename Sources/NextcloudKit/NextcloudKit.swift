@@ -40,7 +40,7 @@ open class NextcloudKit {
     public let nkCommonInstance = NKCommon()
     internal lazy var internalSession: Alamofire.Session = {
         return Alamofire.Session(configuration: URLSessionConfiguration.af.default,
-                                 delegate: NextcloudKitSessionDelegate(),
+                                 delegate: NextcloudKitSessionDelegate(nkCommonInstance: nkCommonInstance),
                                  eventMonitors: [AlamofireLogger(nkCommonInstance: self.nkCommonInstance)])
     }()
 
