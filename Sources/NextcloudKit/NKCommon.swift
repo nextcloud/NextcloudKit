@@ -46,7 +46,9 @@ public protocol NextcloudKitDelegate {
 }
 
 public class NKCommon: NSObject {
-    public let dav: String = "remote.php/dav"
+    public var nksessions = ThreadSafeArray<NKSession>()
+    public var delegate: NextcloudKitDelegate?
+
     public let identifierSessionDownload: String = "com.nextcloud.nextcloudkit.session.download"
     public let identifierSessionUpload: String = "com.nextcloud.nextcloudkit.session.upload"
     public let identifierSessionDownloadBackground: String = "com.nextcloud.session.download.background"
@@ -57,6 +59,10 @@ public class NKCommon: NSObject {
     public let rootQueue = DispatchQueue(label: "com.nextcloud.session.rootQueue")
     public let requestQueue = DispatchQueue(label: "com.nextcloud.session.requestQueue")
     public let serializationQueue = DispatchQueue(label: "com.nextcloud.session.serializationQueue")
+    public let backgroundQueue = DispatchQueue(label: "com.nextcloud.nextcloudkit.backgroundqueue", qos: .background, attributes: .concurrent)
+    private let logQueue = DispatchQueue(label: "com.nextcloud.nextcloudkit.queuelog", attributes: .concurrent )
+
+    public let notificationCenterChunkedFileStop = NSNotification.Name(rawValue: "NextcloudKit.chunkedFile.stop")
 
     public enum TypeReachability: Int {
         case unknown = 0
@@ -105,35 +111,29 @@ public class NKCommon: NSObject {
     internal var mimeTypeCache = NSCache<CFString, NSString>()
     internal var filePropertiesCache = NSCache<CFString, NKFileProperty>()
     internal var internalTypeIdentifiers: [UTTypeConformsToServer] = []
-    internal var delegate: NextcloudKitDelegate?
 
-    private var _filenameLog: String = "communication.log"
-    private var _pathLog: String = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true).first!
-    private var _filenamePathLog: String = ""
-    private var _levelLog: Int = 0
-    private var _printLog: Bool = true
-    private var _copyLogToDocumentDirectory: Bool = false
-    private let queueLog = DispatchQueue(label: "com.nextcloud.nextcloudkit.queuelog", attributes: .concurrent )
+    public var filenamePathLog: String = ""
+    public var levelLog: Int = 0
+    public var copyLogToDocumentDirectory: Bool = false
+    public var printLog: Bool = true
 
-    public let backgroundQueue = DispatchQueue(label: "com.nextcloud.nextcloudkit.backgroundqueue", qos: .background, attributes: .concurrent)
-    public let notificationCenterChunkedFileStop = NSNotification.Name(rawValue: "NextcloudKit.chunkedFile.stop")
-    public var nksessions = ThreadSafeArray<NKSession>()
-
+    private var internalFilenameLog: String = "communication.log"
     public var filenameLog: String {
         get {
-            return _filenameLog
+            return internalFilenameLog
         }
         set(newVal) {
             if !newVal.isEmpty {
-                _filenameLog = newVal
-                _filenamePathLog = _pathLog + "/" + _filenameLog
+                internalFilenameLog = newVal
+                internalFilenameLog = internalPathLog + "/" + internalFilenameLog
             }
         }
     }
 
+    private var internalPathLog: String = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true).first!
     public var pathLog: String {
         get {
-            return _pathLog
+            return internalPathLog
         }
         set(newVal) {
             var tempVal = newVal
@@ -141,40 +141,9 @@ public class NKCommon: NSObject {
                 tempVal = String(tempVal.dropLast())
             }
             if !tempVal.isEmpty {
-                _pathLog = tempVal
-                _filenamePathLog = _pathLog + "/" + _filenameLog
+                internalPathLog = tempVal
+                filenamePathLog = internalPathLog + "/" + internalFilenameLog
             }
-        }
-    }
-
-    public var filenamePathLog: String {
-        return _filenamePathLog
-    }
-
-    public var levelLog: Int {
-        get {
-            return _levelLog
-        }
-        set(newVal) {
-            _levelLog = newVal
-        }
-    }
-
-    public var printLog: Bool {
-        get {
-            return _printLog
-        }
-        set(newVal) {
-            _printLog = newVal
-        }
-    }
-
-    public var copyLogToDocumentDirectory: Bool {
-        get {
-            return _copyLogToDocumentDirectory
-        }
-        set(newVal) {
-            _copyLogToDocumentDirectory = newVal
         }
     }
 
@@ -183,7 +152,7 @@ public class NKCommon: NSObject {
     override init() {
         super.init()
 
-        _filenamePathLog = _pathLog + "/" + _filenameLog
+        filenamePathLog = internalPathLog + "/" + internalFilenameLog
     }
 
     // MARK: - Type Identifier
@@ -564,7 +533,7 @@ public class NKCommon: NSObject {
 
         if printLog { print(textToWrite) }
         if levelLog > 0 {
-            queueLog.async(flags: .barrier) {
+            logQueue.async(flags: .barrier) {
                 self.writeLogToDisk(filename: self.filenamePathLog, text: textToWrite)
                 if self.copyLogToDocumentDirectory, let path = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true).first {
                     let filenameCopyToDocumentDirectory = path + "/" + self.filenameLog
