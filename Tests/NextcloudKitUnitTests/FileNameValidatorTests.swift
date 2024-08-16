@@ -69,79 +69,43 @@ class FileNameValidatorTests: XCTestCase {
 
     func testValidFolderAndFilePaths() {
         let folderPath = "validFolder"
-        let filePaths = ["file1.txt", "file2.doc", "file3.jpg"]
 
-        let result = fileNameValidator.checkFolderAndFilePaths(folderPath: folderPath, filePaths: filePaths)
+        let result = fileNameValidator.checkFolderPath(folderPath: folderPath)
         XCTAssertTrue(result)
     }
 
     func testFolderPathWithReservedName() {
         let folderPath = "CON"
-        let filePaths = ["file1.txt", "file2.doc", "file3.jpg"]
 
-        let result = fileNameValidator.checkFolderAndFilePaths(folderPath: folderPath, filePaths: filePaths)
-        XCTAssertFalse(result)
-    }
-
-    func testFilePathWithReservedName() {
-        let folderPath = "validFolder"
-        let filePaths = ["file1.txt", "PRN.doc", "file3.jpg"]
-
-        let result = fileNameValidator.checkFolderAndFilePaths(folderPath: folderPath, filePaths: filePaths)
+        let result = fileNameValidator.checkFolderPath(folderPath: folderPath)
         XCTAssertFalse(result)
     }
 
     func testFolderPathWithInvalidCharacter() {
         let folderPath = "invalid<Folder"
-        let filePaths = ["file1.txt", "file2.doc", "file3.jpg"]
 
-        let result = fileNameValidator.checkFolderAndFilePaths(folderPath: folderPath, filePaths: filePaths)
-        XCTAssertFalse(result)
-    }
-
-    func testFilePathWithInvalidCharacter() {
-        let folderPath = "validFolder"
-        let filePaths = ["file1.txt", "file|2.doc", "file3.jpg"]
-
-        let result = fileNameValidator.checkFolderAndFilePaths(folderPath: folderPath, filePaths: filePaths)
+        let result = fileNameValidator.checkFolderPath(folderPath: folderPath)
         XCTAssertFalse(result)
     }
 
     func testFolderPathEndingWithSpace() {
         let folderPath = "folderWithSpace "
-        let filePaths = ["file1.txt", "file2.doc", "file3.jpg"]
 
-        let result = fileNameValidator.checkFolderAndFilePaths(folderPath: folderPath, filePaths: filePaths)
+        let result = fileNameValidator.checkFolderPath(folderPath: folderPath)
         XCTAssertFalse(result)
     }
 
-    func testFilePathEndingWithPeriod() {
-        let folderPath = "validFolder"
-        let filePaths = ["file1.txt", "file2.doc", "file3."]
+    func testFolderPathEndingWithPeriod() {
+        let folderPath = "validFolder."
 
-        let result = fileNameValidator.checkFolderAndFilePaths(folderPath: folderPath, filePaths: filePaths)
+        let result = fileNameValidator.checkFolderPath(folderPath: folderPath)
         XCTAssertFalse(result)
     }
 
     func testFilePathWithNestedFolder() {
         let folderPath = "validFolder/secondValidFolder/CON"
-        let filePaths = ["file1.txt", "file2.doc", "file3."]
 
-        let result = fileNameValidator.checkFolderAndFilePaths(folderPath: folderPath, filePaths: filePaths)
-        XCTAssertFalse(result)
-    }
-
-    func testOnlyFolderPath() {
-        let folderPath = "/A1/Aaaww/W/C2/"
-
-        let result = fileNameValidator.checkFolderAndFilePaths(folderPath: folderPath, filePaths: [])
-        XCTAssertTrue(result)
-    }
-
-    func testOnlyFolderPathWithOneReservedName() {
-        let folderPath = "/A1/Aaaww/CON/W/C2/"
-
-        let result = fileNameValidator.checkFolderAndFilePaths(folderPath: folderPath, filePaths: [])
+        let result = fileNameValidator.checkFolderPath(folderPath: folderPath)
         XCTAssertFalse(result)
     }
 }

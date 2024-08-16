@@ -53,22 +53,22 @@ public class FileNameValidator {
         }
     }
 
-    public let fileEndsWithSpacePeriodError = NKError(errorCode: NSURLErrorCannotCreateFile, errorDescription: NSLocalizedString("_file_name_validator_error_ends_with_space_period_", value: "File name ends with a space or a period", comment: ""))
+    public let fileEndsWithSpacePeriodError = NKError(errorCode: NSURLErrorCannotCreateFile, errorDescription: NSLocalizedString("_file_name_validator_error_ends_with_space_period_", value: "File name ends with a space or a period.", comment: ""))
 
     public var fileReservedNameError: NKError {
-        let errorMessageTemplate = NSLocalizedString("_file_name_validator_error_reserved_name_", value: "%@ is a reserved name", comment: "")
+        let errorMessageTemplate = NSLocalizedString("_file_name_validator_error_reserved_name_", value: "%@ is a forbidden name.", comment: "")
         let errorMessage = String(format: errorMessageTemplate, templateString)
         return NKError(errorCode: NSURLErrorCannotCreateFile, errorDescription: errorMessage)
     }
 
     public var fileForbiddenFileExtensionError: NKError {
-        let errorMessageTemplate = NSLocalizedString("_file_name_validator_error_forbidden_file_extension_", value: ".%@ is a forbidden file extension", comment: "")
+        let errorMessageTemplate = NSLocalizedString("_file_name_validator_error_forbidden_file_extension_", value: ".%@ is a forbidden file extension.", comment: "")
         let errorMessage = String(format: errorMessageTemplate, templateString)
         return NKError(errorCode: NSURLErrorCannotCreateFile, errorDescription: errorMessage)
     }
 
     public var fileInvalidCharacterError: NKError {
-        let errorMessageTemplate = NSLocalizedString("file_name_validator_error_invalid_character_", value: "File name contains an invalid character: %@", comment: "")
+        let errorMessageTemplate = NSLocalizedString("file_name_validator_error_invalid_character_", value: "Name contains an invalid character: %@.", comment: "")
         let errorMessage = String(format: errorMessageTemplate, templateString)
         return NKError(errorCode: NSURLErrorCannotCreateFile, errorDescription: errorMessage)
     }
@@ -105,15 +105,6 @@ public class FileNameValidator {
         }
 
         return nil
-    }
-
-    public func checkFolderAndFilePaths(folderPath: String, filePaths: [String]) -> Bool {
-        return checkFolderPath(folderPath: folderPath) &&
-        checkFilePaths(filePaths: filePaths)
-    }
-
-    public func checkFilePaths(filePaths: [String]) -> Bool {
-        return filePaths.allSatisfy { checkFileName($0) == nil }
     }
 
     public func checkFolderPath(folderPath: String) -> Bool {
