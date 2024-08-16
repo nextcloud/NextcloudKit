@@ -71,7 +71,7 @@ public class NKSession {
                                         rootQueue: NextcloudKit.shared.nkCommonInstance.rootQueue,
                                         requestQueue: NextcloudKit.shared.nkCommonInstance.requestQueue,
                                         serializationQueue: NextcloudKit.shared.nkCommonInstance.serializationQueue,
-                                        eventMonitors: [AlamofireLogger(nkCommonInstance: NextcloudKit.shared.nkCommonInstance)])
+                                        eventMonitors: [NKLogger(nkCommonInstance: NextcloudKit.shared.nkCommonInstance)])
 
         /// Session Download Background
         let configurationDownloadBackground = URLSessionConfiguration.background(withIdentifier: NKCommon().identifierSessionDownloadBackground)

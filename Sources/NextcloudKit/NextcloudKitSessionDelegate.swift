@@ -43,8 +43,6 @@ open class NextcloudKitSessionDelegate: SessionDelegate {
         self.nkCommonInstance = nkCommonInstance
     }
 
-    // MARK: - SessionDelegate
-
     public func urlSession(_ session: URLSession, didReceive challenge: URLAuthenticationChallenge, completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
         if let nkCommon = self.nkCommonInstance,
            let delegate = nkCommon.delegate {

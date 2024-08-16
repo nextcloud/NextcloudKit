@@ -41,7 +41,7 @@ open class NextcloudKit {
     internal lazy var internalSession: Alamofire.Session = {
         return Alamofire.Session(configuration: URLSessionConfiguration.af.default,
                                  delegate: NextcloudKitSessionDelegate(nkCommonInstance: nkCommonInstance),
-                                 eventMonitors: [AlamofireLogger(nkCommonInstance: self.nkCommonInstance)])
+                                 eventMonitors: [NKLogger(nkCommonInstance: self.nkCommonInstance)])
     }()
 
     init() {
@@ -56,7 +56,7 @@ open class NextcloudKit {
 #endif
     }
 
-    // MARK: - Setup
+    // MARK: - Session setup
 
     public func setup(delegate: NextcloudKitDelegate?) {
         self.nkCommonInstance.delegate = delegate
@@ -152,46 +152,4 @@ open class NextcloudKit {
         reachabilityManager?.stopListening()
     }
 #endif
-}
-
-final class AlamofireLogger: EventMonitor {
-    let nkCommonInstance: NKCommon
-
-    init(nkCommonInstance: NKCommon) {
-        self.nkCommonInstance = nkCommonInstance
-    }
-
-    func requestDidResume(_ request: Request) {
-        if self.nkCommonInstance.levelLog > 0 {
-            self.nkCommonInstance.writeLog("Network request started: \(request)")
-            if self.nkCommonInstance.levelLog > 1 {
-                let allHeaders = request.request.flatMap { $0.allHTTPHeaderFields.map { $0.description } } ?? "None"
-                let body = request.request.flatMap { $0.httpBody.map { String(decoding: $0, as: UTF8.self) } } ?? "None"
-
-                self.nkCommonInstance.writeLog("Network request headers: \(allHeaders)")
-                self.nkCommonInstance.writeLog("Network request body: \(body)")
-            }
-        }
-    }
-
-    func request<Value>(_ request: DataRequest, didParseResponse response: AFDataResponse<Value>) {
-        guard let date = self.nkCommonInstance.convertDate(Date(), format: "yyyy-MM-dd' 'HH:mm:ss") else { return }
-        let responseResultString = String("\(response.result)")
-        let responseDebugDescription = String("\(response.debugDescription)")
-        let responseAllHeaderFields = String("\(String(describing: response.response?.allHeaderFields))")
-
-        if self.nkCommonInstance.levelLog > 0 {
-            if self.nkCommonInstance.levelLog == 1 {
-                if let request = response.request {
-                    let requestString = "\(request)"
-                    self.nkCommonInstance.writeLog("Network response request: " + requestString + ", result: " + responseResultString)
-                } else {
-                    self.nkCommonInstance.writeLog("Network response result: " + responseResultString)
-                }
-            } else {
-                self.nkCommonInstance.writeLog("Network response result: \(date) " + responseDebugDescription)
-                self.nkCommonInstance.writeLog("Network response all headers: \(date) " + responseAllHeaderFields)
-            }
-        }
-    }
 }
