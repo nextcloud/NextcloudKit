@@ -51,11 +51,10 @@ public class NKCommon: NSObject {
 
     public let identifierSessionDownload: String = "com.nextcloud.nextcloudkit.session.download"
     public let identifierSessionUpload: String = "com.nextcloud.nextcloudkit.session.upload"
-    public let identifierSessionDownloadBackground: String = "com.nextcloud.session.download.background"
-    public let identifierSessionUploadBackground: String = "com.nextcloud.session.upload.background"
-    public let identifierSessionUploadBackgroundWWan: String = "com.nextcloud.session.upload.backgroundWWan"
-    public let identifierSessionUploadBackgroundExt: String = "com.nextcloud.session.upload.extension"
-
+    public let identifierSessionDownloadBackground: String = "com.nextcloud.session.downloadbackground"
+    public let identifierSessionUploadBackground: String = "com.nextcloud.session.uploadbackground"
+    public let identifierSessionUploadBackgroundWWan: String = "com.nextcloud.session.uploadbackgroundWWan"
+    public let identifierSessionUploadBackgroundExt: String = "com.nextcloud.session.uploadextension"
 
     public let rootQueue = DispatchQueue(label: "com.nextcloud.session.rootQueue")
     public let requestQueue = DispatchQueue(label: "com.nextcloud.session.requestQueue")
