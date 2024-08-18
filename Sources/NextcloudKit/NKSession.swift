@@ -32,7 +32,7 @@ public class NKSession {
     public var account: String
     public var userAgent: String
     public var nextcloudVersion: Int
-    public let groupIdentifier: String?
+    public let groupIdentifier: String
     public let dav: String = "remote.php/dav"
     public var internalTypeIdentifiers: [NKCommon.UTTypeConformsToServer] = []
     public let sessionData: Alamofire.Session
@@ -48,7 +48,7 @@ public class NKSession {
          account: String,
          userAgent: String,
          nextcloudVersion: Int,
-         groupIdentifier: String? = nil) {
+         groupIdentifier: String) {
         self.urlBase = urlBase
         self.user = user
         self.userId = userId
