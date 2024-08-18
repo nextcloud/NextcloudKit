@@ -104,7 +104,8 @@ public class NKSession {
         sessionUploadBackgroundWWan = URLSession(configuration: configurationUploadBackgroundWWan, delegate: backgroundSessionDelegate, delegateQueue: OperationQueue.main)
 
         /// Session Upload Background Extension
-        let configurationUploadBackgroundExt = URLSessionConfiguration.background(withIdentifier: UUID().uuidString)
+        //let configurationUploadBackgroundExt = URLSessionConfiguration.background(withIdentifier: UUID().uuidString)
+        let configurationUploadBackgroundExt = URLSessionConfiguration.background(withIdentifier: NKCommon().identifierSessionUploadBackgroundExt)
         configurationUploadBackgroundExt.allowsCellularAccess = true
         configurationUploadBackgroundExt.sessionSendsLaunchEvents = true
         configurationUploadBackgroundExt.isDiscretionary = false
