@@ -28,12 +28,13 @@ public class FileNameValidator {
         return instance
     }()
 
-    public var forbiddenFileNames: [String] = [] {
+    public private(set) var forbiddenFileNames: [String] = [] {
         didSet {
             forbiddenFileNames = forbiddenFileNames.map({$0.uppercased()})
         }
     }
-    public var forbiddenFileNameBasenames: [String] = [] {
+
+    public private(set) var forbiddenFileNameBasenames: [String] = [] {
         didSet {
             forbiddenFileNameBasenames = forbiddenFileNameBasenames.map({$0.uppercased()})
         }
@@ -41,13 +42,13 @@ public class FileNameValidator {
 
     private var forbiddenFileNameCharactersRegex: NSRegularExpression?
 
-    public var forbiddenFileNameCharacters: [String] = [] {
+    public private(set) var forbiddenFileNameCharacters: [String] = [] {
         didSet {
             forbiddenFileNameCharactersRegex = try? NSRegularExpression(pattern: "[\(forbiddenFileNameCharacters.joined())]")
         }
     }
 
-    public var forbiddenFileNameExtensions: [String] = [] {
+    public private(set) var forbiddenFileNameExtensions: [String] = [] {
         didSet {
             forbiddenFileNameExtensions = forbiddenFileNameExtensions.map({$0.uppercased()})
         }
@@ -84,7 +85,7 @@ public class FileNameValidator {
         self.forbiddenFileNameExtensions = forbiddenFileNameExtensions
     }
 
-    public func checkFileName(_ filename: String, existedFileNames: Set<String>? = nil) -> NKError? {
+    public func checkFileName(_ filename: String) -> NKError? {
         if filename.hasSuffix(" ") || filename.hasSuffix(".") {
             return fileEndsWithSpacePeriodError
         }
