@@ -28,12 +28,13 @@ public class FileNameValidator {
         return instance
     }()
 
-    public var forbiddenFileNames: [String] = [] {
+    public private(set) var forbiddenFileNames: [String] = [] {
         didSet {
             forbiddenFileNames = forbiddenFileNames.map({$0.uppercased()})
         }
     }
-    public var forbiddenFileNameBasenames: [String] = [] {
+
+    public private(set) var forbiddenFileNameBasenames: [String] = [] {
         didSet {
             forbiddenFileNameBasenames = forbiddenFileNameBasenames.map({$0.uppercased()})
         }
@@ -41,13 +42,13 @@ public class FileNameValidator {
 
     private var forbiddenFileNameCharactersRegex: NSRegularExpression?
 
-    public var forbiddenFileNameCharacters: [String] = [] {
+    public private(set) var forbiddenFileNameCharacters: [String] = [] {
         didSet {
             forbiddenFileNameCharactersRegex = try? NSRegularExpression(pattern: "[\(forbiddenFileNameCharacters.joined())]")
         }
     }
 
-    public var forbiddenFileNameExtensions: [String] = [] {
+    public private(set) var forbiddenFileNameExtensions: [String] = [] {
         didSet {
             forbiddenFileNameExtensions = forbiddenFileNameExtensions.map({$0.uppercased()})
         }
@@ -56,19 +57,19 @@ public class FileNameValidator {
     public let fileEndsWithSpacePeriodError = NKError(errorCode: NSURLErrorCannotCreateFile, errorDescription: NSLocalizedString("_file_name_validator_error_ends_with_space_period_", value: "File name ends with a space or a period.", comment: ""))
 
     public var fileReservedNameError: NKError {
-        let errorMessageTemplate = NSLocalizedString("_file_name_validator_error_reserved_name_", value: "%@ is a forbidden name.", comment: "")
+        let errorMessageTemplate = NSLocalizedString("_file_name_validator_error_reserved_name_", value: "\"%@\" is a forbidden name.", comment: "")
         let errorMessage = String(format: errorMessageTemplate, templateString)
         return NKError(errorCode: NSURLErrorCannotCreateFile, errorDescription: errorMessage)
     }
 
     public var fileForbiddenFileExtensionError: NKError {
-        let errorMessageTemplate = NSLocalizedString("_file_name_validator_error_forbidden_file_extension_", value: ".%@ is a forbidden file extension.", comment: "")
+        let errorMessageTemplate = NSLocalizedString("_file_name_validator_error_forbidden_file_extension_", value: ".\"%@\" is a forbidden file extension.", comment: "")
         let errorMessage = String(format: errorMessageTemplate, templateString)
         return NKError(errorCode: NSURLErrorCannotCreateFile, errorDescription: errorMessage)
     }
 
     public var fileInvalidCharacterError: NKError {
-        let errorMessageTemplate = NSLocalizedString("file_name_validator_error_invalid_character_", value: "Name contains an invalid character: %@.", comment: "")
+        let errorMessageTemplate = NSLocalizedString("_file_name_validator_error_invalid_character_", value: "Name contains an invalid character: \"%@\".", comment: "")
         let errorMessage = String(format: errorMessageTemplate, templateString)
         return NKError(errorCode: NSURLErrorCannotCreateFile, errorDescription: errorMessage)
     }
@@ -84,7 +85,7 @@ public class FileNameValidator {
         self.forbiddenFileNameExtensions = forbiddenFileNameExtensions
     }
 
-    public func checkFileName(_ filename: String, existedFileNames: Set<String>? = nil) -> NKError? {
+    public func checkFileName(_ filename: String) -> NKError? {
         if filename.hasSuffix(" ") || filename.hasSuffix(".") {
             return fileEndsWithSpacePeriodError
         }
