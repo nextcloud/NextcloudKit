@@ -116,6 +116,10 @@ open class NextcloudKit {
         }
     }
 
+    public func getSession(account: String) -> NKSession? {
+        return nkCommonInstance.nksessions.filter({ $0.account == account }).first
+    }
+
     public func deleteCookieStorageForAccount(_ account: String) {
         guard let nkSession = nkCommonInstance.nksessions.filter({ $0.account == account }).first else { return }
 
