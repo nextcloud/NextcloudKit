@@ -139,7 +139,7 @@ public extension NextcloudKit {
         if options.customHeader == nil {
             options.customHeader = [:]
         }
-        options.customHeader?["Destination"] = serverUrlFileName
+        options.customHeader?["Destination"] = serverUrlFileName.urlEncoded
         options.customHeader?["OC-Total-Length"] = String(fileNameLocalSize)
 
         // check space
