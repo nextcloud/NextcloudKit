@@ -30,6 +30,7 @@ public extension NextcloudKit {
                 fileNameLocalPath: String,
                 dateCreationFile: Date? = nil,
                 dateModificationFile: Date? = nil,
+                overwrite: Bool = false,
                 account: String,
                 options: NKRequestOptions = NKRequestOptions(),
                 requestHandler: @escaping (_ request: UploadRequest) -> Void = { _ in },
@@ -56,6 +57,9 @@ public extension NextcloudKit {
         // Epoch of linux do not permitted negativ value
         if let dateModificationFile, dateModificationFile.timeIntervalSince1970 > 0 {
             headers.update(name: "X-OC-MTime", value: "\(dateModificationFile.timeIntervalSince1970)")
+        }
+        if overwrite {
+            headers.update(name: "Overwrite", value: "true")
         }
 
         let request = nkSession.sessionData.upload(fileNameLocalPathUrl, to: url, method: .put, headers: headers, interceptor: nil, fileManager: .default).validate(statusCode: 200..<300).onURLSessionTaskCreation(perform: { task in
