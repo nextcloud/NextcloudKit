@@ -273,12 +273,12 @@ public extension NextcloudKit {
                          account: String,
                          options: NKRequestOptions = NKRequestOptions(),
                          taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-                         completion: @escaping (_ account: String, _ data: Data?, _ etag: String?, _ error: NKError) -> Void) {
+                         completion: @escaping (_ account: String, _ data: Data?, _ width: Int, _ height: Int, _ etag: String?, _ error: NKError) -> Void) {
         let endpoint = "index.php/core/preview?fileId=\(fileId)&x=\(width)&y=\(height)&a=\(crop)&mode=\(cropMode)&forceIcon=\(forceIcon)&mimeFallback=\(mimeFallback)"
         guard let nkSession = nkCommonInstance.getSession(account: account),
               let url = nkCommonInstance.createStandardUrl(serverUrl: nkSession.urlBase, endpoint: endpoint, options: options),
               var headers = nkCommonInstance.getStandardHeaders(account: account, options: options) else {
-            return options.queue.async { completion(account, nil, etag, .urlError) }
+            return options.queue.async { completion(account, nil, width, height, etag, .urlError) }
         }
 
         if var etag = etag {
@@ -296,12 +296,12 @@ public extension NextcloudKit {
             switch response.result {
             case .failure(let error):
                 let error = NKError(error: error, afResponse: response, responseData: response.data)
-                options.queue.async { completion(account, nil, etag, error) }
+                options.queue.async { completion(account, nil, width, height, etag, error) }
             case .success:
                 if let data = response.data {
-                    options.queue.async { completion(account, data, etag, .success) }
+                    options.queue.async { completion(account, data, width, height, etag, .success) }
                 } else {
-                    options.queue.async { completion(account, nil, etag, .invalidData) }
+                    options.queue.async { completion(account, nil, width, height, etag, .invalidData) }
                 }
             }
         }
@@ -317,13 +317,13 @@ public extension NextcloudKit {
                               account: String,
                               options: NKRequestOptions = NKRequestOptions(),
                               taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-                              completion: @escaping (_ account: String, _ data: Data?, _ error: NKError) -> Void) {
+                              completion: @escaping (_ account: String, _ data: Data?, _ width: Int, _ height: Int, _ error: NKError) -> Void) {
         let endpoint = "index.php/apps/files_trashbin/preview?fileId=\(fileId)&x=\(width)&y=\(height)&a=\(crop)&mode=\(cropMode)&forceIcon=\(forceIcon)&mimeFallback=\(mimeFallback)"
 
         guard let nkSession = nkCommonInstance.getSession(account: account),
               let url = nkCommonInstance.createStandardUrl(serverUrl: nkSession.urlBase, endpoint: endpoint, options: options),
               let headers = nkCommonInstance.getStandardHeaders(account: account, options: options) else {
-            return options.queue.async { completion(account, nil, .urlError) }
+            return options.queue.async { completion(account, nil, width, height, .urlError) }
         }
 
         nkSession.sessionData.request(url, method: .get, parameters: nil, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
@@ -336,12 +336,12 @@ public extension NextcloudKit {
             switch response.result {
             case .failure(let error):
                 let error = NKError(error: error, afResponse: response, responseData: response.data)
-                options.queue.async { completion(account, nil, error) }
+                options.queue.async { completion(account, nil, width, height, error) }
             case .success:
                 if let data = response.data {
-                    options.queue.async { completion(account, data, .success) }
+                    options.queue.async { completion(account, data, width, height, .success) }
                 } else {
-                    options.queue.async { completion(account, nil, .invalidData) }
+                    options.queue.async { completion(account, nil, width, height, .invalidData) }
                 }
             }
         }
