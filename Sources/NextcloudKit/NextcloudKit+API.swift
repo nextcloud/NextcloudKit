@@ -263,8 +263,8 @@ public extension NextcloudKit {
     }
 
     func downloadPreview(fileId: String,
-                         widthPreview: Int = 512,
-                         heightPreview: Int = 512,
+                         width: Int = 512,
+                         height: Int = 512,
                          etag: String? = nil,
                          crop: Int = 1,
                          cropMode: String = "cover",
@@ -274,7 +274,7 @@ public extension NextcloudKit {
                          options: NKRequestOptions = NKRequestOptions(),
                          taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
                          completion: @escaping (_ account: String, _ data: Data?, _ error: NKError) -> Void) {
-        let endpoint = "index.php/core/preview?fileId=\(fileId)&x=\(widthPreview)&y=\(heightPreview)&a=\(crop)&mode=\(cropMode)&forceIcon=\(forceIcon)&mimeFallback=\(mimeFallback)"
+        let endpoint = "index.php/core/preview?fileId=\(fileId)&x=\(width)&y=\(height)&a=\(crop)&mode=\(cropMode)&forceIcon=\(forceIcon)&mimeFallback=\(mimeFallback)"
         guard let nkSession = nkCommonInstance.getSession(account: account),
               let url = nkCommonInstance.createStandardUrl(serverUrl: nkSession.urlBase, endpoint: endpoint, options: options),
               var headers = nkCommonInstance.getStandardHeaders(account: account, options: options) else {
@@ -310,8 +310,8 @@ public extension NextcloudKit {
 
 
     func downloadTrashPreview(fileId: String,
-                              widthPreview: Int = 512,
-                              heightPreview: Int = 512,
+                              width: Int = 512,
+                              height: Int = 512,
                               crop: Int = 1,
                               cropMode: String = "cover",
                               forceIcon: Int = 0,
@@ -320,7 +320,7 @@ public extension NextcloudKit {
                               options: NKRequestOptions = NKRequestOptions(),
                               taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
                               completion: @escaping (_ account: String, _ data: Data?, _ error: NKError) -> Void) {
-        let endpoint = "index.php/apps/files_trashbin/preview?fileId=\(fileId)&x=\(widthPreview)&y=\(heightPreview)&a=\(crop)&mode=\(cropMode)&forceIcon=\(forceIcon)&mimeFallback=\(mimeFallback)"
+        let endpoint = "index.php/apps/files_trashbin/preview?fileId=\(fileId)&x=\(width)&y=\(height)&a=\(crop)&mode=\(cropMode)&forceIcon=\(forceIcon)&mimeFallback=\(mimeFallback)"
 
         guard let nkSession = nkCommonInstance.getSession(account: account),
               let url = nkCommonInstance.createStandardUrl(serverUrl: nkSession.urlBase, endpoint: endpoint, options: options),
