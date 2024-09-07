@@ -278,7 +278,7 @@ public extension NextcloudKit {
         guard let nkSession = nkCommonInstance.getSession(account: account),
               let url = nkCommonInstance.createStandardUrl(serverUrl: nkSession.urlBase, endpoint: endpoint, options: options),
               var headers = nkCommonInstance.getStandardHeaders(account: account, options: options) else {
-            return options.queue.async { completion(account, nil, width, height, etag, .urlError) }
+            return options.queue.async { completion(account, nil, width, height, nil, .urlError) }
         }
 
         if var etag = etag {
@@ -296,12 +296,13 @@ public extension NextcloudKit {
             switch response.result {
             case .failure(let error):
                 let error = NKError(error: error, afResponse: response, responseData: response.data)
-                options.queue.async { completion(account, nil, width, height, etag, error) }
+                options.queue.async { completion(account, nil, width, height, nil, error) }
             case .success:
                 if let data = response.data {
+                    let etag = self.nkCommonInstance.findHeader("etag", allHeaderFields: response.response?.allHeaderFields)?.replacingOccurrences(of: "\"", with: "")
                     options.queue.async { completion(account, data, width, height, etag, .success) }
                 } else {
-                    options.queue.async { completion(account, nil, width, height, etag, .invalidData) }
+                    options.queue.async { completion(account, nil, width, height, nil, .invalidData) }
                 }
             }
         }
