@@ -263,8 +263,8 @@ public extension NextcloudKit {
     }
 
     func downloadPreview(fileId: String,
-                         width: Int = 512,
-                         height: Int = 512,
+                         width: Int = 1024,
+                         height: Int = 1024,
                          etag: String? = nil,
                          crop: Int = 1,
                          cropMode: String = "cover",
