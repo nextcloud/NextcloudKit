@@ -74,9 +74,11 @@ public enum NKProperties: String, CaseIterable {
     case systemtags = "<system-tags xmlns=\"http://nextcloud.org/ns\"/>"
     case filemetadatasize = "<file-metadata-size xmlns=\"http://nextcloud.org/ns\"/>"
     case filemetadatagps = "<file-metadata-gps xmlns=\"http://nextcloud.org/ns\"/>"
-    case metadataphotossize = "<metadata-photos-size xmlns=\"http://nextcloud.org/ns\"/>"
+    case metadataphotosexif = "<metadata-photos-exif xmlns=\"http://nextcloud.org/ns\"/>"
     case metadataphotosgps = "<metadata-photos-gps xmlns=\"http://nextcloud.org/ns\"/>"
     case metadataphotosoriginaldatetime = "<metadata-photos-original_date_time xmlns=\"http://nextcloud.org/ns\"/>"
+    case metadataphotoplace = "<metadata-photos-place xmlns=\"http://nextcloud.org/ns\"/>"
+    case metadataphotossize = "<metadata-photos-size xmlns=\"http://nextcloud.org/ns\"/>"
     case metadatafileslivephoto = "<metadata-files-live-photo xmlns=\"http://nextcloud.org/ns\"/>"
     case hidden = "<hidden xmlns=\"http://nextcloud.org/ns\"/>"
     /// open-collaboration-services.org
@@ -231,6 +233,8 @@ public class NKFile: NSObject {
     public var isFlaggedAsLivePhotoByServer = false
     ///
     public var datePhotosOriginal: Date?
+    public var exifPhotos: String?
+    public var placePhoto: String?
 }
 
 public class NKFileProperty: NSObject {
@@ -863,6 +867,14 @@ class NKDataFileXML: NSObject {
 
             if let datePhotosOriginal = propstat["d:prop", "nc:metadata-photos-original_date_time"].double, datePhotosOriginal > 0 {
                 file.datePhotosOriginal = Date(timeIntervalSince1970: datePhotosOriginal)
+            }
+
+            if let exifPhotos = propstat["d:prop", "nc:metadata-photos-place"].text {
+                file.exifPhotos = exifPhotos
+            }
+
+            if let placePhoto = propstat["d:prop", "nc:metadata-photos-exif"].text {
+                file.placePhoto = placePhoto
             }
 
             let results = self.nkCommonInstance.getInternalType(fileName: file.fileName, mimeType: file.contentType, directory: file.directory, account: nkSession.account)
