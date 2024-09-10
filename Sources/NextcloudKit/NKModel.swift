@@ -76,6 +76,7 @@ public enum NKProperties: String, CaseIterable {
     case filemetadatagps = "<file-metadata-gps xmlns=\"http://nextcloud.org/ns\"/>"
     case metadataphotossize = "<metadata-photos-size xmlns=\"http://nextcloud.org/ns\"/>"
     case metadataphotosgps = "<metadata-photos-gps xmlns=\"http://nextcloud.org/ns\"/>"
+    case metadataphotosoriginaldatetime = "<metadata-photos-original_date_time xmlns=\"http://nextcloud.org/ns\"/>"
     case metadatafileslivephoto = "<metadata-files-live-photo xmlns=\"http://nextcloud.org/ns\"/>"
     case hidden = "<hidden xmlns=\"http://nextcloud.org/ns\"/>"
     /// open-collaboration-services.org
@@ -228,6 +229,8 @@ public class NKFile: NSObject {
     public var livePhotoFile = ""
     /// Indicating if the file is sent as a live photo from the server, or if we should detect it as such and convert it client-side
     public var isFlaggedAsLivePhotoByServer = false
+    ///
+    public var datePhotosOriginal: Date?
 }
 
 public class NKFileProperty: NSObject {
@@ -856,6 +859,10 @@ class NKDataFileXML: NSObject {
 
             if let hidden = propstat["d:prop", "nc:hidden"].text {
                 file.hidden = (hidden as NSString).boolValue
+            }
+
+            if let datePhotosOriginal = propstat["d:prop", "nc:metadata-photos-original_date_time"].double, datePhotosOriginal > 0 {
+                file.datePhotosOriginal = Date(timeIntervalSince1970: datePhotosOriginal)
             }
 
             let results = self.nkCommonInstance.getInternalType(fileName: file.fileName, mimeType: file.contentType, directory: file.directory, account: nkSession.account)
