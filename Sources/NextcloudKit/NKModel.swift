@@ -233,8 +233,13 @@ public class NKFile: NSObject {
     public var isFlaggedAsLivePhotoByServer = false
     ///
     public var datePhotosOriginal: Date?
-    // public var exifPhotos: [Any] = []
-    // public var placePhotos: [Any] = []
+    ///
+    public struct ChildElement {
+        let name: String
+        let text: String?
+    }
+    public var exifPhotos: [ChildElement] = []
+    public var placePhotos: String?
 }
 
 public class NKFileProperty: NSObject {
@@ -869,17 +874,14 @@ class NKDataFileXML: NSObject {
                 file.datePhotosOriginal = Date(timeIntervalSince1970: datePhotosOriginal)
             }
 
-            /*
             let exifPhotosElements = propstat["d:prop", "nc:metadata-photos-exif"]
-            for element in exifPhotosElements["nc:metadata-photos-exif"] {
-                file.exifPhotos.append(element)
+            if let element = exifPhotosElements.element {
+                for child in element.childElements {
+                    file.exifPhotos.append(NKFile.ChildElement(name: child.name, text: child.text))
+                }
             }
 
-            let placePhotosElements = propstat["d:prop", "nc:metadata-photos-place"]
-            for element in placePhotosElements["nc:metadata-photos-place"] {
-                file.placePhotos.append(element)
-            }
-            */
+            file.placePhotos = propstat["d:prop", "nc:metadata-photos-place"].text
 
             let results = self.nkCommonInstance.getInternalType(fileName: file.fileName, mimeType: file.contentType, directory: file.directory, account: nkSession.account)
 
