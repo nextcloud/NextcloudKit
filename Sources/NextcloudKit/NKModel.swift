@@ -238,7 +238,7 @@ public class NKFile: NSObject {
         let name: String
         let text: String?
     }
-    public var exifPhotos: [ChildElement] = []
+    public var exifPhotos = [[String: String?]]()
     public var placePhotos: String?
 }
 
@@ -877,7 +877,7 @@ class NKDataFileXML: NSObject {
             let exifPhotosElements = propstat["d:prop", "nc:metadata-photos-exif"]
             if let element = exifPhotosElements.element {
                 for child in element.childElements {
-                    file.exifPhotos.append(NKFile.ChildElement(name: child.name, text: child.text))
+                    file.exifPhotos.append([child.name: child.text])
                 }
             }
 
