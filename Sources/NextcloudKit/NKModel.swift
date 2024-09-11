@@ -328,7 +328,7 @@ public class NKUserStatus: NSObject {
 
 // MARK: - Data File
 
-class NKDataFileXML: NSObject {
+public class NKDataFileXML: NSObject {
     let nkCommonInstance: NKCommon
     let requestBodyComments =
     """
