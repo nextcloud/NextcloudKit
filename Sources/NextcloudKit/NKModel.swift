@@ -328,7 +328,7 @@ public class NKUserStatus: NSObject {
 
 // MARK: - Data File
 
-public class NKDataFileXML: NSObject {
+class NKDataFileXML: NSObject {
     let nkCommonInstance: NKCommon
     let requestBodyComments =
     """
@@ -604,20 +604,6 @@ public class NKDataFileXML: NSObject {
         <d:set>
             <d:prop>
                 <nc:metadata-files-live-photo>%@</nc:metadata-files-live-photo>
-            </d:prop>
-        </d:set>
-    </d:propertyupdate>
-    """
-
-    let requestId =
-    """
-    <?xml version=\"1.0\" encoding=\"UTF-8\"?>
-    <d:propertyupdate xmlns:d=\"DAV:\" xmlns:oc=\"http://owncloud.org/ns\" xmlns:nc=\"http://nextcloud.org/ns\">
-        <d:set>
-            <d:prop>
-                <d:getetag />
-                <fileid xmlns=\"http://owncloud.org/ns\"/>
-                <id xmlns=\"http://owncloud.org/ns\"/>
             </d:prop>
         </d:set>
     </d:propertyupdate>
