@@ -609,6 +609,20 @@ class NKDataFileXML: NSObject {
     </d:propertyupdate>
     """
 
+    let requestId =
+    """
+    <?xml version=\"1.0\" encoding=\"UTF-8\"?>
+    <d:propertyupdate xmlns:d=\"DAV:\" xmlns:oc=\"http://owncloud.org/ns\" xmlns:nc=\"http://nextcloud.org/ns\">
+        <d:set>
+            <d:prop>
+                <d:getetag />
+                <fileid xmlns=\"http://owncloud.org/ns\"/>
+                <id xmlns=\"http://owncloud.org/ns\"/>
+            </d:prop>
+        </d:set>
+    </d:propertyupdate>
+    """
+
     init(nkCommonInstance: NKCommon) {
         self.nkCommonInstance = nkCommonInstance
         super.init()
