@@ -27,8 +27,6 @@ import SwiftyJSON
 
 public extension NextcloudKit {
     func subscribingPushNotification(serverUrl: String,
-                                     user: String,
-                                     password: String,
                                      pushTokenHash: String,
                                      devicePublicKey: String,
                                      proxyServerUrl: String,
@@ -37,7 +35,9 @@ public extension NextcloudKit {
                                      taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
                                      completion: @escaping (_ account: String, _ deviceIdentifier: String?, _ signature: String?, _ publicKey: String?, _ data: Data?, _ error: NKError) -> Void) {
         let endpoint = "ocs/v2.php/apps/notifications/api/v2/push"
-        guard let url = self.nkCommonInstance.createStandardUrl(serverUrl: serverUrl, endpoint: endpoint) else {
+        guard let nkSession = nkCommonInstance.getSession(account: account),
+              let url = nkCommonInstance.createStandardUrl(serverUrl: nkSession.urlBase, endpoint: endpoint, options: options),
+              let headers = nkCommonInstance.getStandardHeaders(account: account, options: options) else {
             return options.queue.async { completion(account, nil, nil, nil, nil, .urlError) }
         }
         let parameters = [
@@ -45,9 +45,8 @@ public extension NextcloudKit {
             "devicePublicKey": devicePublicKey,
             "proxyServer": proxyServerUrl
         ]
-        let headers = self.nkCommonInstance.getStandardHeaders(user: user, password: password, appendHeaders: options.customHeader, customUserAgent: options.customUserAgent)
 
-        sessionManager.request(url, method: .post, parameters: parameters, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
+        nkSession.sessionData.request(url, method: .post, parameters: parameters, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
             task.taskDescription = options.taskDescription
             taskHandler(task)
         }.responseData(queue: self.nkCommonInstance.backgroundQueue) { response in
@@ -74,19 +73,18 @@ public extension NextcloudKit {
     }
 
     func unsubscribingPushNotification(serverUrl: String,
-                                       user: String,
-                                       password: String,
                                        account: String,
                                        options: NKRequestOptions = NKRequestOptions(),
                                        taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
                                        completion: @escaping (_ account: String, _ error: NKError) -> Void) {
         let endpoint = "ocs/v2.php/apps/notifications/api/v2/push"
-        guard let url = self.nkCommonInstance.createStandardUrl(serverUrl: serverUrl, endpoint: endpoint) else {
+        guard let nkSession = nkCommonInstance.getSession(account: account),
+              let url = nkCommonInstance.createStandardUrl(serverUrl: nkSession.urlBase, endpoint: endpoint, options: options),
+              let headers = nkCommonInstance.getStandardHeaders(account: account, options: options) else {
             return options.queue.async { completion(account, .urlError) }
         }
-        let headers = self.nkCommonInstance.getStandardHeaders(user: user, password: password, appendHeaders: options.customHeader, customUserAgent: options.customUserAgent)
 
-        sessionManager.request(url, method: .delete, parameters: nil, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
+        nkSession.sessionData.request(url, method: .delete, parameters: nil, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
             task.taskDescription = options.taskDescription
             taskHandler(task)
         }.response(queue: self.nkCommonInstance.backgroundQueue) { response in
@@ -113,7 +111,8 @@ public extension NextcloudKit {
                               taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
                               completion: @escaping (_ account: String, _ error: NKError) -> Void) {
         let endpoint = "devices?format=json"
-        guard let url = self.nkCommonInstance.createStandardUrl(serverUrl: proxyServerUrl, endpoint: endpoint),
+        guard let nkSession = nkCommonInstance.getSession(account: account),
+              let url = self.nkCommonInstance.createStandardUrl(serverUrl: proxyServerUrl, endpoint: endpoint, options: options),
               let userAgent = options.customUserAgent else {
             return options.queue.async { completion(account, .urlError) }
         }
@@ -125,7 +124,7 @@ public extension NextcloudKit {
         ]
         let headers = HTTPHeaders(arrayLiteral: .userAgent(userAgent))
 
-        sessionManager.request(url, method: .post, parameters: parameters, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
+        nkSession.sessionData.request(url, method: .post, parameters: parameters, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
             task.taskDescription = options.taskDescription
             taskHandler(task)
         }.response(queue: self.nkCommonInstance.backgroundQueue) { response in
@@ -151,7 +150,8 @@ public extension NextcloudKit {
                                 taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
                                 completion: @escaping (_ account: String, _ error: NKError) -> Void) {
         let endpoint = "devices"
-        guard let url = self.nkCommonInstance.createStandardUrl(serverUrl: proxyServerUrl, endpoint: endpoint),
+        guard let nkSession = nkCommonInstance.getSession(account: account),
+              let url = self.nkCommonInstance.createStandardUrl(serverUrl: proxyServerUrl, endpoint: endpoint, options: options),
               let userAgent = options.customUserAgent else {
             return options.queue.async { completion(account, .urlError) }
         }
@@ -162,7 +162,7 @@ public extension NextcloudKit {
         ]
         let headers = HTTPHeaders(arrayLiteral: .userAgent(userAgent))
 
-        sessionManager.request(url, method: .delete, parameters: parameters, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
+        nkSession.sessionData.request(url, method: .delete, parameters: parameters, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
             task.taskDescription = options.taskDescription
             taskHandler(task)
         }.response(queue: self.nkCommonInstance.backgroundQueue) { response in

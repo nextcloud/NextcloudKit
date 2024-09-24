@@ -26,20 +26,20 @@ import Alamofire
 import SwiftyJSON
 
 public extension NextcloudKit {
-     func NCTextObtainEditorDetails(account: String,
-                                    options: NKRequestOptions = NKRequestOptions(),
-                                    taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-                                    completion: @escaping (_ account: String, _  editors: [NKEditorDetailsEditors], _ creators: [NKEditorDetailsCreators], _ data: Data?, _ error: NKError) -> Void) {
-        let urlBase = self.nkCommonInstance.urlBase
+    func NCTextObtainEditorDetails(account: String,
+                                   options: NKRequestOptions = NKRequestOptions(),
+                                   taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
+                                   completion: @escaping (_ account: String, _  editors: [NKEditorDetailsEditors], _ creators: [NKEditorDetailsCreators], _ data: Data?, _ error: NKError) -> Void) {
         let endpoint = "ocs/v2.php/apps/files/api/v1/directEditing"
         var editors: [NKEditorDetailsEditors] = []
         var creators: [NKEditorDetailsCreators] = []
-        guard let url = self.nkCommonInstance.createStandardUrl(serverUrl: urlBase, endpoint: endpoint) else {
+        guard let nkSession = nkCommonInstance.getSession(account: account),
+              let url = nkCommonInstance.createStandardUrl(serverUrl: nkSession.urlBase, endpoint: endpoint, options: options),
+              let headers = nkCommonInstance.getStandardHeaders(account: account, options: options) else {
             return options.queue.async { completion(account, editors, creators, nil, .urlError) }
         }
-        let headers = self.nkCommonInstance.getStandardHeaders(options: options)
 
-        sessionManager.request(url, method: .get, parameters: nil, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
+        nkSession.sessionData.request(url, method: .get, parameters: nil, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
             task.taskDescription = options.taskDescription
             taskHandler(task)
         }.responseData(queue: self.nkCommonInstance.backgroundQueue) { response in
@@ -96,7 +96,6 @@ public extension NextcloudKit {
                         options: NKRequestOptions = NKRequestOptions(),
                         taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
                         completion: @escaping (_ account: String, _  url: String?, _ data: Data?, _ error: NKError) -> Void) {
-        let urlBase = self.nkCommonInstance.urlBase
         guard let fileNamePath = fileNamePath.urlEncoded else {
             return options.queue.async { completion(account, nil, nil, .urlError) }
         }
@@ -104,12 +103,13 @@ public extension NextcloudKit {
         if let fileId = fileId {
             endpoint = "ocs/v2.php/apps/files/api/v1/directEditing/open?path=/\(fileNamePath)&fileId=\(fileId)&editorId=\(editor)"
         }
-        guard let url = self.nkCommonInstance.createStandardUrl(serverUrl: urlBase, endpoint: endpoint) else {
+        guard let nkSession = nkCommonInstance.getSession(account: account),
+              let url = nkCommonInstance.createStandardUrl(serverUrl: nkSession.urlBase, endpoint: endpoint, options: options),
+              let headers = nkCommonInstance.getStandardHeaders(account: account, options: options) else {
             return options.queue.async { completion(account, nil, nil, .urlError) }
         }
-        let headers = self.nkCommonInstance.getStandardHeaders(options: options)
 
-        sessionManager.request(url, method: .post, parameters: nil, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
+        nkSession.sessionData.request(url, method: .post, parameters: nil, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
             task.taskDescription = options.taskDescription
             taskHandler(task)
         }.responseData(queue: self.nkCommonInstance.backgroundQueue) { response in
@@ -131,16 +131,16 @@ public extension NextcloudKit {
     func NCTextGetListOfTemplates(account: String,
                                   options: NKRequestOptions = NKRequestOptions(),
                                   taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-                                  completion: @escaping (_ account: String, _  templates: [NKEditorTemplates], _ data: Data?, _ error: NKError) -> Void) {
-        let urlBase = self.nkCommonInstance.urlBase
+                                  completion: @escaping (_ account: String, _ templates: [NKEditorTemplates]?, _ data: Data?, _ error: NKError) -> Void) {
         let endpoint = "ocs/v2.php/apps/files/api/v1/directEditing/templates/text/textdocumenttemplate"
         var templates: [NKEditorTemplates] = []
-        guard let url = self.nkCommonInstance.createStandardUrl(serverUrl: urlBase, endpoint: endpoint) else {
-            return options.queue.async { completion(account, templates, nil, .urlError) }
+        guard let nkSession = nkCommonInstance.getSession(account: account),
+              let url = nkCommonInstance.createStandardUrl(serverUrl: nkSession.urlBase, endpoint: endpoint, options: options),
+              let headers = nkCommonInstance.getStandardHeaders(account: account, options: options) else {
+            return options.queue.async { completion(account, nil, nil, .urlError) }
         }
-        let headers = self.nkCommonInstance.getStandardHeaders(options: options)
 
-        sessionManager.request(url, method: .get, parameters: nil, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
+        nkSession.sessionData.request(url, method: .get, parameters: nil, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
             task.taskDescription = options.taskDescription
             taskHandler(task)
         }.responseData(queue: self.nkCommonInstance.backgroundQueue) { response in
@@ -178,7 +178,6 @@ public extension NextcloudKit {
                           options: NKRequestOptions = NKRequestOptions(),
                           taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
                           completion: @escaping (_ account: String, _ url: String?, _ data: Data?, _ error: NKError) -> Void) {
-        let urlBase = self.nkCommonInstance.urlBase
         guard let fileNamePath = fileNamePath.urlEncoded else {
             return options.queue.async { completion(account, nil, nil, .urlError) }
         }
@@ -188,12 +187,13 @@ public extension NextcloudKit {
         } else {
             endpoint = "ocs/v2.php/apps/files/api/v1/directEditing/create?path=/\(fileNamePath)&editorId=\(editorId)&creatorId=\(creatorId)&templateId=\(templateId)"
         }
-        guard let url = self.nkCommonInstance.createStandardUrl(serverUrl: urlBase, endpoint: endpoint) else {
+        guard let nkSession = nkCommonInstance.getSession(account: account),
+              let url = nkCommonInstance.createStandardUrl(serverUrl: nkSession.urlBase, endpoint: endpoint, options: options),
+              let headers = nkCommonInstance.getStandardHeaders(account: account, options: options) else {
             return options.queue.async { completion(account, nil, nil, .urlError) }
         }
-        let headers = self.nkCommonInstance.getStandardHeaders(options: options)
 
-        sessionManager.request(url, method: .post, parameters: nil, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
+        nkSession.sessionData.request(url, method: .post, parameters: nil, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
             task.taskDescription = options.taskDescription
             taskHandler(task)
         }.responseData(queue: self.nkCommonInstance.backgroundQueue) { response in

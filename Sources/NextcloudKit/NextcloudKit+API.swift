@@ -263,8 +263,8 @@ public extension NextcloudKit {
     }
 
     func downloadPreview(fileId: String,
-                         width: Int = 1024,
-                         height: Int = 1024,
+                         widthPreview: Int = 512,
+                         heightPreview: Int = 512,
                          etag: String? = nil,
                          crop: Int = 1,
                          cropMode: String = "cover",
@@ -273,12 +273,12 @@ public extension NextcloudKit {
                          account: String,
                          options: NKRequestOptions = NKRequestOptions(),
                          taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-                         completion: @escaping (_ account: String, _ data: Data?, _ width: Int, _ height: Int, _ etag: String?, _ error: NKError) -> Void) {
-        let endpoint = "index.php/core/preview?fileId=\(fileId)&x=\(width)&y=\(height)&a=\(crop)&mode=\(cropMode)&forceIcon=\(forceIcon)&mimeFallback=\(mimeFallback)"
+                         completion: @escaping (_ account: String, _ data: Data?, _ error: NKError) -> Void) {
+        let endpoint = "index.php/core/preview?fileId=\(fileId)&x=\(widthPreview)&y=\(heightPreview)&a=\(crop)&mode=\(cropMode)&forceIcon=\(forceIcon)&mimeFallback=\(mimeFallback)"
         guard let nkSession = nkCommonInstance.getSession(account: account),
               let url = nkCommonInstance.createStandardUrl(serverUrl: nkSession.urlBase, endpoint: endpoint, options: options),
               var headers = nkCommonInstance.getStandardHeaders(account: account, options: options) else {
-            return options.queue.async { completion(account, nil, width, height, nil, .urlError) }
+            return options.queue.async { completion(account, nil, .urlError) }
         }
 
         if var etag = etag {
@@ -296,21 +296,51 @@ public extension NextcloudKit {
             switch response.result {
             case .failure(let error):
                 let error = NKError(error: error, afResponse: response, responseData: response.data)
-                options.queue.async { completion(account, nil, width, height, nil, error) }
+                options.queue.async { completion(account, nil, error) }
             case .success:
                 if let data = response.data {
-                    let etag = self.nkCommonInstance.findHeader("etag", allHeaderFields: response.response?.allHeaderFields)?.replacingOccurrences(of: "\"", with: "")
-                    options.queue.async { completion(account, data, width, height, etag, .success) }
+                    options.queue.async { completion(account, data, .success) }
                 } else {
-                    options.queue.async { completion(account, nil, width, height, nil, .invalidData) }
+                    options.queue.async { completion(account, nil, .invalidData) }
                 }
             }
         }
     }
 
+    func downloadPreview(fileId: String,
+                         fileNamePreviewLocalPath: String,
+                         fileNameIconLocalPath: String? = nil,
+                         widthPreview: Int = 512,
+                         heightPreview: Int = 512,
+                         sizeIcon: Int = 512,
+                         compressionQualityPreview: CGFloat = 0.5,
+                         compressionQualityIcon: CGFloat = 0.5,
+                         etag: String? = nil,
+                         crop: Int = 1,
+                         cropMode: String = "cover",
+                         forceIcon: Int = 0,
+                         mimeFallback: Int = 0,
+                         account: String,
+                         options: NKRequestOptions = NKRequestOptions(),
+                         taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
+                         completion: @escaping (_ account: String, _ imagePreview: UIImage?, _ imageIcon: UIImage?, _ imageOriginal: UIImage?, _ etag: String?, _ error: NKError) -> Void) {
+        let endpoint = "index.php/core/preview?fileId=\(fileId)&x=\(widthPreview)&y=\(heightPreview)&a=\(crop)&mode=\(cropMode)&forceIcon=\(forceIcon)&mimeFallback=\(mimeFallback)"
+
+        downloadPreview(fileNamePreviewLocalPath: fileNamePreviewLocalPath, fileNameIconLocalPath: fileNameIconLocalPath, sizeIcon: sizeIcon, compressionQualityPreview: compressionQualityPreview, compressionQualityIcon: compressionQualityIcon, etag: etag, endpoint: endpoint, account: account, options: options) { task in
+            taskHandler(task)
+        } completion: { account, imagePreview, imageIcon, imageOriginal, etag, error in
+            completion(account, imagePreview, imageIcon, imageOriginal,etag,error)
+        }
+    }
+
     func downloadTrashPreview(fileId: String,
-                              width: Int = 512,
-                              height: Int = 512,
+                              fileNamePreviewLocalPath: String,
+                              fileNameIconLocalPath: String,
+                              widthPreview: Int = 512,
+                              heightPreview: Int = 512,
+                              sizeIcon: Int = 512,
+                              compressionQualityPreview: CGFloat = 0.5,
+                              compressionQualityIcon: CGFloat = 0.5,
                               crop: Int = 1,
                               cropMode: String = "cover",
                               forceIcon: Int = 0,
@@ -318,13 +348,35 @@ public extension NextcloudKit {
                               account: String,
                               options: NKRequestOptions = NKRequestOptions(),
                               taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-                              completion: @escaping (_ account: String, _ data: Data?, _ width: Int, _ height: Int, _ error: NKError) -> Void) {
-        let endpoint = "index.php/apps/files_trashbin/preview?fileId=\(fileId)&x=\(width)&y=\(height)&a=\(crop)&mode=\(cropMode)&forceIcon=\(forceIcon)&mimeFallback=\(mimeFallback)"
+                              completion: @escaping (_ account: String, _ imagePreview: UIImage?, _ imageIcon: UIImage?, _ imageOriginal: UIImage?, _ etag: String?, _ error: NKError) -> Void) {
+        let endpoint = "index.php/apps/files_trashbin/preview?fileId=\(fileId)&x=\(widthPreview)&y=\(heightPreview)&a=\(crop)&mode=\(cropMode)&forceIcon=\(forceIcon)&mimeFallback=\(mimeFallback)"
 
+        downloadPreview(fileNamePreviewLocalPath: fileNamePreviewLocalPath, fileNameIconLocalPath: fileNameIconLocalPath, sizeIcon: sizeIcon, compressionQualityPreview: compressionQualityPreview, compressionQualityIcon: compressionQualityIcon, etag: nil, endpoint: endpoint, account: account, options: options) { task in
+            taskHandler(task)
+        } completion: { account, imagePreview, imageIcon, imageOriginal, etag, error in
+            completion(account, imagePreview, imageIcon, imageOriginal,etag,error)
+        }
+    }
+
+    private func downloadPreview(fileNamePreviewLocalPath: String,
+                                 fileNameIconLocalPath: String? = nil,
+                                 sizeIcon: Int = 0,
+                                 compressionQualityPreview: CGFloat,
+                                 compressionQualityIcon: CGFloat,
+                                 etag: String? = nil,
+                                 endpoint: String,
+                                 account: String,
+                                 options: NKRequestOptions = NKRequestOptions(),
+                                 taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
+                                 completion: @escaping (_ account: String, _ imagePreview: UIImage?, _ imageIcon: UIImage?, _ imageOriginal: UIImage?, _ etag: String?, _ error: NKError) -> Void) {
         guard let nkSession = nkCommonInstance.getSession(account: account),
               let url = nkCommonInstance.createStandardUrl(serverUrl: nkSession.urlBase, endpoint: endpoint, options: options),
-              let headers = nkCommonInstance.getStandardHeaders(account: account, options: options) else {
-            return options.queue.async { completion(account, nil, width, height, .urlError) }
+              var headers = nkCommonInstance.getStandardHeaders(account: account, options: options) else {
+            return options.queue.async { completion(account, nil, nil, nil, nil, .urlError) }
+        }
+        if var etag = etag {
+            etag = "\"" + etag + "\""
+            headers.update(name: "If-None-Match", value: etag)
         }
 
         nkSession.sessionData.request(url, method: .get, parameters: nil, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
@@ -337,12 +389,28 @@ public extension NextcloudKit {
             switch response.result {
             case .failure(let error):
                 let error = NKError(error: error, afResponse: response, responseData: response.data)
-                options.queue.async { completion(account, nil, width, height, error) }
+                options.queue.async { completion(account, nil, nil, nil, nil, error) }
             case .success:
-                if let data = response.data {
-                    options.queue.async { completion(account, data, width, height, .success) }
-                } else {
-                    options.queue.async { completion(account, nil, width, height, .invalidData) }
+                guard let data = response.data, let imageOriginal = UIImage(data: data) else {
+                    return options.queue.async { completion(account, nil, nil, nil, nil, .invalidData) }
+                }
+                let etag = self.nkCommonInstance.findHeader("etag", allHeaderFields: response.response?.allHeaderFields)?.replacingOccurrences(of: "\"", with: "")
+                var imagePreview, imageIcon: UIImage?
+                do {
+                    if let data = imageOriginal.jpegData(compressionQuality: compressionQualityPreview) {
+                        try data.write(to: URL(fileURLWithPath: fileNamePreviewLocalPath), options: .atomic)
+                        imagePreview = UIImage(data: data)
+                    }
+                    if let fileNameIconLocalPath, sizeIcon > 0 {
+                        imageIcon = imageOriginal.resizeImage(size: CGSize(width: sizeIcon, height: sizeIcon))
+                        if let data = imageIcon?.jpegData(compressionQuality: compressionQualityIcon) {
+                            try data.write(to: URL(fileURLWithPath: fileNameIconLocalPath), options: .atomic)
+                            imageIcon = UIImage(data: data)
+                        }
+                    }
+                    options.queue.async { completion(account, imagePreview, imageIcon, imageOriginal, etag, .success) }
+                } catch {
+                    options.queue.async { completion(account, nil, nil, nil, nil, NKError(error: error)) }
                 }
             }
         }

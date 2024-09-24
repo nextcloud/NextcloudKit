@@ -30,15 +30,14 @@ public extension NextcloudKit {
                          options: NKRequestOptions = NKRequestOptions(),
                          taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
                          completion: @escaping (_ account: String, _ results: [NKGroupfolders]?, _ data: Data?, _ error: NKError) -> Void) {
-        let urlBase = self.nkCommonInstance.urlBase
         let endpoint = "index.php/apps/groupfolders/folders?applicable=1"
-        guard let url = self.nkCommonInstance.createStandardUrl(serverUrl: urlBase, endpoint: endpoint)
-        else {
-            return options.queue.async { completion(account, nil, nil, .urlError) }
+        guard let nkSession = nkCommonInstance.getSession(account: account),
+              let url = nkCommonInstance.createStandardUrl(serverUrl: nkSession.urlBase, endpoint: endpoint, options: options),
+              let headers = nkCommonInstance.getStandardHeaders(account: account, options: options) else {
+            return options.queue.async { completion(account, nil,nil, .urlError) }
         }
-        let headers = self.nkCommonInstance.getStandardHeaders(options: options)
 
-        sessionManager.request(url, method: .get, parameters: nil, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
+        nkSession.sessionData.request(url, method: .get, parameters: nil, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
             task.taskDescription = options.taskDescription
             taskHandler(task)
         }.responseData(queue: self.nkCommonInstance.backgroundQueue) { response in

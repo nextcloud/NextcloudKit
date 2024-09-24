@@ -116,7 +116,7 @@ open class NextcloudKit {
         }
     }
 
-    public func getSession(account: String) -> NKSession? {
+    public func getSessionhttpResponse(account: String) -> NKSession? {
         return nkCommonInstance.nksessions.filter({ $0.account == account }).first
     }
 
