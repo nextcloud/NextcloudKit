@@ -35,7 +35,7 @@ public extension NextcloudKit {
                         taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
                         completion: @escaping (_ token: String?, _ data: Data?, _ error: NKError) -> Void) {
         let endpoint = "ocs/v2.php/core/getapppassword"
-        guard let url = self.nkCommonInstance.createStandardUrl(serverUrl: url, endpoint: endpoint) else {
+        guard let url = self.nkCommonInstance.createStandardUrl(serverUrl: url, endpoint: endpoint, options: options) else {
             return options.queue.async { completion(nil, nil, .urlError) }
         }
         var headers: HTTPHeaders = [.authorization(username: user, password: password)]
@@ -51,7 +51,7 @@ public extension NextcloudKit {
             return options.queue.async { completion(nil, nil, NKError(error: error)) }
         }
 
-        sessionManager.request(urlRequest).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
+        internalSession.request(urlRequest).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
             task.taskDescription = options.taskDescription
             taskHandler(task)
         }.response(queue: self.nkCommonInstance.backgroundQueue) { response in
@@ -82,7 +82,8 @@ public extension NextcloudKit {
                            taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
                            completion: @escaping (_ data: Data?, _ error: NKError) -> Void) {
         let endpoint = "ocs/v2.php/core/apppassword"
-        guard let url = self.nkCommonInstance.createStandardUrl(serverUrl: serverUrl, endpoint: endpoint) else {
+        guard let nkSession = nkCommonInstance.getSession(account: account),
+              let url = self.nkCommonInstance.createStandardUrl(serverUrl: serverUrl, endpoint: endpoint, options: options) else {
             return options.queue.async { completion(nil, .urlError) }
         }
         var headers: HTTPHeaders = [.authorization(username: username, password: password)]
@@ -98,7 +99,7 @@ public extension NextcloudKit {
             return options.queue.async { completion(nil, NKError(error: error)) }
         }
 
-        sessionManager.request(urlRequest).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
+        nkSession.sessionData.request(urlRequest).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
             task.taskDescription = options.taskDescription
             taskHandler(task)
         }.response(queue: self.nkCommonInstance.backgroundQueue) { response in
@@ -122,7 +123,7 @@ public extension NextcloudKit {
                         taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
                         completion: @escaping (_ token: String?, _ endpoint: String?, _ login: String?, _ data: Data?, _ error: NKError) -> Void) {
         let endpoint = "index.php/login/v2"
-        guard let url = self.nkCommonInstance.createStandardUrl(serverUrl: serverUrl, endpoint: endpoint) else {
+        guard let url = nkCommonInstance.createStandardUrl(serverUrl: serverUrl, endpoint: endpoint, options: options) else {
             return options.queue.async { completion(nil, nil, nil, nil, .urlError) }
         }
         var headers: HTTPHeaders?
@@ -130,7 +131,7 @@ public extension NextcloudKit {
             headers = [HTTPHeader.userAgent(userAgent)]
         }
 
-        sessionManager.request(url, method: .post, parameters: nil, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
+        internalSession.request(url, method: .post, parameters: nil, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
             task.taskDescription = options.taskDescription
             taskHandler(task)
         }.responseData(queue: self.nkCommonInstance.backgroundQueue) { response in
@@ -167,7 +168,7 @@ public extension NextcloudKit {
             headers = [HTTPHeader.userAgent(userAgent)]
         }
 
-        sessionManager.request(url, method: .post, parameters: nil, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
+        internalSession.request(url, method: .post, parameters: nil, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
             task.taskDescription = options.taskDescription
             taskHandler(task)
         }.responseData(queue: self.nkCommonInstance.backgroundQueue) { response in

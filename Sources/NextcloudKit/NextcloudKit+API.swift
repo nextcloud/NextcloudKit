@@ -57,7 +57,7 @@ public extension NextcloudKit {
             return options.queue.async { completion(.urlError) }
         }
 
-        sessionManager.request(url, method: .head, parameters: nil, encoding: URLEncoding.default, headers: nil, interceptor: nil).onURLSessionTaskCreation { task in
+        internalSession.request(url, method: .head, parameters: nil, encoding: URLEncoding.default, headers: nil, interceptor: nil).onURLSessionTaskCreation { task in
             task.taskDescription = options.taskDescription
             taskHandler(task)
         }.response(queue: self.nkCommonInstance.backgroundQueue) { response in
@@ -77,19 +77,19 @@ public extension NextcloudKit {
     // MARK: -
 
     func generalWithEndpoint(_ endpoint: String,
-                             method: String,
                              account: String,
+                             method: String,
                              options: NKRequestOptions = NKRequestOptions(),
                              taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
                              completion: @escaping (_ account: String, _ data: Data?, _ error: NKError) -> Void) {
-        let urlBase = self.nkCommonInstance.urlBase
-        guard let url = self.nkCommonInstance.createStandardUrl(serverUrl: urlBase, endpoint: endpoint) else {
+        guard let nkSession = nkCommonInstance.getSession(account: account),
+              let url = nkCommonInstance.createStandardUrl(serverUrl: nkSession.urlBase, endpoint: endpoint, options: options),
+              let headers = nkCommonInstance.getStandardHeaders(account: account, options: options) else {
             return options.queue.async { completion(account, nil, .urlError) }
         }
         let method = HTTPMethod(rawValue: method.uppercased())
-        let headers = self.nkCommonInstance.getStandardHeaders(options: options)
 
-        sessionManager.request(url, method: method, parameters: nil, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
+        nkSession.sessionData.request(url, method: method, parameters: nil, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
             task.taskDescription = options.taskDescription
             taskHandler(task)
         }.responseData(queue: self.nkCommonInstance.backgroundQueue) { response in
@@ -112,15 +112,15 @@ public extension NextcloudKit {
                          options: NKRequestOptions = NKRequestOptions(),
                          taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
                          completion: @escaping (_ account: String, _ externalFiles: [NKExternalSite], _ data: Data?, _ error: NKError) -> Void) {
-        let urlBase = self.nkCommonInstance.urlBase
         var externalSites: [NKExternalSite] = []
         let endpoint = "ocs/v2.php/apps/external/api/v1"
-        guard let url = self.nkCommonInstance.createStandardUrl(serverUrl: urlBase, endpoint: endpoint) else {
+        guard let nkSession = nkCommonInstance.getSession(account: account),
+              let url = nkCommonInstance.createStandardUrl(serverUrl: nkSession.urlBase, endpoint: endpoint, options: options),
+              let headers = nkCommonInstance.getStandardHeaders(account: account, options: options) else {
             return options.queue.async { completion(account, externalSites, nil, .urlError) }
         }
-        let headers = self.nkCommonInstance.getStandardHeaders(options: options)
 
-        sessionManager.request(url, method: .get, parameters: nil, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
+        nkSession.sessionData.request(url, method: .get, parameters: nil, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
             task.taskDescription = options.taskDescription
             taskHandler(task)
         }.responseData(queue: self.nkCommonInstance.backgroundQueue) { response in
@@ -174,12 +174,15 @@ public extension NextcloudKit {
                          taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
                          completion: @escaping (ServerInfoResult) -> Void) {
         let endpoint = "status.php"
-        guard let url = self.nkCommonInstance.createStandardUrl(serverUrl: serverUrl, endpoint: endpoint) else {
+        guard let url = nkCommonInstance.createStandardUrl(serverUrl: serverUrl, endpoint: endpoint, options: options) else {
             return options.queue.async { completion(ServerInfoResult.failure(.urlError)) }
         }
-        let headers = self.nkCommonInstance.getStandardHeaders(options: options)
+        var headers: HTTPHeaders?
+        if let userAgent = options.customUserAgent {
+            headers = [HTTPHeader.userAgent(userAgent)]
+        }
 
-        sessionManager.request(url, method: .get, parameters: nil, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
+        internalSession.request(url, method: .get, parameters: nil, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
             task.taskDescription = options.taskDescription
             taskHandler(task)
         }.responseData(queue: self.nkCommonInstance.backgroundQueue) { response in
@@ -228,65 +231,23 @@ public extension NextcloudKit {
                          options: NKRequestOptions = NKRequestOptions(),
                          taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
                          completion: @escaping (_ account: String, _ data: Data?, _ error: NKError) -> Void) {
-        var headers = self.nkCommonInstance.getStandardHeaders(options: options)
-        if var etag = etag {
-            etag = "\"" + etag + "\""
-            headers.update(name: "If-None-Match", value: etag)
-        }
-
-        sessionManager.request(url, method: .get, parameters: nil, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
-            task.taskDescription = options.taskDescription
-            taskHandler(task)
-        }.response(queue: self.nkCommonInstance.backgroundQueue) { response in
-            if self.nkCommonInstance.levelLog > 0 {
-                debugPrint(response)
-            }
-
-            switch response.result {
-            case .failure(let error):
-                let error = NKError(error: error, afResponse: response, responseData: response.data)
-                options.queue.async { completion(account, nil, error) }
-            case .success:
-                if let data = response.data {
-                    options.queue.async { completion(account, data, .success) }
-                } else {
-                    options.queue.async { completion(account, nil, .invalidData) }
-                }
-            }
-        }
-    }
-
-    func downloadPreview(fileId: String,
-                         widthPreview: Int = 512,
-                         heightPreview: Int = 512,
-                         etag: String? = nil,
-                         crop: Int = 1,
-                         cropMode: String = "cover",
-                         forceIcon: Int = 0,
-                         mimeFallback: Int = 0,
-                         account: String,
-                         options: NKRequestOptions = NKRequestOptions(),
-                         taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-                         completion: @escaping (_ account: String, _ data: Data?, _ error: NKError) -> Void) {
-        let urlBase = self.nkCommonInstance.urlBase
-        let endpoint = "index.php/core/preview?fileId=\(fileId)&x=\(widthPreview)&y=\(heightPreview)&a=\(crop)&mode=\(cropMode)&forceIcon=\(forceIcon)&mimeFallback=\(mimeFallback)"
-        let url = self.nkCommonInstance.createStandardUrl(serverUrl: urlBase, endpoint: endpoint)
-        guard let urlRequest = url else {
+        guard let nkSession = nkCommonInstance.getSession(account: account),
+              var headers = nkCommonInstance.getStandardHeaders(account: account, options: options) else {
             return options.queue.async { completion(account, nil, .urlError) }
         }
-        var headers = self.nkCommonInstance.getStandardHeaders(options: options)
         if var etag = etag {
             etag = "\"" + etag + "\""
             headers.update(name: "If-None-Match", value: etag)
         }
 
-        sessionManager.request(urlRequest, method: .get, parameters: nil, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
+        nkSession.sessionData.request(url, method: .get, parameters: nil, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
             task.taskDescription = options.taskDescription
             taskHandler(task)
         }.response(queue: self.nkCommonInstance.backgroundQueue) { response in
             if self.nkCommonInstance.levelLog > 0 {
                 debugPrint(response)
             }
+
             switch response.result {
             case .failure(let error):
                 let error = NKError(error: error, afResponse: response, responseData: response.data)
@@ -302,13 +263,8 @@ public extension NextcloudKit {
     }
 
     func downloadPreview(fileId: String,
-                         fileNamePreviewLocalPath: String,
-                         fileNameIconLocalPath: String? = nil,
-                         widthPreview: Int = 512,
-                         heightPreview: Int = 512,
-                         sizeIcon: Int = 512,
-                         compressionQualityPreview: CGFloat = 0.5,
-                         compressionQualityIcon: CGFloat = 0.5,
+                         width: Int = 1024,
+                         height: Int = 1024,
                          etag: String? = nil,
                          crop: Int = 1,
                          cropMode: String = "cover",
@@ -317,24 +273,44 @@ public extension NextcloudKit {
                          account: String,
                          options: NKRequestOptions = NKRequestOptions(),
                          taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-                         completion: @escaping (_ account: String, _ imagePreview: UIImage?, _ imageIcon: UIImage?, _ imageOriginal: UIImage?, _ etag: String?, _ error: NKError) -> Void) {
-        let endpoint = "index.php/core/preview?fileId=\(fileId)&x=\(widthPreview)&y=\(heightPreview)&a=\(crop)&mode=\(cropMode)&forceIcon=\(forceIcon)&mimeFallback=\(mimeFallback)"
+                         completion: @escaping (_ account: String, _ data: Data?, _ width: Int, _ height: Int, _ etag: String?, _ error: NKError) -> Void) {
+        let endpoint = "index.php/core/preview?fileId=\(fileId)&x=\(width)&y=\(height)&a=\(crop)&mode=\(cropMode)&forceIcon=\(forceIcon)&mimeFallback=\(mimeFallback)"
+        guard let nkSession = nkCommonInstance.getSession(account: account),
+              let url = nkCommonInstance.createStandardUrl(serverUrl: nkSession.urlBase, endpoint: endpoint, options: options),
+              var headers = nkCommonInstance.getStandardHeaders(account: account, options: options) else {
+            return options.queue.async { completion(account, nil, width, height, nil, .urlError) }
+        }
 
-        downloadPreview(fileNamePreviewLocalPath: fileNamePreviewLocalPath, fileNameIconLocalPath: fileNameIconLocalPath, sizeIcon: sizeIcon, compressionQualityPreview: compressionQualityPreview, compressionQualityIcon: compressionQualityIcon, etag: etag, endpoint: endpoint, account: account, options: options) { task in
+        if var etag = etag {
+            etag = "\"" + etag + "\""
+            headers.update(name: "If-None-Match", value: etag)
+        }
+
+        nkSession.sessionData.request(url, method: .get, parameters: nil, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
+            task.taskDescription = options.taskDescription
             taskHandler(task)
-        } completion: { account, imagePreview, imageIcon, imageOriginal, etag, error in
-            completion(account, imagePreview, imageIcon, imageOriginal,etag,error)
+        }.response(queue: self.nkCommonInstance.backgroundQueue) { response in
+            if self.nkCommonInstance.levelLog > 0 {
+                debugPrint(response)
+            }
+            switch response.result {
+            case .failure(let error):
+                let error = NKError(error: error, afResponse: response, responseData: response.data)
+                options.queue.async { completion(account, nil, width, height, nil, error) }
+            case .success:
+                if let data = response.data {
+                    let etag = self.nkCommonInstance.findHeader("etag", allHeaderFields: response.response?.allHeaderFields)?.replacingOccurrences(of: "\"", with: "")
+                    options.queue.async { completion(account, data, width, height, etag, .success) }
+                } else {
+                    options.queue.async { completion(account, nil, width, height, nil, .invalidData) }
+                }
+            }
         }
     }
 
     func downloadTrashPreview(fileId: String,
-                              fileNamePreviewLocalPath: String,
-                              fileNameIconLocalPath: String,
-                              widthPreview: Int = 512,
-                              heightPreview: Int = 512,
-                              sizeIcon: Int = 512,
-                              compressionQualityPreview: CGFloat = 0.5,
-                              compressionQualityIcon: CGFloat = 0.5,
+                              width: Int = 512,
+                              height: Int = 512,
                               crop: Int = 1,
                               cropMode: String = "cover",
                               forceIcon: Int = 0,
@@ -342,42 +318,16 @@ public extension NextcloudKit {
                               account: String,
                               options: NKRequestOptions = NKRequestOptions(),
                               taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-                              completion: @escaping (_ account: String, _ imagePreview: UIImage?, _ imageIcon: UIImage?, _ imageOriginal: UIImage?, _ etag: String?, _ error: NKError) -> Void) {
-        let endpoint = "index.php/apps/files_trashbin/preview?fileId=\(fileId)&x=\(widthPreview)&y=\(heightPreview)&a=\(crop)&mode=\(cropMode)&forceIcon=\(forceIcon)&mimeFallback=\(mimeFallback)"
+                              completion: @escaping (_ account: String, _ data: Data?, _ width: Int, _ height: Int, _ error: NKError) -> Void) {
+        let endpoint = "index.php/apps/files_trashbin/preview?fileId=\(fileId)&x=\(width)&y=\(height)&a=\(crop)&mode=\(cropMode)&forceIcon=\(forceIcon)&mimeFallback=\(mimeFallback)"
 
-        downloadPreview(fileNamePreviewLocalPath: fileNamePreviewLocalPath, fileNameIconLocalPath: fileNameIconLocalPath, sizeIcon: sizeIcon, compressionQualityPreview: compressionQualityPreview, compressionQualityIcon: compressionQualityIcon, etag: nil, endpoint: endpoint, account: account, options: options) { task in
-            taskHandler(task)
-        } completion: { account, imagePreview, imageIcon, imageOriginal, etag, error in
-            completion(account, imagePreview, imageIcon, imageOriginal,etag,error)
-        }
-    }
-
-    private func downloadPreview(fileNamePreviewLocalPath: String,
-                                 fileNameIconLocalPath: String? = nil,
-                                 sizeIcon: Int = 0,
-                                 compressionQualityPreview: CGFloat,
-                                 compressionQualityIcon: CGFloat,
-                                 etag: String? = nil,
-                                 endpoint: String?,
-                                 account: String,
-                                 options: NKRequestOptions = NKRequestOptions(),
-                                 taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-                                 completion: @escaping (_ account: String, _ imagePreview: UIImage?, _ imageIcon: UIImage?, _ imageOriginal: UIImage?, _ etag: String?, _ error: NKError) -> Void) {
-        let urlBase = self.nkCommonInstance.urlBase
-        var url: URLConvertible?
-        if let endpoint {
-            url = self.nkCommonInstance.createStandardUrl(serverUrl: urlBase, endpoint: endpoint)
-        }
-        guard let urlRequest = url else {
-            return options.queue.async { completion(account, nil, nil, nil, nil, .urlError) }
-        }
-        var headers = self.nkCommonInstance.getStandardHeaders(options: options)
-        if var etag = etag {
-            etag = "\"" + etag + "\""
-            headers.update(name: "If-None-Match", value: etag)
+        guard let nkSession = nkCommonInstance.getSession(account: account),
+              let url = nkCommonInstance.createStandardUrl(serverUrl: nkSession.urlBase, endpoint: endpoint, options: options),
+              let headers = nkCommonInstance.getStandardHeaders(account: account, options: options) else {
+            return options.queue.async { completion(account, nil, width, height, .urlError) }
         }
 
-        sessionManager.request(urlRequest, method: .get, parameters: nil, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
+        nkSession.sessionData.request(url, method: .get, parameters: nil, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
             task.taskDescription = options.taskDescription
             taskHandler(task)
         }.response(queue: self.nkCommonInstance.backgroundQueue) { response in
@@ -387,28 +337,12 @@ public extension NextcloudKit {
             switch response.result {
             case .failure(let error):
                 let error = NKError(error: error, afResponse: response, responseData: response.data)
-                options.queue.async { completion(account, nil, nil, nil, nil, error) }
+                options.queue.async { completion(account, nil, width, height, error) }
             case .success:
-                guard let data = response.data, let imageOriginal = UIImage(data: data) else {
-                    return options.queue.async { completion(account, nil, nil, nil, nil, .invalidData) }
-                }
-                let etag = self.nkCommonInstance.findHeader("etag", allHeaderFields: response.response?.allHeaderFields)?.replacingOccurrences(of: "\"", with: "")
-                var imagePreview, imageIcon: UIImage?
-                do {
-                    if let data = imageOriginal.jpegData(compressionQuality: compressionQualityPreview) {
-                        try data.write(to: URL(fileURLWithPath: fileNamePreviewLocalPath), options: .atomic)
-                        imagePreview = UIImage(data: data)
-                    }
-                    if let fileNameIconLocalPath, sizeIcon > 0 {
-                        imageIcon = imageOriginal.resizeImage(size: CGSize(width: sizeIcon, height: sizeIcon))
-                        if let data = imageIcon?.jpegData(compressionQuality: compressionQualityIcon) {
-                            try data.write(to: URL(fileURLWithPath: fileNameIconLocalPath), options: .atomic)
-                            imageIcon = UIImage(data: data)
-                        }
-                    }
-                    options.queue.async { completion(account, imagePreview, imageIcon, imageOriginal, etag, .success) }
-                } catch {
-                    options.queue.async { completion(account, nil, nil, nil, nil, NKError(error: error)) }
+                if let data = response.data {
+                    options.queue.async { completion(account, data, width, height, .success) }
+                } else {
+                    options.queue.async { completion(account, nil, width, height, .invalidData) }
                 }
             }
         }
@@ -423,18 +357,19 @@ public extension NextcloudKit {
                         options: NKRequestOptions = NKRequestOptions(),
                         taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
                         completion: @escaping (_ account: String, _ imageAvatar: UIImage?, _ imageOriginal: UIImage?, _ etag: String?, _ error: NKError) -> Void) {
-        let urlBase = self.nkCommonInstance.urlBase
         let endpoint = "index.php/avatar/\(user)/\(sizeImage)"
-        guard let url = self.nkCommonInstance.createStandardUrl(serverUrl: urlBase, endpoint: endpoint) else {
+        guard let nkSession = nkCommonInstance.getSession(account: account),
+              let url = nkCommonInstance.createStandardUrl(serverUrl: nkSession.urlBase, endpoint: endpoint, options: options),
+              var headers = nkCommonInstance.getStandardHeaders(account: account, options: options) else {
             return options.queue.async { completion(account, nil, nil, nil, .urlError) }
         }
-        var headers = self.nkCommonInstance.getStandardHeaders(options: options)
+
         if var etag = etag {
             etag = "\"" + etag + "\""
             headers.update(name: "If-None-Match", value: etag)
         }
 
-        sessionManager.request(url, method: .get, parameters: nil, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
+        nkSession.sessionData.request(url, method: .get, parameters: nil, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
             task.taskDescription = options.taskDescription
             taskHandler(task)
         }.response(queue: self.nkCommonInstance.backgroundQueue) { response in
@@ -510,12 +445,13 @@ public extension NextcloudKit {
                          options: NKRequestOptions = NKRequestOptions(),
                          taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
                          completion: @escaping (_ account: String, _ data: Data?, _ error: NKError) -> Void) {
-        guard let url = serverUrl.asUrl else {
+        guard let url = serverUrl.asUrl,
+              let nkSession = nkCommonInstance.getSession(account: account),
+              let headers = nkCommonInstance.getStandardHeaders(account: account, options: options) else {
             return options.queue.async { completion(account, nil, .urlError) }
         }
-        let headers = self.nkCommonInstance.getStandardHeaders(options: options)
 
-        sessionManager.request(url, method: .get, parameters: nil, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
+        nkSession.sessionData.request(url, method: .get, parameters: nil, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
             task.taskDescription = options.taskDescription
             taskHandler(task)
         }.response(queue: self.nkCommonInstance.backgroundQueue) { response in
@@ -542,14 +478,14 @@ public extension NextcloudKit {
                         options: NKRequestOptions = NKRequestOptions(),
                         taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
                         completion: @escaping (_ account: String, _ userProfile: NKUserProfile?, _ data: Data?, _ error: NKError) -> Void) {
-        let urlBase = self.nkCommonInstance.urlBase
         let endpoint = "ocs/v2.php/cloud/user"
-        guard let url = self.nkCommonInstance.createStandardUrl(serverUrl: urlBase, endpoint: endpoint) else {
+        guard let nkSession = nkCommonInstance.getSession(account: account),
+              let url = nkCommonInstance.createStandardUrl(serverUrl: nkSession.urlBase, endpoint: endpoint, options: options),
+              let headers = nkCommonInstance.getStandardHeaders(account: account, options: options) else {
             return options.queue.async { completion(account, nil, nil, .urlError) }
         }
-        let headers = self.nkCommonInstance.getStandardHeaders(options: options)
 
-        sessionManager.request(url, method: .get, parameters: nil, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
+        nkSession.sessionData.request(url, method: .get, parameters: nil, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
             task.taskDescription = options.taskDescription
             taskHandler(task)
         }.responseData(queue: self.nkCommonInstance.backgroundQueue) { response in
@@ -611,14 +547,14 @@ public extension NextcloudKit {
                          options: NKRequestOptions = NKRequestOptions(),
                          taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
                          completion: @escaping (_ account: String, _ data: Data?, _ error: NKError) -> Void) {
-        let urlBase = self.nkCommonInstance.urlBase
         let endpoint = "ocs/v1.php/cloud/capabilities"
-        guard let url = self.nkCommonInstance.createStandardUrl(serverUrl: urlBase, endpoint: endpoint) else {
+        guard let nkSession = nkCommonInstance.getSession(account: account),
+              let url = nkCommonInstance.createStandardUrl(serverUrl: nkSession.urlBase, endpoint: endpoint, options: options),
+              let headers = nkCommonInstance.getStandardHeaders(account: account, options: options) else {
             return options.queue.async { completion(account, nil, .urlError) }
         }
-        let headers = self.nkCommonInstance.getStandardHeaders(options: options)
 
-        sessionManager.request(url, method: .get, parameters: nil, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
+        nkSession.sessionData.request(url, method: .get, parameters: nil, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
             task.taskDescription = options.taskDescription
             taskHandler(task)
         }.response(queue: self.nkCommonInstance.backgroundQueue) { response in
@@ -649,12 +585,16 @@ public extension NextcloudKit {
                              completion: @escaping (_ account: String, _ wipe: Bool, _ data: Data?, _ error: NKError) -> Void) {
         let endpoint = "index.php/core/wipe/check"
         let parameters: [String: Any] = ["token": token]
-        let headers = self.nkCommonInstance.getStandardHeaders(options.customHeader, customUserAgent: options.customUserAgent, contentType: "application/json")
-        guard let url = self.nkCommonInstance.createStandardUrl(serverUrl: serverUrl, endpoint: endpoint) else {
+        ///
+        options.contentType = "application/json"
+        ///
+        guard let nkSession = nkCommonInstance.getSession(account: account),
+              let url = nkCommonInstance.createStandardUrl(serverUrl: serverUrl, endpoint: endpoint, options: options),
+              let headers = nkCommonInstance.getStandardHeaders(account: account, options: options) else {
             return options.queue.async { completion(account, false, nil, .urlError) }
         }
 
-        sessionManager.request(url, method: .post, parameters: parameters, encoding: URLEncoding.default, headers: headers).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
+        nkSession.sessionData.request(url, method: .post, parameters: parameters, encoding: URLEncoding.default, headers: headers).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
             task.taskDescription = options.taskDescription
             taskHandler(task)
         }.responseData(queue: self.nkCommonInstance.backgroundQueue) { response in
@@ -681,12 +621,16 @@ public extension NextcloudKit {
                                    completion: @escaping (_ account: String, _ error: NKError) -> Void) {
         let endpoint = "index.php/core/wipe/success"
         let parameters: [String: Any] = ["token": token]
-        let headers = self.nkCommonInstance.getStandardHeaders(options.customHeader, customUserAgent: options.customUserAgent, contentType: "application/json")
-        guard let url = self.nkCommonInstance.createStandardUrl(serverUrl: serverUrl, endpoint: endpoint) else {
+        ///
+        options.contentType = "application/json"
+        ///
+        guard let nkSession = nkCommonInstance.getSession(account: account),
+              let url = nkCommonInstance.createStandardUrl(serverUrl: serverUrl, endpoint: endpoint, options: options),
+              let headers = nkCommonInstance.getStandardHeaders(account: account, options: options) else {
             return options.queue.async { completion(account, .urlError) }
         }
 
-        sessionManager.request(url, method: .post, parameters: parameters, encoding: URLEncoding.default, headers: headers).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
+        nkSession.sessionData.request(url, method: .post, parameters: parameters, encoding: URLEncoding.default, headers: headers).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
             task.taskDescription = options.taskDescription
             taskHandler(task)
         }.responseData(queue: self.nkCommonInstance.backgroundQueue) { response in
@@ -714,7 +658,6 @@ public extension NextcloudKit {
                      options: NKRequestOptions = NKRequestOptions(),
                      taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
                      completion: @escaping (_ account: String, _ activities: [NKActivity], _ activityFirstKnown: Int, _ activityLastGiven: Int, _ data: Data?, _ error: NKError) -> Void) {
-        let urlBase = self.nkCommonInstance.urlBase
         var activities: [NKActivity] = []
         var activityFirstKnown = 0
         var activityLastGiven = 0
@@ -737,12 +680,13 @@ public extension NextcloudKit {
             parameters["previews"] = "true"
         }
 
-        guard let url = self.nkCommonInstance.createStandardUrl(serverUrl: urlBase, endpoint: endpoint) else {
+        guard let nkSession = nkCommonInstance.getSession(account: account),
+              let url = nkCommonInstance.createStandardUrl(serverUrl: nkSession.urlBase, endpoint: endpoint, options: options),
+              let headers = nkCommonInstance.getStandardHeaders(account: account, options: options) else {
             return options.queue.async { completion(account, activities, activityFirstKnown, activityLastGiven, nil, .urlError) }
         }
-        let headers = self.nkCommonInstance.getStandardHeaders(options: options)
 
-        sessionManager.request(url, method: .get, parameters: parameters, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
+        nkSession.sessionData.request(url, method: .get, parameters: parameters, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
             task.taskDescription = options.taskDescription
             taskHandler(task)
         }.responseData(queue: self.nkCommonInstance.backgroundQueue) { response in
@@ -811,15 +755,14 @@ public extension NextcloudKit {
                           options: NKRequestOptions = NKRequestOptions(),
                           taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
                           completion: @escaping (_ account: String, _ notifications: [NKNotifications]?, _ data: Data?, _ error: NKError) -> Void) {
-        let urlBase = self.nkCommonInstance.urlBase
         let endpoint = "ocs/v2.php/apps/notifications/api/v2/notifications"
-        var notifications: [NKNotifications] = []
-        guard let url = self.nkCommonInstance.createStandardUrl(serverUrl: urlBase, endpoint: endpoint) else {
+        guard let nkSession = nkCommonInstance.getSession(account: account),
+              let url = nkCommonInstance.createStandardUrl(serverUrl: nkSession.urlBase, endpoint: endpoint, options: options),
+              let headers = nkCommonInstance.getStandardHeaders(account: account, options: options) else {
             return options.queue.async { completion(account, nil, nil, .urlError) }
         }
-        let headers = self.nkCommonInstance.getStandardHeaders(options: options)
 
-        sessionManager.request(url, method: .get, parameters: nil, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
+        nkSession.sessionData.request(url, method: .get, parameters: nil, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
             task.taskDescription = options.taskDescription
             taskHandler(task)
         }.responseData(queue: self.nkCommonInstance.backgroundQueue) { response in
@@ -834,6 +777,7 @@ public extension NextcloudKit {
                 let json = JSON(jsonData)
                 if json["ocs"]["meta"]["statuscode"].int == 200 {
                     let ocsdata = json["ocs"]["data"]
+                    var notifications: [NKNotifications] = []
                     for (_, subJson): (String, JSON) in ocsdata {
                         let notification = NKNotifications()
 
@@ -885,11 +829,14 @@ public extension NextcloudKit {
                          options: NKRequestOptions = NKRequestOptions(),
                          taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
                          completion: @escaping (_ account: String, _ error: NKError) -> Void) {
-        let urlBase = self.nkCommonInstance.urlBase
+        guard let nkSession = nkCommonInstance.getSession(account: account),
+              let headers = nkCommonInstance.getStandardHeaders(account: account, options: options) else {
+            return options.queue.async { completion(account, .urlError) }
+        }
         var url: URLConvertible?
         if serverUrl == nil {
             let endpoint = "ocs/v2.php/apps/notifications/api/v2/notifications/\(idNotification)"
-            url = self.nkCommonInstance.createStandardUrl(serverUrl: urlBase, endpoint: endpoint)
+            url = self.nkCommonInstance.createStandardUrl(serverUrl: nkSession.urlBase, endpoint: endpoint, options: options)
         } else {
             url = serverUrl?.asUrl
         }
@@ -897,9 +844,8 @@ public extension NextcloudKit {
             return options.queue.async { completion(account, .urlError) }
         }
         let method = HTTPMethod(rawValue: method)
-        let headers = self.nkCommonInstance.getStandardHeaders(options: options)
 
-        sessionManager.request(urlRequest, method: method, parameters: nil, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
+        nkSession.sessionData.request(urlRequest, method: method, parameters: nil, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
             task.taskDescription = options.taskDescription
             taskHandler(task)
         }.response(queue: self.nkCommonInstance.backgroundQueue) { response in
@@ -923,18 +869,18 @@ public extension NextcloudKit {
                            options: NKRequestOptions = NKRequestOptions(),
                            taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
                            completion: @escaping (_ account: String, _ url: String?, _ data: Data?, _ error: NKError) -> Void) {
-        let urlBase = self.nkCommonInstance.urlBase
         let endpoint = "ocs/v2.php/apps/dav/api/v1/direct"
         let parameters: [String: Any] = [
             "fileId": fileId,
             "format": "json"
         ]
-        guard let url = self.nkCommonInstance.createStandardUrl(serverUrl: urlBase, endpoint: endpoint) else {
+        guard let nkSession = nkCommonInstance.getSession(account: account),
+              let url = nkCommonInstance.createStandardUrl(serverUrl: nkSession.urlBase, endpoint: endpoint, options: options),
+              let headers = nkCommonInstance.getStandardHeaders(account: account, options: options) else {
             return options.queue.async { completion(account, nil, nil, .urlError) }
         }
-        let headers = self.nkCommonInstance.getStandardHeaders(options: options)
 
-        sessionManager.request(url, method: .post, parameters: parameters, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
+        nkSession.sessionData.request(url, method: .post, parameters: parameters, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
             task.taskDescription = options.taskDescription
             taskHandler(task)
         }.responseData(queue: self.nkCommonInstance.backgroundQueue) { response in
@@ -961,12 +907,15 @@ public extension NextcloudKit {
                                               options: NKRequestOptions = NKRequestOptions(),
                                               taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
                                               completion: @escaping (_ account: String, _ error: NKError) -> Void) {
-        let urlBase = self.nkCommonInstance.urlBase
         let endpoint = "ocs/v2.php/apps/security_guard/diagnostics"
-        guard let url = self.nkCommonInstance.createStandardUrl(serverUrl: urlBase, endpoint: endpoint) else {
+        ///
+        options.contentType = "application/json"
+        ///
+        guard let nkSession = nkCommonInstance.getSession(account: account),
+              let url = nkCommonInstance.createStandardUrl(serverUrl: nkSession.urlBase, endpoint: endpoint, options: options),
+              let headers = nkCommonInstance.getStandardHeaders(account: account, options: options) else {
             return options.queue.async { completion(account, .urlError) }
         }
-        let headers = self.nkCommonInstance.getStandardHeaders(options.customHeader, customUserAgent: options.customUserAgent, contentType: "application/json")
         var urlRequest: URLRequest
         do {
             try urlRequest = URLRequest(url: url, method: .put, headers: headers)
@@ -975,7 +924,7 @@ public extension NextcloudKit {
             return options.queue.async { completion(account, NKError(error: error)) }
         }
 
-        sessionManager.request(urlRequest).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
+        nkSession.sessionData.request(urlRequest).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
             task.taskDescription = options.taskDescription
             taskHandler(task)
         }.response(queue: self.nkCommonInstance.backgroundQueue) { response in
