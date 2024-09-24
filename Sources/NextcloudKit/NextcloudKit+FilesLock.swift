@@ -38,13 +38,10 @@ public extension NextcloudKit {
             return options.queue.async { completion(account, .urlError) }
         }
         let method = HTTPMethod(rawValue: shouldLock ? "LOCK" : "UNLOCK")
-        guard let nkSession = nkCommonInstance.getSession(account: account),
-              var headers = nkCommonInstance.getStandardHeaders(account: account, options: options) else {
-            return options.queue.async { completion(account, .urlError) }
-        }
+        var headers = self.nkCommonInstance.getStandardHeaders(options: options)
         headers.update(name: "X-User-Lock", value: "1")
 
-        nkSession.sessionData.request(url, method: method, parameters: nil, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
+        sessionManager.request(url, method: method, parameters: nil, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
             task.taskDescription = options.taskDescription
             taskHandler(task)
         }.response(queue: self.nkCommonInstance.backgroundQueue) { response in

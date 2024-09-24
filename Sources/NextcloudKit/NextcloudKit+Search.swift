@@ -52,14 +52,14 @@ public extension NextcloudKit {
                        providers: @escaping (_ account: String, _ searchProviders: [NKSearchProvider]?) -> Void,
                        update: @escaping (_ account: String, _ searchResult: NKSearchResult?, _ provider: NKSearchProvider, _ error: NKError) -> Void,
                        completion: @escaping (_ account: String, _ data: Data?, _ error: NKError) -> Void) {
+        let urlBase = self.nkCommonInstance.urlBase
         let endpoint = "ocs/v2.php/search/providers"
-        guard let nkSession = nkCommonInstance.getSession(account: account),
-              let url = nkCommonInstance.createStandardUrl(serverUrl: nkSession.urlBase, endpoint: endpoint, options: options),
-              let headers = nkCommonInstance.getStandardHeaders(account: account, options: options) else {
-            return options.queue.async { completion(account, nil, .urlError) }
+        guard let url = self.nkCommonInstance.createStandardUrl(serverUrl: urlBase, endpoint: endpoint) else {
+            return completion(account, nil, .urlError)
         }
+        let headers = self.nkCommonInstance.getStandardHeaders(options: options)
 
-        let requestUnifiedSearch = nkSession.sessionData.request(url, method: .get, parameters: nil, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
+        let requestUnifiedSearch = sessionManager.request(url, method: .get, parameters: nil, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
             task.taskDescription = options.taskDescription
             taskHandler(task)
         }.responseData(queue: self.nkCommonInstance.backgroundQueue) { response in
@@ -122,9 +122,8 @@ public extension NextcloudKit {
                         options: NKRequestOptions = NKRequestOptions(),
                         taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
                         completion: @escaping (_ account: String, NKSearchResult?, _ data: Data?, _ error: NKError) -> Void) -> DataRequest? {
-        guard let term = term.urlEncoded,
-              let nkSession = nkCommonInstance.getSession(account: account),
-              let headers = nkCommonInstance.getStandardHeaders(account: account, options: options) else {
+        let urlBase = self.nkCommonInstance.urlBase
+        guard let term = term.urlEncoded else {
             completion(account, nil, nil, .urlError)
             return nil
         }
@@ -135,11 +134,14 @@ public extension NextcloudKit {
         if let cursor = cursor {
             endpoint += "&cursor=\(cursor)"
         }
-        guard let url = self.nkCommonInstance.createStandardUrl(serverUrl: nkSession.urlBase, endpoint: endpoint, options: options)
+        guard let url = self.nkCommonInstance.createStandardUrl(
+            serverUrl: urlBase,
+            endpoint: endpoint)
         else {
             completion(account, nil, nil, .urlError)
             return nil
         }
+        let headers = self.nkCommonInstance.getStandardHeaders(options: options)
         var urlRequest: URLRequest
 
         do {
@@ -150,7 +152,7 @@ public extension NextcloudKit {
             return nil
         }
 
-        let requestSearchProvider = nkSession.sessionData.request(urlRequest).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
+        let requestSearchProvider = sessionManager.request(urlRequest).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
             task.taskDescription = options.taskDescription
             taskHandler(task)
         }.responseData(queue: self.nkCommonInstance.backgroundQueue) { response in

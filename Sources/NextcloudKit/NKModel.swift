@@ -619,10 +619,10 @@ class NKDataFileXML: NSObject {
         return xml["ocs", "data", "apppassword"].text
     }
 
-    func convertDataFile(xmlData: Data, nkSession: NKSession, showHiddenFiles: Bool, includeHiddenFiles: [String]) -> [NKFile] {
+    func convertDataFile(xmlData: Data, dav: String, urlBase: String, user: String, userId: String, account: String, showHiddenFiles: Bool, includeHiddenFiles: [String]) -> [NKFile] {
         var files: [NKFile] = []
-        let rootFiles = "/" + nkSession.dav + "/files/"
-        guard let baseUrl = self.nkCommonInstance.getHostName(urlString: nkSession.urlBase) else {
+        let rootFiles = "/" + dav + "/files/"
+        guard let baseUrl = self.nkCommonInstance.getHostName(urlString: urlBase) else {
             return files
         }
         let xml = XML.parse(xmlData)
@@ -653,7 +653,7 @@ class NKDataFileXML: NSObject {
                 }
 
                 // account
-                file.account = nkSession.account
+                file.account = account
 
                 // path
                 file.path = (fileNamePath as NSString).deletingLastPathComponent + "/"
@@ -664,7 +664,7 @@ class NKDataFileXML: NSObject {
                 file.fileName = file.fileName.removingPercentEncoding ?? ""
 
                 // ServerUrl
-                if href == rootFiles + nkSession.user + "/" {
+                if href == rootFiles + user + "/" {
                     file.fileName = "."
                     file.serverUrl = ".."
                 } else {
@@ -889,23 +889,23 @@ class NKDataFileXML: NSObject {
             file.iconName = results.iconName
             file.name = "files"
             file.classFile = results.classFile
-            file.urlBase = nkSession.urlBase
-            file.user = nkSession.user
-            file.userId = nkSession.userId
+            file.urlBase = urlBase
+            file.user = user
+            file.userId = userId
 
             files.append(file)
         }
 
         // Live photo detect
         files = files.sorted {
-            return ($0.serverUrl, ($0.fileName as NSString).deletingPathExtension, $0.classFile) < ($1.serverUrl, ($1.fileName as NSString).deletingPathExtension, $1.classFile)
+            return ($0.serverUrl, $0.fileName.withRemovedFileExtension, $0.classFile) < ($1.serverUrl, $1.fileName.withRemovedFileExtension, $1.classFile)
         }
         for index in files.indices {
             if !files[index].livePhotoFile.isEmpty || files[index].directory {
                 continue
             }
             if index < files.count - 1,
-               (files[index].fileName as NSString).deletingPathExtension == (files[index + 1].fileName as NSString) .deletingPathExtension,
+               files[index].fileName.withRemovedFileExtension == files[index + 1].fileName.withRemovedFileExtension,
                files[index].classFile == NKCommon.TypeClassFile.image.rawValue,
                files[index + 1].classFile == NKCommon.TypeClassFile.video.rawValue {
                 files[index].livePhotoFile = files[index + 1].fileId
@@ -916,10 +916,10 @@ class NKDataFileXML: NSObject {
         return files
     }
 
-    func convertDataTrash(xmlData: Data, nkSession: NKSession, showHiddenFiles: Bool) -> [NKTrash] {
+    func convertDataTrash(xmlData: Data, urlBase: String, showHiddenFiles: Bool) -> [NKTrash] {
         var files: [NKTrash] = []
         var first: Bool = true
-        guard let baseUrl = self.nkCommonInstance.getHostName(urlString: nkSession.urlBase) else {
+        guard let baseUrl = self.nkCommonInstance.getHostName(urlString: urlBase) else {
             return files
         }
         let xml = XML.parse(xmlData)

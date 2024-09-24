@@ -32,19 +32,19 @@ public extension NextcloudKit {
                         options: NKRequestOptions = NKRequestOptions(),
                         taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
                         completion: @escaping (_ account: String, _ error: NKError) -> Void) {
+        let urlBase = self.nkCommonInstance.urlBase
         var version = "v1"
         if let optionsVesion = options.version {
             version = optionsVesion
         }
         let endpoint = "ocs/v2.php/apps/end_to_end_encryption/api/\(version)/encrypted/\(fileId)"
-        guard let nkSession = nkCommonInstance.getSession(account: account),
-              let url = nkCommonInstance.createStandardUrl(serverUrl: nkSession.urlBase, endpoint: endpoint, options: options),
-              let headers = nkCommonInstance.getStandardHeaders(account: account, options: options) else {
+        guard let url = self.nkCommonInstance.createStandardUrl(serverUrl: urlBase, endpoint: endpoint) else {
             return options.queue.async { completion(account, .urlError) }
         }
         let method: HTTPMethod = delete ? .delete : .put
+        let headers = self.nkCommonInstance.getStandardHeaders(options: options)
 
-        nkSession.sessionData.request(url, method: method, parameters: nil, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
+        sessionManager.request(url, method: method, parameters: nil, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
             task.taskDescription = options.taskDescription
             taskHandler(task)
         }.responseData(queue: self.nkCommonInstance.backgroundQueue) { response in
@@ -75,17 +75,17 @@ public extension NextcloudKit {
                         options: NKRequestOptions = NKRequestOptions(),
                         taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
                         completion: @escaping (_ account: String, _ e2eToken: String?, _ data: Data?, _ error: NKError) -> Void) {
+        let urlBase = self.nkCommonInstance.urlBase
         var version = "v1"
         if let optionsVesion = options.version {
             version = optionsVesion
         }
         let endpoint = "ocs/v2.php/apps/end_to_end_encryption/api/\(version)/lock/\(fileId)"
-        guard let nkSession = nkCommonInstance.getSession(account: account),
-              let url = nkCommonInstance.createStandardUrl(serverUrl: nkSession.urlBase, endpoint: endpoint, options: options),
-              var headers = nkCommonInstance.getStandardHeaders(account: account, options: options) else {
+        guard let url = self.nkCommonInstance.createStandardUrl(serverUrl: urlBase, endpoint: endpoint) else {
             return options.queue.async { completion(account, nil, nil, .urlError) }
         }
         let method = HTTPMethod(rawValue: method)
+        var headers = self.nkCommonInstance.getStandardHeaders(options: options)
         var parameters: [String: Any] = [:]
 
         if let e2eToken {
@@ -96,7 +96,7 @@ public extension NextcloudKit {
             headers.update(name: "X-NC-E2EE-COUNTER", value: e2eCounter)
         }
 
-        nkSession.sessionData.request(url, method: method, parameters: parameters, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
+        sessionManager.request(url, method: method, parameters: parameters, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
             task.taskDescription = options.taskDescription
             taskHandler(task)
         }.responseData(queue: self.nkCommonInstance.backgroundQueue) { response in
@@ -126,22 +126,23 @@ public extension NextcloudKit {
                          options: NKRequestOptions = NKRequestOptions(),
                          taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
                          completion: @escaping (_ account: String, _ e2eMetadata: String?, _ signature: String?, _ data: Data?, _ error: NKError) -> Void) {
+        let urlBase = self.nkCommonInstance.urlBase
         var version = "v1"
         if let optionsVesion = options.version {
             version = optionsVesion
         }
         let endpoint = "ocs/v2.php/apps/end_to_end_encryption/api/\(version)/meta-data/\(fileId)"
-        guard let nkSession = nkCommonInstance.getSession(account: account),
-              let url = nkCommonInstance.createStandardUrl(serverUrl: nkSession.urlBase, endpoint: endpoint, options: options),
-              let headers = nkCommonInstance.getStandardHeaders(account: account, options: options) else {
+        guard let url = self.nkCommonInstance.createStandardUrl(serverUrl: urlBase, endpoint: endpoint) else {
             return options.queue.async { completion(account, nil, nil, nil, .urlError) }
         }
+        let headers = self.nkCommonInstance.getStandardHeaders(options: options)
         var parameters: [String: Any] = [:]
+
         if let e2eToken {
             parameters["e2e-token"] = e2eToken
         }
 
-        nkSession.sessionData.request(url, method: .get, parameters: parameters, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
+        sessionManager.request(url, method: .get, parameters: parameters, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
             task.taskDescription = options.taskDescription
             taskHandler(task)
         }.responseData(queue: self.nkCommonInstance.backgroundQueue) { response in
@@ -175,20 +176,22 @@ public extension NextcloudKit {
                          options: NKRequestOptions = NKRequestOptions(),
                          taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
                          completion: @escaping (_ account: String, _ metadata: String?, _ data: Data?, _ error: NKError) -> Void) {
+        let urlBase = self.nkCommonInstance.urlBase
         var version = "v1"
         if let optionsVesion = options.version {
             version = optionsVesion
         }
         let endpoint = "ocs/v2.php/apps/end_to_end_encryption/api/\(version)/meta-data/\(fileId)"
-        guard let nkSession = nkCommonInstance.getSession(account: account),
-              let url = nkCommonInstance.createStandardUrl(serverUrl: nkSession.urlBase, endpoint: endpoint, options: options),
-              var headers = nkCommonInstance.getStandardHeaders(account: account, options: options) else {
+        guard let url = self.nkCommonInstance.createStandardUrl(serverUrl: urlBase, endpoint: endpoint) else {
             return options.queue.async { completion(account, nil, nil, .urlError) }
         }
         let method = HTTPMethod(rawValue: method)
+        var headers = self.nkCommonInstance.getStandardHeaders(options: options)
         var parameters: [String: Any] = [:]
+
         parameters["e2e-token"] = e2eToken
         headers.update(name: "e2e-token", value: e2eToken)
+
         if let e2eMetadata {
             parameters["metaData"] = e2eMetadata
         }
@@ -196,7 +199,7 @@ public extension NextcloudKit {
             headers.update(name: "X-NC-E2EE-SIGNATURE", value: signature)
         }
 
-        nkSession.sessionData.request(url, method: method, parameters: parameters, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
+        sessionManager.request(url, method: method, parameters: parameters, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
             task.taskDescription = options.taskDescription
             taskHandler(task)
         }.responseData(queue: self.nkCommonInstance.backgroundQueue) { response in
@@ -227,7 +230,8 @@ public extension NextcloudKit {
                             options: NKRequestOptions = NKRequestOptions(),
                             taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
                             completion: @escaping (_ account: String, _ certificate: String?, _ certificateUser: String?, _ data: Data?, _ error: NKError) -> Void) {
-
+        let urlBase = self.nkCommonInstance.urlBase
+        let userId = self.nkCommonInstance.userId
         var version = "v1"
         if let optionsVesion = options.version {
             version = optionsVesion
@@ -241,13 +245,12 @@ public extension NextcloudKit {
         } else {
             endpoint = "ocs/v2.php/apps/end_to_end_encryption/api/\(version)/public-key"
         }
-        guard let nkSession = nkCommonInstance.getSession(account: account),
-              let url = nkCommonInstance.createStandardUrl(serverUrl: nkSession.urlBase, endpoint: endpoint, options: options),
-              let headers = nkCommonInstance.getStandardHeaders(account: account, options: options) else {
+        guard let url = self.nkCommonInstance.createStandardUrl(serverUrl: urlBase, endpoint: endpoint) else {
             return options.queue.async { completion(account, nil, nil, nil, .urlError) }
         }
+        let headers = self.nkCommonInstance.getStandardHeaders(options: options)
 
-        nkSession.sessionData.request(url, method: .get, parameters: nil, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
+        sessionManager.request(url, method: .get, parameters: nil, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
             task.taskDescription = options.taskDescription
             taskHandler(task)
         }.responseData(queue: self.nkCommonInstance.backgroundQueue) { response in
@@ -262,7 +265,7 @@ public extension NextcloudKit {
                 let json = JSON(jsonData)
                 let statusCode = json["ocs"]["meta"]["statuscode"].int ?? NKError.internalError
                 if 200..<300 ~= statusCode {
-                    let key = json["ocs"]["data"]["public-keys"][nkSession.userId].stringValue
+                    let key = json["ocs"]["data"]["public-keys"][userId].stringValue
                     if let user = user {
                         let keyUser = json["ocs"]["data"]["public-keys"][user].string
                         options.queue.async { completion(account, key, keyUser, jsonData, .success) }
@@ -280,18 +283,18 @@ public extension NextcloudKit {
                            options: NKRequestOptions = NKRequestOptions(),
                            taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
                            completion: @escaping (_ account: String, _ privateKey: String?, _ data: Data?, _ error: NKError) -> Void) {
+        let urlBase = self.nkCommonInstance.urlBase
         var version = "v1"
         if let optionsVesion = options.version {
             version = optionsVesion
         }
         let endpoint = "ocs/v2.php/apps/end_to_end_encryption/api/\(version)/private-key"
-        guard let nkSession = nkCommonInstance.getSession(account: account),
-              let url = nkCommonInstance.createStandardUrl(serverUrl: nkSession.urlBase, endpoint: endpoint, options: options),
-              let headers = nkCommonInstance.getStandardHeaders(account: account, options: options) else {
+        guard let url = self.nkCommonInstance.createStandardUrl(serverUrl: urlBase, endpoint: endpoint) else {
             return options.queue.async { completion(account, nil, nil, .urlError) }
         }
+        let headers = self.nkCommonInstance.getStandardHeaders(options: options)
 
-        nkSession.sessionData.request(url, method: .get, parameters: nil, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
+        sessionManager.request(url, method: .get, parameters: nil, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
             task.taskDescription = options.taskDescription
             taskHandler(task)
         }.responseData(queue: self.nkCommonInstance.backgroundQueue) { response in
@@ -319,18 +322,18 @@ public extension NextcloudKit {
                           options: NKRequestOptions = NKRequestOptions(),
                           taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
                           completion: @escaping (_ account: String, _ publicKey: String?, _ data: Data?, _ error: NKError) -> Void) {
+        let urlBase = self.nkCommonInstance.urlBase
         var version = "v1"
         if let optionsVesion = options.version {
             version = optionsVesion
         }
         let endpoint = "ocs/v2.php/apps/end_to_end_encryption/api/\(version)/server-key"
-        guard let nkSession = nkCommonInstance.getSession(account: account),
-              let url = nkCommonInstance.createStandardUrl(serverUrl: nkSession.urlBase, endpoint: endpoint, options: options),
-              let headers = nkCommonInstance.getStandardHeaders(account: account, options: options) else {
+        guard let url = self.nkCommonInstance.createStandardUrl(serverUrl: urlBase, endpoint: endpoint) else {
             return options.queue.async { completion(account, nil, nil, .urlError) }
         }
+        let headers = self.nkCommonInstance.getStandardHeaders(options: options)
 
-        nkSession.sessionData.request(url, method: .get, parameters: nil, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
+        sessionManager.request(url, method: .get, parameters: nil, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
             task.taskDescription = options.taskDescription
             taskHandler(task)
         }.responseData(queue: self.nkCommonInstance.backgroundQueue) { response in
@@ -359,19 +362,19 @@ public extension NextcloudKit {
                              options: NKRequestOptions = NKRequestOptions(),
                              taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
                              completion: @escaping (_ account: String, _ certificate: String?, _ data: Data?, _ error: NKError) -> Void) {
+        let urlBase = self.nkCommonInstance.urlBase
         var version = "v1"
         if let optionsVesion = options.version {
             version = optionsVesion
         }
         let endpoint = "ocs/v2.php/apps/end_to_end_encryption/api/\(version)/public-key"
-        guard let nkSession = nkCommonInstance.getSession(account: account),
-              let url = nkCommonInstance.createStandardUrl(serverUrl: nkSession.urlBase, endpoint: endpoint, options: options),
-              let headers = nkCommonInstance.getStandardHeaders(account: account, options: options) else {
+        guard let url = self.nkCommonInstance.createStandardUrl(serverUrl: urlBase, endpoint: endpoint) else {
             return options.queue.async { completion(account, nil, nil, .urlError) }
         }
+        let headers = self.nkCommonInstance.getStandardHeaders(options: options)
         let parameters = ["csr": certificate]
 
-        nkSession.sessionData.request(url, method: .post, parameters: parameters, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
+        sessionManager.request(url, method: .post, parameters: parameters, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
             task.taskDescription = options.taskDescription
             taskHandler(task)
         }.responseData(queue: self.nkCommonInstance.backgroundQueue) { response in
@@ -401,19 +404,19 @@ public extension NextcloudKit {
                              options: NKRequestOptions = NKRequestOptions(),
                              taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
                              completion: @escaping (_ account: String, _ privateKey: String?, _ data: Data?, _ error: NKError) -> Void) {
+        let urlBase = self.nkCommonInstance.urlBase
         var version = "v1"
         if let optionsVesion = options.version {
             version = optionsVesion
         }
         let endpoint = "ocs/v2.php/apps/end_to_end_encryption/api/\(version)/private-key"
-        guard let nkSession = nkCommonInstance.getSession(account: account),
-              let url = nkCommonInstance.createStandardUrl(serverUrl: nkSession.urlBase, endpoint: endpoint, options: options),
-              let headers = nkCommonInstance.getStandardHeaders(account: account, options: options) else {
+        guard let url = self.nkCommonInstance.createStandardUrl(serverUrl: urlBase, endpoint: endpoint) else {
             return options.queue.async { completion(account, nil, nil, .urlError) }
         }
+        let headers = self.nkCommonInstance.getStandardHeaders(options: options)
         let parameters = ["privateKey": privateKey]
 
-        nkSession.sessionData.request(url, method: .post, parameters: parameters, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
+        sessionManager.request(url, method: .post, parameters: parameters, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
             task.taskDescription = options.taskDescription
             taskHandler(task)
         }.responseData(queue: self.nkCommonInstance.backgroundQueue) { response in
@@ -441,17 +444,18 @@ public extension NextcloudKit {
                                options: NKRequestOptions = NKRequestOptions(),
                                taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
                                completion: @escaping (_ account: String, _ error: NKError) -> Void) {
+        let urlBase = self.nkCommonInstance.urlBase
         var version = "v1"
         if let optionsVesion = options.version {
             version = optionsVesion
         }
         let endpoint = "ocs/v2.php/apps/end_to_end_encryption/api/\(version)/public-key"
-        guard let nkSession = nkCommonInstance.getSession(account: account),
-              let url = nkCommonInstance.createStandardUrl(serverUrl: nkSession.urlBase, endpoint: endpoint, options: options),
-              let headers = nkCommonInstance.getStandardHeaders(account: account, options: options) else {
+        guard let url = self.nkCommonInstance.createStandardUrl(serverUrl: urlBase, endpoint: endpoint) else {
             return options.queue.async { completion(account, .urlError) }
         }
-        nkSession.sessionData.request(url, method: .delete, parameters: nil, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
+        let headers = self.nkCommonInstance.getStandardHeaders(options: options)
+
+        sessionManager.request(url, method: .delete, parameters: nil, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
             task.taskDescription = options.taskDescription
             taskHandler(task)
         }.response(queue: self.nkCommonInstance.backgroundQueue) { response in
@@ -472,18 +476,18 @@ public extension NextcloudKit {
                               options: NKRequestOptions = NKRequestOptions(),
                               taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
                               completion: @escaping (_ account: String, _ error: NKError) -> Void) {
+        let urlBase = self.nkCommonInstance.urlBase
         var version = "v1"
         if let optionsVesion = options.version {
             version = optionsVesion
         }
         let endpoint = "ocs/v2.php/apps/end_to_end_encryption/api/\(version)/private-key"
-        guard let nkSession = nkCommonInstance.getSession(account: account),
-              let url = nkCommonInstance.createStandardUrl(serverUrl: nkSession.urlBase, endpoint: endpoint, options: options),
-              let headers = nkCommonInstance.getStandardHeaders(account: account, options: options) else {
+        guard let url = self.nkCommonInstance.createStandardUrl(serverUrl: urlBase, endpoint: endpoint) else {
             return options.queue.async { completion(account, .urlError) }
         }
+        let headers = self.nkCommonInstance.getStandardHeaders(options: options)
 
-        nkSession.sessionData.request(url, method: .delete, parameters: nil, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
+        sessionManager.request(url, method: .delete, parameters: nil, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
             task.taskDescription = options.taskDescription
             taskHandler(task)
         }.response(queue: self.nkCommonInstance.backgroundQueue) { response in
