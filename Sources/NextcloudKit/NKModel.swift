@@ -74,8 +74,11 @@ public enum NKProperties: String, CaseIterable {
     case systemtags = "<system-tags xmlns=\"http://nextcloud.org/ns\"/>"
     case filemetadatasize = "<file-metadata-size xmlns=\"http://nextcloud.org/ns\"/>"
     case filemetadatagps = "<file-metadata-gps xmlns=\"http://nextcloud.org/ns\"/>"
-    case metadataphotossize = "<metadata-photos-size xmlns=\"http://nextcloud.org/ns\"/>"
+    case metadataphotosexif = "<metadata-photos-exif xmlns=\"http://nextcloud.org/ns\"/>"
     case metadataphotosgps = "<metadata-photos-gps xmlns=\"http://nextcloud.org/ns\"/>"
+    case metadataphotosoriginaldatetime = "<metadata-photos-original_date_time xmlns=\"http://nextcloud.org/ns\"/>"
+    case metadataphotoplace = "<metadata-photos-place xmlns=\"http://nextcloud.org/ns\"/>"
+    case metadataphotossize = "<metadata-photos-size xmlns=\"http://nextcloud.org/ns\"/>"
     case metadatafileslivephoto = "<metadata-files-live-photo xmlns=\"http://nextcloud.org/ns\"/>"
     case hidden = "<hidden xmlns=\"http://nextcloud.org/ns\"/>"
     /// open-collaboration-services.org
@@ -228,6 +231,15 @@ public class NKFile: NSObject {
     public var livePhotoFile = ""
     /// Indicating if the file is sent as a live photo from the server, or if we should detect it as such and convert it client-side
     public var isFlaggedAsLivePhotoByServer = false
+    ///
+    public var datePhotosOriginal: Date?
+    ///
+    public struct ChildElement {
+        let name: String
+        let text: String?
+    }
+    public var exifPhotos = [[String: String?]]()
+    public var placePhotos: String?
 }
 
 public class NKFileProperty: NSObject {
@@ -857,6 +869,19 @@ class NKDataFileXML: NSObject {
             if let hidden = propstat["d:prop", "nc:hidden"].text {
                 file.hidden = (hidden as NSString).boolValue
             }
+
+            if let datePhotosOriginal = propstat["d:prop", "nc:metadata-photos-original_date_time"].double, datePhotosOriginal > 0 {
+                file.datePhotosOriginal = Date(timeIntervalSince1970: datePhotosOriginal)
+            }
+
+            let exifPhotosElements = propstat["d:prop", "nc:metadata-photos-exif"]
+            if let element = exifPhotosElements.element {
+                for child in element.childElements {
+                    file.exifPhotos.append([child.name: child.text])
+                }
+            }
+
+            file.placePhotos = propstat["d:prop", "nc:metadata-photos-place"].text
 
             let results = self.nkCommonInstance.getInternalType(fileName: file.fileName, mimeType: file.contentType, directory: file.directory, account: nkSession.account)
 

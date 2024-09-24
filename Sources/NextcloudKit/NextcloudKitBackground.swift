@@ -72,6 +72,7 @@ public class NKBackground: NSObject, URLSessionTaskDelegate, URLSessionDelegate,
                        dateCreationFile: Date?,
                        dateModificationFile: Date?,
                        taskDescription: String? = nil,
+                       overwrite: Bool = false,
                        account: String,
                        sessionIdentifier: String) -> URLSessionUploadTask? {
         var url: URL?
@@ -95,6 +96,9 @@ public class NKBackground: NSObject, URLSessionTaskDelegate, URLSessionDelegate,
         request.httpMethod = "PUT"
         request.setValue(nkSession.userAgent, forHTTPHeaderField: "User-Agent")
         request.setValue("Basic \(base64LoginString)", forHTTPHeaderField: "Authorization")
+        if overwrite {
+            request.setValue("true", forHTTPHeaderField: "Overwrite")
+        }
         // Epoch of linux do not permitted negativ value
         if let dateCreationFile, dateCreationFile.timeIntervalSince1970 > 0 {
             request.setValue("\(dateCreationFile.timeIntervalSince1970)", forHTTPHeaderField: "X-OC-CTime")
