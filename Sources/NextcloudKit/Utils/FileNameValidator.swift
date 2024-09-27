@@ -48,7 +48,7 @@ public class FileNameValidator {
         }
     }
 
-    public let fileEndsWithSpacePeriodError = NKError(errorCode: NSURLErrorCannotCreateFile, errorDescription: NSLocalizedString("_file_name_validator_error_ends_with_space_period_", value: "File name ends with a space or a period.", comment: ""))
+    public let fileWithSpaceError = NKError(errorCode: NSURLErrorCannotCreateFile, errorDescription: NSLocalizedString("_file_name_validator_error_space_", value: "Name must not contain spaces at the beginning or end.", comment: ""))
 
     public var fileReservedNameError: NKError {
         let errorMessageTemplate = NSLocalizedString("_file_name_validator_error_reserved_name_", value: "\"%@\" is a forbidden name.", comment: "")
@@ -80,10 +80,6 @@ public class FileNameValidator {
     }
 
     public func checkFileName(_ filename: String) -> NKError? {
-        if filename.hasSuffix(" ") || filename.hasSuffix(".") {
-            return fileEndsWithSpacePeriodError
-        }
-
         if let regex = try? NSRegularExpression(pattern: "[\(forbiddenFileNameCharacters.joined())]"), let invalidCharacterError = checkInvalidCharacters(string: filename, regex: regex) {
             return invalidCharacterError
         }
@@ -94,9 +90,20 @@ public class FileNameValidator {
             return fileReservedNameError
         }
 
-        if forbiddenFileNameExtensions.contains(where: { filename.uppercased().hasSuffix($0.uppercased()) }) {
-            templateString = filename.fileExtension
-            return fileForbiddenFileExtensionError
+        for fileNameExtension in forbiddenFileNameExtensions {
+            if fileNameExtension == " " {
+                if filename.uppercased().hasSuffix(fileNameExtension) || filename.uppercased().hasPrefix(fileNameExtension) {
+                    return fileWithSpaceError
+                }
+            } else if filename.uppercased().hasSuffix(fileNameExtension.uppercased()) {
+                if fileNameExtension == " " {
+                    return fileWithSpaceError
+                }
+
+                templateString = filename.fileExtension
+
+                return fileForbiddenFileExtensionError
+            }
         }
 
         return nil
