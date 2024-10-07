@@ -1,3 +1,7 @@
+<!--
+  - SPDX-FileCopyrightText: 2022 Nextcloud GmbH and Nextcloud contributors
+  - SPDX-License-Identifier: GPL-3.0-or-later
+-->
 # NextcloudKit V 2
 <img src="image.png" alt="Demo of the Nextcloud iOS files app" width="200" height="200">
 
