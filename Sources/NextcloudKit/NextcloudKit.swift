@@ -58,7 +58,7 @@ open class NextcloudKit {
 
     // MARK: - Session setup
 
-    public func setup(delegate: NextcloudKitDelegate?, memoryCapacity:Int = 50, diskCapacity:Int = 200) {
+    public func setup(delegate: NextcloudKitDelegate?, memoryCapacity:Int = 50, diskCapacity:Int = 200, removeAllCachedResponses: Bool = true) {
         self.nkCommonInstance.delegate = delegate
 
         /// Cache URLSession
@@ -67,6 +67,10 @@ open class NextcloudKit {
         let diskCapacity = diskCapacity * 1024 * 1024       // default 200 MB on Disk
         let urlCache = URLCache(memoryCapacity: memoryCapacity, diskCapacity: diskCapacity, diskPath: nil)
         URLCache.shared = urlCache
+
+        if removeAllCachedResponses {
+            URLCache.shared.removeAllCachedResponses()
+        }
     }
 
     public func appendSession(account: String,
