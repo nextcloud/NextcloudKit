@@ -33,6 +33,7 @@ public class NKSession {
     public var userAgent: String
     public var nextcloudVersion: Int
     public let groupIdentifier: String
+    public let requestCachePolicy: URLRequest.CachePolicy
     public let dav: String = "remote.php/dav"
     public var internalTypeIdentifiers: [NKCommon.UTTypeConformsToServer] = []
     public let sessionData: Alamofire.Session
@@ -48,7 +49,8 @@ public class NKSession {
          account: String,
          userAgent: String,
          nextcloudVersion: Int,
-         groupIdentifier: String) {
+         groupIdentifier: String,
+         requestCachePolicy: URLRequest.CachePolicy = .useProtocolCachePolicy) {
         self.urlBase = urlBase
         self.user = user
         self.userId = userId
@@ -57,6 +59,7 @@ public class NKSession {
         self.userAgent = userAgent
         self.nextcloudVersion = nextcloudVersion
         self.groupIdentifier = groupIdentifier
+        self.requestCachePolicy = requestCachePolicy
 
         let backgroundSessionDelegate = NKBackground(nkCommonInstance: NextcloudKit.shared.nkCommonInstance)
         /// Strange but works ?!?!
@@ -64,7 +67,7 @@ public class NKSession {
 
         /// Session Alamofire
         let configuration = URLSessionConfiguration.af.default
-        configuration.requestCachePolicy = .reloadIgnoringLocalCacheData
+        configuration.requestCachePolicy = requestCachePolicy
         configuration.httpCookieStorage = HTTPCookieStorage.sharedCookieStorage(forGroupContainerIdentifier: sharedCookieStorage)
         sessionData = Alamofire.Session(configuration: configuration,
                                         delegate: NextcloudKitSessionDelegate(nkCommonInstance: NextcloudKit.shared.nkCommonInstance),
@@ -79,7 +82,7 @@ public class NKSession {
         configurationDownloadBackground.sessionSendsLaunchEvents = true
         configurationDownloadBackground.isDiscretionary = false
         configurationDownloadBackground.httpMaximumConnectionsPerHost = 5
-        configurationDownloadBackground.requestCachePolicy = NSURLRequest.CachePolicy.reloadIgnoringLocalCacheData
+        configurationDownloadBackground.requestCachePolicy = requestCachePolicy
         configurationDownloadBackground.httpCookieStorage = HTTPCookieStorage.sharedCookieStorage(forGroupContainerIdentifier: sharedCookieStorage)
         sessionDownloadBackground = URLSession(configuration: configurationDownloadBackground, delegate: backgroundSessionDelegate, delegateQueue: OperationQueue.main)
 
@@ -89,7 +92,7 @@ public class NKSession {
         configurationUploadBackground.sessionSendsLaunchEvents = true
         configurationUploadBackground.isDiscretionary = false
         configurationUploadBackground.httpMaximumConnectionsPerHost = 5
-        configurationUploadBackground.requestCachePolicy = NSURLRequest.CachePolicy.reloadIgnoringLocalCacheData
+        configurationUploadBackground.requestCachePolicy = requestCachePolicy
         configurationUploadBackground.httpCookieStorage = HTTPCookieStorage.sharedCookieStorage(forGroupContainerIdentifier: sharedCookieStorage)
         sessionUploadBackground = URLSession(configuration: configurationUploadBackground, delegate: backgroundSessionDelegate, delegateQueue: OperationQueue.main)
 
@@ -99,7 +102,7 @@ public class NKSession {
         configurationUploadBackgroundWWan.sessionSendsLaunchEvents = true
         configurationUploadBackgroundWWan.isDiscretionary = false
         configurationUploadBackgroundWWan.httpMaximumConnectionsPerHost = 5
-        configurationUploadBackgroundWWan.requestCachePolicy = NSURLRequest.CachePolicy.reloadIgnoringLocalCacheData
+        configurationUploadBackgroundWWan.requestCachePolicy = requestCachePolicy
         configurationUploadBackgroundWWan.httpCookieStorage = HTTPCookieStorage.sharedCookieStorage(forGroupContainerIdentifier: sharedCookieStorage)
         sessionUploadBackgroundWWan = URLSession(configuration: configurationUploadBackgroundWWan, delegate: backgroundSessionDelegate, delegateQueue: OperationQueue.main)
 
@@ -109,7 +112,7 @@ public class NKSession {
         configurationUploadBackgroundExt.sessionSendsLaunchEvents = true
         configurationUploadBackgroundExt.isDiscretionary = false
         configurationUploadBackgroundExt.httpMaximumConnectionsPerHost = 5
-        configurationUploadBackgroundExt.requestCachePolicy = NSURLRequest.CachePolicy.reloadIgnoringLocalCacheData
+        configurationUploadBackgroundExt.requestCachePolicy = requestCachePolicy
         configurationUploadBackgroundExt.sharedContainerIdentifier = groupIdentifier
         configurationUploadBackgroundExt.httpCookieStorage = HTTPCookieStorage.sharedCookieStorage(forGroupContainerIdentifier: sharedCookieStorage)
         sessionUploadBackgroundExt = URLSession(configuration: configurationUploadBackgroundExt, delegate: backgroundSessionDelegate, delegateQueue: OperationQueue.main)

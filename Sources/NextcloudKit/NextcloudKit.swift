@@ -58,8 +58,15 @@ open class NextcloudKit {
 
     // MARK: - Session setup
 
-    public func setup(delegate: NextcloudKitDelegate?) {
+    public func setup(delegate: NextcloudKitDelegate?, memoryCapacity:Int = 50, diskCapacity:Int = 200) {
         self.nkCommonInstance.delegate = delegate
+
+        /// Cache URLSession
+        ///
+        let memoryCapacity = memoryCapacity * 1024 * 1024   // default 50 MB in RAM
+        let diskCapacity = diskCapacity * 1024 * 1024       // default 200 MB on Disk
+        let urlCache = URLCache(memoryCapacity: memoryCapacity, diskCapacity: diskCapacity, diskPath: nil)
+        URLCache.shared = urlCache
     }
 
     public func appendSession(account: String,
