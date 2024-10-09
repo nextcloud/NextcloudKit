@@ -71,17 +71,29 @@ public extension NextcloudKit {
         }
     }
 
-    func deleteFileOrFolder(serverUrlFileName: String,
+    func deleteFileOrFolder(serverUrlFileName: String?,
+                            fileId: String?,
                             account: String,
                             options: NKRequestOptions = NKRequestOptions(),
                             taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
                             completion: @escaping (_ account: String, _ error: NKError) -> Void) {
-        guard let url = serverUrlFileName.encodedToUrl,
-              let nkSession = nkCommonInstance.getSession(account: account),
+        guard let nkSession = nkCommonInstance.getSession(account: account),
               let headers = nkCommonInstance.getStandardHeaders(account: account, options: options) else {
             return options.queue.async { completion(account, .urlError) }
         }
         var urlRequest: URLRequest
+        var url: URLConvertible?
+
+        if let serverUrlFileName {
+            url = serverUrlFileName.encodedToUrl
+        } else if let fileId {
+            url = nkSession.urlBase + "/" + nkSession.dav + "/spaces/" + fileId
+        }
+
+        guard let url else {
+            return options.queue.async { completion(account, .urlError) }
+        }
+
         do {
             try urlRequest = URLRequest(url: url, method: .delete, headers: headers)
             urlRequest.timeoutInterval = options.timeout
