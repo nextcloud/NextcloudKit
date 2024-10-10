@@ -38,22 +38,22 @@ public class FileAutoRenamer {
         return instance
     }()
 
-    public private(set) var forbiddenFileNameCharacters: [String] = []
+    private var forbiddenFileNameCharacters: [String] = []
 
-    public private(set) var forbiddenFileNameExtensions: [String] = [] {
+    private var forbiddenFileNameExtensions: [String] = [] {
         didSet {
             forbiddenFileNameExtensions = forbiddenFileNameExtensions.map({$0.uppercased()})
         }
     }
 
-    private let REPLACEMENT = "_"
+    private let replacement = "_"
 
     public func setup(forbiddenFileNameCharacters: [String], forbiddenFileNameExtensions: [String]) {
         self.forbiddenFileNameCharacters = forbiddenFileNameCharacters
         self.forbiddenFileNameExtensions = forbiddenFileNameExtensions
     }
 
-    func rename(filename: String, isFolderPath: Bool = false) -> String {
+    public func rename(filename: String, isFolderPath: Bool = false) -> String {
         var pathSegments = filename.split(separator: "/", omittingEmptySubsequences: false).map { String($0) }
 
         if isFolderPath {
@@ -64,7 +64,7 @@ public class FileAutoRenamer {
             var modifiedSegment = segment
             forbiddenFileNameCharacters.forEach { forbiddenChar in
                 if modifiedSegment.contains(forbiddenChar) {
-                    modifiedSegment = modifiedSegment.replacingOccurrences(of: forbiddenChar, with: REPLACEMENT)
+                    modifiedSegment = modifiedSegment.replacingOccurrences(of: forbiddenChar, with: replacement)
                 }
             }
 
@@ -74,7 +74,7 @@ public class FileAutoRenamer {
 
             forbiddenFileNameExtensions.forEach { forbiddenExtension in
                 if modifiedSegment.uppercased().hasSuffix(forbiddenExtension) || modifiedSegment.uppercased().hasPrefix(forbiddenExtension) {
-                    modifiedSegment = modifiedSegment.replacingOccurrences(of: forbiddenExtension, with: REPLACEMENT)
+                    modifiedSegment = modifiedSegment.replacingOccurrences(of: forbiddenExtension, with: replacement)
                 }
             }
 
