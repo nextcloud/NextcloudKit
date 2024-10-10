@@ -64,7 +64,7 @@ public class FileAutoRenamer {
             var modifiedSegment = segment
             forbiddenFileNameCharacters.forEach { forbiddenChar in
                 if modifiedSegment.contains(forbiddenChar) {
-                    modifiedSegment = modifiedSegment.replacingOccurrences(of: forbiddenChar, with: replacement)
+                    modifiedSegment = modifiedSegment.replacingOccurrences(of: forbiddenChar, with: replacement, options: .caseInsensitive)
                 }
             }
 
@@ -74,7 +74,7 @@ public class FileAutoRenamer {
 
             forbiddenFileNameExtensions.forEach { forbiddenExtension in
                 if modifiedSegment.uppercased().hasSuffix(forbiddenExtension) || modifiedSegment.uppercased().hasPrefix(forbiddenExtension) {
-                    modifiedSegment = modifiedSegment.replacingOccurrences(of: forbiddenExtension, with: replacement)
+                    modifiedSegment = modifiedSegment.replacingOccurrences(of: forbiddenExtension, with: replacement, options: .caseInsensitive)
                 }
             }
 
