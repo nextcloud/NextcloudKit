@@ -32,7 +32,7 @@ final class FileAutoRenamerUnitTests: XCTestCase {
     override func setUp() {
         fileAutoRenamer.setup(
             forbiddenFileNameCharacters: ["<", ">", ":", "\\\\", "/", "|", "?", "*", "&"],
-            forbiddenFileNameExtensions: [".filepart",".part", ".", ",", " "]
+            forbiddenFileNameExtensions: [" ", ".filepart",".part", ".", ","]
         )
         super.setUp()
     }
