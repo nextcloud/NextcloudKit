@@ -23,7 +23,7 @@
 import XCTest
 @testable import NextcloudKit
 
-class FileNameValidatorTests: XCTestCase {
+class FileNameValidatorUnitTests: XCTestCase {
     let fileNameValidator = FileNameValidator.shared
 
     override func setUp() {
