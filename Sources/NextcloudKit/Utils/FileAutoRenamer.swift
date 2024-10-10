@@ -1,7 +1,7 @@
 //
 //  File.swift
 //  NextcloudKit
-// 
+//
 //  Created by Milen Pivchev on 09.10.24.
 //  Copyright © 2024 Milen Pivchev. All rights reserved.
 //
@@ -37,18 +37,6 @@ public class FileAutoRenamer {
         let instance = FileAutoRenamer()
         return instance
     }()
-//
-//    public private(set) var forbiddenFileNames: [String] = [] {
-//        didSet {
-//            forbiddenFileNames = forbiddenFileNames.map({$0.uppercased()})
-//        }
-//    }
-//
-//    public private(set) var forbiddenFileNameBasenames: [String] = [] {
-//        didSet {
-//            forbiddenFileNameBasenames = forbiddenFileNameBasenames.map({$0.uppercased()})
-//        }
-//    }
 
     public private(set) var forbiddenFileNameCharacters: [String] = []
 
@@ -66,41 +54,34 @@ public class FileAutoRenamer {
     }
 
     func rename(filename: String, isFolderPath: Bool = false) -> String {
-//        let capabilities = NCCapabilities.shared.getCapabilities(account: account)
+        var pathSegments = filename.split(separator: "/", omittingEmptySubsequences: false).map { String($0) }
 
-        var pathSegments = filename.split(separator: OCFile.PATH_SEPARATOR).map { String($0) }
+        if isFolderPath {
+            forbiddenFileNameCharacters.removeAll { $0 == "/" }
+        }
 
-            if isFolderPath {
-                forbiddenFileNameCharacters.removeAll { $0 == String(OCFile.PATH_SEPARATOR) }
-            }
-
-            pathSegments = pathSegments.map { segment in
-                var modifiedSegment = segment
-                forbiddenFileNameCharacters.forEach { forbiddenChar in
-                    if modifiedSegment.contains(forbiddenChar) {
-                        modifiedSegment = modifiedSegment.replacingOccurrences(of: forbiddenChar, with: REPLACEMENT)
-                    }
+        pathSegments = pathSegments.map { segment in
+            var modifiedSegment = segment
+            forbiddenFileNameCharacters.forEach { forbiddenChar in
+                if modifiedSegment.contains(forbiddenChar) {
+                    modifiedSegment = modifiedSegment.replacingOccurrences(of: forbiddenChar, with: REPLACEMENT)
                 }
-                return modifiedSegment
             }
 
-            pathSegments = pathSegments.map { segment in
-                var modifiedSegment = segment
-                forbiddenFileNameExtensions.forEach { forbiddenExtension in
-                    if forbiddenExtension == StringConstants.SPACE {
-                        modifiedSegment = modifiedSegment.trimmingCharacters(in: .whitespaces)
-                    }
+            if forbiddenFileNameExtensions.contains(" ") {
+                modifiedSegment = modifiedSegment.trimmingCharacters(in: .whitespaces)
+            }
 
-                    if modifiedSegment.hasSuffix(forbiddenExtension) || modifiedSegment.hasPrefix(forbiddenExtension) {
-                        modifiedSegment = modifiedSegment.replacingOccurrences(of: forbiddenExtension, with: REPLACEMENT)
-                    }
+            forbiddenFileNameExtensions.forEach { forbiddenExtension in
+                if modifiedSegment.uppercased().hasSuffix(forbiddenExtension) || modifiedSegment.uppercased().hasPrefix(forbiddenExtension) {
+                    modifiedSegment = modifiedSegment.replacingOccurrences(of: forbiddenExtension, with: REPLACEMENT)
                 }
-                return modifiedSegment
             }
 
-        let result = pathSegments.joined(separator: String(OCFile.PATH_SEPARATOR))
-//        return capability.shouldRemoveNonPrintableUnicodeCharactersAndConvertToUTF8() ? removeNonPrintableUnicodeCharacters(convertToUTF8(result)) : result
+            return modifiedSegment
+        }
 
+        let result = pathSegments.joined(separator: "/")
         return removeNonPrintableUnicodeCharacters(convertToUTF8(result))
     }
 
@@ -112,49 +93,5 @@ public class FileAutoRenamer {
         let regex = try! NSRegularExpression(pattern: "\\p{C}", options: [])
         let range = NSRange(location: 0, length: filename.utf16.count)
         return regex.stringByReplacingMatches(in: filename, options: [], range: range, withTemplate: "")
-    }
-}
-
-// Support structs and classes for compatibility (mock-up)
-
-struct StringConstants {
-    static let SPACE = " "
-}
-
-class OCFile {
-    static let PATH_SEPARATOR: Character = "/"
-}
-
-struct NextcloudVersion {
-    static let nextcloud_30 = NextcloudVersion(version: "30")
-
-    let version: String
-
-    func isNewerOrEqual(to otherVersion: NextcloudVersion) -> Bool {
-        return version >= otherVersion.version
-    }
-}
-
-class OCCapability {
-    var version: NextcloudVersion
-    var forbiddenFilenameCharactersJson: String?
-    var forbiddenFilenameExtensionJson: String?
-
-    init(version: NextcloudVersion, forbiddenFilenameCharactersJson: String?, forbiddenFilenameExtensionJson: String?) {
-        self.version = version
-        self.forbiddenFilenameCharactersJson = forbiddenFilenameCharactersJson
-        self.forbiddenFilenameExtensionJson = forbiddenFilenameExtensionJson
-    }
-
-    func forbiddenFilenameCharacters() -> [String] {
-        return ["\\", "/", ":", "*", "?", "\"", "<", ">", "|"] // Example characters
-    }
-
-    func forbiddenFilenameExtensions() -> [String] {
-        return [".", " "]
-    }
-
-    func shouldRemoveNonPrintableUnicodeCharactersAndConvertToUTF8() -> Bool {
-        return true
     }
 }

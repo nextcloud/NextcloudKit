@@ -40,7 +40,7 @@ class LoginUnitTests: XCTestCase {
 
     override func setUp() {
         // Set our mock session manager as the one the API is going to use
-        NextcloudKit.shared.nkCommonInstance.sessionConfiguration = mockSessionManager()
+//        NextcloudKit.shared.nkCommonInstance.sessionConfiguration = mockSessionManager()
     }
 
     // Format of function names should be: func test_functionName_withCircumstances_shouldExpectation() {}
