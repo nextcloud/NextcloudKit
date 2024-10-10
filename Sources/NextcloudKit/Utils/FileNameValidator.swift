@@ -28,21 +28,21 @@ public class FileNameValidator {
         return instance
     }()
 
-    public private(set) var forbiddenFileNames: [String] = [] {
+    private var forbiddenFileNames: [String] = [] {
         didSet {
             forbiddenFileNames = forbiddenFileNames.map({$0.uppercased()})
         }
     }
 
-    public private(set) var forbiddenFileNameBasenames: [String] = [] {
+    private var forbiddenFileNameBasenames: [String] = [] {
         didSet {
             forbiddenFileNameBasenames = forbiddenFileNameBasenames.map({$0.uppercased()})
         }
     }
 
-    public private(set) var forbiddenFileNameCharacters: [String] = []
+    private var forbiddenFileNameCharacters: [String] = []
 
-    public private(set) var forbiddenFileNameExtensions: [String] = [] {
+    private var forbiddenFileNameExtensions: [String] = [] {
         didSet {
             forbiddenFileNameExtensions = forbiddenFileNameExtensions.map({$0.uppercased()})
         }
