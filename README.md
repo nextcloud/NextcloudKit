@@ -5,6 +5,8 @@
 # NextcloudKit V 2
 <img src="image.png" alt="Demo of the Nextcloud iOS files app" width="200" height="200">
 
+[![REUSE status](https://api.reuse.software/badge/github.com/nextcloud/NextcloudKit)](https://api.reuse.software/info/github.com/nextcloud/NextcloudKit)
+
 ## Installation
 
 ### Carthage
