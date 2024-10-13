@@ -61,7 +61,7 @@ public extension NextcloudKit {
             switch response.result {
             case .failure(let error):
                 let resultError = NKError(error: error, afResponse: response, responseData: nil)
-                options.queue.async { completionHandler(account, nil, nil, 0, nil, error, resultError) }
+                options.queue.async { completionHandler(account, nil, nil, 0, response, error, resultError) }
             case .success:
                 var date: Date?
                 var etag: String?

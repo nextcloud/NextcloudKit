@@ -72,7 +72,7 @@ public extension NextcloudKit {
             switch response.result {
             case .failure(let error):
                 let resultError = NKError(error: error, afResponse: response, responseData: response.data)
-                options.queue.async { completionHandler(account, nil, nil, nil, 0, nil, error, resultError) }
+                options.queue.async { completionHandler(account, nil, nil, nil, 0, response, error, resultError) }
             case .success:
                 var ocId: String?, etag: String?
                 if self.nkCommonInstance.findHeader("oc-fileid", allHeaderFields: response.response?.allHeaderFields) != nil {
