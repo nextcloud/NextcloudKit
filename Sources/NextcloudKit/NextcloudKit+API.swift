@@ -81,7 +81,7 @@ public extension NextcloudKit {
                              method: String,
                              options: NKRequestOptions = NKRequestOptions(),
                              taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-                             completion: @escaping (_ account: String, _ data: Data?, _ error: NKError) -> Void) {
+                             completion: @escaping (_ account: String, _ responseData: AFDataResponse<Data>?, _ error: NKError) -> Void) {
         guard let nkSession = nkCommonInstance.getSession(account: account),
               let url = nkCommonInstance.createStandardUrl(serverUrl: nkSession.urlBase, endpoint: endpoint, options: options),
               let headers = nkCommonInstance.getStandardHeaders(account: account, options: options) else {
@@ -99,9 +99,9 @@ public extension NextcloudKit {
             switch response.result {
             case .failure(let error):
                 let error = NKError(error: error, afResponse: response, responseData: response.data)
-                options.queue.async { completion(account, nil, error) }
+                options.queue.async { completion(account, response, error) }
             case .success:
-                options.queue.async { completion(account, response.data, .success) }
+                options.queue.async { completion(account, response, .success) }
             }
         }
     }
@@ -111,7 +111,7 @@ public extension NextcloudKit {
     func getExternalSite(account: String,
                          options: NKRequestOptions = NKRequestOptions(),
                          taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-                         completion: @escaping (_ account: String, _ externalFiles: [NKExternalSite], _ data: Data?, _ error: NKError) -> Void) {
+                         completion: @escaping (_ account: String, _ externalFiles: [NKExternalSite], _ responseData: AFDataResponse<Data>?, _ error: NKError) -> Void) {
         var externalSites: [NKExternalSite] = []
         let endpoint = "ocs/v2.php/apps/external/api/v1"
         guard let nkSession = nkCommonInstance.getSession(account: account),
@@ -130,7 +130,7 @@ public extension NextcloudKit {
             switch response.result {
             case .failure(let error):
                 let error = NKError(error: error, afResponse: response, responseData: response.data)
-                options.queue.async { completion(account, externalSites, nil, error) }
+                options.queue.async { completion(account, externalSites, response, error) }
             case .success(let jsonData):
                 let json = JSON(jsonData)
                 let ocsdata = json["ocs"]["data"]
@@ -144,7 +144,7 @@ public extension NextcloudKit {
                     extrernalSite.url = subJson["url"].stringValue
                     externalSites.append(extrernalSite)
                 }
-                options.queue.async { completion(account, externalSites, jsonData, .success) }
+                options.queue.async { completion(account, externalSites, response, .success) }
             }
         }
     }
@@ -230,7 +230,7 @@ public extension NextcloudKit {
                          etag: String? = nil,
                          options: NKRequestOptions = NKRequestOptions(),
                          taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-                         completion: @escaping (_ account: String, _ data: Data?, _ error: NKError) -> Void) {
+                         completion: @escaping (_ account: String, _ responseData: AFDataResponse<Data?>?, _ error: NKError) -> Void) {
         guard let nkSession = nkCommonInstance.getSession(account: account),
               var headers = nkCommonInstance.getStandardHeaders(account: account, options: options) else {
             return options.queue.async { completion(account, nil, .urlError) }
@@ -251,13 +251,9 @@ public extension NextcloudKit {
             switch response.result {
             case .failure(let error):
                 let error = NKError(error: error, afResponse: response, responseData: response.data)
-                options.queue.async { completion(account, nil, error) }
+                options.queue.async { completion(account, response, error) }
             case .success:
-                if let data = response.data {
-                    options.queue.async { completion(account, data, .success) }
-                } else {
-                    options.queue.async { completion(account, nil, .invalidData) }
-                }
+                options.queue.async { completion(account, response, .success) }
             }
         }
     }
@@ -273,12 +269,12 @@ public extension NextcloudKit {
                          account: String,
                          options: NKRequestOptions = NKRequestOptions(),
                          taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-                         completion: @escaping (_ account: String, _ data: Data?, _ width: Int, _ height: Int, _ etag: String?, _ error: NKError) -> Void) {
+                         completion: @escaping (_ account: String, _ width: Int, _ height: Int, _ etag: String?, _ responseData: AFDataResponse<Data?>?, _ error: NKError) -> Void) {
         let endpoint = "index.php/core/preview?fileId=\(fileId)&x=\(width)&y=\(height)&a=\(crop)&mode=\(cropMode)&forceIcon=\(forceIcon)&mimeFallback=\(mimeFallback)"
         guard let nkSession = nkCommonInstance.getSession(account: account),
               let url = nkCommonInstance.createStandardUrl(serverUrl: nkSession.urlBase, endpoint: endpoint, options: options),
               var headers = nkCommonInstance.getStandardHeaders(account: account, options: options) else {
-            return options.queue.async { completion(account, nil, width, height, nil, .urlError) }
+            return options.queue.async { completion(account, width, height, nil, nil, .urlError) }
         }
 
         if var etag = etag {
@@ -296,14 +292,10 @@ public extension NextcloudKit {
             switch response.result {
             case .failure(let error):
                 let error = NKError(error: error, afResponse: response, responseData: response.data)
-                options.queue.async { completion(account, nil, width, height, nil, error) }
+                options.queue.async { completion(account, width, height, nil, response, error) }
             case .success:
-                if let data = response.data {
-                    let etag = self.nkCommonInstance.findHeader("etag", allHeaderFields: response.response?.allHeaderFields)?.replacingOccurrences(of: "\"", with: "")
-                    options.queue.async { completion(account, data, width, height, etag, .success) }
-                } else {
-                    options.queue.async { completion(account, nil, width, height, nil, .invalidData) }
-                }
+                let etag = self.nkCommonInstance.findHeader("etag", allHeaderFields: response.response?.allHeaderFields)?.replacingOccurrences(of: "\"", with: "")
+                options.queue.async { completion(account, width, height, etag, response, .success) }
             }
         }
     }
@@ -318,13 +310,13 @@ public extension NextcloudKit {
                               account: String,
                               options: NKRequestOptions = NKRequestOptions(),
                               taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-                              completion: @escaping (_ account: String, _ data: Data?, _ width: Int, _ height: Int, _ error: NKError) -> Void) {
+                              completion: @escaping (_ account: String, _ width: Int, _ height: Int, _ responseData: AFDataResponse<Data?>?, _ error: NKError) -> Void) {
         let endpoint = "index.php/apps/files_trashbin/preview?fileId=\(fileId)&x=\(width)&y=\(height)&a=\(crop)&mode=\(cropMode)&forceIcon=\(forceIcon)&mimeFallback=\(mimeFallback)"
 
         guard let nkSession = nkCommonInstance.getSession(account: account),
               let url = nkCommonInstance.createStandardUrl(serverUrl: nkSession.urlBase, endpoint: endpoint, options: options),
               let headers = nkCommonInstance.getStandardHeaders(account: account, options: options) else {
-            return options.queue.async { completion(account, nil, width, height, .urlError) }
+            return options.queue.async { completion(account, width, height, nil, .urlError) }
         }
 
         nkSession.sessionData.request(url, method: .get, parameters: nil, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
@@ -337,13 +329,9 @@ public extension NextcloudKit {
             switch response.result {
             case .failure(let error):
                 let error = NKError(error: error, afResponse: response, responseData: response.data)
-                options.queue.async { completion(account, nil, width, height, error) }
+                options.queue.async { completion(account, width, height, response, error) }
             case .success:
-                if let data = response.data {
-                    options.queue.async { completion(account, data, width, height, .success) }
-                } else {
-                    options.queue.async { completion(account, nil, width, height, .invalidData) }
-                }
+                options.queue.async { completion(account, width, height, response, .success) }
             }
         }
     }
@@ -356,12 +344,12 @@ public extension NextcloudKit {
                         account: String,
                         options: NKRequestOptions = NKRequestOptions(),
                         taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-                        completion: @escaping (_ account: String, _ imageAvatar: UIImage?, _ imageOriginal: UIImage?, _ etag: String?, _ error: NKError) -> Void) {
+                        completion: @escaping (_ account: String, _ imageAvatar: UIImage?, _ imageOriginal: UIImage?, _ etag: String?, _ responseData: AFDataResponse<Data?>?, _ error: NKError) -> Void) {
         let endpoint = "index.php/avatar/\(user)/\(sizeImage)"
         guard let nkSession = nkCommonInstance.getSession(account: account),
               let url = nkCommonInstance.createStandardUrl(serverUrl: nkSession.urlBase, endpoint: endpoint, options: options),
               var headers = nkCommonInstance.getStandardHeaders(account: account, options: options) else {
-            return options.queue.async { completion(account, nil, nil, nil, .urlError) }
+            return options.queue.async { completion(account, nil, nil, nil, nil, .urlError) }
         }
 
         if var etag = etag {
@@ -379,7 +367,7 @@ public extension NextcloudKit {
             switch response.result {
             case .failure(let error):
                 let error = NKError(error: error, afResponse: response, responseData: response.data)
-                options.queue.async { completion(account, nil, nil, nil, error) }
+                options.queue.async { completion(account, nil, nil, nil, response, error) }
             case .success:
                 if let data = response.data {
                     let imageOriginal = UIImage(data: data)
@@ -429,12 +417,12 @@ public extension NextcloudKit {
                         } else {
                             try data.write(to: url)
                         }
-                        options.queue.async { completion(account, imageAvatar, imageOriginal, etag, .success) }
+                        options.queue.async { completion(account, imageAvatar, imageOriginal, etag, response, .success) }
                     } catch {
-                        options.queue.async { completion(account, nil, nil, nil, NKError(error: error)) }
+                        options.queue.async { completion(account, nil, nil, nil, response, NKError(error: error)) }
                     }
                 } else {
-                    options.queue.async { completion(account, nil, nil, nil, .invalidData) }
+                    options.queue.async { completion(account, nil, nil, nil, response, .invalidData) }
                 }
             }
         }
@@ -444,7 +432,7 @@ public extension NextcloudKit {
                          account: String,
                          options: NKRequestOptions = NKRequestOptions(),
                          taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-                         completion: @escaping (_ account: String, _ data: Data?, _ error: NKError) -> Void) {
+                         completion: @escaping (_ account: String, _ responseData: AFDataResponse<Data?>?, _ error: NKError) -> Void) {
         guard let url = serverUrl.asUrl,
               let nkSession = nkCommonInstance.getSession(account: account),
               let headers = nkCommonInstance.getStandardHeaders(account: account, options: options) else {
@@ -461,13 +449,9 @@ public extension NextcloudKit {
             switch response.result {
             case .failure(let error):
                 let error = NKError(error: error, afResponse: response, responseData: response.data)
-                options.queue.async { completion(account, nil, error) }
+                options.queue.async { completion(account, response, error) }
             case .success:
-                if let data = response.data {
-                    options.queue.async { completion(account, data, .success) }
-                } else {
-                    options.queue.async { completion(account, nil, .invalidData) }
-                }
+                options.queue.async { completion(account, response, .success) }
             }
         }
     }
@@ -477,7 +461,7 @@ public extension NextcloudKit {
     func getUserProfile(account: String,
                         options: NKRequestOptions = NKRequestOptions(),
                         taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-                        completion: @escaping (_ account: String, _ userProfile: NKUserProfile?, _ data: Data?, _ error: NKError) -> Void) {
+                        completion: @escaping (_ account: String, _ userProfile: NKUserProfile?, _ responseData: AFDataResponse<Data>?, _ error: NKError) -> Void) {
         let endpoint = "ocs/v2.php/cloud/user"
         guard let nkSession = nkCommonInstance.getSession(account: account),
               let url = nkCommonInstance.createStandardUrl(serverUrl: nkSession.urlBase, endpoint: endpoint, options: options),
@@ -495,7 +479,7 @@ public extension NextcloudKit {
             switch response.result {
             case .failure(let error):
                 let error = NKError(error: error, afResponse: response, responseData: response.data)
-                options.queue.async { completion(account, nil, nil, error) }
+                options.queue.async { completion(account, nil, response, error) }
             case .success(let jsonData):
                 let json = JSON(jsonData)
                 let ocs = json["ocs"]
@@ -535,9 +519,9 @@ public extension NextcloudKit {
                     userProfile.twitter = data["twitter"].stringValue
                     userProfile.website = data["website"].stringValue
 
-                    options.queue.async { completion(account, userProfile, jsonData, .success) }
+                    options.queue.async { completion(account, userProfile, response, .success) }
                 } else {
-                    options.queue.async { completion(account, nil, jsonData, NKError(rootJson: json, fallbackStatusCode: response.response?.statusCode)) }
+                    options.queue.async { completion(account, nil, response, NKError(rootJson: json, fallbackStatusCode: response.response?.statusCode)) }
                 }
             }
         }
@@ -546,7 +530,7 @@ public extension NextcloudKit {
     func getCapabilities(account: String,
                          options: NKRequestOptions = NKRequestOptions(),
                          taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-                         completion: @escaping (_ account: String, _ data: Data?, _ error: NKError) -> Void) {
+                         completion: @escaping (_ account: String, _ responseData: AFDataResponse<Data?>?, _ error: NKError) -> Void) {
         let endpoint = "ocs/v1.php/cloud/capabilities"
         guard let nkSession = nkCommonInstance.getSession(account: account),
               let url = nkCommonInstance.createStandardUrl(serverUrl: nkSession.urlBase, endpoint: endpoint, options: options),
@@ -564,13 +548,9 @@ public extension NextcloudKit {
             switch response.result {
             case .failure(let error):
                 let error = NKError(error: error, afResponse: response, responseData: response.data)
-                options.queue.async { completion(account, nil, error) }
+                options.queue.async { completion(account, response, error) }
             case .success:
-                if let jsonData = response.data {
-                    options.queue.async { completion(account, jsonData, .success) }
-                } else {
-                    options.queue.async { completion(account, nil, .invalidData) }
-                }
+                options.queue.async { completion(account, response, .success) }
             }
         }
     }
@@ -582,7 +562,7 @@ public extension NextcloudKit {
                              account: String,
                              options: NKRequestOptions = NKRequestOptions(),
                              taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-                             completion: @escaping (_ account: String, _ wipe: Bool, _ data: Data?, _ error: NKError) -> Void) {
+                             completion: @escaping (_ account: String, _ wipe: Bool, _ responseData: AFDataResponse<Data>?, _ error: NKError) -> Void) {
         let endpoint = "index.php/core/wipe/check"
         let parameters: [String: Any] = ["token": token]
         ///
@@ -604,11 +584,11 @@ public extension NextcloudKit {
             switch response.result {
             case .failure(let error):
                 let error = NKError(error: error, afResponse: response, responseData: response.data)
-                options.queue.async { completion(account, false, nil, error) }
+                options.queue.async { completion(account, false, response, error) }
             case .success(let jsonData):
                 let json = JSON(jsonData)
                 let wipe = json["wipe"].boolValue
-                options.queue.async { completion(account, wipe, jsonData, .success) }
+                options.queue.async { completion(account, wipe, response, .success) }
             }
         }
     }
@@ -618,7 +598,7 @@ public extension NextcloudKit {
                                    account: String,
                                    options: NKRequestOptions = NKRequestOptions(),
                                    taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-                                   completion: @escaping (_ account: String, _ error: NKError) -> Void) {
+                                   completion: @escaping (_ account: String, _ responseData: AFDataResponse<Data>?, _ error: NKError) -> Void) {
         let endpoint = "index.php/core/wipe/success"
         let parameters: [String: Any] = ["token": token]
         ///
@@ -627,7 +607,7 @@ public extension NextcloudKit {
         guard let nkSession = nkCommonInstance.getSession(account: account),
               let url = nkCommonInstance.createStandardUrl(serverUrl: serverUrl, endpoint: endpoint, options: options),
               let headers = nkCommonInstance.getStandardHeaders(account: account, options: options) else {
-            return options.queue.async { completion(account, .urlError) }
+            return options.queue.async { completion(account, nil, .urlError) }
         }
 
         nkSession.sessionData.request(url, method: .post, parameters: parameters, encoding: URLEncoding.default, headers: headers).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
@@ -640,9 +620,9 @@ public extension NextcloudKit {
             switch response.result {
             case .failure(let error):
                 let error = NKError(error: error, afResponse: response, responseData: response.data)
-                options.queue.async { completion(account, error) }
+                options.queue.async { completion(account, response, error) }
             case .success:
-                options.queue.async { completion(account, .success) }
+                options.queue.async { completion(account, response, .success) }
             }
         }
     }
@@ -657,7 +637,7 @@ public extension NextcloudKit {
                      account: String,
                      options: NKRequestOptions = NKRequestOptions(),
                      taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-                     completion: @escaping (_ account: String, _ activities: [NKActivity], _ activityFirstKnown: Int, _ activityLastGiven: Int, _ data: Data?, _ error: NKError) -> Void) {
+                     completion: @escaping (_ account: String, _ activities: [NKActivity], _ activityFirstKnown: Int, _ activityLastGiven: Int, _ responseData: AFDataResponse<Data>?, _ error: NKError) -> Void) {
         var activities: [NKActivity] = []
         var activityFirstKnown = 0
         var activityLastGiven = 0
@@ -696,7 +676,7 @@ public extension NextcloudKit {
             switch response.result {
             case .failure(let error):
                 let error = NKError(error: error, afResponse: response, responseData: response.data)
-                options.queue.async { completion(account, activities, activityFirstKnown, 0, nil, error) }
+                options.queue.async { completion(account, activities, activityFirstKnown, 0, response, error) }
             case .success(let jsonData):
                 let json = JSON(jsonData)
                 let ocsdata = json["ocs"]["data"]
@@ -744,7 +724,7 @@ public extension NextcloudKit {
                 if let iFirstKnown = Int(firstKnown) { activityFirstKnown = iFirstKnown }
                 if let ilastGiven = Int(lastGiven) { activityLastGiven = ilastGiven }
 
-                options.queue.async { completion(account, activities, activityFirstKnown, activityLastGiven, jsonData, .success) }
+                options.queue.async { completion(account, activities, activityFirstKnown, activityLastGiven, response, .success) }
             }
         }
     }
@@ -754,7 +734,7 @@ public extension NextcloudKit {
     func getNotifications(account: String,
                           options: NKRequestOptions = NKRequestOptions(),
                           taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-                          completion: @escaping (_ account: String, _ notifications: [NKNotifications]?, _ data: Data?, _ error: NKError) -> Void) {
+                          completion: @escaping (_ account: String, _ notifications: [NKNotifications]?, _ responseData: AFDataResponse<Data>?, _ error: NKError) -> Void) {
         let endpoint = "ocs/v2.php/apps/notifications/api/v2/notifications"
         guard let nkSession = nkCommonInstance.getSession(account: account),
               let url = nkCommonInstance.createStandardUrl(serverUrl: nkSession.urlBase, endpoint: endpoint, options: options),
@@ -772,7 +752,7 @@ public extension NextcloudKit {
             switch response.result {
             case .failure(let error):
                 let error = NKError(error: error, afResponse: response, responseData: response.data)
-                options.queue.async { completion(account, nil, nil, error) }
+                options.queue.async { completion(account, nil, response, error) }
             case .success(let jsonData):
                 let json = JSON(jsonData)
                 if json["ocs"]["meta"]["statuscode"].int == 200 {
@@ -814,9 +794,9 @@ public extension NextcloudKit {
                         notification.user = subJson["user"].stringValue
                         notifications.append(notification)
                     }
-                    options.queue.async { completion(account, notifications, jsonData, .success) }
+                    options.queue.async { completion(account, notifications, response, .success) }
                 } else {
-                    options.queue.async { completion(account, nil, jsonData, NKError(rootJson: json, fallbackStatusCode: response.response?.statusCode)) }
+                    options.queue.async { completion(account, nil, response, NKError(rootJson: json, fallbackStatusCode: response.response?.statusCode)) }
                 }
             }
         }
@@ -828,10 +808,10 @@ public extension NextcloudKit {
                          account: String,
                          options: NKRequestOptions = NKRequestOptions(),
                          taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-                         completion: @escaping (_ account: String, _ error: NKError) -> Void) {
+                         completion: @escaping (_ account: String, _ responseData: AFDataResponse<Data?>?, _ error: NKError) -> Void) {
         guard let nkSession = nkCommonInstance.getSession(account: account),
               let headers = nkCommonInstance.getStandardHeaders(account: account, options: options) else {
-            return options.queue.async { completion(account, .urlError) }
+            return options.queue.async { completion(account, nil, .urlError) }
         }
         var url: URLConvertible?
         if serverUrl == nil {
@@ -841,7 +821,7 @@ public extension NextcloudKit {
             url = serverUrl?.asUrl
         }
         guard let urlRequest = url else {
-            return options.queue.async { completion(account, .urlError) }
+            return options.queue.async { completion(account, nil, .urlError) }
         }
         let method = HTTPMethod(rawValue: method)
 
@@ -855,9 +835,9 @@ public extension NextcloudKit {
             switch response.result {
             case .failure(let error):
                 let error = NKError(error: error, afResponse: response, responseData: response.data)
-                options.queue.async { completion(account, error) }
+                options.queue.async { completion(account, response, error) }
             case .success:
-                options.queue.async { completion(account, .success) }
+                options.queue.async { completion(account, response, .success) }
             }
         }
     }
@@ -868,7 +848,7 @@ public extension NextcloudKit {
                            account: String,
                            options: NKRequestOptions = NKRequestOptions(),
                            taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-                           completion: @escaping (_ account: String, _ url: String?, _ data: Data?, _ error: NKError) -> Void) {
+                           completion: @escaping (_ account: String, _ url: String?, _ responseData: AFDataResponse<Data>?, _ error: NKError) -> Void) {
         let endpoint = "ocs/v2.php/apps/dav/api/v1/direct"
         let parameters: [String: Any] = [
             "fileId": fileId,
@@ -890,12 +870,12 @@ public extension NextcloudKit {
             switch response.result {
             case .failure(let error):
                 let error = NKError(error: error, afResponse: response, responseData: response.data)
-                options.queue.async { completion(account, nil, nil, error) }
+                options.queue.async { completion(account, nil, response, error) }
             case .success(let jsonData):
                 let json = JSON(jsonData)
                 let ocsdata = json["ocs"]["data"]
                 let url = ocsdata["url"].string
-                options.queue.async { completion(account, url, jsonData, .success) }
+                options.queue.async { completion(account, url, response, .success) }
             }
         }
     }
@@ -906,7 +886,7 @@ public extension NextcloudKit {
                                               account: String,
                                               options: NKRequestOptions = NKRequestOptions(),
                                               taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-                                              completion: @escaping (_ account: String, _ error: NKError) -> Void) {
+                                              completion: @escaping (_ account: String, _ responseData: AFDataResponse<Data?>?, _ error: NKError) -> Void) {
         let endpoint = "ocs/v2.php/apps/security_guard/diagnostics"
         ///
         options.contentType = "application/json"
@@ -914,14 +894,14 @@ public extension NextcloudKit {
         guard let nkSession = nkCommonInstance.getSession(account: account),
               let url = nkCommonInstance.createStandardUrl(serverUrl: nkSession.urlBase, endpoint: endpoint, options: options),
               let headers = nkCommonInstance.getStandardHeaders(account: account, options: options) else {
-            return options.queue.async { completion(account, .urlError) }
+            return options.queue.async { completion(account, nil, .urlError) }
         }
         var urlRequest: URLRequest
         do {
             try urlRequest = URLRequest(url: url, method: .put, headers: headers)
             urlRequest.httpBody = data
         } catch {
-            return options.queue.async { completion(account, NKError(error: error)) }
+            return options.queue.async { completion(account, nil, NKError(error: error)) }
         }
 
         nkSession.sessionData.request(urlRequest).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
@@ -934,9 +914,9 @@ public extension NextcloudKit {
             switch response.result {
             case .failure(let error):
                 let error = NKError(error: error, afResponse: response, responseData: response.data)
-                options.queue.async { completion(account, error) }
+                options.queue.async { completion(account, response, error) }
             case .success:
-                options.queue.async { completion(account, .success) }
+                options.queue.async { completion(account, response, .success) }
             }
         }
     }
