@@ -36,7 +36,7 @@ public extension NextcloudKit {
                 requestHandler: @escaping (_ request: UploadRequest) -> Void = { _ in },
                 taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
                 progressHandler: @escaping (_ progress: Progress) -> Void = { _ in },
-                completionHandler: @escaping (_ account: String, _ ocId: String?, _ etag: String?, _ date: Date?, _ size: Int64, _ allHeaderFields: [AnyHashable: Any]?, _ afError: AFError?, _ nkError: NKError) -> Void) {
+                completionHandler: @escaping (_ account: String, _ ocId: String?, _ etag: String?, _ date: Date?, _ size: Int64, _ responseData: AFDataResponse<Data?>?, _ afError: AFError?, _ nkError: NKError) -> Void) {
         var convertible: URLConvertible?
         var size: Int64 = 0
         if serverUrlFileName is URL {
@@ -75,7 +75,6 @@ public extension NextcloudKit {
                 options.queue.async { completionHandler(account, nil, nil, nil, 0, nil, error, resultError) }
             case .success:
                 var ocId: String?, etag: String?
-                let allHeaderFields = response.response?.allHeaderFields
                 if self.nkCommonInstance.findHeader("oc-fileid", allHeaderFields: response.response?.allHeaderFields) != nil {
                     ocId = self.nkCommonInstance.findHeader("oc-fileid", allHeaderFields: response.response?.allHeaderFields)
                 } else if self.nkCommonInstance.findHeader("fileid", allHeaderFields: response.response?.allHeaderFields) != nil {
@@ -91,12 +90,12 @@ public extension NextcloudKit {
                 }
                 if let dateString = self.nkCommonInstance.findHeader("date", allHeaderFields: response.response?.allHeaderFields) {
                     if let date = self.nkCommonInstance.convertDate(dateString, format: "EEE, dd MMM y HH:mm:ss zzz") {
-                        options.queue.async { completionHandler(account, ocId, etag, date, size, allHeaderFields, nil, .success) }
+                        options.queue.async { completionHandler(account, ocId, etag, date, size, response, nil, .success) }
                     } else {
-                        options.queue.async { completionHandler(account, nil, nil, nil, 0, allHeaderFields, nil, .invalidDate) }
+                        options.queue.async { completionHandler(account, nil, nil, nil, 0, response, nil, .invalidDate) }
                     }
                 } else {
-                    options.queue.async { completionHandler(account, nil, nil, nil, 0, allHeaderFields, nil, .invalidDate) }
+                    options.queue.async { completionHandler(account, nil, nil, nil, 0, response, nil, .invalidDate) }
                 }
             }
         }
