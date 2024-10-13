@@ -29,12 +29,12 @@ public extension NextcloudKit {
     func getGroupfolders(account: String,
                          options: NKRequestOptions = NKRequestOptions(),
                          taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-                         completion: @escaping (_ account: String, _ results: [NKGroupfolders]?, _ data: Data?, _ error: NKError) -> Void) {
+                         completion: @escaping (_ account: String, _ results: [NKGroupfolders]?, _ responseData: AFDataResponse<Data>?, _ error: NKError) -> Void) {
         let endpoint = "index.php/apps/groupfolders/folders?applicable=1"
         guard let nkSession = nkCommonInstance.getSession(account: account),
               let url = nkCommonInstance.createStandardUrl(serverUrl: nkSession.urlBase, endpoint: endpoint, options: options),
               let headers = nkCommonInstance.getStandardHeaders(account: account, options: options) else {
-            return options.queue.async { completion(account, nil,nil, .urlError) }
+            return options.queue.async { completion(account, nil, nil, .urlError) }
         }
 
         nkSession.sessionData.request(url, method: .get, parameters: nil, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
@@ -47,14 +47,14 @@ public extension NextcloudKit {
             switch response.result {
             case .failure(let error):
                 let error = NKError(error: error, afResponse: response, responseData: response.data)
-                options.queue.async { completion(account, nil, response.data, error) }
+                options.queue.async { completion(account, nil, response, error) }
             case .success(let jsonData):
                 let json = JSON(jsonData)
                 let data = json["ocs"]["data"]
                 guard json["ocs"]["meta"]["statuscode"].int == 200 || json["ocs"]["meta"]["statuscode"].int == 100
                 else {
                     let error = NKError(rootJson: json, fallbackStatusCode: response.response?.statusCode)
-                    options.queue.async { completion(account, nil, jsonData, error) }
+                    options.queue.async { completion(account, nil, response, error) }
                     return
                 }
                 var results = [NKGroupfolders]()
@@ -63,7 +63,7 @@ public extension NextcloudKit {
                         results.append(result)
                     }
                 }
-                options.queue.async { completion(account, results, jsonData, .success) }
+                options.queue.async { completion(account, results, response, .success) }
             }
         }
     }
