@@ -52,9 +52,9 @@ public extension NextcloudKit {
     func checkServer(serverUrl: String,
                      options: NKRequestOptions = NKRequestOptions(),
                      taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-                     completion: @escaping (_ error: NKError) -> Void) {
+                     completion: @escaping (_ responseData: AFDataResponse<Data?>?, _ error: NKError) -> Void) {
         guard let url = serverUrl.asUrl else {
-            return options.queue.async { completion(.urlError) }
+            return options.queue.async { completion(nil, .urlError) }
         }
 
         internalSession.request(url, method: .head, parameters: nil, encoding: URLEncoding.default, headers: nil, interceptor: nil).onURLSessionTaskCreation { task in
@@ -67,9 +67,9 @@ public extension NextcloudKit {
             switch response.result {
             case .failure(let error):
                 let error = NKError(error: error, afResponse: response, responseData: response.data)
-                options.queue.async { completion(error) }
+                options.queue.async { completion(response, error) }
             case .success:
-                options.queue.async { completion(.success) }
+                options.queue.async { completion(response, .success) }
             }
         }
     }
@@ -172,10 +172,10 @@ public extension NextcloudKit {
     func getServerStatus(serverUrl: String,
                          options: NKRequestOptions = NKRequestOptions(),
                          taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-                         completion: @escaping (ServerInfoResult) -> Void) {
+                         completion: @escaping (_ responseData: AFDataResponse<Data>?, ServerInfoResult) -> Void) {
         let endpoint = "status.php"
         guard let url = nkCommonInstance.createStandardUrl(serverUrl: serverUrl, endpoint: endpoint, options: options) else {
-            return options.queue.async { completion(ServerInfoResult.failure(.urlError)) }
+            return options.queue.async { completion(nil, ServerInfoResult.failure(.urlError)) }
         }
         var headers: HTTPHeaders?
         if let userAgent = options.customUserAgent {
@@ -192,7 +192,7 @@ public extension NextcloudKit {
             switch response.result {
             case .failure(let error):
                 let error = NKError(error: error, afResponse: response, responseData: response.data)
-                return options.queue.async { completion(ServerInfoResult.failure(error)) }
+                return options.queue.async { completion(response, ServerInfoResult.failure(error)) }
             case .success(let jsonData):
                 let json = JSON(jsonData)
                 var versionMajor = 0, versionMinor = 0, versionMicro = 0
@@ -218,7 +218,7 @@ public extension NextcloudKit {
                                             versionMinor: versionMinor,
                                             versionMicro: versionMicro,
                                             data: jsonData)
-                options.queue.async { completion(ServerInfoResult.success(serverInfo)) }
+                options.queue.async { completion(response, ServerInfoResult.success(serverInfo)) }
             }
         }
     }
