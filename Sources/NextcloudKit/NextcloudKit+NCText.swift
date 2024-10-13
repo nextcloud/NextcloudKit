@@ -29,7 +29,7 @@ public extension NextcloudKit {
     func NCTextObtainEditorDetails(account: String,
                                    options: NKRequestOptions = NKRequestOptions(),
                                    taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-                                   completion: @escaping (_ account: String, _  editors: [NKEditorDetailsEditors], _ creators: [NKEditorDetailsCreators], _ data: Data?, _ error: NKError) -> Void) {
+                                   completion: @escaping (_ account: String, _  editors: [NKEditorDetailsEditors], _ creators: [NKEditorDetailsCreators], _ responseData: AFDataResponse<Data>?, _ error: NKError) -> Void) {
         let endpoint = "ocs/v2.php/apps/files/api/v1/directEditing"
         var editors: [NKEditorDetailsEditors] = []
         var creators: [NKEditorDetailsCreators] = []
@@ -49,7 +49,7 @@ public extension NextcloudKit {
             switch response.result {
             case .failure(let error):
                 let error = NKError(error: error, afResponse: response, responseData: response.data)
-                options.queue.async { completion(account, editors, creators, nil, error) }
+                options.queue.async { completion(account, editors, creators, response, error) }
             case .success(let jsonData):
                 let json = JSON(jsonData)
                 let ocsdataeditors = json["ocs"]["data"]["editors"]
@@ -84,7 +84,7 @@ public extension NextcloudKit {
                     creators.append(creator)
                 }
 
-                options.queue.async { completion(account, editors, creators, jsonData, .success) }
+                options.queue.async { completion(account, editors, creators, response, .success) }
             }
         }
     }
@@ -95,7 +95,7 @@ public extension NextcloudKit {
                         account: String,
                         options: NKRequestOptions = NKRequestOptions(),
                         taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-                        completion: @escaping (_ account: String, _  url: String?, _ data: Data?, _ error: NKError) -> Void) {
+                        completion: @escaping (_ account: String, _  url: String?, _ responseData: AFDataResponse<Data>?, _ error: NKError) -> Void) {
         guard let fileNamePath = fileNamePath.urlEncoded else {
             return options.queue.async { completion(account, nil, nil, .urlError) }
         }
@@ -119,11 +119,11 @@ public extension NextcloudKit {
             switch response.result {
             case .failure(let error):
                 let error = NKError(error: error, afResponse: response, responseData: response.data)
-                options.queue.async { completion(account, nil, nil, error) }
+                options.queue.async { completion(account, nil, response, error) }
             case .success(let jsonData):
                 let json = JSON(jsonData)
                 let url = json["ocs"]["data"]["url"].stringValue
-                options.queue.async { completion(account, url, jsonData, .success) }
+                options.queue.async { completion(account, url, response, .success) }
             }
         }
     }
@@ -131,7 +131,7 @@ public extension NextcloudKit {
     func NCTextGetListOfTemplates(account: String,
                                   options: NKRequestOptions = NKRequestOptions(),
                                   taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-                                  completion: @escaping (_ account: String, _ templates: [NKEditorTemplates]?, _ data: Data?, _ error: NKError) -> Void) {
+                                  completion: @escaping (_ account: String, _ templates: [NKEditorTemplates]?, _ responseData: AFDataResponse<Data>?, _ error: NKError) -> Void) {
         let endpoint = "ocs/v2.php/apps/files/api/v1/directEditing/templates/text/textdocumenttemplate"
         var templates: [NKEditorTemplates] = []
         guard let nkSession = nkCommonInstance.getSession(account: account),
@@ -150,7 +150,7 @@ public extension NextcloudKit {
             switch response.result {
             case .failure(let error):
                 let error = NKError(error: error, afResponse: response, responseData: response.data)
-                options.queue.async { completion(account, templates, nil, error) }
+                options.queue.async { completion(account, templates, response, error) }
             case .success(let jsonData):
                 let json = JSON(jsonData)
                 let ocsdatatemplates = json["ocs"]["data"]["editors"]
@@ -165,7 +165,7 @@ public extension NextcloudKit {
                     templates.append(template)
                 }
 
-                options.queue.async { completion(account, templates, jsonData, .success) }
+                options.queue.async { completion(account, templates, response, .success) }
             }
         }
     }
@@ -177,7 +177,7 @@ public extension NextcloudKit {
                           account: String,
                           options: NKRequestOptions = NKRequestOptions(),
                           taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-                          completion: @escaping (_ account: String, _ url: String?, _ data: Data?, _ error: NKError) -> Void) {
+                          completion: @escaping (_ account: String, _ url: String?, _ responseData: AFDataResponse<Data>?, _ error: NKError) -> Void) {
         guard let fileNamePath = fileNamePath.urlEncoded else {
             return options.queue.async { completion(account, nil, nil, .urlError) }
         }
@@ -203,11 +203,11 @@ public extension NextcloudKit {
             switch response.result {
             case .failure(let error):
                 let error = NKError(error: error, afResponse: response, responseData: response.data)
-                options.queue.async { completion(account, nil, nil, error) }
+                options.queue.async { completion(account, nil, response, error) }
             case .success(let jsonData):
                 let json = JSON(jsonData)
                 let url = json["ocs"]["data"]["url"].stringValue
-                options.queue.async { completion(account, url, jsonData, .success) }
+                options.queue.async { completion(account, url, response, .success) }
             }
         }
     }
