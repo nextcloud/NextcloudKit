@@ -2,8 +2,8 @@
 //  EnvVars.stencil.swift
 //  NextcloudIntegrationTests
 //
-//  Created by Milen on 31.05.23.
-//  Copyright © 2023 Marino Faggiana. All rights reserved.
+// SPDX-FileCopyrightText: 2023 Nextcloud GmbH and Nextcloud contributors
+// SPDX-License-Identifier: GPL-3.0-or-later
 //
 
 import Foundation

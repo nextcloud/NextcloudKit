@@ -1,4 +1,6 @@
-
+# SPDX-FileCopyrightText: 2023 Nextcloud GmbH and Nextcloud contributors
+# SPDX-License-Identifier: GPL-3.0-or-later
+#
 # Lints the project using SwiftLint
 
 name: SwiftLint

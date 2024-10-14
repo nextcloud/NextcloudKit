@@ -1,4 +1,8 @@
 #!/usr/bin/env bash
+#
+# SPDX-FileCopyrightText: 2023 Nextcloud GmbH and Nextcloud contributors
+# SPDX-License-Identifier: GPL-3.0-or-later
+#
 #This script creates a testable Docker enviroment of the Nextcloud server, and is used by the CI for tests.
 
 container_name="nextcloud_test"
