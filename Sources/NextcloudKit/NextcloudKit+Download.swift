@@ -33,7 +33,7 @@ public extension NextcloudKit {
                   requestHandler: @escaping (_ request: DownloadRequest) -> Void = { _ in },
                   taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
                   progressHandler: @escaping (_ progress: Progress) -> Void = { _ in },
-                  completionHandler: @escaping (_ account: String, _ etag: String?, _ date: Date?, _ lenght: Int64, _ allHeaderFields: [AnyHashable: Any]?, _ afError: AFError?, _ nKError: NKError) -> Void) {
+                  completionHandler: @escaping (_ account: String, _ etag: String?, _ date: Date?, _ lenght: Int64, _ responseData: AFDownloadResponse<URL?>?, _ afError: AFError?, _ nKError: NKError) -> Void) {
         var convertible: URLConvertible?
         if serverUrlFileName is URL {
             convertible = serverUrlFileName as? URLConvertible
@@ -61,12 +61,11 @@ public extension NextcloudKit {
             switch response.result {
             case .failure(let error):
                 let resultError = NKError(error: error, afResponse: response, responseData: nil)
-                options.queue.async { completionHandler(account, nil, nil, 0, nil, error, resultError) }
+                options.queue.async { completionHandler(account, nil, nil, 0, response, error, resultError) }
             case .success:
                 var date: Date?
                 var etag: String?
                 var length: Int64 = 0
-                let allHeaderFields = response.response?.allHeaderFields
 
                 if let result = response.response?.allHeaderFields["Content-Length"] as? String {
                     length = Int64(result) ?? 0
@@ -83,7 +82,7 @@ public extension NextcloudKit {
                     date = self.nkCommonInstance.convertDate(dateString, format: "EEE, dd MMM y HH:mm:ss zzz")
                 }
 
-                options.queue.async { completionHandler(account, etag, date, length, allHeaderFields, nil, .success) }
+                options.queue.async { completionHandler(account, etag, date, length, response, nil, .success) }
             }
         }
 

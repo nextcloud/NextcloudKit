@@ -33,7 +33,7 @@ public extension NextcloudKit {
                         userAgent: String? = nil,
                         options: NKRequestOptions = NKRequestOptions(),
                         taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-                        completion: @escaping (_ token: String?, _ data: Data?, _ error: NKError) -> Void) {
+                        completion: @escaping (_ token: String?, _ responseData: AFDataResponse<Data?>?, _ error: NKError) -> Void) {
         let endpoint = "ocs/v2.php/core/getapppassword"
         guard let url = self.nkCommonInstance.createStandardUrl(serverUrl: url, endpoint: endpoint, options: options) else {
             return options.queue.async { completion(nil, nil, .urlError) }
@@ -61,13 +61,13 @@ public extension NextcloudKit {
             switch response.result {
             case .failure(let error):
                 let error = NKError(error: error, afResponse: response, responseData: response.data)
-                options.queue.async { completion(nil, nil, error) }
+                options.queue.async { completion(nil, response, error) }
             case .success(let xmlData):
                 if let data = xmlData {
                     let apppassword = NKDataFileXML(nkCommonInstance: self.nkCommonInstance).convertDataAppPassword(data: data)
-                    options.queue.async { completion(apppassword, xmlData, .success) }
+                    options.queue.async { completion(apppassword, response, .success) }
                 } else {
-                    options.queue.async { completion(nil, nil, .xmlError) }
+                    options.queue.async { completion(nil, response, .xmlError) }
                 }
             }
         }
@@ -80,7 +80,7 @@ public extension NextcloudKit {
                            account: String,
                            options: NKRequestOptions = NKRequestOptions(),
                            taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-                           completion: @escaping (_ data: Data?, _ error: NKError) -> Void) {
+                           completion: @escaping (_ responseData: AFDataResponse<Data?>?, _ error: NKError) -> Void) {
         let endpoint = "ocs/v2.php/core/apppassword"
         guard let nkSession = nkCommonInstance.getSession(account: account),
               let url = self.nkCommonInstance.createStandardUrl(serverUrl: serverUrl, endpoint: endpoint, options: options) else {
@@ -109,9 +109,9 @@ public extension NextcloudKit {
             switch response.result {
             case .failure(let error):
                 let error = NKError(error: error, afResponse: response, responseData: response.data)
-                options.queue.async { completion(nil, error) }
-            case .success(let xmlData):
-                options.queue.async { completion(xmlData, .success) }
+                options.queue.async { completion(response, error) }
+            case .success:
+                options.queue.async { completion(response, .success) }
             }
         }
     }
@@ -121,7 +121,7 @@ public extension NextcloudKit {
     func getLoginFlowV2(serverUrl: String,
                         options: NKRequestOptions = NKRequestOptions(),
                         taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-                        completion: @escaping (_ token: String?, _ endpoint: String?, _ login: String?, _ data: Data?, _ error: NKError) -> Void) {
+                        completion: @escaping (_ token: String?, _ endpoint: String?, _ login: String?, _ responseData: AFDataResponse<Data>?, _ error: NKError) -> Void) {
         let endpoint = "index.php/login/v2"
         guard let url = nkCommonInstance.createStandardUrl(serverUrl: serverUrl, endpoint: endpoint, options: options) else {
             return options.queue.async { completion(nil, nil, nil, nil, .urlError) }
@@ -141,7 +141,7 @@ public extension NextcloudKit {
             switch response.result {
             case .failure(let error):
                 let error = NKError(error: error, afResponse: response, responseData: response.data)
-                options.queue.async { completion(nil, nil, nil, nil, error) }
+                options.queue.async { completion(nil, nil, nil, response, error) }
             case .success(let jsonData):
                 let json = JSON(jsonData)
 
@@ -149,7 +149,7 @@ public extension NextcloudKit {
                 let endpoint = json["poll"]["endpoint"].string
                 let login = json["login"].string
 
-                options.queue.async { completion(token, endpoint, login, jsonData, .success) }
+                options.queue.async { completion(token, endpoint, login, response, .success) }
             }
         }
     }
@@ -158,7 +158,7 @@ public extension NextcloudKit {
                             endpoint: String,
                             options: NKRequestOptions = NKRequestOptions(),
                             taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-                            completion: @escaping (_ server: String?, _ loginName: String?, _ appPassword: String?, _ data: Data?, _ error: NKError) -> Void) {
+                            completion: @escaping (_ server: String?, _ loginName: String?, _ appPassword: String?, _ responseData: AFDataResponse<Data>?, _ error: NKError) -> Void) {
         let serverUrl = endpoint + "?token=" + token
         guard let url = serverUrl.asUrl else {
             return options.queue.async { completion(nil, nil, nil, nil, .urlError) }
@@ -178,14 +178,14 @@ public extension NextcloudKit {
             switch response.result {
             case .failure(let error):
                 let error = NKError(error: error, afResponse: response, responseData: response.data)
-                options.queue.async { completion(nil, nil, nil, nil, error) }
+                options.queue.async { completion(nil, nil, nil, response, error) }
             case .success(let jsonData):
                 let json = JSON(jsonData)
                 let server = json["server"].string
                 let loginName = json["loginName"].string
                 let appPassword = json["appPassword"].string
 
-                options.queue.async { completion(server, loginName, appPassword, jsonData, .success) }
+                options.queue.async { completion(server, loginName, appPassword, response, .success) }
             }
         }
     }

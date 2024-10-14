@@ -36,7 +36,7 @@ public extension NextcloudKit {
                 requestHandler: @escaping (_ request: UploadRequest) -> Void = { _ in },
                 taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
                 progressHandler: @escaping (_ progress: Progress) -> Void = { _ in },
-                completionHandler: @escaping (_ account: String, _ ocId: String?, _ etag: String?, _ date: Date?, _ size: Int64, _ allHeaderFields: [AnyHashable: Any]?, _ afError: AFError?, _ nkError: NKError) -> Void) {
+                completionHandler: @escaping (_ account: String, _ ocId: String?, _ etag: String?, _ date: Date?, _ size: Int64, _ responseData: AFDataResponse<Data?>?, _ afError: AFError?, _ nkError: NKError) -> Void) {
         var convertible: URLConvertible?
         var size: Int64 = 0
         if serverUrlFileName is URL {
@@ -72,10 +72,9 @@ public extension NextcloudKit {
             switch response.result {
             case .failure(let error):
                 let resultError = NKError(error: error, afResponse: response, responseData: response.data)
-                options.queue.async { completionHandler(account, nil, nil, nil, 0, nil, error, resultError) }
+                options.queue.async { completionHandler(account, nil, nil, nil, 0, response, error, resultError) }
             case .success:
                 var ocId: String?, etag: String?
-                let allHeaderFields = response.response?.allHeaderFields
                 if self.nkCommonInstance.findHeader("oc-fileid", allHeaderFields: response.response?.allHeaderFields) != nil {
                     ocId = self.nkCommonInstance.findHeader("oc-fileid", allHeaderFields: response.response?.allHeaderFields)
                 } else if self.nkCommonInstance.findHeader("fileid", allHeaderFields: response.response?.allHeaderFields) != nil {
@@ -91,12 +90,12 @@ public extension NextcloudKit {
                 }
                 if let dateString = self.nkCommonInstance.findHeader("date", allHeaderFields: response.response?.allHeaderFields) {
                     if let date = self.nkCommonInstance.convertDate(dateString, format: "EEE, dd MMM y HH:mm:ss zzz") {
-                        options.queue.async { completionHandler(account, ocId, etag, date, size, allHeaderFields, nil, .success) }
+                        options.queue.async { completionHandler(account, ocId, etag, date, size, response, nil, .success) }
                     } else {
-                        options.queue.async { completionHandler(account, nil, nil, nil, 0, allHeaderFields, nil, .invalidDate) }
+                        options.queue.async { completionHandler(account, nil, nil, nil, 0, response, nil, .invalidDate) }
                     }
                 } else {
-                    options.queue.async { completionHandler(account, nil, nil, nil, 0, allHeaderFields, nil, .invalidDate) }
+                    options.queue.async { completionHandler(account, nil, nil, nil, 0, response, nil, .invalidDate) }
                 }
             }
         }
@@ -179,7 +178,7 @@ public extension NextcloudKit {
                 if error == .success {
                     completion(NKError())
                 } else if error.errorCode == 404 {
-                    NextcloudKit.shared.createFolder(serverUrlFileName: serverUrlChunkFolder, account: account, options: options) { _, _, _, error in
+                    NextcloudKit.shared.createFolder(serverUrlFileName: serverUrlChunkFolder, account: account, options: options) { _, _, _, _, error in
                         completion(error)
                     }
                 } else {
@@ -264,7 +263,7 @@ public extension NextcloudKit {
                 let assembleTimeMax: Double = 30 * 60   // 30 min
                 options.timeout = max(assembleTimeMin, min(assembleTimePerGB * assembleSizeInGB, assembleTimeMax))
 
-                self.moveFileOrFolder(serverUrlFileNameSource: serverUrlFileNameSource, serverUrlFileNameDestination: serverUrlFileName, overwrite: true, account: account, options: options) { _, error in
+                self.moveFileOrFolder(serverUrlFileNameSource: serverUrlFileNameSource, serverUrlFileNameDestination: serverUrlFileName, overwrite: true, account: account, options: options) { _, _, error in
                     guard error == .success else {
                         return completion(account, filesChunkOutput, nil, nil, NKError(errorCode: NKError.chunkMoveFile, errorDescription: error.errorDescription))
                     }

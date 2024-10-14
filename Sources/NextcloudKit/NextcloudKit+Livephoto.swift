@@ -30,17 +30,17 @@ public extension NextcloudKit {
                       account: String,
                       options: NKRequestOptions = NKRequestOptions(),
                       taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-                      completion: @escaping (_ account: String, _ error: NKError) -> Void) {
+                      completion: @escaping (_ account: String, _ responseData: AFDataResponse<Data?>?, _ error: NKError) -> Void) {
         guard let url = serverUrlfileNamePath.encodedToUrl,
               let nkSession = nkCommonInstance.getSession(account: account) else {
-            return options.queue.async { completion(account, .urlError) }
+            return options.queue.async { completion(account, nil, .urlError) }
         }
         let method = HTTPMethod(rawValue: "PROPPATCH")
         ///
         options.contentType = "application/xml"
         ///
         guard let headers = nkCommonInstance.getStandardHeaders(account: account, options: options) else {
-            return options.queue.async { completion(account, .urlError) }
+            return options.queue.async { completion(account, nil, .urlError) }
         }
         var urlRequest: URLRequest
         do {
@@ -48,7 +48,7 @@ public extension NextcloudKit {
             let parameters = String(format: NKDataFileXML(nkCommonInstance: self.nkCommonInstance).requestBodyLivephoto, livePhotoFile)
             urlRequest.httpBody = parameters.data(using: .utf8)
         } catch {
-            return options.queue.async { completion(account, NKError(error: error)) }
+            return options.queue.async { completion(account, nil, NKError(error: error)) }
         }
 
         nkSession.sessionData.request(urlRequest).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
@@ -61,9 +61,9 @@ public extension NextcloudKit {
             switch response.result {
             case .failure(let error):
                 let error = NKError(error: error, afResponse: response, responseData: response.data)
-                options.queue.async { completion(account, error) }
+                options.queue.async { completion(account, response, error) }
             case .success:
-                options.queue.async { completion(account, .success) }
+                options.queue.async { completion(account, response, .success) }
             }
         }
     }

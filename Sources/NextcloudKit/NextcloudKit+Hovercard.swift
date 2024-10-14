@@ -31,12 +31,12 @@ public extension NextcloudKit {
                       account: String,
                       options: NKRequestOptions = NKRequestOptions(),
                       taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-                      completion: @escaping (_ account: String, _ result: NKHovercard?, _ data: Data?, _ error: NKError) -> Void) {
+                      completion: @escaping (_ account: String, _ result: NKHovercard?, _ responseData: AFDataResponse<Data>?, _ error: NKError) -> Void) {
         let endpoint = "ocs/v2.php/hovercard/v1/\(userId)"
         guard let nkSession = nkCommonInstance.getSession(account: account),
               let url = nkCommonInstance.createStandardUrl(serverUrl: nkSession.urlBase, endpoint: endpoint, options: options),
               let headers = nkCommonInstance.getStandardHeaders(account: account, options: options) else {
-            return options.queue.async { completion(account, nil,nil, .urlError) }
+            return options.queue.async { completion(account, nil, nil, .urlError) }
         }
 
         nkSession.sessionData.request(url, method: .get, parameters: nil, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
@@ -49,7 +49,7 @@ public extension NextcloudKit {
             switch response.result {
             case .failure(let error):
                 let error = NKError(error: error, afResponse: response, responseData: response.data)
-                options.queue.async { completion(account, nil, nil, error) }
+                options.queue.async { completion(account, nil, response, error) }
             case .success(let jsonData):
                 let json = JSON(jsonData)
                 let data = json["ocs"]["data"]
@@ -57,10 +57,10 @@ public extension NextcloudKit {
                       let result = NKHovercard(jsonData: data)
                 else {
                     let error = NKError(rootJson: json, fallbackStatusCode: response.response?.statusCode)
-                    options.queue.async { completion(account, nil, jsonData, error) }
+                    options.queue.async { completion(account, nil, response, error) }
                     return
                 }
-                options.queue.async { completion(account, result, jsonData, .success) }
+                options.queue.async { completion(account, result, response, .success) }
             }
         }
     }
