@@ -110,7 +110,7 @@ public class NKCommon: NSObject {
     internal var utiCache = NSCache<NSString, CFString>()
     internal var mimeTypeCache = NSCache<CFString, NSString>()
     internal var filePropertiesCache = NSCache<CFString, NKFileProperty>()
-    internal var internalTypeIdentifiers: [UTTypeConformsToServer] = []
+    internal var internalTypeIdentifiers = ThreadSafeArray<UTTypeConformsToServer>()
 
     public var filenamePathLog: String = ""
     public var levelLog: Int = 0
