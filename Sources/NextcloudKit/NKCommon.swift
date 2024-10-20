@@ -43,6 +43,8 @@ public protocol NextcloudKitDelegate {
 
     func downloadComplete(fileName: String, serverUrl: String, etag: String?, date: Date?, dateLastModified: Date?, length: Int64, task: URLSessionTask, error: NKError)
     func uploadComplete(fileName: String, serverUrl: String, ocId: String?, etag: String?, date: Date?, size: Int64, task: URLSessionTask, error: NKError)
+
+    func request<Value>(_ request: DataRequest, didParseResponse response: AFDataResponse<Value>)
 }
 
 public class NKCommon: NSObject {
