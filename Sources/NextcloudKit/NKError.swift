@@ -121,7 +121,7 @@ public class NKError: NSObject {
         case 500:
             return NSLocalizedString("_internal_server_", value: "Internal server error", comment: "")
         case 503:
-            return NSLocalizedString("_server_error_retry_", value: "Server is currently in maintenance mode", comment: "")
+            return NSLocalizedString("_server_maintenance_mode_", value: "Server is currently in maintenance mode", comment: "")
         case 507:
             return NSLocalizedString("_user_over_quota_", value: "Storage quota is reached", comment: "")
         case 200:
