@@ -73,7 +73,7 @@ public class NKError: NSObject {
     public static let invalidData = NKError(errorCode: NSURLErrorCannotDecodeContentData, errorDescription: NSLocalizedString("_invalid_data_format_", value: "Invalid data format", comment: ""))
     public static let success = NKError(errorCode: 0, errorDescription: "")
 
-    private static func getErrorDescription(for code: Int) -> String? {
+    public static func getErrorDescription(for code: Int) -> String? {
         switch code {
         case -9999:
             return NSLocalizedString("_internal_server_", value: "Internal error", comment: "")
