@@ -55,8 +55,11 @@ public enum NKProperties: String, CaseIterable {
     case systemtags = "<system-tags xmlns=\"http://nextcloud.org/ns\"/>"
     case filemetadatasize = "<file-metadata-size xmlns=\"http://nextcloud.org/ns\"/>"
     case filemetadatagps = "<file-metadata-gps xmlns=\"http://nextcloud.org/ns\"/>"
-    case metadataphotossize = "<metadata-photos-size xmlns=\"http://nextcloud.org/ns\"/>"
+    case metadataphotosexif = "<metadata-photos-exif xmlns=\"http://nextcloud.org/ns\"/>"
     case metadataphotosgps = "<metadata-photos-gps xmlns=\"http://nextcloud.org/ns\"/>"
+    case metadataphotosoriginaldatetime = "<metadata-photos-original_date_time xmlns=\"http://nextcloud.org/ns\"/>"
+    case metadataphotoplace = "<metadata-photos-place xmlns=\"http://nextcloud.org/ns\"/>"
+    case metadataphotossize = "<metadata-photos-size xmlns=\"http://nextcloud.org/ns\"/>"
     case metadatafileslivephoto = "<metadata-files-live-photo xmlns=\"http://nextcloud.org/ns\"/>"
     case hidden = "<hidden xmlns=\"http://nextcloud.org/ns\"/>"
     /// open-collaboration-services.org
@@ -209,6 +212,15 @@ public class NKFile: NSObject {
     public var livePhotoFile = ""
     /// Indicating if the file is sent as a live photo from the server, or if we should detect it as such and convert it client-side
     public var isFlaggedAsLivePhotoByServer = false
+    ///
+    public var datePhotosOriginal: Date?
+    ///
+    public struct ChildElement {
+        let name: String
+        let text: String?
+    }
+    public var exifPhotos = [[String: String?]]()
+    public var placePhotos: String?
 }
 
 public class NKFileProperty: NSObject {
@@ -588,10 +600,10 @@ class NKDataFileXML: NSObject {
         return xml["ocs", "data", "apppassword"].text
     }
 
-    func convertDataFile(xmlData: Data, dav: String, urlBase: String, user: String, userId: String, account: String, showHiddenFiles: Bool, includeHiddenFiles: [String]) -> [NKFile] {
+    func convertDataFile(xmlData: Data, nkSession: NKSession, showHiddenFiles: Bool, includeHiddenFiles: [String]) -> [NKFile] {
         var files: [NKFile] = []
-        let rootFiles = "/" + dav + "/files/"
-        guard let baseUrl = self.nkCommonInstance.getHostName(urlString: urlBase) else {
+        let rootFiles = "/" + nkSession.dav + "/files/"
+        guard let baseUrl = self.nkCommonInstance.getHostName(urlString: nkSession.urlBase) else {
             return files
         }
         let xml = XML.parse(xmlData)
@@ -622,7 +634,7 @@ class NKDataFileXML: NSObject {
                 }
 
                 // account
-                file.account = account
+                file.account = nkSession.account
 
                 // path
                 file.path = (fileNamePath as NSString).deletingLastPathComponent + "/"
@@ -633,7 +645,7 @@ class NKDataFileXML: NSObject {
                 file.fileName = file.fileName.removingPercentEncoding ?? ""
 
                 // ServerUrl
-                if href == rootFiles + user + "/" {
+                if href == rootFiles + nkSession.user + "/" {
                     file.fileName = "."
                     file.serverUrl = ".."
                 } else {
@@ -839,29 +851,42 @@ class NKDataFileXML: NSObject {
                 file.hidden = (hidden as NSString).boolValue
             }
 
-            let results = self.nkCommonInstance.getInternalType(fileName: file.fileName, mimeType: file.contentType, directory: file.directory)
+            if let datePhotosOriginal = propstat["d:prop", "nc:metadata-photos-original_date_time"].double, datePhotosOriginal > 0 {
+                file.datePhotosOriginal = Date(timeIntervalSince1970: datePhotosOriginal)
+            }
+
+            let exifPhotosElements = propstat["d:prop", "nc:metadata-photos-exif"]
+            if let element = exifPhotosElements.element {
+                for child in element.childElements {
+                    file.exifPhotos.append([child.name: child.text])
+                }
+            }
+
+            file.placePhotos = propstat["d:prop", "nc:metadata-photos-place"].text
+
+            let results = self.nkCommonInstance.getInternalType(fileName: file.fileName, mimeType: file.contentType, directory: file.directory, account: nkSession.account)
 
             file.contentType = results.mimeType
             file.iconName = results.iconName
             file.name = "files"
             file.classFile = results.classFile
-            file.urlBase = urlBase
-            file.user = user
-            file.userId = userId
+            file.urlBase = nkSession.urlBase
+            file.user = nkSession.user
+            file.userId = nkSession.userId
 
             files.append(file)
         }
 
         // Live photo detect
         files = files.sorted {
-            return ($0.serverUrl, $0.fileName.withRemovedFileExtension, $0.classFile) < ($1.serverUrl, $1.fileName.withRemovedFileExtension, $1.classFile)
+            return ($0.serverUrl, ($0.fileName as NSString).deletingPathExtension, $0.classFile) < ($1.serverUrl, ($1.fileName as NSString).deletingPathExtension, $1.classFile)
         }
         for index in files.indices {
             if !files[index].livePhotoFile.isEmpty || files[index].directory {
                 continue
             }
             if index < files.count - 1,
-               files[index].fileName.withRemovedFileExtension == files[index + 1].fileName.withRemovedFileExtension,
+               (files[index].fileName as NSString).deletingPathExtension == (files[index + 1].fileName as NSString) .deletingPathExtension,
                files[index].classFile == NKCommon.TypeClassFile.image.rawValue,
                files[index + 1].classFile == NKCommon.TypeClassFile.video.rawValue {
                 files[index].livePhotoFile = files[index + 1].fileId
@@ -872,10 +897,10 @@ class NKDataFileXML: NSObject {
         return files
     }
 
-    func convertDataTrash(xmlData: Data, urlBase: String, showHiddenFiles: Bool) -> [NKTrash] {
+    func convertDataTrash(xmlData: Data, nkSession: NKSession, showHiddenFiles: Bool) -> [NKTrash] {
         var files: [NKTrash] = []
         var first: Bool = true
-        guard let baseUrl = self.nkCommonInstance.getHostName(urlString: urlBase) else {
+        guard let baseUrl = self.nkCommonInstance.getHostName(urlString: nkSession.urlBase) else {
             return files
         }
         let xml = XML.parse(xmlData)
@@ -944,7 +969,7 @@ class NKDataFileXML: NSObject {
                 file.trashbinDeletionTime = Date(timeIntervalSince1970: trashbinDeletionTimeDouble)
             }
 
-            let results = self.nkCommonInstance.getInternalType(fileName: file.trashbinFileName, mimeType: file.contentType, directory: file.directory)
+            let results = self.nkCommonInstance.getInternalType(fileName: file.trashbinFileName, mimeType: file.contentType, directory: file.directory, account: nkSession.account)
 
             file.contentType = results.mimeType
             file.classFile = results.classFile

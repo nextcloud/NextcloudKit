@@ -1,6 +1,23 @@
 //
-// SPDX-FileCopyrightText: 2024 Nextcloud GmbH and Nextcloud contributors
-// SPDX-License-Identifier: GPL-3.0-or-later
+//  fileNameValidatorTests.swift
+//
+//
+//  Created by Milen Pivchev on 12.07.24.
+//  Copyright © 2024 Milen Pivchev. All rights reserved.
+//
+//  Author: Milen Pivchev <milen.pivchev@nextcloud.com>
+//  This program is free software: you can redistribute it and/or modify
+//  it under the terms of the GNU General Public License as published by
+//  the Free Software Foundation, either version 3 of the License, or
+//  (at your option) any later version.
+//
+//  This program is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU General Public License for more details.
+//
+//  You should have received a copy of the GNU General Public License
+//  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 
 import XCTest
@@ -17,7 +34,7 @@ class FileNameValidatorTests: XCTestCase {
                                          "lpt0", "lpt1", "lpt2", "lpt3", "lpt4", "lpt5", "lpt6", "lpt7",
                                          "lpt8", "lpt9", "lpt¹", "lpt²", "lpt³"],
             forbiddenFileNameCharacters: ["<", ">", ":", "\\\\", "/", "|", "?", "*", "&"],
-            forbiddenFileNameExtensions: [".filepart",".part"]
+            forbiddenFileNameExtensions: [".filepart",".part", ".", ",", " "]
         )
         super.setUp()
     }
@@ -39,56 +56,71 @@ class FileNameValidatorTests: XCTestCase {
 
     func testEndsWithSpaceOrPeriod() {
         let result = fileNameValidator.checkFileName("filename ")
-        XCTAssertEqual(result?.errorDescription, fileNameValidator.fileEndsWithSpacePeriodError.errorDescription)
+        XCTAssertEqual(result?.errorDescription, fileNameValidator.fileWithSpaceError.errorDescription)
 
         let result2 = fileNameValidator.checkFileName("filename.")
-        XCTAssertEqual(result2?.errorDescription, fileNameValidator.fileEndsWithSpacePeriodError.errorDescription)
+        XCTAssertEqual(result2?.errorDescription, fileNameValidator.fileForbiddenFileExtensionError.errorDescription)
+
+        let result3 = fileNameValidator.checkFileName(" filename")
+        XCTAssertEqual(result3?.errorDescription, fileNameValidator.fileWithSpaceError.errorDescription)
+
+        let result4 = fileNameValidator.checkFileName(" filename. ")
+        XCTAssertEqual(result4?.errorDescription, fileNameValidator.fileWithSpaceError.errorDescription)
     }
 
     func testValidFileName() {
         let result = fileNameValidator.checkFileName("validFileName")
         XCTAssertNil(result?.errorDescription)
+
+        let result2 = fileNameValidator.checkFileName("validFi.leName")
+        XCTAssertNil(result2?.errorDescription)
+
+        let result3 = fileNameValidator.checkFileName("validFi.leName.txt")
+        XCTAssertNil(result3?.errorDescription)
+
+        let result4 = fileNameValidator.checkFileName("validFi   leName.txt")
+        XCTAssertNil(result4?.errorDescription)
     }
 
     func testValidFolderAndFilePaths() {
         let folderPath = "validFolder"
 
-        let result = fileNameValidator.checkFolderPath(folderPath: folderPath)
+        let result = fileNameValidator.checkFolderPath(folderPath)
         XCTAssertTrue(result)
     }
 
     func testFolderPathWithReservedName() {
         let folderPath = "CON"
 
-        let result = fileNameValidator.checkFolderPath(folderPath: folderPath)
+        let result = fileNameValidator.checkFolderPath(folderPath)
         XCTAssertFalse(result)
     }
 
     func testFolderPathWithInvalidCharacter() {
         let folderPath = "invalid<Folder"
 
-        let result = fileNameValidator.checkFolderPath(folderPath: folderPath)
+        let result = fileNameValidator.checkFolderPath(folderPath)
         XCTAssertFalse(result)
     }
 
     func testFolderPathEndingWithSpace() {
         let folderPath = "folderWithSpace "
 
-        let result = fileNameValidator.checkFolderPath(folderPath: folderPath)
+        let result = fileNameValidator.checkFolderPath(folderPath)
         XCTAssertFalse(result)
     }
 
     func testFolderPathEndingWithPeriod() {
         let folderPath = "validFolder."
 
-        let result = fileNameValidator.checkFolderPath(folderPath: folderPath)
+        let result = fileNameValidator.checkFolderPath(folderPath)
         XCTAssertFalse(result)
     }
 
     func testFilePathWithNestedFolder() {
         let folderPath = "validFolder/secondValidFolder/CON"
 
-        let result = fileNameValidator.checkFolderPath(folderPath: folderPath)
+        let result = fileNameValidator.checkFolderPath(folderPath)
         XCTAssertFalse(result)
     }
 }

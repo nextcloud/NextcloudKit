@@ -12,21 +12,15 @@ public extension NextcloudKit {
                             options: NKRequestOptions = NKRequestOptions(),
                             request: @escaping (DataRequest?) -> Void = { _ in },
                             taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-                            completion: @escaping (_ account: String, _ dashboardWidgets: [NCCDashboardWidget]?, _ data: Data?, _ error: NKError) -> Void) {
-        let urlBase = self.nkCommonInstance.urlBase
-        var url: URLConvertible?
-        if let endpoint = options.endpoint {
-            url = URL(string: endpoint)
-        } else {
-            let endpoint = "ocs/v2.php/apps/dashboard/api/v1/widgets"
-            url = self.nkCommonInstance.createStandardUrl(serverUrl: urlBase, endpoint: endpoint)
+                            completion: @escaping (_ account: String, _ dashboardWidgets: [NCCDashboardWidget]?, _ responseData: AFDataResponse<Data>?, _ error: NKError) -> Void) {
+        let endpoint = "ocs/v2.php/apps/dashboard/api/v1/widgets"
+        guard let nkSession = nkCommonInstance.getSession(account: account),
+              let url = nkCommonInstance.createStandardUrl(serverUrl: nkSession.urlBase, endpoint: endpoint, options: options),
+              let headers = nkCommonInstance.getStandardHeaders(account: account, options: options) else {
+            return options.queue.async { completion(account, nil,nil, .urlError) }
         }
-        guard let url = url else {
-            return options.queue.async { completion(account, nil, nil, .urlError) }
-        }
-        let headers = self.nkCommonInstance.getStandardHeaders(options: options)
 
-        let dashboardRequest = sessionManager.request(url, method: .get, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
+        let dashboardRequest = nkSession.sessionData.request(url, method: .get, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
             task.taskDescription = options.taskDescription
             taskHandler(task)
         }.responseData(queue: self.nkCommonInstance.backgroundQueue) { response in
@@ -40,13 +34,13 @@ public extension NextcloudKit {
                 let statusCode = json["ocs"]["meta"]["statuscode"].int ?? NKError.internalError
                 if 200..<300 ~= statusCode {
                     let results = NCCDashboardWidget.factory(data: data)
-                    options.queue.async { completion(account, results, jsonData, .success) }
+                    options.queue.async { completion(account, results, response, .success) }
                 } else {
-                    options.queue.async { completion(account, nil, jsonData, NKError(rootJson: json, fallbackStatusCode: response.response?.statusCode)) }
+                    options.queue.async { completion(account, nil, response, NKError(rootJson: json, fallbackStatusCode: response.response?.statusCode)) }
                 }
             case .failure(let error):
                 let error = NKError(error: error, afResponse: response, responseData: response.data)
-                options.queue.async { completion(account, nil, nil, error) }
+                options.queue.async { completion(account, nil, response, error) }
             }
         }
         options.queue.async { request(dashboardRequest) }
@@ -57,21 +51,15 @@ public extension NextcloudKit {
                                         options: NKRequestOptions = NKRequestOptions(),
                                         request: @escaping (DataRequest?) -> Void = { _ in },
                                         taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-                                        completion: @escaping (_ account: String, _ dashboardApplications: [NCCDashboardApplication]?, _ data: Data?, _ error: NKError) -> Void) {
-        let urlBase = self.nkCommonInstance.urlBase
-        var url: URLConvertible?
-        if let endpoint = options.endpoint {
-            url = URL(string: endpoint)
-        } else {
-            let endpoint = "ocs/v2.php/apps/dashboard/api/v1/widget-items?widgets[]=\(items)"
-            url = self.nkCommonInstance.createStandardUrl(serverUrl: urlBase, endpoint: endpoint)
+                                        completion: @escaping (_ account: String, _ dashboardApplications: [NCCDashboardApplication]?, _ responseData: AFDataResponse<Data>?, _ error: NKError) -> Void) {
+        let endpoint = "ocs/v2.php/apps/dashboard/api/v1/widget-items?widgets[]=\(items)"
+        guard let nkSession = nkCommonInstance.getSession(account: account),
+              let url = nkCommonInstance.createStandardUrl(serverUrl: nkSession.urlBase, endpoint: endpoint, options: options),
+              let headers = nkCommonInstance.getStandardHeaders(account: account, options: options) else {
+            return options.queue.async { completion(account, nil,nil, .urlError) }
         }
-        guard let url = url else {
-            return options.queue.async { completion(account, nil, nil, .urlError) }
-        }
-        let headers = self.nkCommonInstance.getStandardHeaders(options: options)
 
-        let dashboardRequest = sessionManager.request(url, method: .get, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
+        let dashboardRequest = nkSession.sessionData.request(url, method: .get, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
             task.taskDescription = options.taskDescription
             taskHandler(task)
         }.responseData(queue: self.nkCommonInstance.backgroundQueue) { response in
@@ -85,13 +73,13 @@ public extension NextcloudKit {
                 let statusCode = json["ocs"]["meta"]["statuscode"].int ?? NKError.internalError
                 if 200..<300 ~= statusCode {
                     let results = NCCDashboardApplication.factory(data: data)
-                    options.queue.async { completion(account, results, jsonData, .success) }
+                    options.queue.async { completion(account, results, response, .success) }
                 } else {
-                    options.queue.async { completion(account, nil, jsonData, NKError(rootJson: json, fallbackStatusCode: response.response?.statusCode)) }
+                    options.queue.async { completion(account, nil, response, NKError(rootJson: json, fallbackStatusCode: response.response?.statusCode)) }
                 }
             case .failure(let error):
                 let error = NKError(error: error, afResponse: response, responseData: response.data)
-                options.queue.async { completion(account, nil, nil, error) }
+                options.queue.async { completion(account, nil, response, error) }
             }
         }
         options.queue.async { request(dashboardRequest) }
