@@ -73,7 +73,7 @@ public class NKError: NSObject {
     public static let invalidData = NKError(errorCode: NSURLErrorCannotDecodeContentData, errorDescription: NSLocalizedString("_invalid_data_format_", value: "Invalid data format", comment: ""))
     public static let success = NKError(errorCode: 0, errorDescription: "")
 
-    private static func getErrorDescription(for code: Int) -> String? {
+    public static func getErrorDescription(for code: Int) -> String? {
         switch code {
         case -9999:
             return NSLocalizedString("_internal_server_", value: "Internal error", comment: "")
@@ -121,7 +121,7 @@ public class NKError: NSObject {
         case 500:
             return NSLocalizedString("_internal_server_", value: "Internal server error", comment: "")
         case 503:
-            return NSLocalizedString("_server_error_retry_", value: "The server is temporarily unavailable", comment: "")
+            return NSLocalizedString("_server_maintenance_mode_", value: "Server is currently in maintenance mode", comment: "")
         case 507:
             return NSLocalizedString("_user_over_quota_", value: "Storage quota is reached", comment: "")
         case 200:

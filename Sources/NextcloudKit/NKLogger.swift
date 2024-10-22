@@ -46,6 +46,8 @@ final class NKLogger: EventMonitor {
     }
 
     func request<Value>(_ request: DataRequest, didParseResponse response: AFDataResponse<Value>) {
+        self.nkCommonInstance.delegate?.request(request, didParseResponse: response)
+
         guard let date = self.nkCommonInstance.convertDate(Date(), format: "yyyy-MM-dd' 'HH:mm:ss") else { return }
         let responseResultString = String("\(response.result)")
         let responseDebugDescription = String("\(response.debugDescription)")
