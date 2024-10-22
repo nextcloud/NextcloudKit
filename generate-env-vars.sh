@@ -1,6 +1,9 @@
 #This generates an env-vars file that the project uses for various tasks, mostly testing. If you want to modify the env vars, open .env-vars in the root dir.
 #It also generates a .swift file in the project that contains the env vars as swift constants for easy use. Check EnvVars.generated.swift
-
+#
+# SPDX-FileCopyrightText: 2022 Nextcloud GmbH and Nextcloud contributors
+# SPDX-License-Identifier: GPL-3.0-or-later
+#
 if [ ! -f ".env-vars" ]; then
     touch .env-vars
     echo "export TEST_SERVER_URL=" >> .env-vars

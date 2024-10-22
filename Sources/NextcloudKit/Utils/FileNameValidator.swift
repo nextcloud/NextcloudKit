@@ -40,13 +40,7 @@ public class FileNameValidator {
         }
     }
 
-    private var forbiddenFileNameCharactersRegex: NSRegularExpression?
-
-    public private(set) var forbiddenFileNameCharacters: [String] = [] {
-        didSet {
-            forbiddenFileNameCharactersRegex = try? NSRegularExpression(pattern: "[\(forbiddenFileNameCharacters.joined())]")
-        }
-    }
+    public private(set) var forbiddenFileNameCharacters: [String] = []
 
     public private(set) var forbiddenFileNameExtensions: [String] = [] {
         didSet {
@@ -54,7 +48,7 @@ public class FileNameValidator {
         }
     }
 
-    public let fileEndsWithSpacePeriodError = NKError(errorCode: NSURLErrorCannotCreateFile, errorDescription: NSLocalizedString("_file_name_validator_error_ends_with_space_period_", value: "File name ends with a space or a period.", comment: ""))
+    public let fileWithSpaceError = NKError(errorCode: NSURLErrorCannotCreateFile, errorDescription: NSLocalizedString("_file_name_validator_error_space_", value: "Name must not contain spaces at the beginning or end.", comment: ""))
 
     public var fileReservedNameError: NKError {
         let errorMessageTemplate = NSLocalizedString("_file_name_validator_error_reserved_name_", value: "\"%@\" is a forbidden name.", comment: "")
@@ -86,11 +80,7 @@ public class FileNameValidator {
     }
 
     public func checkFileName(_ filename: String) -> NKError? {
-        if filename.hasSuffix(" ") || filename.hasSuffix(".") {
-            return fileEndsWithSpacePeriodError
-        }
-
-        if let invalidCharacterError = checkInvalidCharacters(string: filename) {
+        if let regex = try? NSRegularExpression(pattern: "[\(forbiddenFileNameCharacters.joined())]"), let invalidCharacterError = checkInvalidCharacters(string: filename, regex: regex) {
             return invalidCharacterError
         }
 
@@ -100,25 +90,36 @@ public class FileNameValidator {
             return fileReservedNameError
         }
 
-        if forbiddenFileNameExtensions.contains(where: { filename.uppercased().hasSuffix($0.uppercased()) }) {
-            templateString = filename.fileExtension
-            return fileForbiddenFileExtensionError
+        for fileNameExtension in forbiddenFileNameExtensions {
+            if fileNameExtension == " " {
+                if filename.uppercased().hasSuffix(fileNameExtension) || filename.uppercased().hasPrefix(fileNameExtension) {
+                    return fileWithSpaceError
+                }
+            } else if filename.uppercased().hasSuffix(fileNameExtension.uppercased()) {
+                if fileNameExtension == " " {
+                    return fileWithSpaceError
+                }
+
+                templateString = filename.fileExtension
+
+                return fileForbiddenFileExtensionError
+            }
         }
 
         return nil
     }
 
-    public func checkFolderPath(folderPath: String) -> Bool {
+    public func checkFolderPath(_ folderPath: String) -> Bool {
         return folderPath.split { $0 == "/" || $0 == "\\" }
             .allSatisfy { checkFileName(String($0)) == nil }
     }
 
-    private func checkInvalidCharacters(string: String) -> NKError? {
+    private func checkInvalidCharacters(string: String, regex: NSRegularExpression) -> NKError? {
         for char in string {
             let charAsString = String(char)
             let range = NSRange(location: 0, length: charAsString.utf16.count)
 
-            if forbiddenFileNameCharactersRegex?.firstMatch(in: charAsString, options: [], range: range) != nil {
+            if regex.firstMatch(in: charAsString, options: [], range: range) != nil {
                 templateString = charAsString
                 return fileInvalidCharacterError
             }

@@ -1,22 +1,6 @@
 //
-//  NextcloudKitIntegrationTests.swift
-//  
-//  Created by Milen Pivchev on 23.05.23.
-//  Copyright © 2023 Milen Pivchev. All rights reserved.
-//
-//  Author: Milen Pivchev <milen.pivchev@nextcloud.com>
-//  This program is free software: you can redistribute it and/or modify
-//  it under the terms of the GNU General Public License as published by
-//  the Free Software Foundation, either version 3 of the License, or
-//  (at your option) any later version.
-//
-//  This program is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//  GNU General Public License for more details.
-//
-//  You should have received a copy of the GNU General Public License
-//  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+// SPDX-FileCopyrightText: 2023 Nextcloud GmbH and Nextcloud contributors
+// SPDX-License-Identifier: GPL-3.0-or-later
 //
 
 import XCTest
@@ -29,7 +13,7 @@ final class FilesIntegrationTests: BaseIntegrationXCTestCase {
         let serverUrl = "\(baseUrl)/remote.php/dav/files/\(userId)"
         let serverUrlFileName = "\(serverUrl)/\(folderName)"
 
-        NextcloudKit.shared.setup(account: account, user: user, userId: userId, password: password, urlBase: baseUrl)
+        NextcloudKit.shared.appendSession(account: account, urlBase: baseUrl, user: user, userId: userId, password: password, userAgent: "", nextcloudVersion: 0, groupIdentifier: "")
 
         // Test creating folder
         NextcloudKit.shared.createFolder(serverUrlFileName: serverUrlFileName, account: account) { account, ocId, date, error in
@@ -45,7 +29,7 @@ final class FilesIntegrationTests: BaseIntegrationXCTestCase {
                 XCTAssertEqual(self.account, account)
                 XCTAssertEqual(NKError.success.errorCode, error.errorCode)
                 XCTAssertEqual(NKError.success.errorDescription, error.errorDescription)
-                XCTAssertEqual(files[0].fileName, folderName)
+                XCTAssertEqual(files?[0].fileName, folderName)
 
                 Thread.sleep(forTimeInterval: 0.2)
 
@@ -63,7 +47,7 @@ final class FilesIntegrationTests: BaseIntegrationXCTestCase {
 
                         XCTAssertEqual(404, error.errorCode)
                         XCTAssertEqual(self.account, account)
-                        XCTAssertTrue(files.isEmpty)
+                        XCTAssertTrue(files?.isEmpty ?? false)
                     }
                 }
             }

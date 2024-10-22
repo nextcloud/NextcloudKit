@@ -1,25 +1,6 @@
 //
-//  NKError.swift
-//  NextcloudKit
-//
-//  Created by Henrik Storch on 18/08/22.
-//  Copyright © 2022 Henrik Sorch. All rights reserved.
-//
-//  Author Marino Faggiana <marino.faggiana@nextcloud.com>
-//  Author Henrik Storch <henrik.storch@nextcloud.com>
-//
-//  This program is free software: you can redistribute it and/or modify
-//  it under the terms of the GNU General Public License as published by
-//  the Free Software Foundation, either version 3 of the License, or
-//  (at your option) any later version.
-//
-//  This program is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//  GNU General Public License for more details.
-//
-//  You should have received a copy of the GNU General Public License
-//  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+// SPDX-FileCopyrightText: 2022 Nextcloud GmbH and Nextcloud contributors
+// SPDX-License-Identifier: GPL-3.0-or-later
 //
 
 import Foundation
@@ -67,12 +48,13 @@ public class NKError: NSObject {
     public let responseData: Data?
 
     public static let urlError = NKError(errorCode: NSURLErrorBadURL, errorDescription: NSLocalizedString("_invalid_url_", value: "Invalid server url", comment: ""))
+    public static let invalidResponseError = NKError(errorCode: NSURLErrorBadServerResponse, errorDescription: NSLocalizedString("_error_response_", value: "Invalid response", comment: ""))
     public static let xmlError = NKError(errorCode: NSURLErrorBadServerResponse, errorDescription: NSLocalizedString("_error_decode_xml_", value: "Invalid response, error decoding XML", comment: ""))
     public static let invalidDate = NKError(errorCode: NSURLErrorBadServerResponse, errorDescription: NSLocalizedString("_invalid_date_format_", value: "Invalid date format", comment: ""))
     public static let invalidData = NKError(errorCode: NSURLErrorCannotDecodeContentData, errorDescription: NSLocalizedString("_invalid_data_format_", value: "Invalid data format", comment: ""))
     public static let success = NKError(errorCode: 0, errorDescription: "")
 
-    private static func getErrorDescription(for code: Int) -> String? {
+    public static func getErrorDescription(for code: Int) -> String? {
         switch code {
         case -9999:
             return NSLocalizedString("_internal_server_", value: "Internal error", comment: "")
@@ -120,7 +102,7 @@ public class NKError: NSObject {
         case 500:
             return NSLocalizedString("_internal_server_", value: "Internal server error", comment: "")
         case 503:
-            return NSLocalizedString("_server_error_retry_", value: "The server is temporarily unavailable", comment: "")
+            return NSLocalizedString("_server_maintenance_mode_", value: "Server is currently in maintenance mode", comment: "")
         case 507:
             return NSLocalizedString("_user_over_quota_", value: "Storage quota is reached", comment: "")
         case 200:

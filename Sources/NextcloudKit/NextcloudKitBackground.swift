@@ -1,24 +1,6 @@
 //
-//  NextcloudKitBackground.swift
-//  NextcloudKit
-//
-//  Created by Marino Faggiana on 29/10/19.
-//  Copyright © 2022 Marino Faggiana. All rights reserved.
-//
-//  Author Marino Faggiana <marino.faggiana@nextcloud.com>
-//
-//  This program is free software: you can redistribute it and/or modify
-//  it under the terms of the GNU General Public License as published by
-//  the Free Software Foundation, either version 3 of the License, or
-//  (at your option) any later version.
-//
-//  This program is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//  GNU General Public License for more details.
-//
-//  You should have received a copy of the GNU General Public License
-//  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+// SPDX-FileCopyrightText: 2019 Nextcloud GmbH and Nextcloud contributors
+// SPDX-License-Identifier: GPL-3.0-or-later
 //
 
 import Foundation
@@ -36,26 +18,28 @@ public class NKBackground: NSObject, URLSessionTaskDelegate, URLSessionDelegate,
     public func download(serverUrlFileName: Any,
                          fileNameLocalPath: String,
                          taskDescription: String? = nil,
-                         account: String,
-                         session: URLSession) -> URLSessionDownloadTask? {
+                         account: String) -> URLSessionDownloadTask? {
         var url: URL?
         if serverUrlFileName is URL {
             url = serverUrlFileName as? URL
         } else if serverUrlFileName is String || serverUrlFileName is NSString {
             url = (serverUrlFileName as? String)?.encodedToUrl as? URL
         }
+        guard let nkSession = nkCommonInstance.getSession(account: account) else {
+            return nil
+        }
         guard let urlForRequest = url else { return nil }
         var request = URLRequest(url: urlForRequest)
-        let loginString = "\(self.nkCommonInstance.user):\(self.nkCommonInstance.password)"
+        let loginString = "\(nkSession.user):\(nkSession.password)"
         guard let loginData = loginString.data(using: String.Encoding.utf8) else {
             return nil
         }
         let base64LoginString = loginData.base64EncodedString()
 
-        request.setValue(self.nkCommonInstance.userAgent, forHTTPHeaderField: "User-Agent")
+        request.setValue(nkSession.userAgent, forHTTPHeaderField: "User-Agent")
         request.setValue("Basic \(base64LoginString)", forHTTPHeaderField: "Authorization")
 
-        let task = session.downloadTask(with: request)
+        let task = nkSession.sessionDownloadBackground.downloadTask(with: request)
         task.taskDescription = taskDescription
         task.resume()
         self.nkCommonInstance.writeLog("Network start download file: \(serverUrlFileName)")
@@ -70,9 +54,12 @@ public class NKBackground: NSObject, URLSessionTaskDelegate, URLSessionDelegate,
                        dateCreationFile: Date?,
                        dateModificationFile: Date?,
                        taskDescription: String? = nil,
+                       overwrite: Bool = false,
                        account: String,
-                       session: URLSession) -> URLSessionUploadTask? {
+                       sessionIdentifier: String) -> URLSessionUploadTask? {
         var url: URL?
+        var uploadSession: URLSession?
+        guard let nkSession = nkCommonInstance.getSession(account: account) else { return nil }
         if serverUrlFileName is URL {
             url = serverUrlFileName as? URL
         } else if serverUrlFileName is String || serverUrlFileName is NSString {
@@ -82,15 +69,18 @@ public class NKBackground: NSObject, URLSessionTaskDelegate, URLSessionDelegate,
             return nil
         }
         var request = URLRequest(url: urlForRequest)
-        let loginString = "\(self.nkCommonInstance.user):\(self.nkCommonInstance.password)"
+        let loginString = "\(nkSession.user):\(nkSession.password)"
         guard let loginData = loginString.data(using: String.Encoding.utf8) else {
             return nil
         }
         let base64LoginString = loginData.base64EncodedString()
 
         request.httpMethod = "PUT"
-        request.setValue(self.nkCommonInstance.userAgent, forHTTPHeaderField: "User-Agent")
+        request.setValue(nkSession.userAgent, forHTTPHeaderField: "User-Agent")
         request.setValue("Basic \(base64LoginString)", forHTTPHeaderField: "Authorization")
+        if overwrite {
+            request.setValue("true", forHTTPHeaderField: "Overwrite")
+        }
         // Epoch of linux do not permitted negativ value
         if let dateCreationFile, dateCreationFile.timeIntervalSince1970 > 0 {
             request.setValue("\(dateCreationFile.timeIntervalSince1970)", forHTTPHeaderField: "X-OC-CTime")
@@ -100,11 +90,18 @@ public class NKBackground: NSObject, URLSessionTaskDelegate, URLSessionDelegate,
             request.setValue("\(dateModificationFile.timeIntervalSince1970)", forHTTPHeaderField: "X-OC-MTime")
         }
 
-        let task = session.uploadTask(with: request, fromFile: URL(fileURLWithPath: fileNameLocalPath))
-        task.taskDescription = taskDescription
-        task.resume()
-        self.nkCommonInstance.writeLog("Network start upload file: \(serverUrlFileName)")
+        if sessionIdentifier == nkCommonInstance.identifierSessionUploadBackground {
+            uploadSession = nkSession.sessionUploadBackground
+        } else if sessionIdentifier == nkCommonInstance.identifierSessionUploadBackgroundWWan {
+            uploadSession = nkSession.sessionUploadBackgroundWWan
+        } else if sessionIdentifier == nkCommonInstance.identifierSessionUploadBackgroundExt {
+            uploadSession = nkSession.sessionUploadBackgroundExt
+        }
 
+        let task = uploadSession?.uploadTask(with: request, fromFile: URL(fileURLWithPath: fileNameLocalPath))
+        task?.taskDescription = taskDescription
+        task?.resume()
+        self.nkCommonInstance.writeLog("Network start upload file: \(serverUrlFileName)")
         return task
     }
 

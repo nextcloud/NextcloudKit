@@ -34,7 +34,7 @@ class FileNameValidatorTests: XCTestCase {
                                          "lpt0", "lpt1", "lpt2", "lpt3", "lpt4", "lpt5", "lpt6", "lpt7",
                                          "lpt8", "lpt9", "lpt¹", "lpt²", "lpt³"],
             forbiddenFileNameCharacters: ["<", ">", ":", "\\\\", "/", "|", "?", "*", "&"],
-            forbiddenFileNameExtensions: [".filepart",".part"]
+            forbiddenFileNameExtensions: [".filepart",".part", ".", ",", " "]
         )
         super.setUp()
     }
@@ -56,15 +56,72 @@ class FileNameValidatorTests: XCTestCase {
 
     func testEndsWithSpaceOrPeriod() {
         let result = fileNameValidator.checkFileName("filename ")
-        XCTAssertEqual(result?.errorDescription, fileNameValidator.fileEndsWithSpacePeriodError.errorDescription)
+        XCTAssertEqual(result?.errorDescription, fileNameValidator.fileWithSpaceError.errorDescription)
 
         let result2 = fileNameValidator.checkFileName("filename.")
-        XCTAssertEqual(result2?.errorDescription, fileNameValidator.fileEndsWithSpacePeriodError.errorDescription)
+        XCTAssertEqual(result2?.errorDescription, fileNameValidator.fileForbiddenFileExtensionError.errorDescription)
+
+        let result3 = fileNameValidator.checkFileName(" filename")
+        XCTAssertEqual(result3?.errorDescription, fileNameValidator.fileWithSpaceError.errorDescription)
+
+        let result4 = fileNameValidator.checkFileName(" filename. ")
+        XCTAssertEqual(result4?.errorDescription, fileNameValidator.fileWithSpaceError.errorDescription)
     }
 
     func testValidFileName() {
         let result = fileNameValidator.checkFileName("validFileName")
         XCTAssertNil(result?.errorDescription)
+
+        let result2 = fileNameValidator.checkFileName("validFi.leName")
+        XCTAssertNil(result2?.errorDescription)
+
+        let result3 = fileNameValidator.checkFileName("validFi.leName.txt")
+        XCTAssertNil(result3?.errorDescription)
+
+        let result4 = fileNameValidator.checkFileName("validFi   leName.txt")
+        XCTAssertNil(result4?.errorDescription)
+    }
+
+    func testValidFolderAndFilePaths() {
+        let folderPath = "validFolder"
+
+        let result = fileNameValidator.checkFolderPath(folderPath)
+        XCTAssertTrue(result)
+    }
+
+    func testFolderPathWithReservedName() {
+        let folderPath = "CON"
+
+        let result = fileNameValidator.checkFolderPath(folderPath)
+        XCTAssertFalse(result)
+    }
+
+    func testFolderPathWithInvalidCharacter() {
+        let folderPath = "invalid<Folder"
+
+        let result = fileNameValidator.checkFolderPath(folderPath)
+        XCTAssertFalse(result)
+    }
+
+    func testFolderPathEndingWithSpace() {
+        let folderPath = "folderWithSpace "
+
+        let result = fileNameValidator.checkFolderPath(folderPath)
+        XCTAssertFalse(result)
+    }
+
+    func testFolderPathEndingWithPeriod() {
+        let folderPath = "validFolder."
+
+        let result = fileNameValidator.checkFolderPath(folderPath)
+        XCTAssertFalse(result)
+    }
+
+    func testFilePathWithNestedFolder() {
+        let folderPath = "validFolder/secondValidFolder/CON"
+
+        let result = fileNameValidator.checkFolderPath(folderPath)
+        XCTAssertFalse(result)
     }
 
     func testValidFolderAndFilePaths() {
