@@ -16,7 +16,7 @@ public extension NextcloudKit {
         guard let nkSession = nkCommonInstance.getSession(account: account),
               let url = nkCommonInstance.createStandardUrl(serverUrl: nkSession.urlBase, endpoint: endpoint, options: options),
               let headers = nkCommonInstance.getStandardHeaders(account: account, options: options) else {
-            return options.queue.async { completion(account, nil,nil, .urlError) }
+            return options.queue.async { completion(account, nil, nil, .urlError) }
         }
 
         nkSession.sessionData.request(url, method: .get, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
@@ -56,7 +56,7 @@ public extension NextcloudKit {
         guard let nkSession = nkCommonInstance.getSession(account: account),
               let url = nkCommonInstance.createStandardUrl(serverUrl: nkSession.urlBase, endpoint: endpoint, options: options),
               let headers = nkCommonInstance.getStandardHeaders(account: account, options: options) else {
-            return options.queue.async { completion(account, nil,nil, .urlError) }
+            return options.queue.async { completion(account, nil, nil, .urlError) }
         }
         let parameters: [String: Any] = ["input": input, "type": typeId, "appId": appId, "identifier": identifier]
 
@@ -94,7 +94,7 @@ public extension NextcloudKit {
         guard let nkSession = nkCommonInstance.getSession(account: account),
               let url = nkCommonInstance.createStandardUrl(serverUrl: nkSession.urlBase, endpoint: endpoint, options: options),
               let headers = nkCommonInstance.getStandardHeaders(account: account, options: options) else {
-            return options.queue.async { completion(account, nil,nil, .urlError) }
+            return options.queue.async { completion(account, nil, nil, .urlError) }
         }
 
         nkSession.sessionData.request(url, method: .get, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
@@ -131,7 +131,7 @@ public extension NextcloudKit {
         guard let nkSession = nkCommonInstance.getSession(account: account),
               let url = nkCommonInstance.createStandardUrl(serverUrl: nkSession.urlBase, endpoint: endpoint, options: options),
               let headers = nkCommonInstance.getStandardHeaders(account: account, options: options) else {
-            return options.queue.async { completion(account, nil,nil, .urlError) }
+            return options.queue.async { completion(account, nil, nil, .urlError) }
         }
 
         nkSession.sessionData.request(url, method: .delete, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
@@ -168,7 +168,7 @@ public extension NextcloudKit {
         guard let nkSession = nkCommonInstance.getSession(account: account),
               let url = nkCommonInstance.createStandardUrl(serverUrl: nkSession.urlBase, endpoint: endpoint, options: options),
               let headers = nkCommonInstance.getStandardHeaders(account: account, options: options) else {
-            return options.queue.async { completion(account, nil,nil, .urlError) }
+            return options.queue.async { completion(account, nil, nil, .urlError) }
         }
 
         nkSession.sessionData.request(url, method: .get, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
@@ -261,7 +261,6 @@ public class NKTextProcessingTask {
     }
 
     static func factory(data: JSON) -> NKTextProcessingTask? {
-        NKTextProcessingTask.init(json: data)
+        NKTextProcessingTask(json: data)
     }
 }
-

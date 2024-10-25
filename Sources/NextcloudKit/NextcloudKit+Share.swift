@@ -121,7 +121,7 @@ public extension NextcloudKit {
         guard let nkSession = nkCommonInstance.getSession(account: account),
               let url = nkCommonInstance.createStandardUrl(serverUrl: nkSession.urlBase, endpoint: endpoint, options: options),
               let headers = nkCommonInstance.getStandardHeaders(account: account, options: options) else {
-            return options.queue.async { completion(account, nil,nil, .urlError) }
+            return options.queue.async { completion(account, nil, nil, .urlError) }
         }
         let parameters = [
             "search": search,
@@ -275,7 +275,7 @@ public extension NextcloudKit {
         guard let nkSession = nkCommonInstance.getSession(account: account),
               let url = nkCommonInstance.createStandardUrl(serverUrl: nkSession.urlBase, endpoint: endpoint, options: options),
               let headers = nkCommonInstance.getStandardHeaders(account: account, options: options) else {
-            return options.queue.async { completion(account, nil,nil, .urlError) }
+            return options.queue.async { completion(account, nil, nil, .urlError) }
         }
         var parameters = [
             "path": path,
@@ -361,7 +361,7 @@ public extension NextcloudKit {
         guard let nkSession = nkCommonInstance.getSession(account: account),
               let url = nkCommonInstance.createStandardUrl(serverUrl: nkSession.urlBase, endpoint: endpoint, options: options),
               let headers = nkCommonInstance.getStandardHeaders(account: account, options: options) else {
-            return options.queue.async { completion(account, nil,nil, .urlError) }
+            return options.queue.async { completion(account, nil, nil, .urlError) }
         }
         var parameters = [
             "permissions": String(permissions)

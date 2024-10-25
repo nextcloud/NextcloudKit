@@ -11,8 +11,6 @@ import Foundation
 //  Copyright © 2024 Marino Faggiana. All rights reserved.
 //
 
-import Foundation
-
 public class FileAutoRenamer {
     public static let shared: FileAutoRenamer = {
         let instance = FileAutoRenamer()

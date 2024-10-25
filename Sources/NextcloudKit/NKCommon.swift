@@ -274,7 +274,7 @@ public class NKCommon: NSObject {
 
     // MARK: - Chunked File
 
-    public func chunkedFile(inputDirectory: String, 
+    public func chunkedFile(inputDirectory: String,
                             outputDirectory: String,
                             fileName: String,
                             chunkSize: Int,
