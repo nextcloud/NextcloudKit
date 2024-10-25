@@ -50,7 +50,7 @@ public extension NextcloudKit {
 public class NKHovercard: NSObject {
     public let userId, displayName: String
     public let actions: [Action]
-    
+
     init?(jsonData: JSON) {
         guard let userId = jsonData["userId"].string,
               let displayName = jsonData["displayName"].string,

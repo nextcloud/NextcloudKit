@@ -12,7 +12,7 @@ import Alamofire
 import SwiftyJSON
 
 final class NextcloudKitSessionDelegate: SessionDelegate {
-    public var nkCommonInstance: NKCommon? = nil
+    public var nkCommonInstance: NKCommon?
 
     override public init(fileManager: FileManager = .default) {
         super.init(fileManager: fileManager)

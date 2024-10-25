@@ -258,4 +258,3 @@ public extension NextcloudKit {
         }
     }
 }
-
