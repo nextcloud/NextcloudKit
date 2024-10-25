@@ -46,5 +46,6 @@ excluded:
   - Pods
   - Package.swift
   - Tests
+  - DerivedData
 
 reporter: "xcode"
