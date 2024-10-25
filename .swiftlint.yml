@@ -47,5 +47,6 @@ excluded:
   - Package.swift
   - Tests
   - DerivedData
+  - .build
 
 reporter: "xcode"
