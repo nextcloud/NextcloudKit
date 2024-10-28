@@ -10,10 +10,13 @@ final class FileAutoRenamerUnitTests: XCTestCase {
     let forbiddenFilenameCharacter = ">"
     let forbiddenFilenameExtension = "."
 
+    let initialCharacters = ["<", ">", ":", "\\\\", "/", "|", "?", "*", "&"]
+    let initialExtensions = [" ", ",", ".", ".filepart", ".part"]
+
     override func setUp() {
         fileAutoRenamer.setup(
-            forbiddenFileNameCharacters: ["<", ">", ":", "\\\\", "/", "|", "?", "*", "&"],
-            forbiddenFileNameExtensions: [" ", ".filepart",".part", ".", ","]
+            forbiddenFileNameCharacters: initialCharacters,
+            forbiddenFileNameExtensions: initialExtensions
         )
         super.setUp()
     }
@@ -40,6 +43,30 @@ final class FileAutoRenamerUnitTests: XCTestCase {
     }
 
     func testStartEndInvalidExtensions() {
+        let filename = " .file.part "
+        let result = fileAutoRenamer.rename(filename: filename)
+        let expectedFilename = "_file_part"
+        XCTAssertEqual(result, expectedFilename, "Expected \(expectedFilename) but got \(result)")
+    }
+
+    func testStartEndInvalidExtensions2() {
+        fileAutoRenamer.setup(
+            forbiddenFileNameCharacters: initialCharacters,
+            forbiddenFileNameExtensions: [",", ".", ".filepart", ".part", " "]
+        )
+
+        let filename = " .file.part "
+        let result = fileAutoRenamer.rename(filename: filename)
+        let expectedFilename = "_file_part"
+        XCTAssertEqual(result, expectedFilename, "Expected \(expectedFilename) but got \(result)")
+    }
+
+    func testStartEndInvalidExtensions3() {
+        fileAutoRenamer.setup(
+            forbiddenFileNameCharacters: initialCharacters,
+            forbiddenFileNameExtensions: [".FILEPART", ".PART", " ", ",", "."]
+        )
+
         let filename = " .file.part "
         let result = fileAutoRenamer.rename(filename: filename)
         let expectedFilename = "_file_part"
