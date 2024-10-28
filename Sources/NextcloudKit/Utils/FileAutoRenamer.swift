@@ -41,6 +41,7 @@ public class FileAutoRenamer {
 
         pathSegments = pathSegments.map { segment in
             var modifiedSegment = segment
+
             forbiddenFileNameCharacters.forEach { forbiddenChar in
                 if modifiedSegment.contains(forbiddenChar) {
                     modifiedSegment = modifiedSegment.replacingOccurrences(of: forbiddenChar, with: replacement, options: .caseInsensitive)
@@ -51,7 +52,12 @@ public class FileAutoRenamer {
                 modifiedSegment = modifiedSegment.trimmingCharacters(in: .whitespaces)
             }
 
+
             forbiddenFileNameExtensions.forEach { forbiddenExtension in
+                if modifiedSegment.uppercased().hasSuffix(forbiddenExtension) && hasAnyExtension(forbiddenExtension) {
+                    modifiedSegment = modifiedSegment.replacingOccurrences(of: ".", with: replacement, options: .caseInsensitive)
+                }
+
                 if modifiedSegment.uppercased().hasSuffix(forbiddenExtension) || modifiedSegment.uppercased().hasPrefix(forbiddenExtension) {
                     modifiedSegment = modifiedSegment.replacingOccurrences(of: forbiddenExtension, with: replacement, options: .caseInsensitive)
                 }
@@ -66,6 +72,13 @@ public class FileAutoRenamer {
 
     private func convertToUTF8(_ filename: String) -> String {
         return String(data: filename.data(using: .utf8) ?? Data(), encoding: .utf8) ?? filename
+    }
+
+    private func hasAnyExtension(_ string: String) -> Bool {
+        let pattern = "\\.[a-zA-Z0-9]+$"  // Matches a period followed by one or more alphanumeric characters at the end
+        let regex = try? NSRegularExpression(pattern: pattern, options: .caseInsensitive)
+        let range = NSRange(location: 0, length: string.utf16.count)
+        return regex?.firstMatch(in: string, options: [], range: range) != nil
     }
 
     private func removeNonPrintableUnicodeCharacters(_ filename: String) -> String {
