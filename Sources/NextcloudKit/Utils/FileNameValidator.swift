@@ -95,6 +95,10 @@ public class FileNameValidator {
             .allSatisfy { checkFileName(String($0)) == nil }
     }
 
+    public func isFileHidden(_ name: String) -> Bool {
+        return !name.isEmpty && name.first == "."
+    }
+
     private func checkInvalidCharacters(string: String, regex: NSRegularExpression) -> NKError? {
         for char in string {
             let charAsString = String(char)
@@ -106,9 +110,5 @@ public class FileNameValidator {
             }
         }
         return nil
-    }
-
-    func isFileHidden(_ name: String) -> Bool {
-        return !name.isEmpty && name.first == "."
     }
 }

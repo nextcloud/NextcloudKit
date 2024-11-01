@@ -53,7 +53,7 @@ final class FileAutoRenamerUnitTests: XCTestCase {
         fileAutoRenamer.setup(
             forbiddenFileNameCharacters: initialCharacters,
             forbiddenFileNameExtensions: [",", ".", ".filepart", ".part", " "]
-        ) 
+        )
 
         let filename = " .file.part "
         let result = fileAutoRenamer.rename(filename: filename)
