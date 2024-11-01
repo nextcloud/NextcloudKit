@@ -107,4 +107,8 @@ public class FileNameValidator {
         }
         return nil
     }
+
+    func isFileHidden(_ name: String) -> Bool {
+        return !name.isEmpty && name.first == "."
+    }
 }
