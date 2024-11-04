@@ -66,7 +66,7 @@ public class FileAutoRenamer {
 
             // Replace other forbidden extensions. Original allowed extension is ignored.
             forbiddenFileNameExtensions.forEach { forbiddenExtension in
-                if modifiedSegment.uppercased().hasSuffix(forbiddenExtension) || modifiedSegment.uppercased().hasPrefix(forbiddenExtension) {
+                if modifiedSegment.lowercased().hasSuffix(forbiddenExtension) || modifiedSegment.lowercased().hasPrefix(forbiddenExtension) {
                     modifiedSegment = modifiedSegment.replacingOccurrences(of: forbiddenExtension, with: replacement, options: .caseInsensitive)
                 }
             }
