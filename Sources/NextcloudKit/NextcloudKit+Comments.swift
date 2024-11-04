@@ -17,7 +17,7 @@ public extension NextcloudKit {
         ///
         guard let nkSession = nkCommonInstance.getSession(account: account),
               let headers = nkCommonInstance.getStandardHeaders(account: account, options: options) else {
-            return options.queue.async { completion(account, nil,nil, .urlError) }
+            return options.queue.async { completion(account, nil, nil, .urlError) }
         }
         let serverUrlEndpoint = nkSession.urlBase + "/" + nkSession.dav + "/comments/files/\(fileId)"
         guard let url = serverUrlEndpoint.encodedToUrl else {
@@ -143,7 +143,7 @@ public extension NextcloudKit {
                 let error = NKError(error: error, afResponse: response, responseData: response.data)
                 options.queue.async { completion(account, response, error) }
             case .success:
-                options.queue.async { completion(account, response ,.success) }
+                options.queue.async { completion(account, response, .success) }
             }
         }
     }

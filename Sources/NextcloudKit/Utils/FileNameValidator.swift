@@ -1,24 +1,5 @@
-//
-//  FileNameValidator.swift
-//
-//
-//  Created by Milen Pivchev on 12.07.24.
-//  Copyright © 2024 Milen Pivchev. All rights reserved.
-//
-//  Author: Milen Pivchev <milen.pivchev@nextcloud.com>
-//  This program is free software: you can redistribute it and/or modify
-//  it under the terms of the GNU General Public License as published by
-//  the Free Software Foundation, either version 3 of the License, or
-//  (at your option) any later version.
-//
-//  This program is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//  GNU General Public License for more details.
-//
-//  You should have received a copy of the GNU General Public License
-//  along with this program.  If not, see <http://www.gnu.org/licenses/>.
-//
+// SPDX-FileCopyrightText: 2020 Nextcloud GmbH and Nextcloud contributors
+// SPDX-License-Identifier: GPL-3.0-or-later
 
 import Foundation
 
@@ -28,21 +9,21 @@ public class FileNameValidator {
         return instance
     }()
 
-    public private(set) var forbiddenFileNames: [String] = [] {
+    private var forbiddenFileNames: [String] = [] {
         didSet {
             forbiddenFileNames = forbiddenFileNames.map({$0.uppercased()})
         }
     }
 
-    public private(set) var forbiddenFileNameBasenames: [String] = [] {
+    private var forbiddenFileNameBasenames: [String] = [] {
         didSet {
             forbiddenFileNameBasenames = forbiddenFileNameBasenames.map({$0.uppercased()})
         }
     }
 
-    public private(set) var forbiddenFileNameCharacters: [String] = []
+    private var forbiddenFileNameCharacters: [String] = []
 
-    public private(set) var forbiddenFileNameExtensions: [String] = [] {
+    private var forbiddenFileNameExtensions: [String] = [] {
         didSet {
             forbiddenFileNameExtensions = forbiddenFileNameExtensions.map({$0.uppercased()})
         }
@@ -112,6 +93,10 @@ public class FileNameValidator {
     public func checkFolderPath(_ folderPath: String) -> Bool {
         return folderPath.split { $0 == "/" || $0 == "\\" }
             .allSatisfy { checkFileName(String($0)) == nil }
+    }
+
+    public func isFileHidden(_ name: String) -> Bool {
+        return !name.isEmpty && name.first == "."
     }
 
     private func checkInvalidCharacters(string: String, regex: NSRegularExpression) -> NKError? {
