@@ -21,7 +21,7 @@ public class FileAutoRenamer {
 
     private var forbiddenFileNameExtensions: [String] = [] {
         didSet {
-            forbiddenFileNameExtensions = forbiddenFileNameExtensions.map({$0.uppercased()})
+            forbiddenFileNameExtensions = forbiddenFileNameExtensions.map({$0.lowercased()})
         }
     }
 
@@ -52,14 +52,28 @@ public class FileAutoRenamer {
                 modifiedSegment = modifiedSegment.trimmingCharacters(in: .whitespaces)
             }
 
+            // Replace forbidden extension, if any (ex. .part -> _part)
             forbiddenFileNameExtensions.forEach { forbiddenExtension in
-                if modifiedSegment.uppercased().hasSuffix(forbiddenExtension) && isFullExtension(forbiddenExtension) {
-                    modifiedSegment = modifiedSegment.replacingOccurrences(of: ".", with: replacement, options: .caseInsensitive)
+                if modifiedSegment.lowercased().hasSuffix(forbiddenExtension) && isFullExtension(forbiddenExtension) {
+                    let changedExtension = forbiddenExtension.replacingOccurrences(of: ".", with: replacement, options: .caseInsensitive)
+                    modifiedSegment = modifiedSegment.replacingOccurrences(of: forbiddenExtension, with: changedExtension, options: .caseInsensitive)
                 }
+            }
 
+            // Keep original allowed extension and add it at the end (ex file.test.txt becomes file.test)
+            let fileExtension = modifiedSegment.fileExtension
+            modifiedSegment = modifiedSegment.withRemovedFileExtension
+
+            // Replace other forbidden extensions. Original allowed extension is ignored.
+            forbiddenFileNameExtensions.forEach { forbiddenExtension in
                 if modifiedSegment.uppercased().hasSuffix(forbiddenExtension) || modifiedSegment.uppercased().hasPrefix(forbiddenExtension) {
                     modifiedSegment = modifiedSegment.replacingOccurrences(of: forbiddenExtension, with: replacement, options: .caseInsensitive)
                 }
+            }
+
+            // If there is an original allowed extension, add it back (ex file_test becomes file_test.txt)
+            if !fileExtension.isEmpty {
+                modifiedSegment.append(".\(fileExtension.lowercased())")
             }
 
             return modifiedSegment

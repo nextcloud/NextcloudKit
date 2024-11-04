@@ -22,30 +22,30 @@ final class FileAutoRenamerUnitTests: XCTestCase {
     }
 
     func testInvalidChar() {
-        let filename = "file\(forbiddenFilenameCharacter)file.txt"
+        let filename = "File\(forbiddenFilenameCharacter)File.txt"
         let result = fileAutoRenamer.rename(filename: filename)
-        let expectedFilename = "file_file.txt"
+        let expectedFilename = "File_File.txt"
         XCTAssertEqual(result, expectedFilename, "Expected \(expectedFilename) but got \(result)")
     }
 
     func testInvalidExtension() {
-        let filename = "file\(forbiddenFilenameExtension)"
+        let filename = "File\(forbiddenFilenameExtension)"
         let result = fileAutoRenamer.rename(filename: filename)
-        let expectedFilename = "file_"
+        let expectedFilename = "File_"
         XCTAssertEqual(result, expectedFilename, "Expected \(expectedFilename) but got \(result)")
     }
 
     func testMultipleInvalidChars() {
-        let filename = "file|name?<>.txt"
+        let filename = "File|name?<>.txt"
         let result = fileAutoRenamer.rename(filename: filename)
-        let expectedFilename = "file_name___.txt"
+        let expectedFilename = "File_name___.txt"
         XCTAssertEqual(result, expectedFilename, "Expected \(expectedFilename) but got \(result)")
     }
 
     func testStartEndInvalidExtensions() {
-        let filename = " .file.part "
+        let filename = " .File.part "
         let result = fileAutoRenamer.rename(filename: filename)
-        let expectedFilename = "_file_part"
+        let expectedFilename = "_File_part"
         XCTAssertEqual(result, expectedFilename, "Expected \(expectedFilename) but got \(result)")
     }
 
@@ -55,9 +55,9 @@ final class FileAutoRenamerUnitTests: XCTestCase {
             forbiddenFileNameExtensions: [",", ".", ".filepart", ".part", " "]
         )
 
-        let filename = " .file.part "
+        let filename = " .File.part "
         let result = fileAutoRenamer.rename(filename: filename)
-        let expectedFilename = "_file_part"
+        let expectedFilename = "_File_part"
         XCTAssertEqual(result, expectedFilename, "Expected \(expectedFilename) but got \(result)")
     }
 
@@ -67,86 +67,100 @@ final class FileAutoRenamerUnitTests: XCTestCase {
             forbiddenFileNameExtensions: [".FILEPART", ".PART", " ", ",", "."]
         )
 
-        let filename = " .file.part "
+        let filename = " .File.part "
         let result = fileAutoRenamer.rename(filename: filename)
-        let expectedFilename = "_file_part"
+        let expectedFilename = "_File_part"
         XCTAssertEqual(result, expectedFilename, "Expected \(expectedFilename) but got \(result)")
     }
 
     func testStartInvalidExtension() {
-        let filename = " .file.part"
+        let filename = " .File.part"
         let result = fileAutoRenamer.rename(filename: filename)
-        let expectedFilename = "_file_part"
+        let expectedFilename = "_File_part"
         XCTAssertEqual(result, expectedFilename, "Expected \(expectedFilename) but got \(result)")
     }
 
     func testEndInvalidExtension() {
-        let filename = ".file.part "
+        let filename = ".File.part "
         let result = fileAutoRenamer.rename(filename: filename)
-        let expectedFilename = "_file_part"
+        let expectedFilename = "_File_part"
+        XCTAssertEqual(result, expectedFilename, "Expected \(expectedFilename) but got \(result)")
+    }
+
+    func testHiddenFile() {
+        let filename = ".Filename.txt"
+        let result = fileAutoRenamer.rename(filename: filename)
+        let expectedFilename = "_Filename.txt"
+        XCTAssertEqual(result, expectedFilename, "Expected \(expectedFilename) but got \(result)")
+    }
+
+    func testUppercaseExtension() {
+        let filename = ".Filename.TXT"
+        let result = fileAutoRenamer.rename(filename: filename)
+        let expectedFilename = "_Filename.txt"
         XCTAssertEqual(result, expectedFilename, "Expected \(expectedFilename) but got \(result)")
     }
 
     func testMiddleNonPrintableChar() {
-        let filename = "file\u{0001}name.txt"
+        let filename = "File\u{0001}name.txt"
         let result = fileAutoRenamer.rename(filename: filename)
-        let expectedFilename = "filename.txt"
+        let expectedFilename = "Filename.txt"
         XCTAssertEqual(result, expectedFilename, "Expected \(expectedFilename) but got \(result)")
     }
 
     func testStartNonPrintableChar() {
-        let filename = "\u{0001}filename.txt"
+        let filename = "\u{0001}Filename.txt"
         let result = fileAutoRenamer.rename(filename: filename)
-        let expectedFilename = "filename.txt"
+        let expectedFilename = "Filename.txt"
         XCTAssertEqual(result, expectedFilename, "Expected \(expectedFilename) but got \(result)")
     }
 
     func testEndNonPrintableChar() {
-        let filename = "filename.txt\u{0001}"
+        let filename = "Filename.txt\u{0001}"
         let result = fileAutoRenamer.rename(filename: filename)
-        let expectedFilename = "filename.txt"
+        let expectedFilename = "Filename.txt"
         XCTAssertEqual(result, expectedFilename, "Expected \(expectedFilename) but got \(result)")
     }
 
     func testExtensionNonPrintableChar() {
-        let filename = "filename.t\u{0001}xt"
+        let filename = "Filename.t\u{0001}xt"
         let result = fileAutoRenamer.rename(filename: filename)
-        let expectedFilename = "filename.txt"
+        let expectedFilename = "Filename.txt"
         XCTAssertEqual(result, expectedFilename, "Expected \(expectedFilename) but got \(result)")
     }
 
     func testMiddleInvalidFolderChar() {
-        let folderPath = "abc/def/kg\(forbiddenFilenameCharacter)/lmo/pp"
+        let folderPath = "Abc/Def/kg\(forbiddenFilenameCharacter)/lmo/pp"
         let result = fileAutoRenamer.rename(filename: folderPath, isFolderPath: true)
-        let expectedFolderName = "abc/def/kg_/lmo/pp"
+        let expectedFolderName = "Abc/Def/kg_/lmo/pp"
         XCTAssertEqual(result, expectedFolderName, "Expected \(expectedFolderName) but got \(result)")
     }
 
     func testEndInvalidFolderChar() {
-        let folderPath = "abc/def/kg/lmo/pp\(forbiddenFilenameCharacter)"
+        let folderPath = "Abc/Def/kg/lmo/pp\(forbiddenFilenameCharacter)"
         let result = fileAutoRenamer.rename(filename: folderPath, isFolderPath: true)
-        let expectedFolderName = "abc/def/kg/lmo/pp_"
+        let expectedFolderName = "Abc/Def/kg/lmo/pp_"
         XCTAssertEqual(result, expectedFolderName, "Expected \(expectedFolderName) but got \(result)")
     }
 
     func testStartInvalidFolderChar() {
-        let folderPath = "\(forbiddenFilenameCharacter)abc/def/kg/lmo/pp"
+        let folderPath = "\(forbiddenFilenameCharacter)Abc/Def/kg/lmo/pp"
         let result = fileAutoRenamer.rename(filename: folderPath, isFolderPath: true)
-        let expectedFolderName = "_abc/def/kg/lmo/pp"
+        let expectedFolderName = "_Abc/Def/kg/lmo/pp"
         XCTAssertEqual(result, expectedFolderName, "Expected \(expectedFolderName) but got \(result)")
     }
 
     func testMixedInvalidChar() {
-        let filename = " file\u{0001}na\(forbiddenFilenameCharacter)me.txt "
+        let filename = " File\u{0001}na\(forbiddenFilenameCharacter)me.txt "
         let result = fileAutoRenamer.rename(filename: filename)
-        let expectedFilename = "filena_me.txt"
+        let expectedFilename = "Filena_me.txt"
         XCTAssertEqual(result, expectedFilename, "Expected \(expectedFilename) but got \(result)")
     }
 
     func testStartsWithPathSeparator() {
-        let folderPath = "/abc/def/kg/lmo/pp\(forbiddenFilenameCharacter)/file.txt/"
+        let folderPath = "/Abc/Def/kg/lmo/pp\(forbiddenFilenameCharacter)/File.txt/"
         let result = fileAutoRenamer.rename(filename: folderPath, isFolderPath: true)
-        let expectedFolderName = "/abc/def/kg/lmo/pp_/file.txt/"
+        let expectedFolderName = "/Abc/Def/kg/lmo/pp_/File.txt/"
         XCTAssertEqual(result, expectedFolderName, "Expected \(expectedFolderName) but got \(result)")
     }
 
