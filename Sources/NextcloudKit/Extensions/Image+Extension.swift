@@ -1,7 +1,7 @@
-//
-// SPDX-FileCopyrightText: 2020 Nextcloud GmbH and Nextcloud contributors
+// SPDX-FileCopyrightText: Nextcloud GmbH
+// SPDX-FileCopyrightText: 2020 Marino Faggiana
+// SPDX-FileCopyrightText: 2021 Henrik Storch
 // SPDX-License-Identifier: GPL-3.0-or-later
-//
 
 #if os(macOS)
 import Foundation
