@@ -18,6 +18,7 @@ env:
   DESTINATION_MACOS: platform=macOS,arch=x86_64
   SCHEME: NextcloudKit
   SERVER_BRANCH: stable28
+  PHP_VERSION: 8.2
 
 jobs:
   build-and-test:
@@ -28,6 +29,18 @@ jobs:
     - name: Set env var
       run: echo "DEVELOPER_DIR=$(xcode-select --print-path)" >> $GITHUB_ENV
     - uses: actions/checkout@v4
+
+    - name: Set up php ${{ env.PHP_VERSION }}
+      uses: shivammathur/setup-php@8872c784b04a1420e81191df5d64fbd59d3d3033 # v2.30.0
+      with:
+        php-version: ${{ env.PHP_VERSION }}
+        # https://docs.nextcloud.com/server/stable/admin_manual/installation/source_installation.html#prerequisites-for-manual-installation
+        extensions: apcu, bz2, ctype, curl, dom, fileinfo, gd, iconv, intl, json, libxml, mbstring, openssl, pcntl, posix, session, simplexml, xmlreader, xmlwriter, zip, zlib, pgsql, pdo_pgsql
+        coverage: none
+        ini-file: development
+        # Temporary workaround for missing pcntl_* in PHP 8.3: ini-values: apc.enable_cli=on
+        ini-values: apc.enable_cli=on, disable_functions=
+
     - name: Checkout server
       uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
       with:
@@ -35,7 +48,7 @@ jobs:
         repository: nextcloud/server
         path: server
         ref: ${{ env.SERVER_BRANCH }}
-        
+
     - name: Set up Nextcloud
       run: |
         mkdir server/data
