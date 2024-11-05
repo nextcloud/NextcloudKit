@@ -11,10 +11,10 @@ final class ShareIntegrationTests: BaseIntegrationXCTestCase {
         let expectation = expectation(description: "Should finish last callback")
         
         let folderName = "Share\(randomInt)"
-        let serverUrl = "\(baseUrl)/remote.php/dav/files/\(userId)"
+        let serverUrl = "\(TestConstants.server)/remote.php/dav/files/\(TestConstants.username)"
         let serverUrlFileName = "\(serverUrl)/\(folderName)"
 
-        NextcloudKit.shared.appendSession(account: account, urlBase: baseUrl, user: user, userId: userId, password: password, userAgent: "", nextcloudVersion: 0, groupIdentifier: "")
+        NextcloudKit.shared.appendSession(account: TestConstants.account, urlBase: TestConstants.server, user: TestConstants.username, userId: TestConstants.username, password: TestConstants.password, userAgent: "", nextcloudVersion: 0, groupIdentifier: "")
 
 //        NextcloudKit.shared.createFolder(serverUrlFileName: serverUrlFileName, account: account) { account, ocId, date, error in
 //            XCTAssertEqual(self.account, account)
