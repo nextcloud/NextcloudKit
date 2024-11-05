@@ -14,7 +14,7 @@ on:
       - develop
 
 env:
-  DESTINATION_IOS: platform=iOS Simulator,name=iPhone 15,OS=18.1
+  DESTINATION_IOS: platform=iOS Simulator,name=iPhone 16,OS=18.1
   DESTINATION_MACOS: platform=macOS,arch=x86_64
   SCHEME: NextcloudKit
   SERVER_BRANCH: stable28
@@ -23,7 +23,7 @@ env:
 jobs:
   build-and-test:
     name: Build and Test
-    runs-on: macos-14
+    runs-on: macos-15
     if: github.event.pull_request.draft == false
     steps:
     - name: Set env var
