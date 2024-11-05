@@ -26,7 +26,14 @@ jobs:
     steps:
     - name: Set env var
       run: echo "DEVELOPER_DIR=$(xcode-select --print-path)" >> $GITHUB_ENV
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
+    - name: Checkout server
+      uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
+      with:
+        submodules: true
+        repository: nextcloud/server
+        path: server
+        ref: ${{ env.SERVER_BRANCH }}
     - name: Set up Nextcloud
       run: |
         mkdir server/data
