@@ -1,7 +1,6 @@
-//
-// SPDX-FileCopyrightText: 2022 Nextcloud GmbH and Nextcloud contributors
+// SPDX-FileCopyrightText: Nextcloud GmbH
+// SPDX-FileCopyrightText: 2022 Henrik Sorch
 // SPDX-License-Identifier: GPL-3.0-or-later
-//
 
 import Foundation
 import Alamofire
