@@ -17,6 +17,7 @@ env:
   DESTINATION: platform=iOS Simulator,name=iPhone 16,OS=18.1
   DESTINATION_MACOS: platform=macOS,arch=x86_64
   SCHEME: NextcloudKit
+  SERVER_BRANCH: stable28
 
 jobs:
   build-and-test:
@@ -34,6 +35,7 @@ jobs:
         repository: nextcloud/server
         path: server
         ref: ${{ env.SERVER_BRANCH }}
+        
     - name: Set up Nextcloud
       run: |
         mkdir server/data
