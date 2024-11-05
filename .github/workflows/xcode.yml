@@ -14,8 +14,8 @@ on:
       - develop
 
 env:
-  DESTINATION_IOS: platform=iOS Simulator,name=iPhone 14
-  DESTINATION_MACOS: platform=macOS,arch=x86_64
+  DESTINATION: platform=iOS Simulator,name=iPhone 16,OS=18.1
+#  DESTINATION_MACOS: platform=macOS,arch=x86_64
   SCHEME: NextcloudKit
 
 jobs:
