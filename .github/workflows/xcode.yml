@@ -91,7 +91,6 @@ jobs:
         set -o pipefail && xcodebuild test -scheme "$SCHEME" \
         -destination "$DESTINATION_IOS" \
         -destination "$DESTINATION_MACOS" \
-        -enableCodeCoverage YES \
         -test-iterations 3 \
         -retry-tests-on-failure \
         | xcpretty
