@@ -1,8 +1,6 @@
-//
-// SPDX-FileCopyrightText: 2024 Nextcloud GmbH and Nextcloud contributors
+// SPDX-FileCopyrightText: Nextcloud GmbH
+// SPDX-FileCopyrightText: 2019 Marino Faggiana
 // SPDX-License-Identifier: GPL-3.0-or-later
-//
-
 
 import Foundation
 import Alamofire

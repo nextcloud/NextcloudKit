@@ -1,12 +1,11 @@
-//
-// SPDX-FileCopyrightText: 2024 Nextcloud GmbH and Nextcloud contributors
+// SPDX-FileCopyrightText: Nextcloud GmbH
+// SPDX-FileCopyrightText: 2024 Milen Pivchev
 // SPDX-License-Identifier: GPL-3.0-or-later
-//
 
 import XCTest
 @testable import NextcloudKit
 
-class FileNameValidatorTests: XCTestCase {
+class FileNameValidatorUnitTests: XCTestCase {
     let fileNameValidator = FileNameValidator.shared
 
     override func setUp() {
@@ -104,48 +103,6 @@ class FileNameValidatorTests: XCTestCase {
         let folderPath = "validFolder/secondValidFolder/CON"
 
         let result = fileNameValidator.checkFolderPath(folderPath)
-        XCTAssertFalse(result)
-    }
-
-    func testValidFolderAndFilePaths() {
-        let folderPath = "validFolder"
-
-        let result = fileNameValidator.checkFolderPath(folderPath: folderPath)
-        XCTAssertTrue(result)
-    }
-
-    func testFolderPathWithReservedName() {
-        let folderPath = "CON"
-
-        let result = fileNameValidator.checkFolderPath(folderPath: folderPath)
-        XCTAssertFalse(result)
-    }
-
-    func testFolderPathWithInvalidCharacter() {
-        let folderPath = "invalid<Folder"
-
-        let result = fileNameValidator.checkFolderPath(folderPath: folderPath)
-        XCTAssertFalse(result)
-    }
-
-    func testFolderPathEndingWithSpace() {
-        let folderPath = "folderWithSpace "
-
-        let result = fileNameValidator.checkFolderPath(folderPath: folderPath)
-        XCTAssertFalse(result)
-    }
-
-    func testFolderPathEndingWithPeriod() {
-        let folderPath = "validFolder."
-
-        let result = fileNameValidator.checkFolderPath(folderPath: folderPath)
-        XCTAssertFalse(result)
-    }
-
-    func testFilePathWithNestedFolder() {
-        let folderPath = "validFolder/secondValidFolder/CON"
-
-        let result = fileNameValidator.checkFolderPath(folderPath: folderPath)
         XCTAssertFalse(result)
     }
 }

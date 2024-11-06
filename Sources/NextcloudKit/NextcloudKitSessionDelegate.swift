@@ -1,7 +1,7 @@
-//
-// SPDX-FileCopyrightText: 2024 Nextcloud GmbH and Nextcloud contributors
+// SPDX-FileCopyrightText: Nextcloud GmbH
+// SPDX-FileCopyrightText: 2020 MarinoFaggiana
+// SPDX-FileCopyrightText: 2023 Claudio Cambra
 // SPDX-License-Identifier: GPL-3.0-or-later
-//
 
 import Foundation
 
@@ -14,7 +14,7 @@ import Alamofire
 import SwiftyJSON
 
 final class NextcloudKitSessionDelegate: SessionDelegate {
-    public var nkCommonInstance: NKCommon? = nil
+    public var nkCommonInstance: NKCommon?
 
     override public init(fileManager: FileManager = .default) {
         super.init(fileManager: fileManager)

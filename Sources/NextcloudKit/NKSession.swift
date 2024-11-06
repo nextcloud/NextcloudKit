@@ -1,7 +1,6 @@
-//
-// SPDX-FileCopyrightText: 2024 Nextcloud GmbH and Nextcloud contributors
+// SPDX-FileCopyrightText: Nextcloud GmbH
+// SPDX-FileCopyrightText: 2024 Marino Faggiana
 // SPDX-License-Identifier: GPL-3.0-or-later
-//
 
 import Foundation
 import Alamofire
@@ -50,6 +49,7 @@ public class NKSession {
         /// Session Alamofire
         let configuration = URLSessionConfiguration.af.default
         configuration.requestCachePolicy = requestCachePolicy
+        configuration.multipathServiceType = .handover
         configuration.httpCookieStorage = HTTPCookieStorage.sharedCookieStorage(forGroupContainerIdentifier: sharedCookieStorage)
         sessionData = Alamofire.Session(configuration: configuration,
                                         delegate: NextcloudKitSessionDelegate(nkCommonInstance: NextcloudKit.shared.nkCommonInstance),
@@ -65,6 +65,7 @@ public class NKSession {
         configurationDownloadBackground.isDiscretionary = false
         configurationDownloadBackground.httpMaximumConnectionsPerHost = 5
         configurationDownloadBackground.requestCachePolicy = requestCachePolicy
+        configurationDownloadBackground.multipathServiceType = .handover
         configurationDownloadBackground.httpCookieStorage = HTTPCookieStorage.sharedCookieStorage(forGroupContainerIdentifier: sharedCookieStorage)
         sessionDownloadBackground = URLSession(configuration: configurationDownloadBackground, delegate: backgroundSessionDelegate, delegateQueue: OperationQueue.main)
 
@@ -75,6 +76,7 @@ public class NKSession {
         configurationUploadBackground.isDiscretionary = false
         configurationUploadBackground.httpMaximumConnectionsPerHost = 5
         configurationUploadBackground.requestCachePolicy = requestCachePolicy
+        configurationUploadBackground.multipathServiceType = .handover
         configurationUploadBackground.httpCookieStorage = HTTPCookieStorage.sharedCookieStorage(forGroupContainerIdentifier: sharedCookieStorage)
         sessionUploadBackground = URLSession(configuration: configurationUploadBackground, delegate: backgroundSessionDelegate, delegateQueue: OperationQueue.main)
 
@@ -96,6 +98,7 @@ public class NKSession {
         configurationUploadBackgroundExt.httpMaximumConnectionsPerHost = 5
         configurationUploadBackgroundExt.requestCachePolicy = requestCachePolicy
         configurationUploadBackgroundExt.sharedContainerIdentifier = groupIdentifier
+        configurationUploadBackgroundExt.multipathServiceType = .handover
         configurationUploadBackgroundExt.httpCookieStorage = HTTPCookieStorage.sharedCookieStorage(forGroupContainerIdentifier: sharedCookieStorage)
         sessionUploadBackgroundExt = URLSession(configuration: configurationUploadBackgroundExt, delegate: backgroundSessionDelegate, delegateQueue: OperationQueue.main)
     }

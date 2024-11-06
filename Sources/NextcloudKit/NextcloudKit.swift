@@ -1,7 +1,6 @@
-//
-// SPDX-FileCopyrightText: 2019 Nextcloud GmbH and Nextcloud contributors
+// SPDX-FileCopyrightText: Nextcloud GmbH
+// SPDX-FileCopyrightText: 2019 Marino Faggiana
 // SPDX-License-Identifier: GPL-3.0-or-later
-//
 
 #if os(macOS)
 import Foundation
@@ -40,7 +39,7 @@ open class NextcloudKit {
 
     // MARK: - Session setup
 
-    public func setup(delegate: NextcloudKitDelegate?, memoryCapacity:Int = 30, diskCapacity:Int = 500, removeAllCachedResponses: Bool = false) {
+    public func setup(delegate: NextcloudKitDelegate?, memoryCapacity: Int = 30, diskCapacity: Int = 500, removeAllCachedResponses: Bool = false) {
         self.nkCommonInstance.delegate = delegate
 
         /// Cache URLSession

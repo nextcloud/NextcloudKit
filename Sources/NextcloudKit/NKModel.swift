@@ -1,7 +1,7 @@
-//
-// SPDX-FileCopyrightText: 2019 Nextcloud GmbH and Nextcloud contributors
+// SPDX-FileCopyrightText: Nextcloud GmbH
+// SPDX-FileCopyrightText: 2019 Marino Faggiana
+// SPDX-FileCopyrightText: 2023 Claudio Cambra
 // SPDX-License-Identifier: GPL-3.0-or-later
-//
 
 import Foundation
 
@@ -355,7 +355,7 @@ class NKDataFileXML: NSObject {
     """
 
     func getRequestBodyFile(createProperties: [NKProperties]?, removeProperties: [NKProperties] = []) -> String {
-        let request =  """
+        let request = """
         <?xml version=\"1.0\" encoding=\"UTF-8\"?>
         <d:propfind xmlns:d=\"DAV:\" xmlns:oc=\"http://owncloud.org/ns\" xmlns:nc=\"http://nextcloud.org/ns\">
             <d:prop>
@@ -379,7 +379,7 @@ class NKDataFileXML: NSObject {
     """
 
     func getRequestBodyFileListingFavorites(createProperties: [NKProperties]?, removeProperties: [NKProperties] = []) -> String {
-        let request =  """
+        let request = """
         <?xml version=\"1.0\"?>
         <oc:filter-files xmlns:d=\"DAV:\" xmlns:oc=\"http://owncloud.org/ns\" xmlns:nc=\"http://nextcloud.org/ns\">
             <d:prop>
@@ -394,7 +394,7 @@ class NKDataFileXML: NSObject {
     }
 
     func getRequestBodySearchFileName(createProperties: [NKProperties]?, removeProperties: [NKProperties] = []) -> String {
-        let request =  """
+        let request = """
         <?xml version=\"1.0\"?>
         <d:searchrequest xmlns:d=\"DAV:\" xmlns:oc=\"http://owncloud.org/ns\" xmlns:nc=\"http://nextcloud.org/ns\">
         <d:basicsearch>
@@ -422,7 +422,7 @@ class NKDataFileXML: NSObject {
     }
 
     func getRequestBodySearchFileId(createProperties: [NKProperties]?, removeProperties: [NKProperties] = []) -> String {
-        let request =  """
+        let request = """
         <?xml version=\"1.0\"?>
         <d:searchrequest xmlns:d=\"DAV:\" xmlns:oc=\"http://owncloud.org/ns\" xmlns:nc=\"http://nextcloud.org/ns\">
         <d:basicsearch>
@@ -450,7 +450,7 @@ class NKDataFileXML: NSObject {
     }
 
     func getRequestBodySearchMedia(createProperties: [NKProperties]?, removeProperties: [NKProperties] = []) -> String {
-        let request =  """
+        let request = """
         <?xml version=\"1.0\"?>
         <d:searchrequest xmlns:d=\"DAV:\" xmlns:oc=\"http://owncloud.org/ns\" xmlns:nc=\"http://nextcloud.org/ns\">
         <d:basicsearch>
@@ -508,7 +508,7 @@ class NKDataFileXML: NSObject {
     }
 
     func getRequestBodySearchMediaWithLimit(createProperties: [NKProperties]?, removeProperties: [NKProperties] = []) -> String {
-        let request =  """
+        let request = """
         <?xml version=\"1.0\"?>
         <d:searchrequest xmlns:d=\"DAV:\" xmlns:oc=\"http://owncloud.org/ns\" xmlns:nc=\"http://nextcloud.org/ns\">
         <d:basicsearch>

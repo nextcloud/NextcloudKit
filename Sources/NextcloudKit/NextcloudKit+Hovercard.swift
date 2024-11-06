@@ -1,7 +1,6 @@
-//
-// SPDX-FileCopyrightText: 2021 Nextcloud GmbH and Nextcloud contributors
+// SPDX-FileCopyrightText: Nextcloud GmbH
+// SPDX-FileCopyrightText: 2021 Henrik Sorch
 // SPDX-License-Identifier: GPL-3.0-or-later
-//
 
 import Foundation
 import Alamofire
@@ -50,7 +49,7 @@ public extension NextcloudKit {
 public class NKHovercard: NSObject {
     public let userId, displayName: String
     public let actions: [Action]
-    
+
     init?(jsonData: JSON) {
         guard let userId = jsonData["userId"].string,
               let displayName = jsonData["displayName"].string,

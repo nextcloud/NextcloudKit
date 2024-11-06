@@ -1,7 +1,6 @@
-//
-// SPDX-FileCopyrightText: 2024 Nextcloud GmbH and Nextcloud contributors
+// SPDX-FileCopyrightText: Nextcloud GmbH
+// SPDX-FileCopyrightText: 2024 Milen Pivchev
 // SPDX-License-Identifier: GPL-3.0-or-later
-//
 
 import Foundation
 
@@ -11,21 +10,21 @@ public class FileNameValidator {
         return instance
     }()
 
-    public private(set) var forbiddenFileNames: [String] = [] {
+    private var forbiddenFileNames: [String] = [] {
         didSet {
             forbiddenFileNames = forbiddenFileNames.map({$0.uppercased()})
         }
     }
 
-    public private(set) var forbiddenFileNameBasenames: [String] = [] {
+    private var forbiddenFileNameBasenames: [String] = [] {
         didSet {
             forbiddenFileNameBasenames = forbiddenFileNameBasenames.map({$0.uppercased()})
         }
     }
 
-    public private(set) var forbiddenFileNameCharacters: [String] = []
+    private var forbiddenFileNameCharacters: [String] = []
 
-    public private(set) var forbiddenFileNameExtensions: [String] = [] {
+    private var forbiddenFileNameExtensions: [String] = [] {
         didSet {
             forbiddenFileNameExtensions = forbiddenFileNameExtensions.map({$0.uppercased()})
         }
@@ -95,6 +94,10 @@ public class FileNameValidator {
     public func checkFolderPath(_ folderPath: String) -> Bool {
         return folderPath.split { $0 == "/" || $0 == "\\" }
             .allSatisfy { checkFileName(String($0)) == nil }
+    }
+
+    public func isFileHidden(_ name: String) -> Bool {
+        return !name.isEmpty && name.first == "."
     }
 
     private func checkInvalidCharacters(string: String, regex: NSRegularExpression) -> NKError? {
