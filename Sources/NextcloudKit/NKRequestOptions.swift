@@ -18,9 +18,9 @@ public class NKRequestOptions: NSObject {
     var removeProperties: [NKProperties]
     var paginate: Bool
     var paginateToken: String?
-    var paginateTotal: Int
-    var paginateOffset: Int
-    var paginateCount: Int
+    var paginateTotal: Int?
+    var paginateOffset: Int?
+    var paginateCount: Int?
     var queue: DispatchQueue
 
     public init(endpoint: String? = nil,
@@ -35,9 +35,9 @@ public class NKRequestOptions: NSObject {
                 removeProperties: [NKProperties] = [],
                 paginate: Bool = false,
                 paginateToken: String? = nil,
-                paginateTotal: Int = 0,
-                paginateOffset: Int = 0,
-                paginateCount: Int = 0,
+                paginateTotal: Int? = nil,
+                paginateOffset: Int? = nil,
+                paginateCount: Int? = nil,
                 queue: DispatchQueue = .main) {
 
         self.endpoint = endpoint

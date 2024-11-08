@@ -416,6 +416,9 @@ public class NKCommon: NSObject {
             if options.paginate {
                 headers.update(name: "X-NC-Paginate", value: "true")
             }
+            if let paginateCount = options.paginateCount {
+                headers.update(name: "X-NC-Paginate-Count", value: "\(paginateCount)")
+            }
         }
         return headers
     }
