@@ -419,6 +419,12 @@ public class NKCommon: NSObject {
             if let paginateCount = options.paginateCount {
                 headers.update(name: "X-NC-Paginate-Count", value: "\(paginateCount)")
             }
+            if let paginateOffset = options.paginateOffset {
+                headers.update(name: "X-NC-Paginate-Offset", value: "\(paginateOffset)")
+            }
+            if let paginateToken = options.paginateToken {
+                headers.update(name: "X-NC-Paginate-Token", value: paginateToken)
+            }
         }
         return headers
     }
