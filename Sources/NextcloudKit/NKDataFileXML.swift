@@ -560,7 +560,23 @@ class NKDataFileXML: NSObject {
             }
 
             file.placePhotos = propstat["d:prop", "nc:metadata-photos-place"].text
-            
+
+            for downloadLimit in propstat["d:prop", "nc:share-download-limits", "nc:share-download-limit"] {
+                guard let token = downloadLimit["nc:token"].text else {
+                    continue
+                }
+
+                guard let limit = downloadLimit["nc:limit"].int else {
+                    continue
+                }
+
+                guard let count = downloadLimit["nc:count"].int else {
+                    continue
+                }
+
+                file.downloadLimits.append(NKDownloadLimit(count: count, limit: limit, token: token))
+            }
+
             let results = self.nkCommonInstance.getInternalType(fileName: file.fileName, mimeType: file.contentType, directory: file.directory, account: nkSession.account)
 
             file.contentType = results.mimeType
