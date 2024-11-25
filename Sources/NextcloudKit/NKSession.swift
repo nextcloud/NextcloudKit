@@ -49,7 +49,11 @@ public class NKSession {
         /// Session Alamofire
         let configuration = URLSessionConfiguration.af.default
         configuration.requestCachePolicy = requestCachePolicy
-        configuration.multipathServiceType = .handover
+
+        #if os(iOS) || targetEnvironment(macCatalyst)
+            configuration.multipathServiceType = .handover
+        #endif
+
         configuration.httpCookieStorage = HTTPCookieStorage.sharedCookieStorage(forGroupContainerIdentifier: sharedCookieStorage)
         sessionData = Alamofire.Session(configuration: configuration,
                                         delegate: NextcloudKitSessionDelegate(nkCommonInstance: NextcloudKit.shared.nkCommonInstance),
@@ -61,29 +65,49 @@ public class NKSession {
         /// Session Download Background
         let configurationDownloadBackground = URLSessionConfiguration.background(withIdentifier: NKCommon().identifierSessionDownloadBackground)
         configurationDownloadBackground.allowsCellularAccess = true
-        configurationDownloadBackground.sessionSendsLaunchEvents = true
+
+        if #available(macOS 11, *) {
+            configurationDownloadBackground.sessionSendsLaunchEvents = true
+        }
+
         configurationDownloadBackground.isDiscretionary = false
         configurationDownloadBackground.httpMaximumConnectionsPerHost = 5
         configurationDownloadBackground.requestCachePolicy = requestCachePolicy
-        configurationDownloadBackground.multipathServiceType = .handover
+
+        #if os(iOS) || targetEnvironment(macCatalyst)
+            configurationDownloadBackground.multipathServiceType = .handover
+        #endif
+
         configurationDownloadBackground.httpCookieStorage = HTTPCookieStorage.sharedCookieStorage(forGroupContainerIdentifier: sharedCookieStorage)
         sessionDownloadBackground = URLSession(configuration: configurationDownloadBackground, delegate: backgroundSessionDelegate, delegateQueue: OperationQueue.main)
 
         /// Session Upload Background
         let configurationUploadBackground = URLSessionConfiguration.background(withIdentifier: NKCommon().identifierSessionUploadBackground)
         configurationUploadBackground.allowsCellularAccess = true
-        configurationUploadBackground.sessionSendsLaunchEvents = true
+
+        if #available(macOS 11, *) {
+            configurationUploadBackground.sessionSendsLaunchEvents = true
+        }
+
         configurationUploadBackground.isDiscretionary = false
         configurationUploadBackground.httpMaximumConnectionsPerHost = 5
         configurationUploadBackground.requestCachePolicy = requestCachePolicy
-        configurationUploadBackground.multipathServiceType = .handover
+
+        #if os(iOS) || targetEnvironment(macCatalyst)
+            configurationUploadBackground.multipathServiceType = .handover
+        #endif
+
         configurationUploadBackground.httpCookieStorage = HTTPCookieStorage.sharedCookieStorage(forGroupContainerIdentifier: sharedCookieStorage)
         sessionUploadBackground = URLSession(configuration: configurationUploadBackground, delegate: backgroundSessionDelegate, delegateQueue: OperationQueue.main)
 
         /// Session Upload Background WWan
         let configurationUploadBackgroundWWan = URLSessionConfiguration.background(withIdentifier: NKCommon().identifierSessionUploadBackgroundWWan)
         configurationUploadBackgroundWWan.allowsCellularAccess = false
-        configurationUploadBackgroundWWan.sessionSendsLaunchEvents = true
+
+        if #available(macOS 11, *) {
+            configurationUploadBackgroundWWan.sessionSendsLaunchEvents = true
+        }
+
         configurationUploadBackgroundWWan.isDiscretionary = false
         configurationUploadBackgroundWWan.httpMaximumConnectionsPerHost = 5
         configurationUploadBackgroundWWan.requestCachePolicy = requestCachePolicy
@@ -93,12 +117,20 @@ public class NKSession {
         /// Session Upload Background Extension
         let configurationUploadBackgroundExt = URLSessionConfiguration.background(withIdentifier: NKCommon().identifierSessionUploadBackgroundExt + UUID().uuidString)
         configurationUploadBackgroundExt.allowsCellularAccess = true
-        configurationUploadBackgroundExt.sessionSendsLaunchEvents = true
+
+        if #available(macOS 11, *) {
+            configurationUploadBackgroundExt.sessionSendsLaunchEvents = true
+        }
+
         configurationUploadBackgroundExt.isDiscretionary = false
         configurationUploadBackgroundExt.httpMaximumConnectionsPerHost = 5
         configurationUploadBackgroundExt.requestCachePolicy = requestCachePolicy
         configurationUploadBackgroundExt.sharedContainerIdentifier = groupIdentifier
-        configurationUploadBackgroundExt.multipathServiceType = .handover
+
+        #if os(iOS) || targetEnvironment(macCatalyst)
+            configurationUploadBackgroundExt.multipathServiceType = .handover
+        #endif
+        
         configurationUploadBackgroundExt.httpCookieStorage = HTTPCookieStorage.sharedCookieStorage(forGroupContainerIdentifier: sharedCookieStorage)
         sessionUploadBackgroundExt = URLSession(configuration: configurationUploadBackgroundExt, delegate: backgroundSessionDelegate, delegateQueue: OperationQueue.main)
     }
