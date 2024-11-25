@@ -2,18 +2,18 @@
   - SPDX-FileCopyrightText: 2022 Nextcloud GmbH and Nextcloud contributors
   - SPDX-License-Identifier: GPL-3.0-or-later
 -->
-# NextcloudKit V 2
-<img src="image.png" alt="Demo of the Nextcloud iOS files app" width="200" height="200">
 
-[![REUSE status](https://api.reuse.software/badge/github.com/nextcloud/NextcloudKit)](https://api.reuse.software/info/github.com/nextcloud/NextcloudKit)
+<div align="center">
+    <img src="NextcloudKit.png" alt="Logo of NextcloudKit" width="256" height="256" />
+    <h1>NextcloudKit</h1>
+    <img src="https://api.reuse.software/badge/github.com/nextcloud/NextcloudKit" alt="REUSE status" />
+</div>
 
 ## Installation
 
 ### Carthage
 
-[Carthage](https://github.com/Carthage/Carthage) is a decentralized dependency manager that builds your dependencies and provides you with binary frameworks.
-
-To integrate **NextcloudKit** into your Xcode project using Carthage, specify it in your `Cartfile`:
+[Carthage](https://github.com/Carthage/Carthage) is a decentralized dependency manager that builds your dependencies and provides you with binary frameworks. To integrate **NextcloudKit** into your Xcode project using Carthage, specify it in your `Cartfile`:
 
 ```
 github "nextcloud/NextcloudKit" "main"
@@ -23,9 +23,7 @@ Run `carthage update` to build the framework and drag the built `NextcloudKit.fr
 
 ### Swift Package Manager
 
-[Swift Package Manager](https://swift.org/package-manager/) is a tool for automating the distribution of Swift code and is integrated into the `swift` compiler. 
-
-Once you have your Swift package set up, adding NextcloudKit as a dependency is as easy as adding it to the `dependencies` value of your `Package.swift`.
+[Swift Package Manager](https://swift.org/package-manager/) is a tool for automating the distribution of Swift code and is integrated into the `swift` compiler. Once you have your Swift package set up, adding NextcloudKit as a dependency is as easy as adding it to the `dependencies` value of your `Package.swift`.
 
 ```swift
 dependencies: [
@@ -40,16 +38,16 @@ Then, add `NextcloudKit.xcodeproj` to your project, select your app target and a
 
 ## Testing
 
-### Unit tests:
+### Unit Tests
 
 Since most functions in NextcloudKit involve a server call, you can mock the Alamofire session request. For that we use [Mocker](https://github.com/WeTransfer/Mocker).
 
-### Integration tests:
+### Integration Tests
 To run integration tests, you need a docker instance of a Nextcloud test server. [This](https://github.com/szaimen/nextcloud-easy-test) is a good start.
 
-1. In `TestConstants.swift` you must specify your instance credentials. App Token is automatically generated.
+1. In `TestConstants.swift` you must specify your instance credentials. The app token is automatically generated.
 
-```
+```swift
 public class TestConstants {
     static let timeoutLong: Double = 400
     static let server = "http://localhost:8080"
