@@ -658,6 +658,10 @@ class NKDataFileXML: NSObject {
                 file.contentType = "httpd/unix-directory"
             }
 
+            if let ocId = propstat["d:prop", "oc:id"].text {
+                file.ocId = ocId
+            }
+
             if let fileId = propstat["d:prop", "oc:fileid"].text {
                 file.fileId = fileId
             }

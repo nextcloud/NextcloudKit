@@ -6,6 +6,7 @@
 import Foundation
 
 public class NKTrash: NSObject {
+    public var ocId = ""
     public var contentType = ""
     public var date = Date()
     public var directory: Bool = false
