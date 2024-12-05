@@ -5,12 +5,7 @@
 import XCTest
 @testable import NextcloudKit
 
-class BaseIntegrationXCTestCase: XCTestCase {
-    internal let baseUrl = EnvVars.testServerUrl
-    internal let user = EnvVars.testUser
-    internal let userId = EnvVars.testUser
-    internal let password = EnvVars.testAppPassword
-    internal lazy var account = "\(userId) \(baseUrl)"
+class BaseIntegrationXCTestCase: BaseXCTestCase {
     internal var randomInt: Int {
         get {
             return Int.random(in: 1000...Int.max)
