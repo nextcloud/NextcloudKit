@@ -46,13 +46,13 @@ public extension NextcloudKit {
         options.queue.async { request(tosRequest) }
     }
 
-    func signTermsOfService(termId: String,
+    func signTermsOfService(id: String,
                             account: String,
                             options: NKRequestOptions = NKRequestOptions(),
                             taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
                             completion: @escaping (_ account: String, _ responseData: AFDataResponse<Data>?, _ error: NKError) -> Void) {
-        let endpoint = "ocs/v2.php/apps/terms_of_service/signs"
-        let parameters: [String: Any] = ["termId": termId]
+        let endpoint = "ocs/v2.php/apps/terms_of_service/sign"
+        let parameters: [String: Any] = ["operationId": id]
         guard let nkSession = nkCommonInstance.getSession(account: account),
               let url = nkCommonInstance.createStandardUrl(serverUrl: nkSession.urlBase, endpoint: endpoint, options: options),
               let headers = nkCommonInstance.getStandardHeaders(account: account, options: options) else {
