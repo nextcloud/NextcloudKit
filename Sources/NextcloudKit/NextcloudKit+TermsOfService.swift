@@ -70,7 +70,6 @@ public extension NextcloudKit {
             return options.queue.async { completion(account, nil, NKError(error: error)) }
         }
 
-
         nkSession.sessionData.request(urlRequest).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
             task.taskDescription = options.taskDescription
             taskHandler(task)
