@@ -11,7 +11,7 @@ public extension NextcloudKit {
                            options: NKRequestOptions = NKRequestOptions(),
                            request: @escaping (DataRequest?) -> Void = { _ in },
                            taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-                           completion: @escaping (_ account: String, _ tos: [NKTermsOfService.Term]?, _ responseData: AFDataResponse<Data>?, _ error: NKError) -> Void) {
+                           completion: @escaping (_ account: String, _ tos: NKTermsOfService?, _ responseData: AFDataResponse<Data>?, _ error: NKError) -> Void) {
         let endpoint = "ocs/v2.php/apps/terms_of_service/terms"
         guard let nkSession = nkCommonInstance.getSession(account: account),
               let url = nkCommonInstance.createStandardUrl(serverUrl: nkSession.urlBase, endpoint: endpoint, options: options),
@@ -30,7 +30,7 @@ public extension NextcloudKit {
             case .success(let jsonData):
                 let tos = NKTermsOfService()
                 if tos.loadFromJSON(jsonData) {
-                    options.queue.async { completion(account, tos.getTerms(), response, .success) }
+                    options.queue.async { completion(account, tos, response, .success) }
                 } else {
                     options.queue.async { completion(account, nil, response, NKError(rootJson: JSON(jsonData), fallbackStatusCode: response.response?.statusCode)) }
                 }
