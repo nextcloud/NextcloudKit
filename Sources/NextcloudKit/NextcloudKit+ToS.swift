@@ -11,12 +11,12 @@ public extension NextcloudKit {
                            options: NKRequestOptions = NKRequestOptions(),
                            request: @escaping (DataRequest?) -> Void = { _ in },
                            taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-                           completion: @escaping (_ account: String, _ error: NKError) -> Void) {
+                           completion: @escaping (_ account: String, _ tos: [NKTermsOfService]?, _ responseData: AFDataResponse<Data>?, _ error: NKError) -> Void) {
         let endpoint = "ocs/v2.php/apps/terms_of_service/terms"
         guard let nkSession = nkCommonInstance.getSession(account: account),
               let url = nkCommonInstance.createStandardUrl(serverUrl: nkSession.urlBase, endpoint: endpoint, options: options),
               let headers = nkCommonInstance.getStandardHeaders(account: account, options: options) else {
-            return options.queue.async { completion(account, .urlError) }
+            return options.queue.async { completion(account, nil, nil, .urlError) }
         }
 
         let tosRequest = nkSession.sessionData.request(url, method: .get, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
@@ -32,15 +32,50 @@ public extension NextcloudKit {
                 let data = json["ocs"]["data"]
                 let statusCode = json["ocs"]["meta"]["statuscode"].int ?? NKError.internalError
                 if 200..<300 ~= statusCode {
-                    options.queue.async { completion(account, .success) }
+                    let results = NKTermsOfService.factories(data: data)
+                    options.queue.async { completion(account, results, response, .success) }
                 } else {
-                    options.queue.async { completion(account,NKError(rootJson: json, fallbackStatusCode: response.response?.statusCode)) }
+                    options.queue.async { completion(account, nil, response, NKError(rootJson: json, fallbackStatusCode: response.response?.statusCode)) }
                 }
             case .failure(let error):
                 let error = NKError(error: error, afResponse: response, responseData: response.data)
-                options.queue.async { completion(account, error) }
+                options.queue.async { completion(account, nil, response, error) }
             }
         }
         options.queue.async { request(tosRequest) }
     }
 }
+
+public class NKTermsOfService {
+    public var id: String?
+    public var countryCode: String?
+    public var languageCode: String?
+    public var body: String?
+    public var renderedBody: String?
+
+    public init(id: String? = nil, countryCode: String? = nil, languageCode: String? = nil, body: String? = nil, renderedBody: String? = nil) {
+        self.id = id
+        self.countryCode = countryCode
+        self.languageCode = languageCode
+        self.body = body
+        self.renderedBody = renderedBody
+    }
+
+    public init?(json: JSON) {
+        self.id = json["id"].string
+        self.countryCode = json["countryCode"].string
+        self.languageCode = json["languageCode"].string
+        self.body = json["body"].string
+        self.renderedBody = json["renderedBody"].string
+    }
+
+    static func factories(data: JSON) -> [NKTermsOfService]? {
+        guard let allResults = data.array else { return nil }
+        return allResults.compactMap(NKTermsOfService.init)
+    }
+
+    static func factory(data: JSON) -> NKTermsOfService? {
+        NKTermsOfService(json: data)
+    }
+}
+
