@@ -11,7 +11,7 @@ public extension NextcloudKit {
                            options: NKRequestOptions = NKRequestOptions(),
                            request: @escaping (DataRequest?) -> Void = { _ in },
                            taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-                           completion: @escaping (_ account: String, _ tos: [NKTermsOfService]?, _ responseData: AFDataResponse<Data>?, _ error: NKError) -> Void) {
+                           completion: @escaping (_ account: String, _ tos: [NKTermsOfService.Term]?, _ responseData: AFDataResponse<Data>?, _ error: NKError) -> Void) {
         let endpoint = "ocs/v2.php/apps/terms_of_service/terms"
         guard let nkSession = nkCommonInstance.getSession(account: account),
               let url = nkCommonInstance.createStandardUrl(serverUrl: nkSession.urlBase, endpoint: endpoint, options: options),
@@ -28,14 +28,11 @@ public extension NextcloudKit {
             }
             switch response.result {
             case .success(let jsonData):
-                let json = JSON(jsonData)
-                let data = json["ocs"]["data"]
-                let statusCode = json["ocs"]["meta"]["statuscode"].int ?? NKError.internalError
-                if 200..<300 ~= statusCode {
-                    let results = NKTermsOfService.factories(data: data)
-                    options.queue.async { completion(account, results, response, .success) }
+                let tos = NKTermsOfService()
+                if tos.loadFromJSON(jsonData) {
+                    options.queue.async { completion(account, tos.getTerms(), response, .success) }
                 } else {
-                    options.queue.async { completion(account, nil, response, NKError(rootJson: json, fallbackStatusCode: response.response?.statusCode)) }
+                    options.queue.async { completion(account, nil, response, NKError(rootJson: JSON(jsonData), fallbackStatusCode: response.response?.statusCode)) }
                 }
             case .failure(let error):
                 let error = NKError(error: error, afResponse: response, responseData: response.data)
@@ -45,37 +42,3 @@ public extension NextcloudKit {
         options.queue.async { request(tosRequest) }
     }
 }
-
-public class NKTermsOfService {
-    public var id: String?
-    public var countryCode: String?
-    public var languageCode: String?
-    public var body: String?
-    public var renderedBody: String?
-
-    public init(id: String? = nil, countryCode: String? = nil, languageCode: String? = nil, body: String? = nil, renderedBody: String? = nil) {
-        self.id = id
-        self.countryCode = countryCode
-        self.languageCode = languageCode
-        self.body = body
-        self.renderedBody = renderedBody
-    }
-
-    public init?(json: JSON) {
-        self.id = json["id"].string
-        self.countryCode = json["countryCode"].string
-        self.languageCode = json["languageCode"].string
-        self.body = json["body"].string
-        self.renderedBody = json["renderedBody"].string
-    }
-
-    static func factories(data: JSON) -> [NKTermsOfService]? {
-        guard let allResults = data.array else { return nil }
-        return allResults.compactMap(NKTermsOfService.init)
-    }
-
-    static func factory(data: JSON) -> NKTermsOfService? {
-        NKTermsOfService(json: data)
-    }
-}
-
