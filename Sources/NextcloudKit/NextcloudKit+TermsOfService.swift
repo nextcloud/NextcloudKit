@@ -52,7 +52,7 @@ public extension NextcloudKit {
                             taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
                             completion: @escaping (_ account: String, _ responseData: AFDataResponse<Data>?, _ error: NKError) -> Void) {
         let endpoint = "ocs/v2.php/apps/terms_of_service/sign"
-        let parameters: [String: Any] = ["termId": termId]
+        var urlRequest: URLRequest
         ///
         options.contentType = "application/json"
         ///
@@ -62,7 +62,16 @@ public extension NextcloudKit {
             return options.queue.async { completion(account, nil, .urlError) }
         }
 
-        nkSession.sessionData.request(url, method: .post, parameters: parameters, encoding: URLEncoding.default, headers: headers).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
+        do {
+            try urlRequest = URLRequest(url: url, method: .post, headers: headers)
+            let parameters = "{\"termId\":\"" + termId + "\"}"
+            urlRequest.httpBody = parameters.data(using: .utf8)
+        } catch {
+            return options.queue.async { completion(account, nil, NKError(error: error)) }
+        }
+
+
+        nkSession.sessionData.request(urlRequest).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
             task.taskDescription = options.taskDescription
             taskHandler(task)
         }.responseData(queue: self.nkCommonInstance.backgroundQueue) { response in
