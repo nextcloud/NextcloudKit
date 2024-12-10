@@ -19,7 +19,7 @@ public class NKTermsOfService: NSObject {
             self.data = decodedResponse.ocs.data
             return true
         } catch {
-            print("Errore durante la decodifica:", error)
+            print("decode error:", error)
             return false
         }
     }
@@ -34,6 +34,10 @@ public class NKTermsOfService: NSObject {
 
     public func hasUserSigned() -> Bool {
         return data?.hasSigned ?? false
+    }
+
+    public func getMeta() -> Meta? {
+        return meta
     }
 
     // MARK: - Codable

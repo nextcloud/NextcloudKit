@@ -29,10 +29,14 @@ public extension NextcloudKit {
             switch response.result {
             case .success(let jsonData):
                 let tos = NKTermsOfService()
-                if tos.loadFromJSON(jsonData) {
-                    options.queue.async { completion(account, tos, response, .success) }
+                if tos.loadFromJSON(jsonData), let meta = tos.getMeta() {
+                    if meta.statuscode == 200 {
+                        options.queue.async { completion(account, tos, response, .success) }
+                    } else {
+                        options.queue.async { completion(account, tos, response, NKError(errorCode: meta.statuscode, errorDescription: meta.message, responseData: jsonData)) }
+                    }
                 } else {
-                    options.queue.async { completion(account, nil, response, NKError(rootJson: JSON(jsonData), fallbackStatusCode: response.response?.statusCode)) }
+                    options.queue.async { completion(account, nil, response, .invalidData) }
                 }
             case .failure(let error):
                 let error = NKError(error: error, afResponse: response, responseData: response.data)
