@@ -16,6 +16,10 @@ public class NKRequestOptions: NSObject {
     var taskDescription: String?
     var createProperties: [NKProperties]?
     var removeProperties: [NKProperties]
+    var paginate: Bool
+    var paginateToken: String?
+    var paginateOffset: Int?
+    var paginateCount: Int?
     var queue: DispatchQueue
 
     public init(endpoint: String? = nil,
@@ -28,6 +32,10 @@ public class NKRequestOptions: NSObject {
                 taskDescription: String? = nil,
                 createProperties: [NKProperties]? = nil,
                 removeProperties: [NKProperties] = [],
+                paginate: Bool = false,
+                paginateToken: String? = nil,
+                paginateOffset: Int? = nil,
+                paginateCount: Int? = nil,
                 queue: DispatchQueue = .main) {
 
         self.endpoint = endpoint
@@ -40,6 +48,10 @@ public class NKRequestOptions: NSObject {
         self.taskDescription = taskDescription
         self.createProperties = createProperties
         self.removeProperties = removeProperties
+        self.paginate = paginate
+        self.paginateToken = paginateToken
+        self.paginateOffset = paginateOffset
+        self.paginateCount = paginateCount
         self.queue = queue
     }
 }

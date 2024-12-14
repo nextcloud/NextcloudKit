@@ -2,174 +2,287 @@
 // SPDX-FileCopyrightText: 2024 Milen Pivchev
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-import XCTest
+import Testing
 @testable import NextcloudKit
 
-final class FileAutoRenamerUnitTests: XCTestCase {
+@Suite(.serialized) struct FileAutoRenamerUnitTests {
     let fileAutoRenamer = FileAutoRenamer.shared
 
     let forbiddenFilenameCharacter = ">"
     let forbiddenFilenameExtension = "."
 
-    let initialCharacters = ["<", ">", ":", "\\\\", "/", "|", "?", "*", "&"]
-    let initialExtensions = [" ", ",", ".", ".filepart", ".part"]
+    let characterArrays = [
+        ["\\\\", "*", ">", "&", "/", "|", ":", "<", "?"],
+        [">", ":", "?", "&", "*", "\\\\", "|", "<", "/"],
+        ["<", "|", "?", ":", "&", "*", "\\\\", "/", ">"],
+        ["?", "/", ":", "&", "<", "|", ">", "\\\\", "*"],
+        ["&", "<", "|", "*", "/", "?", ">", ":", "\\\\"]
+    ]
 
-    override func setUp() {
-        fileAutoRenamer.setup(
-            forbiddenFileNameCharacters: initialCharacters,
-            forbiddenFileNameExtensions: initialExtensions
-        )
-        super.setUp()
+    let extensionArrays = [
+        [" ", ",", ".", ".filepart", ".part"],
+        [".filepart", ".part", " ", ".", ","],
+        [".PART", ".", ",", " ", ".filepart"],
+        [",", " ", ".FILEPART", ".part", "."],
+        [".", ".PART", ",", " ", ".FILEPART"]
+    ]
+
+    let combinedTuples: [([String], [String])]
+
+    init() {
+        combinedTuples = zip(characterArrays, extensionArrays).map { ($0, $1) }
     }
 
-    func testInvalidChar() {
-        let filename = "File\(forbiddenFilenameCharacter)File.txt"
-        let result = fileAutoRenamer.rename(filename: filename)
-        let expectedFilename = "File_File.txt"
-        XCTAssertEqual(result, expectedFilename, "Expected \(expectedFilename) but got \(result)")
+    @Test func testInvalidChar() {
+        for (characterArray, extensionArray) in combinedTuples {
+            fileAutoRenamer.setup(
+                forbiddenFileNameCharacters: characterArray,
+                forbiddenFileNameExtensions: extensionArray
+            )
+
+            let filename = "File\(forbiddenFilenameCharacter)File.txt"
+            let result = fileAutoRenamer.rename(filename: filename)
+            let expectedFilename = "File_File.txt"
+            #expect(result == expectedFilename)
+        }
     }
 
-    func testInvalidExtension() {
-        let filename = "File\(forbiddenFilenameExtension)"
-        let result = fileAutoRenamer.rename(filename: filename)
-        let expectedFilename = "File_"
-        XCTAssertEqual(result, expectedFilename, "Expected \(expectedFilename) but got \(result)")
+    @Test func testInvalidExtension() {
+        for (characterArray, extensionArray) in combinedTuples {
+            fileAutoRenamer.setup(
+                forbiddenFileNameCharacters: characterArray,
+                forbiddenFileNameExtensions: extensionArray
+            )
+
+            let filename = "File\(forbiddenFilenameExtension)"
+            let result = fileAutoRenamer.rename(filename: filename)
+            let expectedFilename = "File_"
+            #expect(result == expectedFilename)
+        }
     }
 
-    func testMultipleInvalidChars() {
-        let filename = "File|name?<>.txt"
-        let result = fileAutoRenamer.rename(filename: filename)
-        let expectedFilename = "File_name___.txt"
-        XCTAssertEqual(result, expectedFilename, "Expected \(expectedFilename) but got \(result)")
+    @Test func testMultipleInvalidChars() {
+        for (characterArray, extensionArray) in combinedTuples {
+            fileAutoRenamer.setup(
+                forbiddenFileNameCharacters: characterArray,
+                forbiddenFileNameExtensions: extensionArray
+            )
+
+            let filename = "File|name?<>.txt"
+            let result = fileAutoRenamer.rename(filename: filename)
+            let expectedFilename = "File_name___.txt"
+            #expect(result == expectedFilename)
+        }
     }
 
-    func testStartEndInvalidExtensions() {
-        let filename = " .File.part "
-        let result = fileAutoRenamer.rename(filename: filename)
-        let expectedFilename = "_File_part"
-        XCTAssertEqual(result, expectedFilename, "Expected \(expectedFilename) but got \(result)")
+    @Test func testStartEndInvalidExtensions() {
+        for (characterArray, extensionArray) in combinedTuples {
+            fileAutoRenamer.setup(
+                forbiddenFileNameCharacters: characterArray,
+                forbiddenFileNameExtensions: extensionArray
+            )
+
+            let filename = " .File.part "
+            let result = fileAutoRenamer.rename(filename: filename)
+            let expectedFilename = "_File_part"
+            #expect(result == expectedFilename)
+        }
     }
 
-    func testStartEndInvalidExtensions2() {
-        fileAutoRenamer.setup(
-            forbiddenFileNameCharacters: initialCharacters,
-            forbiddenFileNameExtensions: [",", ".", ".filepart", ".part", " "]
-        )
+    @Test func testStartInvalidExtension() {
+        for (characterArray, extensionArray) in combinedTuples {
+            fileAutoRenamer.setup(
+                forbiddenFileNameCharacters: characterArray,
+                forbiddenFileNameExtensions: extensionArray
+            )
 
-        let filename = " .File.part "
-        let result = fileAutoRenamer.rename(filename: filename)
-        let expectedFilename = "_File_part"
-        XCTAssertEqual(result, expectedFilename, "Expected \(expectedFilename) but got \(result)")
+            let filename = " .File.part"
+            let result = fileAutoRenamer.rename(filename: filename)
+            let expectedFilename = "_File_part"
+            #expect(result == expectedFilename)
+        }
     }
 
-    func testStartEndInvalidExtensions3() {
-        fileAutoRenamer.setup(
-            forbiddenFileNameCharacters: initialCharacters,
-            forbiddenFileNameExtensions: [".FILEPART", ".PART", " ", ",", "."]
-        )
+    @Test func testEndInvalidExtension() {
+        for (characterArray, extensionArray) in combinedTuples {
+            fileAutoRenamer.setup(
+                forbiddenFileNameCharacters: characterArray,
+                forbiddenFileNameExtensions: extensionArray
+            )
 
-        let filename = " .File.part "
-        let result = fileAutoRenamer.rename(filename: filename)
-        let expectedFilename = "_File_part"
-        XCTAssertEqual(result, expectedFilename, "Expected \(expectedFilename) but got \(result)")
+            let filename = ".File.part "
+            let result = fileAutoRenamer.rename(filename: filename)
+            let expectedFilename = "_File_part"
+            #expect(result == expectedFilename)
+        }
     }
 
-    func testStartInvalidExtension() {
-        let filename = " .File.part"
-        let result = fileAutoRenamer.rename(filename: filename)
-        let expectedFilename = "_File_part"
-        XCTAssertEqual(result, expectedFilename, "Expected \(expectedFilename) but got \(result)")
+    @Test func testHiddenFile() {
+        for (characterArray, extensionArray) in combinedTuples {
+            fileAutoRenamer.setup(
+                forbiddenFileNameCharacters: characterArray,
+                forbiddenFileNameExtensions: extensionArray
+            )
+
+            let filename = ".Filename.txt"
+            let result = fileAutoRenamer.rename(filename: filename)
+            let expectedFilename = "_Filename.txt"
+            #expect(result == expectedFilename)
+        }
     }
 
-    func testEndInvalidExtension() {
-        let filename = ".File.part "
-        let result = fileAutoRenamer.rename(filename: filename)
-        let expectedFilename = "_File_part"
-        XCTAssertEqual(result, expectedFilename, "Expected \(expectedFilename) but got \(result)")
+    @Test func testUppercaseExtension() {
+        for (characterArray, extensionArray) in combinedTuples {
+            fileAutoRenamer.setup(
+                forbiddenFileNameCharacters: characterArray,
+                forbiddenFileNameExtensions: extensionArray
+            )
+
+            let filename = ".Filename.TXT"
+            let result = fileAutoRenamer.rename(filename: filename)
+            let expectedFilename = "_Filename.txt"
+            #expect(result == expectedFilename)
+        }
     }
 
-    func testHiddenFile() {
-        let filename = ".Filename.txt"
-        let result = fileAutoRenamer.rename(filename: filename)
-        let expectedFilename = "_Filename.txt"
-        XCTAssertEqual(result, expectedFilename, "Expected \(expectedFilename) but got \(result)")
+    @Test func testMiddleNonPrintableChar() {
+        for (characterArray, extensionArray) in combinedTuples {
+            fileAutoRenamer.setup(
+                forbiddenFileNameCharacters: characterArray,
+                forbiddenFileNameExtensions: extensionArray
+            )
+
+            let filename = "File\u{0001}name.txt"
+            let result = fileAutoRenamer.rename(filename: filename)
+            let expectedFilename = "Filename.txt"
+            #expect(result == expectedFilename)
+        }
     }
 
-    func testUppercaseExtension() {
-        let filename = ".Filename.TXT"
-        let result = fileAutoRenamer.rename(filename: filename)
-        let expectedFilename = "_Filename.txt"
-        XCTAssertEqual(result, expectedFilename, "Expected \(expectedFilename) but got \(result)")
+    @Test func testStartNonPrintableChar() {
+        for (characterArray, extensionArray) in combinedTuples {
+            fileAutoRenamer.setup(
+                forbiddenFileNameCharacters: characterArray,
+                forbiddenFileNameExtensions: extensionArray
+            )
+
+            let filename = "\u{0001}Filename.txt"
+            let result = fileAutoRenamer.rename(filename: filename)
+            let expectedFilename = "Filename.txt"
+            #expect(result == expectedFilename)
+        }
     }
 
-    func testMiddleNonPrintableChar() {
-        let filename = "File\u{0001}name.txt"
-        let result = fileAutoRenamer.rename(filename: filename)
-        let expectedFilename = "Filename.txt"
-        XCTAssertEqual(result, expectedFilename, "Expected \(expectedFilename) but got \(result)")
+    @Test func testEndNonPrintableChar() {
+        for (characterArray, extensionArray) in combinedTuples {
+            fileAutoRenamer.setup(
+                forbiddenFileNameCharacters: characterArray,
+                forbiddenFileNameExtensions: extensionArray
+            )
+
+            let filename = "Filename.txt\u{0001}"
+            let result = fileAutoRenamer.rename(filename: filename)
+            let expectedFilename = "Filename.txt"
+            #expect(result == expectedFilename)
+        }
     }
 
-    func testStartNonPrintableChar() {
-        let filename = "\u{0001}Filename.txt"
-        let result = fileAutoRenamer.rename(filename: filename)
-        let expectedFilename = "Filename.txt"
-        XCTAssertEqual(result, expectedFilename, "Expected \(expectedFilename) but got \(result)")
+    @Test func testExtensionNonPrintableChar() {
+        for (characterArray, extensionArray) in combinedTuples {
+            fileAutoRenamer.setup(
+                forbiddenFileNameCharacters: characterArray,
+                forbiddenFileNameExtensions: extensionArray
+            )
+
+            let filename = "Filename.t\u{0001}xt"
+            let result = fileAutoRenamer.rename(filename: filename)
+            let expectedFilename = "Filename.txt"
+            #expect(result == expectedFilename)
+        }
     }
 
-    func testEndNonPrintableChar() {
-        let filename = "Filename.txt\u{0001}"
-        let result = fileAutoRenamer.rename(filename: filename)
-        let expectedFilename = "Filename.txt"
-        XCTAssertEqual(result, expectedFilename, "Expected \(expectedFilename) but got \(result)")
+    @Test func testMiddleInvalidFolderChar() {
+        for (characterArray, extensionArray) in combinedTuples {
+            fileAutoRenamer.setup(
+                forbiddenFileNameCharacters: characterArray,
+                forbiddenFileNameExtensions: extensionArray
+            )
+
+            let folderPath = "Abc/Def/kg\(forbiddenFilenameCharacter)/lmo/pp"
+            let result = fileAutoRenamer.rename(filename: folderPath, isFolderPath: true)
+            let expectedFolderName = "Abc/Def/kg_/lmo/pp"
+            #expect(result == expectedFolderName)
+        }
     }
 
-    func testExtensionNonPrintableChar() {
-        let filename = "Filename.t\u{0001}xt"
-        let result = fileAutoRenamer.rename(filename: filename)
-        let expectedFilename = "Filename.txt"
-        XCTAssertEqual(result, expectedFilename, "Expected \(expectedFilename) but got \(result)")
+    @Test func testEndInvalidFolderChar() {
+        for (characterArray, extensionArray) in combinedTuples {
+            fileAutoRenamer.setup(
+                forbiddenFileNameCharacters: characterArray,
+                forbiddenFileNameExtensions: extensionArray
+            )
+
+            let folderPath = "Abc/Def/kg/lmo/pp\(forbiddenFilenameCharacter)"
+            let result = fileAutoRenamer.rename(filename: folderPath, isFolderPath: true)
+            let expectedFolderName = "Abc/Def/kg/lmo/pp_"
+            #expect(result == expectedFolderName)
+        }
     }
 
-    func testMiddleInvalidFolderChar() {
-        let folderPath = "Abc/Def/kg\(forbiddenFilenameCharacter)/lmo/pp"
-        let result = fileAutoRenamer.rename(filename: folderPath, isFolderPath: true)
-        let expectedFolderName = "Abc/Def/kg_/lmo/pp"
-        XCTAssertEqual(result, expectedFolderName, "Expected \(expectedFolderName) but got \(result)")
+    @Test func testStartInvalidFolderChar() {
+        for (characterArray, extensionArray) in combinedTuples {
+            fileAutoRenamer.setup(
+                forbiddenFileNameCharacters: characterArray,
+                forbiddenFileNameExtensions: extensionArray
+            )
+
+            let folderPath = "\(forbiddenFilenameCharacter)Abc/Def/kg/lmo/pp"
+            let result = fileAutoRenamer.rename(filename: folderPath, isFolderPath: true)
+            let expectedFolderName = "_Abc/Def/kg/lmo/pp"
+            #expect(result == expectedFolderName)
+        }
     }
 
-    func testEndInvalidFolderChar() {
-        let folderPath = "Abc/Def/kg/lmo/pp\(forbiddenFilenameCharacter)"
-        let result = fileAutoRenamer.rename(filename: folderPath, isFolderPath: true)
-        let expectedFolderName = "Abc/Def/kg/lmo/pp_"
-        XCTAssertEqual(result, expectedFolderName, "Expected \(expectedFolderName) but got \(result)")
+    @Test func testMixedInvalidChar() {
+        for (characterArray, extensionArray) in combinedTuples {
+            fileAutoRenamer.setup(
+                forbiddenFileNameCharacters: characterArray,
+                forbiddenFileNameExtensions: extensionArray
+            )
+
+            let filename = " File\u{0001}na\(forbiddenFilenameCharacter)me.txt "
+            let result = fileAutoRenamer.rename(filename: filename)
+            let expectedFilename = "Filena_me.txt"
+            #expect(result == expectedFilename)
+        }
     }
 
-    func testStartInvalidFolderChar() {
-        let folderPath = "\(forbiddenFilenameCharacter)Abc/Def/kg/lmo/pp"
-        let result = fileAutoRenamer.rename(filename: folderPath, isFolderPath: true)
-        let expectedFolderName = "_Abc/Def/kg/lmo/pp"
-        XCTAssertEqual(result, expectedFolderName, "Expected \(expectedFolderName) but got \(result)")
+    @Test func testStartsWithPathSeparator() {
+        for (characterArray, extensionArray) in combinedTuples {
+            fileAutoRenamer.setup(
+                forbiddenFileNameCharacters: characterArray,
+                forbiddenFileNameExtensions: extensionArray
+            )
+
+            let folderPath = "/Abc/Def/kg/lmo/pp\(forbiddenFilenameCharacter)/File.txt/"
+            let result = fileAutoRenamer.rename(filename: folderPath, isFolderPath: true)
+            let expectedFolderName = "/Abc/Def/kg/lmo/pp_/File.txt/"
+            #expect(result == expectedFolderName)
+        }
     }
 
-    func testMixedInvalidChar() {
-        let filename = " File\u{0001}na\(forbiddenFilenameCharacter)me.txt "
-        let result = fileAutoRenamer.rename(filename: filename)
-        let expectedFilename = "Filena_me.txt"
-        XCTAssertEqual(result, expectedFilename, "Expected \(expectedFilename) but got \(result)")
-    }
-
-    func testStartsWithPathSeparator() {
-        let folderPath = "/Abc/Def/kg/lmo/pp\(forbiddenFilenameCharacter)/File.txt/"
-        let result = fileAutoRenamer.rename(filename: folderPath, isFolderPath: true)
-        let expectedFolderName = "/Abc/Def/kg/lmo/pp_/File.txt/"
-        XCTAssertEqual(result, expectedFolderName, "Expected \(expectedFolderName) but got \(result)")
-    }
-
-    func testStartsWithPathSeparatorAndValidFilepath() {
-        let folderPath = "/COm02/2569.webp"
-        let result = fileAutoRenamer.rename(filename: folderPath, isFolderPath: true)
-        let expectedFolderName = "/COm02/2569.webp"
-        XCTAssertEqual(result, expectedFolderName, "Expected \(expectedFolderName) but got \(result)")
+    @Test func testStartsWithPathSeparatorAndValidFilepath() {
+        for (characterArray, extensionArray) in combinedTuples {
+            fileAutoRenamer.setup(
+                forbiddenFileNameCharacters: characterArray,
+                forbiddenFileNameExtensions: extensionArray
+            )
+            
+            let folderPath = "/COm02/2569.webp"
+            let result = fileAutoRenamer.rename(filename: folderPath, isFolderPath: true)
+            let expectedFolderName = "/COm02/2569.webp"
+            #expect(result == expectedFolderName)
+        }
     }
 }
 
