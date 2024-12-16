@@ -16,6 +16,12 @@ public class NKFile: NSObject {
     public var date = Date()
     public var directory: Bool = false
     public var downloadURL = ""
+
+    ///
+    /// Download limits for shares of this file.
+    ///
+    public var downloadLimits = [NKDownloadLimit]()
+    
     public var e2eEncrypted: Bool = false
     public var etag = ""
     public var favorite: Bool = false
