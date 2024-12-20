@@ -6,14 +6,14 @@ import Foundation
 import SwiftyXMLParser
 
 public class NKRecommendation {
-    var id: String
-    var timestamp: Date?
-    var name: String
-    var directory: String
-    var extensionType: String
-    var mimeType: String
-    var hasPreview: Bool
-    var reason: String
+    public var id: String
+    public var timestamp: Date?
+    public var name: String
+    public var directory: String
+    public var extensionType: String
+    public var mimeType: String
+    public var hasPreview: Bool
+    public var reason: String
 
     init(id: String, timestamp: Date?, name: String, directory: String, extensionType: String, mimeType: String, hasPreview: Bool, reason: String) {
         self.id = id
