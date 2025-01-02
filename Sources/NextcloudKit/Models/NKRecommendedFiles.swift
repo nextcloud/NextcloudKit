@@ -5,7 +5,7 @@
 import Foundation
 import SwiftyXMLParser
 
-public class NKRecommendation {
+public class NKRecommendation: NSObject {
     public var id: String
     public var timestamp: Date?
     public var name: String
@@ -15,7 +15,7 @@ public class NKRecommendation {
     public var hasPreview: Bool
     public var reason: String
 
-    init(id: String, timestamp: Date?, name: String, directory: String, extensionType: String, mimeType: String, hasPreview: Bool, reason: String) {
+    public init(id: String, timestamp: Date?, name: String, directory: String, extensionType: String, mimeType: String, hasPreview: Bool, reason: String) {
         self.id = id
         self.timestamp = timestamp
         self.name = name
