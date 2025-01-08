@@ -97,6 +97,7 @@ public extension NextcloudKit {
 
     func uploadChunk(directory: String,
                      fileName: String,
+                     destinationFileName: String? = nil,
                      date: Date?,
                      creationDate: Date?,
                      serverUrl: String,
@@ -119,7 +120,7 @@ public extension NextcloudKit {
         }
         let fileNameLocalSize = self.nkCommonInstance.getFileSize(filePath: directory + "/" + fileName)
         let serverUrlChunkFolder = nkSession.urlBase + "/" + nkSession.dav + "/uploads/" + nkSession.userId + "/" + chunkFolder
-        let serverUrlFileName = nkSession.urlBase + "/" + nkSession.dav + "/files/" + nkSession.userId + self.nkCommonInstance.returnPathfromServerUrl(serverUrl, urlBase: nkSession.urlBase, userId: nkSession.userId) + "/" + fileName
+        let serverUrlFileName = nkSession.urlBase + "/" + nkSession.dav + "/files/" + nkSession.userId + self.nkCommonInstance.returnPathfromServerUrl(serverUrl, urlBase: nkSession.urlBase, userId: nkSession.userId) + "/" + (destinationFileName ?? fileName)
         if options.customHeader == nil {
             options.customHeader = [:]
         }
