@@ -96,7 +96,9 @@ public extension NextcloudKit {
     ///     - chunkSizeInMB: Size in MB of chunk
 
     func uploadChunk(directory: String,
+                     fileChunksOutputDirectory: String? = nil,
                      fileName: String,
+                     destinationFileName: String? = nil,
                      date: Date?,
                      creationDate: Date?,
                      serverUrl: String,
@@ -119,7 +121,7 @@ public extension NextcloudKit {
         }
         let fileNameLocalSize = self.nkCommonInstance.getFileSize(filePath: directory + "/" + fileName)
         let serverUrlChunkFolder = nkSession.urlBase + "/" + nkSession.dav + "/uploads/" + nkSession.userId + "/" + chunkFolder
-        let serverUrlFileName = nkSession.urlBase + "/" + nkSession.dav + "/files/" + nkSession.userId + self.nkCommonInstance.returnPathfromServerUrl(serverUrl, urlBase: nkSession.urlBase, userId: nkSession.userId) + "/" + fileName
+        let serverUrlFileName = nkSession.urlBase + "/" + nkSession.dav + "/files/" + nkSession.userId + self.nkCommonInstance.returnPathfromServerUrl(serverUrl, urlBase: nkSession.urlBase, userId: nkSession.userId) + "/" + (destinationFileName ?? fileName)
         if options.customHeader == nil {
             options.customHeader = [:]
         }
@@ -175,7 +177,8 @@ public extension NextcloudKit {
             var uploadNKError = NKError()
             var uploadAFError: AFError?
 
-            self.nkCommonInstance.chunkedFile(inputDirectory: directory, outputDirectory: directory, fileName: fileName, chunkSize: chunkSize, filesChunk: filesChunk) { num in
+            let outputDirectory = fileChunksOutputDirectory ?? directory
+            self.nkCommonInstance.chunkedFile(inputDirectory: directory, outputDirectory: outputDirectory, fileName: fileName, chunkSize: chunkSize, filesChunk: filesChunk) { num in
                 numChunks(num)
             } counterChunk: { counter in
                 counterChunk(counter)
@@ -190,7 +193,7 @@ public extension NextcloudKit {
 
                 for fileChunk in filesChunk {
                     let serverUrlFileName = serverUrlChunkFolder + "/" + fileChunk.fileName
-                    let fileNameLocalPath = directory + "/" + fileChunk.fileName
+                    let fileNameLocalPath = outputDirectory + "/" + fileChunk.fileName
                     let fileSize = self.nkCommonInstance.getFileSize(filePath: fileNameLocalPath)
                     if fileSize == 0 {
                         // The file could not be sent
