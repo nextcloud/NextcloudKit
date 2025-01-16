@@ -3,9 +3,18 @@
 // SPDX-FileCopyrightText: 2023 Claudio Cambra
 // SPDX-License-Identifier: GPL-3.0-or-later
 
+///
+/// Definition of properties used for decoding in ``NKDataFileXML``.
+///
 public enum NKProperties: String, CaseIterable {
     /// DAV
     case displayname = "<d:displayname />"
+
+    ///
+    /// Download limits for shares of a file as optionally provided by the [Files Download Limit](https://github.com/nextcloud/files_downloadlimit) app for Nextcloud server.
+    ///
+    case downloadLimit = "<nc:share-download-limits />"
+
     case getlastmodified = "<d:getlastmodified />"
     case getetag = "<d:getetag />"
     case getcontenttype = "<d:getcontenttype />"
