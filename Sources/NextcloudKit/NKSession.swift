@@ -34,9 +34,9 @@ public class NKSession {
          userAgent: String,
          nextcloudVersion: Int,
          groupIdentifier: String,
-         httpMaximumConnectionsPerHost: Int = 6,
-         httpMaximumConnectionsPerHostInDownload: Int = 5,
-         httpMaximumConnectionsPerHostInUpload: Int = 5,
+         httpMaximumConnectionsPerHost: Int,
+         httpMaximumConnectionsPerHostInDownload: Int,
+         httpMaximumConnectionsPerHostInUpload: Int,
          requestCachePolicy: URLRequest.CachePolicy = .useProtocolCachePolicy) {
         self.urlBase = urlBase
         self.user = user
