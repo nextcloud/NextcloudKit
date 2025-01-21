@@ -14,6 +14,7 @@ public class NKSession {
     public var userAgent: String
     public var nextcloudVersion: Int
     public let groupIdentifier: String
+    public let httpMaximumConnectionsPerHost: Int
     public let requestCachePolicy: URLRequest.CachePolicy
     public let dav: String = "remote.php/dav"
     public var internalTypeIdentifiers: [NKCommon.UTTypeConformsToServer] = []
@@ -31,6 +32,7 @@ public class NKSession {
          userAgent: String,
          nextcloudVersion: Int,
          groupIdentifier: String,
+         httpMaximumConnectionsPerHost: Int = 5,
          requestCachePolicy: URLRequest.CachePolicy = .useProtocolCachePolicy) {
         self.urlBase = urlBase
         self.user = user
@@ -40,6 +42,7 @@ public class NKSession {
         self.userAgent = userAgent
         self.nextcloudVersion = nextcloudVersion
         self.groupIdentifier = groupIdentifier
+        self.httpMaximumConnectionsPerHost = httpMaximumConnectionsPerHost
         self.requestCachePolicy = requestCachePolicy
 
         let backgroundSessionDelegate = NKBackground(nkCommonInstance: NextcloudKit.shared.nkCommonInstance)
@@ -71,7 +74,7 @@ public class NKSession {
         }
 
         configurationDownloadBackground.isDiscretionary = false
-        configurationDownloadBackground.httpMaximumConnectionsPerHost = 5
+        configurationDownloadBackground.httpMaximumConnectionsPerHost = self.httpMaximumConnectionsPerHost
         configurationDownloadBackground.requestCachePolicy = requestCachePolicy
 
         #if os(iOS) || targetEnvironment(macCatalyst)
@@ -90,7 +93,7 @@ public class NKSession {
         }
 
         configurationUploadBackground.isDiscretionary = false
-        configurationUploadBackground.httpMaximumConnectionsPerHost = 5
+        configurationUploadBackground.httpMaximumConnectionsPerHost = self.httpMaximumConnectionsPerHost
         configurationUploadBackground.requestCachePolicy = requestCachePolicy
 
         #if os(iOS) || targetEnvironment(macCatalyst)
@@ -109,7 +112,7 @@ public class NKSession {
         }
 
         configurationUploadBackgroundWWan.isDiscretionary = false
-        configurationUploadBackgroundWWan.httpMaximumConnectionsPerHost = 5
+        configurationUploadBackgroundWWan.httpMaximumConnectionsPerHost = self.httpMaximumConnectionsPerHost
         configurationUploadBackgroundWWan.requestCachePolicy = requestCachePolicy
         configurationUploadBackgroundWWan.httpCookieStorage = HTTPCookieStorage.sharedCookieStorage(forGroupContainerIdentifier: sharedCookieStorage)
         sessionUploadBackgroundWWan = URLSession(configuration: configurationUploadBackgroundWWan, delegate: backgroundSessionDelegate, delegateQueue: OperationQueue.main)
@@ -123,7 +126,7 @@ public class NKSession {
         }
 
         configurationUploadBackgroundExt.isDiscretionary = false
-        configurationUploadBackgroundExt.httpMaximumConnectionsPerHost = 5
+        configurationUploadBackgroundExt.httpMaximumConnectionsPerHost = self.httpMaximumConnectionsPerHost
         configurationUploadBackgroundExt.requestCachePolicy = requestCachePolicy
         configurationUploadBackgroundExt.sharedContainerIdentifier = groupIdentifier
 
