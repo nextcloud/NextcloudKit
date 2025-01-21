@@ -62,8 +62,8 @@ open class NextcloudKit {
                               userAgent: String,
                               nextcloudVersion: Int,
                               httpMaximumConnectionsPerHost: Int = 6,
-                              httpMaximumConnectionsPerHostInDownload: Int = 5,
-                              httpMaximumConnectionsPerHostInUpload: Int = 5,
+                              httpMaximumConnectionsPerHostInDownload: Int = 6,
+                              httpMaximumConnectionsPerHostInUpload: Int = 6,
                               groupIdentifier: String) {
         if nkCommonInstance.nksessions.filter({ $0.account == account }).first != nil {
             return updateSession(account: account, urlBase: urlBase, userId: userId, password: password, userAgent: userAgent, nextcloudVersion: nextcloudVersion)
