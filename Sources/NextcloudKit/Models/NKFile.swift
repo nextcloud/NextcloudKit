@@ -21,7 +21,7 @@ public class NKFile: NSObject {
     /// Download limits for shares of this file.
     ///
     public var downloadLimits = [NKDownloadLimit]()
-    
+
     public var e2eEncrypted: Bool = false
     public var etag = ""
     public var favorite: Bool = false
