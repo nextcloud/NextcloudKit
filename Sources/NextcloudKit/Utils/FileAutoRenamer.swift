@@ -73,6 +73,11 @@ public final class FileAutoRenamer: Sendable {
                 modifiedSegment.append(".\(fileExtension.lowercased())")
             }
 
+            if modifiedSegment.hasPrefix(".") {
+                modifiedSegment.remove(at: modifiedSegment.startIndex)
+                modifiedSegment = replacement + modifiedSegment
+            }
+
             return modifiedSegment
         }
 
