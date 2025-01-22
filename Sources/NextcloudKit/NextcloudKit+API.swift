@@ -379,7 +379,19 @@ public extension NextcloudKit {
                             #else
 
                             #if os(iOS)
-                            let screenScale = UIScreen.main.scale
+                            var screenScale = 1.0
+                            if #available(iOS 13.0, *) {
+                                let semaphore = DispatchSemaphore(value: 0)
+                                Task {
+                                    screenScale = await UIScreen.main.scale
+                                    semaphore.signal()
+                                }
+                                semaphore.wait()
+                            } else {
+                                #if swift(<6.0)
+                                screenScale = UIScreen.main.scale
+                                #endif
+                            }
                             #else
                             let screenScale = 1.0
                             #endif
