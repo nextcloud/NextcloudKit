@@ -14,15 +14,11 @@ import Alamofire
 import SwiftyJSON
 
 final class NextcloudKitSessionDelegate: SessionDelegate {
-    public var nkCommonInstance: NKCommon?
+    public let nkCommonInstance: NKCommon?
 
-    override public init(fileManager: FileManager = .default) {
-        super.init(fileManager: fileManager)
-    }
-
-    convenience init(nkCommonInstance: NKCommon?) {
-        self.init()
+    public init(fileManager: FileManager = .default, nkCommonInstance: NKCommon? = nil) {
         self.nkCommonInstance = nkCommonInstance
+        super.init(fileManager: fileManager)
     }
 
     public func urlSession(_ session: URLSession, didReceive challenge: URLAuthenticationChallenge, completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
