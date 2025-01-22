@@ -307,7 +307,7 @@ class NKDataFileXML: NSObject {
         let elements = xml["d:multistatus", "d:response"]
 
         for element in elements {
-            let file = NKFile()
+            var file = NKFile()
             if let href = element["d:href"].text {
                 var fileNamePath = href
                 if href.last == "/" {
