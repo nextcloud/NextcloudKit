@@ -82,7 +82,7 @@ public class NKCommon: NSObject {
         case xls = "xls"
     }
 
-    public struct UTTypeConformsToServer {
+    public struct UTTypeConformsToServer: Sendable {
         var typeIdentifier: String
         var classFile: String
         var editor: String
