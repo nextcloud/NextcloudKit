@@ -39,14 +39,14 @@ public final class FileAutoRenamer: Sendable {
         pathSegments = pathSegments.map { segment in
             var modifiedSegment = segment
 
+            if mutableForbiddenFileNameCharacters.contains(" ") {
+                modifiedSegment = modifiedSegment.trimmingCharacters(in: .whitespaces)
+            }
+
             mutableForbiddenFileNameCharacters.forEach { forbiddenChar in
                 if modifiedSegment.contains(forbiddenChar) {
                     modifiedSegment = modifiedSegment.replacingOccurrences(of: forbiddenChar, with: replacement, options: .caseInsensitive)
                 }
-            }
-
-            if mutableForbiddenFileNameCharacters.contains(" ") {
-                modifiedSegment = modifiedSegment.trimmingCharacters(in: .whitespaces)
             }
 
             // Replace forbidden extension, if any (ex. .part -> _part)
