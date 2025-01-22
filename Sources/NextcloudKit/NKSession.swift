@@ -3,9 +3,9 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 import Foundation
-import Alamofire
+@preconcurrency import Alamofire
 
-public class NKSession {
+public struct NKSession: Sendable {
     public var urlBase: String
     public var user: String
     public var userId: String

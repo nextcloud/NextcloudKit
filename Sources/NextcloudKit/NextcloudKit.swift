@@ -94,7 +94,7 @@ open class NextcloudKit {
                               userAgent: String? = nil,
                               nextcloudVersion: Int? = nil,
                               replaceWithAccount: String? = nil) {
-        guard let nkSession = nkCommonInstance.nksessions.filter({ $0.account == account }).first else { return }
+        guard var nkSession = nkCommonInstance.nksessions.filter({ $0.account == account }).first else { return }
         if let urlBase {
             nkSession.urlBase = urlBase
         }
