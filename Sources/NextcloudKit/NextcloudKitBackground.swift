@@ -4,7 +4,7 @@
 
 import Foundation
 
-public class NKBackground: NSObject, URLSessionTaskDelegate, URLSessionDelegate, URLSessionDownloadDelegate {
+public final class NKBackground: NSObject, URLSessionTaskDelegate, URLSessionDelegate, URLSessionDownloadDelegate {
     let nkCommonInstance: NKCommon
 
     public init(nkCommonInstance: NKCommon) {
