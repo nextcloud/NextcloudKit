@@ -70,6 +70,7 @@ open class NextcloudKit {
         }
         
         let nkSession = NKSession(
+            nkCommonInstance: nkCommonInstance,
             urlBase: urlBase,
             user: user,
             userId: userId,
