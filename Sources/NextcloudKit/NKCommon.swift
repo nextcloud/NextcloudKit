@@ -212,7 +212,7 @@ public class NKCommon: NSObject {
     }
 
     public func getFileProperties(inUTI: CFString) -> NKFileProperty {
-        let fileProperty = NKFileProperty()
+        var fileProperty = NKFileProperty()
         let typeIdentifier: String = inUTI as String
 
         if let fileExtension = UTTypeCopyPreferredTagWithClass(inUTI as CFString, kUTTagClassFilenameExtension) {
