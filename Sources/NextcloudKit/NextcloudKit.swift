@@ -68,7 +68,7 @@ open class NextcloudKit {
         if nkCommonInstance.nksessions.filter({ $0.account == account }).first != nil {
             return updateSession(account: account, urlBase: urlBase, userId: userId, password: password, userAgent: userAgent, nextcloudVersion: nextcloudVersion)
         }
-        let nkSession = NKSession(urlBase: urlBase, user: user, userId: userId, password: password, account: account, userAgent: userAgent, nextcloudVersion: nextcloudVersion, groupIdentifier: groupIdentifier, httpMaximumConnectionsPerHost: httpMaximumConnectionsPerHost, httpMaximumConnectionsPerHostInDownload: httpMaximumConnectionsPerHostInDownload, httpMaximumConnectionsPerHostInUpload: httpMaximumConnectionsPerHostInUpload)
+        let nkSession = NKSession(nkCommonInstance: nkCommonInstance, urlBase: urlBase, user: user, userId: userId, password: password, account: account, userAgent: userAgent, nextcloudVersion: nextcloudVersion, groupIdentifier: groupIdentifier, httpMaximumConnectionsPerHost: httpMaximumConnectionsPerHost, httpMaximumConnectionsPerHostInDownload: httpMaximumConnectionsPerHostInDownload, httpMaximumConnectionsPerHostInUpload: httpMaximumConnectionsPerHostInUpload)
 
         nkCommonInstance.nksessions.append(nkSession)
     }
