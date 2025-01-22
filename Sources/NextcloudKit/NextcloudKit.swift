@@ -18,7 +18,7 @@ open class NextcloudKit {
 #if !os(watchOS)
     private let reachabilityManager = Alamofire.NetworkReachabilityManager()
 #endif
-    public let nkCommonInstance = NKCommon()
+    public var nkCommonInstance = NKCommon()
     internal lazy var internalSession: Alamofire.Session = {
         return Alamofire.Session(configuration: URLSessionConfiguration.af.default,
                                  delegate: NextcloudKitSessionDelegate(nkCommonInstance: nkCommonInstance),
