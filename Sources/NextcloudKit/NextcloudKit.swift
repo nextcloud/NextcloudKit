@@ -11,10 +11,12 @@ import Alamofire
 import SwiftyJSON
 
 open class NextcloudKit {
+#if swift(<6.0)
     public static let shared: NextcloudKit = {
         let instance = NextcloudKit()
         return instance
     }()
+#endif
 #if !os(watchOS)
     private let reachabilityManager = Alamofire.NetworkReachabilityManager()
 #endif
@@ -25,11 +27,19 @@ open class NextcloudKit {
                                  eventMonitors: [NKLogger(nkCommonInstance: self.nkCommonInstance)])
     }()
 
+#if swift(<6.0)
     init() {
 #if !os(watchOS)
         startNetworkReachabilityObserver()
 #endif
     }
+#else
+    public init() {
+#if !os(watchOS)
+        startNetworkReachabilityObserver()
+#endif
+    }
+#endif
 
     deinit {
 #if !os(watchOS)

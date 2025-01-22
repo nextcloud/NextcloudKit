@@ -45,7 +45,12 @@ class LoginUnitTests: XCTestCase {
 //        NextcloudKit.shared.nkCommonInstance.sessionConfiguration = mockSessionManager()
 
         // Now we call the function we want to test; it will use the mock session and request and return the mock data
-        NextcloudKit.shared.getLoginFlowV2(serverUrl: serverUrl) { token, endpoint, login, data, error in
+#if swift(<6.0)
+        let ncKit = NextcloudKit.shared
+#else
+        let ncKit = NextcloudKit()
+#endif
+        ncKit.getLoginFlowV2(serverUrl: serverUrl) { token, endpoint, login, data, error in
             let json = JSON(mockJsonData)
 
             let mockToken = json["poll"]["token"].string
@@ -71,8 +76,13 @@ class LoginUnitTests: XCTestCase {
         }
         mock.register()
 
+#if swift(<6.0)
+        let ncKit = NextcloudKit.shared
+#else
+        let ncKit = NextcloudKit()
+#endif
         // Now we call the function we want to test; it will use the mock session and request and return the mock data
-        NextcloudKit.shared.getLoginFlowV2(serverUrl: serverUrl) { token, endpoint, login, data, error in
+        ncKit.getLoginFlowV2(serverUrl: serverUrl) { token, endpoint, login, data, error in
             XCTAssertNotNil(error)
             XCTAssertNil(token)
             XCTAssertNil(endpoint)
@@ -94,8 +104,13 @@ class LoginUnitTests: XCTestCase {
         // Set our mock session manager as the one the API is going to use
 //        NextcloudKit.shared.nkCommonInstance.sessionConfiguration = mockSessionManager()
 
+#if swift(<6.0)
+        let ncKit = NextcloudKit.shared
+#else
+        let ncKit = NextcloudKit()
+#endif
         // Now we call the function we want to test; it will use the mock session and request and return the mock data
-        NextcloudKit.shared.getLoginFlowV2(serverUrl: "badUrl") { token, endpoint, login, data, error in
+        ncKit.getLoginFlowV2(serverUrl: "badUrl") { token, endpoint, login, data, error in
             XCTAssertNotNil(error)
             XCTAssertNil(token)
             XCTAssertNil(endpoint)
