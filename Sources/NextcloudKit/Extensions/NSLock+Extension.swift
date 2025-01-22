@@ -1,9 +1,6 @@
-//
-//  NSLock+Extension.swift
-//  NextcloudKit
-//
-//  Created by Claudio Cambra on 2025-01-22.
-//
+// SPDX-FileCopyrightText: Nextcloud GmbH
+// SPDX-FileCopyrightText: 2025 Claudio Cambra <claudio.cambra@nextcloud.com>
+// SPDX-License-Identifier: GPL-3.0-or-later
 
 import Foundation
 
