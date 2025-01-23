@@ -39,7 +39,7 @@ public class FileNameValidator {
     }
 
     public var fileForbiddenFileExtensionError: NKError {
-        let errorMessageTemplate = NSLocalizedString("_file_name_validator_error_forbidden_file_extension_", value: ".\"%@\" is a forbidden file extension.", comment: "")
+        let errorMessageTemplate = NSLocalizedString("_file_name_validator_error_forbidden_file_extension_", value: "\".%@\" is a forbidden file extension.", comment: "")
         let errorMessage = String(format: errorMessageTemplate, templateString)
         return NKError(errorCode: NSURLErrorCannotCreateFile, errorDescription: errorMessage)
     }
