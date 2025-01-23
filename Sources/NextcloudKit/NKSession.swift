@@ -140,7 +140,7 @@ public class NKSession {
         #if os(iOS) || targetEnvironment(macCatalyst)
             configurationUploadBackgroundExt.multipathServiceType = .handover
         #endif
-        
+
         configurationUploadBackgroundExt.httpCookieStorage = HTTPCookieStorage.sharedCookieStorage(forGroupContainerIdentifier: sharedCookieStorage)
         sessionUploadBackgroundExt = URLSession(configuration: configurationUploadBackgroundExt, delegate: backgroundSessionDelegate, delegateQueue: OperationQueue.main)
     }
