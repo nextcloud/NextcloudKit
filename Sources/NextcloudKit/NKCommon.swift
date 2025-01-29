@@ -411,6 +411,8 @@ public class NKCommon: NSObject {
         for (key, value) in options?.customHeader ?? [:] {
             headers.update(name: key, value: value)
         }
+        // added temporany header account
+        headers.update(name: "X-NC-Account", value: account)
         // Paginate
         if let options {
             if options.paginate {
