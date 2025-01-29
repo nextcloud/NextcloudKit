@@ -11,7 +11,9 @@ import Alamofire
 class Interceptor: RequestInterceptor {
     static let shared = Interceptor()
 
-    let groupDefaults = UserDefaults(suiteName: NextcloudKit.shared.nkCommonInstance.groupIdentifier)
+    lazy var groupDefaults: UserDefaults? = {
+        return UserDefaults(suiteName: NextcloudKit.shared.nkCommonInstance.groupIdentifier)
+    }()
 
     func adapt(_ urlRequest: URLRequest, for session: Session, completion: @escaping (Result<URLRequest, Error>) -> Void) {
         var modifiedRequest = urlRequest
