@@ -10,11 +10,18 @@ import Alamofire
 
 class Interceptor: RequestInterceptor {
     static let shared = Interceptor()
+    public let nkCommonInstance = NKCommon()
 
     // MARK: - ADAPT (Prima della richiesta)
     func adapt(_ urlRequest: URLRequest, for session: Session, completion: @escaping (Result<URLRequest, Error>) -> Void) {
-        // Modifica la richiesta prima che venga inviata
+        let groupDefaults = UserDefaults(suiteName: nkCommonInstance.groupIdentifier)
         var modifiedRequest = urlRequest
+
+        if let account = urlRequest.value(forHTTPHeaderField: "X-NC-Account") {
+            
+        }
+
+        completion(.success(modifiedRequest))
 
         // Aggiungi l'header di autorizzazione
         modifiedRequest.setValue("Bearer myToken", forHTTPHeaderField: "Authorization")

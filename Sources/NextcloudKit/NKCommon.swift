@@ -32,6 +32,7 @@ public protocol NextcloudKitDelegate {
 public class NKCommon: NSObject {
     public var nksessions = ThreadSafeArray<NKSession>()
     public var delegate: NextcloudKitDelegate?
+    public var groupIdentifier: String = ""
 
     public let identifierSessionDownload: String = "com.nextcloud.nextcloudkit.session.download"
     public let identifierSessionUpload: String = "com.nextcloud.nextcloudkit.session.upload"
