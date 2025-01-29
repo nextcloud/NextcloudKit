@@ -11,6 +11,32 @@ import Alamofire
 class Interceptor: RequestInterceptor {
     static let shared = Interceptor()
 
+    // MARK: - ADAPT (Prima della richiesta)
+    func adapt(_ urlRequest: URLRequest, for session: Session, completion: @escaping (Result<URLRequest, Error>) -> Void) {
+        // Modifica la richiesta prima che venga inviata
+        var modifiedRequest = urlRequest
+
+        // Aggiungi l'header di autorizzazione
+        modifiedRequest.setValue("Bearer myToken", forHTTPHeaderField: "Authorization")
+
+        print("Richiesta modificata: \(modifiedRequest)")
+        completion(.success(modifiedRequest))
+    }
+
+    // MARK: - DID RECEIVE (Dopo la risposta, gestisci la logica post-richiesta)
+    func didReceive(_ response: DataResponse<Data?, AFError>, for request: Request, completion: @escaping (DataResponse<Data?, AFError>) -> Void) {
+        // Gestisci la risposta
+        if let error = response.error {
+            print("Errore nella risposta: \(error)")
+        } else {
+            print("Risposta ricevuta: \(String(describing: response.data))")
+        }
+
+        // Continua con la risposta ricevuta
+        completion(response)
+    }
+
+    /*
     private var isSessionBlocked = false
     private var retryCount = 0
     private let maxRetryAttempts = 1 // Numero massimo di retry per errore 401
@@ -55,4 +81,5 @@ class Interceptor: RequestInterceptor {
         isSessionBlocked = false
         retryCount = 0
     }
+    */
 }
