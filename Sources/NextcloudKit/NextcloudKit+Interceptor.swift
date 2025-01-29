@@ -13,20 +13,17 @@ class Interceptor: RequestInterceptor {
 
     let groupDefaults = UserDefaults(suiteName: NextcloudKit.shared.nkCommonInstance.groupIdentifier)
 
-    // MARK: - ADAPT (Prima della richiesta)
     func adapt(_ urlRequest: URLRequest, for session: Session, completion: @escaping (Result<URLRequest, Error>) -> Void) {
         var modifiedRequest = urlRequest
 
-        if let account = urlRequest.value(forHTTPHeaderField: "X-NC-Account") {
-            
+        if let account = urlRequest.value(forHTTPHeaderField: "X-NC-Account"),
+           let unauthorizedArray = groupDefaults?.array(forKey: "Unauthorized") as? [String],
+           unauthorizedArray.contains(account) {
+            let error = AFError.responseValidationFailed(reason: .unacceptableStatusCode(code: 401))
+            return completion(.failure(error))
         }
 
-        completion(.success(modifiedRequest))
-
-        // Aggiungi l'header di autorizzazione
-        modifiedRequest.setValue("Bearer myToken", forHTTPHeaderField: "Authorization")
-
-        print("Richiesta modificata: \(modifiedRequest)")
+        modifiedRequest.setValue(nil, forHTTPHeaderField: "X-NC-Account")
         completion(.success(modifiedRequest))
     }
 }
