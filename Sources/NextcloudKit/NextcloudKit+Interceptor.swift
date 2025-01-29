@@ -10,11 +10,17 @@ import Alamofire
 
 class Interceptor: RequestInterceptor {
     static let shared = Interceptor()
-    public let nkCommonInstance = NKCommon()
+
+    let nkCommonInstance: NKCommon
+    let groupDefaults: UserDefaults?
+
+    private init() {
+        self.nkCommonInstance = NKCommon()
+        self.groupDefaults = UserDefaults(suiteName: nkCommonInstance.groupIdentifier)
+    }
 
     // MARK: - ADAPT (Prima della richiesta)
     func adapt(_ urlRequest: URLRequest, for session: Session, completion: @escaping (Result<URLRequest, Error>) -> Void) {
-        let groupDefaults = UserDefaults(suiteName: nkCommonInstance.groupIdentifier)
         var modifiedRequest = urlRequest
 
         if let account = urlRequest.value(forHTTPHeaderField: "X-NC-Account") {
