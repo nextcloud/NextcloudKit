@@ -14,7 +14,7 @@ class Interceptor: RequestInterceptor {
     let nkCommonInstance: NKCommon
     let groupDefaults: UserDefaults?
 
-    private init() {
+    init() {
         self.nkCommonInstance = NKCommon()
         self.groupDefaults = UserDefaults(suiteName: nkCommonInstance.groupIdentifier)
     }
