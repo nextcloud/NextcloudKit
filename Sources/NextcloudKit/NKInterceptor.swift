@@ -13,8 +13,7 @@ class NKInterceptor: RequestInterceptor {
     }()
 
     func adapt(_ urlRequest: URLRequest, for session: Session, completion: @escaping (Result<URLRequest, Error>) -> Void) {
-        var modifiedRequest = urlRequest
-
+        //
         // Detect if exists in the groupDefaults Unauthorized array the account
         //
         if let account = urlRequest.value(forHTTPHeaderField: "X-NC-Account"),
@@ -24,7 +23,6 @@ class NKInterceptor: RequestInterceptor {
             return completion(.failure(error))
         }
 
-        // modifiedRequest.setValue(nil, forHTTPHeaderField: "X-NC-Account")
-        completion(.success(modifiedRequest))
+        completion(.success(urlRequest))
     }
 }

@@ -8,6 +8,10 @@ import Alamofire
 final class NKLogger: EventMonitor {
     let nkCommonInstance: NKCommon
 
+    lazy var groupDefaults: UserDefaults? = {
+        return UserDefaults(suiteName: NextcloudKit.shared.nkCommonInstance.groupIdentifier)
+    }()
+
     init(nkCommonInstance: NKCommon) {
         self.nkCommonInstance = nkCommonInstance
     }
@@ -48,10 +52,16 @@ final class NKLogger: EventMonitor {
         }
 
         //
+        // Error 401, append the account in groupDefaults Unauthorized array
         //
-        //
-        if let statusCode = response.response?.statusCode, statusCode == 401 {
+        if let statusCode = response.response?.statusCode, statusCode == 401,
+           let account = request.request?.allHTTPHeaderFields?["X-NC-Account"] as? String {
 
+            var unauthorizedArray = groupDefaults?.array(forKey: "Unauthorized") as? [String] ?? []
+            if !unauthorizedArray.contains(account) {
+                unauthorizedArray.append(account)
+                groupDefaults?.set(unauthorizedArray, forKey: "Unauthorized")
+            }
         }
     }
 }
