@@ -46,5 +46,12 @@ final class NKLogger: EventMonitor {
                 self.nkCommonInstance.writeLog("Network response all headers: \(date) " + responseAllHeaderFields)
             }
         }
+
+        //
+        //
+        //
+        if let statusCode = response.response?.statusCode, statusCode == 401 {
+
+        }
     }
 }
