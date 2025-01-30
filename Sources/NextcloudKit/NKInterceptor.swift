@@ -5,14 +5,12 @@
 import Foundation
 import Alamofire
 
-class NKInterceptor: RequestInterceptor {
+final class NKInterceptor: RequestInterceptor, @unchecked Sendable {
     static let shared = Interceptor()
 
-    lazy var groupDefaults: UserDefaults? = {
-        return UserDefaults(suiteName: NextcloudKit.shared.nkCommonInstance.groupIdentifier)
-    }()
-
     func adapt(_ urlRequest: URLRequest, for session: Session, completion: @escaping (Result<URLRequest, Error>) -> Void) {
+        let groupDefaults = UserDefaults(suiteName: NextcloudKit.shared.nkCommonInstance.groupIdentifier)
+
         //
         // Detect if exists in the groupDefaults Unauthorized array the account
         //
