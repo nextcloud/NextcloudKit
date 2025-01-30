@@ -19,6 +19,7 @@ open class NextcloudKit {
     private let reachabilityManager = Alamofire.NetworkReachabilityManager()
 #endif
     public let nkCommonInstance = NKCommon()
+    public let nkInterceptor = NKInterceptor.shared
     internal lazy var internalSession: Alamofire.Session = {
         return Alamofire.Session(configuration: URLSessionConfiguration.af.default,
                                  delegate: NextcloudKitSessionDelegate(nkCommonInstance: nkCommonInstance),

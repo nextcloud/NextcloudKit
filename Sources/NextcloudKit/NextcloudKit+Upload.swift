@@ -43,7 +43,7 @@ public extension NextcloudKit {
             headers.update(name: "Overwrite", value: "true")
         }
 
-        let request = nkSession.sessionData.upload(fileNameLocalPathUrl, to: url, method: .put, headers: headers, interceptor: Interceptor.shared, fileManager: .default).validate(statusCode: 200..<300).onURLSessionTaskCreation(perform: { task in
+        let request = nkSession.sessionData.upload(fileNameLocalPathUrl, to: url, method: .put, headers: headers, interceptor: nkInterceptor, fileManager: .default).validate(statusCode: 200..<300).onURLSessionTaskCreation(perform: { task in
             task.taskDescription = options.taskDescription
             options.queue.async { taskHandler(task) }
         }) .uploadProgress { progress in

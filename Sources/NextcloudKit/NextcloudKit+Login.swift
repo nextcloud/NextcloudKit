@@ -32,7 +32,7 @@ public extension NextcloudKit {
             return options.queue.async { completion(nil, nil, NKError(error: error)) }
         }
 
-        internalSession.request(urlRequest, interceptor: Interceptor.shared).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
+        internalSession.request(urlRequest, interceptor: nkInterceptor).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
             task.taskDescription = options.taskDescription
             taskHandler(task)
         }.response(queue: self.nkCommonInstance.backgroundQueue) { response in
@@ -80,7 +80,7 @@ public extension NextcloudKit {
             return options.queue.async { completion(nil, NKError(error: error)) }
         }
 
-        nkSession.sessionData.request(urlRequest, interceptor: Interceptor.shared).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
+        nkSession.sessionData.request(urlRequest, interceptor: nkInterceptor).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
             task.taskDescription = options.taskDescription
             taskHandler(task)
         }.response(queue: self.nkCommonInstance.backgroundQueue) { response in
@@ -112,7 +112,7 @@ public extension NextcloudKit {
             headers = [HTTPHeader.userAgent(userAgent)]
         }
 
-        internalSession.request(url, method: .post, parameters: nil, encoding: URLEncoding.default, headers: headers, interceptor: Interceptor.shared).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
+        internalSession.request(url, method: .post, parameters: nil, encoding: URLEncoding.default, headers: headers, interceptor: nkInterceptor).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
             task.taskDescription = options.taskDescription
             taskHandler(task)
         }.responseData(queue: self.nkCommonInstance.backgroundQueue) { response in
@@ -149,7 +149,7 @@ public extension NextcloudKit {
             headers = [HTTPHeader.userAgent(userAgent)]
         }
 
-        internalSession.request(url, method: .post, parameters: nil, encoding: URLEncoding.default, headers: headers, interceptor: Interceptor.shared).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
+        internalSession.request(url, method: .post, parameters: nil, encoding: URLEncoding.default, headers: headers, interceptor: nkInterceptor).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
             task.taskDescription = options.taskDescription
             taskHandler(task)
         }.responseData(queue: self.nkCommonInstance.backgroundQueue) { response in

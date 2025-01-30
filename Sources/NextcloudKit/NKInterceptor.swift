@@ -1,14 +1,11 @@
-//
-//  NextcloudKit+in.swift
-//  NextcloudKit
-//
-//  Created by Marino Faggiana on 29/01/25.
-//
+// SPDX-FileCopyrightText: Nextcloud GmbH
+// SPDX-FileCopyrightText: 2025 Marino Faggiana
+// SPDX-License-Identifier: GPL-3.0-or-later
 
 import Foundation
 import Alamofire
 
-class Interceptor: RequestInterceptor {
+class NKInterceptor: RequestInterceptor {
     static let shared = Interceptor()
 
     lazy var groupDefaults: UserDefaults? = {
@@ -27,7 +24,7 @@ class Interceptor: RequestInterceptor {
             return completion(.failure(error))
         }
 
-        modifiedRequest.setValue(nil, forHTTPHeaderField: "X-NC-Account")
+        // modifiedRequest.setValue(nil, forHTTPHeaderField: "X-NC-Account")
         completion(.success(modifiedRequest))
     }
 }
