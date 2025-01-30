@@ -92,6 +92,8 @@ public class NKBackground: NSObject, URLSessionTaskDelegate, URLSessionDelegate,
         request.httpMethod = "PUT"
         request.setValue(nkSession.userAgent, forHTTPHeaderField: "User-Agent")
         request.setValue("Basic \(base64LoginString)", forHTTPHeaderField: "Authorization")
+        request.setValue(account, forHTTPHeaderField: "X-NC-Account")
+
         if overwrite {
             request.setValue("true", forHTTPHeaderField: "Overwrite")
         }
@@ -154,13 +156,16 @@ public class NKBackground: NSObject, URLSessionTaskDelegate, URLSessionDelegate,
         }
         var nkError: NKError = .success
 
-        if let httpResponse = (task.response as? HTTPURLResponse) {
-            if httpResponse.statusCode >= 200 && httpResponse.statusCode < 300 {
+        if let response = (task.response as? HTTPURLResponse) {
+            if response.statusCode == 401 {
+
+            }
+            if response.statusCode >= 200 && response.statusCode < 300 {
                 if let error = error {
                     nkError = NKError(error: error)
                 }
             } else {
-                nkError = NKError(httpResponse: httpResponse)
+                nkError = NKError(httpResponse: response)
             }
         } else {
             if let error = error {
