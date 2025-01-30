@@ -69,11 +69,17 @@ public class NKBackground: NSObject, URLSessionTaskDelegate, URLSessionDelegate,
                        sessionIdentifier: String) -> URLSessionUploadTask? {
         var url: URL?
         var uploadSession: URLSession?
+        let groupDefaults = UserDefaults(suiteName: NextcloudKit.shared.nkCommonInstance.groupIdentifier)
 
         if serverUrlFileName is URL {
             url = serverUrlFileName as? URL
         } else if serverUrlFileName is String || serverUrlFileName is NSString {
             url = (serverUrlFileName as? String)?.encodedToUrl as? URL
+        }
+
+        if let unauthorizedArray = groupDefaults?.array(forKey: "Unauthorized") as? [String],
+           unauthorizedArray.contains(account) {
+            return nil
         }
 
         guard let nkSession = nkCommonInstance.getSession(account: account),
@@ -92,8 +98,6 @@ public class NKBackground: NSObject, URLSessionTaskDelegate, URLSessionDelegate,
         request.httpMethod = "PUT"
         request.setValue(nkSession.userAgent, forHTTPHeaderField: "User-Agent")
         request.setValue("Basic \(base64LoginString)", forHTTPHeaderField: "Authorization")
-        request.setValue(account, forHTTPHeaderField: "X-NC-Account")
-
         if overwrite {
             request.setValue("true", forHTTPHeaderField: "Overwrite")
         }
