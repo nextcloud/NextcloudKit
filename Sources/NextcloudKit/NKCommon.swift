@@ -391,7 +391,7 @@ public class NKCommon: NSObject {
         return session
     }
 
-    public func getStandardHeaders(account: String, options: NKRequestOptions? = nil) -> HTTPHeaders? {
+    public func getStandardHeaders(account: String, addHeaderAccount: Bool, options: NKRequestOptions? = nil) -> HTTPHeaders? {
         guard let session = nksessions.filter({ $0.account == account }).first else { return nil}
         var headers: HTTPHeaders = []
 
@@ -412,8 +412,9 @@ public class NKCommon: NSObject {
         for (key, value) in options?.customHeader ?? [:] {
             headers.update(name: key, value: value)
         }
-        // added temporany header account
-        headers.update(name: "X-NC-Account", value: account)
+        if addHeaderAccount {
+            headers.update(name: "X-NC-Account", value: account)
+        }
         // Paginate
         if let options {
             if options.paginate {
