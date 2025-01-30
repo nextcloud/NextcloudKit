@@ -19,18 +19,29 @@ public class NKBackground: NSObject, URLSessionTaskDelegate, URLSessionDelegate,
                          taskDescription: String? = nil,
                          account: String) -> URLSessionDownloadTask? {
         var url: URL?
+        let groupDefaults = UserDefaults(suiteName: NextcloudKit.shared.nkCommonInstance.groupIdentifier)
+
         if serverUrlFileName is URL {
             url = serverUrlFileName as? URL
         } else if serverUrlFileName is String || serverUrlFileName is NSString {
             url = (serverUrlFileName as? String)?.encodedToUrl as? URL
         }
-        guard let nkSession = nkCommonInstance.getSession(account: account) else {
+
+        if let unauthorizedArray = groupDefaults?.array(forKey: "Unauthorized") as? [String],
+           unauthorizedArray.contains(account) {
             return nil
         }
-        guard let urlForRequest = url else { return nil }
+
+        guard let nkSession = nkCommonInstance.getSession(account: account),
+              let urlForRequest = url
+        else {
+            return nil
+        }
         var request = URLRequest(url: urlForRequest)
         let loginString = "\(nkSession.user):\(nkSession.password)"
-        guard let loginData = loginString.data(using: String.Encoding.utf8) else {
+
+        guard let loginData = loginString.data(using: String.Encoding.utf8)
+        else {
             return nil
         }
         let base64LoginString = loginData.base64EncodedString()
@@ -58,15 +69,19 @@ public class NKBackground: NSObject, URLSessionTaskDelegate, URLSessionDelegate,
                        sessionIdentifier: String) -> URLSessionUploadTask? {
         var url: URL?
         var uploadSession: URLSession?
-        guard let nkSession = nkCommonInstance.getSession(account: account) else { return nil }
+
         if serverUrlFileName is URL {
             url = serverUrlFileName as? URL
         } else if serverUrlFileName is String || serverUrlFileName is NSString {
             url = (serverUrlFileName as? String)?.encodedToUrl as? URL
         }
-        guard let urlForRequest = url else {
+
+        guard let nkSession = nkCommonInstance.getSession(account: account),
+              let urlForRequest = url
+        else {
             return nil
         }
+
         var request = URLRequest(url: urlForRequest)
         let loginString = "\(nkSession.user):\(nkSession.password)"
         guard let loginData = loginString.data(using: String.Encoding.utf8) else {
