@@ -391,7 +391,7 @@ public class NKCommon: NSObject {
         return session
     }
 
-    public func getStandardHeaders(account: String, addHeaderAccount: Bool, options: NKRequestOptions? = nil) -> HTTPHeaders? {
+    public func getStandardHeaders(account: String, addHeaderAccount: Bool = false, options: NKRequestOptions? = nil) -> HTTPHeaders? {
         guard let session = nksessions.filter({ $0.account == account }).first else { return nil}
         var headers: HTTPHeaders = []
 

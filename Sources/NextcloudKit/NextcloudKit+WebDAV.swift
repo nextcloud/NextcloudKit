@@ -14,7 +14,7 @@ public extension NextcloudKit {
                       completion: @escaping (_ account: String, _ ocId: String?, _ date: Date?, _ responseData: AFDataResponse<Data?>?, _ error: NKError) -> Void) {
         guard let url = serverUrlFileName.encodedToUrl,
               let nkSession = nkCommonInstance.getSession(account: account),
-              let headers = nkCommonInstance.getStandardHeaders(account: account, options: options) else {
+              let headers = nkCommonInstance.getStandardHeaders(account: account, addHeaderAccount: true, options: options) else {
             return options.queue.async { completion(account, nil, nil, nil, .urlError) }
         }
         let method = HTTPMethod(rawValue: "MKCOL")
@@ -59,7 +59,7 @@ public extension NextcloudKit {
                             completion: @escaping (_ account: String, _ responseData: AFDataResponse<Data?>?, _ error: NKError) -> Void) {
         guard let url = serverUrlFileName.encodedToUrl,
               let nkSession = nkCommonInstance.getSession(account: account),
-              let headers = nkCommonInstance.getStandardHeaders(account: account, options: options) else {
+              let headers = nkCommonInstance.getStandardHeaders(account: account, addHeaderAccount: true, options: options) else {
             return options.queue.async { completion(account, nil, .urlError) }
         }
         var urlRequest: URLRequest
@@ -96,7 +96,7 @@ public extension NextcloudKit {
                           completion: @escaping (_ account: String, _ responseData: AFDataResponse<Data?>?, _ error: NKError) -> Void) {
         guard let url = serverUrlFileNameSource.encodedToUrl,
               let nkSession = nkCommonInstance.getSession(account: account),
-              var headers = nkCommonInstance.getStandardHeaders(account: account, options: options) else {
+              var headers = nkCommonInstance.getStandardHeaders(account: account, addHeaderAccount: true, options: options) else {
             return options.queue.async { completion(account, nil, .urlError) }
         }
         let method = HTTPMethod(rawValue: "MOVE")
@@ -140,7 +140,7 @@ public extension NextcloudKit {
                           completion: @escaping (_ account: String, _ responseData: AFDataResponse<Data?>?, _ error: NKError) -> Void) {
         guard let url = serverUrlFileNameSource.encodedToUrl,
               let nkSession = nkCommonInstance.getSession(account: account),
-              var headers = nkCommonInstance.getStandardHeaders(account: account, options: options) else {
+              var headers = nkCommonInstance.getStandardHeaders(account: account, addHeaderAccount: true, options: options) else {
             return options.queue.async { completion(account, nil, .urlError) }
         }
         let method = HTTPMethod(rawValue: "COPY")
@@ -192,7 +192,7 @@ public extension NextcloudKit {
         ///
         guard let nkSession = nkCommonInstance.getSession(account: account),
               let url = serverUrlFileName.encodedToUrl,
-              var headers = nkCommonInstance.getStandardHeaders(account: account, options: options) else {
+              var headers = nkCommonInstance.getStandardHeaders(account: account, addHeaderAccount: true, options: options) else {
             return options.queue.async { completion(account, nil, nil, .urlError) }
         }
         if depth == "0", serverUrlFileName.last == "/" {
@@ -369,7 +369,7 @@ public extension NextcloudKit {
         options.contentType = "application/xml"
         ///
         guard let nkSession = nkCommonInstance.getSession(account: account),
-              let headers = nkCommonInstance.getStandardHeaders(account: account, options: options) else {
+              let headers = nkCommonInstance.getStandardHeaders(account: account, addHeaderAccount: true, options: options) else {
             return options.queue.async { completion(account, nil, nil, .urlError) }
         }
         var files: [NKFile] = []
@@ -418,7 +418,7 @@ public extension NextcloudKit {
         options.contentType = "application/xml"
         ///
         guard let nkSession = nkCommonInstance.getSession(account: account),
-              let headers = nkCommonInstance.getStandardHeaders(account: account, options: options) else {
+              let headers = nkCommonInstance.getStandardHeaders(account: account, addHeaderAccount: true, options: options) else {
             return options.queue.async { completion(account, nil, .urlError) }
         }
         let serverUrlFileName = nkSession.urlBase + "/" + nkSession.dav + "/files/" + nkSession.userId + "/" + fileName
@@ -464,7 +464,7 @@ public extension NextcloudKit {
         options.contentType = "application/xml"
         ///
         guard let nkSession = nkCommonInstance.getSession(account: account),
-              let headers = nkCommonInstance.getStandardHeaders(account: account, options: options) else {
+              let headers = nkCommonInstance.getStandardHeaders(account: account, addHeaderAccount: true, options: options) else {
             return options.queue.async { completion(account, nil, nil, .urlError) }
         }
         let serverUrlFileName = nkSession.urlBase + "/" + nkSession.dav + "/files/" + nkSession.userId
@@ -515,7 +515,7 @@ public extension NextcloudKit {
         options.contentType = "application/xml"
         ///
         guard let nkSession = nkCommonInstance.getSession(account: account),
-              var headers = nkCommonInstance.getStandardHeaders(account: account, options: options) else {
+              var headers = nkCommonInstance.getStandardHeaders(account: account, addHeaderAccount: true, options: options) else {
             return options.queue.async { completion(account, nil, nil, .urlError) }
         }
         var serverUrlFileName = nkSession.urlBase + "/" + nkSession.dav + "/trashbin/" + nkSession.userId + "/trash/"

@@ -23,7 +23,7 @@ public extension NextcloudKit {
         }
         guard let url = convertible,
               let nkSession = nkCommonInstance.getSession(account: account),
-              let headers = nkCommonInstance.getStandardHeaders(account: account, options: options) else {
+              let headers = nkCommonInstance.getStandardHeaders(account: account, addHeaderAccount: true, options: options) else {
             return options.queue.async { completionHandler(account, nil, nil, 0, nil, nil, .urlError) }
         }
         var destination: Alamofire.DownloadRequest.Destination?

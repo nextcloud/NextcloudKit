@@ -27,7 +27,7 @@ public extension NextcloudKit {
         }
         guard let url = convertible,
               let nkSession = nkCommonInstance.getSession(account: account),
-              var headers = nkCommonInstance.getStandardHeaders(account: account, options: options) else {
+              var headers = nkCommonInstance.getStandardHeaders(account: account, addHeaderAccount: true, options: options) else {
             return options.queue.async { completionHandler(account, nil, nil, nil, 0, nil, nil, .urlError) }
         }
         let fileNameLocalPathUrl = URL(fileURLWithPath: fileNameLocalPath)
