@@ -3,9 +3,9 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 import Foundation
-import Alamofire
+@preconcurrency import Alamofire
 
-public class NKSession {
+public struct NKSession: Sendable {
     public var urlBase: String
     public var user: String
     public var userId: String
@@ -26,7 +26,8 @@ public class NKSession {
     public let sessionUploadBackgroundWWan: URLSession
     public let sessionUploadBackgroundExt: URLSession
 
-    init(urlBase: String,
+    init(nkCommonInstance: NKCommon,
+         urlBase: String,
          user: String,
          userId: String,
          password: String,
@@ -51,7 +52,7 @@ public class NKSession {
         self.httpMaximumConnectionsPerHostInUpload = httpMaximumConnectionsPerHostInUpload
         self.requestCachePolicy = requestCachePolicy
 
-        let backgroundSessionDelegate = NKBackground(nkCommonInstance: NextcloudKit.shared.nkCommonInstance)
+        let backgroundSessionDelegate = NKBackground(nkCommonInstance: nkCommonInstance)
         /// Strange but works ?!?!
         let sharedCookieStorage = user + "@" + urlBase
 
@@ -66,11 +67,11 @@ public class NKSession {
 
         configuration.httpCookieStorage = HTTPCookieStorage.sharedCookieStorage(forGroupContainerIdentifier: sharedCookieStorage)
         sessionData = Alamofire.Session(configuration: configuration,
-                                        delegate: NextcloudKitSessionDelegate(nkCommonInstance: NextcloudKit.shared.nkCommonInstance),
-                                        rootQueue: NextcloudKit.shared.nkCommonInstance.rootQueue,
-                                        requestQueue: NextcloudKit.shared.nkCommonInstance.requestQueue,
-                                        serializationQueue: NextcloudKit.shared.nkCommonInstance.serializationQueue,
-                                        eventMonitors: [NKLogger(nkCommonInstance: NextcloudKit.shared.nkCommonInstance)])
+                                        delegate: NextcloudKitSessionDelegate(nkCommonInstance: nkCommonInstance),
+                                        rootQueue: nkCommonInstance.rootQueue,
+                                        requestQueue: nkCommonInstance.requestQueue,
+                                        serializationQueue: nkCommonInstance.serializationQueue,
+                                        eventMonitors: [NKLogger(nkCommonInstance: nkCommonInstance)])
 
         /// Session Download Background
         let configurationDownloadBackground = URLSessionConfiguration.background(withIdentifier: NKCommon().identifierSessionDownloadBackground)

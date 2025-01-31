@@ -6,10 +6,10 @@ import XCTest
 @testable import NextcloudKit
 
 class FileNameValidatorUnitTests: XCTestCase {
-    let fileNameValidator = FileNameValidator.shared
+    var fileNameValidator: FileNameValidator!
 
     override func setUp() {
-        fileNameValidator.setup(
+        fileNameValidator = FileNameValidator(
             forbiddenFileNames: [".htaccess",".htaccess"],
             forbiddenFileNameBasenames: ["con", "prn", "aux", "nul", "com0", "com1", "com2", "com3", "com4",
                                          "com5", "com6", "com7", "com8", "com9", "com¹", "com²", "com³",
@@ -23,31 +23,31 @@ class FileNameValidatorUnitTests: XCTestCase {
 
     func testInvalidCharacter() {
         let result = fileNameValidator.checkFileName("file<name")
-        XCTAssertEqual(result?.errorDescription, fileNameValidator.fileInvalidCharacterError.errorDescription)
+        XCTAssertEqual(result?.errorDescription, fileNameValidator.fileInvalidCharacterError(templateString: "<").errorDescription)
     }
 
     func testReservedName() {
         let result = fileNameValidator.checkFileName("CON")
-        XCTAssertEqual(result?.errorDescription, fileNameValidator.fileReservedNameError.errorDescription)
+        XCTAssertEqual(result?.errorDescription, fileNameValidator.fileReservedNameError(templateString: "CON").errorDescription)
     }
 
     func testForbiddenFilenameExtension() {
         let result = fileNameValidator.checkFileName("my_fav_file.filepart")
-        XCTAssertEqual(result?.errorDescription, fileNameValidator.fileForbiddenFileExtensionError.errorDescription)
+        XCTAssertEqual(result?.errorDescription, fileNameValidator.fileForbiddenFileExtensionError(templateString: "filepart").errorDescription)
     }
 
     func testEndsWithSpaceOrPeriod() {
         let result = fileNameValidator.checkFileName("filename ")
-        XCTAssertEqual(result?.errorDescription, fileNameValidator.fileWithSpaceError.errorDescription)
+        XCTAssertEqual(result?.errorDescription, fileNameValidator.fileWithSpaceError().errorDescription)
 
         let result2 = fileNameValidator.checkFileName("filename.")
-        XCTAssertEqual(result2?.errorDescription, fileNameValidator.fileForbiddenFileExtensionError.errorDescription)
+        XCTAssertEqual(result2?.errorDescription, fileNameValidator.fileForbiddenFileExtensionError(templateString: "").errorDescription)
 
         let result3 = fileNameValidator.checkFileName(" filename")
-        XCTAssertEqual(result3?.errorDescription, fileNameValidator.fileWithSpaceError.errorDescription)
+        XCTAssertEqual(result3?.errorDescription, fileNameValidator.fileWithSpaceError().errorDescription)
 
         let result4 = fileNameValidator.checkFileName(" filename. ")
-        XCTAssertEqual(result4?.errorDescription, fileNameValidator.fileWithSpaceError.errorDescription)
+        XCTAssertEqual(result4?.errorDescription, fileNameValidator.fileWithSpaceError().errorDescription)
     }
 
     func testValidFileName() {

@@ -7,7 +7,7 @@ import Foundation
 import SwiftyXMLParser
 
 class NKDataFileXML: NSObject {
-    let nkCommonInstance: NKCommon
+    var nkCommonInstance: NKCommon
     let requestBodyComments =
     """
     <?xml version=\"1.0\" encoding=\"UTF-8\"?>
@@ -307,7 +307,7 @@ class NKDataFileXML: NSObject {
         let elements = xml["d:multistatus", "d:response"]
 
         for element in elements {
-            let file = NKFile()
+            var file = NKFile()
             if let href = element["d:href"].text {
                 var fileNamePath = href
                 if href.last == "/" {
@@ -577,7 +577,7 @@ class NKDataFileXML: NSObject {
                 file.downloadLimits.append(NKDownloadLimit(count: count, limit: limit, token: token))
             }
 
-            let results = self.nkCommonInstance.getInternalType(fileName: file.fileName, mimeType: file.contentType, directory: file.directory, account: nkSession.account)
+            var results = self.nkCommonInstance.getInternalType(fileName: file.fileName, mimeType: file.contentType, directory: file.directory, account: nkSession.account)
 
             file.contentType = results.mimeType
             file.iconName = results.iconName

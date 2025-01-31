@@ -161,7 +161,7 @@ public extension NextcloudKit {
                 if error == .success {
                     completion(NKError())
                 } else if error.errorCode == 404 {
-                    NextcloudKit.shared.createFolder(serverUrlFileName: serverUrlChunkFolder, account: account, options: options) { _, _, _, _, error in
+                    self.createFolder(serverUrlFileName: serverUrlChunkFolder, account: account, options: options) { _, _, _, _, error in
                         completion(error)
                     }
                 } else {

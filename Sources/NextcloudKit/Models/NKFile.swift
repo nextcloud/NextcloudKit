@@ -5,7 +5,7 @@
 
 import Foundation
 
-public class NKFile: NSObject {
+public struct NKFile: Sendable {
     public var account = ""
     public var classFile = ""
     public var commentsUnread: Bool = false

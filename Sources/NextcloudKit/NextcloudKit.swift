@@ -11,25 +11,35 @@ import Alamofire
 import SwiftyJSON
 
 open class NextcloudKit {
+#if swift(<6.0)
     public static let shared: NextcloudKit = {
         let instance = NextcloudKit()
         return instance
     }()
+#endif
 #if !os(watchOS)
     private let reachabilityManager = Alamofire.NetworkReachabilityManager()
 #endif
-    public let nkCommonInstance = NKCommon()
+    public var nkCommonInstance = NKCommon()
     internal lazy var internalSession: Alamofire.Session = {
         return Alamofire.Session(configuration: URLSessionConfiguration.af.default,
                                  delegate: NextcloudKitSessionDelegate(nkCommonInstance: nkCommonInstance),
                                  eventMonitors: [NKLogger(nkCommonInstance: self.nkCommonInstance)])
     }()
 
+#if swift(<6.0)
     init() {
 #if !os(watchOS)
         startNetworkReachabilityObserver()
 #endif
     }
+#else
+    public init() {
+#if !os(watchOS)
+        startNetworkReachabilityObserver()
+#endif
+    }
+#endif
 
     deinit {
 #if !os(watchOS)
@@ -70,6 +80,7 @@ open class NextcloudKit {
         }
         
         let nkSession = NKSession(
+            nkCommonInstance: nkCommonInstance,
             urlBase: urlBase,
             user: user,
             userId: userId,
@@ -94,7 +105,7 @@ open class NextcloudKit {
                               userAgent: String? = nil,
                               nextcloudVersion: Int? = nil,
                               replaceWithAccount: String? = nil) {
-        guard let nkSession = nkCommonInstance.nksessions.filter({ $0.account == account }).first else { return }
+        guard var nkSession = nkCommonInstance.nksessions.filter({ $0.account == account }).first else { return }
         if let urlBase {
             nkSession.urlBase = urlBase
         }

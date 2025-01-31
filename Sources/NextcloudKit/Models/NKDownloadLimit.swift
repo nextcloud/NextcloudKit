@@ -9,7 +9,7 @@ import Foundation
 ///
 /// Each relates to a share of a file and is optionally provided by the [Files Download Limit](https://github.com/nextcloud/files_downloadlimit) app for Nextcloud server.
 ///
-public class NKDownloadLimit: NSObject {
+public struct NKDownloadLimit: Sendable {
     ///
     /// The number of downloads which already happened.
     ///

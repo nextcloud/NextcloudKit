@@ -10,11 +10,17 @@ import NextcloudKit
 
 class BaseXCTestCase: XCTestCase {
     var appToken = ""
+    var ncKit: NextcloudKit!
 
-    func setupAppToken() {
+    func setupAppToken() async {
         let expectation = expectation(description: "Should get app token")
+#if swift(<6.0)
+        ncKit = NextcloudKit.shared
+#else
+        ncKit = NextcloudKit()
+#endif
 
-        NextcloudKit.shared.getAppPassword(url: TestConstants.server, user: TestConstants.username, password: TestConstants.password) { token, _, error in
+        ncKit.getAppPassword(url: TestConstants.server, user: TestConstants.username, password: TestConstants.password) { token, _, error in
             XCTAssertEqual(error.errorCode, 0)
             XCTAssertNotNil(token)
 
@@ -23,11 +29,11 @@ class BaseXCTestCase: XCTestCase {
             self.appToken = token
             expectation.fulfill()
         }
-        
-        waitForExpectations(timeout: TestConstants.timeoutLong)
+
+        await fulfillment(of: [expectation], timeout: TestConstants.timeoutLong)
     }
 
-    override func setUpWithError() throws {
-        setupAppToken()
+    override func setUp() async throws {
+        await setupAppToken()
     }
 }

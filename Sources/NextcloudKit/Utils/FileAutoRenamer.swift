@@ -12,45 +12,41 @@ import Foundation
 //  Copyright © 2024 Marino Faggiana. All rights reserved.
 //
 
-public class FileAutoRenamer {
+public final class FileAutoRenamer: Sendable {
     public static let shared: FileAutoRenamer = {
         let instance = FileAutoRenamer()
         return instance
     }()
 
-    private var forbiddenFileNameCharacters: [String] = []
-
-    private var forbiddenFileNameExtensions: [String] = [] {
-        didSet {
-            forbiddenFileNameExtensions = forbiddenFileNameExtensions.map({$0.lowercased()})
-        }
-    }
+    private let forbiddenFileNameCharacters: [String]
+    private let forbiddenFileNameExtensions: [String]
 
     private let replacement = "_"
 
-    public func setup(forbiddenFileNameCharacters: [String], forbiddenFileNameExtensions: [String]) {
+    public init(forbiddenFileNameCharacters: [String] = [], forbiddenFileNameExtensions: [String] = []) {
         self.forbiddenFileNameCharacters = forbiddenFileNameCharacters
-        self.forbiddenFileNameExtensions = forbiddenFileNameExtensions
+        self.forbiddenFileNameExtensions = forbiddenFileNameExtensions.map { $0.lowercased() }
     }
 
     public func rename(filename: String, isFolderPath: Bool = false) -> String {
         var pathSegments = filename.split(separator: "/", omittingEmptySubsequences: false).map { String($0) }
+        var mutableForbiddenFileNameCharacters = self.forbiddenFileNameCharacters
 
         if isFolderPath {
-            forbiddenFileNameCharacters.removeAll { $0 == "/" }
+            mutableForbiddenFileNameCharacters.removeAll { $0 == "/" }
         }
 
         pathSegments = pathSegments.map { segment in
             var modifiedSegment = segment
 
-            forbiddenFileNameCharacters.forEach { forbiddenChar in
+            if mutableForbiddenFileNameCharacters.contains(" ") {
+                modifiedSegment = modifiedSegment.trimmingCharacters(in: .whitespaces)
+            }
+
+            mutableForbiddenFileNameCharacters.forEach { forbiddenChar in
                 if modifiedSegment.contains(forbiddenChar) {
                     modifiedSegment = modifiedSegment.replacingOccurrences(of: forbiddenChar, with: replacement, options: .caseInsensitive)
                 }
-            }
-
-            if forbiddenFileNameExtensions.contains(" ") {
-                modifiedSegment = modifiedSegment.trimmingCharacters(in: .whitespaces)
             }
 
             // Replace forbidden extension, if any (ex. .part -> _part)
@@ -75,6 +71,11 @@ public class FileAutoRenamer {
             // If there is an original allowed extension, add it back (ex file_test becomes file_test.txt)
             if !fileExtension.isEmpty {
                 modifiedSegment.append(".\(fileExtension.lowercased())")
+            }
+
+            if modifiedSegment.hasPrefix(".") {
+                modifiedSegment.remove(at: modifiedSegment.startIndex)
+                modifiedSegment = replacement + modifiedSegment
             }
 
             return modifiedSegment

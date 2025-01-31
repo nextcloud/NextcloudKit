@@ -5,9 +5,18 @@
 
 import Foundation
 
+#if swift(<6.0)
 public class NKFileProperty: NSObject {
     public var classFile: String = ""
     public var iconName: String = ""
     public var name: String = ""
     public var ext: String = ""
 }
+#else
+public struct NKFileProperty: Sendable {
+    public var classFile: String = ""
+    public var iconName: String = ""
+    public var name: String = ""
+    public var ext: String = ""
+}
+#endif
