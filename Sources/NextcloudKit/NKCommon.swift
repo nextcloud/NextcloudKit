@@ -12,7 +12,7 @@ import MobileCoreServices
 import CoreServices
 #endif
 
-public protocol NextcloudKitDelegate: Sendable {
+public protocol NextcloudKitDelegate: AnyObject, Sendable {
     func authenticationChallenge(_ session: URLSession, didReceive challenge: URLAuthenticationChallenge, completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void)
     func urlSessionDidFinishEvents(forBackgroundURLSession session: URLSession)
 
