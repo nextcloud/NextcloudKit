@@ -6,8 +6,6 @@ import Testing
 @testable import NextcloudKit
 
 @Suite(.serialized) struct FileAutoRenamerUnitTests {
-    let fileAutoRenamer = FileAutoRenamer.shared
-
     let forbiddenFilenameCharacter = ">"
     let forbiddenFilenameExtension = "."
 

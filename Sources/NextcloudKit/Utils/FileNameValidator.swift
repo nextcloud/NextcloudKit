@@ -71,7 +71,7 @@ public final class FileNameValidator: Sendable {
             .allSatisfy { checkFileName(String($0)) == nil }
     }
 
-    public func isFileHidden(_ name: String) -> Bool {
+    public static func isFileHidden(_ name: String) -> Bool {
         return !name.isEmpty && name.first == "."
     }
 

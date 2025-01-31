@@ -13,11 +13,6 @@ import Foundation
 //
 
 public final class FileAutoRenamer: Sendable {
-    public static let shared: FileAutoRenamer = {
-        let instance = FileAutoRenamer()
-        return instance
-    }()
-
     private let forbiddenFileNameCharacters: [String]
     private let forbiddenFileNameExtensions: [String]
 
