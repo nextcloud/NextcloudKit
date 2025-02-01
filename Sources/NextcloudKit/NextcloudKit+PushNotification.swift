@@ -18,7 +18,7 @@ public extension NextcloudKit {
         let endpoint = "ocs/v2.php/apps/notifications/api/v2/push"
         guard let nkSession = nkCommonInstance.getSession(account: account),
               let url = nkCommonInstance.createStandardUrl(serverUrl: nkSession.urlBase, endpoint: endpoint, options: options),
-              let headers = nkCommonInstance.getStandardHeaders(account: account, options: options) else {
+              let headers = nkCommonInstance.getStandardHeaders(account: account, checkUnauthorized: true, options: options) else {
             return options.queue.async { completion(account, nil, nil, nil, nil, .urlError) }
         }
         let parameters = [
@@ -61,7 +61,7 @@ public extension NextcloudKit {
         let endpoint = "ocs/v2.php/apps/notifications/api/v2/push"
         guard let nkSession = nkCommonInstance.getSession(account: account),
               let url = nkCommonInstance.createStandardUrl(serverUrl: nkSession.urlBase, endpoint: endpoint, options: options),
-              let headers = nkCommonInstance.getStandardHeaders(account: account, options: options) else {
+              let headers = nkCommonInstance.getStandardHeaders(account: account, checkUnauthorized: true, options: options) else {
             return options.queue.async { completion(account, nil, .urlError) }
         }
 

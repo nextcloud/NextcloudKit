@@ -18,7 +18,7 @@ public extension NextcloudKit {
         ///
         guard let nkSession = nkCommonInstance.getSession(account: account),
               let url = nkCommonInstance.createStandardUrl(serverUrl: nkSession.urlBase, endpoint: endpoint, options: options),
-              let headers = nkCommonInstance.getStandardHeaders(account: account, options: options) else {
+              let headers = nkCommonInstance.getStandardHeaders(account: account, checkUnauthorized: true, options: options) else {
             return options.queue.async { completion(account, nil, nil, .urlError) }
         }
 
