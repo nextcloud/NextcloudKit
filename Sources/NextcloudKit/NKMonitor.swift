@@ -5,7 +5,7 @@
 import Foundation
 import Alamofire
 
-final class NKMonitor: EventMonitor {
+final class NKMonitor: EventMonitor, Sendable {
     let nkCommonInstance: NKCommon
 
     init(nkCommonInstance: NKCommon) {
@@ -27,7 +27,27 @@ final class NKMonitor: EventMonitor {
 
     func request<Value>(_ request: DataRequest, didParseResponse response: AFDataResponse<Value>) {
         self.nkCommonInstance.delegate?.request(request, didParseResponse: response)
+        let groupDefaults = UserDefaults(suiteName: NextcloudKit.shared.nkCommonInstance.groupIdentifier)
 
+        //
+        // Error 401, append the account in groupDefaults Unauthorized array
+        //
+        if let statusCode = response.response?.statusCode,
+           statusCode == 401,
+           let isCheckUnauthorized = request.request?.allHTTPHeaderFields?["X-NC-CheckUnauthorized"] as? Bool,
+           isCheckUnauthorized,
+           let account = request.request?.allHTTPHeaderFields?["X-NC-Account"] as? String {
+
+            var unauthorizedArray = groupDefaults?.array(forKey: "Unauthorized") as? [String] ?? []
+            if !unauthorizedArray.contains(account) {
+                unauthorizedArray.append(account)
+                groupDefaults?.set(unauthorizedArray, forKey: "Unauthorized")
+            }
+        }
+
+        //
+        // LOG
+        //
         guard let date = self.nkCommonInstance.convertDate(Date(), format: "yyyy-MM-dd' 'HH:mm:ss") else { return }
         let responseResultString = String("\(response.result)")
         let responseDebugDescription = String("\(response.debugDescription)")

@@ -32,6 +32,7 @@ public protocol NextcloudKitDelegate: AnyObject, Sendable {
 public struct NKCommon: Sendable {
     public var nksessions = ThreadSafeArray<NKSession>()
     public var delegate: NextcloudKitDelegate?
+    public var groupIdentifier: String = ""
 
     public let identifierSessionDownload: String = "com.nextcloud.nextcloudkit.session.download"
     public let identifierSessionUpload: String = "com.nextcloud.nextcloudkit.session.upload"
@@ -248,7 +249,7 @@ public struct NKCommon: Sendable {
     }
 
     public func getFileProperties(inUTI: CFString) -> NKFileProperty {
-        var fileProperty = NKFileProperty()
+        let fileProperty = NKFileProperty()
         let typeIdentifier: String = inUTI as String
 
         if let fileExtension = UTTypeCopyPreferredTagWithClass(inUTI as CFString, kUTTagClassFilenameExtension) {
@@ -426,7 +427,7 @@ public struct NKCommon: Sendable {
         return session
     }
 
-    public func getStandardHeaders(account: String, options: NKRequestOptions? = nil) -> HTTPHeaders? {
+    public func getStandardHeaders(account: String, checkUnauthorized: Bool = false, options: NKRequestOptions? = nil) -> HTTPHeaders? {
         guard let session = nksessions.filter({ $0.account == account }).first else { return nil}
         var headers: HTTPHeaders = []
 
@@ -446,6 +447,10 @@ public struct NKCommon: Sendable {
         headers.update(name: "OCS-APIRequest", value: "true")
         for (key, value) in options?.customHeader ?? [:] {
             headers.update(name: key, value: value)
+        }
+        headers.update(name: "X-NC-Account", value: account)
+        if checkUnauthorized {
+            headers.update(name: "X-NC-CheckUnauthorized", value: "true")
         }
         // Paginate
         if let options {
