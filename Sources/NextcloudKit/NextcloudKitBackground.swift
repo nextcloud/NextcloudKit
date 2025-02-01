@@ -161,9 +161,6 @@ public final class NKBackground: NSObject, URLSessionTaskDelegate, URLSessionDel
         var nkError: NKError = .success
 
         if let response = (task.response as? HTTPURLResponse) {
-            if response.statusCode == 401 {
-
-            }
             if response.statusCode >= 200 && response.statusCode < 300 {
                 if let error = error {
                     nkError = NKError(error: error)
