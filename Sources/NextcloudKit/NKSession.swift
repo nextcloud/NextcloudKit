@@ -71,6 +71,7 @@ public struct NKSession: Sendable {
                                         rootQueue: nkCommonInstance.rootQueue,
                                         requestQueue: nkCommonInstance.requestQueue,
                                         serializationQueue: nkCommonInstance.serializationQueue,
+                                        interceptor: NKInterceptor.shared,
                                         eventMonitors: [NKMonitor(nkCommonInstance: nkCommonInstance)])
 
         /// Session Download Background
