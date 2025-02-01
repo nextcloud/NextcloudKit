@@ -24,7 +24,7 @@ open class NextcloudKit {
     internal lazy var internalSession: Alamofire.Session = {
         return Alamofire.Session(configuration: URLSessionConfiguration.af.default,
                                  delegate: NextcloudKitSessionDelegate(nkCommonInstance: nkCommonInstance),
-                                 eventMonitors: [NKLogger(nkCommonInstance: self.nkCommonInstance)])
+                                 eventMonitors: [NKMonitor(nkCommonInstance: self.nkCommonInstance)])
     }()
 
 #if swift(<6.0)

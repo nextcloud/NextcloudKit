@@ -5,7 +5,7 @@
 import Foundation
 import Alamofire
 
-final class NKLogger: EventMonitor {
+final class NKMonitor: EventMonitor {
     let nkCommonInstance: NKCommon
 
     init(nkCommonInstance: NKCommon) {

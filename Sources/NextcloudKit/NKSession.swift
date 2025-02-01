@@ -71,7 +71,7 @@ public struct NKSession: Sendable {
                                         rootQueue: nkCommonInstance.rootQueue,
                                         requestQueue: nkCommonInstance.requestQueue,
                                         serializationQueue: nkCommonInstance.serializationQueue,
-                                        eventMonitors: [NKLogger(nkCommonInstance: nkCommonInstance)])
+                                        eventMonitors: [NKMonitor(nkCommonInstance: nkCommonInstance)])
 
         /// Session Download Background
         let configurationDownloadBackground = URLSessionConfiguration.background(withIdentifier: NKCommon().identifierSessionDownloadBackground)
