@@ -5,7 +5,7 @@
 import Foundation
 import Alamofire
 
-final class NKInterceptor: RequestInterceptor, Sendable {
+class NKInterceptor: RequestInterceptor, @unchecked Sendable {
     static let shared = Interceptor()
 
     func adapt(_ urlRequest: URLRequest, for session: Session, completion: @escaping (Result<URLRequest, Error>) -> Void) {
