@@ -577,7 +577,7 @@ class NKDataFileXML: NSObject {
                 file.downloadLimits.append(NKDownloadLimit(count: count, limit: limit, token: token))
             }
 
-            var results = self.nkCommonInstance.getInternalType(fileName: file.fileName, mimeType: file.contentType, directory: file.directory, account: nkSession.account)
+            let results = self.nkCommonInstance.getInternalType(fileName: file.fileName, mimeType: file.contentType, directory: file.directory, account: nkSession.account)
 
             file.contentType = results.mimeType
             file.iconName = results.iconName
