@@ -5,8 +5,7 @@
 import Foundation
 import Alamofire
 
-class NKInterceptor: RequestInterceptor, @unchecked Sendable {
-    static let shared = Interceptor()
+final class NKInterceptor: RequestInterceptor, Sendable {
 
     func adapt(_ urlRequest: URLRequest, for session: Session, completion: @escaping (Result<URLRequest, Error>) -> Void) {
         let groupDefaults = UserDefaults(suiteName: NextcloudKit.shared.nkCommonInstance.groupIdentifier)

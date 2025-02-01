@@ -25,7 +25,7 @@ public extension NextcloudKit {
 
         nkSession
             .sessionData
-            .request(url, method: .get, encoding: URLEncoding.default, headers: headers, interceptor: nkInterceptor)
+            .request(url, method: .get, encoding: URLEncoding.default, headers: headers, interceptor: NKInterceptor())
             .validate(statusCode: 200..<300)
             .responseData(queue: self.nkCommonInstance.backgroundQueue) { response in
                 if self.nkCommonInstance.levelLog > 0 {
@@ -94,7 +94,7 @@ public extension NextcloudKit {
 
         nkSession
             .sessionData
-            .request(url, method: .delete, encoding: URLEncoding.default, headers: headers, interceptor: nkInterceptor)
+            .request(url, method: .delete, encoding: URLEncoding.default, headers: headers, interceptor: NKInterceptor())
             .validate(statusCode: 200..<300)
             .response(queue: self.nkCommonInstance.backgroundQueue) { response in
                 if self.nkCommonInstance.levelLog > 0 {
@@ -136,7 +136,7 @@ public extension NextcloudKit {
 
         nkSession
             .sessionData
-            .request(urlRequest, interceptor: nkInterceptor)
+            .request(urlRequest, interceptor: NKInterceptor())
             .validate(statusCode: 200..<300)
             .response(queue: self.nkCommonInstance.backgroundQueue) { response in
                 if self.nkCommonInstance.levelLog > 0 {

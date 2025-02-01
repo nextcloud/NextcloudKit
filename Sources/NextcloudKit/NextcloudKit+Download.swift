@@ -33,7 +33,7 @@ public extension NextcloudKit {
         }
         destination = destinationFile
 
-        let request = nkSession.sessionData.download(url, method: .get, encoding: URLEncoding.default, headers: headers, interceptor: nkInterceptor, to: destination).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
+        let request = nkSession.sessionData.download(url, method: .get, encoding: URLEncoding.default, headers: headers, interceptor: NKInterceptor(), to: destination).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
             task.taskDescription = options.taskDescription
             options.queue.async { taskHandler(task) }
         } .downloadProgress { progress in

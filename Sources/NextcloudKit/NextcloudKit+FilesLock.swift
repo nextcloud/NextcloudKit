@@ -24,7 +24,7 @@ public extension NextcloudKit {
         }
         headers.update(name: "X-User-Lock", value: "1")
 
-        nkSession.sessionData.request(url, method: method, encoding: URLEncoding.default, headers: headers, interceptor: nkInterceptor).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
+        nkSession.sessionData.request(url, method: method, encoding: URLEncoding.default, headers: headers, interceptor: NKInterceptor()).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
             task.taskDescription = options.taskDescription
             taskHandler(task)
         }.response(queue: self.nkCommonInstance.backgroundQueue) { response in
