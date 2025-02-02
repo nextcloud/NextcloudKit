@@ -42,6 +42,8 @@ final class NKMonitor: EventMonitor, Sendable {
             if !unauthorizedArray.contains(account) {
                 unauthorizedArray.append(account)
                 groupDefaults?.set(unauthorizedArray, forKey: "Unauthorized")
+
+                self.nkCommonInstance.writeLog("Unauthorized set for account: \(account)")
             }
         }
 
