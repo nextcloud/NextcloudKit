@@ -37,7 +37,7 @@ final class NKMonitor: EventMonitor, Sendable {
               let headerValue = request.request?.allHTTPHeaderFields?["X-NC-CheckUnauthorized"],
               headerValue.lowercased() == "true",
               let account = request.request?.allHTTPHeaderFields?["X-NC-Account"] as? String,
-              let session = nkCommonInstance.nksessions.filter({ $0.account == account }).first {
+              let session = nkCommonInstance.getSession(account: account) {
                let serverUrlFileName = session.urlBase + "/remote.php/dav/files/" + session.userId
                self.readFile(serverUrlFileName: serverUrlFileName, account: account) { account, error in
                    /*
