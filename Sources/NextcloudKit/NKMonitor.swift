@@ -34,8 +34,8 @@ final class NKMonitor: EventMonitor, Sendable {
         //
         if let statusCode = response.response?.statusCode,
            statusCode == 401,
-           let isCheckUnauthorized = request.request?.allHTTPHeaderFields?["X-NC-CheckUnauthorized"] as? Bool,
-           isCheckUnauthorized,
+           let headerValue = request.request?.allHTTPHeaderFields?["X-NC-CheckUnauthorized"],
+           headerValue.lowercased() == "true",
            let account = request.request?.allHTTPHeaderFields?["X-NC-Account"] as? String {
 
             var unauthorizedArray = groupDefaults?.array(forKey: "Unauthorized") as? [String] ?? []
