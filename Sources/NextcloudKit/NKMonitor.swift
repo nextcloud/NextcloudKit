@@ -36,8 +36,10 @@ final class NKMonitor: EventMonitor, Sendable {
            if statusCode == 401,
               let headerValue = request.request?.allHTTPHeaderFields?["X-NC-CheckUnauthorized"],
               headerValue.lowercased() == "true",
-              let account = request.request?.allHTTPHeaderFields?["X-NC-Account"] as? String {
-               self.readFile(serverUrlFileName: "", account: account) { account, error in
+              let account = request.request?.allHTTPHeaderFields?["X-NC-Account"] as? String,
+              let session = nkCommonInstance.nksessions.filter({ $0.account == account }).first {
+               let serverUrlFileName = session.urlBase + "/remote.php/dav/files/" + session.userId
+               self.readFile(serverUrlFileName: serverUrlFileName, account: account) { account, error in
                    /*
                    var unauthorizedArray = groupDefaults?.array(forKey: "Unauthorized") as? [String] ?? []
                    if !unauthorizedArray.contains(account) {
