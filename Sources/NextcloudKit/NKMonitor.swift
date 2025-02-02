@@ -32,19 +32,22 @@ final class NKMonitor: EventMonitor, Sendable {
         //
         // Error 401, append the account in groupDefaults Unauthorized array
         //
-        if let statusCode = response.response?.statusCode,
-           statusCode == 401,
-           let headerValue = request.request?.allHTTPHeaderFields?["X-NC-CheckUnauthorized"],
-           headerValue.lowercased() == "true",
-           let account = request.request?.allHTTPHeaderFields?["X-NC-Account"] as? String {
+        if let statusCode = response.response?.statusCode {
+           if statusCode == 401,
+              let headerValue = request.request?.allHTTPHeaderFields?["X-NC-CheckUnauthorized"],
+              headerValue.lowercased() == "true",
+              let account = request.request?.allHTTPHeaderFields?["X-NC-Account"] as? String {
 
-            var unauthorizedArray = groupDefaults?.array(forKey: "Unauthorized") as? [String] ?? []
-            if !unauthorizedArray.contains(account) {
-                unauthorizedArray.append(account)
-                groupDefaults?.set(unauthorizedArray, forKey: "Unauthorized")
+               var unauthorizedArray = groupDefaults?.array(forKey: "Unauthorized") as? [String] ?? []
+               if !unauthorizedArray.contains(account) {
+                   unauthorizedArray.append(account)
+                   groupDefaults?.set(unauthorizedArray, forKey: "Unauthorized")
 
-                self.nkCommonInstance.writeLog("Unauthorized set for account: \(account)")
-            }
+                   self.nkCommonInstance.writeLog("Unauthorized set for account: \(account)")
+               }
+           } else if statusCode == 503 {
+               print("503 Service Unavailable")
+           }
         }
 
         //
