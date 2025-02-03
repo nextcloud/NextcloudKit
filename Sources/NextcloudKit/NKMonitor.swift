@@ -47,7 +47,6 @@ final class NKMonitor: EventMonitor, Sendable {
                     self.nkCommonInstance.writeLog("Unauthorized set for account: \(account)")
                 }
 
-
             //
             // Error 503, append the account in groupDefaults Unavailable array
             //

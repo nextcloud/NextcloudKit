@@ -49,7 +49,11 @@ open class NextcloudKit {
 
     // MARK: - Session setup
 
-    public func setup(groupIdentifier: String, delegate: NextcloudKitDelegate?, memoryCapacity: Int = 30, diskCapacity: Int = 500, removeAllCachedResponses: Bool = false) {
+    public func setup(groupIdentifier: String? = nil,
+                      delegate: NextcloudKitDelegate? = nil,
+                      memoryCapacity: Int = 30,
+                      diskCapacity: Int = 500,
+                      removeAllCachedResponses: Bool = false) {
         self.nkCommonInstance.delegate = delegate
         self.nkCommonInstance.groupIdentifier = groupIdentifier
 
