@@ -12,6 +12,11 @@ final class NKInterceptor: RequestInterceptor, Sendable {
         //
         // Detect if exists in the groupDefaults Unauthorized array the account
         //
+        if let checkUnauthorized = urlRequest.value(forHTTPHeaderField: "X-NC-CheckUnauthorized"),
+           checkUnauthorized == "false" {
+            completion(.success(urlRequest))
+        }
+
         if let account = urlRequest.value(forHTTPHeaderField: "X-NC-Account"),
            let unauthorizedArray = groupDefaults?.array(forKey: "Unauthorized") as? [String],
            unauthorizedArray.contains(account) {
