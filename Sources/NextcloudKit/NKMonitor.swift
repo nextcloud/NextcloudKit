@@ -53,10 +53,10 @@ final class NKMonitor: EventMonitor, Sendable {
             } else if statusCode == 503,
                       let account = request.request?.allHTTPHeaderFields?["X-NC-Account"] as? String {
 
-                var unauthorizedArray = groupDefaults?.array(forKey: "Unavailable") as? [String] ?? []
-                if !unauthorizedArray.contains(account) {
-                    unauthorizedArray.append(account)
-                    groupDefaults?.set(unauthorizedArray, forKey: "Unavailable")
+                var unavailableArray = groupDefaults?.array(forKey: "Unavailable") as? [String] ?? []
+                if !unavailableArray.contains(account) {
+                    unavailableArray.append(account)
+                    groupDefaults?.set(unavailableArray, forKey: "Unavailable")
 
                     self.nkCommonInstance.writeLog("Unavailable set for account: \(account)")
                 }
