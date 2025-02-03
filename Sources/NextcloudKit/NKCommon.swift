@@ -425,7 +425,7 @@ public struct NKCommon: Sendable {
         return session
     }
 
-    public func getStandardHeaders(account: String, checkUnauthorized: Bool = false, options: NKRequestOptions? = nil) -> HTTPHeaders? {
+    public func getStandardHeaders(account: String, checkUnauthorized: Bool? = nil, options: NKRequestOptions? = nil) -> HTTPHeaders? {
         guard let session = nksessions.filter({ $0.account == account }).first else { return nil}
         var headers: HTTPHeaders = []
 
@@ -447,8 +447,8 @@ public struct NKCommon: Sendable {
             headers.update(name: key, value: value)
         }
         headers.update(name: "X-NC-Account", value: account)
-        if checkUnauthorized {
-            headers.update(name: "X-NC-CheckUnauthorized", value: "true")
+        if let checkUnauthorized {
+            headers.update(name: "X-NC-CheckUnauthorized", value: checkUnauthorized.description)
         }
         // Paginate
         if let options {
