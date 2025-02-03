@@ -26,7 +26,6 @@ final class NKMonitor: EventMonitor, Sendable {
     }
 
     func request<Value>(_ request: DataRequest, didParseResponse response: AFDataResponse<Value>) {
-        self.nkCommonInstance.delegate?.request(request, didParseResponse: response)
         let groupDefaults = UserDefaults(suiteName: NextcloudKit.shared.nkCommonInstance.groupIdentifier)
 
         if let statusCode = response.response?.statusCode {
