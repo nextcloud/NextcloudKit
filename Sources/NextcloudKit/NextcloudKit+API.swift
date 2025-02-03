@@ -64,9 +64,13 @@ public extension NextcloudKit {
                              options: NKRequestOptions = NKRequestOptions(),
                              taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
                              completion: @escaping (_ account: String, _ responseData: AFDataResponse<Data>?, _ error: NKError) -> Void) {
+        var checkUnauthorized = true
+        if let optionsCheckUnauthorized = options.checkUnauthorized {
+            checkUnauthorized = optionsCheckUnauthorized
+        }
         guard let nkSession = nkCommonInstance.getSession(account: account),
               let url = nkCommonInstance.createStandardUrl(serverUrl: nkSession.urlBase, endpoint: endpoint, options: options),
-              let headers = nkCommonInstance.getStandardHeaders(account: account, checkUnauthorized: true, options: options) else {
+              let headers = nkCommonInstance.getStandardHeaders(account: account, checkUnauthorized: checkUnauthorized, options: options) else {
             return options.queue.async { completion(account, nil, .urlError) }
         }
         let method = HTTPMethod(rawValue: method.uppercased())
@@ -96,9 +100,13 @@ public extension NextcloudKit {
                          completion: @escaping (_ account: String, _ externalFiles: [NKExternalSite], _ responseData: AFDataResponse<Data>?, _ error: NKError) -> Void) {
         var externalSites: [NKExternalSite] = []
         let endpoint = "ocs/v2.php/apps/external/api/v1"
+        var checkUnauthorized = true
+        if let optionsCheckUnauthorized = options.checkUnauthorized {
+            checkUnauthorized = optionsCheckUnauthorized
+        }
         guard let nkSession = nkCommonInstance.getSession(account: account),
               let url = nkCommonInstance.createStandardUrl(serverUrl: nkSession.urlBase, endpoint: endpoint, options: options),
-              let headers = nkCommonInstance.getStandardHeaders(account: account, checkUnauthorized: true, options: options) else {
+              let headers = nkCommonInstance.getStandardHeaders(account: account, checkUnauthorized: checkUnauthorized, options: options) else {
             return options.queue.async { completion(account, externalSites, nil, .urlError) }
         }
 
@@ -213,8 +221,12 @@ public extension NextcloudKit {
                          options: NKRequestOptions = NKRequestOptions(),
                          taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
                          completion: @escaping (_ account: String, _ responseData: AFDataResponse<Data?>?, _ error: NKError) -> Void) {
+        var checkUnauthorized = true
+        if let optionsCheckUnauthorized = options.checkUnauthorized {
+            checkUnauthorized = optionsCheckUnauthorized
+        }
         guard let nkSession = nkCommonInstance.getSession(account: account),
-              var headers = nkCommonInstance.getStandardHeaders(account: account, checkUnauthorized: true, options: options) else {
+              var headers = nkCommonInstance.getStandardHeaders(account: account, checkUnauthorized: checkUnauthorized, options: options) else {
             return options.queue.async { completion(account, nil, .urlError) }
         }
         if var etag = etag {
@@ -252,10 +264,14 @@ public extension NextcloudKit {
                          options: NKRequestOptions = NKRequestOptions(),
                          taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
                          completion: @escaping (_ account: String, _ width: Int, _ height: Int, _ etag: String?, _ responseData: AFDataResponse<Data?>?, _ error: NKError) -> Void) {
+        var checkUnauthorized = true
+        if let optionsCheckUnauthorized = options.checkUnauthorized {
+            checkUnauthorized = optionsCheckUnauthorized
+        }
         let endpoint = "index.php/core/preview?fileId=\(fileId)&x=\(width)&y=\(height)&a=\(crop)&mode=\(cropMode)&forceIcon=\(forceIcon)&mimeFallback=\(mimeFallback)"
         guard let nkSession = nkCommonInstance.getSession(account: account),
               let url = nkCommonInstance.createStandardUrl(serverUrl: nkSession.urlBase, endpoint: endpoint, options: options),
-              var headers = nkCommonInstance.getStandardHeaders(account: account, checkUnauthorized: true, options: options) else {
+              var headers = nkCommonInstance.getStandardHeaders(account: account, checkUnauthorized: checkUnauthorized, options: options) else {
             return options.queue.async { completion(account, width, height, nil, nil, .urlError) }
         }
 
@@ -293,11 +309,15 @@ public extension NextcloudKit {
                               options: NKRequestOptions = NKRequestOptions(),
                               taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
                               completion: @escaping (_ account: String, _ width: Int, _ height: Int, _ responseData: AFDataResponse<Data?>?, _ error: NKError) -> Void) {
+        var checkUnauthorized = true
+        if let optionsCheckUnauthorized = options.checkUnauthorized {
+            checkUnauthorized = optionsCheckUnauthorized
+        }
         let endpoint = "index.php/apps/files_trashbin/preview?fileId=\(fileId)&x=\(width)&y=\(height)&a=\(crop)&mode=\(cropMode)&forceIcon=\(forceIcon)&mimeFallback=\(mimeFallback)"
 
         guard let nkSession = nkCommonInstance.getSession(account: account),
               let url = nkCommonInstance.createStandardUrl(serverUrl: nkSession.urlBase, endpoint: endpoint, options: options),
-              let headers = nkCommonInstance.getStandardHeaders(account: account, checkUnauthorized: true, options: options) else {
+              let headers = nkCommonInstance.getStandardHeaders(account: account, checkUnauthorized: checkUnauthorized, options: options) else {
             return options.queue.async { completion(account, width, height, nil, .urlError) }
         }
 
@@ -327,10 +347,14 @@ public extension NextcloudKit {
                         options: NKRequestOptions = NKRequestOptions(),
                         taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
                         completion: @escaping (_ account: String, _ imageAvatar: UIImage?, _ imageOriginal: UIImage?, _ etag: String?, _ responseData: AFDataResponse<Data?>?, _ error: NKError) -> Void) {
+        var checkUnauthorized = true
+        if let optionsCheckUnauthorized = options.checkUnauthorized {
+            checkUnauthorized = optionsCheckUnauthorized
+        }
         let endpoint = "index.php/avatar/\(user)/\(sizeImage)"
         guard let nkSession = nkCommonInstance.getSession(account: account),
               let url = nkCommonInstance.createStandardUrl(serverUrl: nkSession.urlBase, endpoint: endpoint, options: options),
-              var headers = nkCommonInstance.getStandardHeaders(account: account, checkUnauthorized: true, options: options) else {
+              var headers = nkCommonInstance.getStandardHeaders(account: account, checkUnauthorized: checkUnauthorized, options: options) else {
             return options.queue.async { completion(account, nil, nil, nil, nil, .urlError) }
         }
 
@@ -427,9 +451,13 @@ public extension NextcloudKit {
                          options: NKRequestOptions = NKRequestOptions(),
                          taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
                          completion: @escaping (_ account: String, _ responseData: AFDataResponse<Data?>?, _ error: NKError) -> Void) {
+        var checkUnauthorized = true
+        if let optionsCheckUnauthorized = options.checkUnauthorized {
+            checkUnauthorized = optionsCheckUnauthorized
+        }
         guard let url = serverUrl.asUrl,
               let nkSession = nkCommonInstance.getSession(account: account),
-              let headers = nkCommonInstance.getStandardHeaders(account: account, checkUnauthorized: true, options: options) else {
+              let headers = nkCommonInstance.getStandardHeaders(account: account, checkUnauthorized: checkUnauthorized, options: options) else {
             return options.queue.async { completion(account, nil, .urlError) }
         }
 
@@ -456,10 +484,14 @@ public extension NextcloudKit {
                         options: NKRequestOptions = NKRequestOptions(),
                         taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
                         completion: @escaping (_ account: String, _ userProfile: NKUserProfile?, _ responseData: AFDataResponse<Data>?, _ error: NKError) -> Void) {
+        var checkUnauthorized = true
+        if let optionsCheckUnauthorized = options.checkUnauthorized {
+            checkUnauthorized = optionsCheckUnauthorized
+        }
         let endpoint = "ocs/v2.php/cloud/user"
         guard let nkSession = nkCommonInstance.getSession(account: account),
               let url = nkCommonInstance.createStandardUrl(serverUrl: nkSession.urlBase, endpoint: endpoint, options: options),
-              let headers = nkCommonInstance.getStandardHeaders(account: account, checkUnauthorized: true, options: options) else {
+              let headers = nkCommonInstance.getStandardHeaders(account: account, checkUnauthorized: checkUnauthorized, options: options) else {
             return options.queue.async { completion(account, nil, nil, .urlError) }
         }
 
@@ -525,10 +557,14 @@ public extension NextcloudKit {
                          options: NKRequestOptions = NKRequestOptions(),
                          taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
                          completion: @escaping (_ account: String, _ responseData: AFDataResponse<Data?>?, _ error: NKError) -> Void) {
+        var checkUnauthorized = true
+        if let optionsCheckUnauthorized = options.checkUnauthorized {
+            checkUnauthorized = optionsCheckUnauthorized
+        }
         let endpoint = "ocs/v1.php/cloud/capabilities"
         guard let nkSession = nkCommonInstance.getSession(account: account),
               let url = nkCommonInstance.createStandardUrl(serverUrl: nkSession.urlBase, endpoint: endpoint, options: options),
-              let headers = nkCommonInstance.getStandardHeaders(account: account, checkUnauthorized: true, options: options) else {
+              let headers = nkCommonInstance.getStandardHeaders(account: account, checkUnauthorized: checkUnauthorized, options: options) else {
             return options.queue.async { completion(account, nil, .urlError) }
         }
 
@@ -632,6 +668,10 @@ public extension NextcloudKit {
                      options: NKRequestOptions = NKRequestOptions(),
                      taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
                      completion: @escaping (_ account: String, _ activities: [NKActivity], _ activityFirstKnown: Int, _ activityLastGiven: Int, _ responseData: AFDataResponse<Data>?, _ error: NKError) -> Void) {
+        var checkUnauthorized = true
+        if let optionsCheckUnauthorized = options.checkUnauthorized {
+            checkUnauthorized = optionsCheckUnauthorized
+        }
         var activities: [NKActivity] = []
         var activityFirstKnown = 0
         var activityLastGiven = 0
@@ -656,7 +696,7 @@ public extension NextcloudKit {
 
         guard let nkSession = nkCommonInstance.getSession(account: account),
               let url = nkCommonInstance.createStandardUrl(serverUrl: nkSession.urlBase, endpoint: endpoint, options: options),
-              let headers = nkCommonInstance.getStandardHeaders(account: account, checkUnauthorized: true, options: options) else {
+              let headers = nkCommonInstance.getStandardHeaders(account: account, checkUnauthorized: checkUnauthorized, options: options) else {
             return options.queue.async { completion(account, activities, activityFirstKnown, activityLastGiven, nil, .urlError) }
         }
 
@@ -729,10 +769,14 @@ public extension NextcloudKit {
                           options: NKRequestOptions = NKRequestOptions(),
                           taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
                           completion: @escaping (_ account: String, _ notifications: [NKNotifications]?, _ responseData: AFDataResponse<Data>?, _ error: NKError) -> Void) {
+        var checkUnauthorized = true
+        if let optionsCheckUnauthorized = options.checkUnauthorized {
+            checkUnauthorized = optionsCheckUnauthorized
+        }
         let endpoint = "ocs/v2.php/apps/notifications/api/v2/notifications"
         guard let nkSession = nkCommonInstance.getSession(account: account),
               let url = nkCommonInstance.createStandardUrl(serverUrl: nkSession.urlBase, endpoint: endpoint, options: options),
-              let headers = nkCommonInstance.getStandardHeaders(account: account, checkUnauthorized: true, options: options) else {
+              let headers = nkCommonInstance.getStandardHeaders(account: account, checkUnauthorized: checkUnauthorized, options: options) else {
             return options.queue.async { completion(account, nil, nil, .urlError) }
         }
 
@@ -803,8 +847,12 @@ public extension NextcloudKit {
                          options: NKRequestOptions = NKRequestOptions(),
                          taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
                          completion: @escaping (_ account: String, _ responseData: AFDataResponse<Data?>?, _ error: NKError) -> Void) {
+        var checkUnauthorized = true
+        if let optionsCheckUnauthorized = options.checkUnauthorized {
+            checkUnauthorized = optionsCheckUnauthorized
+        }
         guard let nkSession = nkCommonInstance.getSession(account: account),
-              let headers = nkCommonInstance.getStandardHeaders(account: account, checkUnauthorized: true, options: options) else {
+              let headers = nkCommonInstance.getStandardHeaders(account: account, checkUnauthorized: checkUnauthorized, options: options) else {
             return options.queue.async { completion(account, nil, .urlError) }
         }
         var url: URLConvertible?
@@ -843,6 +891,10 @@ public extension NextcloudKit {
                            options: NKRequestOptions = NKRequestOptions(),
                            taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
                            completion: @escaping (_ account: String, _ url: String?, _ responseData: AFDataResponse<Data>?, _ error: NKError) -> Void) {
+        var checkUnauthorized = true
+        if let optionsCheckUnauthorized = options.checkUnauthorized {
+            checkUnauthorized = optionsCheckUnauthorized
+        }
         let endpoint = "ocs/v2.php/apps/dav/api/v1/direct"
         let parameters: [String: Any] = [
             "fileId": fileId,
@@ -850,7 +902,7 @@ public extension NextcloudKit {
         ]
         guard let nkSession = nkCommonInstance.getSession(account: account),
               let url = nkCommonInstance.createStandardUrl(serverUrl: nkSession.urlBase, endpoint: endpoint, options: options),
-              let headers = nkCommonInstance.getStandardHeaders(account: account, checkUnauthorized: true, options: options) else {
+              let headers = nkCommonInstance.getStandardHeaders(account: account, checkUnauthorized: checkUnauthorized, options: options) else {
             return options.queue.async { completion(account, nil, nil, .urlError) }
         }
 
@@ -881,13 +933,17 @@ public extension NextcloudKit {
                                               options: NKRequestOptions = NKRequestOptions(),
                                               taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
                                               completion: @escaping (_ account: String, _ responseData: AFDataResponse<Data?>?, _ error: NKError) -> Void) {
+        var checkUnauthorized = true
+        if let optionsCheckUnauthorized = options.checkUnauthorized {
+            checkUnauthorized = optionsCheckUnauthorized
+        }
         let endpoint = "ocs/v2.php/apps/security_guard/diagnostics"
         ///
         options.contentType = "application/json"
         ///
         guard let nkSession = nkCommonInstance.getSession(account: account),
               let url = nkCommonInstance.createStandardUrl(serverUrl: nkSession.urlBase, endpoint: endpoint, options: options),
-              let headers = nkCommonInstance.getStandardHeaders(account: account, checkUnauthorized: true, options: options) else {
+              let headers = nkCommonInstance.getStandardHeaders(account: account, checkUnauthorized: checkUnauthorized, options: options) else {
             return options.queue.async { completion(account, nil, .urlError) }
         }
         var urlRequest: URLRequest
