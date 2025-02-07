@@ -5,8 +5,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/Alamofire/Alamofire",
       "state" : {
-        "revision" : "f455c2975872ccd2d9c81594c658af65716e9b9a",
-        "version" : "5.9.1"
+        "revision" : "513364f870f6bfc468f9d2ff0a95caccc10044c5",
+        "version" : "5.10.2"
       }
     },
     {
@@ -14,8 +14,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/WeTransfer/Mocker.git",
       "state" : {
-        "revision" : "5d86f27a8f80d4ba388bc1a379a3c2289a1f3d18",
-        "version" : "2.6.0"
+        "revision" : "95fa785c751f6bc40c49e112d433c3acf8417a97",
+        "version" : "3.0.2"
       }
     },
     {
