@@ -10,7 +10,10 @@ final class NKInterceptor: RequestInterceptor, Sendable {
         //
         // Detect if exists in the groupDefaults Unauthorized array the account
         //
-        debugPrint("[DEBUG] Interceptor request url: \(String(describing: urlRequest.url))")
+        if let url: String = urlRequest.url?.absoluteString {
+            debugPrint("[DEBUG] Interceptor request url: " + url)
+        }
+
         if let checkUnauthorized = urlRequest.value(forHTTPHeaderField: "X-NC-CheckUnauthorized"),
            checkUnauthorized == "false" {
             return completion(.success(urlRequest))
