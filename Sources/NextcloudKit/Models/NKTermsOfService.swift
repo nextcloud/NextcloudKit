@@ -19,7 +19,7 @@ public class NKTermsOfService: NSObject {
             self.data = decodedResponse.ocs.data
             return true
         } catch {
-            debugPrint("decode error:", error)
+            debugPrint("[DEBUG] decode error:", error)
             return false
         }
     }

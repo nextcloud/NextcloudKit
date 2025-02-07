@@ -44,7 +44,7 @@ final class NKMonitor: EventMonitor, Sendable {
                     groupDefaults.set(unauthorizedArray, forKey: "Unauthorized")
                     groupDefaults.synchronize()
 
-                    self.nkCommonInstance.writeLog("Unauthorized set for account: \(account)")
+                    self.nkCommonInstance.writeLog("[DEBUG] Unauthorized set for account: \(account)")
                 }
 
             //
@@ -60,7 +60,7 @@ final class NKMonitor: EventMonitor, Sendable {
                     groupDefaults.set(unavailableArray, forKey: "Unavailable")
                     groupDefaults.synchronize()
 
-                    self.nkCommonInstance.writeLog("Unavailable set for account: \(account)")
+                    self.nkCommonInstance.writeLog("[DEBUG] Unavailable set for account: \(account)")
                 }
             }
         }

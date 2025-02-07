@@ -370,7 +370,7 @@ public struct NKCommon: Sendable {
                     writer = nil
                     chunk = 0
                     counterChunk(counter)
-                    debugPrint("Counter: \(counter)")
+                    debugPrint("[DEBUG] Counter: \(counter)")
                     counter += 1
                 }
 
