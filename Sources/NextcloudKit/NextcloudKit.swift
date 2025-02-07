@@ -21,7 +21,7 @@ open class NextcloudKit {
     private let reachabilityManager = Alamofire.NetworkReachabilityManager()
 #endif
     public var nkCommonInstance = NKCommon()
-    internal lazy var internalSession: Alamofire.Session = {
+    internal lazy var unauthorizedSession: Alamofire.Session = {
         return Alamofire.Session(configuration: URLSessionConfiguration.af.default,
                                  delegate: NextcloudKitSessionDelegate(nkCommonInstance: nkCommonInstance),
                                  eventMonitors: [NKMonitor(nkCommonInstance: self.nkCommonInstance)])

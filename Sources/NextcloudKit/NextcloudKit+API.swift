@@ -39,7 +39,7 @@ public extension NextcloudKit {
             return options.queue.async { completion(nil, .urlError) }
         }
 
-        internalSession.request(url, method: .head, encoding: URLEncoding.default).onURLSessionTaskCreation { task in
+        unauthorizedSession.request(url, method: .head, encoding: URLEncoding.default).onURLSessionTaskCreation { task in
             task.taskDescription = options.taskDescription
             taskHandler(task)
         }.response(queue: self.nkCommonInstance.backgroundQueue) { response in
@@ -172,7 +172,7 @@ public extension NextcloudKit {
             headers = [HTTPHeader.userAgent(userAgent)]
         }
 
-        internalSession.request(url, method: .get, encoding: URLEncoding.default, headers: headers).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
+        unauthorizedSession.request(url, method: .get, encoding: URLEncoding.default, headers: headers).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
             task.taskDescription = options.taskDescription
             taskHandler(task)
         }.responseData(queue: self.nkCommonInstance.backgroundQueue) { response in
@@ -598,13 +598,15 @@ public extension NextcloudKit {
         ///
         options.contentType = "application/json"
         ///
-        guard let nkSession = nkCommonInstance.getSession(account: account),
-              let url = nkCommonInstance.createStandardUrl(serverUrl: serverUrl, endpoint: endpoint, options: options),
-              let headers = nkCommonInstance.getStandardHeaders(account: account, options: options) else {
+        guard let url = nkCommonInstance.createStandardUrl(serverUrl: serverUrl, endpoint: endpoint, options: options) else {
             return options.queue.async { completion(account, false, nil, .urlError) }
         }
+        var headers: HTTPHeaders?
+        if let userAgent = options.customUserAgent {
+            headers = [HTTPHeader.userAgent(userAgent)]
+        }
 
-        nkSession.sessionData.request(url, method: .post, parameters: parameters, encoding: URLEncoding.default, headers: headers).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
+        unauthorizedSession.request(url, method: .post, parameters: parameters, encoding: URLEncoding.default, headers: headers).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
             task.taskDescription = options.taskDescription
             taskHandler(task)
         }.responseData(queue: self.nkCommonInstance.backgroundQueue) { response in
@@ -634,13 +636,15 @@ public extension NextcloudKit {
         ///
         options.contentType = "application/json"
         ///
-        guard let nkSession = nkCommonInstance.getSession(account: account),
-              let url = nkCommonInstance.createStandardUrl(serverUrl: serverUrl, endpoint: endpoint, options: options),
-              let headers = nkCommonInstance.getStandardHeaders(account: account, options: options) else {
+        guard let url = nkCommonInstance.createStandardUrl(serverUrl: serverUrl, endpoint: endpoint, options: options) else {
             return options.queue.async { completion(account, nil, .urlError) }
         }
+        var headers: HTTPHeaders?
+        if let userAgent = options.customUserAgent {
+            headers = [HTTPHeader.userAgent(userAgent)]
+        }
 
-        nkSession.sessionData.request(url, method: .post, parameters: parameters, encoding: URLEncoding.default, headers: headers).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
+        unauthorizedSession.request(url, method: .post, parameters: parameters, encoding: URLEncoding.default, headers: headers).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
             task.taskDescription = options.taskDescription
             taskHandler(task)
         }.responseData(queue: self.nkCommonInstance.backgroundQueue) { response in
