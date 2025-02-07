@@ -26,8 +26,6 @@ final class NKMonitor: EventMonitor, Sendable {
     }
 
     func request<Value>(_ request: DataRequest, didParseResponse response: AFDataResponse<Value>) {
-        let groupDefaults = UserDefaults(suiteName: NextcloudKit.shared.nkCommonInstance.groupIdentifier)
-
         if let statusCode = response.response?.statusCode {
 
             //
@@ -38,7 +36,7 @@ final class NKMonitor: EventMonitor, Sendable {
                let headerValue = request.request?.allHTTPHeaderFields?["X-NC-CheckUnauthorized"],
                headerValue.lowercased() == "true",
                let account = request.request?.allHTTPHeaderFields?["X-NC-Account"] as? String,
-               let groupDefaults {
+               let groupDefaults = UserDefaults(suiteName: NextcloudKit.shared.nkCommonInstance.groupIdentifier) {
 
                 var unauthorizedArray = groupDefaults.array(forKey: "Unauthorized") as? [String] ?? []
                 if !unauthorizedArray.contains(account) {
@@ -54,7 +52,7 @@ final class NKMonitor: EventMonitor, Sendable {
             //
             } else if statusCode == 503,
                       let account = request.request?.allHTTPHeaderFields?["X-NC-Account"] as? String,
-                      let groupDefaults {
+                      let groupDefaults = UserDefaults(suiteName: NextcloudKit.shared.nkCommonInstance.groupIdentifier) {
 
                 var unavailableArray = groupDefaults.array(forKey: "Unavailable") as? [String] ?? []
                 if !unavailableArray.contains(account) {

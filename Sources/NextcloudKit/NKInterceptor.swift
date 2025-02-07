@@ -7,8 +7,6 @@ import Alamofire
 
 final class NKInterceptor: RequestInterceptor, Sendable {
     func adapt(_ urlRequest: URLRequest, for session: Session, completion: @escaping (Result<URLRequest, Error>) -> Void) {
-        let groupDefaults = UserDefaults(suiteName: NextcloudKit.shared.nkCommonInstance.groupIdentifier)
-
         //
         // Detect if exists in the groupDefaults Unauthorized array the account
         //
@@ -16,8 +14,9 @@ final class NKInterceptor: RequestInterceptor, Sendable {
            checkUnauthorized == "false" {
             return completion(.success(urlRequest))
         } else if let account = urlRequest.value(forHTTPHeaderField: "X-NC-Account"),
-           let unauthorizedArray = groupDefaults?.array(forKey: "Unauthorized") as? [String],
-           unauthorizedArray.contains(account) {
+                  let groupDefaults = UserDefaults(suiteName: NextcloudKit.shared.nkCommonInstance.groupIdentifier),
+                  let unauthorizedArray = groupDefaults.array(forKey: "Unauthorized") as? [String],
+                  unauthorizedArray.contains(account) {
             print("Unauthorized for account: \(account)")
             let error = AFError.responseValidationFailed(reason: .unacceptableStatusCode(code: 401))
             return completion(.failure(error))
