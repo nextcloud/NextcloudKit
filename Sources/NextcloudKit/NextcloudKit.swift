@@ -69,6 +69,14 @@ open class NextcloudKit {
         }
     }
 
+    public func setupLog(pathLog: String,
+                         levelLog: Int,
+                         copyLogToDocumentDirectory: Bool) {
+        self.nkCommonInstance.pathLog = pathLog
+        self.nkCommonInstance.levelLog = levelLog
+        self.nkCommonInstance.copyLogToDocumentDirectory = copyLogToDocumentDirectory
+    }
+
     public func appendSession(account: String,
                               urlBase: String,
                               user: String,
