@@ -61,7 +61,7 @@ final class NKMonitor: EventMonitor, Sendable {
 
             if let url = request.request?.url?.absoluteString,
                let account = request.request?.allHTTPHeaderFields?["X-NC-Account"] as? String {
-                self.nkCommonInstance.writeLog("[DEBUG] Interceptor request url: \(url), status code \(statusCode), account: \(account)")
+                self.nkCommonInstance.writeLog("[DEBUG] Monitor request url: \(url), status code \(statusCode), account: \(account)")
             }
         }
 
