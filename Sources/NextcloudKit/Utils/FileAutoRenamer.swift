@@ -97,7 +97,7 @@ public final class FileAutoRenamer: Sendable {
             let range = NSRange(location: 0, length: filename.utf16.count)
             return regex.stringByReplacingMatches(in: filename, options: [], range: range, withTemplate: "")
         } catch {
-            print("Could not remove printable unicode characters.")
+            debugPrint("Could not remove printable unicode characters.")
             return filename
         }
     }

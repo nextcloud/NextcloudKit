@@ -370,7 +370,7 @@ public struct NKCommon: Sendable {
                     writer = nil
                     chunk = 0
                     counterChunk(counter)
-                    print("Counter: \(counter)")
+                    debugPrint("Counter: \(counter)")
                     counter += 1
                 }
 
@@ -532,7 +532,7 @@ public struct NKCommon: Sendable {
             let attributes = try FileManager.default.attributesOfItem(atPath: filePath)
             return attributes[FileAttributeKey.size] as? Int64 ?? 0
         } catch {
-            print(error)
+            debugPrint(error)
         }
         return 0
     }

@@ -10,6 +10,7 @@ final class NKInterceptor: RequestInterceptor, Sendable {
         //
         // Detect if exists in the groupDefaults Unauthorized array the account
         //
+        debugPrint("[DEBUG] Interceptor request url: \(String(describing: urlRequest.url))")
         if let checkUnauthorized = urlRequest.value(forHTTPHeaderField: "X-NC-CheckUnauthorized"),
            checkUnauthorized == "false" {
             return completion(.success(urlRequest))
@@ -17,7 +18,7 @@ final class NKInterceptor: RequestInterceptor, Sendable {
                   let groupDefaults = UserDefaults(suiteName: NextcloudKit.shared.nkCommonInstance.groupIdentifier),
                   let unauthorizedArray = groupDefaults.array(forKey: "Unauthorized") as? [String],
                   unauthorizedArray.contains(account) {
-            print("Unauthorized for account: \(account)")
+            debugPrint("[DEBUG] Unauthorized for account: \(account)")
             let error = AFError.responseValidationFailed(reason: .unacceptableStatusCode(code: 401))
             return completion(.failure(error))
         }
