@@ -37,12 +37,14 @@ final class NKMonitor: EventMonitor, Sendable {
             if statusCode == 401,
                let headerValue = request.request?.allHTTPHeaderFields?["X-NC-CheckUnauthorized"],
                headerValue.lowercased() == "true",
-               let account = request.request?.allHTTPHeaderFields?["X-NC-Account"] as? String {
+               let account = request.request?.allHTTPHeaderFields?["X-NC-Account"] as? String,
+               let groupDefaults {
 
-                var unauthorizedArray = groupDefaults?.array(forKey: "Unauthorized") as? [String] ?? []
+                var unauthorizedArray = groupDefaults.array(forKey: "Unauthorized") as? [String] ?? []
                 if !unauthorizedArray.contains(account) {
                     unauthorizedArray.append(account)
-                    groupDefaults?.set(unauthorizedArray, forKey: "Unauthorized")
+                    groupDefaults.set(unauthorizedArray, forKey: "Unauthorized")
+                    groupDefaults.synchronize()
 
                     self.nkCommonInstance.writeLog("Unauthorized set for account: \(account)")
                 }
@@ -51,12 +53,14 @@ final class NKMonitor: EventMonitor, Sendable {
             // Error 503, append the account in groupDefaults Unavailable array
             //
             } else if statusCode == 503,
-                      let account = request.request?.allHTTPHeaderFields?["X-NC-Account"] as? String {
+                      let account = request.request?.allHTTPHeaderFields?["X-NC-Account"] as? String,
+                      let groupDefaults {
 
-                var unavailableArray = groupDefaults?.array(forKey: "Unavailable") as? [String] ?? []
+                var unavailableArray = groupDefaults.array(forKey: "Unavailable") as? [String] ?? []
                 if !unavailableArray.contains(account) {
                     unavailableArray.append(account)
-                    groupDefaults?.set(unavailableArray, forKey: "Unavailable")
+                    groupDefaults.set(unavailableArray, forKey: "Unavailable")
+                    groupDefaults.synchronize()
 
                     self.nkCommonInstance.writeLog("Unavailable set for account: \(account)")
                 }
