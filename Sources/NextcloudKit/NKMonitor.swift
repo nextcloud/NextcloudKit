@@ -60,8 +60,9 @@ final class NKMonitor: EventMonitor, Sendable {
             }
 
             if let url = request.request?.url?.absoluteString,
-               let account = request.request?.allHTTPHeaderFields?["X-NC-Account"] as? String {
-                self.nkCommonInstance.writeLog("[DEBUG] Monitor request url: \(url), status code \(statusCode), account: \(account)")
+               let account = request.request?.allHTTPHeaderFields?["X-NC-Account"] as? String,
+               self.nkCommonInstance.levelLog > 0 {
+                debugPrint("[DEBUG] Monitor request url: \(url), status code \(statusCode), account: \(account)")
             }
         }
 
