@@ -26,40 +26,43 @@ final class NKMonitor: EventMonitor, Sendable {
     }
 
     func request<Value>(_ request: DataRequest, didParseResponse response: AFDataResponse<Value>) {
-        let groupDefaults = UserDefaults(suiteName: NextcloudKit.shared.nkCommonInstance.groupIdentifier)
-
         if let statusCode = response.response?.statusCode {
 
             //
-            // Error 401, append the account in groupDefaults Unauthorized array
+            // Unauthorized, append the account in groupDefaults unauthorized array
             //
-
             if statusCode == 401,
                let headerValue = request.request?.allHTTPHeaderFields?["X-NC-CheckUnauthorized"],
                headerValue.lowercased() == "true",
-               let account = request.request?.allHTTPHeaderFields?["X-NC-Account"] as? String {
+               let account = request.request?.allHTTPHeaderFields?["X-NC-Account"] as? String,
+               let groupDefaults = UserDefaults(suiteName: NextcloudKit.shared.nkCommonInstance.groupIdentifier) {
 
-                var unauthorizedArray = groupDefaults?.array(forKey: "Unauthorized") as? [String] ?? []
+                var unauthorizedArray = groupDefaults.array(forKey: "Unauthorized") as? [String] ?? []
                 if !unauthorizedArray.contains(account) {
                     unauthorizedArray.append(account)
-                    groupDefaults?.set(unauthorizedArray, forKey: "Unauthorized")
-
-                    self.nkCommonInstance.writeLog("Unauthorized set for account: \(account)")
+                    groupDefaults.set(unauthorizedArray, forKey: "Unauthorized")
+                    groupDefaults.synchronize()
                 }
 
             //
-            // Error 503, append the account in groupDefaults Unavailable array
+            // Unavailable, append the account in groupDefaults unavailable array
             //
             } else if statusCode == 503,
-                      let account = request.request?.allHTTPHeaderFields?["X-NC-Account"] as? String {
+                      let account = request.request?.allHTTPHeaderFields?["X-NC-Account"] as? String,
+                      let groupDefaults = UserDefaults(suiteName: NextcloudKit.shared.nkCommonInstance.groupIdentifier) {
 
-                var unavailableArray = groupDefaults?.array(forKey: "Unavailable") as? [String] ?? []
+                var unavailableArray = groupDefaults.array(forKey: "Unavailable") as? [String] ?? []
                 if !unavailableArray.contains(account) {
                     unavailableArray.append(account)
-                    groupDefaults?.set(unavailableArray, forKey: "Unavailable")
-
-                    self.nkCommonInstance.writeLog("Unavailable set for account: \(account)")
+                    groupDefaults.set(unavailableArray, forKey: "Unavailable")
+                    groupDefaults.synchronize()
                 }
+            }
+
+            if let url = request.request?.url?.absoluteString,
+               let account = request.request?.allHTTPHeaderFields?["X-NC-Account"] as? String,
+               self.nkCommonInstance.levelLog > 0 {
+                debugPrint("[DEBUG] Monitor request url: \(url), status code \(statusCode), account: \(account)")
             }
         }
 

@@ -152,64 +152,6 @@ class NKDataFileXML: NSObject {
         <d:searchrequest xmlns:d=\"DAV:\" xmlns:oc=\"http://owncloud.org/ns\" xmlns:nc=\"http://nextcloud.org/ns\">
         <d:basicsearch>
         <d:select>
-        <d:prop>
-        """ + NKProperties.properties(createProperties: createProperties, removeProperties: removeProperties) + """
-        </d:prop>
-        </d:select>
-        <d:from>
-            <d:scope>
-                <d:href>%@</d:href>
-                <d:depth>infinity</d:depth>
-            </d:scope>
-        </d:from>
-        <d:orderby>
-            <d:order>
-                <d:prop><%@></d:prop>
-                <d:descending/>
-            </d:order>
-            <d:order>
-                <d:prop><d:displayname/></d:prop>
-                <d:descending/>
-            </d:order>
-        </d:orderby>
-        <d:where>
-            <d:and>
-                <d:or>
-                    <d:like>
-                        <d:prop><d:getcontenttype/></d:prop>
-                        <d:literal>image/%%</d:literal>
-                    </d:like>
-                    <d:like>
-                        <d:prop><d:getcontenttype/></d:prop>
-                        <d:literal>video/%%</d:literal>
-                    </d:like>
-                </d:or>
-                <d:or>
-                    <d:and>
-                        <d:lt>
-                            <d:prop><%@></d:prop>
-                            <d:literal>%@</d:literal>
-                        </d:lt>
-                        <d:gt>
-                            <d:prop><%@></d:prop>
-                            <d:literal>%@</d:literal>
-                        </d:gt>
-                    </d:and>
-                </d:or>
-            </d:and>
-        </d:where>
-        </d:basicsearch>
-        </d:searchrequest>
-        """
-        return request
-    }
-
-    func getRequestBodySearchMediaWithLimit(createProperties: [NKProperties]?, removeProperties: [NKProperties] = []) -> String {
-        let request = """
-        <?xml version=\"1.0\"?>
-        <d:searchrequest xmlns:d=\"DAV:\" xmlns:oc=\"http://owncloud.org/ns\" xmlns:nc=\"http://nextcloud.org/ns\">
-        <d:basicsearch>
-        <d:select>
             <d:prop>
         """ + NKProperties.properties(createProperties: createProperties, removeProperties: removeProperties) + """
             </d:prop>

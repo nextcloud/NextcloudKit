@@ -21,7 +21,7 @@ open class NextcloudKit {
     private let reachabilityManager = Alamofire.NetworkReachabilityManager()
 #endif
     public var nkCommonInstance = NKCommon()
-    internal lazy var internalSession: Alamofire.Session = {
+    internal lazy var unauthorizedSession: Alamofire.Session = {
         return Alamofire.Session(configuration: URLSessionConfiguration.af.default,
                                  delegate: NextcloudKitSessionDelegate(nkCommonInstance: nkCommonInstance),
                                  eventMonitors: [NKMonitor(nkCommonInstance: self.nkCommonInstance)])
@@ -67,6 +67,14 @@ open class NextcloudKit {
         if removeAllCachedResponses {
             URLCache.shared.removeAllCachedResponses()
         }
+    }
+
+    public func setupLog(pathLog: String,
+                         levelLog: Int,
+                         copyLogToDocumentDirectory: Bool) {
+        self.nkCommonInstance.pathLog = pathLog
+        self.nkCommonInstance.levelLog = levelLog
+        self.nkCommonInstance.copyLogToDocumentDirectory = copyLogToDocumentDirectory
     }
 
     public func appendSession(account: String,
