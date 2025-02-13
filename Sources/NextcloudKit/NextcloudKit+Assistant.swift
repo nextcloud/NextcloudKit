@@ -202,7 +202,7 @@ public extension NextcloudKit {
     func textProcessingGetTypesV2(account: String,
                                   options: NKRequestOptions = NKRequestOptions(),
                                   taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-                                  completion: @escaping (_ account: String, _ types: NKTextProcessingTaskTypeV2.TaskTypes?, _ responseData: AFDataResponse<Data>?, _ error: NKError) -> Void) {
+                                  completion: @escaping (_ account: String, _ types: NKTextProcessingTaskTypeV2?, _ responseData: AFDataResponse<Data>?, _ error: NKError) -> Void) {
         let endpoint = "ocs/v2.php/taskprocessing/tasktypes"
         guard let nkSession = nkCommonInstance.getSession(account: account),
               let url = nkCommonInstance.createStandardUrl(serverUrl: nkSession.urlBase, endpoint: endpoint, options: options),
@@ -281,7 +281,7 @@ public extension NextcloudKit {
                                account: String,
                                options: NKRequestOptions = NKRequestOptions(),
                                taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-                                  completion: @escaping (_ account: String, _ tasks: NKTextProcessingTaskV2.TaskList?, _ responseData: AFDataResponse<Data>?, _ error: NKError) -> Void) {
+                                  completion: @escaping (_ account: String, _ tasks: NKTextProcessingTaskV2?, _ responseData: AFDataResponse<Data>?, _ error: NKError) -> Void) {
         let endpoint = "/ocs/v2.php/taskprocessing/tasks?taskType=\(taskType)"
         guard let nkSession = nkCommonInstance.getSession(account: account),
               let url = nkCommonInstance.createStandardUrl(serverUrl: nkSession.urlBase, endpoint: endpoint, options: options),

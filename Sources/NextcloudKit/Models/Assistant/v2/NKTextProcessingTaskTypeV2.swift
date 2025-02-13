@@ -28,20 +28,14 @@ import SwiftyJSON
 // }
 
 public struct NKTextProcessingTaskTypeV2: Codable {
-    public struct TaskTypes: Codable {
-        public let types: [String: TaskTypeData]
-
-        init(types: [String : TaskTypeData]) {
-            self.types = types
-        }
-    }
-
+    public let types: [String: TaskTypeData]
+    
     public struct TaskTypeData: Codable {
-       public let id: String?
-       public let name: String?
-       public let description: String?
-       public let inputShape: TaskInputShape?
-       public let outputShape: TaskOutputShape?
+        public let id: String?
+        public let name: String?
+        public let description: String?
+        public let inputShape: TaskInputShape?
+        public let outputShape: TaskOutputShape?
     }
 
     public struct TaskInputShape: Codable {
@@ -58,7 +52,7 @@ public struct NKTextProcessingTaskTypeV2: Codable {
         public let type: String
     }
 
-    static func factory(data: JSON) -> NKTextProcessingTaskTypeV2.TaskTypes? {
+    static func factory(data: JSON) -> NKTextProcessingTaskTypeV2? {
         var taskTypesDict: [String: NKTextProcessingTaskTypeV2.TaskTypeData] = [:]
 
         for (key, subJson) in data {
@@ -85,9 +79,12 @@ public struct NKTextProcessingTaskTypeV2: Codable {
             taskTypesDict[key] = taskTypeData
         }
 
-        let taskTypes = NKTextProcessingTaskTypeV2.TaskTypes(types: taskTypesDict)
+        let taskTypes = NKTextProcessingTaskTypeV2(types: taskTypesDict)
         return taskTypes
     }
+
 }
+
+
 
 
