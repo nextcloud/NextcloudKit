@@ -27,48 +27,26 @@ import SwiftyJSON
 //    }
 // }
 
-public struct NKTextProcessingTaskTypeV2: Codable {
+public struct TaskTypes: Codable {
     public let types: [String: TaskTypeData]
-    
-    public struct TaskTypeData: Codable {
-        public let id: String?
-        public let name: String?
-        public let description: String?
-        public let inputShape: TaskInputShape?
-        public let outputShape: TaskOutputShape?
-    }
 
-    public struct TaskInputShape: Codable {
-        public let input: Shape?
-    }
-
-    public struct TaskOutputShape: Codable {
-        public let output: Shape?
-    }
-
-    public struct Shape: Codable {
-        public let name: String
-        public let description: String
-        public let type: String
-    }
-
-    static func factory(data: JSON) -> NKTextProcessingTaskTypeV2? {
-        var taskTypesDict: [String: NKTextProcessingTaskTypeV2.TaskTypeData] = [:]
+    static func factory(data: JSON) -> TaskTypes? {
+        var taskTypesDict: [String: TaskTypeData] = [:]
 
         for (key, subJson) in data {
-            let taskTypeData = NKTextProcessingTaskTypeV2.TaskTypeData(
+            let taskTypeData = TaskTypeData(
                 id: key,
                 name: subJson["name"].string,
                 description: subJson["description"].string,
-                inputShape: subJson["inputShape"].dictionary != nil ? NKTextProcessingTaskTypeV2.TaskInputShape(
-                    input: subJson["inputShape"]["input"].dictionary != nil ? NKTextProcessingTaskTypeV2.Shape(
+                inputShape: subJson["inputShape"].dictionary != nil ? TaskInputShape(
+                    input: subJson["inputShape"]["input"].dictionary != nil ? Shape(
                         name: subJson["inputShape"]["input"]["name"].stringValue,
                         description: subJson["inputShape"]["input"]["description"].stringValue,
                         type: subJson["inputShape"]["input"]["type"].stringValue
                     ) : nil
                 ) : nil,
-                outputShape: subJson["outputShape"].dictionary != nil ? NKTextProcessingTaskTypeV2.TaskOutputShape(
-                    output: subJson["outputShape"]["output"].dictionary != nil ? NKTextProcessingTaskTypeV2.Shape(
+                outputShape: subJson["outputShape"].dictionary != nil ? TaskOutputShape(
+                    output: subJson["outputShape"]["output"].dictionary != nil ? Shape(
                         name: subJson["outputShape"]["output"]["name"].stringValue,
                         description: subJson["outputShape"]["output"]["description"].stringValue,
                         type: subJson["outputShape"]["output"]["type"].stringValue
@@ -79,11 +57,34 @@ public struct NKTextProcessingTaskTypeV2: Codable {
             taskTypesDict[key] = taskTypeData
         }
 
-        let taskTypes = NKTextProcessingTaskTypeV2(types: taskTypesDict)
+        let taskTypes = TaskTypes(types: taskTypesDict)
         return taskTypes
     }
-
 }
+
+public struct TaskTypeData: Codable {
+    public let id: String?
+    public let name: String?
+    public let description: String?
+    public let inputShape: TaskInputShape?
+    public let outputShape: TaskOutputShape?
+}
+
+public struct TaskInputShape: Codable {
+    public let input: Shape?
+}
+
+public struct TaskOutputShape: Codable {
+    public let output: Shape?
+}
+
+public struct Shape: Codable {
+    public let name: String
+    public let description: String
+    public let type: String
+}
+
+
 
 
 

@@ -49,8 +49,39 @@ import SwiftyJSON
 //    }
 //}
 
-public struct NKTextProcessingTaskV2: Codable {
+public struct TaskList: Codable {
     public var tasks: [Task]
+
+    static func factory(from data: JSON) -> TaskList? {
+        //        guard let data = jsonString.data(using: .utf8) else { return nil }
+
+        do {
+            //            let json = try JSON(data: data)
+            //            let tasksArray = json["ocs"]["data"]["tasks"]
+
+            let tasks = data.arrayValue.map { taskJson in
+                Task(
+                    id: taskJson["id"].int64Value,
+                    type: taskJson["type"].string,
+                    status: taskJson["status"].string,
+                    userId: taskJson["userId"].string,
+                    appId: taskJson["appId"].string,
+                    input: TaskInput(input: taskJson["input"]["input"].string),
+                    output: TaskOutput(output: taskJson["output"]["output"].string),
+                    completionExpectedAt: taskJson["completionExpectedAt"].int,
+                    progress: taskJson["progress"].int,
+                    lastUpdated: taskJson["lastUpdated"].int,
+                    scheduledAt: taskJson["scheduledAt"].int,
+                    endedAt: taskJson["endedAt"].int
+                )
+            }
+
+            return TaskList(tasks: tasks)
+        } catch {
+            print("Failed to parse JSON: \(error)")
+            return nil
+        }
+    }
 
     public struct Task: Codable {
         public let id: Int64
@@ -65,46 +96,37 @@ public struct NKTextProcessingTaskV2: Codable {
         public let lastUpdated: Int?
         public let scheduledAt: Int?
         public let endedAt: Int?
-    }
 
-    public struct TaskInput: Codable {
-        public var input: String?
-    }
+        static func factory(from data: JSON) -> TaskList.Task? {
+            //        guard let data = jsonString.data(using: .utf8) else { return nil }
 
-    public struct TaskOutput: Codable {
-        public var output: String?
-    }
 
-    static func parseTaskList(from data: JSON) -> NKTextProcessingTaskV2? {
-        //        guard let data = jsonString.data(using: .utf8) else { return nil }
+            let task = Task(
+                id: data["id"].int64Value,
+                type: data["type"].string,
+                status: data["status"].string,
+                userId: data["userId"].string,
+                appId: data["appId"].string,
+                input: TaskInput(input: data["input"]["input"].string),
+                output: TaskOutput(output: data["output"]["output"].string),
+                completionExpectedAt: data["completionExpectedAt"].int,
+                progress: data["progress"].int,
+                lastUpdated: data["lastUpdated"].int,
+                scheduledAt: data["scheduledAt"].int,
+                endedAt: data["endedAt"].int
+            )
 
-        do {
-            //            let json = try JSON(data: data)
-            //            let tasksArray = json["ocs"]["data"]["tasks"]
-
-            let tasks = data.arrayValue.map { taskJson in
-                NKTextProcessingTaskV2.Task(
-                    id: taskJson["id"].int64Value,
-                    type: taskJson["type"].string,
-                    status: taskJson["status"].string,
-                    userId: taskJson["userId"].string,
-                    appId: taskJson["appId"].string,
-                    input: NKTextProcessingTaskV2.TaskInput(input: taskJson["input"]["input"].string),
-                    output: NKTextProcessingTaskV2.TaskOutput(output: taskJson["output"]["output"].string),
-                    completionExpectedAt: taskJson["completionExpectedAt"].int,
-                    progress: taskJson["progress"].int,
-                    lastUpdated: taskJson["lastUpdated"].int,
-                    scheduledAt: taskJson["scheduledAt"].int,
-                    endedAt: taskJson["endedAt"].int
-                )
-            }
-
-            return NKTextProcessingTaskV2(tasks: tasks)
-        } catch {
-            print("Failed to parse JSON: \(error)")
-            return nil
+            return task
         }
     }
+}
+
+public struct TaskInput: Codable {
+    public var input: String?
+}
+
+public struct TaskOutput: Codable {
+    public var output: String?
 }
 
 
