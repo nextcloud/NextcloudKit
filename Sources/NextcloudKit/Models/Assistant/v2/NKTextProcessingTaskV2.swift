@@ -49,10 +49,8 @@ import SwiftyJSON
 //    }
 //}
 
-public struct NKTextProcessingTaskV2 {
-    public struct TaskList: Codable {
-        public var tasks: [Task]
-    }
+public struct NKTextProcessingTaskV2: Codable {
+    public var tasks: [Task]
 
     public struct Task: Codable {
         public let id: Int64
@@ -77,12 +75,12 @@ public struct NKTextProcessingTaskV2 {
         public var output: String?
     }
 
-    static func parseTaskList(from data: JSON) -> NKTextProcessingTaskV2.TaskList? {
-//        guard let data = jsonString.data(using: .utf8) else { return nil }
+    static func parseTaskList(from data: JSON) -> NKTextProcessingTaskV2? {
+        //        guard let data = jsonString.data(using: .utf8) else { return nil }
 
         do {
-//            let json = try JSON(data: data)
-//            let tasksArray = json["ocs"]["data"]["tasks"]
+            //            let json = try JSON(data: data)
+            //            let tasksArray = json["ocs"]["data"]["tasks"]
 
             let tasks = data.arrayValue.map { taskJson in
                 NKTextProcessingTaskV2.Task(
@@ -101,10 +99,12 @@ public struct NKTextProcessingTaskV2 {
                 )
             }
 
-            return NKTextProcessingTaskV2.TaskList(tasks: tasks)
+            return NKTextProcessingTaskV2(tasks: tasks)
         } catch {
             print("Failed to parse JSON: \(error)")
             return nil
         }
     }
 }
+
+
