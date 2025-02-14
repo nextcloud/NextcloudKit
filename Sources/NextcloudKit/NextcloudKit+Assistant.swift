@@ -241,7 +241,7 @@ public extension NextcloudKit {
                                   account: String,
                                   options: NKRequestOptions = NKRequestOptions(),
                                   taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-                                  completion: @escaping (_ account: String, _ task: TaskList.Task?, _ responseData: AFDataResponse<Data>?, _ error: NKError) -> Void) {
+                                  completion: @escaping (_ account: String, _ task: TaskList.AssistantTask?, _ responseData: AFDataResponse<Data>?, _ error: NKError) -> Void) {
         let endpoint = "/ocs/v2.php/taskprocessing/schedule"
         guard let nkSession = nkCommonInstance.getSession(account: account),
               let url = nkCommonInstance.createStandardUrl(serverUrl: nkSession.urlBase, endpoint: endpoint, options: options),
@@ -269,7 +269,7 @@ public extension NextcloudKit {
                 let data = json["ocs"]["data"]["task"]
                 let statusCode = json["ocs"]["meta"]["statuscode"].int ?? NKError.internalError
                 if 200..<300 ~= statusCode {
-                    let result = TaskList.Task.factory(from: data)
+                    let result = TaskList.AssistantTask.factory(from: data)
                     options.queue.async { completion(account, result, response, .success) }
                 } else {
                     options.queue.async { completion(account, nil, response, NKError(rootJson: json, fallbackStatusCode: response.response?.statusCode)) }
