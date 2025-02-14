@@ -48,7 +48,7 @@ public class NKTextProcessingTask {
         NKTextProcessingTask(json: data)
     }
 
-    static func toV2(tasks: [NKTextProcessingTask]) -> TaskList {
+    public static func toV2(tasks: [NKTextProcessingTask]) -> TaskList {
         let tasks = tasks.map { task in
             AssistantTask(
                 id: Int64(task.id ?? 0),
