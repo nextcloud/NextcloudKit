@@ -59,7 +59,7 @@ struct Test {
                     NextcloudKit.shared.textProcessingGetTypesV2(account: account) { account, types, responseData, error in
                         print(error)
                         print(types)
-                        guard let type = types?.types["core:text2text"] else { return }
+                        guard let type = types?.first(where: {$0.id == "core:text2text"}) else { return }
                         NextcloudKit.shared.textProcessingScheduleV2(input: "TestFROM2", taskType: type, account: account) { account, task, responseData, error in
                             print(error)
                             print(task)
@@ -95,7 +95,7 @@ struct Test {
                     NextcloudKit.shared.textProcessingGetTypesV2(account: account) { account, types, responseData, error in
                         print(error)
                         print(types)
-                        guard let type = types?.types["core:text2text"] else { return }
+                        guard let type = types?.first(where: {$0.id == "core:text2text"}) else { return }
                         NextcloudKit.shared.textProcessingGetTasksV2(taskType: type.id ?? "", account: account) { account, task, responseData, error in
                             print(task)
 
@@ -132,7 +132,7 @@ struct Test {
                 NextcloudKit.shared.textProcessingGetTypesV2(account: account) { account, types, responseData, error in
                     print(error)
                     print(types)
-                    guard let type = types?.types["core:text2text"] else { return }
+                    guard let type = types?.first(where: {$0.id == "core:text2text"}) else { return }
                     NextcloudKit.shared.textProcessingGetTasksV2(taskType: type.id ?? "", account: account) { account, task, responseData, error in
                         print(task)
 
