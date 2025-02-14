@@ -25,6 +25,14 @@ public class NKTextProcessingTaskType {
         guard let allResults = data.array else { return nil }
         return allResults.compactMap(NKTextProcessingTaskType.init)
     }
+
+    static func toV2(type: [NKTextProcessingTaskType]) -> TaskTypes {
+        let types = type.map { type in
+            TaskTypeData(id: type.id, name: type.name, description: type.description, inputShape: nil, outputShape: nil)
+        }
+
+        return TaskTypes(types: types)
+    }
 }
 
 

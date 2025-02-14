@@ -28,10 +28,11 @@ import SwiftyJSON
 // }
 
 public struct TaskTypes: Codable {
-    public let types: [String: TaskTypeData]
+    public let types: [TaskTypeData]
 
     static func factory(data: JSON) -> TaskTypes? {
-        var taskTypesDict: [String: TaskTypeData] = [:]
+        var taskTypes: [TaskTypeData] = []
+//        var taskTypesDict: [String: TaskTypeData] = [:]
 
         for (key, subJson) in data {
             let taskTypeData = TaskTypeData(
@@ -54,11 +55,10 @@ public struct TaskTypes: Codable {
                 ) : nil
             )
 
-            taskTypesDict[key] = taskTypeData
+            taskTypes.append(taskTypeData)
         }
 
-        let taskTypes = TaskTypes(types: taskTypesDict)
-        return taskTypes
+        return TaskTypes(types: taskTypes)
     }
 }
 
@@ -68,20 +68,42 @@ public struct TaskTypeData: Codable {
     public let description: String?
     public let inputShape: TaskInputShape?
     public let outputShape: TaskOutputShape?
+
+    init(id: String?, name: String?, description: String?, inputShape: TaskInputShape?, outputShape: TaskOutputShape?) {
+        self.id = id
+        self.name = name
+        self.description = description
+        self.inputShape = inputShape
+        self.outputShape = outputShape
+    }
 }
 
 public struct TaskInputShape: Codable {
     public let input: Shape?
+
+    init(input: Shape?) {
+        self.input = input
+    }
 }
 
 public struct TaskOutputShape: Codable {
     public let output: Shape?
+
+    init(output: Shape?) {
+        self.output = output
+    }
 }
 
 public struct Shape: Codable {
     public let name: String
     public let description: String
     public let type: String
+
+    init(name: String, description: String, type: String) {
+        self.name = name
+        self.description = description
+        self.type = type
+    }
 }
 
 
