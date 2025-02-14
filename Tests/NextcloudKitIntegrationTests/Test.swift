@@ -9,7 +9,6 @@ import Testing
 import NextcloudKit
 
 struct Test {
-
     @Test func TestGetTypes() async throws {
         let urlBase = "https://daily.ltd2.nextcloud.com"
         let account = "milen.pivchev@nextcloud.com https://daily.ltd2.nextcloud.com"
