@@ -50,7 +50,7 @@ import SwiftyJSON
 //}
 
 public struct TaskList: Codable {
-    public var tasks: [Task]
+    public var tasks: [AssistantTask]
 
     static func factory(from data: JSON) -> TaskList? {
         //        guard let data = jsonString.data(using: .utf8) else { return nil }
@@ -60,7 +60,7 @@ public struct TaskList: Codable {
             //            let tasksArray = json["ocs"]["data"]["tasks"]
 
             let tasks = data.arrayValue.map { taskJson in
-                Task(
+                AssistantTask(
                     id: taskJson["id"].int64Value,
                     type: taskJson["type"].string,
                     status: taskJson["status"].string,
@@ -83,7 +83,7 @@ public struct TaskList: Codable {
         }
     }
 
-    public struct Task: Codable {
+    public struct AssistantTask: Codable {
         public let id: Int64
         public let type: String?
         public let status: String?
@@ -97,11 +97,11 @@ public struct TaskList: Codable {
         public let scheduledAt: Int?
         public let endedAt: Int?
 
-        static func factory(from data: JSON) -> TaskList.Task? {
+        static func factory(from data: JSON) -> TaskList.AssistantTask? {
             //        guard let data = jsonString.data(using: .utf8) else { return nil }
 
 
-            let task = Task(
+            let task = AssistantTask(
                 id: data["id"].int64Value,
                 type: data["type"].string,
                 status: data["status"].string,
