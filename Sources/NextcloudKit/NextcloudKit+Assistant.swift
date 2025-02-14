@@ -228,7 +228,7 @@ public extension NextcloudKit {
                 let statusCode = json["ocs"]["meta"]["statuscode"].int ?? NKError.internalError
                 if 200..<300 ~= statusCode {
                     let dict = TaskTypes.factory(data: data)
-                    let result = dict?.types.values.map({$0})
+                    let result = dict?.types.map({$0})
                     options.queue.async { completion(account, result, response, .success) }
                 } else {
                     options.queue.async { completion(account, nil, response, NKError(rootJson: json, fallbackStatusCode: response.response?.statusCode)) }

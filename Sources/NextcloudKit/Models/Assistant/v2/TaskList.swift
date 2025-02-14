@@ -98,6 +98,21 @@ public struct AssistantTask: Codable {
     public let scheduledAt: Int?
     public let endedAt: Int?
 
+    init(id: Int64, type: String?, status: String?, userId: String?, appId: String?, input: TaskInput?, output: TaskOutput?, completionExpectedAt: Int?, progress: Int? = nil, lastUpdated: Int?, scheduledAt: Int?, endedAt: Int?) {
+        self.id = id
+        self.type = type
+        self.status = status
+        self.userId = userId
+        self.appId = appId
+        self.input = input
+        self.output = output
+        self.completionExpectedAt = completionExpectedAt
+        self.progress = progress
+        self.lastUpdated = lastUpdated
+        self.scheduledAt = scheduledAt
+        self.endedAt = endedAt
+    }
+
     static func factory(from data: JSON) -> AssistantTask? {
         //        guard let data = jsonString.data(using: .utf8) else { return nil }
 
@@ -123,10 +138,18 @@ public struct AssistantTask: Codable {
 
 public struct TaskInput: Codable {
     public var input: String?
+
+    init(input: String? = nil) {
+        self.input = input
+    }
 }
 
 public struct TaskOutput: Codable {
     public var output: String?
+
+    init(output: String? = nil) {
+        self.output = output
+    }
 }
 
 

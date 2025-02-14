@@ -47,4 +47,25 @@ public class NKTextProcessingTask {
     static func factory(data: JSON) -> NKTextProcessingTask? {
         NKTextProcessingTask(json: data)
     }
+
+    static func toV2(tasks: [NKTextProcessingTask]) -> TaskList {
+        let tasks = tasks.map { task in
+            AssistantTask(
+                id: Int64(task.id ?? 0),
+                type: task.type,
+                status: String(task.status ?? 0),
+                userId: task.userId,
+                appId: task.appId,
+                input: TaskInput(input: task.input),
+                output: TaskOutput(output: task.output),
+                completionExpectedAt: Int(task.completionExpectedAt ?? 0),
+                progress: nil,
+                lastUpdated: nil,
+                scheduledAt: nil,
+                endedAt: nil
+            )
+        }
+
+        return TaskList(tasks: tasks)
+    }
 }
