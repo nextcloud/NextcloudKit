@@ -82,42 +82,42 @@ public struct TaskList: Codable {
             return nil
         }
     }
+}
 
-    public struct AssistantTask: Codable {
-        public let id: Int64
-        public let type: String?
-        public let status: String?
-        public let userId: String?
-        public let appId: String?
-        public let input: TaskInput?
-        public let output: TaskOutput?
-        public let completionExpectedAt: Int?
-        public var progress: Int?
-        public let lastUpdated: Int?
-        public let scheduledAt: Int?
-        public let endedAt: Int?
+public struct AssistantTask: Codable {
+    public let id: Int64
+    public let type: String?
+    public let status: String?
+    public let userId: String?
+    public let appId: String?
+    public let input: TaskInput?
+    public let output: TaskOutput?
+    public let completionExpectedAt: Int?
+    public var progress: Int?
+    public let lastUpdated: Int?
+    public let scheduledAt: Int?
+    public let endedAt: Int?
 
-        static func factory(from data: JSON) -> TaskList.AssistantTask? {
-            //        guard let data = jsonString.data(using: .utf8) else { return nil }
+    static func factory(from data: JSON) -> AssistantTask? {
+        //        guard let data = jsonString.data(using: .utf8) else { return nil }
 
 
-            let task = AssistantTask(
-                id: data["id"].int64Value,
-                type: data["type"].string,
-                status: data["status"].string,
-                userId: data["userId"].string,
-                appId: data["appId"].string,
-                input: TaskInput(input: data["input"]["input"].string),
-                output: TaskOutput(output: data["output"]["output"].string),
-                completionExpectedAt: data["completionExpectedAt"].int,
-                progress: data["progress"].int,
-                lastUpdated: data["lastUpdated"].int,
-                scheduledAt: data["scheduledAt"].int,
-                endedAt: data["endedAt"].int
-            )
+        let task = AssistantTask(
+            id: data["id"].int64Value,
+            type: data["type"].string,
+            status: data["status"].string,
+            userId: data["userId"].string,
+            appId: data["appId"].string,
+            input: TaskInput(input: data["input"]["input"].string),
+            output: TaskOutput(output: data["output"]["output"].string),
+            completionExpectedAt: data["completionExpectedAt"].int,
+            progress: data["progress"].int,
+            lastUpdated: data["lastUpdated"].int,
+            scheduledAt: data["scheduledAt"].int,
+            endedAt: data["endedAt"].int
+        )
 
-            return task
-        }
+        return task
     }
 }
 
