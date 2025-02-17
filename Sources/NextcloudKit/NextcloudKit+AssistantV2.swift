@@ -38,7 +38,7 @@ public extension NextcloudKit {
                     let dict = TaskTypes.factory(data: data)
                     let result = dict?.types.map({$0})
                     let filteredResult = result?.filter({ $0.inputShape?.input?.type == supportedTaskType && $0.outputShape?.output?.type == supportedTaskType })
-                    options.queue.async { completion(account, result, response, .success) }
+                    options.queue.async { completion(account, filteredResult, response, .success) }
                 } else {
                     options.queue.async { completion(account, nil, response, NKError(rootJson: json, fallbackStatusCode: response.response?.statusCode)) }
                 }
