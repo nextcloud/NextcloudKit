@@ -32,7 +32,6 @@ public struct TaskTypes: Codable {
 
     static func factory(data: JSON) -> TaskTypes? {
         var taskTypes: [TaskTypeData] = []
-//        var taskTypesDict: [String: TaskTypeData] = [:]
 
         for (key, subJson) in data {
             let taskTypeData = TaskTypeData(
