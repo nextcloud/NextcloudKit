@@ -4,29 +4,6 @@
 
 import SwiftyJSON
 
-//public class NKTextProcessingTaskTypeV2 {
-//    public var id: String?
-//    public var name: String?
-//    public var description: String?
-//
-//    public init(id: String? = nil, name: String? = nil, description: String? = nil) {
-//        self.id = id
-//        self.name = name
-//        self.description = description
-//    }
-//
-//    public init?(json: JSON) {
-//        self.id = json["id"].string
-//        self.name = json["name"].string
-//        self.description = json["description"].string
-//    }
-//
-//    static func factory(data: JSON) -> [NKTextProcessingTaskType]? {
-//        guard let allResults = data.array else { return nil }
-//        return allResults.compactMap(NKTextProcessingTaskType.init)
-//    }
-// }
-
 public struct TaskTypes: Codable {
     public let types: [TaskTypeData]
 
@@ -68,7 +45,7 @@ public struct TaskTypeData: Codable {
     public let inputShape: TaskInputShape?
     public let outputShape: TaskOutputShape?
 
-    init(id: String?, name: String?, description: String?, inputShape: TaskInputShape?, outputShape: TaskOutputShape?) {
+    public init(id: String?, name: String?, description: String?, inputShape: TaskInputShape?, outputShape: TaskOutputShape?) {
         self.id = id
         self.name = name
         self.description = description
@@ -80,7 +57,7 @@ public struct TaskTypeData: Codable {
 public struct TaskInputShape: Codable {
     public let input: Shape?
 
-    init(input: Shape?) {
+    public init(input: Shape?) {
         self.input = input
     }
 }
@@ -88,7 +65,7 @@ public struct TaskInputShape: Codable {
 public struct TaskOutputShape: Codable {
     public let output: Shape?
 
-    init(output: Shape?) {
+    public init(output: Shape?) {
         self.output = output
     }
 }
@@ -98,7 +75,7 @@ public struct Shape: Codable {
     public let description: String
     public let type: String
 
-    init(name: String, description: String, type: String) {
+    public init(name: String, description: String, type: String) {
         self.name = name
         self.description = description
         self.type = type

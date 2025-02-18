@@ -53,34 +53,24 @@ public struct TaskList: Codable {
     public var tasks: [AssistantTask]
 
     static func factory(from data: JSON) -> TaskList? {
-        //        guard let data = jsonString.data(using: .utf8) else { return nil }
-
-        do {
-            //            let json = try JSON(data: data)
-            //            let tasksArray = json["ocs"]["data"]["tasks"]
-
-            let tasks = data.arrayValue.map { taskJson in
-                AssistantTask(
-                    id: taskJson["id"].int64Value,
-                    type: taskJson["type"].string,
-                    status: taskJson["status"].string,
-                    userId: taskJson["userId"].string,
-                    appId: taskJson["appId"].string,
-                    input: TaskInput(input: taskJson["input"]["input"].string),
-                    output: TaskOutput(output: taskJson["output"]["output"].string),
-                    completionExpectedAt: taskJson["completionExpectedAt"].int,
-                    progress: taskJson["progress"].int,
-                    lastUpdated: taskJson["lastUpdated"].int,
-                    scheduledAt: taskJson["scheduledAt"].int,
-                    endedAt: taskJson["endedAt"].int
-                )
-            }
-
-            return TaskList(tasks: tasks)
-        } catch {
-            print("Failed to parse JSON: \(error)")
-            return nil
+        let tasks = data.arrayValue.map { taskJson in
+            AssistantTask(
+                id: taskJson["id"].int64Value,
+                type: taskJson["type"].string,
+                status: taskJson["status"].string,
+                userId: taskJson["userId"].string,
+                appId: taskJson["appId"].string,
+                input: TaskInput(input: taskJson["input"]["input"].string),
+                output: TaskOutput(output: taskJson["output"]["output"].string),
+                completionExpectedAt: taskJson["completionExpectedAt"].int,
+                progress: taskJson["progress"].int,
+                lastUpdated: taskJson["lastUpdated"].int,
+                scheduledAt: taskJson["scheduledAt"].int,
+                endedAt: taskJson["endedAt"].int
+            )
         }
+
+        return TaskList(tasks: tasks)
     }
 }
 
@@ -98,7 +88,7 @@ public struct AssistantTask: Codable {
     public let scheduledAt: Int?
     public let endedAt: Int?
 
-    init(id: Int64, type: String?, status: String?, userId: String?, appId: String?, input: TaskInput?, output: TaskOutput?, completionExpectedAt: Int?, progress: Int? = nil, lastUpdated: Int?, scheduledAt: Int?, endedAt: Int?) {
+    public init(id: Int64, type: String?, status: String?, userId: String?, appId: String?, input: TaskInput?, output: TaskOutput?, completionExpectedAt: Int?, progress: Int? = nil, lastUpdated: Int?, scheduledAt: Int?, endedAt: Int?) {
         self.id = id
         self.type = type
         self.status = status
@@ -114,9 +104,6 @@ public struct AssistantTask: Codable {
     }
 
     static func factory(from data: JSON) -> AssistantTask? {
-        //        guard let data = jsonString.data(using: .utf8) else { return nil }
-
-
         let task = AssistantTask(
             id: data["id"].int64Value,
             type: data["type"].string,
@@ -139,7 +126,7 @@ public struct AssistantTask: Codable {
 public struct TaskInput: Codable {
     public var input: String?
 
-    init(input: String? = nil) {
+    public init(input: String? = nil) {
         self.input = input
     }
 }
@@ -147,7 +134,7 @@ public struct TaskInput: Codable {
 public struct TaskOutput: Codable {
     public var output: String?
 
-    init(output: String? = nil) {
+    public init(output: String? = nil) {
         self.output = output
     }
 }
