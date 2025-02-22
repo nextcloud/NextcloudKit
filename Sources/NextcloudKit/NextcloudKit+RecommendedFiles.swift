@@ -12,17 +12,21 @@ public extension NextcloudKit {
                              request: @escaping (DataRequest?) -> Void = { _ in },
                              taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
                              completion: @escaping (_ account: String, _ recommendations: [NKRecommendation]?, _ responseData: AFDataResponse<Data>?, _ error: NKError) -> Void) {
+        var checkUnauthorized = true
+        if let optionsCheckUnauthorized = options.checkUnauthorized {
+            checkUnauthorized = optionsCheckUnauthorized
+        }
         let endpoint = "ocs/v2.php/apps/recommendations/api/v1/recommendations"
         ///
         options.contentType = "application/xml"
         ///
         guard let nkSession = nkCommonInstance.getSession(account: account),
               let url = nkCommonInstance.createStandardUrl(serverUrl: nkSession.urlBase, endpoint: endpoint, options: options),
-              let headers = nkCommonInstance.getStandardHeaders(account: account, options: options) else {
+              let headers = nkCommonInstance.getStandardHeaders(account: account, checkUnauthorized: checkUnauthorized, options: options) else {
             return options.queue.async { completion(account, nil, nil, .urlError) }
         }
 
-        let tosRequest = nkSession.sessionData.request(url, method: .get, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
+        let tosRequest = nkSession.sessionData.request(url, method: .get, encoding: URLEncoding.default, headers: headers, interceptor: NKInterceptor(nkCommonInstance: nkCommonInstance)).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
             task.taskDescription = options.taskDescription
             taskHandler(task)
         }.responseData(queue: self.nkCommonInstance.backgroundQueue) { response in

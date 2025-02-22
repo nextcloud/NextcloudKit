@@ -7,14 +7,13 @@
 import Foundation
 
 /// A thread-safe array.
-public class ThreadSafeArray<Element> {
+public struct ThreadSafeArray<Element: Sendable>: Sendable {
 
     private var array = [Element]()
-    private let queue = DispatchQueue(label: "com.nextcloud.ThreadSafeArray", attributes: .concurrent)
 
     public init() { }
 
-    public convenience init(_ array: [Element]) {
+    public init(_ array: [Element]) {
         self.init()
         self.array = array
     }
@@ -26,37 +25,27 @@ public extension ThreadSafeArray {
 
     /// The first element of the collection.
     var first: Element? {
-        var result: Element?
-        queue.sync { result = self.array.first }
-        return result
+        NSLock().perform { self.array.first }
     }
 
     /// The last element of the collection.
     var last: Element? {
-        var result: Element?
-        queue.sync { result = self.array.last }
-        return result
+        NSLock().perform { self.array.last }
     }
 
     /// The number of elements in the array.
     var count: Int {
-        var result = 0
-        queue.sync { result = self.array.count }
-        return result
+        NSLock().perform { self.array.count }
     }
 
     /// A Boolean value indicating whether the collection is empty.
     var isEmpty: Bool {
-        var result = false
-        queue.sync { result = self.array.isEmpty }
-        return result
+        NSLock().perform { self.array.isEmpty }
     }
 
     /// A textual representation of the array and its elements.
     var description: String {
-        var result = ""
-        queue.sync { result = self.array.description }
-        return result
+        NSLock().perform { self.array.description }
     }
 }
 
@@ -69,9 +58,7 @@ public extension ThreadSafeArray {
     /// - Parameter predicate: A closure that takes an element of the sequence as its argument and returns a Boolean value indicating whether the element is a match.
     /// - Returns: The first element of the sequence that satisfies predicate, or nil if there is no element that satisfies predicate.
     func first(where predicate: (Element) -> Bool) -> Element? {
-        var result: Element?
-        queue.sync { result = self.array.first(where: predicate) }
-        return result
+        NSLock().perform { self.array.first(where: predicate) }
     }
 
     /// Returns the last element of the sequence that satisfies the given predicate.
@@ -79,9 +66,7 @@ public extension ThreadSafeArray {
     /// - Parameter predicate: A closure that takes an element of the sequence as its argument and returns a Boolean value indicating whether the element is a match.
     /// - Returns: The last element of the sequence that satisfies predicate, or nil if there is no element that satisfies predicate.
     func last(where predicate: (Element) -> Bool) -> Element? {
-        var result: Element?
-        queue.sync { result = self.array.last(where: predicate) }
-        return result
+        NSLock().perform { self.array.last(where: predicate) }
     }
 
     /// Returns an array containing, in order, the elements of the sequence that satisfy the given predicate.
@@ -89,9 +74,7 @@ public extension ThreadSafeArray {
     /// - Parameter isIncluded: A closure that takes an element of the sequence as its argument and returns a Boolean value indicating whether the element should be included in the returned array.
     /// - Returns: An array of the elements that includeElement allowed.
     func filter(_ isIncluded: @escaping (Element) -> Bool) -> ThreadSafeArray {
-        var result: ThreadSafeArray?
-        queue.sync { result = ThreadSafeArray(self.array.filter(isIncluded)) }
-        return result!
+        NSLock().perform { ThreadSafeArray(self.array.filter(isIncluded)) }
     }
 
     /// Returns the first index in which an element of the collection satisfies the given predicate.
@@ -99,9 +82,7 @@ public extension ThreadSafeArray {
     /// - Parameter predicate: A closure that takes an element as its argument and returns a Boolean value that indicates whether the passed element represents a match.
     /// - Returns: The index of the first element for which predicate returns true. If no elements in the collection satisfy the given predicate, returns nil.
     func index(where predicate: (Element) -> Bool) -> Int? {
-        var result: Int?
-        queue.sync { result = self.array.firstIndex(where: predicate) }
-        return result
+        NSLock().perform { self.array.firstIndex(where: predicate) }
     }
 
     /// Returns the elements of the collection, sorted using the given predicate as the comparison between elements.
@@ -109,9 +90,7 @@ public extension ThreadSafeArray {
     /// - Parameter areInIncreasingOrder: A predicate that returns true if its first argument should be ordered before its second argument; otherwise, false.
     /// - Returns: A sorted array of the collection’s elements.
     func sorted(by areInIncreasingOrder: (Element, Element) -> Bool) -> ThreadSafeArray {
-        var result: ThreadSafeArray?
-        queue.sync { result = ThreadSafeArray(self.array.sorted(by: areInIncreasingOrder)) }
-        return result!
+        NSLock().perform { ThreadSafeArray(self.array.sorted(by: areInIncreasingOrder)) }
     }
 
     /// Returns an array containing the results of mapping the given closure over the sequence’s elements.
@@ -119,9 +98,7 @@ public extension ThreadSafeArray {
     /// - Parameter transform: A closure that accepts an element of this sequence as its argument and returns an optional value.
     /// - Returns: An array of the non-nil results of calling transform with each element of the sequence.
     func map<ElementOfResult>(_ transform: @escaping (Element) -> ElementOfResult) -> [ElementOfResult] {
-        var result = [ElementOfResult]()
-        queue.sync { result = self.array.map(transform) }
-        return result
+        NSLock().perform { self.array.map(transform) }
     }
 
     /// Returns an array containing the non-nil results of calling the given transformation with each element of this sequence.
@@ -129,9 +106,7 @@ public extension ThreadSafeArray {
     /// - Parameter transform: A closure that accepts an element of this sequence as its argument and returns an optional value.
     /// - Returns: An array of the non-nil results of calling transform with each element of the sequence.
     func compactMap<ElementOfResult>(_ transform: (Element) -> ElementOfResult?) -> [ElementOfResult] {
-        var result = [ElementOfResult]()
-        queue.sync { result = self.array.compactMap(transform) }
-        return result
+        NSLock().perform { self.array.compactMap(transform) }
     }
 
     /// Returns the result of combining the elements of the sequence using the given closure.
@@ -141,9 +116,7 @@ public extension ThreadSafeArray {
     ///   - nextPartialResult: A closure that combines an accumulating value and an element of the sequence into a new accumulating value, to be used in the next call of the nextPartialResult closure or returned to the caller.
     /// - Returns: The final accumulated value. If the sequence has no elements, the result is initialResult.
     func reduce<ElementOfResult>(_ initialResult: ElementOfResult, _ nextPartialResult: @escaping (ElementOfResult, Element) -> ElementOfResult) -> ElementOfResult {
-        var result: ElementOfResult?
-        queue.sync { result = self.array.reduce(initialResult, nextPartialResult) }
-        return result ?? initialResult
+        NSLock().perform { self.array.reduce(initialResult, nextPartialResult) }
     }
 
     /// Returns the result of combining the elements of the sequence using the given closure.
@@ -153,16 +126,14 @@ public extension ThreadSafeArray {
     ///   - updateAccumulatingResult: A closure that updates the accumulating value with an element of the sequence.
     /// - Returns: The final accumulated value. If the sequence has no elements, the result is initialResult.
     func reduce<ElementOfResult>(into initialResult: ElementOfResult, _ updateAccumulatingResult: @escaping (inout ElementOfResult, Element) -> Void) -> ElementOfResult {
-        var result: ElementOfResult?
-        queue.sync { result = self.array.reduce(into: initialResult, updateAccumulatingResult) }
-        return result ?? initialResult
+        NSLock().perform { self.array.reduce(into: initialResult, updateAccumulatingResult) }
     }
 
     /// Calls the given closure on each element in the sequence in the same order as a for-in loop.
     ///
     /// - Parameter body: A closure that takes an element of the sequence as a parameter.
     func forEach(_ body: (Element) -> Void) {
-        queue.sync { self.array.forEach(body) }
+        NSLock().perform { self.array.forEach(body) }
     }
 
     /// Returns a Boolean value indicating whether the sequence contains an element that satisfies the given predicate.
@@ -170,9 +141,7 @@ public extension ThreadSafeArray {
     /// - Parameter predicate: A closure that takes an element of the sequence as its argument and returns a Boolean value that indicates whether the passed element represents a match.
     /// - Returns: true if the sequence contains an element that satisfies predicate; otherwise, false.
     func contains(where predicate: (Element) -> Bool) -> Bool {
-        var result = false
-        queue.sync { result = self.array.contains(where: predicate) }
-        return result
+        NSLock().perform { self.array.contains(where: predicate) }
     }
 
     /// Returns a Boolean value indicating whether every element of a sequence satisfies a given predicate.
@@ -180,18 +149,14 @@ public extension ThreadSafeArray {
     /// - Parameter predicate: A closure that takes an element of the sequence as its argument and returns a Boolean value that indicates whether the passed element satisfies a condition.
     /// - Returns: true if the sequence contains only elements that satisfy predicate; otherwise, false.
     func allSatisfy(_ predicate: (Element) -> Bool) -> Bool {
-        var result = false
-        queue.sync { result = self.array.allSatisfy(predicate) }
-        return result
+        NSLock().perform { self.array.allSatisfy(predicate) }
     }
 
     /// Returns the array
     ///
     /// - Returns: the array part.
     func getArray() -> [Element]? {
-        var results: [Element]?
-        queue.sync { results = self.array }
-        return results
+        NSLock().perform { self.array }
     }
 }
 
@@ -202,19 +167,15 @@ public extension ThreadSafeArray {
     /// Adds a new element at the end of the array.
     ///
     /// - Parameter element: The element to append to the array.
-    func append(_ element: Element) {
-        queue.async(flags: .barrier) {
-            self.array.append(element)
-        }
+    mutating func append(_ element: Element) {
+        NSLock().perform { self.array.append(element) }
     }
 
     /// Adds new elements at the end of the array.
     ///
     /// - Parameter element: The elements to append to the array.
-    func append(_ elements: [Element]) {
-        queue.async(flags: .barrier) {
-            self.array += elements
-        }
+    mutating func append(_ elements: [Element]) {
+        NSLock().perform { self.array += elements }
     }
 
     /// Inserts a new element at the specified position.
@@ -222,10 +183,8 @@ public extension ThreadSafeArray {
     /// - Parameters:
     ///   - element: The new element to insert into the array.
     ///   - index: The position at which to insert the new element.
-    func insert(_ element: Element, at index: Int) {
-        queue.async(flags: .barrier) {
-            self.array.insert(element, at: index)
-        }
+    mutating func insert(_ element: Element, at index: Int) {
+        NSLock().perform { self.array.insert(element, at: index) }
     }
 
     /// Removes and returns the element at the specified position.
@@ -233,11 +192,8 @@ public extension ThreadSafeArray {
     /// - Parameters:
     ///   - index: The position of the element to remove.
     ///   - completion: The handler with the removed element.
-    func remove(at index: Int, completion: ((Element) -> Void)? = nil) {
-        queue.async(flags: .barrier) {
-            let element = self.array.remove(at: index)
-            DispatchQueue.main.async { completion?(element) }
-        }
+    mutating func remove(at index: Int, completion: ((Element) -> Void)? = nil) {
+        NSLock().perform { self.array.remove(at: index) }
     }
 
     /// Removes and returns the elements that meet the criteria.
@@ -245,27 +201,21 @@ public extension ThreadSafeArray {
     /// - Parameters:
     ///   - predicate: A closure that takes an element of the sequence as its argument and returns a Boolean value indicating whether the element is a match.
     ///   - completion: The handler with the removed elements.
-    func remove(where predicate: @escaping (Element) -> Bool, completion: (([Element]) -> Void)? = nil) {
-        queue.async(flags: .barrier) {
+    mutating func remove(where predicate: @escaping (Element) -> Bool) -> [Element] {
+        return NSLock().perform {
             var elements = [Element]()
-
             while let index = self.array.firstIndex(where: predicate) {
                 elements.append(self.array.remove(at: index))
             }
-
-            DispatchQueue.main.async { completion?(elements) }
+            return elements
         }
     }
 
     /// Removes all elements from the array.
     ///
-    /// - Parameter completion: The handler with the removed elements.
-    func removeAll(completion: (([Element]) -> Void)? = nil) {
-        queue.async(flags: .barrier) {
-            let elements = self.array
-            self.array.removeAll()
-            DispatchQueue.main.async { completion?(elements) }
-        }
+    /// - Parameter keepingCapacity: Pass true to keep the existing capacity of the array after removing its elements. The default value is false.
+    mutating func removeAll(keepingCapacity: Bool = false) {
+        NSLock().perform { self.array.removeAll(keepingCapacity: keepingCapacity) }
     }
 }
 
@@ -277,21 +227,14 @@ public extension ThreadSafeArray {
     /// - Returns: optional element if it exists.
     subscript(index: Int) -> Element? {
         get {
-            var result: Element?
-
-            queue.sync {
-                guard self.array.startIndex..<self.array.endIndex ~= index else { return }
-                result = self.array[index]
+            NSLock().perform {
+                guard self.array.startIndex..<self.array.endIndex ~= index else { return nil }
+                return self.array[index]
             }
-
-            return result
         }
         set {
             guard let newValue = newValue else { return }
-
-            queue.async(flags: .barrier) {
-                self.array[index] = newValue
-            }
+            NSLock().perform { self.array[index] = newValue }
         }
     }
 }
@@ -305,9 +248,7 @@ public extension ThreadSafeArray where Element: Equatable {
     /// - Parameter element: The element to find in the sequence.
     /// - Returns: true if the element was found in the sequence; otherwise, false.
     func contains(_ element: Element) -> Bool {
-        var result = false
-        queue.sync { result = self.array.contains(element) }
-        return result
+        NSLock().perform { self.array.contains(element) }
     }
 }
 

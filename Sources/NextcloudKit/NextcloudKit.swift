@@ -11,25 +11,35 @@ import Alamofire
 import SwiftyJSON
 
 open class NextcloudKit {
+#if swift(<6.0)
     public static let shared: NextcloudKit = {
         let instance = NextcloudKit()
         return instance
     }()
+#endif
 #if !os(watchOS)
     private let reachabilityManager = Alamofire.NetworkReachabilityManager()
 #endif
-    public let nkCommonInstance = NKCommon()
-    internal lazy var internalSession: Alamofire.Session = {
+    public var nkCommonInstance = NKCommon()
+    internal lazy var unauthorizedSession: Alamofire.Session = {
         return Alamofire.Session(configuration: URLSessionConfiguration.af.default,
                                  delegate: NextcloudKitSessionDelegate(nkCommonInstance: nkCommonInstance),
-                                 eventMonitors: [NKLogger(nkCommonInstance: self.nkCommonInstance)])
+                                 eventMonitors: [NKMonitor(nkCommonInstance: self.nkCommonInstance)])
     }()
 
+#if swift(<6.0)
     init() {
 #if !os(watchOS)
         startNetworkReachabilityObserver()
 #endif
     }
+#else
+    public init() {
+#if !os(watchOS)
+        startNetworkReachabilityObserver()
+#endif
+    }
+#endif
 
     deinit {
 #if !os(watchOS)
@@ -39,8 +49,13 @@ open class NextcloudKit {
 
     // MARK: - Session setup
 
-    public func setup(delegate: NextcloudKitDelegate?, memoryCapacity: Int = 30, diskCapacity: Int = 500, removeAllCachedResponses: Bool = false) {
+    public func setup(groupIdentifier: String? = nil,
+                      delegate: NextcloudKitDelegate? = nil,
+                      memoryCapacity: Int = 30,
+                      diskCapacity: Int = 500,
+                      removeAllCachedResponses: Bool = false) {
         self.nkCommonInstance.delegate = delegate
+        self.nkCommonInstance.groupIdentifier = groupIdentifier
 
         /// Cache URLSession
         ///
@@ -52,6 +67,14 @@ open class NextcloudKit {
         if removeAllCachedResponses {
             URLCache.shared.removeAllCachedResponses()
         }
+    }
+
+    public func setupLog(pathLog: String,
+                         levelLog: Int,
+                         copyLogToDocumentDirectory: Bool) {
+        self.nkCommonInstance.pathLog = pathLog
+        self.nkCommonInstance.levelLog = levelLog
+        self.nkCommonInstance.copyLogToDocumentDirectory = copyLogToDocumentDirectory
     }
 
     public func appendSession(account: String,
@@ -70,6 +93,7 @@ open class NextcloudKit {
         }
         
         let nkSession = NKSession(
+            nkCommonInstance: nkCommonInstance,
             urlBase: urlBase,
             user: user,
             userId: userId,
@@ -94,7 +118,7 @@ open class NextcloudKit {
                               userAgent: String? = nil,
                               nextcloudVersion: Int? = nil,
                               replaceWithAccount: String? = nil) {
-        guard let nkSession = nkCommonInstance.nksessions.filter({ $0.account == account }).first else { return }
+        guard var nkSession = nkCommonInstance.nksessions.filter({ $0.account == account }).first else { return }
         if let urlBase {
             nkSession.urlBase = urlBase
         }

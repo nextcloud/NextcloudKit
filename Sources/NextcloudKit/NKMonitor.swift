@@ -5,7 +5,7 @@
 import Foundation
 import Alamofire
 
-final class NKLogger: EventMonitor {
+final class NKMonitor: EventMonitor, Sendable {
     let nkCommonInstance: NKCommon
 
     init(nkCommonInstance: NKCommon) {
@@ -26,8 +26,49 @@ final class NKLogger: EventMonitor {
     }
 
     func request<Value>(_ request: DataRequest, didParseResponse response: AFDataResponse<Value>) {
-        self.nkCommonInstance.delegate?.request(request, didParseResponse: response)
+        if let statusCode = response.response?.statusCode {
 
+            //
+            // Unauthorized, append the account in groupDefaults unauthorized array
+            //
+            if statusCode == 401,
+               let headerValue = request.request?.allHTTPHeaderFields?["X-NC-CheckUnauthorized"],
+               headerValue.lowercased() == "true",
+               let account = request.request?.allHTTPHeaderFields?["X-NC-Account"] as? String,
+               let groupDefaults = UserDefaults(suiteName: NextcloudKit.shared.nkCommonInstance.groupIdentifier) {
+
+                var unauthorizedArray = groupDefaults.array(forKey: "Unauthorized") as? [String] ?? []
+                if !unauthorizedArray.contains(account) {
+                    unauthorizedArray.append(account)
+                    groupDefaults.set(unauthorizedArray, forKey: "Unauthorized")
+                    groupDefaults.synchronize()
+                }
+
+            //
+            // Unavailable, append the account in groupDefaults unavailable array
+            //
+            } else if statusCode == 503,
+                      let account = request.request?.allHTTPHeaderFields?["X-NC-Account"] as? String,
+                      let groupDefaults = UserDefaults(suiteName: NextcloudKit.shared.nkCommonInstance.groupIdentifier) {
+
+                var unavailableArray = groupDefaults.array(forKey: "Unavailable") as? [String] ?? []
+                if !unavailableArray.contains(account) {
+                    unavailableArray.append(account)
+                    groupDefaults.set(unavailableArray, forKey: "Unavailable")
+                    groupDefaults.synchronize()
+                }
+            }
+
+            if let url = request.request?.url?.absoluteString,
+               let account = request.request?.allHTTPHeaderFields?["X-NC-Account"] as? String,
+               self.nkCommonInstance.levelLog > 0 {
+                debugPrint("[DEBUG] Monitor request url: \(url), status code \(statusCode), account: \(account)")
+            }
+        }
+
+        //
+        // LOG
+        //
         guard let date = self.nkCommonInstance.convertDate(Date(), format: "yyyy-MM-dd' 'HH:mm:ss") else { return }
         let responseResultString = String("\(response.result)")
         let responseDebugDescription = String("\(response.debugDescription)")

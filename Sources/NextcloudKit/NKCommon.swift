@@ -12,7 +12,7 @@ import MobileCoreServices
 import CoreServices
 #endif
 
-public protocol NextcloudKitDelegate {
+public protocol NextcloudKitDelegate: AnyObject, Sendable {
     func authenticationChallenge(_ session: URLSession, didReceive challenge: URLAuthenticationChallenge, completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void)
     func urlSessionDidFinishEvents(forBackgroundURLSession session: URLSession)
 
@@ -25,13 +25,12 @@ public protocol NextcloudKitDelegate {
 
     func downloadComplete(fileName: String, serverUrl: String, etag: String?, date: Date?, dateLastModified: Date?, length: Int64, task: URLSessionTask, error: NKError)
     func uploadComplete(fileName: String, serverUrl: String, ocId: String?, etag: String?, date: Date?, size: Int64, task: URLSessionTask, error: NKError)
-
-    func request<Value>(_ request: DataRequest, didParseResponse response: AFDataResponse<Value>)
 }
 
-public class NKCommon: NSObject {
+public struct NKCommon: Sendable {
     public var nksessions = ThreadSafeArray<NKSession>()
     public var delegate: NextcloudKitDelegate?
+    public var groupIdentifier: String?
 
     public let identifierSessionDownload: String = "com.nextcloud.nextcloudkit.session.download"
     public let identifierSessionUpload: String = "com.nextcloud.nextcloudkit.session.upload"
@@ -82,7 +81,7 @@ public class NKCommon: NSObject {
         case xls = "xls"
     }
 
-    public struct UTTypeConformsToServer {
+    public struct UTTypeConformsToServer: Sendable {
         var typeIdentifier: String
         var classFile: String
         var editor: String
@@ -91,9 +90,15 @@ public class NKCommon: NSObject {
         var account: String
     }
 
+#if swift(<6.0)
     internal var utiCache = NSCache<NSString, CFString>()
     internal var mimeTypeCache = NSCache<CFString, NSString>()
     internal var filePropertiesCache = NSCache<CFString, NKFileProperty>()
+#else
+    internal var utiCache = [String: String]()
+    internal var mimeTypeCache = [String: String]()
+    internal var filePropertiesCache = [String: NKFileProperty]()
+#endif
     internal var internalTypeIdentifiers = ThreadSafeArray<UTTypeConformsToServer>()
 
     public var filenamePathLog: String = ""
@@ -133,56 +138,77 @@ public class NKCommon: NSObject {
 
     // MARK: - Init
 
-    override init() {
-        super.init()
-
+    init() {
         filenamePathLog = internalPathLog + "/" + internalFilenameLog
     }
 
     // MARK: - Type Identifier
 
-    public func clearInternalTypeIdentifier(account: String) {
+    mutating public func clearInternalTypeIdentifier(account: String) {
         internalTypeIdentifiers = internalTypeIdentifiers.filter({ $0.account != account })
     }
 
-    public func addInternalTypeIdentifier(typeIdentifier: String, classFile: String, editor: String, iconName: String, name: String, account: String) {
+    mutating public func addInternalTypeIdentifier(typeIdentifier: String, classFile: String, editor: String, iconName: String, name: String, account: String) {
         if !internalTypeIdentifiers.contains(where: { $0.typeIdentifier == typeIdentifier && $0.editor == editor && $0.account == account}) {
             let newUTI = UTTypeConformsToServer(typeIdentifier: typeIdentifier, classFile: classFile, editor: editor, iconName: iconName, name: name, account: account)
             internalTypeIdentifiers.append(newUTI)
         }
     }
 
-    public func getInternalType(fileName: String, mimeType: String, directory: Bool, account: String) -> (mimeType: String, classFile: String, iconName: String, typeIdentifier: String, fileNameWithoutExt: String, ext: String) {
+    mutating public func getInternalType(fileName: String, mimeType: String, directory: Bool, account: String) -> (mimeType: String, classFile: String, iconName: String, typeIdentifier: String, fileNameWithoutExt: String, ext: String) {
         var ext = (fileName as NSString).pathExtension.lowercased()
         var mimeType = mimeType
         var classFile = "", iconName = "", typeIdentifier = "", fileNameWithoutExt = ""
         var inUTI: CFString?
 
+#if swift(<6.0)
         if let cachedUTI = utiCache.object(forKey: ext as NSString) {
             inUTI = cachedUTI
-        } else {
+        }
+#else
+        if let cachedUTI = utiCache[ext] {
+            inUTI = cachedUTI as CFString
+        }
+#endif
+        if inUTI == nil {
             if let unmanagedFileUTI = UTTypeCreatePreferredIdentifierForTag(kUTTagClassFilenameExtension, ext as CFString, nil) {
                 inUTI = unmanagedFileUTI.takeRetainedValue()
                 if let inUTI {
+#if swift(<6.0)
                     utiCache.setObject(inUTI, forKey: ext as NSString)
+#else
+                    utiCache[ext] = inUTI as String
+#endif
                 }
             }
         }
 
-        if let inUTI = inUTI {
+        if let inUTI {
             typeIdentifier = inUTI as String
             fileNameWithoutExt = (fileName as NSString).deletingPathExtension
 
             // contentType detect
             if mimeType.isEmpty {
+#if swift(<6.0)
                 if let cachedMimeUTI = mimeTypeCache.object(forKey: inUTI) {
                     mimeType = cachedMimeUTI as String
-                } else {
+                }
+#else
+                if let cachedMimeUTI = mimeTypeCache[inUTI as String] {
+                    mimeType = cachedMimeUTI
+                }
+#endif
+
+                if mimeType.isEmpty {
                     if let mimeUTI = UTTypeCopyPreferredTagWithClass(inUTI, kUTTagClassMIMEType) {
                         let mimeUTIString = mimeUTI.takeRetainedValue() as String
 
                         mimeType = mimeUTIString
+#if swift(<6.0)
                         mimeTypeCache.setObject(mimeUTIString as NSString, forKey: inUTI)
+#else
+                        mimeTypeCache[inUTI as String] = mimeUTIString as String
+#endif
                     }
                 }
             }
@@ -197,12 +223,21 @@ public class NKCommon: NSObject {
             } else {
                 var fileProperties: NKFileProperty
 
+#if swift(<6.0)
                 if let cachedFileProperties = filePropertiesCache.object(forKey: inUTI) {
                     fileProperties = cachedFileProperties
                 } else {
                     fileProperties = getFileProperties(inUTI: inUTI)
                     filePropertiesCache.setObject(fileProperties, forKey: inUTI)
                 }
+#else
+                if let cachedFileProperties = filePropertiesCache[inUTI as String] {
+                    fileProperties = cachedFileProperties
+                } else {
+                    fileProperties = getFileProperties(inUTI: inUTI)
+                    filePropertiesCache[inUTI as String] = fileProperties
+                }
+#endif
 
                 classFile = fileProperties.classFile
                 iconName = fileProperties.iconName
@@ -335,7 +370,7 @@ public class NKCommon: NSObject {
                     writer = nil
                     chunk = 0
                     counterChunk(counter)
-                    print("Counter: \(counter)")
+                    debugPrint("[DEBUG] Counter: \(counter)")
                     counter += 1
                 }
 
@@ -390,7 +425,7 @@ public class NKCommon: NSObject {
         return session
     }
 
-    public func getStandardHeaders(account: String, options: NKRequestOptions? = nil) -> HTTPHeaders? {
+    public func getStandardHeaders(account: String, checkUnauthorized: Bool? = nil, options: NKRequestOptions? = nil) -> HTTPHeaders? {
         guard let session = nksessions.filter({ $0.account == account }).first else { return nil}
         var headers: HTTPHeaders = []
 
@@ -410,6 +445,10 @@ public class NKCommon: NSObject {
         headers.update(name: "OCS-APIRequest", value: "true")
         for (key, value) in options?.customHeader ?? [:] {
             headers.update(name: key, value: value)
+        }
+        headers.update(name: "X-NC-Account", value: account)
+        if let checkUnauthorized {
+            headers.update(name: "X-NC-CheckUnauthorized", value: checkUnauthorized.description)
         }
         // Paginate
         if let options {
@@ -493,7 +532,7 @@ public class NKCommon: NSObject {
             let attributes = try FileManager.default.attributesOfItem(atPath: filePath)
             return attributes[FileAttributeKey.size] as? Int64 ?? 0
         } catch {
-            print(error)
+            debugPrint(error)
         }
         return 0
     }

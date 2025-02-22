@@ -25,7 +25,7 @@ public extension NextcloudKit {
         }
         let method: HTTPMethod = delete ? .delete : .put
 
-        nkSession.sessionData.request(url, method: method, parameters: nil, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
+        nkSession.sessionData.request(url, method: method, encoding: URLEncoding.default, headers: headers, interceptor: NKInterceptor(nkCommonInstance: nkCommonInstance)).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
             task.taskDescription = options.taskDescription
             taskHandler(task)
         }.responseData(queue: self.nkCommonInstance.backgroundQueue) { response in
@@ -77,7 +77,7 @@ public extension NextcloudKit {
             headers.update(name: "X-NC-E2EE-COUNTER", value: e2eCounter)
         }
 
-        nkSession.sessionData.request(url, method: method, parameters: parameters, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
+        nkSession.sessionData.request(url, method: method, parameters: parameters, encoding: URLEncoding.default, headers: headers, interceptor: NKInterceptor(nkCommonInstance: nkCommonInstance)).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
             task.taskDescription = options.taskDescription
             taskHandler(task)
         }.responseData(queue: self.nkCommonInstance.backgroundQueue) { response in
@@ -122,7 +122,7 @@ public extension NextcloudKit {
             parameters["e2e-token"] = e2eToken
         }
 
-        nkSession.sessionData.request(url, method: .get, parameters: parameters, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
+        nkSession.sessionData.request(url, method: .get, parameters: parameters, encoding: URLEncoding.default, headers: headers, interceptor: NKInterceptor(nkCommonInstance: nkCommonInstance)).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
             task.taskDescription = options.taskDescription
             taskHandler(task)
         }.responseData(queue: self.nkCommonInstance.backgroundQueue) { response in
@@ -177,7 +177,7 @@ public extension NextcloudKit {
             headers.update(name: "X-NC-E2EE-SIGNATURE", value: signature)
         }
 
-        nkSession.sessionData.request(url, method: method, parameters: parameters, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
+        nkSession.sessionData.request(url, method: method, parameters: parameters, encoding: URLEncoding.default, headers: headers, interceptor: NKInterceptor(nkCommonInstance: nkCommonInstance)).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
             task.taskDescription = options.taskDescription
             taskHandler(task)
         }.responseData(queue: self.nkCommonInstance.backgroundQueue) { response in
@@ -228,7 +228,7 @@ public extension NextcloudKit {
             return options.queue.async { completion(account, nil, nil, nil, .urlError) }
         }
 
-        nkSession.sessionData.request(url, method: .get, parameters: nil, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
+        nkSession.sessionData.request(url, method: .get, encoding: URLEncoding.default, headers: headers, interceptor: NKInterceptor(nkCommonInstance: nkCommonInstance)).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
             task.taskDescription = options.taskDescription
             taskHandler(task)
         }.responseData(queue: self.nkCommonInstance.backgroundQueue) { response in
@@ -272,7 +272,7 @@ public extension NextcloudKit {
             return options.queue.async { completion(account, nil, nil, .urlError) }
         }
 
-        nkSession.sessionData.request(url, method: .get, parameters: nil, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
+        nkSession.sessionData.request(url, method: .get, encoding: URLEncoding.default, headers: headers, interceptor: NKInterceptor(nkCommonInstance: nkCommonInstance)).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
             task.taskDescription = options.taskDescription
             taskHandler(task)
         }.responseData(queue: self.nkCommonInstance.backgroundQueue) { response in
@@ -311,7 +311,7 @@ public extension NextcloudKit {
             return options.queue.async { completion(account, nil, nil, .urlError) }
         }
 
-        nkSession.sessionData.request(url, method: .get, parameters: nil, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
+        nkSession.sessionData.request(url, method: .get, encoding: URLEncoding.default, headers: headers, interceptor: NKInterceptor(nkCommonInstance: nkCommonInstance)).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
             task.taskDescription = options.taskDescription
             taskHandler(task)
         }.responseData(queue: self.nkCommonInstance.backgroundQueue) { response in
@@ -352,7 +352,7 @@ public extension NextcloudKit {
         }
         let parameters = ["csr": certificate]
 
-        nkSession.sessionData.request(url, method: .post, parameters: parameters, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
+        nkSession.sessionData.request(url, method: .post, parameters: parameters, encoding: URLEncoding.default, headers: headers, interceptor: NKInterceptor(nkCommonInstance: nkCommonInstance)).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
             task.taskDescription = options.taskDescription
             taskHandler(task)
         }.responseData(queue: self.nkCommonInstance.backgroundQueue) { response in
@@ -394,7 +394,7 @@ public extension NextcloudKit {
         }
         let parameters = ["privateKey": privateKey]
 
-        nkSession.sessionData.request(url, method: .post, parameters: parameters, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
+        nkSession.sessionData.request(url, method: .post, parameters: parameters, encoding: URLEncoding.default, headers: headers, interceptor: NKInterceptor(nkCommonInstance: nkCommonInstance)).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
             task.taskDescription = options.taskDescription
             taskHandler(task)
         }.responseData(queue: self.nkCommonInstance.backgroundQueue) { response in
@@ -432,7 +432,7 @@ public extension NextcloudKit {
               let headers = nkCommonInstance.getStandardHeaders(account: account, options: options) else {
             return options.queue.async { completion(account, nil, .urlError) }
         }
-        nkSession.sessionData.request(url, method: .delete, parameters: nil, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
+        nkSession.sessionData.request(url, method: .delete, encoding: URLEncoding.default, headers: headers, interceptor: NKInterceptor(nkCommonInstance: nkCommonInstance)).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
             task.taskDescription = options.taskDescription
             taskHandler(task)
         }.response(queue: self.nkCommonInstance.backgroundQueue) { response in
@@ -464,7 +464,7 @@ public extension NextcloudKit {
             return options.queue.async { completion(account, nil, .urlError) }
         }
 
-        nkSession.sessionData.request(url, method: .delete, parameters: nil, encoding: URLEncoding.default, headers: headers, interceptor: nil).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
+        nkSession.sessionData.request(url, method: .delete, encoding: URLEncoding.default, headers: headers, interceptor: NKInterceptor(nkCommonInstance: nkCommonInstance)).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
             task.taskDescription = options.taskDescription
             taskHandler(task)
         }.response(queue: self.nkCommonInstance.backgroundQueue) { response in

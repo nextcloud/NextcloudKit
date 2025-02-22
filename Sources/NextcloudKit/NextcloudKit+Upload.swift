@@ -43,7 +43,7 @@ public extension NextcloudKit {
             headers.update(name: "Overwrite", value: "true")
         }
 
-        let request = nkSession.sessionData.upload(fileNameLocalPathUrl, to: url, method: .put, headers: headers, interceptor: nil, fileManager: .default).validate(statusCode: 200..<300).onURLSessionTaskCreation(perform: { task in
+        let request = nkSession.sessionData.upload(fileNameLocalPathUrl, to: url, method: .put, headers: headers, interceptor: NKInterceptor(nkCommonInstance: nkCommonInstance), fileManager: .default).validate(statusCode: 200..<300).onURLSessionTaskCreation(perform: { task in
             task.taskDescription = options.taskDescription
             options.queue.async { taskHandler(task) }
         }) .uploadProgress { progress in
@@ -161,7 +161,7 @@ public extension NextcloudKit {
                 if error == .success {
                     completion(NKError())
                 } else if error.errorCode == 404 {
-                    NextcloudKit.shared.createFolder(serverUrlFileName: serverUrlChunkFolder, account: account, options: options) { _, _, _, _, error in
+                    self.createFolder(serverUrlFileName: serverUrlChunkFolder, account: account, options: options) { _, _, _, _, error in
                         completion(error)
                     }
                 } else {

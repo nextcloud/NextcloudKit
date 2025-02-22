@@ -6,17 +6,15 @@ import Testing
 @testable import NextcloudKit
 
 @Suite(.serialized) struct FileAutoRenamerUnitTests {
-    let fileAutoRenamer = FileAutoRenamer.shared
-
     let forbiddenFilenameCharacter = ">"
     let forbiddenFilenameExtension = "."
 
     let characterArrays = [
-        ["\\\\", "*", ">", "&", "/", "|", ":", "<", "?"],
-        [">", ":", "?", "&", "*", "\\\\", "|", "<", "/"],
-        ["<", "|", "?", ":", "&", "*", "\\\\", "/", ">"],
-        ["?", "/", ":", "&", "<", "|", ">", "\\\\", "*"],
-        ["&", "<", "|", "*", "/", "?", ">", ":", "\\\\"]
+        ["\\\\", "*", ">", "&", "/", "|", ":", "<", "?", " "],
+        [">", ":", "?", " ", "&", "*", "\\\\", "|", "<", "/"],
+        ["<", "|", "?", ":", "&", "*", "\\\\", " ", "/", ">"],
+        ["?", "/", " ", ":", "&", "<", "|", ">", "\\\\", "*"],
+        ["&", "<", "|", "*", "/", "?", ">", " ", ":", "\\\\"]
     ]
 
     let extensionArrays = [
@@ -35,7 +33,7 @@ import Testing
 
     @Test func testInvalidChar() {
         for (characterArray, extensionArray) in combinedTuples {
-            fileAutoRenamer.setup(
+            let fileAutoRenamer = FileAutoRenamer(
                 forbiddenFileNameCharacters: characterArray,
                 forbiddenFileNameExtensions: extensionArray
             )
@@ -49,7 +47,7 @@ import Testing
 
     @Test func testInvalidExtension() {
         for (characterArray, extensionArray) in combinedTuples {
-            fileAutoRenamer.setup(
+            let fileAutoRenamer = FileAutoRenamer(
                 forbiddenFileNameCharacters: characterArray,
                 forbiddenFileNameExtensions: extensionArray
             )
@@ -63,7 +61,7 @@ import Testing
 
     @Test func testMultipleInvalidChars() {
         for (characterArray, extensionArray) in combinedTuples {
-            fileAutoRenamer.setup(
+            let fileAutoRenamer = FileAutoRenamer(
                 forbiddenFileNameCharacters: characterArray,
                 forbiddenFileNameExtensions: extensionArray
             )
@@ -77,7 +75,7 @@ import Testing
 
     @Test func testStartEndInvalidExtensions() {
         for (characterArray, extensionArray) in combinedTuples {
-            fileAutoRenamer.setup(
+            let fileAutoRenamer = FileAutoRenamer(
                 forbiddenFileNameCharacters: characterArray,
                 forbiddenFileNameExtensions: extensionArray
             )
@@ -91,7 +89,7 @@ import Testing
 
     @Test func testStartInvalidExtension() {
         for (characterArray, extensionArray) in combinedTuples {
-            fileAutoRenamer.setup(
+            let fileAutoRenamer = FileAutoRenamer(
                 forbiddenFileNameCharacters: characterArray,
                 forbiddenFileNameExtensions: extensionArray
             )
@@ -105,7 +103,7 @@ import Testing
 
     @Test func testEndInvalidExtension() {
         for (characterArray, extensionArray) in combinedTuples {
-            fileAutoRenamer.setup(
+            let fileAutoRenamer = FileAutoRenamer(
                 forbiddenFileNameCharacters: characterArray,
                 forbiddenFileNameExtensions: extensionArray
             )
@@ -119,7 +117,7 @@ import Testing
 
     @Test func testHiddenFile() {
         for (characterArray, extensionArray) in combinedTuples {
-            fileAutoRenamer.setup(
+            let fileAutoRenamer = FileAutoRenamer(
                 forbiddenFileNameCharacters: characterArray,
                 forbiddenFileNameExtensions: extensionArray
             )
@@ -133,7 +131,7 @@ import Testing
 
     @Test func testUppercaseExtension() {
         for (characterArray, extensionArray) in combinedTuples {
-            fileAutoRenamer.setup(
+            let fileAutoRenamer = FileAutoRenamer(
                 forbiddenFileNameCharacters: characterArray,
                 forbiddenFileNameExtensions: extensionArray
             )
@@ -147,7 +145,7 @@ import Testing
 
     @Test func testMiddleNonPrintableChar() {
         for (characterArray, extensionArray) in combinedTuples {
-            fileAutoRenamer.setup(
+            let fileAutoRenamer = FileAutoRenamer(
                 forbiddenFileNameCharacters: characterArray,
                 forbiddenFileNameExtensions: extensionArray
             )
@@ -161,7 +159,7 @@ import Testing
 
     @Test func testStartNonPrintableChar() {
         for (characterArray, extensionArray) in combinedTuples {
-            fileAutoRenamer.setup(
+            let fileAutoRenamer = FileAutoRenamer(
                 forbiddenFileNameCharacters: characterArray,
                 forbiddenFileNameExtensions: extensionArray
             )
@@ -175,7 +173,7 @@ import Testing
 
     @Test func testEndNonPrintableChar() {
         for (characterArray, extensionArray) in combinedTuples {
-            fileAutoRenamer.setup(
+            let fileAutoRenamer = FileAutoRenamer(
                 forbiddenFileNameCharacters: characterArray,
                 forbiddenFileNameExtensions: extensionArray
             )
@@ -189,7 +187,7 @@ import Testing
 
     @Test func testExtensionNonPrintableChar() {
         for (characterArray, extensionArray) in combinedTuples {
-            fileAutoRenamer.setup(
+            let fileAutoRenamer = FileAutoRenamer(
                 forbiddenFileNameCharacters: characterArray,
                 forbiddenFileNameExtensions: extensionArray
             )
@@ -203,7 +201,7 @@ import Testing
 
     @Test func testMiddleInvalidFolderChar() {
         for (characterArray, extensionArray) in combinedTuples {
-            fileAutoRenamer.setup(
+            let fileAutoRenamer = FileAutoRenamer(
                 forbiddenFileNameCharacters: characterArray,
                 forbiddenFileNameExtensions: extensionArray
             )
@@ -217,7 +215,7 @@ import Testing
 
     @Test func testEndInvalidFolderChar() {
         for (characterArray, extensionArray) in combinedTuples {
-            fileAutoRenamer.setup(
+            let fileAutoRenamer = FileAutoRenamer(
                 forbiddenFileNameCharacters: characterArray,
                 forbiddenFileNameExtensions: extensionArray
             )
@@ -231,7 +229,7 @@ import Testing
 
     @Test func testStartInvalidFolderChar() {
         for (characterArray, extensionArray) in combinedTuples {
-            fileAutoRenamer.setup(
+            let fileAutoRenamer = FileAutoRenamer(
                 forbiddenFileNameCharacters: characterArray,
                 forbiddenFileNameExtensions: extensionArray
             )
@@ -245,7 +243,7 @@ import Testing
 
     @Test func testMixedInvalidChar() {
         for (characterArray, extensionArray) in combinedTuples {
-            fileAutoRenamer.setup(
+            let fileAutoRenamer = FileAutoRenamer(
                 forbiddenFileNameCharacters: characterArray,
                 forbiddenFileNameExtensions: extensionArray
             )
@@ -259,7 +257,7 @@ import Testing
 
     @Test func testStartsWithPathSeparator() {
         for (characterArray, extensionArray) in combinedTuples {
-            fileAutoRenamer.setup(
+            let fileAutoRenamer = FileAutoRenamer(
                 forbiddenFileNameCharacters: characterArray,
                 forbiddenFileNameExtensions: extensionArray
             )
@@ -273,7 +271,7 @@ import Testing
 
     @Test func testStartsWithPathSeparatorAndValidFilepath() {
         for (characterArray, extensionArray) in combinedTuples {
-            fileAutoRenamer.setup(
+            let fileAutoRenamer = FileAutoRenamer(
                 forbiddenFileNameCharacters: characterArray,
                 forbiddenFileNameExtensions: extensionArray
             )

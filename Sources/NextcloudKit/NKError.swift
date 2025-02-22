@@ -32,7 +32,7 @@ extension OCSPath {
     static var ocsXMLMsg: Self { ["d:error", "s:message"] }
 }
 
-public class NKError: NSObject {
+public struct NKError: Sendable, Equatable {
     static let internalError = -9999
     // Chunk error
     public static let chunkNoEnoughMemory = -9998
@@ -159,7 +159,7 @@ public class NKError: NSObject {
         self.responseData = responseData
     }
 
-    convenience init(httpResponse: HTTPURLResponse) {
+    init(httpResponse: HTTPURLResponse) {
         self.init(statusCode: httpResponse.statusCode, fallbackDescription: httpResponse.description)
     }
 
@@ -181,7 +181,7 @@ public class NKError: NSObject {
         self.error = NSError(domain: NSCocoaErrorDomain, code: self.errorCode, userInfo: [NSLocalizedDescriptionKey: self.errorDescription])
     }
 
-    public convenience init<T: AFResponse>(error: AFError?, afResponse: T, responseData: Data? = nil) {
+    public init<T: AFResponse>(error: AFError?, afResponse: T, responseData: Data? = nil) {
         if let errorCode = afResponse.response?.statusCode {
             guard let dataResponse = afResponse as? Alamofire.DataResponse<T.Success, T.Failure>,
                   let errorData = dataResponse.data
@@ -216,9 +216,13 @@ public class NKError: NSObject {
         }
     }
 
-    public override func isEqual(_ object: Any?) -> Bool {
-        if let object = object as? NKError {
-            return self.errorCode == object.errorCode && self.errorDescription == object.errorDescription
+    public static func == (lhs: NKError, rhs: NKError) -> Bool {
+        return lhs.errorCode == rhs.errorCode && lhs.errorDescription == rhs.errorDescription
+    }
+
+    public static func == (lhs: NKError, rhs: NKError?) -> Bool {
+        if let rhs {
+            return lhs == rhs;
         }
         return false
     }
