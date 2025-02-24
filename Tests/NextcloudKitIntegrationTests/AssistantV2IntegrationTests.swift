@@ -1,9 +1,6 @@
-//
-//  Test.swift
-//  NextcloudKit
-//
-//  Created by Milen Pivchev on 12.02.25.
-//
+// SPDX-FileCopyrightText: Nextcloud GmbH
+// SPDX-FileCopyrightText: 2025 Milen Pivchev
+// SPDX-License-Identifier: GPL-3.0-or-later
 
 import Testing
 import NextcloudKit
