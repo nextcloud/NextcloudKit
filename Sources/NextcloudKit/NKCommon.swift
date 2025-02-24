@@ -18,6 +18,8 @@ public protocol NextcloudKitDelegate: AnyObject, Sendable {
 
     func networkReachabilityObserver(_ typeReachability: NKCommon.TypeReachability)
 
+    func request<Value>(_ request: DataRequest, didParseResponse response: AFDataResponse<Value>)
+
     func downloadProgress(_ progress: Float, totalBytes: Int64, totalBytesExpected: Int64, fileName: String, serverUrl: String, session: URLSession, task: URLSessionTask)
     func uploadProgress(_ progress: Float, totalBytes: Int64, totalBytesExpected: Int64, fileName: String, serverUrl: String, session: URLSession, task: URLSessionTask)
 

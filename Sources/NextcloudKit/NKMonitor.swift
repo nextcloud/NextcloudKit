@@ -26,6 +26,8 @@ final class NKMonitor: EventMonitor, Sendable {
     }
 
     func request<Value>(_ request: DataRequest, didParseResponse response: AFDataResponse<Value>) {
+        nkCommonInstance.delegate?.request(request, didParseResponse: response)
+
         if let statusCode = response.response?.statusCode {
 
             //
