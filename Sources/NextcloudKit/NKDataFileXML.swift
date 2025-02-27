@@ -248,6 +248,10 @@ public class NKDataFileXML: NSObject {
         super.init()
     }
 
+    public convenience override init() {
+        self.init()
+    }
+
     func convertDataAppPassword(data: Data) -> String? {
         let xml = XML.parse(data)
         return xml["ocs", "data", "apppassword"].text
