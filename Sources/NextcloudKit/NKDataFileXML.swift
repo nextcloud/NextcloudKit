@@ -51,7 +51,7 @@ public class NKDataFileXML: NSObject {
     </d:propertyupdate>
     """
 
-    func getRequestBodyFile(createProperties: [NKProperties]?, removeProperties: [NKProperties] = []) -> String {
+    public func getRequestBodyFile(createProperties: [NKProperties]?, removeProperties: [NKProperties] = []) -> String {
         let request = """
         <?xml version=\"1.0\" encoding=\"UTF-8\"?>
         <d:propfind xmlns:d=\"DAV:\" xmlns:oc=\"http://owncloud.org/ns\" xmlns:nc=\"http://nextcloud.org/ns\">
@@ -63,7 +63,7 @@ public class NKDataFileXML: NSObject {
         return request
     }
 
-    func getRequestBodyFileExists() -> String {
+    public func getRequestBodyFileExists() -> String {
         let request = """
         <?xml version=\"1.0\" encoding=\"UTF-8\"?>
         <d:propfind xmlns:d=\"DAV:\" xmlns:oc=\"http://owncloud.org/ns\" xmlns:nc=\"http://nextcloud.org/ns\">
