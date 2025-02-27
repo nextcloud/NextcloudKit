@@ -243,13 +243,9 @@ public class NKDataFileXML: NSObject {
     </d:propertyupdate>
     """
 
-    init(nkCommonInstance: NKCommon) {
+    public init(nkCommonInstance: NKCommon) {
         self.nkCommonInstance = nkCommonInstance
         super.init()
-    }
-
-    public convenience override init() {
-        self.init()
     }
 
     func convertDataAppPassword(data: Data) -> String? {
