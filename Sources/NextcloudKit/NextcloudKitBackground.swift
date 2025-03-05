@@ -17,7 +17,7 @@ public final class NKBackground: NSObject, URLSessionTaskDelegate, URLSessionDel
     public func download(serverUrlFileName: Any,
                          fileNameLocalPath: String,
                          taskDescription: String? = nil,
-                         account: String) -> (URLSessionDownloadTask?, error: NKError?) {
+                         account: String) -> (URLSessionDownloadTask?, error: NKError) {
         var url: URL?
         let groupDefaults = UserDefaults(suiteName: NextcloudKit.shared.nkCommonInstance.groupIdentifier)
 
@@ -69,7 +69,7 @@ public final class NKBackground: NSObject, URLSessionTaskDelegate, URLSessionDel
                        taskDescription: String? = nil,
                        overwrite: Bool = false,
                        account: String,
-                       sessionIdentifier: String) -> (URLSessionUploadTask?, error: NKError?) {
+                       sessionIdentifier: String) -> (URLSessionUploadTask?, error: NKError) {
         var url: URL?
         var uploadSession: URLSession?
         let groupDefaults = UserDefaults(suiteName: NextcloudKit.shared.nkCommonInstance.groupIdentifier)
