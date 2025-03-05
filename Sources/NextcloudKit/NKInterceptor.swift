@@ -21,12 +21,12 @@ final class NKInterceptor: RequestInterceptor, Sendable {
             debugPrint("[DEBUG] Interceptor request url: " + url)
         }
 
-        if let checkUnauthorized = urlRequest.value(forHTTPHeaderField: "X-NC-CheckUnauthorized"),
+        if let checkUnauthorized = urlRequest.value(forHTTPHeaderField: nkCommonInstance.headerCheckUnauthorized),
            checkUnauthorized == "false" {
             return completion(.success(urlRequest))
-        } else if let account = urlRequest.value(forHTTPHeaderField: "X-NC-Account"),
-                  let groupDefaults = UserDefaults(suiteName: NextcloudKit.shared.nkCommonInstance.groupIdentifier),
-                  let unauthorizedArray = groupDefaults.array(forKey: "Unauthorized") as? [String],
+        } else if let account = urlRequest.value(forHTTPHeaderField: nkCommonInstance.headerAccount),
+                  let groupDefaults = UserDefaults(suiteName: nkCommonInstance.groupIdentifier),
+                  let unauthorizedArray = groupDefaults.array(forKey: nkCommonInstance.groupDefaultsUnauthorized) as? [String],
                   unauthorizedArray.contains(account) {
             self.nkCommonInstance.writeLog("[DEBUG] Unauthorized for account: \(account)")
             let error = AFError.responseValidationFailed(reason: .unacceptableStatusCode(code: 401))

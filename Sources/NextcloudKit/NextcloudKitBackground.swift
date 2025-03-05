@@ -27,7 +27,7 @@ public final class NKBackground: NSObject, URLSessionTaskDelegate, URLSessionDel
             url = (serverUrlFileName as? String)?.encodedToUrl as? URL
         }
 
-        if let unauthorizedArray = groupDefaults?.array(forKey: "Unauthorized") as? [String],
+        if let unauthorizedArray = groupDefaults?.array(forKey: NextcloudKit.shared.nkCommonInstance.groupDefaultsUnauthorized) as? [String],
            unauthorizedArray.contains(account) {
             return nil
         }
@@ -77,7 +77,7 @@ public final class NKBackground: NSObject, URLSessionTaskDelegate, URLSessionDel
             url = (serverUrlFileName as? String)?.encodedToUrl as? URL
         }
 
-        if let unauthorizedArray = groupDefaults?.array(forKey: "Unauthorized") as? [String],
+        if let unauthorizedArray = groupDefaults?.array(forKey: NextcloudKit.shared.nkCommonInstance.groupDefaultsUnauthorized) as? [String],
            unauthorizedArray.contains(account) {
             return nil
         }
