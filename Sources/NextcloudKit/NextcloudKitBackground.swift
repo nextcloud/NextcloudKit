@@ -30,6 +30,9 @@ public final class NKBackground: NSObject, URLSessionTaskDelegate, URLSessionDel
         if let unauthorizedArray = groupDefaults?.array(forKey: NextcloudKit.shared.nkCommonInstance.groupDefaultsUnauthorized) as? [String],
            unauthorizedArray.contains(account) {
             return nil
+        } else if let tosArray = groupDefaults?.array(forKey: NextcloudKit.shared.nkCommonInstance.groupDefaultsToS) as? [String],
+                  tosArray.contains(account) {
+            return nil
         }
 
         guard let nkSession = nkCommonInstance.getSession(account: account),
@@ -79,6 +82,9 @@ public final class NKBackground: NSObject, URLSessionTaskDelegate, URLSessionDel
 
         if let unauthorizedArray = groupDefaults?.array(forKey: NextcloudKit.shared.nkCommonInstance.groupDefaultsUnauthorized) as? [String],
            unauthorizedArray.contains(account) {
+            return nil
+        } else if let tosArray = groupDefaults?.array(forKey: NextcloudKit.shared.nkCommonInstance.groupDefaultsToS) as? [String],
+                  tosArray.contains(account) {
             return nil
         }
 
