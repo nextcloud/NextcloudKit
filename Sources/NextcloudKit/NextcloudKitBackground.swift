@@ -17,7 +17,7 @@ public final class NKBackground: NSObject, URLSessionTaskDelegate, URLSessionDel
     public func download(serverUrlFileName: Any,
                          fileNameLocalPath: String,
                          taskDescription: String? = nil,
-                         account: String) -> URLSessionDownloadTask? {
+                         account: String) -> (URLSessionDownloadTask?, error: NKError?) {
         var url: URL?
         let groupDefaults = UserDefaults(suiteName: NextcloudKit.shared.nkCommonInstance.groupIdentifier)
 
@@ -29,23 +29,23 @@ public final class NKBackground: NSObject, URLSessionTaskDelegate, URLSessionDel
 
         if let unauthorizedArray = groupDefaults?.array(forKey: NextcloudKit.shared.nkCommonInstance.groupDefaultsUnauthorized) as? [String],
            unauthorizedArray.contains(account) {
-            return nil
+            return (nil, .unauthorizedError)
         } else if let tosArray = groupDefaults?.array(forKey: NextcloudKit.shared.nkCommonInstance.groupDefaultsToS) as? [String],
                   tosArray.contains(account) {
-            return nil
+            return (nil, .forbiddenError)
         }
 
         guard let nkSession = nkCommonInstance.getSession(account: account),
               let urlForRequest = url
         else {
-            return nil
+            return (nil, .urlError)
         }
         var request = URLRequest(url: urlForRequest)
         let loginString = "\(nkSession.user):\(nkSession.password)"
 
         guard let loginData = loginString.data(using: String.Encoding.utf8)
         else {
-            return nil
+            return (nil, .invalidData)
         }
         let base64LoginString = loginData.base64EncodedString()
 
@@ -57,7 +57,7 @@ public final class NKBackground: NSObject, URLSessionTaskDelegate, URLSessionDel
         task.resume()
         self.nkCommonInstance.writeLog("Network start download file: \(serverUrlFileName)")
 
-        return task
+        return (task, .success)
     }
 
     // MARK: - Upload
@@ -69,7 +69,7 @@ public final class NKBackground: NSObject, URLSessionTaskDelegate, URLSessionDel
                        taskDescription: String? = nil,
                        overwrite: Bool = false,
                        account: String,
-                       sessionIdentifier: String) -> URLSessionUploadTask? {
+                       sessionIdentifier: String) -> (URLSessionUploadTask?, error: NKError?) {
         var url: URL?
         var uploadSession: URLSession?
         let groupDefaults = UserDefaults(suiteName: NextcloudKit.shared.nkCommonInstance.groupIdentifier)
@@ -82,22 +82,22 @@ public final class NKBackground: NSObject, URLSessionTaskDelegate, URLSessionDel
 
         if let unauthorizedArray = groupDefaults?.array(forKey: NextcloudKit.shared.nkCommonInstance.groupDefaultsUnauthorized) as? [String],
            unauthorizedArray.contains(account) {
-            return nil
+            return (nil, .unauthorizedError)
         } else if let tosArray = groupDefaults?.array(forKey: NextcloudKit.shared.nkCommonInstance.groupDefaultsToS) as? [String],
                   tosArray.contains(account) {
-            return nil
+            return (nil, .forbiddenError)
         }
 
         guard let nkSession = nkCommonInstance.getSession(account: account),
               let urlForRequest = url
         else {
-            return nil
+            return (nil, .urlError)
         }
 
         var request = URLRequest(url: urlForRequest)
         let loginString = "\(nkSession.user):\(nkSession.password)"
         guard let loginData = loginString.data(using: String.Encoding.utf8) else {
-            return nil
+            return (nil, .invalidData)
         }
         let base64LoginString = loginData.base64EncodedString()
 
@@ -128,7 +128,8 @@ public final class NKBackground: NSObject, URLSessionTaskDelegate, URLSessionDel
         task?.taskDescription = taskDescription
         task?.resume()
         self.nkCommonInstance.writeLog("Network start upload file: \(serverUrlFileName)")
-        return task
+
+        return (task, .success)
     }
 
     // MARK: - SessionDelegate
