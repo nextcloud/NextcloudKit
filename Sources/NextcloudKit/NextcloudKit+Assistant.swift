@@ -34,7 +34,7 @@ public extension NextcloudKit {
                 let data = json["ocs"]["data"]["types"]
                 let statusCode = json["ocs"]["meta"]["statuscode"].int ?? NKError.internalError
                 if 200..<300 ~= statusCode {
-                    let results = NKTextProcessingTaskType.factory(data: data)
+                    let results = NKTextProcessingTaskType.deserialize(multipleObjects: data)
                     options.queue.async { completion(account, results, response, .success) }
                 } else {
                     options.queue.async { completion(account, nil, response, NKError(rootJson: json, fallbackStatusCode: response.response?.statusCode)) }
@@ -75,7 +75,7 @@ public extension NextcloudKit {
                 let data = json["ocs"]["data"]["task"]
                 let statusCode = json["ocs"]["meta"]["statuscode"].int ?? NKError.internalError
                 if 200..<300 ~= statusCode {
-                    let result = NKTextProcessingTask.factory(data: data)
+                    let result = NKTextProcessingTask.deserialize(singleObject: data)
                     options.queue.async { completion(account, result, response, .success) }
                 } else {
                     options.queue.async { completion(account, nil, response, NKError(rootJson: json, fallbackStatusCode: response.response?.statusCode)) }
@@ -112,7 +112,7 @@ public extension NextcloudKit {
                 let data = json["ocs"]["data"]["task"]
                 let statusCode = json["ocs"]["meta"]["statuscode"].int ?? NKError.internalError
                 if 200..<300 ~= statusCode {
-                    let result = NKTextProcessingTask.factory(data: data)
+                    let result = NKTextProcessingTask.deserialize(singleObject: data)
                     options.queue.async { completion(account, result, response, .success) }
                 } else {
                     options.queue.async { completion(account, nil, response, NKError(rootJson: json, fallbackStatusCode: response.response?.statusCode)) }
@@ -149,7 +149,7 @@ public extension NextcloudKit {
                 let data = json["ocs"]["data"]["task"]
                 let statusCode = json["ocs"]["meta"]["statuscode"].int ?? NKError.internalError
                 if 200..<300 ~= statusCode {
-                    let result = NKTextProcessingTask.factory(data: data)
+                    let result = NKTextProcessingTask.deserialize(singleObject: data)
                     options.queue.async { completion(account, result, response, .success) }
                 } else {
                     options.queue.async { completion(account, nil, response, NKError(rootJson: json, fallbackStatusCode: response.response?.statusCode)) }
@@ -186,7 +186,7 @@ public extension NextcloudKit {
                 let data = json["ocs"]["data"]["tasks"]
                 let statusCode = json["ocs"]["meta"]["statuscode"].int ?? NKError.internalError
                 if 200..<300 ~= statusCode {
-                    let results = NKTextProcessingTask.factories(data: data)
+                    let results = NKTextProcessingTask.deserialize(multipleObjects: data)
                     options.queue.async { completion(account, results, response, .success) }
                 } else {
                     options.queue.async { completion(account, nil, response, NKError(rootJson: json, fallbackStatusCode: response.response?.statusCode)) }
