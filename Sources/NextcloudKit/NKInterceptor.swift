@@ -28,19 +28,21 @@ final class NKInterceptor: RequestInterceptor, Sendable {
 
         if let account = urlRequest.value(forHTTPHeaderField: nkCommonInstance.headerAccount),
            let groupDefaults = UserDefaults(suiteName: nkCommonInstance.groupIdentifier) {
-            ///
             /// Unauthorized
-            ///
-            if let unauthorizedArray = groupDefaults.array(forKey: nkCommonInstance.groupDefaultsUnauthorized) as? [String],
-               unauthorizedArray.contains(account) {
+            if let array = groupDefaults.array(forKey: nkCommonInstance.groupDefaultsUnauthorized) as? [String],
+               array.contains(account) {
                 self.nkCommonInstance.writeLog("[DEBUG] Unauthorized for account: \(account)")
                 let error = AFError.responseValidationFailed(reason: .unacceptableStatusCode(code: 401))
                 return completion(.failure(error))
-            ///
+            /// Unavailable
+            } else if let array = groupDefaults.array(forKey: nkCommonInstance.groupDefaultsUnavailable) as? [String],
+                      array.contains(account) {
+                self.nkCommonInstance.writeLog("[DEBUG] Unavailable for account: \(account)")
+                let error = AFError.responseValidationFailed(reason: .unacceptableStatusCode(code: 503))
+                return completion(.failure(error))
             /// ToS
-            ///
-            } else if let tosArray = groupDefaults.array(forKey: nkCommonInstance.groupDefaultsToS) as? [String],
-                      tosArray.contains(account) {
+            } else if let array = groupDefaults.array(forKey: nkCommonInstance.groupDefaultsToS) as? [String],
+                      array.contains(account) {
                 self.nkCommonInstance.writeLog("[DEBUG] ToS for account: \(account)")
                 let error = AFError.responseValidationFailed(reason: .unacceptableStatusCode(code: 403))
                 return completion(.failure(error))
