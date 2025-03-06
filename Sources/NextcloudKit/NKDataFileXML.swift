@@ -6,7 +6,7 @@
 import Foundation
 import SwiftyXMLParser
 
-class NKDataFileXML: NSObject {
+public class NKDataFileXML: NSObject {
     var nkCommonInstance: NKCommon
     let requestBodyComments =
     """
@@ -51,12 +51,26 @@ class NKDataFileXML: NSObject {
     </d:propertyupdate>
     """
 
-    func getRequestBodyFile(createProperties: [NKProperties]?, removeProperties: [NKProperties] = []) -> String {
+    public func getRequestBodyFile(createProperties: [NKProperties]?, removeProperties: [NKProperties] = []) -> String {
         let request = """
         <?xml version=\"1.0\" encoding=\"UTF-8\"?>
         <d:propfind xmlns:d=\"DAV:\" xmlns:oc=\"http://owncloud.org/ns\" xmlns:nc=\"http://nextcloud.org/ns\">
             <d:prop>
         """ + NKProperties.properties(createProperties: createProperties, removeProperties: removeProperties) + """
+            </d:prop>
+        </d:propfind>
+        """
+        return request
+    }
+
+    public func getRequestBodyFileExists() -> String {
+        let request = """
+        <?xml version=\"1.0\" encoding=\"UTF-8\"?>
+        <d:propfind xmlns:d=\"DAV:\" xmlns:oc=\"http://owncloud.org/ns\" xmlns:nc=\"http://nextcloud.org/ns\">
+            <d:prop>
+                <d:getetag />
+                <fileid xmlns=\"http://owncloud.org/ns\"/>
+                <id xmlns=\"http://owncloud.org/ns\"/>
             </d:prop>
         </d:propfind>
         """
@@ -229,7 +243,7 @@ class NKDataFileXML: NSObject {
     </d:propertyupdate>
     """
 
-    init(nkCommonInstance: NKCommon) {
+    public init(nkCommonInstance: NKCommon) {
         self.nkCommonInstance = nkCommonInstance
         super.init()
     }
