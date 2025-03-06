@@ -35,7 +35,7 @@ public extension NextcloudKit {
                 let data = json["ocs"]["data"]["types"]
                 let statusCode = json["ocs"]["meta"]["statuscode"].int ?? NKError.internalError
                 if 200..<300 ~= statusCode {
-                    let dict = TaskTypes.factory(data: data)
+                    let dict = TaskTypes.deserialize(from: data)
                     let result = dict?.types.map({$0})
                     var filteredResult = result?
                         .filter({ $0.inputShape?.input?.type == supportedTaskType && $0.outputShape?.output?.type == supportedTaskType })
@@ -81,7 +81,7 @@ public extension NextcloudKit {
                 let data = json["ocs"]["data"]["task"]
                 let statusCode = json["ocs"]["meta"]["statuscode"].int ?? NKError.internalError
                 if 200..<300 ~= statusCode {
-                    let result = AssistantTask.factory(from: data)
+                    let result = AssistantTask.deserialize(from: data)
                     options.queue.async { completion(account, result, response, .success) }
                 } else {
                     options.queue.async { completion(account, nil, response, NKError(rootJson: json, fallbackStatusCode: response.response?.statusCode)) }
@@ -118,7 +118,7 @@ public extension NextcloudKit {
                 let data = json["ocs"]["data"]["tasks"]
                 let statusCode = json["ocs"]["meta"]["statuscode"].int ?? NKError.internalError
                 if 200..<300 ~= statusCode {
-                    let result = TaskList.factory(from: data)
+                    let result = TaskList.deserialize(from: data)
                     options.queue.async { completion(account, result, response, .success) }
                 } else {
                     options.queue.async { completion(account, nil, response, NKError(rootJson: json, fallbackStatusCode: response.response?.statusCode)) }

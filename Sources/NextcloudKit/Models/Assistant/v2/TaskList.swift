@@ -7,7 +7,7 @@ import SwiftyJSON
 public struct TaskList: Codable {
     public var tasks: [AssistantTask]
 
-    static func factory(from data: JSON) -> TaskList? {
+    static func deserialize(from data: JSON) -> TaskList? {
         let tasks = data.arrayValue.map { taskJson in
             AssistantTask(
                 id: taskJson["id"].int64Value,
@@ -58,7 +58,7 @@ public struct AssistantTask: Codable {
         self.endedAt = endedAt
     }
 
-    static func factory(from data: JSON) -> AssistantTask? {
+    static func deserialize(from data: JSON) -> AssistantTask? {
         let task = AssistantTask(
             id: data["id"].int64Value,
             type: data["type"].string,

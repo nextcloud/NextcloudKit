@@ -39,12 +39,12 @@ public class NKTextProcessingTask {
         self.completionExpectedAt = json["completionExpectedAt"].double
     }
 
-    static func factories(data: JSON) -> [NKTextProcessingTask]? {
+    static func deserialize(multipleObjects data: JSON) -> [NKTextProcessingTask]? {
         guard let allResults = data.array else { return nil }
         return allResults.compactMap(NKTextProcessingTask.init)
     }
 
-    static func factory(data: JSON) -> NKTextProcessingTask? {
+    static func deserialize(singleObject data: JSON) -> NKTextProcessingTask? {
         NKTextProcessingTask(json: data)
     }
 

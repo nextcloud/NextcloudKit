@@ -7,7 +7,7 @@ import SwiftyJSON
 public struct TaskTypes: Codable {
     public let types: [TaskTypeData]
 
-    static func factory(data: JSON) -> TaskTypes? {
+    static func deserialize(from data: JSON) -> TaskTypes? {
         var taskTypes: [TaskTypeData] = []
 
         for (key, subJson) in data {

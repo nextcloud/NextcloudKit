@@ -21,7 +21,7 @@ public class NKTextProcessingTaskType {
         self.description = json["description"].string
     }
 
-    static func factory(data: JSON) -> [NKTextProcessingTaskType]? {
+    static func deserialize(multipleObjects data: JSON) -> [NKTextProcessingTaskType]? {
         guard let allResults = data.array else { return nil }
         return allResults.compactMap(NKTextProcessingTaskType.init)
     }
