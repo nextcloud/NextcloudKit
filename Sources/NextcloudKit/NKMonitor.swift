@@ -29,6 +29,16 @@ final class NKMonitor: EventMonitor, Sendable {
         nkCommonInstance.delegate?.request(request, didParseResponse: response)
 
         //
+        // Server Error GroupDefaults
+        //
+        if let statusCode = response.response?.statusCode,
+           let headerCheckInterceptor = request.request?.allHTTPHeaderFields?[self.nkCommonInstance.headerCheckInterceptor],
+           headerCheckInterceptor.lowercased() == "true",
+           let account = request.request?.allHTTPHeaderFields?[self.nkCommonInstance.headerAccount] as? String {
+            self.nkCommonInstance.appendServerErrorAccount(account, errorCode: statusCode)
+        }
+
+        //
         // LOG
         //
         guard let date = self.nkCommonInstance.convertDate(Date(), format: "yyyy-MM-dd' 'HH:mm:ss") else { return }

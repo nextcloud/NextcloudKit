@@ -438,6 +438,40 @@ public struct NKCommon: Sendable {
         return completion(filesChunk)
     }
 
+    // MARK: - Server Error GroupDefaults
+
+    public func appendServerErrorAccount(_ account: String, errorCode: Int) {
+        guard let groupDefaults = UserDefaults(suiteName: groupIdentifier) else {
+            return
+        }
+
+        /// Unavailable
+        if errorCode == 503 {
+            var array = groupDefaults.array(forKey: NextcloudKit.shared.nkCommonInstance.groupDefaultsUnavailable) as? [String] ?? []
+
+            if !array.contains(account) {
+                array.append(account)
+                groupDefaults.set(array, forKey: NextcloudKit.shared.nkCommonInstance.groupDefaultsUnavailable)
+            }
+        /// Unauthorized
+        } else if errorCode == 401 {
+            var array = groupDefaults.array(forKey: NextcloudKit.shared.nkCommonInstance.groupDefaultsUnauthorized) as? [String] ?? []
+
+            if !array.contains(account) {
+                array.append(account)
+                groupDefaults.set(array, forKey: NextcloudKit.shared.nkCommonInstance.groupDefaultsUnauthorized)
+            }
+        /// ToS
+        } else if errorCode == 403 {
+            var array = groupDefaults.array(forKey: NextcloudKit.shared.nkCommonInstance.groupDefaultsToS) as? [String] ?? []
+
+            if !array.contains(account) {
+                array.append(account)
+                groupDefaults.set(array, forKey: NextcloudKit.shared.nkCommonInstance.groupDefaultsToS)
+            }
+        }
+    }
+
     // MARK: - Common
 
     public func getSession(account: String) -> NKSession? {

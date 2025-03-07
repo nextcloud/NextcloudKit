@@ -13,9 +13,6 @@ final class NKInterceptor: RequestInterceptor, Sendable {
     }
 
     func adapt(_ urlRequest: URLRequest, for session: Session, completion: @escaping (Result<URLRequest, Error>) -> Void) {
-        //
-        // Detect if exists in the groupDefaults Unauthorized array the account
-        //
         if let url: String = urlRequest.url?.absoluteString,
            self.nkCommonInstance.levelLog > 0 {
             debugPrint("[DEBUG] Interceptor request url: " + url)
