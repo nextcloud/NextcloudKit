@@ -21,18 +21,22 @@ public final class NKBackground: NSObject, URLSessionTaskDelegate, URLSessionDel
         var url: URL?
         let groupDefaults = UserDefaults(suiteName: NextcloudKit.shared.nkCommonInstance.groupIdentifier)
 
+        /// Check error in groupDefaults
+        if let array = groupDefaults?.array(forKey: NextcloudKit.shared.nkCommonInstance.groupDefaultsUnauthorized) as? [String],
+           array.contains(account) {
+            return (nil, .unauthorizedError)
+        } else if let array = groupDefaults?.array(forKey: NextcloudKit.shared.nkCommonInstance.groupDefaultsUnavailable) as? [String],
+                  array.contains(account) {
+            return (nil, .unavailableError)
+        } else if let array = groupDefaults?.array(forKey: NextcloudKit.shared.nkCommonInstance.groupDefaultsToS) as? [String],
+                  array.contains(account) {
+            return (nil, .forbiddenError)
+        }
+
         if serverUrlFileName is URL {
             url = serverUrlFileName as? URL
         } else if serverUrlFileName is String || serverUrlFileName is NSString {
             url = (serverUrlFileName as? String)?.encodedToUrl as? URL
-        }
-
-        if let unauthorizedArray = groupDefaults?.array(forKey: NextcloudKit.shared.nkCommonInstance.groupDefaultsUnauthorized) as? [String],
-           unauthorizedArray.contains(account) {
-            return (nil, .unauthorizedError)
-        } else if let tosArray = groupDefaults?.array(forKey: NextcloudKit.shared.nkCommonInstance.groupDefaultsToS) as? [String],
-                  tosArray.contains(account) {
-            return (nil, .forbiddenError)
         }
 
         guard let nkSession = nkCommonInstance.getSession(account: account),
@@ -74,18 +78,22 @@ public final class NKBackground: NSObject, URLSessionTaskDelegate, URLSessionDel
         var uploadSession: URLSession?
         let groupDefaults = UserDefaults(suiteName: NextcloudKit.shared.nkCommonInstance.groupIdentifier)
 
+        /// Check error in groupDefaults
+        if let array = groupDefaults?.array(forKey: NextcloudKit.shared.nkCommonInstance.groupDefaultsUnauthorized) as? [String],
+           array.contains(account) {
+            return (nil, .unauthorizedError)
+        } else if let array = groupDefaults?.array(forKey: NextcloudKit.shared.nkCommonInstance.groupDefaultsUnavailable) as? [String],
+                  array.contains(account) {
+            return (nil, .unavailableError)
+        } else if let array = groupDefaults?.array(forKey: NextcloudKit.shared.nkCommonInstance.groupDefaultsToS) as? [String],
+                  array.contains(account) {
+            return (nil, .forbiddenError)
+        }
+
         if serverUrlFileName is URL {
             url = serverUrlFileName as? URL
         } else if serverUrlFileName is String || serverUrlFileName is NSString {
             url = (serverUrlFileName as? String)?.encodedToUrl as? URL
-        }
-
-        if let unauthorizedArray = groupDefaults?.array(forKey: NextcloudKit.shared.nkCommonInstance.groupDefaultsUnauthorized) as? [String],
-           unauthorizedArray.contains(account) {
-            return (nil, .unauthorizedError)
-        } else if let tosArray = groupDefaults?.array(forKey: NextcloudKit.shared.nkCommonInstance.groupDefaultsToS) as? [String],
-                  tosArray.contains(account) {
-            return (nil, .forbiddenError)
         }
 
         guard let nkSession = nkCommonInstance.getSession(account: account),
