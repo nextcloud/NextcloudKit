@@ -74,7 +74,7 @@ public struct NKSession: Sendable {
                                         eventMonitors: [NKMonitor(nkCommonInstance: nkCommonInstance)])
 
         /// Session Download Background
-        let configurationDownloadBackground = URLSessionConfiguration.background(withIdentifier: NKCommon().identifierSessionDownloadBackground)
+        let configurationDownloadBackground = URLSessionConfiguration.background(withIdentifier: NKCommon().getSessionConfigurationIdentifier(NKCommon().identifierSessionDownloadBackground, account: account))
         configurationDownloadBackground.allowsCellularAccess = true
 
         if #available(macOS 11, *) {
@@ -93,7 +93,7 @@ public struct NKSession: Sendable {
         sessionDownloadBackground = URLSession(configuration: configurationDownloadBackground, delegate: backgroundSessionDelegate, delegateQueue: OperationQueue.main)
 
         /// Session Upload Background
-        let configurationUploadBackground = URLSessionConfiguration.background(withIdentifier: NKCommon().identifierSessionUploadBackground)
+        let configurationUploadBackground = URLSessionConfiguration.background(withIdentifier: NKCommon().getSessionConfigurationIdentifier(NKCommon().identifierSessionUploadBackground, account: account))
         configurationUploadBackground.allowsCellularAccess = true
 
         if #available(macOS 11, *) {
@@ -112,7 +112,7 @@ public struct NKSession: Sendable {
         sessionUploadBackground = URLSession(configuration: configurationUploadBackground, delegate: backgroundSessionDelegate, delegateQueue: OperationQueue.main)
 
         /// Session Upload Background WWan
-        let configurationUploadBackgroundWWan = URLSessionConfiguration.background(withIdentifier: NKCommon().identifierSessionUploadBackgroundWWan)
+        let configurationUploadBackgroundWWan = URLSessionConfiguration.background(withIdentifier: NKCommon().getSessionConfigurationIdentifier(NKCommon().identifierSessionUploadBackgroundWWan, account: account))
         configurationUploadBackgroundWWan.allowsCellularAccess = false
 
         if #available(macOS 11, *) {
