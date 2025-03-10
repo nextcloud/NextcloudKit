@@ -66,6 +66,12 @@ public struct NKCommon: Sendable {
 
     public let notificationCenterChunkedFileStop = NSNotification.Name(rawValue: "NextcloudKit.chunkedFile.stop")
 
+    public let headerAccount = "X-NC-Account"
+    public let headerCheckInterceptor = "X-NC-CheckInterceptor"
+    public let groupDefaultsUnauthorized = "Unauthorized"
+    public let groupDefaultsUnavailable = "Unavailable"
+    public let groupDefaultsToS = "ToS"
+
     public enum TypeReachability: Int {
         case unknown = 0
         case notReachable = 1
@@ -432,6 +438,40 @@ public struct NKCommon: Sendable {
         return completion(filesChunk)
     }
 
+    // MARK: - Server Error GroupDefaults
+
+    public func appendServerErrorAccount(_ account: String, errorCode: Int) {
+        guard let groupDefaults = UserDefaults(suiteName: groupIdentifier) else {
+            return
+        }
+
+        /// Unavailable
+        if errorCode == 503 {
+            var array = groupDefaults.array(forKey: NextcloudKit.shared.nkCommonInstance.groupDefaultsUnavailable) as? [String] ?? []
+
+            if !array.contains(account) {
+                array.append(account)
+                groupDefaults.set(array, forKey: NextcloudKit.shared.nkCommonInstance.groupDefaultsUnavailable)
+            }
+        /// Unauthorized
+        } else if errorCode == 401 {
+            var array = groupDefaults.array(forKey: NextcloudKit.shared.nkCommonInstance.groupDefaultsUnauthorized) as? [String] ?? []
+
+            if !array.contains(account) {
+                array.append(account)
+                groupDefaults.set(array, forKey: NextcloudKit.shared.nkCommonInstance.groupDefaultsUnauthorized)
+            }
+        /// ToS
+        } else if errorCode == 403 {
+            var array = groupDefaults.array(forKey: NextcloudKit.shared.nkCommonInstance.groupDefaultsToS) as? [String] ?? []
+
+            if !array.contains(account) {
+                array.append(account)
+                groupDefaults.set(array, forKey: NextcloudKit.shared.nkCommonInstance.groupDefaultsToS)
+            }
+        }
+    }
+
     // MARK: - Common
 
     public func getSession(account: String) -> NKSession? {
@@ -444,7 +484,7 @@ public struct NKCommon: Sendable {
         return session
     }
 
-    public func getStandardHeaders(account: String, checkUnauthorized: Bool? = nil, options: NKRequestOptions? = nil) -> HTTPHeaders? {
+    public func getStandardHeaders(account: String, options: NKRequestOptions? = nil) -> HTTPHeaders? {
         guard let session = nksessions.filter({ $0.account == account }).first else { return nil}
         var headers: HTTPHeaders = []
 
@@ -465,9 +505,9 @@ public struct NKCommon: Sendable {
         for (key, value) in options?.customHeader ?? [:] {
             headers.update(name: key, value: value)
         }
-        headers.update(name: "X-NC-Account", value: account)
-        if let checkUnauthorized {
-            headers.update(name: "X-NC-CheckUnauthorized", value: checkUnauthorized.description)
+        headers.update(name: headerAccount, value: account)
+        if let checkInterceptor = options?.checkInterceptor {
+            headers.update(name: headerCheckInterceptor, value: checkInterceptor.description)
         }
         // Paginate
         if let options {
