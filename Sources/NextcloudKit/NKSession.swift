@@ -126,7 +126,7 @@ public struct NKSession: Sendable {
         sessionUploadBackgroundWWan = URLSession(configuration: configurationUploadBackgroundWWan, delegate: backgroundSessionDelegate, delegateQueue: OperationQueue.main)
 
         /// Session Upload Background Extension
-        let configurationUploadBackgroundExt = URLSessionConfiguration.background(withIdentifier: NKCommon().getSessionConfigurationIdentifier(NKCommon().identifierSessionUploadBackgroundExt, account: account))
+        let configurationUploadBackgroundExt = URLSessionConfiguration.background(withIdentifier: NKCommon().identifierSessionUploadBackgroundExt + UUID().uuidString)
         configurationUploadBackgroundExt.allowsCellularAccess = true
 
         if #available(macOS 11, *) {
