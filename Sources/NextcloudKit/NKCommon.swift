@@ -51,8 +51,10 @@ public struct NKCommon: Sendable {
     public var delegate: NextcloudKitDelegate?
     public var groupIdentifier: String?
 
+    // Foreground
     public let identifierSessionDownload: String = "com.nextcloud.nextcloudkit.session.download"
     public let identifierSessionUpload: String = "com.nextcloud.nextcloudkit.session.upload"
+    // Background
     public let identifierSessionDownloadBackground: String = "com.nextcloud.session.downloadbackground"
     public let identifierSessionUploadBackground: String = "com.nextcloud.session.uploadbackground"
     public let identifierSessionUploadBackgroundWWan: String = "com.nextcloud.session.uploadbackgroundWWan"
@@ -473,6 +475,10 @@ public struct NKCommon: Sendable {
     }
 
     // MARK: - Common
+
+    public func getSessionConfigurationIdentifier(_ identifier: String, account: String) -> String {
+        return "\(identifier).\(account)"
+    }
 
     public func getSession(account: String) -> NKSession? {
         var session: NKSession?
