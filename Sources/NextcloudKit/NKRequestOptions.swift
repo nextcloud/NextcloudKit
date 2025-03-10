@@ -16,7 +16,7 @@ public class NKRequestOptions: NSObject {
     var taskDescription: String?
     var createProperties: [NKProperties]?
     var removeProperties: [NKProperties]
-    var checkUnauthorized: Bool?
+    var checkInterceptor: Bool
     var paginate: Bool
     var paginateToken: String?
     var paginateOffset: Int?
@@ -33,7 +33,7 @@ public class NKRequestOptions: NSObject {
                 taskDescription: String? = nil,
                 createProperties: [NKProperties]? = nil,
                 removeProperties: [NKProperties] = [],
-                checkUnauthorized: Bool? = nil,
+                checkInterceptor: Bool = true,
                 paginate: Bool = false,
                 paginateToken: String? = nil,
                 paginateOffset: Int? = nil,
@@ -50,7 +50,7 @@ public class NKRequestOptions: NSObject {
         self.taskDescription = taskDescription
         self.createProperties = createProperties
         self.removeProperties = removeProperties
-        self.checkUnauthorized = checkUnauthorized
+        self.checkInterceptor = checkInterceptor
         self.paginate = paginate
         self.paginateToken = paginateToken
         self.paginateOffset = paginateOffset

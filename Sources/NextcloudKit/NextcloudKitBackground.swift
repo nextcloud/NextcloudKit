@@ -17,9 +17,21 @@ public final class NKBackground: NSObject, URLSessionTaskDelegate, URLSessionDel
     public func download(serverUrlFileName: Any,
                          fileNameLocalPath: String,
                          taskDescription: String? = nil,
-                         account: String) -> URLSessionDownloadTask? {
+                         account: String) -> (URLSessionDownloadTask?, error: NKError) {
         var url: URL?
         let groupDefaults = UserDefaults(suiteName: NextcloudKit.shared.nkCommonInstance.groupIdentifier)
+
+        /// Check error in groupDefaults
+        if let array = groupDefaults?.array(forKey: NextcloudKit.shared.nkCommonInstance.groupDefaultsUnauthorized) as? [String],
+           array.contains(account) {
+            return (nil, .unauthorizedError)
+        } else if let array = groupDefaults?.array(forKey: NextcloudKit.shared.nkCommonInstance.groupDefaultsUnavailable) as? [String],
+                  array.contains(account) {
+            return (nil, .unavailableError)
+        } else if let array = groupDefaults?.array(forKey: NextcloudKit.shared.nkCommonInstance.groupDefaultsToS) as? [String],
+                  array.contains(account) {
+            return (nil, .forbiddenError)
+        }
 
         if serverUrlFileName is URL {
             url = serverUrlFileName as? URL
@@ -27,22 +39,17 @@ public final class NKBackground: NSObject, URLSessionTaskDelegate, URLSessionDel
             url = (serverUrlFileName as? String)?.encodedToUrl as? URL
         }
 
-        if let unauthorizedArray = groupDefaults?.array(forKey: "Unauthorized") as? [String],
-           unauthorizedArray.contains(account) {
-            return nil
-        }
-
         guard let nkSession = nkCommonInstance.getSession(account: account),
               let urlForRequest = url
         else {
-            return nil
+            return (nil, .urlError)
         }
         var request = URLRequest(url: urlForRequest)
         let loginString = "\(nkSession.user):\(nkSession.password)"
 
         guard let loginData = loginString.data(using: String.Encoding.utf8)
         else {
-            return nil
+            return (nil, .invalidData)
         }
         let base64LoginString = loginData.base64EncodedString()
 
@@ -54,7 +61,7 @@ public final class NKBackground: NSObject, URLSessionTaskDelegate, URLSessionDel
         task.resume()
         self.nkCommonInstance.writeLog("Network start download file: \(serverUrlFileName)")
 
-        return task
+        return (task, .success)
     }
 
     // MARK: - Upload
@@ -66,10 +73,22 @@ public final class NKBackground: NSObject, URLSessionTaskDelegate, URLSessionDel
                        taskDescription: String? = nil,
                        overwrite: Bool = false,
                        account: String,
-                       sessionIdentifier: String) -> URLSessionUploadTask? {
+                       sessionIdentifier: String) -> (URLSessionUploadTask?, error: NKError) {
         var url: URL?
         var uploadSession: URLSession?
         let groupDefaults = UserDefaults(suiteName: NextcloudKit.shared.nkCommonInstance.groupIdentifier)
+
+        /// Check error in groupDefaults
+        if let array = groupDefaults?.array(forKey: NextcloudKit.shared.nkCommonInstance.groupDefaultsUnauthorized) as? [String],
+           array.contains(account) {
+            return (nil, .unauthorizedError)
+        } else if let array = groupDefaults?.array(forKey: NextcloudKit.shared.nkCommonInstance.groupDefaultsUnavailable) as? [String],
+                  array.contains(account) {
+            return (nil, .unavailableError)
+        } else if let array = groupDefaults?.array(forKey: NextcloudKit.shared.nkCommonInstance.groupDefaultsToS) as? [String],
+                  array.contains(account) {
+            return (nil, .forbiddenError)
+        }
 
         if serverUrlFileName is URL {
             url = serverUrlFileName as? URL
@@ -77,21 +96,16 @@ public final class NKBackground: NSObject, URLSessionTaskDelegate, URLSessionDel
             url = (serverUrlFileName as? String)?.encodedToUrl as? URL
         }
 
-        if let unauthorizedArray = groupDefaults?.array(forKey: "Unauthorized") as? [String],
-           unauthorizedArray.contains(account) {
-            return nil
-        }
-
         guard let nkSession = nkCommonInstance.getSession(account: account),
               let urlForRequest = url
         else {
-            return nil
+            return (nil, .urlError)
         }
 
         var request = URLRequest(url: urlForRequest)
         let loginString = "\(nkSession.user):\(nkSession.password)"
         guard let loginData = loginString.data(using: String.Encoding.utf8) else {
-            return nil
+            return (nil, .invalidData)
         }
         let base64LoginString = loginData.base64EncodedString()
 
@@ -122,7 +136,8 @@ public final class NKBackground: NSObject, URLSessionTaskDelegate, URLSessionDel
         task?.taskDescription = taskDescription
         task?.resume()
         self.nkCommonInstance.writeLog("Network start upload file: \(serverUrlFileName)")
-        return task
+
+        return (task, .success)
     }
 
     // MARK: - SessionDelegate
