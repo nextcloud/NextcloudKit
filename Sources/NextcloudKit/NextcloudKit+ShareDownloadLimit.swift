@@ -12,6 +12,11 @@ public extension NextcloudKit {
     }
 
     func getDownloadLimit(account: String, token: String, completion: @escaping (NKDownloadLimit?, NKError) -> Void) {
+        guard token.isEmpty == false else {
+            self.nkCommonInstance.writeLog("[ERROR] Attempt to get share download limit with empty token!")
+            return
+        }
+
         let endpoint = makeEndpoint(with: token)
         let options = NKRequestOptions()
 
@@ -81,6 +86,11 @@ public extension NextcloudKit {
     }
 
     func removeShareDownloadLimit(account: String, token: String, completion: @escaping (_ error: NKError) -> Void) {
+        guard token.isEmpty == false else {
+            self.nkCommonInstance.writeLog("[ERROR] Attempt to remove share download limit with empty token!")
+            return
+        }
+
         let endpoint = makeEndpoint(with: token)
         let options = NKRequestOptions()
 
@@ -117,6 +127,11 @@ public extension NextcloudKit {
     }
 
     func setShareDownloadLimit(account: String, token: String, limit: Int, completion: @escaping (_ error: NKError) -> Void) {
+        guard token.isEmpty == false else {
+            self.nkCommonInstance.writeLog("[ERROR] Attempt to set share download limit with empty token!")
+            return
+        }
+        
         let endpoint = makeEndpoint(with: token)
         let options = NKRequestOptions()
         options.contentType = "application/json"
