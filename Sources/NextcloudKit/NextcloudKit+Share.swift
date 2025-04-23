@@ -347,7 +347,7 @@ public extension NextcloudKit {
                      password: String? = nil,
                      expireDate: String? = nil,
                      permissions: Int = 1,
-                     publicUpload: Bool = false,
+                     publicUpload: Bool? = nil,
                      note: String? = nil,
                      label: String? = nil,
                      hideDownload: Bool,
