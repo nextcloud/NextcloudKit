@@ -377,7 +377,9 @@ public extension NextcloudKit {
         if let label = label {
             parameters["label"] = label
         }
-        parameters["publicUpload"] = publicUpload ? "true" : "false"
+        if let publicUpload = publicUpload {
+            parameters["publicUpload"] = publicUpload ? "true" : "false"
+        }
         parameters["hideDownload"] = hideDownload ? "true" : "false"
         if let attributes = attributes {
             parameters["attributes"] = attributes
