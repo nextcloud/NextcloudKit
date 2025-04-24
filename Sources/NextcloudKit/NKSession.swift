@@ -17,7 +17,6 @@ public struct NKSession: Sendable {
     public let httpMaximumConnectionsPerHost: Int
     public let httpMaximumConnectionsPerHostInDownload: Int
     public let httpMaximumConnectionsPerHostInUpload: Int
-    public let requestCachePolicy: URLRequest.CachePolicy
     public let dav: String = "remote.php/dav"
     public var internalTypeIdentifiers: [NKCommon.UTTypeConformsToServer] = []
     public let sessionData: Alamofire.Session
@@ -38,8 +37,7 @@ public struct NKSession: Sendable {
          groupIdentifier: String,
          httpMaximumConnectionsPerHost: Int,
          httpMaximumConnectionsPerHostInDownload: Int,
-         httpMaximumConnectionsPerHostInUpload: Int,
-         requestCachePolicy: URLRequest.CachePolicy = .useProtocolCachePolicy) {
+         httpMaximumConnectionsPerHostInUpload: Int) {
         self.urlBase = urlBase
         self.user = user
         self.userId = userId
@@ -51,7 +49,6 @@ public struct NKSession: Sendable {
         self.httpMaximumConnectionsPerHost = httpMaximumConnectionsPerHost
         self.httpMaximumConnectionsPerHostInDownload = httpMaximumConnectionsPerHostInDownload
         self.httpMaximumConnectionsPerHostInUpload = httpMaximumConnectionsPerHostInUpload
-        self.requestCachePolicy = requestCachePolicy
 
         let backgroundSessionDelegate = NKBackground(nkCommonInstance: nkCommonInstance)
         /// Strange but works ?!?!
@@ -59,7 +56,7 @@ public struct NKSession: Sendable {
 
         /// SessionData Alamofire
         let configurationSessionData = URLSessionConfiguration.af.default
-        configurationSessionData.requestCachePolicy = requestCachePolicy
+        configurationSessionData.requestCachePolicy = .useProtocolCachePolicy
         configurationSessionData.httpMaximumConnectionsPerHost = httpMaximumConnectionsPerHost
 
         #if os(iOS) || targetEnvironment(macCatalyst)
@@ -96,7 +93,7 @@ public struct NKSession: Sendable {
 
         configurationDownloadBackground.isDiscretionary = false
         configurationDownloadBackground.httpMaximumConnectionsPerHost = self.httpMaximumConnectionsPerHostInDownload
-        configurationDownloadBackground.requestCachePolicy = requestCachePolicy
+        configurationDownloadBackground.requestCachePolicy = .useProtocolCachePolicy
 
         #if os(iOS) || targetEnvironment(macCatalyst)
             configurationDownloadBackground.multipathServiceType = .handover
@@ -115,7 +112,7 @@ public struct NKSession: Sendable {
 
         configurationUploadBackground.isDiscretionary = false
         configurationUploadBackground.httpMaximumConnectionsPerHost = self.httpMaximumConnectionsPerHostInUpload
-        configurationUploadBackground.requestCachePolicy = requestCachePolicy
+        configurationUploadBackground.requestCachePolicy = .useProtocolCachePolicy
 
         #if os(iOS) || targetEnvironment(macCatalyst)
             configurationUploadBackground.multipathServiceType = .handover
@@ -134,7 +131,7 @@ public struct NKSession: Sendable {
 
         configurationUploadBackgroundWWan.isDiscretionary = false
         configurationUploadBackgroundWWan.httpMaximumConnectionsPerHost = self.httpMaximumConnectionsPerHostInUpload
-        configurationUploadBackgroundWWan.requestCachePolicy = requestCachePolicy
+        configurationUploadBackgroundWWan.requestCachePolicy = .useProtocolCachePolicy
         configurationUploadBackgroundWWan.httpCookieStorage = HTTPCookieStorage.sharedCookieStorage(forGroupContainerIdentifier: sharedCookieStorage)
         sessionUploadBackgroundWWan = URLSession(configuration: configurationUploadBackgroundWWan, delegate: backgroundSessionDelegate, delegateQueue: OperationQueue.main)
 
@@ -148,7 +145,7 @@ public struct NKSession: Sendable {
 
         configurationUploadBackgroundExt.isDiscretionary = false
         configurationUploadBackgroundExt.httpMaximumConnectionsPerHost = self.httpMaximumConnectionsPerHostInUpload
-        configurationUploadBackgroundExt.requestCachePolicy = requestCachePolicy
+        configurationUploadBackgroundExt.requestCachePolicy = .useProtocolCachePolicy
         configurationUploadBackgroundExt.sharedContainerIdentifier = groupIdentifier
 
         #if os(iOS) || targetEnvironment(macCatalyst)
