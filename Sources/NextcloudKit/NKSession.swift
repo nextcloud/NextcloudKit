@@ -21,6 +21,7 @@ public struct NKSession: Sendable {
     public let dav: String = "remote.php/dav"
     public var internalTypeIdentifiers: [NKCommon.UTTypeConformsToServer] = []
     public let sessionData: Alamofire.Session
+    public let sessionDataNoCache: Alamofire.Session
     public let sessionDownloadBackground: URLSession
     public let sessionUploadBackground: URLSession
     public let sessionUploadBackgroundWWan: URLSession
@@ -56,22 +57,34 @@ public struct NKSession: Sendable {
         /// Strange but works ?!?!
         let sharedCookieStorage = user + "@" + urlBase
 
-        /// Session Alamofire
-        let configuration = URLSessionConfiguration.af.default
-        configuration.requestCachePolicy = requestCachePolicy
-        configuration.httpMaximumConnectionsPerHost = httpMaximumConnectionsPerHost
+        /// SessionData Alamofire
+        let configurationSessionData = URLSessionConfiguration.af.default
+        configurationSessionData.requestCachePolicy = requestCachePolicy
+        configurationSessionData.httpMaximumConnectionsPerHost = httpMaximumConnectionsPerHost
 
         #if os(iOS) || targetEnvironment(macCatalyst)
-            configuration.multipathServiceType = .handover
+        configurationSessionData.multipathServiceType = .handover
         #endif
 
-        configuration.httpCookieStorage = HTTPCookieStorage.sharedCookieStorage(forGroupContainerIdentifier: sharedCookieStorage)
-        sessionData = Alamofire.Session(configuration: configuration,
+        configurationSessionData.httpCookieStorage = HTTPCookieStorage.sharedCookieStorage(forGroupContainerIdentifier: sharedCookieStorage)
+        sessionData = Alamofire.Session(configuration: configurationSessionData,
                                         delegate: NextcloudKitSessionDelegate(nkCommonInstance: nkCommonInstance),
                                         rootQueue: nkCommonInstance.rootQueue,
                                         requestQueue: nkCommonInstance.requestQueue,
                                         serializationQueue: nkCommonInstance.serializationQueue,
                                         eventMonitors: [NKMonitor(nkCommonInstance: nkCommonInstance)])
+
+        /// SessionDataNoCache Alamofire
+        let configurationSessionDataNoCache = URLSessionConfiguration.af.default
+        configurationSessionDataNoCache.requestCachePolicy = .reloadIgnoringLocalAndRemoteCacheData
+        configurationSessionDataNoCache.httpMaximumConnectionsPerHost = httpMaximumConnectionsPerHost
+
+        sessionDataNoCache = Alamofire.Session(configuration: configurationSessionDataNoCache,
+                                               delegate: NextcloudKitSessionDelegate(nkCommonInstance: nkCommonInstance),
+                                               rootQueue: nkCommonInstance.rootQueue,
+                                               requestQueue: nkCommonInstance.requestQueue,
+                                               serializationQueue: nkCommonInstance.serializationQueue,
+                                               eventMonitors: [NKMonitor(nkCommonInstance: nkCommonInstance)])
 
         /// Session Download Background
         let configurationDownloadBackground = URLSessionConfiguration.background(withIdentifier: NKCommon().getSessionConfigurationIdentifier(NKCommon().identifierSessionDownloadBackground, account: account))
