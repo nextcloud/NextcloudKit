@@ -17,10 +17,10 @@ public struct NKSession: Sendable {
     public let httpMaximumConnectionsPerHost: Int
     public let httpMaximumConnectionsPerHostInDownload: Int
     public let httpMaximumConnectionsPerHostInUpload: Int
-    public let requestCachePolicy: URLRequest.CachePolicy
     public let dav: String = "remote.php/dav"
     public var internalTypeIdentifiers: [NKCommon.UTTypeConformsToServer] = []
     public let sessionData: Alamofire.Session
+    public let sessionDataNoCache: Alamofire.Session
     public let sessionDownloadBackground: URLSession
     public let sessionUploadBackground: URLSession
     public let sessionUploadBackgroundWWan: URLSession
@@ -37,8 +37,7 @@ public struct NKSession: Sendable {
          groupIdentifier: String,
          httpMaximumConnectionsPerHost: Int,
          httpMaximumConnectionsPerHostInDownload: Int,
-         httpMaximumConnectionsPerHostInUpload: Int,
-         requestCachePolicy: URLRequest.CachePolicy = .useProtocolCachePolicy) {
+         httpMaximumConnectionsPerHostInUpload: Int) {
         self.urlBase = urlBase
         self.user = user
         self.userId = userId
@@ -50,28 +49,39 @@ public struct NKSession: Sendable {
         self.httpMaximumConnectionsPerHost = httpMaximumConnectionsPerHost
         self.httpMaximumConnectionsPerHostInDownload = httpMaximumConnectionsPerHostInDownload
         self.httpMaximumConnectionsPerHostInUpload = httpMaximumConnectionsPerHostInUpload
-        self.requestCachePolicy = requestCachePolicy
 
         let backgroundSessionDelegate = NKBackground(nkCommonInstance: nkCommonInstance)
         /// Strange but works ?!?!
         let sharedCookieStorage = user + "@" + urlBase
 
-        /// Session Alamofire
-        let configuration = URLSessionConfiguration.af.default
-        configuration.requestCachePolicy = requestCachePolicy
-        configuration.httpMaximumConnectionsPerHost = httpMaximumConnectionsPerHost
+        /// SessionData Alamofire
+        let configurationSessionData = URLSessionConfiguration.af.default
+        configurationSessionData.requestCachePolicy = .useProtocolCachePolicy
+        configurationSessionData.httpMaximumConnectionsPerHost = httpMaximumConnectionsPerHost
 
         #if os(iOS) || targetEnvironment(macCatalyst)
-            configuration.multipathServiceType = .handover
+        configurationSessionData.multipathServiceType = .handover
         #endif
 
-        configuration.httpCookieStorage = HTTPCookieStorage.sharedCookieStorage(forGroupContainerIdentifier: sharedCookieStorage)
-        sessionData = Alamofire.Session(configuration: configuration,
+        configurationSessionData.httpCookieStorage = HTTPCookieStorage.sharedCookieStorage(forGroupContainerIdentifier: sharedCookieStorage)
+        sessionData = Alamofire.Session(configuration: configurationSessionData,
                                         delegate: NextcloudKitSessionDelegate(nkCommonInstance: nkCommonInstance),
                                         rootQueue: nkCommonInstance.rootQueue,
                                         requestQueue: nkCommonInstance.requestQueue,
                                         serializationQueue: nkCommonInstance.serializationQueue,
                                         eventMonitors: [NKMonitor(nkCommonInstance: nkCommonInstance)])
+
+        /// SessionDataNoCache Alamofire
+        let configurationSessionDataNoCache = URLSessionConfiguration.af.default
+        configurationSessionDataNoCache.requestCachePolicy = .reloadIgnoringLocalAndRemoteCacheData
+        configurationSessionDataNoCache.httpMaximumConnectionsPerHost = httpMaximumConnectionsPerHost
+
+        sessionDataNoCache = Alamofire.Session(configuration: configurationSessionDataNoCache,
+                                               delegate: NextcloudKitSessionDelegate(nkCommonInstance: nkCommonInstance),
+                                               rootQueue: nkCommonInstance.rootQueue,
+                                               requestQueue: nkCommonInstance.requestQueue,
+                                               serializationQueue: nkCommonInstance.serializationQueue,
+                                               eventMonitors: [NKMonitor(nkCommonInstance: nkCommonInstance)])
 
         /// Session Download Background
         let configurationDownloadBackground = URLSessionConfiguration.background(withIdentifier: NKCommon().getSessionConfigurationIdentifier(NKCommon().identifierSessionDownloadBackground, account: account))
@@ -83,7 +93,7 @@ public struct NKSession: Sendable {
 
         configurationDownloadBackground.isDiscretionary = false
         configurationDownloadBackground.httpMaximumConnectionsPerHost = self.httpMaximumConnectionsPerHostInDownload
-        configurationDownloadBackground.requestCachePolicy = requestCachePolicy
+        configurationDownloadBackground.requestCachePolicy = .useProtocolCachePolicy
 
         #if os(iOS) || targetEnvironment(macCatalyst)
             configurationDownloadBackground.multipathServiceType = .handover
@@ -102,7 +112,7 @@ public struct NKSession: Sendable {
 
         configurationUploadBackground.isDiscretionary = false
         configurationUploadBackground.httpMaximumConnectionsPerHost = self.httpMaximumConnectionsPerHostInUpload
-        configurationUploadBackground.requestCachePolicy = requestCachePolicy
+        configurationUploadBackground.requestCachePolicy = .useProtocolCachePolicy
 
         #if os(iOS) || targetEnvironment(macCatalyst)
             configurationUploadBackground.multipathServiceType = .handover
@@ -121,7 +131,7 @@ public struct NKSession: Sendable {
 
         configurationUploadBackgroundWWan.isDiscretionary = false
         configurationUploadBackgroundWWan.httpMaximumConnectionsPerHost = self.httpMaximumConnectionsPerHostInUpload
-        configurationUploadBackgroundWWan.requestCachePolicy = requestCachePolicy
+        configurationUploadBackgroundWWan.requestCachePolicy = .useProtocolCachePolicy
         configurationUploadBackgroundWWan.httpCookieStorage = HTTPCookieStorage.sharedCookieStorage(forGroupContainerIdentifier: sharedCookieStorage)
         sessionUploadBackgroundWWan = URLSession(configuration: configurationUploadBackgroundWWan, delegate: backgroundSessionDelegate, delegateQueue: OperationQueue.main)
 
@@ -135,7 +145,7 @@ public struct NKSession: Sendable {
 
         configurationUploadBackgroundExt.isDiscretionary = false
         configurationUploadBackgroundExt.httpMaximumConnectionsPerHost = self.httpMaximumConnectionsPerHostInUpload
-        configurationUploadBackgroundExt.requestCachePolicy = requestCachePolicy
+        configurationUploadBackgroundExt.requestCachePolicy = .useProtocolCachePolicy
         configurationUploadBackgroundExt.sharedContainerIdentifier = groupIdentifier
 
         #if os(iOS) || targetEnvironment(macCatalyst)
