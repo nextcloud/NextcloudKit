@@ -31,19 +31,11 @@ open class NextcloudKit {
                                  eventMonitors: [NKMonitor(nkCommonInstance: self.nkCommonInstance)])
     }()
 
-#if swift(<6.0)
-    init() {
-#if !os(watchOS)
-        startNetworkReachabilityObserver()
-#endif
-    }
-#else
     public init() {
 #if !os(watchOS)
         startNetworkReachabilityObserver()
 #endif
     }
-#endif
 
     deinit {
 #if !os(watchOS)
