@@ -347,7 +347,7 @@ public extension NextcloudKit {
                      password: String? = nil,
                      expireDate: String? = nil,
                      permissions: Int = 1,
-                     publicUpload: Bool = false,
+                     publicUpload: Bool? = nil,
                      note: String? = nil,
                      label: String? = nil,
                      hideDownload: Bool,
@@ -365,24 +365,26 @@ public extension NextcloudKit {
         var parameters = [
             "permissions": String(permissions)
         ]
-        if let password = password {
+        if let password, !password.isEmpty {
             parameters["password"] = password
         }
-        if let expireDate = expireDate {
+        if let expireDate, !expireDate.isEmpty {
             parameters["expireDate"] = expireDate
         }
-        if let note = note {
+        if let note, !note.isEmpty {
             parameters["note"] = note
         }
-        if let label = label {
+        if let label, !label.isEmpty {
             parameters["label"] = label
         }
-        parameters["publicUpload"] = publicUpload ? "true" : "false"
+
+        if let publicUpload {
+            parameters["publicUpload"] = publicUpload ? "true" : "false"
+        }
+
         parameters["hideDownload"] = hideDownload ? "true" : "false"
         if let attributes = attributes {
             parameters["attributes"] = attributes
-        } else {
-            parameters["attributes"] = "[]"
         }
 
         nkSession.sessionData.request(url, method: .put, parameters: parameters, encoding: URLEncoding.default, headers: headers, interceptor: NKInterceptor(nkCommonInstance: nkCommonInstance)).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
