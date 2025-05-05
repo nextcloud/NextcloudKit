@@ -452,6 +452,76 @@ public extension NextcloudKit {
 
     // MARK: -
 
+    func getUserMetadata(account: String,
+                         userId: String,
+                         options: NKRequestOptions = NKRequestOptions(),
+                         taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
+                         completion: @escaping (_ account: String, _ userProfile: NKUserProfile?, _ responseData: AFDataResponse<Data>?, _ error: NKError) -> Void) {
+        let endpoint = "ocs/v2.php/cloud/user/\(userId)"
+        guard let nkSession = nkCommonInstance.getSession(account: account),
+              let url = nkCommonInstance.createStandardUrl(serverUrl: nkSession.urlBase, endpoint: endpoint, options: options),
+              let headers = nkCommonInstance.getStandardHeaders(account: account, options: options) else {
+            return options.queue.async { completion(account, nil, nil, .urlError) }
+        }
+
+        nkSession.sessionDataNoCache.request(url, method: .get, encoding: URLEncoding.default, headers: headers, interceptor: NKInterceptor(nkCommonInstance: nkCommonInstance)).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
+            task.taskDescription = options.taskDescription
+            taskHandler(task)
+        }.responseData(queue: self.nkCommonInstance.backgroundQueue) { response in
+            if self.nkCommonInstance.levelLog > 0 {
+                debugPrint(response)
+            }
+            switch response.result {
+            case .failure(let error):
+                let error = NKError(error: error, afResponse: response, responseData: response.data)
+                options.queue.async { completion(account, nil, response, error) }
+            case .success(let jsonData):
+                let json = JSON(jsonData)
+                let ocs = json["ocs"]
+                let data = ocs["data"]
+
+                if json["ocs"]["meta"]["statuscode"].int == 200 {
+                    let userProfile = NKUserProfile()
+                    userProfile.address = data["address"].stringValue
+                    userProfile.backend = data["backend"].stringValue
+                    userProfile.backendCapabilitiesSetDisplayName = data["backendCapabilities"]["setDisplayName"].boolValue
+                    userProfile.backendCapabilitiesSetPassword = data["backendCapabilities"]["setPassword"].boolValue
+                    userProfile.displayName = data["display-name"].stringValue
+                    userProfile.email = data["email"].stringValue
+                    userProfile.enabled = data["enabled"].boolValue
+                    if let groups = data["groups"].array {
+                        for group in groups {
+                            userProfile.groups.append(group.stringValue)
+                        }
+                    }
+                    userProfile.userId = data["id"].stringValue
+                    userProfile.language = data["language"].stringValue
+                    userProfile.lastLogin = data["lastLogin"].int64Value
+                    userProfile.locale = data["locale"].stringValue
+                    userProfile.organisation = data["organisation"].stringValue
+                    userProfile.phone = data["phone"].stringValue
+                    userProfile.quotaFree = data["quota"]["free"].int64Value
+                    userProfile.quota = data["quota"]["quota"].int64Value
+                    userProfile.quotaRelative = data["quota"]["relative"].doubleValue
+                    userProfile.quotaTotal = data["quota"]["total"].int64Value
+                    userProfile.quotaUsed = data["quota"]["used"].int64Value
+                    userProfile.storageLocation = data["storageLocation"].stringValue
+                    if let subadmins = data["subadmin"].array {
+                        for subadmin in subadmins {
+                            userProfile.subadmin.append(subadmin.stringValue)
+                        }
+                    }
+                    userProfile.twitter = data["twitter"].stringValue
+                    userProfile.website = data["website"].stringValue
+
+                    options.queue.async { completion(account, userProfile, response, .success) }
+                } else {
+                    options.queue.async { completion(account, nil, response, NKError(rootJson: json, fallbackStatusCode: response.response?.statusCode)) }
+                }
+            }
+        }
+    }
+
     func getUserProfile(account: String,
                         options: NKRequestOptions = NKRequestOptions(),
                         taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
