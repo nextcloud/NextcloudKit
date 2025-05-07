@@ -20,7 +20,7 @@ public extension NextcloudKit {
             return options.queue.async { completion(nil, nil, .urlError) }
         }
         var headers: HTTPHeaders = [.authorization(username: user, password: password)]
-        if let userAgent = userAgent {
+        if let userAgent {
             headers.update(.userAgent(userAgent))
         }
         headers.update(name: "OCS-APIRequest", value: "true")
@@ -68,7 +68,7 @@ public extension NextcloudKit {
             return options.queue.async { completion(nil, .urlError) }
         }
         var headers: HTTPHeaders = [.authorization(username: username, password: password)]
-        if let userAgent = userAgent {
+        if let userAgent {
             headers.update(.userAgent(userAgent))
         }
         headers.update(name: "OCS-APIRequest", value: "true")
@@ -107,9 +107,10 @@ public extension NextcloudKit {
         guard let url = nkCommonInstance.createStandardUrl(serverUrl: serverUrl, endpoint: endpoint, options: options) else {
             return options.queue.async { completion(nil, nil, nil, nil, .urlError) }
         }
-        var headers: HTTPHeaders?
+
+        var headers: HTTPHeaders = [.contentType("application/json")]
         if let userAgent = options.customUserAgent {
-            headers = [HTTPHeader.userAgent(userAgent)]
+            headers.update(.userAgent(userAgent))
         }
 
         unauthorizedSession.request(url, method: .post, encoding: URLEncoding.default, headers: headers).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
@@ -144,9 +145,10 @@ public extension NextcloudKit {
         guard let url = serverUrl.asUrl else {
             return options.queue.async { completion(nil, nil, nil, nil, .urlError) }
         }
-        var headers: HTTPHeaders?
+
+        var headers: HTTPHeaders = [.contentType("application/json")]
         if let userAgent = options.customUserAgent {
-            headers = [HTTPHeader.userAgent(userAgent)]
+            headers.update(.userAgent(userAgent))
         }
 
         unauthorizedSession.request(url, method: .post, encoding: URLEncoding.default, headers: headers).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
