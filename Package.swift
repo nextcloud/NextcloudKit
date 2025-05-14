@@ -11,7 +11,7 @@ let package = Package(
     name: "NextcloudKit",
     platforms: [
         .macOS(.v10_15),
-        .iOS(.v12),
+        .iOS(.v13),
         .tvOS(.v13),
         .watchOS(.v6),
         .visionOS(.v1)
