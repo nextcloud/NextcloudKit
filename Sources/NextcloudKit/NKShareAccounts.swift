@@ -6,11 +6,33 @@ import Foundation
 #if os(iOS)
 import UIKit
 
+///
+/// Facility to read and write partial account information shared among apps of the same security group.
+/// This is the foundation for the quick account selection feature on login.
+///
 public class NKShareAccounts: NSObject {
-    public class DataAccounts: NSObject {
+    ///
+    /// Data transfer object to pass between ``NKShareAccounts`` and calling code.
+    ///
+    public class DataAccounts: NSObject, Identifiable {
+        ///
+        /// The server address of the account.
+        ///
         public var url: String
+
+        ///
+        /// The login name for the account.
+        ///
         public var user: String
+
+        ///
+        /// The display name of the account.
+        ///
         public var name: String?
+
+        ///
+        /// The ccount profile picture.
+        ///
         public var image: UIImage?
 
         public init(withUrl url: String, user: String, name: String? = nil, image: UIImage? = nil) {
@@ -34,6 +56,9 @@ public class NKShareAccounts: NSObject {
     internal let fileName: String = "accounts.json"
     internal let directoryAccounts: String = "Library/Application Support/NextcloudAccounts"
 
+    ///
+    /// Store shared account information in the app group container.
+    ///
     /// - Parameters:
     ///     - directory: the group directory of share the accounts (group.com.nextcloud.apps), use the  func containerURL(forSecurityApplicationGroupIdentifier groupIdentifier: String) -> URL? // Available for OS X in 10.8.3.
     ///     - app: the name of app
@@ -81,6 +106,9 @@ public class NKShareAccounts: NSObject {
         return nil
     }
 
+    ///
+    /// Read the shared account information from the app group container.
+    ///
     /// - Parameters:
     ///     - directory: the group directory of share the accounts (group.com.nextcloud.apps), use the  func containerURL(forSecurityApplicationGroupIdentifier groupIdentifier: String) -> URL? // Available for OS X in 10.8.3.
     ///     - application: the UIApplication used for verify if the app(s) is still installed
