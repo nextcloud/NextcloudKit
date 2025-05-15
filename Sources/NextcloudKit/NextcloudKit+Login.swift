@@ -99,6 +99,39 @@ public extension NextcloudKit {
 
     // MARK: - Login Flow V2
 
+    ///
+    /// Requests the initiation of a login process and retrieves required information.
+    ///
+    /// - Returns: A tuple consisting of the `endpoint` to poll for the login status with the `token`. Additionally, the `login` to open for the user to log in.
+    ///
+    func getLoginFlowV2(serverUrl: String, options: NKRequestOptions = NKRequestOptions(), taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in }) async throws -> (endpoint: URL, login: URL, token: String) {
+        try await withCheckedThrowingContinuation { continuation in
+            getLoginFlowV2(serverUrl: serverUrl, options: options, taskHandler: taskHandler) { token, endpointString, loginString, _, error in
+                if error != .success {
+                    continuation.resume(throwing: error)
+                    return
+                }
+
+                guard let endpointString, let endpointURL = URL(string: endpointString) else {
+                    continuation.resume(throwing: NKError.urlError)
+                    return
+                }
+
+                guard let loginString, let loginURL = URL(string: loginString) else {
+                    continuation.resume(throwing: NKError.urlError)
+                    return
+                }
+
+                guard let token else {
+                    continuation.resume(throwing: NKError.invalidData)
+                    return
+                }
+
+                continuation.resume(returning: (endpointURL, loginURL, token))
+            }
+        }
+    }
+
     func getLoginFlowV2(serverUrl: String,
                         options: NKRequestOptions = NKRequestOptions(),
                         taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },

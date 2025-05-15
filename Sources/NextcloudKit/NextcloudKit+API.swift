@@ -151,6 +151,17 @@ public extension NextcloudKit {
         case failure(NKError)
     }
 
+    ///
+    /// Asynchronous method wrapper for ``getServerStatus(serverUrl:options:taskHandler:completion:)``.
+    ///
+    func getServerStatus(serverUrl: String, options: NKRequestOptions = NKRequestOptions(), taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in }) async -> ServerInfoResult {
+        await withCheckedContinuation { continuation in
+            getServerStatus(serverUrl: serverUrl, options: options, taskHandler: taskHandler) { _, serverInfoResult in
+                continuation.resume(returning: serverInfoResult)
+            }
+        }
+    }
+
     func getServerStatus(serverUrl: String,
                          options: NKRequestOptions = NKRequestOptions(),
                          taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
