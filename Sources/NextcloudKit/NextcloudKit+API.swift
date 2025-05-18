@@ -506,8 +506,27 @@ public extension NextcloudKit {
 
         nkSession.sessionDataNoCache.request(url, method: .get, encoding: URLEncoding.default, headers: headers, interceptor: NKInterceptor(nkCommonInstance: nkCommonInstance)).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
             task.taskDescription = options.taskDescription
+
+            if let url = task.currentRequest?.url,
+               let cookies = HTTPCookieStorage.shared.cookies(for: url) {
+                print("🍪 Cookies for \(url):")
+                for cookie in cookies {
+                    print("- \(cookie.name): \(cookie.value)")
+                }
+            }
+
             taskHandler(task)
         }.responseData(queue: self.nkCommonInstance.backgroundQueue) { response in
+
+            if let httpResponse = response.response,
+               let url = httpResponse.url,
+               let cookies = HTTPCookieStorage.shared.cookies(for: url) {
+                print("🍪 Cookies from response for \(url):")
+                for cookie in cookies {
+                    print("- \(cookie.name): \(cookie.value)")
+                }
+            }
+
             if self.nkCommonInstance.levelLog > 0 {
                 debugPrint(response)
             }
