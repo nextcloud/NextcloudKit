@@ -75,6 +75,7 @@ public struct NKSession: Sendable {
         let configurationSessionDataNoCache = URLSessionConfiguration.af.default
         configurationSessionDataNoCache.requestCachePolicy = .reloadIgnoringLocalAndRemoteCacheData
         configurationSessionDataNoCache.httpMaximumConnectionsPerHost = httpMaximumConnectionsPerHost
+        configurationSessionDataNoCache.httpCookieStorage = HTTPCookieStorage.sharedCookieStorage(forGroupContainerIdentifier: sharedCookieStorage)
 
         sessionDataNoCache = Alamofire.Session(configuration: configurationSessionDataNoCache,
                                                delegate: NextcloudKitSessionDelegate(nkCommonInstance: nkCommonInstance),
