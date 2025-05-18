@@ -504,6 +504,16 @@ public extension NextcloudKit {
             return options.queue.async { completion(account, nil, nil, .urlError) }
         }
 
+        if let url = URL(string: nkSession.urlBase) {
+            let cookieStorage = HTTPCookieStorage.shared
+            if let cookies = cookieStorage.cookies(for: url) {
+                for cookie in cookies {
+                    cookieStorage.deleteCookie(cookie)
+                }
+                print("🧹 Cookie cancellati per: \(url)")
+            }
+        }
+
         nkSession.sessionDataNoCache.request(url, method: .get, encoding: URLEncoding.default, headers: headers, interceptor: NKInterceptor(nkCommonInstance: nkCommonInstance)).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
             task.taskDescription = options.taskDescription
 
