@@ -6,22 +6,22 @@
 import Foundation
 
 public class NKRequestOptions: NSObject {
-    var endpoint: String?
-    var version: String?
-    var customHeader: [String: String]?
-    var customUserAgent: String?
-    var contentType: String?
-    var e2eToken: String?
-    var timeout: TimeInterval
-    var taskDescription: String?
-    var createProperties: [NKProperties]?
-    var removeProperties: [NKProperties]
-    var checkInterceptor: Bool
-    var paginate: Bool
-    var paginateToken: String?
-    var paginateOffset: Int?
-    var paginateCount: Int?
-    var queue: DispatchQueue
+    public let endpoint: String?
+    public let version: String?
+    internal(set) public var customHeader: [String: String]?
+    public let customUserAgent: String?
+    internal(set) public var contentType: String?
+    public let e2eToken: String?
+    internal(set) public var timeout: TimeInterval
+    public let taskDescription: String?
+    public let createProperties: [NKProperties]?
+    public let removeProperties: [NKProperties]
+    public let checkInterceptor: Bool
+    public let paginate: Bool
+    public let paginateToken: String?
+    public let paginateOffset: Int?
+    public let paginateCount: Int?
+    public let queue: DispatchQueue
 
     public init(endpoint: String? = nil,
                 version: String? = nil,
