@@ -32,7 +32,7 @@ extension OCSPath {
     static var ocsXMLMsg: Self { ["d:error", "s:message"] }
 }
 
-public struct NKError: Sendable, Equatable {
+public struct NKError: Error, Equatable {
     static let internalError = -9999
     // Chunk error
     public static let chunkNoEnoughMemory = -9998
