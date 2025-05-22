@@ -7,10 +7,10 @@ import Alamofire
 import SwiftyJSON
 
 public extension NextcloudKit {
-    func NCTextObtainEditorDetails(account: String,
-                                   options: NKRequestOptions = NKRequestOptions(),
-                                   taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-                                   completion: @escaping (_ account: String, _  editors: [NKEditorDetailsEditors], _ creators: [NKEditorDetailsCreators], _ responseData: AFDataResponse<Data>?, _ error: NKError) -> Void) {
+    func textObtainEditorDetails(account: String,
+                                 options: NKRequestOptions = NKRequestOptions(),
+                                 taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
+                                 completion: @escaping (_ account: String, _  editors: [NKEditorDetailsEditors], _ creators: [NKEditorDetailsCreators], _ responseData: AFDataResponse<Data>?, _ error: NKError) -> Void) {
         let endpoint = "ocs/v2.php/apps/files/api/v1/directEditing"
         var editors: [NKEditorDetailsEditors] = []
         var creators: [NKEditorDetailsCreators] = []
@@ -70,13 +70,13 @@ public extension NextcloudKit {
         }
     }
 
-    func NCTextOpenFile(fileNamePath: String,
-                        fileId: String? = nil,
-                        editor: String,
-                        account: String,
-                        options: NKRequestOptions = NKRequestOptions(),
-                        taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-                        completion: @escaping (_ account: String, _  url: String?, _ responseData: AFDataResponse<Data>?, _ error: NKError) -> Void) {
+    func textOpenFile(fileNamePath: String,
+                      fileId: String? = nil,
+                      editor: String,
+                      account: String,
+                      options: NKRequestOptions = NKRequestOptions(),
+                      taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
+                      completion: @escaping (_ account: String, _  url: String?, _ responseData: AFDataResponse<Data>?, _ error: NKError) -> Void) {
         guard let fileNamePath = fileNamePath.urlEncoded else {
             return options.queue.async { completion(account, nil, nil, .urlError) }
         }
@@ -109,10 +109,10 @@ public extension NextcloudKit {
         }
     }
 
-    func NCTextGetListOfTemplates(account: String,
-                                  options: NKRequestOptions = NKRequestOptions(),
-                                  taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-                                  completion: @escaping (_ account: String, _ templates: [NKEditorTemplates]?, _ responseData: AFDataResponse<Data>?, _ error: NKError) -> Void) {
+    func textGetListOfTemplates(account: String,
+                                options: NKRequestOptions = NKRequestOptions(),
+                                taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
+                                completion: @escaping (_ account: String, _ templates: [NKEditorTemplates]?, _ responseData: AFDataResponse<Data>?, _ error: NKError) -> Void) {
         let endpoint = "ocs/v2.php/apps/files/api/v1/directEditing/templates/text/textdocumenttemplate"
         var templates: [NKEditorTemplates] = []
         guard let nkSession = nkCommonInstance.getSession(account: account),
@@ -151,14 +151,22 @@ public extension NextcloudKit {
         }
     }
 
-    func NCTextCreateFile(fileNamePath: String,
-                          editorId: String,
-                          creatorId: String,
-                          templateId: String,
-                          account: String,
-                          options: NKRequestOptions = NKRequestOptions(),
-                          taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-                          completion: @escaping (_ account: String, _ url: String?, _ responseData: AFDataResponse<Data>?, _ error: NKError) -> Void) {
+    func textGetListOfTemplates(account: String, options: NKRequestOptions = NKRequestOptions()) async -> (account: String, templates: [NKEditorTemplates]?, responseData: AFDataResponse<Data>?, error: NKError) {
+        await withUnsafeContinuation({ continuation in
+            textGetListOfTemplates(account: account) { account, templates, responseData, error in
+                continuation.resume(returning: (account: account, templates: templates, responseData: responseData, error: error))
+            }
+        })
+    }
+
+    func textCreateFile(fileNamePath: String,
+                        editorId: String,
+                        creatorId: String,
+                        templateId: String,
+                        account: String,
+                        options: NKRequestOptions = NKRequestOptions(),
+                        taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
+                        completion: @escaping (_ account: String, _ url: String?, _ responseData: AFDataResponse<Data>?, _ error: NKError) -> Void) {
         guard let fileNamePath = fileNamePath.urlEncoded else {
             return options.queue.async { completion(account, nil, nil, .urlError) }
         }
