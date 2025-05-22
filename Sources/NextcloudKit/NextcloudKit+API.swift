@@ -205,6 +205,15 @@ public extension NextcloudKit {
         }
     }
 
+    func getServerStatus(serverUrl: String,
+                         options: NKRequestOptions = NKRequestOptions()) async -> NextcloudKit.ServerInfoResult {
+        await withUnsafeContinuation({ continuation in
+            NextcloudKit.shared.getServerStatus(serverUrl: serverUrl) { _, serverInfoResult in
+                continuation.resume(returning: serverInfoResult)
+            }
+        })
+    }
+
     // MARK: -
 
     func downloadPreview(url: URL,
@@ -238,6 +247,16 @@ public extension NextcloudKit {
                 options.queue.async { completion(account, response, .success) }
             }
         }
+    }
+
+    func downloadPreview(url: URL,
+                         account: String,
+                         options: NKRequestOptions = NKRequestOptions()) async -> (account: String, responseData: AFDataResponse<Data?>?, error: NKError) {
+        await withUnsafeContinuation({ continuation in
+            NextcloudKit.shared.downloadPreview(url: url, account: account, options: options) { account, responseData, error in
+                continuation.resume(returning: (account: account, responseData: responseData, error: error))
+            }
+        })
     }
 
     func downloadPreview(fileId: String,
@@ -280,6 +299,17 @@ public extension NextcloudKit {
                 options.queue.async { completion(account, width, height, etag, response, .success) }
             }
         }
+    }
+
+    func downloadPreview(fileId: String,
+                         etag: String? = nil,
+                         account: String,
+                         options: NKRequestOptions = NKRequestOptions()) async -> (account: String, width: Int, height: Int, etag: String?, responseData: AFDataResponse<Data?>?, error: NKError) {
+        await withUnsafeContinuation({ continuation in
+            NextcloudKit.shared.downloadPreview(fileId: fileId, etag: etag, account: account, options: options) { account, width, height, etag, responseData, error in
+                continuation.resume(returning: (account: account, width: width, height: height, etag: etag, responseData: responseData, error: error))
+            }
+        })
     }
 
     func downloadTrashPreview(fileId: String,
@@ -488,6 +518,16 @@ public extension NextcloudKit {
                 }
             }
         }
+    }
+
+    func getUserMetadata(account: String,
+                         userId: String,
+                         options: NKRequestOptions = NKRequestOptions()) async -> (account: String, userProfile: NKUserProfile?, responseData: AFDataResponse<Data>?, error: NKError) {
+        await withUnsafeContinuation({ continuation in
+            NextcloudKit.shared.getUserMetadata(account: account, userId: userId) { account, userProfile, responseData, error in
+                continuation.resume(returning: (account: account, userProfile: userProfile, responseData: responseData, error: error))
+            }
+        })
     }
 
     func getUserProfile(account: String,

@@ -52,6 +52,16 @@ public extension NextcloudKit {
         }
     }
 
+    func createFolder(serverUrlFileName: String,
+                      account: String,
+                      options: NKRequestOptions = NKRequestOptions()) async -> (account: String, ocId: String?, date: Date?, responseData: AFDataResponse<Data?>?, error: NKError) {
+        await withUnsafeContinuation({ continuation in
+            NextcloudKit.shared.createFolder(serverUrlFileName: serverUrlFileName, account: account, options: options) { account, ocId, date, responseData, error in
+                continuation.resume(returning: (account: account, ocId: ocId, date: date, responseData: responseData, error: error))
+            }
+        })
+    }
+
     func deleteFileOrFolder(serverUrlFileName: String,
                             account: String,
                             options: NKRequestOptions = NKRequestOptions(),
@@ -85,6 +95,16 @@ public extension NextcloudKit {
                 options.queue.async { completion(account, response, .success) }
             }
         }
+    }
+
+    func deleteFileOrFolder(serverUrlFileName: String,
+                            account: String,
+                            options: NKRequestOptions = NKRequestOptions()) async -> (account: String, responseData: AFDataResponse<Data?>?, error: NKError) {
+        await withUnsafeContinuation({ continuation in
+            NextcloudKit.shared.deleteFileOrFolder(serverUrlFileName: serverUrlFileName, account: account, options: options) { account, responseData, error in
+                continuation.resume(returning: (account: account, responseData: responseData, error: error))
+            }
+        })
     }
 
     func moveFileOrFolder(serverUrlFileNameSource: String,
@@ -131,6 +151,18 @@ public extension NextcloudKit {
         }
     }
 
+    func moveFileOrFolder(serverUrlFileNameSource: String,
+                          serverUrlFileNameDestination: String,
+                          overwrite: Bool,
+                          account: String,
+                          options: NKRequestOptions = NKRequestOptions()) async -> (account: String, responseData: AFDataResponse<Data?>?, error: NKError) {
+        await withUnsafeContinuation({ continuation in
+            NextcloudKit.shared.moveFileOrFolder(serverUrlFileNameSource: serverUrlFileNameSource, serverUrlFileNameDestination: serverUrlFileNameDestination, overwrite: overwrite, account: account, options: options) { account, responseData, error in
+                continuation.resume(returning: (account: account, responseData: responseData, error: error))
+            }
+        })
+    }
+
     func copyFileOrFolder(serverUrlFileNameSource: String,
                           serverUrlFileNameDestination: String,
                           overwrite: Bool,
@@ -174,6 +206,18 @@ public extension NextcloudKit {
                 options.queue.async { completion(account, response, .success) }
             }
         }
+    }
+
+    func copyFileOrFolder(serverUrlFileNameSource: String,
+                          serverUrlFileNameDestination: String,
+                          overwrite: Bool,
+                          account: String,
+                          options: NKRequestOptions = NKRequestOptions()) async -> (account: String, responseData: AFDataResponse<Data?>?, error: NKError) {
+        await withUnsafeContinuation({ continuation in
+            NextcloudKit.shared.copyFileOrFolder(serverUrlFileNameSource: serverUrlFileNameSource, serverUrlFileNameDestination: serverUrlFileNameDestination, overwrite: overwrite, account: account, options: options) { account, responseData, error in
+                continuation.resume(returning: (account: account, responseData: responseData, error: error))
+            }
+        })
     }
 
     func readFileOrFolder(serverUrlFileName: String,
@@ -236,6 +280,19 @@ public extension NextcloudKit {
                 }
             }
         }
+    }
+
+    func readFileOrFolder(serverUrlFileName: String,
+                          depth: String,
+                          showHiddenFiles: Bool = true,
+                          requestBody: Data? = nil,
+                          account: String,
+                          options: NKRequestOptions = NKRequestOptions()) async -> (account: String, files: [NKFile]?, responseData: AFDataResponse<Data>?, error: NKError) {
+        await withUnsafeContinuation({ continuation in
+            NextcloudKit.shared.readFileOrFolder(serverUrlFileName: serverUrlFileName, depth: depth, showHiddenFiles: showHiddenFiles, requestBody: requestBody, account: account, options: options) { account, files, responseData, error in
+                continuation.resume(returning: (account: account, files: files, responseData: responseData, error: error))
+            }
+        })
     }
 
     func getFileFromFileId(fileId: String? = nil,
@@ -443,6 +500,17 @@ public extension NextcloudKit {
                 options.queue.async { completion(account, response, .success) }
             }
         }
+    }
+
+    func setFavorite(fileName: String,
+                     favorite: Bool,
+                     account: String,
+                     options: NKRequestOptions = NKRequestOptions()) async -> NKError {
+        await withUnsafeContinuation({ continuation in
+            NextcloudKit.shared.setFavorite(fileName: fileName, favorite: favorite, account: account) { _, _, error in
+                continuation.resume(returning: error)
+            }
+        })
     }
 
     func listingFavorites(showHiddenFiles: Bool,
