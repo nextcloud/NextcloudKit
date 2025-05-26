@@ -8,12 +8,12 @@ name: SwiftLint
 on:
   push:
     branches:
-      - master
+      - main
       - develop
   pull_request:
     types: [synchronize, opened, reopened, ready_for_review]
     branches:
-      - master
+      - main
       - develop
 
 jobs:
