@@ -48,10 +48,10 @@ public extension NextcloudKit {
         }
     }
 
-    func markE2EEFolder(fileId: String,
-                        delete: Bool,
-                        account: String,
-                        options: NKRequestOptions = NKRequestOptions()) async -> (account: String, responseData: AFDataResponse<Data>?, error: NKError) {
+    func markE2EEFolderAsync(fileId: String,
+                             delete: Bool,
+                             account: String,
+                             options: NKRequestOptions = NKRequestOptions()) async -> (account: String, responseData: AFDataResponse<Data>?, error: NKError) {
         await withUnsafeContinuation({ continuation in
             NextcloudKit.shared.markE2EEFolder(fileId: fileId, delete: delete, account: account, options: options) { account, responseData, error in
                 continuation.resume(returning: (account: account, responseData: responseData, error: error))
@@ -112,12 +112,12 @@ public extension NextcloudKit {
         }
     }
 
-    func lockE2EEFolder(fileId: String,
-                        e2eToken: String?,
-                        e2eCounter: String?,
-                        method: String,
-                        account: String,
-                        options: NKRequestOptions = NKRequestOptions()) async -> (account: String, e2eToken: String?, responseData: AFDataResponse<Data>?, error: NKError) {
+    func lockE2EEFolderAsync(fileId: String,
+                             e2eToken: String?,
+                             e2eCounter: String?,
+                             method: String,
+                             account: String,
+                             options: NKRequestOptions = NKRequestOptions()) async -> (account: String, e2eToken: String?, responseData: AFDataResponse<Data>?, error: NKError) {
         await withUnsafeContinuation({ continuation in
             NextcloudKit.shared.lockE2EEFolder(fileId: fileId, e2eToken: e2eToken, e2eCounter: e2eCounter, method: method, account: account, options: options) { account, e2eToken, responseData, error in
                 continuation.resume(returning: (account: account, e2eToken: e2eToken, responseData: responseData, error: error))
@@ -226,13 +226,13 @@ public extension NextcloudKit {
         }
     }
 
-    func putE2EEMetadata(fileId: String,
-                         e2eToken: String,
-                         e2eMetadata: String?,
-                         signature: String?,
-                         method: String,
-                         account: String,
-                         options: NKRequestOptions = NKRequestOptions()) async -> (account: String, metadata: String?, responseData: AFDataResponse<Data>?, error: NKError) {
+    func putE2EEMetadataAsync(fileId: String,
+                              e2eToken: String,
+                              e2eMetadata: String?,
+                              signature: String?,
+                              method: String,
+                              account: String,
+                              options: NKRequestOptions = NKRequestOptions()) async -> (account: String, metadata: String?, responseData: AFDataResponse<Data>?, error: NKError) {
         await withUnsafeContinuation({ continuation in
             NextcloudKit.shared.putE2EEMetadata(fileId: fileId, e2eToken: e2eToken, e2eMetadata: e2eMetadata, signature: signature, method: method, account: account, options: options) { account, metadata, responseData, error in
                 continuation.resume(returning: (account: account, metadata: metadata, responseData: responseData, error: error))
@@ -296,9 +296,9 @@ public extension NextcloudKit {
         }
     }
 
-    func getE2EECertificate(user: String? = nil,
-                            account: String,
-                            options: NKRequestOptions = NKRequestOptions()) async -> (account: String, certificate: String?, certificateUser: String?, responseData: AFDataResponse<Data>?, error: NKError) {
+    func getE2EECertificateAsync(user: String? = nil,
+                                 account: String,
+                                 options: NKRequestOptions = NKRequestOptions()) async -> (account: String, certificate: String?, certificateUser: String?, responseData: AFDataResponse<Data>?, error: NKError) {
         await withUnsafeContinuation({ continuation in
             NextcloudKit.shared.getE2EECertificate(user: user, account: account, options: options) { account, certificate, certificateUser, responseData, error in
                 continuation.resume(returning: (account: account, certificate: certificate, certificateUser: certificateUser, responseData: responseData, error: error))
