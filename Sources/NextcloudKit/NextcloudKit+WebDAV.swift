@@ -629,4 +629,20 @@ public extension NextcloudKit {
             }
         }
     }
+
+    func listingTrashAsync(filename: String? = nil,
+                           showHiddenFiles: Bool,
+                           account: String,
+                           options: NKRequestOptions = NKRequestOptions(),
+                           taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in }) async -> (account: String, items: [NKTrash]?, responseData: AFDataResponse<Data>?, error: NKError) {
+        await withUnsafeContinuation { continuation in
+            listingTrash(filename: filename,
+                         showHiddenFiles: showHiddenFiles,
+                         account: account,
+                         options: options,
+                         taskHandler: taskHandler) { account, items, responseData, error in
+                continuation.resume(returning: (account, items, responseData, error))
+            }
+        }
+    }
 }

@@ -131,6 +131,18 @@ public extension NextcloudKit {
         }
     }
 
+    func getExternalSiteAsync(account: String,
+                              options: NKRequestOptions = NKRequestOptions(),
+                              taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in }) async -> (account: String, externalFiles: [NKExternalSite], responseData: AFDataResponse<Data>?, error: NKError) {
+        await withUnsafeContinuation { continuation in
+            getExternalSite(account: account,
+                            options: options,
+                            taskHandler: taskHandler) { account, externalFiles, responseData, error in
+                continuation.resume(returning: (account, externalFiles, responseData, error))
+            }
+        }
+    }
+
     // MARK: - getServerStatus
 
     struct ServerInfo {
@@ -149,17 +161,6 @@ public extension NextcloudKit {
     enum ServerInfoResult {
         case success(ServerInfo)
         case failure(NKError)
-    }
-
-    ///
-    /// Asynchronous method wrapper for ``getServerStatus(serverUrl:options:taskHandler:completion:)``.
-    ///
-    func getServerStatus(serverUrl: String, options: NKRequestOptions = NKRequestOptions(), taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in }) async -> ServerInfoResult {
-        await withCheckedContinuation { continuation in
-            getServerStatus(serverUrl: serverUrl, options: options, taskHandler: taskHandler) { _, serverInfoResult in
-                continuation.resume(returning: serverInfoResult)
-            }
-        }
     }
 
     func getServerStatus(serverUrl: String,
@@ -217,12 +218,15 @@ public extension NextcloudKit {
     }
 
     func getServerStatusAsync(serverUrl: String,
-                              options: NKRequestOptions = NKRequestOptions()) async -> NextcloudKit.ServerInfoResult {
-        await withUnsafeContinuation({ continuation in
-            NextcloudKit.shared.getServerStatus(serverUrl: serverUrl) { _, serverInfoResult in
-                continuation.resume(returning: serverInfoResult)
+                              options: NKRequestOptions = NKRequestOptions(),
+                              taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in }) async -> (responseData: AFDataResponse<Data>?, result: ServerInfoResult) {
+        await withUnsafeContinuation { continuation in
+            getServerStatus(serverUrl: serverUrl,
+                            options: options,
+                            taskHandler: taskHandler) { responseData, result in
+                continuation.resume(returning: (responseData, result))
             }
-        })
+        }
     }
 
     // MARK: -
@@ -463,6 +467,28 @@ public extension NextcloudKit {
         }
     }
 
+    func downloadAvatarAsync(user: String,
+                             fileNameLocalPath: String,
+                             sizeImage: Int,
+                             avatarSizeRounded: Int = 0,
+                             etag: String?,
+                             account: String,
+                             options: NKRequestOptions = NKRequestOptions(),
+                             taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in }) async -> (account: String, imageAvatar: UIImage?, imageOriginal: UIImage?, etag: String?, responseData: AFDataResponse<Data?>?, error: NKError) {
+        await withUnsafeContinuation { continuation in
+            downloadAvatar(user: user,
+                           fileNameLocalPath: fileNameLocalPath,
+                           sizeImage: sizeImage,
+                           avatarSizeRounded: avatarSizeRounded,
+                           etag: etag,
+                           account: account,
+                           options: options,
+                           taskHandler: taskHandler) { account, imageAvatar, imageOriginal, etag, responseData, error in
+                continuation.resume(returning: (account, imageAvatar, imageOriginal, etag, responseData, error))
+            }
+        }
+    }
+
     func downloadContent(serverUrl: String,
                          account: String,
                          options: NKRequestOptions = NKRequestOptions(),
@@ -624,7 +650,6 @@ public extension NextcloudKit {
     }
     // MARK: -
 
-
     func getCapabilities(account: String,
                          options: NKRequestOptions = NKRequestOptions(),
                          taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
@@ -649,6 +674,18 @@ public extension NextcloudKit {
                 options.queue.async { completion(account, response, error) }
             case .success:
                 options.queue.async { completion(account, response, .success) }
+            }
+        }
+    }
+
+    func getCapabilitiesAsync(account: String,
+                              options: NKRequestOptions = NKRequestOptions(),
+                              taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in }) async -> (account: String, responseData: AFDataResponse<Data?>?, error: NKError) {
+        await withUnsafeContinuation { continuation in
+            getCapabilities(account: account,
+                            options: options,
+                            taskHandler: taskHandler) { account, responseData, error in
+                continuation.resume(returning: (account, responseData, error))
             }
         }
     }

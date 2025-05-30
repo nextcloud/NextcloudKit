@@ -58,6 +58,20 @@ public extension NextcloudKit {
         }
     }
 
+    func getUserStatusAsync(userId: String? = nil,
+                            account: String,
+                            options: NKRequestOptions = NKRequestOptions(),
+                            taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in }) async -> (account: String, clearAt: Date?, icon: String?, message: String?, messageId: String?, messageIsPredefined: Bool, status: String?, statusIsUserDefined: Bool, userId: String?, responseData: AFDataResponse<Data>?, error: NKError) {
+        await withUnsafeContinuation { continuation in
+            getUserStatus(userId: userId,
+                          account: account,
+                          options: options,
+                          taskHandler: taskHandler) { account, clearAt, icon, message, messageId, messageIsPredefined, status, statusIsUserDefined, userId, responseData, error in
+                continuation.resume(returning: (account, clearAt, icon, message, messageId, messageIsPredefined, status, statusIsUserDefined, userId, responseData, error))
+            }
+        }
+    }
+
     func setUserStatus(status: String,
                        account: String,
                        options: NKRequestOptions = NKRequestOptions(),
