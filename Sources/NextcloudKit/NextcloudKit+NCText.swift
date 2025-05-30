@@ -70,6 +70,18 @@ public extension NextcloudKit {
         }
     }
 
+    func textObtainEditorDetailsAsync(account: String,
+                                     options: NKRequestOptions = NKRequestOptions(),
+                                     taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in }) async -> (account: String, editors: [NKEditorDetailsEditors], creators: [NKEditorDetailsCreators], responseData: AFDataResponse<Data>?, error: NKError) {
+        await withUnsafeContinuation { continuation in
+            textObtainEditorDetails(account: account,
+                                    options: options,
+                                    taskHandler: taskHandler) { account, editors, creators, responseData, error in
+                continuation.resume(returning: (account, editors, creators, responseData, error))
+            }
+        }
+    }
+
     func textOpenFile(fileNamePath: String,
                       fileId: String? = nil,
                       editor: String,
