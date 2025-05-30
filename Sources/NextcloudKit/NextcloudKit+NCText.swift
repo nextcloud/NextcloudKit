@@ -151,7 +151,8 @@ public extension NextcloudKit {
         }
     }
 
-    func textGetListOfTemplates(account: String, options: NKRequestOptions = NKRequestOptions()) async -> (account: String, templates: [NKEditorTemplates]?, responseData: AFDataResponse<Data>?, error: NKError) {
+    func textGetListOfTemplatesAsync(account: String,
+                                     options: NKRequestOptions = NKRequestOptions()) async -> (account: String, templates: [NKEditorTemplates]?, responseData: AFDataResponse<Data>?, error: NKError) {
         await withUnsafeContinuation({ continuation in
             textGetListOfTemplates(account: account) { account, templates, responseData, error in
                 continuation.resume(returning: (account: account, templates: templates, responseData: responseData, error: error))

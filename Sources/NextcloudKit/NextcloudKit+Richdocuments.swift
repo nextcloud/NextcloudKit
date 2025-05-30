@@ -90,7 +90,9 @@ public extension NextcloudKit {
         }
     }
 
-    func getTemplatesRichdocuments(typeTemplate: String, account: String, options: NKRequestOptions = NKRequestOptions()) async -> (account: String, templates: [NKRichdocumentsTemplate]?, responseData: AFDataResponse<Data>?, error: NKError) {
+    func getTemplatesRichdocumentsAsync(typeTemplate: String,
+                                        account: String,
+                                        options: NKRequestOptions = NKRequestOptions()) async -> (account: String, templates: [NKRichdocumentsTemplate]?, responseData: AFDataResponse<Data>?, error: NKError) {
         await withUnsafeContinuation({ continuation in
             NextcloudKit.shared.getTemplatesRichdocuments(typeTemplate: typeTemplate, account: account, options: options) { account, templates, responseData, error in
                 continuation.resume(returning: (account: account, templates: templates, responseData: responseData, error: error))
