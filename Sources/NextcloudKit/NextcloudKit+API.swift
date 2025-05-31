@@ -93,7 +93,7 @@ public extension NextcloudKit {
     func getExternalSite(account: String,
                          options: NKRequestOptions = NKRequestOptions(),
                          taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-                         completion: @escaping (_ account: String, _ externalFiles: [NKExternalSite], _ responseData: AFDataResponse<Data>?, _ error: NKError) -> Void) {
+                         completion: @escaping (_ account: String, _ externalSite: [NKExternalSite], _ responseData: AFDataResponse<Data>?, _ error: NKError) -> Void) {
         var externalSites: [NKExternalSite] = []
         let endpoint = "ocs/v2.php/apps/external/api/v1"
         guard let nkSession = nkCommonInstance.getSession(account: account),
@@ -133,12 +133,12 @@ public extension NextcloudKit {
 
     func getExternalSiteAsync(account: String,
                               options: NKRequestOptions = NKRequestOptions(),
-                              taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in }) async -> (account: String, externalFiles: [NKExternalSite], responseData: AFDataResponse<Data>?, error: NKError) {
+                              taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in }) async -> (account: String, externalSite: [NKExternalSite], responseData: AFDataResponse<Data>?, error: NKError) {
         await withUnsafeContinuation { continuation in
             getExternalSite(account: account,
                             options: options,
-                            taskHandler: taskHandler) { account, externalFiles, responseData, error in
-                continuation.resume(returning: (account, externalFiles, responseData, error))
+                            taskHandler: taskHandler) { account, externalSite, responseData, error in
+                continuation.resume(returning: (account, externalSite, responseData, error))
             }
         }
     }
@@ -1056,6 +1056,24 @@ public extension NextcloudKit {
                 options.queue.async { completion(account, response, error) }
             case .success:
                 options.queue.async { completion(account, response, .success) }
+            }
+        }
+    }
+
+    func sendClientDiagnosticsRemoteOperationAsync(
+        data: Data,
+        account: String,
+        options: NKRequestOptions = NKRequestOptions(),
+        taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in }
+    ) async -> (responseData: AFDataResponse<Data?>?, error: NKError) {
+        await withUnsafeContinuation { continuation in
+            sendClientDiagnosticsRemoteOperation(
+                data: data,
+                account: account,
+                options: options,
+                taskHandler: taskHandler
+            ) { _, responseData, error in
+                continuation.resume(returning: (responseData, error))
             }
         }
     }
