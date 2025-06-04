@@ -629,15 +629,58 @@ public struct NKCommon: Sendable {
         }
     }
 
+    ///
+    /// Write a message with an "[DEBUG] " prefix to the log.
+    ///
+    public func writeLog(debug message: String) {
+        writeLog("[DEBUG] \(message)")
+    }
+
+    ///
+    /// Write a message with an "[INFO] " prefix to the log.
+    ///
+    public func writeLog(info message: String) {
+        writeLog("[INFO] \(message)")
+    }
+
+    ///
+    /// Write a message with an "[WARNING] " prefix to the log.
+    ///
+    public func writeLog(warning message: String) {
+        writeLog("[WARNING] \(message)")
+    }
+
+    ///
+    /// Write a message with an "[ERROR] " prefix to the log.
+    ///
+    public func writeLog(error message: String) {
+        writeLog("[ERROR] \(message)")
+    }
+
+    ///
+    /// Write an arbitrary string to the log.
+    ///
+    /// Does not write anything, should `text` be `nil`.
+    ///
     public func writeLog(_ text: String?) {
-        guard let text = text else { return }
-        guard let date = self.convertDate(Date(), format: "yyyy-MM-dd' 'HH:mm:ss") else { return }
+        guard let text = text else {
+            return
+        }
+
+        guard let date = self.convertDate(Date(), format: "yyyy-MM-dd' 'HH:mm:ss") else {
+            return
+        }
+
         let textToWrite = "\(date) " + text + "\n"
 
-        if printLog { print(textToWrite) }
+        if printLog {
+            print(textToWrite)
+        }
+
         if levelLog > 0 {
             logQueue.async(flags: .barrier) {
                 self.writeLogToDisk(filename: self.filenamePathLog, text: textToWrite)
+
                 if self.copyLogToDocumentDirectory, let path = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true).first {
                     let filenameCopyToDocumentDirectory = path + "/" + self.filenameLog
                     self.writeLogToDisk(filename: filenameCopyToDocumentDirectory, text: textToWrite)
@@ -647,7 +690,9 @@ public struct NKCommon: Sendable {
     }
 
     private func writeLogToDisk(filename: String, text: String) {
-        guard let data = text.data(using: .utf8) else { return }
+        guard let data = text.data(using: .utf8) else {
+            return
+        }
 
         if !FileManager.default.fileExists(atPath: filename) {
             FileManager.default.createFile(atPath: filename, contents: nil, attributes: nil)
