@@ -13,7 +13,7 @@ import Compression
 /// Defines the level of log verbosity.
 public enum NKLogLevel: Int, CaseIterable, Identifiable, Comparable {
     /// Logging is disabled.
-    case off = 0
+    case disabled = 0
 
     /// Logs basic request lifecycle for developers (request started, response result).
     case trace = 1
@@ -30,7 +30,7 @@ public enum NKLogLevel: Int, CaseIterable, Identifiable, Comparable {
     // For Picker display
     public var displayText: String {
         switch self {
-        case .off: return NSLocalizedString("_disabled_", comment: "")
+        case .disabled: return NSLocalizedString("_disabled_", comment: "")
         case .trace: return NSLocalizedString("_trace_", comment: "")
         case .normal: return NSLocalizedString("_normal_", comment: "")
         case .verbose: return NSLocalizedString("_verbose_", comment: "")
@@ -77,7 +77,7 @@ public final class NKLogFileManager {
     private let logFileName = "log.txt"
     private let logDirectory: URL
     private var printLog: Bool
-    private var printColor: Bool = true
+    public var printColor: Bool = true
     public var logLevel: NKLogLevel
     private var currentLogDate: String
     private var retentionDays: Int
@@ -151,7 +151,7 @@ public final class NKLogFileManager {
     }
 
     public func writeLog(_ message: String?) {
-        guard logLevel != .off else { return }
+        guard logLevel != .disabled else { return }
         guard let message = message else { return }
 
         let fileTimestamp = Self.stableTimestampString()
@@ -177,11 +177,11 @@ public final class NKLogFileManager {
         } else if message.contains("[WARNING]") {
             return "🟡 " + message
         } else if message.contains("[INFO]") {
-            return "🟢 " + message
+            return "🔵 " + message
         } else if message.contains("[DEBUG]") {
             return "⚪️ " + message
         } else {
-            return "🔷 " + message
+            return "🟣 " + message
         }
     }
 

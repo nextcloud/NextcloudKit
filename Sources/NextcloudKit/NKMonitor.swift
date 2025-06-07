@@ -14,16 +14,27 @@ final class NKMonitor: EventMonitor, Sendable {
     }
 
     func requestDidResume(_ request: Request) {
-        switch NKLogFileManager.shared.logLevel {
+        let level = NKLogFileManager.shared.logLevel
+
+        switch level {
         case .normal:
+            // General-purpose log: full Request description
             nkLog(info: "Request started: \(request)")
+        case .trace:
+            // Minimalist log: METHOD + URL
+            if let method = request.request?.httpMethod,
+               let url = request.request?.url?.absoluteString {
+                nkLog(info: "\(method) \(url)")
+            }
         case .verbose:
+            // Full dump: headers + body
             let headers = request.request?.allHTTPHeaderFields?.description ?? "None"
             let body = request.request?.httpBody.flatMap { String(data: $0, encoding: .utf8) } ?? "None"
-
+            nkLog(debug: "Request started: \(request)")
             nkLog(debug: "Headers: \(headers)")
             nkLog(debug: "Body: \(body)")
-        default: break
+        default:
+            break
         }
     }
 
@@ -52,15 +63,20 @@ final class NKMonitor: EventMonitor, Sendable {
                 nkLog(info: "Network response result: " + responseResultString)
             }
         case .trace:
-            if case let .failure(error) = response.result {
-                nkLog(info: "Response failed: \(error.localizedDescription)")
-            } else {
-                nkLog(info: "Response succeeded.")
+            if let method = request.request?.httpMethod,
+               let url = request.request?.url?.absoluteString,
+               let code = response.response?.statusCode {
+                let statusSymbol: String
+                if NKLogFileManager.shared.printColor {
+                    statusSymbol = (200..<300).contains(code) ? "🟢" : "🔴"
+                } else {
+                    statusSymbol = (200..<300).contains(code) ? "SUCCESS" : "ERROR"
+                }
+                nkLog(info: "\(statusSymbol) \(code) \(method) \(url)")
             }
         case .verbose:
             nkLog(debug: "Network response result: \(date) " + responseDebugDescription)
             nkLog(debug: "Network response all headers: \(date) " + responseAllHeaderFields)
-
         default:
             break
         }
