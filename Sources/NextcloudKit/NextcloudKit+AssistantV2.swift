@@ -34,7 +34,7 @@ public extension NextcloudKit {
                 if 200..<300 ~= statusCode {
                     let dict = TaskTypes.deserialize(from: data)
                     let result = dict?.types.map({$0})
-                    var filteredResult = result?
+                    let filteredResult = result?
                         .filter({ $0.inputShape?.input?.type == supportedTaskType && $0.outputShape?.output?.type == supportedTaskType })
                         .sorted(by: {$0.id! < $1.id!})
                     options.queue.async { completion(account, filteredResult, response, .success) }

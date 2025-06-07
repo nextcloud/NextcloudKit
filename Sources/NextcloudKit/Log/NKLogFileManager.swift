@@ -11,7 +11,7 @@ import Compression
 
 /// Defines the severity level of a log message.
 /// Defines the level of log verbosity.
-public enum LogLevel: Int, Comparable {
+public enum NKLogLevel: Int, Comparable {
     /// Logging is disabled.
     case off = 0
 
@@ -24,7 +24,7 @@ public enum LogLevel: Int, Comparable {
     /// Logs detailed debug info like headers and bodies.
     case verbose = 3
 
-    public static func < (lhs: LogLevel, rhs: LogLevel) -> Bool {
+    public static func < (lhs: NKLogLevel, rhs: NKLogLevel) -> Bool {
         lhs.rawValue < rhs.rawValue
     }
 }
@@ -48,7 +48,7 @@ public final class NKLogFileManager {
 
     public static func configure(printLog: Bool = true,
                                  printColor: Bool = true,
-                                 minLevel: LogLevel = .normal,
+                                 minLevel: NKLogLevel = .normal,
                                  retentionDays: Int = 30) {
         shared.setConfiguration(printLog: printLog, printColor: printColor, minLevel: minLevel, retentionDays: retentionDays)
     }
@@ -64,7 +64,7 @@ public final class NKLogFileManager {
     private let logDirectory: URL
     private var printLog: Bool
     private var printColor: Bool = true
-    public var minLevel: LogLevel
+    public var minLevel: NKLogLevel
     private var currentLogDate: String
     private var retentionDays: Int
     private let logQueue = DispatchQueue(label: "LogWriterQueue", attributes: .concurrent)
@@ -72,7 +72,7 @@ public final class NKLogFileManager {
 
     // MARK: - Initialization
 
-    private init(printLog: Bool = true, minLevel: LogLevel = .normal, retentionDays: Int = 30) {
+    private init(printLog: Bool = true, minLevel: NKLogLevel = .normal, retentionDays: Int = 30) {
         self.printLog = printLog
         self.minLevel = minLevel
         self.retentionDays = retentionDays
@@ -93,7 +93,7 @@ public final class NKLogFileManager {
     ///   - minLevel: The minimum log level.
     ///   - retentionDays: Number of days to retain compressed logs.
     ///
-    private func setConfiguration(printLog: Bool, printColor: Bool, minLevel: LogLevel, retentionDays: Int) {
+    private func setConfiguration(printLog: Bool, printColor: Bool, minLevel: NKLogLevel, retentionDays: Int) {
         self.printLog = printLog
         self.printColor = printColor
         self.minLevel = minLevel
@@ -134,7 +134,7 @@ public final class NKLogFileManager {
     ///   - tag: A custom tag to classify the log message (e.g. "SYNC", "AUTH").
     ///   - message: The log message content.
     ///   - level: The minimum level required for this message to be written.
-    public func writeLog(tag: String, message: String, level: LogLevel = .normal) {
+    public func writeLog(tag: String, message: String, level: NKLogLevel = .normal) {
         guard !tag.isEmpty else { return }
         guard minLevel >= level else { return }
 
