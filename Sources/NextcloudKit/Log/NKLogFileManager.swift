@@ -11,7 +11,7 @@ import Compression
 
 /// Defines the severity level of a log message.
 /// Defines the level of log verbosity.
-public enum NKLogLevel: Int, Comparable {
+public enum NKLogLevel: Int, CaseIterable, Identifiable, Comparable {
     /// Logging is disabled.
     case off = 0
 
@@ -24,6 +24,20 @@ public enum NKLogLevel: Int, Comparable {
     /// Logs detailed debug info like headers and bodies.
     case verbose = 3
 
+    // Needed for Picker
+    public var id: Int { rawValue }
+
+    // For Picker display
+    public var displayText: String {
+        switch self {
+        case .off: return NSLocalizedString("_disabled_", comment: "")
+        case .trace: return NSLocalizedString("_trace_", comment: "")
+        case .normal: return NSLocalizedString("_normal_", comment: "")
+        case .verbose: return NSLocalizedString("_verbose_", comment: "")
+        }
+    }
+
+    // For Comparable
     public static func < (lhs: NKLogLevel, rhs: NKLogLevel) -> Bool {
         lhs.rawValue < rhs.rawValue
     }
