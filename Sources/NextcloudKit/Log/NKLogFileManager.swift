@@ -42,12 +42,15 @@ public final class NKLogFileManager {
     /// Configures the shared logger instance.
     /// - Parameters:
     ///   - printLog: Whether to print logs to the console.
+    ///   - printColor: Whether to print logs to the console with the emojiColored
     ///   - minLevel: The minimum log level to be recorded.
     ///   - retentionDays: Number of days to keep compressed logs.
+
     public static func configure(printLog: Bool = true,
+                                 printColor: Bool = true,
                                  minLevel: LogLevel = .normal,
                                  retentionDays: Int = 30) {
-        shared.setConfiguration(printLog: printLog, minLevel: minLevel, retentionDays: retentionDays)
+        shared.setConfiguration(printLog: printLog, printColor: printColor, minLevel: minLevel, retentionDays: retentionDays)
     }
 
     /// Returns the file URL of the currently active log file.
@@ -60,6 +63,7 @@ public final class NKLogFileManager {
     private let logFileName = "log.txt"
     private let logDirectory: URL
     private var printLog: Bool
+    private var printColor: Bool = true
     public var minLevel: LogLevel
     private var currentLogDate: String
     private var retentionDays: Int
@@ -85,10 +89,13 @@ public final class NKLogFileManager {
     /// Sets configuration parameters for the logger.
     /// - Parameters:
     ///   - printLog: Whether to print logs to the console.
+    ///   - printColor: Whether to print logs to the console with the emojiColored
     ///   - minLevel: The minimum log level.
     ///   - retentionDays: Number of days to retain compressed logs.
-    private func setConfiguration(printLog: Bool, minLevel: LogLevel, retentionDays: Int) {
+    ///
+    private func setConfiguration(printLog: Bool, printColor: Bool, minLevel: LogLevel, retentionDays: Int) {
         self.printLog = printLog
+        self.printColor = printColor
         self.minLevel = minLevel
         self.retentionDays = retentionDays
     }
@@ -143,7 +150,10 @@ public final class NKLogFileManager {
         let fullMessage = "\(fileTimestamp) \(message)\n"
 
         if printLog {
-            print(colored("\(consoleTimestamp) \(message)"))
+            let consoleLine = printColor
+                ? emojiColored("\(consoleTimestamp) \(message)")
+                : "\(consoleTimestamp) \(message)"
+            print(consoleLine)
         }
 
         logQueue.async(flags: .barrier) {
@@ -152,18 +162,17 @@ public final class NKLogFileManager {
         }
     }
 
-    private func colored(_ message: String) -> String {
-        let reset = "\u{001B}[0m"
+    private func emojiColored(_ message: String) -> String {
         if message.contains("[ERROR]") {
-            return "\u{001B}[0;31m" + message + reset
+            return "🔴 " + message
         } else if message.contains("[WARNING]") {
-            return "\u{001B}[0;33m" + message + reset
+            return "🟡 " + message
         } else if message.contains("[INFO]") {
-            return "\u{001B}[0;32m" + message + reset
+            return "🟢 " + message
         } else if message.contains("[DEBUG]") {
-            return "\u{001B}[0;37m" + message + reset
+            return "⚪️ " + message
         } else {
-            return "\u{001B}[0;36m" + message + reset
+            return "🔷 " + message
         }
     }
 
