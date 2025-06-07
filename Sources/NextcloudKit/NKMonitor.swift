@@ -14,18 +14,10 @@ final class NKMonitor: EventMonitor, Sendable {
     }
 
     func requestDidResume(_ request: Request) {
-        let level = NKLogFileManager.shared.logLevel
-
-        switch level {
+        switch NKLogFileManager.shared.logLevel {
         case .normal:
             // General-purpose log: full Request description
             nkLog(info: "Request started: \(request)")
-        case .trace:
-            // Minimalist log: METHOD + URL
-            if let method = request.request?.httpMethod,
-               let url = request.request?.url?.absoluteString {
-                nkLog(info: "\(method) \(url)")
-            }
         case .verbose:
             // Full dump: headers + body
             let headers = request.request?.allHTTPHeaderFields?.description ?? "None"
