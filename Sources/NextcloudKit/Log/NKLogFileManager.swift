@@ -124,22 +124,18 @@ public final class NKLogFileManager {
     }
 
     public func writeLog(debug message: String) {
-        guard minLevel == .verbose else { return }
         writeLog("[DEBUG] \(message)")
     }
 
     public func writeLog(info message: String) {
-        guard minLevel >= .normal else { return }
         writeLog("[INFO] \(message)")
     }
 
     public func writeLog(warning message: String) {
-        guard minLevel >= .normal else { return }
         writeLog("[WARNING] \(message)")
     }
 
     public func writeLog(error message: String) {
-        guard minLevel >= .normal else { return }
         writeLog("[ERROR] \(message)")
     }
 
@@ -150,7 +146,6 @@ public final class NKLogFileManager {
     ///   - level: The minimum level required for this message to be written.
     public func writeLog(tag: String, message: String, level: NKLogLevel = .normal) {
         guard !tag.isEmpty else { return }
-        guard minLevel >= level else { return }
 
         writeLog("[\(tag.uppercased())] \(message)")
     }
