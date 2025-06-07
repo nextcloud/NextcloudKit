@@ -18,7 +18,7 @@ final class NKInterceptor: RequestInterceptor, Sendable {
         // Log request URL in verbose mode
         if logLevel == .verbose,
            let url = urlRequest.url?.absoluteString {
-            log(debug: "Interceptor request url: \(url)")
+            nkLog(debug: "Interceptor request url: \(url)")
         }
 
         // Skip check if explicitly disabled
@@ -33,19 +33,19 @@ final class NKInterceptor: RequestInterceptor, Sendable {
 
             if let array = groupDefaults.array(forKey: nkCommonInstance.groupDefaultsUnauthorized) as? [String],
                array.contains(account) {
-                log(tag: "AUTH", message: "Unauthorized for account: \(account)")
+                nkLog(tag: "AUTH", message: "Unauthorized for account: \(account)")
                 let error = AFError.responseValidationFailed(reason: .unacceptableStatusCode(code: 401))
                 return completion(.failure(error))
 
             } else if let array = groupDefaults.array(forKey: nkCommonInstance.groupDefaultsUnavailable) as? [String],
                       array.contains(account) {
-                log(tag: "SERVICE", message: "Unavailable for account: \(account)")
+                nkLog(tag: "SERVICE", message: "Unavailable for account: \(account)")
                 let error = AFError.responseValidationFailed(reason: .unacceptableStatusCode(code: 503))
                 return completion(.failure(error))
 
             } else if let array = groupDefaults.array(forKey: nkCommonInstance.groupDefaultsToS) as? [String],
                       array.contains(account) {
-                log(tag: "TOS", message: "Terms of service error for account: \(account)")
+                nkLog(tag: "TOS", message: "Terms of service error for account: \(account)")
                 let error = AFError.responseValidationFailed(reason: .unacceptableStatusCode(code: 403))
                 return completion(.failure(error))
             }

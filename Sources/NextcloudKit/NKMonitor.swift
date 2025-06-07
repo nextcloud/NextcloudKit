@@ -17,15 +17,15 @@ final class NKMonitor: EventMonitor, Sendable {
         let level = NKLogFileManager.shared.minLevel
 
         if level >= .trace {
-            log(info: "Request started: \(request)")
+            nkLog(info: "Request started: \(request)")
         }
 
         if level == .verbose {
             let headers = request.request?.allHTTPHeaderFields?.description ?? "None"
             let body = request.request?.httpBody.flatMap { String(data: $0, encoding: .utf8) } ?? "None"
 
-            log(debug: "Headers: \(headers)")
-            log(debug: "Body: \(body)")
+            nkLog(debug: "Headers: \(headers)")
+            nkLog(debug: "Body: \(body)")
         }
     }
 
@@ -43,9 +43,9 @@ final class NKMonitor: EventMonitor, Sendable {
 
         if level >= .trace {
             if case let .failure(error) = response.result {
-                log(info: "Response failed: \(error.localizedDescription)")
+                nkLog(info: "Response failed: \(error.localizedDescription)")
             } else {
-                log(info: "Response succeeded.")
+                nkLog(info: "Response succeeded.")
             }
         }
 
@@ -53,17 +53,17 @@ final class NKMonitor: EventMonitor, Sendable {
             let resultStr = String(describing: response.result)
 
             if let request = response.request {
-                log(info: "Full response from \(request): \(resultStr)")
+                nkLog(info: "Full response from \(request): \(resultStr)")
             } else {
-                log(info: "Response result: \(resultStr)")
+                nkLog(info: "Response result: \(resultStr)")
             }
         }
 
         if level == .verbose {
             let headers = String(describing: response.response?.allHeaderFields)
             let debugDescription = response.debugDescription
-            log(debug: "Debug info: \(debugDescription)")
-            log(debug: "Headers: \(headers)")
+            nkLog(debug: "Debug info: \(debugDescription)")
+            nkLog(debug: "Headers: \(headers)")
         }
     }
 }

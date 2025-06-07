@@ -8,22 +8,22 @@ import Foundation
 /// These functions internally use `NKLogFileManager.shared`.
 
 @inlinable
-public func log(debug message: String) {
+public func nkLog(debug message: String) {
     NKLogFileManager.shared.writeLog(debug: message)
 }
 
 @inlinable
-public func log(info message: String) {
+public func nkLog(info message: String) {
     NKLogFileManager.shared.writeLog(info: message)
 }
 
 @inlinable
-public func log(warning message: String) {
+public func nkLog(warning message: String) {
     NKLogFileManager.shared.writeLog(warning: message)
 }
 
 @inlinable
-public func log(error message: String) {
+public func nkLog(error message: String) {
     NKLogFileManager.shared.writeLog(error: message)
 }
 
@@ -33,6 +33,6 @@ public func log(error message: String) {
 ///   - message: The message to log.
 ///   - level: The minimum level required for the message to be recorded.
 @inlinable
-public func log(tag: String, message: String, level: LogLevel = .normal) {
+public func nkLog(tag: String, message: String, level: LogLevel = .normal) {
     NKLogFileManager.shared.writeLog(tag: tag, message: message, level: level)
 }
