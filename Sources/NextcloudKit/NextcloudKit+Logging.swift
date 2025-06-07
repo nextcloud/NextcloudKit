@@ -10,7 +10,7 @@ public extension NextcloudKit {
 
     /// Configure the shared logger from NextcloudKit
     static func configureLogger(printLog: Bool = true,
-                                minLevel: LogLevel = .debug,
+                                minLevel: LogLevel = .normal,
                                 retentionDays: Int = 30) {
         NKLogFileManager.configure(printLog: printLog, minLevel: minLevel, retentionDays: retentionDays)
     }

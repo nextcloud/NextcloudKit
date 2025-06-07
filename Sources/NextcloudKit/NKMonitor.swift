@@ -16,13 +16,13 @@ final class NKMonitor: EventMonitor, Sendable {
     func requestDidResume(_ request: Request) {
         let level = NKLogFileManager.shared.minLevel
 
-        // Always log at .info or lower
-        if level <= .info {
+        // Log always if enabled at normal level
+        if level >= .normal {
             log(info: "Network request started: \(request)")
         }
 
-        // If verbose enough, log headers and body
-        if level <= .debug {
+        // Log headers and body only in verbose mode
+        if level == .verbose {
             let headers = request.request?.allHTTPHeaderFields?.description ?? "None"
             let body = request.request?.httpBody.flatMap { String(data: $0, encoding: .utf8) } ?? "None"
 
@@ -45,25 +45,25 @@ final class NKMonitor: EventMonitor, Sendable {
         }
 
         //
-        // LOG
-        //
-        let logLevel = NKLogFileManager.shared.minLevel
+            // LOG
+            //
+            let logLevel = NKLogFileManager.shared.minLevel
 
-        if logLevel <= .info {
-            let resultStr = String(describing: response.result)
+            if logLevel >= .normal {
+                let resultStr = String(describing: response.result)
 
-            if let request = response.request {
-                log(info: "Network response request: \(request), result: \(resultStr)")
-            } else {
-                log(info: "Network response result: \(resultStr)")
+                if let request = response.request {
+                    log(info: "Network response request: \(request), result: \(resultStr)")
+                } else {
+                    log(info: "Network response result: \(resultStr)")
+                }
             }
-        }
 
-        if logLevel <= .debug {
-            let headers = String(describing: response.response?.allHeaderFields)
-            let debugDescription = response.debugDescription
-            log(debug: "Network response debug: \(debugDescription)")
-            log(debug: "Network response headers: \(headers)")
-        }
+            if logLevel == .verbose {
+                let headers = String(describing: response.response?.allHeaderFields)
+                let debugDescription = response.debugDescription
+                log(debug: "Network response debug: \(debugDescription)")
+                log(debug: "Network response headers: \(headers)")
+            }
     }
 }

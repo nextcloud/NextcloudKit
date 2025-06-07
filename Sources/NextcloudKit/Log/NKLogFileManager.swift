@@ -2,15 +2,24 @@
 // SPDX-FileCopyrightText: 2025 Marino Faggiana
 // SPDX-License-Identifier: GPL-3.0-or-later
 
+// SPDX-FileCopyrightText: Nextcloud GmbH
+// SPDX-FileCopyrightText: 2025 Marino Faggiana
+// SPDX-License-Identifier: GPL-3.0-or-later
+
 import Foundation
 import Compression
 
 /// Defines the severity level of a log message.
+/// Defines the level of log verbosity.
 public enum LogLevel: Int, Comparable {
-    case debug = 0
-    case info = 1
-    case warning = 2
-    case error = 3
+    /// Logging is disabled.
+    case off = 0
+
+    /// Logs essential events such as requests and errors.
+    case normal = 1
+
+    /// Logs detailed debug information including headers and bodies.
+    case verbose = 2
 
     public static func < (lhs: LogLevel, rhs: LogLevel) -> Bool {
         return lhs.rawValue < rhs.rawValue
@@ -33,7 +42,7 @@ public final class NKLogFileManager {
     ///   - minLevel: The minimum log level to be recorded.
     ///   - retentionDays: Number of days to keep compressed logs.
     public static func configure(printLog: Bool = true,
-                                 minLevel: LogLevel = .debug,
+                                 minLevel: LogLevel = .normal,
                                  retentionDays: Int = 30) {
         shared.setConfiguration(printLog: printLog, minLevel: minLevel, retentionDays: retentionDays)
     }
@@ -51,7 +60,7 @@ public final class NKLogFileManager {
 
     // MARK: - Initialization
 
-    private init(printLog: Bool = true, minLevel: LogLevel = .debug, retentionDays: Int = 30) {
+    private init(printLog: Bool = true, minLevel: LogLevel = .normal, retentionDays: Int = 30) {
         self.printLog = printLog
         self.minLevel = minLevel
         self.retentionDays = retentionDays
@@ -86,31 +95,33 @@ public final class NKLogFileManager {
     }
 
     public func writeLog(debug message: String) {
-        guard minLevel <= .debug else { return }
+        guard minLevel == .verbose else { return }
         writeLog("[DEBUG] \(message)")
     }
 
     public func writeLog(info message: String) {
-        guard minLevel <= .info else { return }
+        guard minLevel >= .normal else { return }
         writeLog("[INFO] \(message)")
     }
 
     public func writeLog(warning message: String) {
-        guard minLevel <= .warning else { return }
+        guard minLevel >= .normal else { return }
         writeLog("[WARNING] \(message)")
     }
 
     public func writeLog(error message: String) {
-        guard minLevel <= .error else { return }
+        guard minLevel >= .normal else { return }
         writeLog("[ERROR] \(message)")
     }
 
     public func writeLog(tag: String, message: String) {
         guard !tag.isEmpty else { return }
+        guard minLevel >= .normal else { return }
         writeLog("[\(tag.uppercased())] \(message)")
     }
 
     public func writeLog(_ message: String?) {
+        guard minLevel != .off else { return }
         guard let message = message else { return }
 
         let fileTimestamp = Self.stableTimestampString()
