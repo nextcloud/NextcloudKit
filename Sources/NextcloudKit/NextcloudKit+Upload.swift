@@ -17,7 +17,7 @@ public extension NextcloudKit {
                 requestHandler: @escaping (_ request: UploadRequest) -> Void = { _ in },
                 taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
                 progressHandler: @escaping (_ progress: Progress) -> Void = { _ in },
-                completionHandler: @escaping (_ account: String, _ ocId: String?, _ etag: String?, _ date: Date?, _ size: Int64, _ responseData: AFDataResponse<Data?>?, _ afError: AFError?, _ nkError: NKError) -> Void) {
+                completionHandler: @escaping (_ account: String, _ ocId: String?, _ etag: String?, _ date: Date?, _ size: Int64, _ responseData: AFDataResponse<Data>?, _ afError: AFError?, _ nkError: NKError) -> Void) {
         var convertible: URLConvertible?
         var size: Int64 = 0
         if serverUrlFileName is URL {
@@ -49,7 +49,7 @@ public extension NextcloudKit {
         }) .uploadProgress { progress in
             options.queue.async { progressHandler(progress) }
             size = progress.totalUnitCount
-        } .response(queue: self.nkCommonInstance.backgroundQueue) { response in
+        } .responseData(queue: self.nkCommonInstance.backgroundQueue) { response in
             switch response.result {
             case .failure(let error):
                 let resultError = NKError(error: error, afResponse: response, responseData: response.data)

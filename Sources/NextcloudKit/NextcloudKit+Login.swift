@@ -14,7 +14,7 @@ public extension NextcloudKit {
                         userAgent: String? = nil,
                         options: NKRequestOptions = NKRequestOptions(),
                         taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-                        completion: @escaping (_ token: String?, _ responseData: AFDataResponse<Data?>?, _ error: NKError) -> Void) {
+                        completion: @escaping (_ token: String?, _ responseData: AFDataResponse<Data>?, _ error: NKError) -> Void) {
         let endpoint = "ocs/v2.php/core/getapppassword"
         guard let url = self.nkCommonInstance.createStandardUrl(serverUrl: url, endpoint: endpoint, options: options) else {
             return options.queue.async { completion(nil, nil, .urlError) }
@@ -35,18 +35,14 @@ public extension NextcloudKit {
         unauthorizedSession.request(urlRequest).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
             task.taskDescription = options.taskDescription
             taskHandler(task)
-        }.response(queue: self.nkCommonInstance.backgroundQueue) { response in
+        }.responseData(queue: self.nkCommonInstance.backgroundQueue) { response in
             switch response.result {
             case .failure(let error):
                 let error = NKError(error: error, afResponse: response, responseData: response.data)
                 options.queue.async { completion(nil, response, error) }
-            case .success(let xmlData):
-                if let data = xmlData {
-                    let apppassword = NKDataFileXML(nkCommonInstance: self.nkCommonInstance).convertDataAppPassword(data: data)
-                    options.queue.async { completion(apppassword, response, .success) }
-                } else {
-                    options.queue.async { completion(nil, response, .xmlError) }
-                }
+            case .success(let data):
+                let apppassword = NKDataFileXML(nkCommonInstance: self.nkCommonInstance).convertDataAppPassword(data: data)
+                options.queue.async { completion(apppassword, response, .success) }
             }
         }
     }
@@ -58,7 +54,7 @@ public extension NextcloudKit {
                            account: String,
                            options: NKRequestOptions = NKRequestOptions(),
                            taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-                           completion: @escaping (_ responseData: AFDataResponse<Data?>?, _ error: NKError) -> Void) {
+                           completion: @escaping (_ responseData: AFDataResponse<Data>?, _ error: NKError) -> Void) {
         let endpoint = "ocs/v2.php/core/apppassword"
         guard let nkSession = nkCommonInstance.getSession(account: account),
               let url = self.nkCommonInstance.createStandardUrl(serverUrl: serverUrl, endpoint: endpoint, options: options) else {
@@ -80,7 +76,7 @@ public extension NextcloudKit {
         nkSession.sessionData.request(urlRequest).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
             task.taskDescription = options.taskDescription
             taskHandler(task)
-        }.response(queue: self.nkCommonInstance.backgroundQueue) { response in
+        }.responseData(queue: self.nkCommonInstance.backgroundQueue) { response in
             switch response.result {
             case .failure(let error):
                 let error = NKError(error: error, afResponse: response, responseData: response.data)
