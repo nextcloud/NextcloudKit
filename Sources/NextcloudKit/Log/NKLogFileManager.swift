@@ -55,7 +55,7 @@ public final class NKLogFileManager {
     private let logFileName = "log.txt"
     private let logDirectory: URL
     private var printLog: Bool
-    internal var minLevel: LogLevel
+    public var minLevel: LogLevel
     private var currentLogDate: String
     private var retentionDays: Int
     private let logQueue = DispatchQueue(label: "LogWriterQueue", attributes: .concurrent)
