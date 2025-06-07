@@ -133,12 +133,24 @@ public extension NextcloudKit {
             taskHandler(task)
         }.responseData(queue: self.nkCommonInstance.backgroundQueue) { response in
             switch response.result {
-            case .failure(let error):
+                case .failure(let error):
+                if let afError = error.asAFError, case .responseSerializationFailed(let reason) = afError, case .inputDataNilOrZeroLength = reason {
+                    // body nil, is .success
+                    options.queue.async {
+                        completion(account, response, .success)
+                    }
+                    return
+                }
+
                 let error = NKError(error: error, afResponse: response, responseData: response.data)
-                options.queue.async { completion(account, response, error) }
-            case .success:
-                options.queue.async { completion(account, response, .success) }
-            }
+                options.queue.async {
+                    completion(account, response, error)
+                }
+                case .success:
+                    options.queue.async {
+                        completion(account, response, .success)
+                    }
+                }
         }
     }
 
