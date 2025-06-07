@@ -15,14 +15,17 @@ public enum LogLevel: Int, Comparable {
     /// Logging is disabled.
     case off = 0
 
-    /// Logs essential events such as requests and errors.
-    case normal = 1
+    /// Logs basic request lifecycle for developers (request started, response result).
+    case trace = 1
 
-    /// Logs detailed debug information including headers and bodies.
-    case verbose = 2
+    /// Logs important info such as result content, errors.
+    case normal = 2
+
+    /// Logs detailed debug info like headers and bodies.
+    case verbose = 3
 
     public static func < (lhs: LogLevel, rhs: LogLevel) -> Bool {
-        return lhs.rawValue < rhs.rawValue
+        lhs.rawValue < rhs.rawValue
     }
 }
 
@@ -114,9 +117,15 @@ public final class NKLogFileManager {
         writeLog("[ERROR] \(message)")
     }
 
-    public func writeLog(tag: String, message: String) {
+    /// Writes a tagged log message with a specific log level.
+    /// - Parameters:
+    ///   - tag: A custom tag to classify the log message (e.g. "SYNC", "AUTH").
+    ///   - message: The log message content.
+    ///   - level: The minimum level required for this message to be written.
+    public func writeLog(tag: String, message: String, level: LogLevel = .normal) {
         guard !tag.isEmpty else { return }
-        guard minLevel >= .normal else { return }
+        guard minLevel >= level else { return }
+
         writeLog("[\(tag.uppercased())] \(message)")
     }
 

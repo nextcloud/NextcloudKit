@@ -16,27 +16,22 @@ final class NKMonitor: EventMonitor, Sendable {
     func requestDidResume(_ request: Request) {
         let level = NKLogFileManager.shared.minLevel
 
-        // Log always if enabled at normal level
-        if level >= .normal {
-            log(info: "Network request started: \(request)")
+        if level >= .trace {
+            log(info: "Request started: \(request)")
         }
 
-        // Log headers and body only in verbose mode
         if level == .verbose {
             let headers = request.request?.allHTTPHeaderFields?.description ?? "None"
             let body = request.request?.httpBody.flatMap { String(data: $0, encoding: .utf8) } ?? "None"
 
-            log(debug: "Network request headers: \(headers)")
-            log(debug: "Network request body: \(body)")
+            log(debug: "Headers: \(headers)")
+            log(debug: "Body: \(body)")
         }
     }
 
     func request<Value>(_ request: DataRequest, didParseResponse response: AFDataResponse<Value>) {
         nkCommonInstance.delegate?.request(request, didParseResponse: response)
 
-        //
-        // Server Error GroupDefaults
-        //
         if let statusCode = response.response?.statusCode,
            let headerCheckInterceptor = request.request?.allHTTPHeaderFields?[nkCommonInstance.headerCheckInterceptor],
            headerCheckInterceptor.lowercased() == "true",
@@ -44,26 +39,31 @@ final class NKMonitor: EventMonitor, Sendable {
             nkCommonInstance.appendServerErrorAccount(account, errorCode: statusCode)
         }
 
-        //
-            // LOG
-            //
-            let logLevel = NKLogFileManager.shared.minLevel
+        let level = NKLogFileManager.shared.minLevel
 
-            if logLevel >= .normal {
-                let resultStr = String(describing: response.result)
-
-                if let request = response.request {
-                    log(info: "Network response request: \(request), result: \(resultStr)")
-                } else {
-                    log(info: "Network response result: \(resultStr)")
-                }
+        if level >= .trace {
+            if case let .failure(error) = response.result {
+                log(info: "Response failed: \(error.localizedDescription)")
+            } else {
+                log(info: "Response succeeded.")
             }
+        }
 
-            if logLevel == .verbose {
-                let headers = String(describing: response.response?.allHeaderFields)
-                let debugDescription = response.debugDescription
-                log(debug: "Network response debug: \(debugDescription)")
-                log(debug: "Network response headers: \(headers)")
+        if level >= .normal {
+            let resultStr = String(describing: response.result)
+
+            if let request = response.request {
+                log(info: "Full response from \(request): \(resultStr)")
+            } else {
+                log(info: "Response result: \(resultStr)")
             }
+        }
+
+        if level == .verbose {
+            let headers = String(describing: response.response?.allHeaderFields)
+            let debugDescription = response.debugDescription
+            log(debug: "Debug info: \(debugDescription)")
+            log(debug: "Headers: \(headers)")
+        }
     }
 }

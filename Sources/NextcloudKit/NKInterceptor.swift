@@ -13,8 +13,10 @@ final class NKInterceptor: RequestInterceptor, Sendable {
     }
 
     func adapt(_ urlRequest: URLRequest, for session: Session, completion: @escaping (Result<URLRequest, Error>) -> Void) {
-        // Log request URL if needed
-        if NKLogFileManager.shared.minLevel == .verbose,
+        let logLevel = NKLogFileManager.shared.minLevel
+
+        // Log request URL in verbose mode
+        if logLevel == .verbose,
            let url = urlRequest.url?.absoluteString {
             log(debug: "Interceptor request url: \(url)")
         }
