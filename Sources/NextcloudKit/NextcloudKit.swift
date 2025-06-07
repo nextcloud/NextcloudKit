@@ -22,6 +22,10 @@ open class NextcloudKit {
 #endif
     public var nkCommonInstance = NKCommon()
 
+    internal func log(debug message: String) {
+        NKLogFileManager.shared.writeLog(debug: message)
+    }
+
     internal lazy var unauthorizedSession: Alamofire.Session = {
         let configuration = URLSessionConfiguration.af.default
         configuration.requestCachePolicy = .reloadIgnoringLocalCacheData
@@ -71,14 +75,6 @@ open class NextcloudKit {
         if removeAllCachedResponses {
             URLCache.shared.removeAllCachedResponses()
         }
-    }
-
-    public func setupLog(pathLog: String,
-                         levelLog: Int,
-                         copyLogToDocumentDirectory: Bool) {
-        self.nkCommonInstance.pathLog = pathLog
-        self.nkCommonInstance.levelLog = levelLog
-        self.nkCommonInstance.copyLogToDocumentDirectory = copyLogToDocumentDirectory
     }
 
     public func appendSession(account: String,

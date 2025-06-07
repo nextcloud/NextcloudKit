@@ -25,13 +25,9 @@ final class NextcloudKitSessionDelegate: SessionDelegate {
         if let nkCommon = self.nkCommonInstance,
            let delegate = nkCommon.delegate {
             delegate.authenticationChallenge(session, didReceive: challenge) { authChallengeDisposition, credential in
-                if nkCommon.levelLog > 1 {
-                    nkCommon.writeLog("[INFO AUTH] Challenge Disposition: \(authChallengeDisposition.rawValue)")
-                }
                 completionHandler(authChallengeDisposition, credential)
             }
         } else {
-            self.nkCommonInstance?.writeLog("[WARNING] URLAuthenticationChallenge, no delegate found, perform with default handling")
             completionHandler(URLSession.AuthChallengeDisposition.performDefaultHandling, nil)
         }
     }

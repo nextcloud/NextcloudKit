@@ -7,21 +7,27 @@ import Alamofire
 
 final class NKMonitor: EventMonitor, Sendable {
     let nkCommonInstance: NKCommon
+    let queue = DispatchQueue(label: "com.nextcloudkit.monitor")
 
     init(nkCommonInstance: NKCommon) {
         self.nkCommonInstance = nkCommonInstance
     }
 
     func requestDidResume(_ request: Request) {
-        if self.nkCommonInstance.levelLog > 0 {
-            self.nkCommonInstance.writeLog("Network request started: \(request)")
-            if self.nkCommonInstance.levelLog > 1 {
-                let allHeaders = request.request.flatMap { $0.allHTTPHeaderFields.map { $0.description } } ?? "None"
-                let body = request.request.flatMap { $0.httpBody.map { String(decoding: $0, as: UTF8.self) } } ?? "None"
+        let level = NKLogFileManager.shared.minLevel
 
-                self.nkCommonInstance.writeLog("Network request headers: \(allHeaders)")
-                self.nkCommonInstance.writeLog("Network request body: \(body)")
-            }
+        // Always log at .info or lower
+        if level <= .info {
+            log(info: "Network request started: \(request)")
+        }
+
+        // If verbose enough, log headers and body
+        if level <= .debug {
+            let headers = request.request?.allHTTPHeaderFields?.description ?? "None"
+            let body = request.request?.httpBody.flatMap { String(data: $0, encoding: .utf8) } ?? "None"
+
+            log(debug: "Network request headers: \(headers)")
+            log(debug: "Network request body: \(body)")
         }
     }
 
@@ -32,32 +38,32 @@ final class NKMonitor: EventMonitor, Sendable {
         // Server Error GroupDefaults
         //
         if let statusCode = response.response?.statusCode,
-           let headerCheckInterceptor = request.request?.allHTTPHeaderFields?[self.nkCommonInstance.headerCheckInterceptor],
+           let headerCheckInterceptor = request.request?.allHTTPHeaderFields?[nkCommonInstance.headerCheckInterceptor],
            headerCheckInterceptor.lowercased() == "true",
-           let account = request.request?.allHTTPHeaderFields?[self.nkCommonInstance.headerAccount] as? String {
-            self.nkCommonInstance.appendServerErrorAccount(account, errorCode: statusCode)
+           let account = request.request?.allHTTPHeaderFields?[nkCommonInstance.headerAccount] {
+            nkCommonInstance.appendServerErrorAccount(account, errorCode: statusCode)
         }
 
         //
         // LOG
         //
-        guard let date = self.nkCommonInstance.convertDate(Date(), format: "yyyy-MM-dd' 'HH:mm:ss") else { return }
-        let responseResultString = String("\(response.result)")
-        let responseDebugDescription = String("\(response.debugDescription)")
-        let responseAllHeaderFields = String("\(String(describing: response.response?.allHeaderFields))")
+        let logLevel = NKLogFileManager.shared.minLevel
 
-        if self.nkCommonInstance.levelLog > 0 {
-            if self.nkCommonInstance.levelLog == 1 {
-                if let request = response.request {
-                    let requestString = "\(request)"
-                    self.nkCommonInstance.writeLog("Network response request: " + requestString + ", result: " + responseResultString)
-                } else {
-                    self.nkCommonInstance.writeLog("Network response result: " + responseResultString)
-                }
+        if logLevel <= .info {
+            let resultStr = String(describing: response.result)
+
+            if let request = response.request {
+                log(info: "Network response request: \(request), result: \(resultStr)")
             } else {
-                self.nkCommonInstance.writeLog("Network response result: \(date) " + responseDebugDescription)
-                self.nkCommonInstance.writeLog("Network response all headers: \(date) " + responseAllHeaderFields)
+                log(info: "Network response result: \(resultStr)")
             }
+        }
+
+        if logLevel <= .debug {
+            let headers = String(describing: response.response?.allHeaderFields)
+            let debugDescription = response.debugDescription
+            log(debug: "Network response debug: \(debugDescription)")
+            log(debug: "Network response headers: \(headers)")
         }
     }
 }
