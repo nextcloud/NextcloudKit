@@ -62,9 +62,9 @@ public final class NKLogFileManager {
 
     public static func configure(printLog: Bool = true,
                                  printColor: Bool = true,
-                                 minLevel: NKLogLevel = .normal,
+                                 logLevel: NKLogLevel = .normal,
                                  retentionDays: Int = 30) {
-        shared.setConfiguration(printLog: printLog, printColor: printColor, minLevel: minLevel, retentionDays: retentionDays)
+        shared.setConfiguration(printLog: printLog, printColor: printColor, logLevel: logLevel, retentionDays: retentionDays)
     }
 
     /// Returns the file URL of the currently active log file.
@@ -78,7 +78,7 @@ public final class NKLogFileManager {
     private let logDirectory: URL
     private var printLog: Bool
     private var printColor: Bool = true
-    public var minLevel: NKLogLevel
+    public var logLevel: NKLogLevel
     private var currentLogDate: String
     private var retentionDays: Int
     private let logQueue = DispatchQueue(label: "LogWriterQueue", attributes: .concurrent)
@@ -86,9 +86,9 @@ public final class NKLogFileManager {
 
     // MARK: - Initialization
 
-    private init(printLog: Bool = true, minLevel: NKLogLevel = .normal, retentionDays: Int = 30) {
+    private init(printLog: Bool = true, logLevel: NKLogLevel = .normal, retentionDays: Int = 30) {
         self.printLog = printLog
-        self.minLevel = minLevel
+        self.logLevel = logLevel
         self.retentionDays = retentionDays
 
         let documents = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
@@ -107,10 +107,10 @@ public final class NKLogFileManager {
     ///   - minLevel: The minimum log level.
     ///   - retentionDays: Number of days to retain compressed logs.
     ///
-    private func setConfiguration(printLog: Bool, printColor: Bool, minLevel: NKLogLevel, retentionDays: Int) {
+    private func setConfiguration(printLog: Bool, printColor: Bool, logLevel: NKLogLevel, retentionDays: Int) {
         self.printLog = printLog
         self.printColor = printColor
-        self.minLevel = minLevel
+        self.logLevel = logLevel
         self.retentionDays = retentionDays
     }
 
@@ -151,7 +151,7 @@ public final class NKLogFileManager {
     }
 
     public func writeLog(_ message: String?) {
-        guard minLevel != .off else { return }
+        guard logLevel != .off else { return }
         guard let message = message else { return }
 
         let fileTimestamp = Self.stableTimestampString()

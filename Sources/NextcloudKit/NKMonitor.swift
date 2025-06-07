@@ -14,18 +14,16 @@ final class NKMonitor: EventMonitor, Sendable {
     }
 
     func requestDidResume(_ request: Request) {
-        let level = NKLogFileManager.shared.minLevel
-
-        if level >= .trace {
+        switch NKLogFileManager.shared.logLevel {
+        case .normal:
             nkLog(info: "Request started: \(request)")
-        }
-
-        if level == .verbose {
+        case .verbose:
             let headers = request.request?.allHTTPHeaderFields?.description ?? "None"
             let body = request.request?.httpBody.flatMap { String(data: $0, encoding: .utf8) } ?? "None"
 
             nkLog(debug: "Headers: \(headers)")
             nkLog(debug: "Body: \(body)")
+        default: break
         }
     }
 
@@ -38,32 +36,33 @@ final class NKMonitor: EventMonitor, Sendable {
            let account = request.request?.allHTTPHeaderFields?[nkCommonInstance.headerAccount] {
             nkCommonInstance.appendServerErrorAccount(account, errorCode: statusCode)
         }
+        guard let date = self.nkCommonInstance.convertDate(Date(), format: "yyyy-MM-dd' 'HH:mm:ss") else {
+            return
+        }
+        let responseResultString = String("\(response.result)")
+        let responseDebugDescription = String("\(response.debugDescription)")
+        let responseAllHeaderFields = String("\(String(describing: response.response?.allHeaderFields))")
 
-        let level = NKLogFileManager.shared.minLevel
-
-        if level >= .trace {
+        switch NKLogFileManager.shared.logLevel {
+        case .normal:
+            if let request = response.request {
+                let requestString = "\(request)"
+                nkLog(info: "Network response request: " + requestString + ", result: " + responseResultString)
+            } else {
+                nkLog(info: "Network response result: " + responseResultString)
+            }
+        case .trace:
             if case let .failure(error) = response.result {
                 nkLog(info: "Response failed: \(error.localizedDescription)")
             } else {
                 nkLog(info: "Response succeeded.")
             }
-        }
+        case .verbose:
+            nkLog(debug: "Network response result: \(date) " + responseDebugDescription)
+            nkLog(debug: "Network response all headers: \(date) " + responseAllHeaderFields)
 
-        if level >= .normal {
-            let resultStr = String(describing: response.result)
-
-            if let request = response.request {
-                nkLog(info: "Full response from \(request): \(resultStr)")
-            } else {
-                nkLog(info: "Response result: \(resultStr)")
-            }
-        }
-
-        if level == .verbose {
-            let headers = String(describing: response.response?.allHeaderFields)
-            let debugDescription = response.debugDescription
-            nkLog(debug: "Debug info: \(debugDescription)")
-            nkLog(debug: "Headers: \(headers)")
+        default:
+            break
         }
     }
 }
