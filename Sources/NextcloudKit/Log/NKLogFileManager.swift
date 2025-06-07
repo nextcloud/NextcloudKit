@@ -144,7 +144,7 @@ public final class NKLogFileManager {
     ///   - tag: A custom tag to classify the log message (e.g. "SYNC", "AUTH").
     ///   - message: The log message content.
     ///   - level: The minimum level required for this message to be written.
-    public func writeLog(tag: String, message: String, level: NKLogLevel = .normal) {
+    public func writeLog(tag: String, message: String) {
         guard !tag.isEmpty else { return }
 
         writeLog("[\(tag.uppercased())] \(message)")
