@@ -50,6 +50,11 @@ public final class NKLogFileManager {
         shared.setConfiguration(printLog: printLog, minLevel: minLevel, retentionDays: retentionDays)
     }
 
+    /// Returns the file URL of the currently active log file.
+    public func currentLogFileURL() -> URL {
+        return logDirectory.appendingPathComponent(logFileName)
+    }
+
     // MARK: - Configuration
 
     private let logFileName = "log.txt"
