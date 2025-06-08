@@ -72,18 +72,13 @@ public extension NextcloudKit {
             if let dateString = self.nkCommonInstance.findHeader("date", allHeaderFields: response.response?.allHeaderFields) {
                 date = self.nkCommonInstance.convertDate(dateString, format: "EEE, dd MMM y HH:mm:ss zzz")
             }
-
-            /*
+            
             if !uploadCompleted {
                 nkLog(error: "Upload incomplete: only \(uploadedSize) bytes sent.")
                 result = .uploadIncomplete
             } else {
                 result = self.evaluateResponse(response)
             }
-            */
-
-
-            result = self.evaluateResponse(response)
 
             options.queue.async {
                 completionHandler(account, ocId, etag, date, uploadedSize, response, result)
