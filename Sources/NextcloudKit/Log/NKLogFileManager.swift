@@ -49,6 +49,7 @@ public enum NKLogTypeTag: String {
     case info = "[INFO]"
     case warning = "[WARNING]"
     case error = "[ERROR]"
+    case success = "[SUCCESS]"
 }
 
 /// A logger that writes log messages to a file in a subdirectory of the user's Documents folder,
@@ -183,6 +184,8 @@ public final class NKLogFileManager {
     private func emojiColored(_ message: String) -> String {
         if message.contains("[ERROR]") {
             return "🔴 "
+        } else if message.contains("[SUCCESS]") {
+            return "🟢 "
         } else if message.contains("[WARNING]") {
             return "🟡 "
         } else if message.contains("[INFO]") {
