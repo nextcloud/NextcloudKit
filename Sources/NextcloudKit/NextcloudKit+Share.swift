@@ -417,12 +417,10 @@ public extension NextcloudKit {
             task.taskDescription = options.taskDescription
             taskHandler(task)
         }.responseData(queue: self.nkCommonInstance.backgroundQueue) { response in
-            switch response.result {
-            case .failure(let error):
-                let error = NKError(error: error, afResponse: response, responseData: response.data)
-                options.queue.async { completion(account, response, error) }
-            case .success:
-                options.queue.async { completion(account, response, .success) }
+            let result = self.evaluateResponse(response)
+
+            options.queue.async {
+                completion(account, response, result)
             }
         }
     }

@@ -188,4 +188,21 @@ open class NextcloudKit {
         reachabilityManager?.stopListening()
     }
 #endif
+
+    /// Evaluates an Alamofire response and returns the appropriate NKError.
+    /// Treats `inputDataNilOrZeroLength` as `.success`.
+    func evaluateResponse<Data>(_ response: AFDataResponse<Data>) -> NKError {
+        switch response.result {
+        case .failure(let error):
+            if let afError = error.asAFError,
+               case .responseSerializationFailed(let reason) = afError,
+               case .inputDataNilOrZeroLength = reason {
+                return .success
+            } else {
+                return NKError(error: error, afResponse: response, responseData: response.data)
+            }
+        case .success:
+            return .success
+        }
+    }
 }
