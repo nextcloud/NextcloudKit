@@ -192,6 +192,12 @@ open class NextcloudKit {
     /// Evaluates an Alamofire response and returns the appropriate NKError.
     /// Treats `inputDataNilOrZeroLength` as `.success`.
     func evaluateResponse<Data>(_ response: AFDataResponse<Data>) -> NKError {
+        if let afError = response.error?.asAFError {
+            if afError.isExplicitlyCancelledError {
+                return .cancelled
+            }
+        }
+
         switch response.result {
         case .failure(let error):
             if let afError = error.asAFError,

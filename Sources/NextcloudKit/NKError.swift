@@ -55,6 +55,7 @@ public struct NKError: Error, Equatable {
     public static let unauthorizedError = NKError(errorCode: 401, errorDescription: NSLocalizedString("_unauthorized_", value: "Unauthorized", comment: ""))
     public static let unavailableError = NKError(errorCode: 503, errorDescription: NSLocalizedString("_Unavailable_", value: "Unavailable", comment: ""))
     public static let forbiddenError = NKError(errorCode: 403, errorDescription: NSLocalizedString("_forbidden_", value: "Forbidden", comment: ""))
+    public static let cancelled = NKError(errorCode: -999, errorDescription: NSLocalizedString("_cancelled_", value: "Cancelled", comment: ""))
 
     public static let success = NKError(errorCode: 0, errorDescription: "")
 
