@@ -33,6 +33,6 @@ public func nkLog(error message: String) {
 ///   - message: The message to log.
 ///   - level: The minimum level required for the message to be recorded.
 @inlinable
-public func nkLog(tag: String, message: String) {
-    NKLogFileManager.shared.writeLog(tag: tag, message: message)
+public func nkLog(tag: String, typeTag: NKLogTypeTag = .debug, message: String) {
+    NKLogFileManager.shared.writeLog(tag: tag, typeTag: typeTag, message: message)
 }

@@ -43,6 +43,14 @@ public enum NKLogLevel: Int, CaseIterable, Identifiable, Comparable {
     }
 }
 
+/// Type for writes a tagged log message
+public enum NKLogTypeTag: String {
+    case debug = "[DEBUG]"
+    case info = "[INFO]"
+    case warning = "[WARNING]"
+    case error = "[ERROR]"
+}
+
 /// A logger that writes log messages to a file in a subdirectory of the user's Documents folder,
 /// rotates the log daily, and compresses old logs with GZip.
 /// Compatible with iOS 13.0+ and Swift 6.
@@ -144,10 +152,11 @@ public final class NKLogFileManager {
     ///   - tag: A custom tag to classify the log message (e.g. "SYNC", "AUTH").
     ///   - message: The log message content.
     ///   - level: The minimum level required for this message to be written.
-    public func writeLog(tag: String, message: String) {
+    public func writeLog(tag: String, typeTag: NKLogTypeTag, message: String) {
         guard !tag.isEmpty else { return }
+        let emojiColored = printColor ? emojiColored(typeTag.rawValue) : ""
 
-        writeLog("[\(tag.uppercased())] \(message)")
+        writeLog("\(emojiColored)[\(tag.uppercased())] \(message)")
     }
 
     public func writeLog(_ message: String?) {
@@ -160,7 +169,7 @@ public final class NKLogFileManager {
 
         if printLog {
             let consoleLine = printColor
-                ? emojiColored("\(consoleTimestamp) \(message)")
+                ? emojiColored(message) + "\(consoleTimestamp) \(message)"
                 : "\(consoleTimestamp) \(message)"
             print(consoleLine)
         }
@@ -173,15 +182,15 @@ public final class NKLogFileManager {
 
     private func emojiColored(_ message: String) -> String {
         if message.contains("[ERROR]") {
-            return "🔴 " + message
+            return "🔴 "
         } else if message.contains("[WARNING]") {
-            return "🟡 " + message
+            return "🟡 "
         } else if message.contains("[INFO]") {
-            return "🔵 " + message
+            return "🔵 "
         } else if message.contains("[DEBUG]") {
-            return "⚪️ " + message
+            return "⚪️ "
         } else {
-            return "🟣 " + message
+            return "🟣 "
         }
     }
 
