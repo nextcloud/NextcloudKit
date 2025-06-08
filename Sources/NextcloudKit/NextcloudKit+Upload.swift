@@ -17,7 +17,7 @@ public extension NextcloudKit {
                 requestHandler: @escaping (_ request: UploadRequest) -> Void = { _ in },
                 taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
                 progressHandler: @escaping (_ progress: Progress) -> Void = { _ in },
-                completionHandler: @escaping (_ account: String, _ ocId: String?, _ etag: String?, _ date: Date?, _ size: Int64, _ responseData: AFDataResponse<Data>?, _ afError: AFError?, _ nkError: NKError) -> Void) {
+                completionHandler: @escaping (_ account: String, _ ocId: String?, _ etag: String?, _ date: Date?, _ size: Int64, _ responseData: AFDataResponse<Data>?, _ nkError: NKError) -> Void) {
         var convertible: URLConvertible?
         var size: Int64 = 0
         if serverUrlFileName is URL {
@@ -28,7 +28,7 @@ public extension NextcloudKit {
         guard let url = convertible,
               let nkSession = nkCommonInstance.getSession(account: account),
               var headers = nkCommonInstance.getStandardHeaders(account: account, options: options) else {
-            return options.queue.async { completionHandler(account, nil, nil, nil, 0, nil, nil, .urlError) }
+            return options.queue.async { completionHandler(account, nil, nil, nil, 0, nil, .urlError) }
         }
         let fileNameLocalPathUrl = URL(fileURLWithPath: fileNameLocalPath)
         // Epoch of linux do not permitted negativ value
@@ -50,34 +50,27 @@ public extension NextcloudKit {
             options.queue.async { progressHandler(progress) }
             size = progress.totalUnitCount
         } .responseData(queue: self.nkCommonInstance.backgroundQueue) { response in
-            switch response.result {
-            case .failure(let error):
-                let resultError = NKError(error: error, afResponse: response, responseData: response.data)
-                options.queue.async { completionHandler(account, nil, nil, nil, 0, response, error, resultError) }
-            case .success:
-                var ocId: String?, etag: String?
-                if self.nkCommonInstance.findHeader("oc-fileid", allHeaderFields: response.response?.allHeaderFields) != nil {
-                    ocId = self.nkCommonInstance.findHeader("oc-fileid", allHeaderFields: response.response?.allHeaderFields)
-                } else if self.nkCommonInstance.findHeader("fileid", allHeaderFields: response.response?.allHeaderFields) != nil {
-                    ocId = self.nkCommonInstance.findHeader("fileid", allHeaderFields: response.response?.allHeaderFields)
-                }
-                if self.nkCommonInstance.findHeader("oc-etag", allHeaderFields: response.response?.allHeaderFields) != nil {
-                    etag = self.nkCommonInstance.findHeader("oc-etag", allHeaderFields: response.response?.allHeaderFields)
-                } else if self.nkCommonInstance.findHeader("etag", allHeaderFields: response.response?.allHeaderFields) != nil {
-                    etag = self.nkCommonInstance.findHeader("etag", allHeaderFields: response.response?.allHeaderFields)
-                }
-                if etag != nil {
-                    etag = etag?.replacingOccurrences(of: "\"", with: "")
-                }
-                if let dateString = self.nkCommonInstance.findHeader("date", allHeaderFields: response.response?.allHeaderFields) {
-                    if let date = self.nkCommonInstance.convertDate(dateString, format: "EEE, dd MMM y HH:mm:ss zzz") {
-                        options.queue.async { completionHandler(account, ocId, etag, date, size, response, nil, .success) }
-                    } else {
-                        options.queue.async { completionHandler(account, nil, nil, nil, 0, response, nil, .invalidDate) }
-                    }
-                } else {
-                    options.queue.async { completionHandler(account, nil, nil, nil, 0, response, nil, .invalidDate) }
-                }
+            var ocId: String?, etag: String?, date: Date?
+            if self.nkCommonInstance.findHeader("oc-fileid", allHeaderFields: response.response?.allHeaderFields) != nil {
+                ocId = self.nkCommonInstance.findHeader("oc-fileid", allHeaderFields: response.response?.allHeaderFields)
+            } else if self.nkCommonInstance.findHeader("fileid", allHeaderFields: response.response?.allHeaderFields) != nil {
+                ocId = self.nkCommonInstance.findHeader("fileid", allHeaderFields: response.response?.allHeaderFields)
+            }
+            if self.nkCommonInstance.findHeader("oc-etag", allHeaderFields: response.response?.allHeaderFields) != nil {
+                etag = self.nkCommonInstance.findHeader("oc-etag", allHeaderFields: response.response?.allHeaderFields)
+            } else if self.nkCommonInstance.findHeader("etag", allHeaderFields: response.response?.allHeaderFields) != nil {
+                etag = self.nkCommonInstance.findHeader("etag", allHeaderFields: response.response?.allHeaderFields)
+            }
+            if etag != nil {
+                etag = etag?.replacingOccurrences(of: "\"", with: "")
+            }
+            if let dateString = self.nkCommonInstance.findHeader("date", allHeaderFields: response.response?.allHeaderFields) {
+                date = self.nkCommonInstance.convertDate(dateString, format: "EEE, dd MMM y HH:mm:ss zzz")
+            }
+            let result = self.evaluateResponse(response)
+
+            options.queue.async {
+                completionHandler(account, ocId, etag, date, size, response, result)
             }
         }
 
@@ -114,10 +107,10 @@ public extension NextcloudKit {
                      taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
                      progressHandler: @escaping (_ totalBytesExpected: Int64, _ totalBytes: Int64, _ fractionCompleted: Double) -> Void = { _, _, _ in },
                      uploaded: @escaping (_ fileChunk: (fileName: String, size: Int64)) -> Void = { _ in },
-                     completion: @escaping (_ account: String, _ filesChunk: [(fileName: String, size: Int64)]?, _ file: NKFile?, _ afError: AFError?, _ error: NKError) -> Void) {
+                     completion: @escaping (_ account: String, _ filesChunk: [(fileName: String, size: Int64)]?, _ file: NKFile?, _ error: NKError) -> Void) {
 
         guard let nkSession = nkCommonInstance.getSession(account: account) else {
-            return completion(account, nil, nil, nil, .urlError)
+            return completion(account, nil, nil, .urlError)
         }
         let fileNameLocalSize = self.nkCommonInstance.getFileSize(filePath: directory + "/" + fileName)
         let serverUrlChunkFolder = nkSession.urlBase + "/" + nkSession.dav + "/uploads/" + nkSession.userId + "/" + chunkFolder
@@ -152,7 +145,7 @@ public extension NextcloudKit {
         if freeDisk < fileNameLocalSize * 4 {
             // It seems there is not enough space to send the file
             let error = NKError(errorCode: NKError.chunkNoEnoughMemory, errorDescription: "_chunk_enough_memory_")
-            return completion(account, nil, nil, nil, error)
+            return completion(account, nil, nil, error)
         }
         #endif
 
@@ -172,10 +165,9 @@ public extension NextcloudKit {
 
         createFolder { error in
             guard error == .success else {
-                return completion(account, nil, nil, nil, NKError(errorCode: NKError.chunkCreateFolder, errorDescription: error.errorDescription))
+                return completion(account, nil, nil, NKError(errorCode: NKError.chunkCreateFolder, errorDescription: error.errorDescription))
             }
             var uploadNKError = NKError()
-            var uploadAFError: AFError?
 
             let outputDirectory = fileChunksOutputDirectory ?? directory
             self.nkCommonInstance.chunkedFile(inputDirectory: directory, outputDirectory: outputDirectory, fileName: fileName, chunkSize: chunkSize, filesChunk: filesChunk) { num in
@@ -186,7 +178,7 @@ public extension NextcloudKit {
                 if filesChunk.isEmpty {
                     // The file for sending could not be created
                     let error = NKError(errorCode: NKError.chunkFilesNull, errorDescription: "_chunk_files_null_")
-                    return completion(account, nil, nil, nil, error)
+                    return completion(account, nil, nil, error)
                 }
                 var filesChunkOutput = filesChunk
                 start(filesChunkOutput)
@@ -198,7 +190,7 @@ public extension NextcloudKit {
                     if fileSize == 0 {
                         // The file could not be sent
                         let error = NKError(errorCode: NKError.chunkFileNull, errorDescription: "_chunk_file_null_")
-                        return completion(account, nil, nil, .explicitlyCancelled, error)
+                        return completion(account, nil, nil, error)
                     }
                     let semaphore = DispatchSemaphore(value: 0)
                     self.upload(serverUrlFileName: serverUrlFileName, fileNameLocalPath: fileNameLocalPath, account: account, options: options, requestHandler: { request in
@@ -210,12 +202,11 @@ public extension NextcloudKit {
                         let totalBytes = fileChunk.size
                         let fractionCompleted = Double(totalBytes) / Double(totalBytesExpected)
                         progressHandler(totalBytesExpected, totalBytes, fractionCompleted)
-                    }) { _, _, _, _, _, _, afError, error in
+                    }) { _, _, _, _, _, _, error in
                         if error == .success {
                             filesChunkOutput.removeFirst()
                             uploaded(fileChunk)
                         }
-                        uploadAFError = afError
                         uploadNKError = error
                         semaphore.signal()
                     }
@@ -227,7 +218,7 @@ public extension NextcloudKit {
                 }
 
                 guard uploadNKError == .success else {
-                    return completion(account, filesChunkOutput, nil, uploadAFError, NKError(errorCode: NKError.chunkFileUpload, errorDescription: uploadNKError.errorDescription))
+                    return completion(account, filesChunkOutput, nil, NKError(errorCode: NKError.chunkFileUpload, errorDescription: uploadNKError.errorDescription))
                 }
 
                 // Assemble the chunks
@@ -249,13 +240,13 @@ public extension NextcloudKit {
 
                 self.moveFileOrFolder(serverUrlFileNameSource: serverUrlFileNameSource, serverUrlFileNameDestination: serverUrlFileName, overwrite: true, account: account, options: options) { _, _, error in
                     guard error == .success else {
-                        return completion(account, filesChunkOutput, nil, nil, NKError(errorCode: NKError.chunkMoveFile, errorDescription: error.errorDescription))
+                        return completion(account, filesChunkOutput, nil, NKError(errorCode: NKError.chunkMoveFile, errorDescription: error.errorDescription))
                     }
                     self.readFileOrFolder(serverUrlFileName: serverUrlFileName, depth: "0", account: account, options: NKRequestOptions(queue: self.nkCommonInstance.backgroundQueue)) { _, files, _, error in
                         guard error == .success, let file = files?.first else {
-                            return completion(account, filesChunkOutput, nil, nil, NKError(errorCode: NKError.chunkMoveFile, errorDescription: error.errorDescription))
+                            return completion(account, filesChunkOutput, nil, NKError(errorCode: NKError.chunkMoveFile, errorDescription: error.errorDescription))
                         }
-                        return completion(account, filesChunkOutput, file, nil, error)
+                        return completion(account, filesChunkOutput, file, error)
                     }
                 }
             }
