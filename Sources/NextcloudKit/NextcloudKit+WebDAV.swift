@@ -30,21 +30,30 @@ public extension NextcloudKit {
             task.taskDescription = options.taskDescription
             taskHandler(task)
         }.responseData(queue: self.nkCommonInstance.backgroundQueue) { response in
+            let result: NKError
+            var date: Date?
+            let ocId = self.nkCommonInstance.findHeader("oc-fileid", allHeaderFields: response.response?.allHeaderFields)
+            if let dateString = self.nkCommonInstance.findHeader("date", allHeaderFields: response.response?.allHeaderFields) {
+                date = self.nkCommonInstance.convertDate(dateString, format: "EEE, dd MMM y HH:mm:ss zzz")
+            }
+
             switch response.result {
             case .failure(let error):
-                let error = NKError(error: error, afResponse: response, responseData: response.data)
-                options.queue.async { completion(account, nil, nil, response, error) }
-            case .success:
-                let ocId = self.nkCommonInstance.findHeader("oc-fileid", allHeaderFields: response.response?.allHeaderFields)
-                if let dateString = self.nkCommonInstance.findHeader("date", allHeaderFields: response.response?.allHeaderFields) {
-                    if let date = self.nkCommonInstance.convertDate(dateString, format: "EEE, dd MMM y HH:mm:ss zzz") {
-                        options.queue.async { completion(account, ocId, date, response, .success) }
-                    } else {
-                        options.queue.async { completion(account, nil, nil, response, .invalidDate) }
-                    }
+                if let afError = error.asAFError,
+                   case .responseSerializationFailed(let reason) = afError,
+                   case .inputDataNilOrZeroLength = reason {
+                    // Treat empty body as success
+                    result = .success
                 } else {
-                    options.queue.async { completion(account, nil, nil, response, .invalidDate) }
+                    result = NKError(error: error, afResponse: response, responseData: response.data)
                 }
+
+            case .success:
+                result = .success
+            }
+
+            options.queue.async {
+                completion(account, ocId, date, response, result)
             }
         }
     }
@@ -81,12 +90,25 @@ public extension NextcloudKit {
             task.taskDescription = options.taskDescription
             taskHandler(task)
         }.responseData(queue: self.nkCommonInstance.backgroundQueue) { response in
+            let result: NKError
+
             switch response.result {
             case .failure(let error):
-                let error = NKError(error: error, afResponse: response, responseData: response.data)
-                options.queue.async { completion(account, response, error) }
+                if let afError = error.asAFError,
+                   case .responseSerializationFailed(let reason) = afError,
+                   case .inputDataNilOrZeroLength = reason {
+                    // Treat empty body as success
+                    result = .success
+                } else {
+                    result = NKError(error: error, afResponse: response, responseData: response.data)
+                }
+
             case .success:
-                options.queue.async { completion(account, response, .success) }
+                result = .success
+            }
+
+            options.queue.async {
+                completion(account, response, result)
             }
         }
     }
@@ -132,25 +154,26 @@ public extension NextcloudKit {
             task.taskDescription = options.taskDescription
             taskHandler(task)
         }.responseData(queue: self.nkCommonInstance.backgroundQueue) { response in
+            let result: NKError
+
             switch response.result {
-                case .failure(let error):
-                if let afError = error.asAFError, case .responseSerializationFailed(let reason) = afError, case .inputDataNilOrZeroLength = reason {
-                    // body nil, is .success
-                    options.queue.async {
-                        completion(account, response, .success)
-                    }
-                    return
+            case .failure(let error):
+                if let afError = error.asAFError,
+                   case .responseSerializationFailed(let reason) = afError,
+                   case .inputDataNilOrZeroLength = reason {
+                    // Treat empty body as success
+                    result = .success
+                } else {
+                    result = NKError(error: error, afResponse: response, responseData: response.data)
                 }
 
-                let error = NKError(error: error, afResponse: response, responseData: response.data)
-                options.queue.async {
-                    completion(account, response, error)
-                }
-                case .success:
-                    options.queue.async {
-                        completion(account, response, .success)
-                    }
-                }
+            case .success:
+                result = .success
+            }
+
+            options.queue.async {
+                completion(account, response, result)
+            }
         }
     }
 
@@ -198,12 +221,25 @@ public extension NextcloudKit {
             task.taskDescription = options.taskDescription
             taskHandler(task)
         }.responseData(queue: self.nkCommonInstance.backgroundQueue) { response in
+            let result: NKError
+
             switch response.result {
             case .failure(let error):
-                let error = NKError(error: error, afResponse: response, responseData: response.data)
-                options.queue.async { completion(account, response, error) }
+                if let afError = error.asAFError,
+                   case .responseSerializationFailed(let reason) = afError,
+                   case .inputDataNilOrZeroLength = reason {
+                    // Treat empty body as success
+                    result = .success
+                } else {
+                    result = NKError(error: error, afResponse: response, responseData: response.data)
+                }
+
             case .success:
-                options.queue.async { completion(account, response, .success) }
+                result = .success
+            }
+
+            options.queue.async {
+                completion(account, response, result)
             }
         }
     }
@@ -483,12 +519,25 @@ public extension NextcloudKit {
             task.taskDescription = options.taskDescription
             taskHandler(task)
         }.responseData(queue: self.nkCommonInstance.backgroundQueue) { response in
+            let result: NKError
+
             switch response.result {
             case .failure(let error):
-                let error = NKError(error: error, afResponse: response, responseData: response.data)
-                options.queue.async { completion(account, response, error) }
+                if let afError = error.asAFError,
+                   case .responseSerializationFailed(let reason) = afError,
+                   case .inputDataNilOrZeroLength = reason {
+                    // Treat empty body as success
+                    result = .success
+                } else {
+                    result = NKError(error: error, afResponse: response, responseData: response.data)
+                }
+
             case .success:
-                options.queue.async { completion(account, response, .success) }
+                result = .success
+            }
+
+            options.queue.async {
+                completion(account, response, result)
             }
         }
     }
