@@ -34,14 +34,6 @@ extension OCSPath {
 
 public struct NKError: Error, Equatable {
     static let internalError = -9999
-    // Chunk error
-    public static let chunkNoEnoughMemory = -9998
-    public static let chunkMoveFile = -9997
-    public static let chunkCreateFolder = -9996
-    public static let chunkFilesNull = -9995
-    public static let chunkFileNull = -9994
-    public static let chunkFileUpload = -9993
-
     public let errorCode: Int
     public let errorDescription: String
     public let error: Error
@@ -56,6 +48,15 @@ public struct NKError: Error, Equatable {
     public static let unavailableError = NKError(errorCode: 503, errorDescription: NSLocalizedString("_Unavailable_", value: "Unavailable", comment: ""))
     public static let forbiddenError = NKError(errorCode: 403, errorDescription: NSLocalizedString("_forbidden_", value: "Forbidden", comment: ""))
     public static let cancelled = NKError(errorCode: -999, errorDescription: NSLocalizedString("_cancelled_", value: "Cancelled", comment: ""))
+
+    public static let uploadIncomplete = NKError(errorCode: -9992, errorDescription: NSLocalizedString("_upload_incomplete_", value: "Upload incomplete", comment: ""))
+
+    public static let errorChunkFileUpload = NKError(errorCode: -9993, errorDescription: NSLocalizedString("_upload_incomplete_", value: "Upload incomplete", comment: ""))
+    public static let errorChunkFileNull = NKError(errorCode: -9994, errorDescription: NSLocalizedString("_error_file_null_", value: "File not found", comment: ""))
+    public static let errorChunkFilesEmpty = NKError(errorCode: -9995, errorDescription: NSLocalizedString("_chunk_files_empty_", value: "Files not found", comment: ""))
+    public static let errorChunkCreateFolder = NKError(errorCode: -9996, errorDescription: NSLocalizedString("_error_create_folder_", value: "Create folder error", comment: ""))
+    public static let errorChunkMoveFile = NKError(errorCode: -9997, errorDescription: NSLocalizedString("_error_move_folder_", value: "Move file error", comment: ""))
+    public static let errorChunkNoEnoughMemory = NKError(errorCode: -9998, errorDescription: NSLocalizedString("_no_enough_memory_", value: "No enough memory", comment: ""))
 
     public static let success = NKError(errorCode: 0, errorDescription: "")
 
