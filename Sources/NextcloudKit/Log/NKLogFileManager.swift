@@ -150,18 +150,16 @@ public final class NKLogFileManager {
         let consoleTimestamp = Self.localizedTimestampString()
         let fileLine = "\(fileTimestamp) \(message)\n"
 
-        // First emoji based on typeTag (e.g. [ERROR], [DEBUG], etc.)
-        let emojiFromTag = typeTag.map { emojiColored($0.rawValue) } ?? ""
+        // Determine which emoji to display in console
+        let emoji = typeTag.map { emojiColored($0.rawValue) } ?? emojiColored(message)
 
-        // Second emoji based on content of message (e.g. [SUCCESS] or [ERROR] keywords)
-        let emojiFromMessage = emojiColored(message)
-
-        // Build visual message with replacements
+        // Visual message with inline replacements
         let visualMessage = message
             .replacingOccurrences(of: "[SUCCESS]", with: "🟢")
             .replacingOccurrences(of: "[ERROR]", with: "🔴")
 
-        let consoleLine = "[NKLOG] [\(consoleTimestamp)] \(emojiFromTag)\(emojiFromMessage)\(visualMessage)"
+        // Build the console line with emoji
+        let consoleLine = "[NKLOG] [\(consoleTimestamp)] \(emoji)\(visualMessage)"
         print(consoleLine)
 
         rotationQueue.sync {
