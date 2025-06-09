@@ -32,6 +32,16 @@ public func nkLog(network message: String) {
     NKLogFileManager.shared.writeLog(network: message)
 }
 
+@inlinable
+public func nkLog(start message: String) {
+    NKLogFileManager.shared.writeLog(start: message)
+}
+
+@inlinable
+public func nkLog(stop message: String) {
+    NKLogFileManager.shared.writeLog(stop: message)
+}
+
 /// Logs a custom tagged message.
 /// - Parameters:
 ///   - tag: A custom uppercase tag, e.g. \"PUSH\", \"SYNC\", \"AUTH\".

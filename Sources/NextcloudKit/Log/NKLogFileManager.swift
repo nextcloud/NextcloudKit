@@ -46,6 +46,8 @@ public enum NKLogTagEmoji: String {
     case info = "[INFO]"
     case debug = "[DEBUG]"
     case network = "[NETWORK]"
+    case start = "[START]"
+    case stop = "[STOP]"
 }
 
 /// A logger that writes log messages to a file in a subdirectory of the user's Documents folder,
@@ -125,6 +127,14 @@ public final class NKLogFileManager {
         writeLog("[NETWORK] \(message)")
     }
 
+    public func writeLog(start message: String) {
+        writeLog("[START] \(message)")
+    }
+
+    public func writeLog(stop message: String) {
+        writeLog("[STOP] \(message)")
+    }
+
     /// Writes a tagged log message with a specific log level.
     /// - Parameters:
     ///   - tag: A custom tag to classify the log message (e.g. "SYNC", "AUTH").
@@ -185,6 +195,10 @@ public final class NKLogFileManager {
             return "⚪️ "
         } else if message.contains("[NETWORK]") {
             return "🌐 "
+        } else if message.contains("[START]") {
+            return "🚀 "
+        } else if message.contains("[STOP]") {
+            return "⏹️ "
         } else {
             return ""
         }
