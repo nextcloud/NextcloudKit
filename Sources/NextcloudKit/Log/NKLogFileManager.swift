@@ -155,8 +155,8 @@ public final class NKLogFileManager {
 
         // Visual message with inline replacements
         let visualMessage = message
-            .replacingOccurrences(of: "[SUCCESS]", with: "🟢")
-            .replacingOccurrences(of: "[ERROR]", with: "🔴")
+            .replacingOccurrences(of: "RESPONSE: SUCCESS", with: "🟢")
+            .replacingOccurrences(of: "RESPONSE: ERROR", with: "🔴")
 
         // Build the console line with emoji
         let consoleLine = "[NKLOG] [\(consoleTimestamp)] \(emoji)\(visualMessage)"
