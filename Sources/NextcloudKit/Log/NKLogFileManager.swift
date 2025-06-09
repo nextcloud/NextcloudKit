@@ -160,12 +160,11 @@ public final class NKLogFileManager {
 
         let fileTimestamp = Self.stableTimestampString()
         let consoleTimestamp = Self.localizedTimestampString()
-        let fullMessage = "\(fileTimestamp) \(message)\n"
+        let emoji = printColor ? emojiColored(message) : ""
+        let fullMessage = "\(fileTimestamp) \(emoji)\(message)\n"
 
         if printLog {
-            let consoleLine = printColor
-                ? emojiColored(message) + "\(consoleTimestamp) \(message)"
-                : "\(consoleTimestamp) \(message)"
+            let consoleLine = "\(consoleTimestamp) \(emoji)\(message)"
             print(consoleLine)
         }
 
