@@ -34,9 +34,9 @@ public func nkLog(network message: String) {
 
 /// Logs a custom tagged message at the specified level.
 /// - Parameters:
-///   - tag: A custom uppercase tag, e.g. \"UPLOAD\", \"SYNC\", \"AUTH\".
+///   - tag: A custom uppercase tag, e.g. \"PUSH\", \"SYNC\", \"AUTH\".
+///   - typeTag: the type tag .info, .debug, .warning, .error, .success ..
 ///   - message: The message to log.
-///   - level: The minimum level required for the message to be recorded.
 @inlinable
 public func nkLog(tag: String, typeTag: NKLogTypeTag = .debug, message: String) {
     NKLogFileManager.shared.writeLog(tag: tag, typeTag: typeTag, message: message)
