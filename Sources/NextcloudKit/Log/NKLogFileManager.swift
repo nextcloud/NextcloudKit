@@ -40,11 +40,12 @@ public enum NKLogLevel: Int, CaseIterable, Identifiable, Comparable {
 
 /// Type for writes a emonji in writeLog(tag: ...)
 public enum NKLogTagEmoji: String {
-    case debug = "[DEBUG]"
-    case info = "[INFO]"
-    case warning = "[WARNING]"
     case error = "[ERROR]"
     case success = "[SUCCESS]"
+    case warning = "[WARNING]"
+    case info = "[INFO]"
+    case debug = "[DEBUG]"
+    case network = "[NETWORK]"
 }
 
 /// A logger that writes log messages to a file in a subdirectory of the user's Documents folder,
