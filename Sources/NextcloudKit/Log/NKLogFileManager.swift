@@ -48,7 +48,7 @@ public enum NKLogTypeTag: String {
 }
 
 /// A logger that writes log messages to a file in a subdirectory of the user's Documents folder,
-/// rotates the log daily, and compresses old logs with GZip.
+/// rotates the log daily
 /// Compatible with iOS 13.0+ and Swift 6.
 public final class NKLogFileManager {
 
@@ -104,13 +104,6 @@ public final class NKLogFileManager {
 
     // MARK: - Public API
 
-    public func compressedLogs() -> [URL] {
-        guard let files = try? fileManager.contentsOfDirectory(at: logDirectory, includingPropertiesForKeys: nil) else {
-            return []
-        }
-        return files.filter { $0.pathExtension == "gz" }
-    }
-
     public func writeLog(debug message: String) {
         writeLog("[DEBUG] \(message)")
     }
@@ -134,8 +127,8 @@ public final class NKLogFileManager {
     /// Writes a tagged log message with a specific log level.
     /// - Parameters:
     ///   - tag: A custom tag to classify the log message (e.g. "SYNC", "AUTH").
+    ///   - typeTag: the type tag .info, .debug, .warning, .error, .success ..
     ///   - message: The log message content.
-    ///   - level: The minimum level required for this message to be written.
     public func writeLog(tag: String, typeTag: NKLogTypeTag, message: String) {
         guard !tag.isEmpty else { return }
         let emojiColored = emojiColored(typeTag.rawValue)
