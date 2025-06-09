@@ -148,6 +148,10 @@ public final class NKLogFileManager {
         writeLog("[ERROR] \(message)")
     }
 
+    public func writeLog(network message: String) {
+        writeLog("[NETWORK] \(message)")
+    }
+
     /// Writes a tagged log message with a specific log level.
     /// - Parameters:
     ///   - tag: A custom tag to classify the log message (e.g. "SYNC", "AUTH").
@@ -192,8 +196,10 @@ public final class NKLogFileManager {
             return "🔵 "
         } else if message.contains("[DEBUG]") {
             return "⚪️ "
-        } else {
+        } else if message.contains("[NETWORK]") {
             return "🟣 "
+        } else {
+            return ""
         }
     }
 

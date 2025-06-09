@@ -27,6 +27,11 @@ public func nkLog(error message: String) {
     NKLogFileManager.shared.writeLog(error: message)
 }
 
+@inlinable
+public func nkLog(network message: String) {
+    NKLogFileManager.shared.writeLog(error: message)
+}
+
 /// Logs a custom tagged message at the specified level.
 /// - Parameters:
 ///   - tag: A custom uppercase tag, e.g. \"UPLOAD\", \"SYNC\", \"AUTH\".

@@ -58,13 +58,13 @@ final class NKMonitor: EventMonitor, Sendable {
             if let method = request.request?.httpMethod,
                let url = request.request?.url?.absoluteString,
                let code = response.response?.statusCode {
-                let statusSymbol: String
+                let response: String
                 if NKLogFileManager.shared.printColor {
-                    statusSymbol = (200..<300).contains(code) ? "🟢" : "🔴"
+                    response = (200..<300).contains(code) ? "🟢" : "🔴"
                 } else {
-                    statusSymbol = (200..<300).contains(code) ? "SUCCESS" : "ERROR"
+                    response = (200..<300).contains(code) ? "SUCCESS" : "ERROR"
                 }
-                nkLog(info: "\(statusSymbol) \(code) \(method) \(url)")
+                nkLog(network: "\(code) \(method) \(url) \(response)")
             }
         case .verbose:
             nkLog(debug: "Network response result: \(date) " + responseDebugDescription)
