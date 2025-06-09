@@ -59,14 +59,10 @@ public final class NKLogFileManager {
 
     /// Configures the shared logger instance.
     /// - Parameters:
-    ///   - printLog: Whether to print logs to the console.
-    ///   - printColor: Whether to print logs to the console with the emojiColored
     ///   - minLevel: The minimum log level to be recorded.
 
-    public static func configure(printLog: Bool = true,
-                                 printColor: Bool = true,
-                                 logLevel: NKLogLevel = .normal) {
-        shared.setConfiguration(printLog: printLog, printColor: printColor, logLevel: logLevel)
+    public static func configure(logLevel: NKLogLevel = .normal) {
+        shared.setConfiguration(logLevel: logLevel)
     }
 
     /// Returns the file URL of the currently active log file.
@@ -76,10 +72,8 @@ public final class NKLogFileManager {
 
     // MARK: - Configuration
 
-    private let logFileName = "log.md"
+    private let logFileName = "log.txt"
     private let logDirectory: URL
-    private var printLog: Bool
-    public var printColor: Bool = true
     public var logLevel: NKLogLevel
     private var currentLogDate: String
     private let logQueue = DispatchQueue(label: "LogWriterQueue", attributes: .concurrent)
@@ -87,8 +81,7 @@ public final class NKLogFileManager {
 
     // MARK: - Initialization
 
-    private init(printLog: Bool = true, logLevel: NKLogLevel = .normal) {
-        self.printLog = printLog
+    private init(logLevel: NKLogLevel = .normal) {
         self.logLevel = logLevel
 
         let documents = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
@@ -102,14 +95,9 @@ public final class NKLogFileManager {
 
     /// Sets configuration parameters for the logger.
     /// - Parameters:
-    ///   - printLog: Whether to print logs to the console.
-    ///   - printColor: Whether to print logs to the console with the emojiColored
-    ///   - minLevel: The minimum log level.
-    ///   - retentionDays: Number of days to retain compressed logs.
+    ///   - logLevel: The  log level.
     ///
-    private func setConfiguration(printLog: Bool, printColor: Bool, logLevel: NKLogLevel) {
-        self.printLog = printLog
-        self.printColor = printColor
+    private func setConfiguration(logLevel: NKLogLevel) {
         self.logLevel = logLevel
     }
 
@@ -149,28 +137,26 @@ public final class NKLogFileManager {
     ///   - level: The minimum level required for this message to be written.
     public func writeLog(tag: String, typeTag: NKLogTypeTag, message: String) {
         guard !tag.isEmpty else { return }
-        let emojiColored = printColor ? emojiColored(typeTag.rawValue) : ""
+        let emojiColored = emojiColored(typeTag.rawValue)
 
         writeLog("\(emojiColored)[\(tag.uppercased())] \(message)")
     }
 
     public func writeLog(_ message: String?) {
-        guard logLevel != .disabled else { return }
-        guard let message = message else { return }
+        guard logLevel != .disabled, let message = message else { return }
 
         let fileTimestamp = Self.stableTimestampString()
         let consoleTimestamp = Self.localizedTimestampString()
-        let emoji = printColor ? emojiColored(message) : ""
-        let fullMessage = "\(fileTimestamp) \(emoji)\(message)\n"
+        let line = "[\(consoleTimestamp)] \(message)"
+        let fileLine = "\(fileTimestamp) \(message)\n"
 
-        if printLog {
-            let consoleLine = "\(consoleTimestamp) \(emoji)\(message)"
-            print(consoleLine)
-        }
+        let emoji = emojiColored(message)
+        let consoleLine = "\(emoji)\(line)"
+        print(consoleLine)
 
-        logQueue.async(flags: .barrier) {
+        logQueue.async {
             self.checkForRotation()
-            self.appendToLog(fullMessage)
+            self.appendToLog(fileLine)
         }
     }
 
@@ -204,7 +190,7 @@ public final class NKLogFileManager {
 
     private func rotateLog(for date: String) {
         let currentPath = logDirectory.appendingPathComponent(logFileName)
-        let rotatedPath = logDirectory.appendingPathComponent("log-\(date).md")
+        let rotatedPath = logDirectory.appendingPathComponent("log-\(date).txt")
 
         do {
             if fileManager.fileExists(atPath: currentPath.path) {

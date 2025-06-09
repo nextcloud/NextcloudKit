@@ -58,6 +58,7 @@ final class NKMonitor: EventMonitor, Sendable {
             if let method = request.request?.httpMethod,
                let url = request.request?.url?.absoluteString,
                let code = response.response?.statusCode {
+                /*
                 let response: String
                 if NKLogFileManager.shared.printColor {
                     response = (200..<300).contains(code) ? "🟢" : "🔴"
@@ -65,6 +66,7 @@ final class NKMonitor: EventMonitor, Sendable {
                     response = (200..<300).contains(code) ? "SUCCESS" : "ERROR"
                 }
                 nkLog(network: "\(code) \(method) \(url) \(response)")
+                */
             }
         case .verbose:
             nkLog(debug: "Network response result: \(date) " + responseDebugDescription)
