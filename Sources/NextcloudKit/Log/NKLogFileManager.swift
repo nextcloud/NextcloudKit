@@ -2,12 +2,7 @@
 // SPDX-FileCopyrightText: 2025 Marino Faggiana
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-// SPDX-FileCopyrightText: Nextcloud GmbH
-// SPDX-FileCopyrightText: 2025 Marino Faggiana
-// SPDX-License-Identifier: GPL-3.0-or-later
-
 import Foundation
-import Compression
 
 /// Defines the severity level of a log message.
 /// Defines the level of log verbosity.
@@ -67,13 +62,11 @@ public final class NKLogFileManager {
     ///   - printLog: Whether to print logs to the console.
     ///   - printColor: Whether to print logs to the console with the emojiColored
     ///   - minLevel: The minimum log level to be recorded.
-    ///   - retentionDays: Number of days to keep compressed logs.
 
     public static func configure(printLog: Bool = true,
                                  printColor: Bool = true,
-                                 logLevel: NKLogLevel = .normal,
-                                 retentionDays: Int = 30) {
-        shared.setConfiguration(printLog: printLog, printColor: printColor, logLevel: logLevel, retentionDays: retentionDays)
+                                 logLevel: NKLogLevel = .normal) {
+        shared.setConfiguration(printLog: printLog, printColor: printColor, logLevel: logLevel)
     }
 
     /// Returns the file URL of the currently active log file.
@@ -83,22 +76,20 @@ public final class NKLogFileManager {
 
     // MARK: - Configuration
 
-    private let logFileName = "log.txt"
+    private let logFileName = "log.md"
     private let logDirectory: URL
     private var printLog: Bool
     public var printColor: Bool = true
     public var logLevel: NKLogLevel
     private var currentLogDate: String
-    private var retentionDays: Int
     private let logQueue = DispatchQueue(label: "LogWriterQueue", attributes: .concurrent)
     private let fileManager = FileManager.default
 
     // MARK: - Initialization
 
-    private init(printLog: Bool = true, logLevel: NKLogLevel = .normal, retentionDays: Int = 30) {
+    private init(printLog: Bool = true, logLevel: NKLogLevel = .normal) {
         self.printLog = printLog
         self.logLevel = logLevel
-        self.retentionDays = retentionDays
 
         let documents = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
         let logsFolder = documents.appendingPathComponent("Logs", isDirectory: true)
@@ -116,11 +107,10 @@ public final class NKLogFileManager {
     ///   - minLevel: The minimum log level.
     ///   - retentionDays: Number of days to retain compressed logs.
     ///
-    private func setConfiguration(printLog: Bool, printColor: Bool, logLevel: NKLogLevel, retentionDays: Int) {
+    private func setConfiguration(printLog: Bool, printColor: Bool, logLevel: NKLogLevel) {
         self.printLog = printLog
         self.printColor = printColor
         self.logLevel = logLevel
-        self.retentionDays = retentionDays
     }
 
     // MARK: - Public API
@@ -197,7 +187,7 @@ public final class NKLogFileManager {
         } else if message.contains("[DEBUG]") {
             return "⚪️ "
         } else if message.contains("[NETWORK]") {
-            return "🟣 "
+            return "🌐 "
         } else {
             return ""
         }
@@ -215,40 +205,18 @@ public final class NKLogFileManager {
 
     private func rotateLog(for date: String) {
         let currentPath = logDirectory.appendingPathComponent(logFileName)
-        let rotatedPath = logDirectory.appendingPathComponent("log-\(date)")
-        let compressedPath = rotatedPath.appendingPathExtension("gz")
+        let rotatedPath = logDirectory.appendingPathComponent("log-\(date).md")
 
         do {
             if fileManager.fileExists(atPath: currentPath.path) {
                 try fileManager.moveItem(at: currentPath, to: rotatedPath)
-                try compressFile(at: rotatedPath, to: compressedPath)
-                try fileManager.removeItem(at: rotatedPath)
             }
 
+            // Create a new empty log file for today
             try Data().write(to: currentPath)
-            cleanupOldLogs()
+
         } catch {
             print("Log rotation failed: \(error)")
-        }
-    }
-
-    private func cleanupOldLogs() {
-        let calendar = Calendar.current
-        let now = Date()
-
-        guard let enumerator = try? fileManager.contentsOfDirectory(at: logDirectory, includingPropertiesForKeys: [.contentModificationDateKey], options: [.skipsHiddenFiles]) else {
-            return
-        }
-
-        for fileURL in enumerator {
-            guard fileURL.pathExtension == "gz" else { continue }
-
-            if let attrs = try? fileURL.resourceValues(forKeys: [.contentModificationDateKey]),
-               let modDate = attrs.contentModificationDate,
-               let expiryDate = calendar.date(byAdding: .day, value: -retentionDays, to: now),
-               modDate < expiryDate {
-                try? fileManager.removeItem(at: fileURL)
-            }
         }
     }
 
@@ -268,31 +236,6 @@ public final class NKLogFileManager {
         } else {
             try? data.write(to: logPath)
         }
-    }
-
-    // MARK: - Compression
-
-    private func compressFile(at inputURL: URL, to outputURL: URL) throws {
-        let inputData = try Data(contentsOf: inputURL)
-        var compressedBuffer = [UInt8](repeating: 0, count: inputData.count)
-
-        let compressedSize = inputData.withUnsafeBytes { srcPtr in
-            compression_encode_buffer(
-                &compressedBuffer,
-                compressedBuffer.count,
-                srcPtr.baseAddress!.assumingMemoryBound(to: UInt8.self),
-                inputData.count,
-                nil,
-                COMPRESSION_ZLIB
-            )
-        }
-
-        guard compressedSize > 0 else {
-            throw NSError(domain: "CompressionError", code: -1, userInfo: [NSLocalizedDescriptionKey: "Compression failed"])
-        }
-
-        let compressedData = Data(bytes: compressedBuffer, count: compressedSize)
-        try compressedData.write(to: outputURL)
     }
 
     // MARK: - Date Helpers

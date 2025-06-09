@@ -29,7 +29,7 @@ public func nkLog(error message: String) {
 
 @inlinable
 public func nkLog(network message: String) {
-    NKLogFileManager.shared.writeLog(error: message)
+    NKLogFileManager.shared.writeLog(network: message)
 }
 
 /// Logs a custom tagged message at the specified level.

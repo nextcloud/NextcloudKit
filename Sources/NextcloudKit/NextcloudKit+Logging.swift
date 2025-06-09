@@ -11,11 +11,9 @@ public extension NextcloudKit {
     /// Configure the shared logger from NextcloudKit
     static func configureLogger(printLog: Bool = true,
                                 printColor: Bool = true,
-                                logLevel: NKLogLevel = .normal,
-                                retentionDays: Int = 30) {
+                                logLevel: NKLogLevel = .normal) {
         NKLogFileManager.configure(printLog: printLog,
                                    printColor: printColor,
-                                   logLevel: logLevel,
-                                   retentionDays: retentionDays)
+                                   logLevel: logLevel)
     }
 }
