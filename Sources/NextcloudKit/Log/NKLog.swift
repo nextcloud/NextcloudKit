@@ -32,7 +32,7 @@ public func nkLog(network message: String) {
     NKLogFileManager.shared.writeLog(network: message)
 }
 
-/// Logs a custom tagged message at the specified level.
+/// Logs a custom tagged message.
 /// - Parameters:
 ///   - tag: A custom uppercase tag, e.g. \"PUSH\", \"SYNC\", \"AUTH\".
 ///   - typeTag: the type tag .info, .debug, .warning, .error, .success ..
