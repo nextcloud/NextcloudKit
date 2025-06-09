@@ -58,7 +58,7 @@ final class NKMonitor: EventMonitor, Sendable {
             if let method = request.request?.httpMethod,
                let url = request.request?.url?.absoluteString,
                let code = response.response?.statusCode {
-                let response = (200..<300).contains(code) ? "SUCCESS" : "ERROR"
+                let response = (200..<300).contains(code) ? "RESPONSE: SUCCESS" : "RESPONSE: ERROR"
                 nkLog(network: "\(code) \(method) \(url) \(response)")
             }
         case .verbose:

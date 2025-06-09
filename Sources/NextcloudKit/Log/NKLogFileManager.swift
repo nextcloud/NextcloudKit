@@ -161,8 +161,8 @@ public final class NKLogFileManager {
         // Prepare the console line with emoji prefix and keyword substitution
         let emojiPrefix = emojiColored(message)
         let visualMessage = message
-            .replacingOccurrences(of: "[SUCCESS]", with: "🟢")
-            .replacingOccurrences(of: "[ERROR]", with: "🔴")
+            .replacingOccurrences(of: "RESPONSE: SUCCESS", with: "🟢")
+            .replacingOccurrences(of: "RESPONSE: ERROR", with: "🔴")
 
         let consoleLine = "[NKLOG] [\(consoleTimestamp)] \(emojiPrefix)\(visualMessage)"
         print(consoleLine)
