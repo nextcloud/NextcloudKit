@@ -77,6 +77,7 @@ public final class NKLogFileManager {
     public var logLevel: NKLogLevel
     private var currentLogDate: String
     private let logQueue = DispatchQueue(label: "LogWriterQueue", attributes: .concurrent)
+    private let rotationQueue = DispatchQueue(label: "LogRotationQueue")
     private let fileManager = FileManager.default
 
     // MARK: - Initialization
@@ -142,20 +143,37 @@ public final class NKLogFileManager {
         writeLog("\(emojiColored)[\(tag.uppercased())] \(message)")
     }
 
+    /// Writes a log message to both the console and the log file.
+    /// Emojis and keyword replacements (e.g. [SUCCESS] -> 🟢) are only applied to the console output.
+    /// The log file is plain and suitable for parsing. Rotation is handled before writing.
+    ///
+    /// - Parameter message: The log message to record.
     public func writeLog(_ message: String?) {
         guard logLevel != .disabled, let message = message else { return }
 
+        // Generate timestamps for file and console
         let fileTimestamp = Self.stableTimestampString()
         let consoleTimestamp = Self.localizedTimestampString()
-        let line = "[\(consoleTimestamp)] \(message)"
+
+        // Prepare the clean file line (without emojis or replacements)
         let fileLine = "\(fileTimestamp) \(message)\n"
 
-        let emoji = emojiColored(message)
-        let consoleLine = "\(emoji)\(line)"
+        // Prepare the console line with emoji prefix and keyword substitution
+        let emojiPrefix = emojiColored(message)
+        let visualMessage = message
+            .replacingOccurrences(of: "[SUCCESS]", with: "🟢")
+            .replacingOccurrences(of: "[ERROR]", with: "🔴")
+
+        let consoleLine = "[NKLOG] [\(consoleTimestamp)] \(emojiPrefix)\(visualMessage)"
         print(consoleLine)
 
-        logQueue.async {
+        // Ensure log rotation is completed before writing to the file
+        rotationQueue.sync {
             self.checkForRotation()
+        }
+
+        // Write to the log file asynchronously
+        logQueue.async {
             self.appendToLog(fileLine)
         }
     }
