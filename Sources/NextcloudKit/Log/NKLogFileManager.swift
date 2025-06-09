@@ -38,8 +38,8 @@ public enum NKLogLevel: Int, CaseIterable, Identifiable, Comparable {
     }
 }
 
-/// Type for writes a tagged log message
-public enum NKLogTypeTag: String {
+/// Type for writes a emonji in writeLog(tag: ...)
+public enum NKLogTagEmoji: String {
     case debug = "[DEBUG]"
     case info = "[INFO]"
     case warning = "[WARNING]"
@@ -129,11 +129,11 @@ public final class NKLogFileManager {
     ///   - tag: A custom tag to classify the log message (e.g. "SYNC", "AUTH").
     ///   - typeTag: the type tag .info, .debug, .warning, .error, .success ..
     ///   - message: The log message content.
-    public func writeLog(tag: String, typeTag: NKLogTypeTag, message: String) {
+    public func writeLog(tag: String, emonji: NKLogTagEmoji, message: String) {
         guard !tag.isEmpty else { return }
 
         let taggedMessage = "[\(tag.uppercased())] \(message)"
-        writeLog(taggedMessage, typeTag: typeTag)
+        writeLog(taggedMessage, emonji: emonji)
     }
 
     /// Writes a log message with an optional typeTag to determine console emoji.
@@ -143,7 +143,7 @@ public final class NKLogFileManager {
     /// - Parameters:
     ///   - message: The log message to record.
     ///   - typeTag: Optional log type tag to determine console emoji (e.g. [INFO], [ERROR]).
-    public func writeLog(_ message: String?, typeTag: NKLogTypeTag? = nil) {
+    public func writeLog(_ message: String?, emonji: NKLogTagEmoji? = nil) {
         guard logLevel != .disabled, let message = message else { return }
 
         let fileTimestamp = Self.stableTimestampString()
@@ -151,7 +151,7 @@ public final class NKLogFileManager {
         let fileLine = "\(fileTimestamp) \(message)\n"
 
         // Determine which emoji to display in console
-        let emoji = typeTag.map { emojiColored($0.rawValue) } ?? emojiColored(message)
+        let emoji = emonji.map { emojiColored($0.rawValue) } ?? emojiColored(message)
 
         // Visual message with inline replacements
         let visualMessage = message

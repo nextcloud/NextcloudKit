@@ -38,6 +38,6 @@ public func nkLog(network message: String) {
 ///   - typeTag: the type tag .info, .debug, .warning, .error, .success ..
 ///   - message: The message to log.
 @inlinable
-public func nkLog(tag: String, typeTag: NKLogTypeTag = .debug, message: String) {
-    NKLogFileManager.shared.writeLog(tag: tag, typeTag: typeTag, message: message)
+public func nkLog(tag: String, emonji: NKLogTagEmoji  = .debug, message: String) {
+    NKLogFileManager.shared.writeLog(tag: tag, emonji: emonji, message: message)
 }
