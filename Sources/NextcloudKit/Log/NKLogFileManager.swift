@@ -131,18 +131,20 @@ public final class NKLogFileManager {
     ///   - message: The log message content.
     public func writeLog(tag: String, typeTag: NKLogTypeTag, message: String) {
         guard !tag.isEmpty else { return }
-        let emojiColored = emojiColored(typeTag.rawValue)
 
-        writeLog("\(emojiColored)[\(tag.uppercased())] \(message)")
+        let taggedMessage = "[\(tag.uppercased())] \(message)"
+        writeLog(taggedMessage, typeTag: typeTag)
     }
 
-    /// Writes a log message to both the console and the log file.
+    /// Writes a log message with an optional typeTag to determine console emoji.
     /// Emojis and keyword replacements (e.g. [SUCCESS] -> 🟢) are only applied to the console output.
-    /// The log file is plain and suitable for parsing. Rotation is handled before writing.
+    /// The file output remains clean (no emoji or substitutions).
     ///
-    /// - Parameter message: The log message to record.
-    public func writeLog(_ message: String?) {
-        guard logLevel != .disabled, let message = message else { return }
+    /// - Parameters:
+    ///   - message: The log message to record.
+    ///   - typeTag: Optional log type tag to determine console emoji (e.g. [INFO], [ERROR]).
+    public func writeLog(_ message: String, typeTag: NKLogTypeTag? = nil) {
+        guard logLevel != .disabled else { return }
 
         // Generate timestamps for file and console
         let fileTimestamp = Self.stableTimestampString()
@@ -151,21 +153,21 @@ public final class NKLogFileManager {
         // Prepare the clean file line (without emojis or replacements)
         let fileLine = "\(fileTimestamp) \(message)\n"
 
-        // Prepare the console line with emoji prefix and keyword substitution
-        let emojiPrefix = emojiColored(message)
+        // Determine emoji only if a typeTag is provided
+        let emojiPrefix = typeTag.map { emojiColored($0.rawValue) } ?? ""
+
+        // Apply keyword replacements (e.g. [SUCCESS] -> 🟢) only in console
         let visualMessage = message
-            .replacingOccurrences(of: "RESPONSE: SUCCESS", with: "🟢")
-            .replacingOccurrences(of: "RESPONSE: ERROR", with: "🔴")
+            .replacingOccurrences(of: "[SUCCESS]", with: "🟢")
+            .replacingOccurrences(of: "[ERROR]", with: "🔴")
 
         let consoleLine = "[NKLOG] [\(consoleTimestamp)] \(emojiPrefix)\(visualMessage)"
         print(consoleLine)
 
-        // Ensure log rotation is completed before writing to the file
         rotationQueue.sync {
             self.checkForRotation()
         }
 
-        // Write to the log file asynchronously
         logQueue.async {
             self.appendToLog(fileLine)
         }
