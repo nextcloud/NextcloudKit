@@ -123,6 +123,10 @@ public final class NKLogFileManager {
         writeLog("[ERROR] \(message)")
     }
 
+    public func writeLog(success message: String) {
+        writeLog("[SUCCESS] \(message)")
+    }
+
     public func writeLog(network message: String) {
         writeLog("[NETWORK] \(message)")
     }

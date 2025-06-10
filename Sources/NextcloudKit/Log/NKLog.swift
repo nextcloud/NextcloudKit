@@ -28,6 +28,11 @@ public func nkLog(error message: String) {
 }
 
 @inlinable
+public func nkLog(success message: String) {
+    NKLogFileManager.shared.writeLog(success: message)
+}
+
+@inlinable
 public func nkLog(network message: String) {
     NKLogFileManager.shared.writeLog(network: message)
 }
