@@ -11,7 +11,7 @@ public enum NKLogLevel: Int, CaseIterable, Identifiable, Comparable {
     case disabled = 0
 
     /// Logs basic request lifecycle for developers (request started, response result).
-    case trace = 1
+    case compact = 1
 
     /// Logs important info such as result content, errors.
     case normal = 2
@@ -26,7 +26,7 @@ public enum NKLogLevel: Int, CaseIterable, Identifiable, Comparable {
     public var displayText: String {
         switch self {
         case .disabled: return NSLocalizedString("_disabled_", comment: "")
-        case .trace: return NSLocalizedString("_trace_", comment: "")
+        case .compact: return NSLocalizedString("_compact_", comment: "")
         case .normal: return NSLocalizedString("_normal_", comment: "")
         case .verbose: return NSLocalizedString("_verbose_", comment: "")
         }

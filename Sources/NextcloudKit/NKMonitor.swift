@@ -54,12 +54,17 @@ final class NKMonitor: EventMonitor, Sendable {
             } else {
                 nkLog(info: "Network response result: " + responseResultString)
             }
-        case .trace:
+        case .compact:
             if let method = request.request?.httpMethod,
                let url = request.request?.url?.absoluteString,
                let code = response.response?.statusCode {
-                let response = (200..<300).contains(code) ? "RESPONSE: SUCCESS" : "RESPONSE: ERROR"
-                nkLog(network: "\(code) \(method) \(url) \(response)")
+                // Determine response status string
+                let responseStatus = (200..<300).contains(code) ? "RESPONSE: SUCCESS" : "RESPONSE: ERROR"
+
+                // Extract error code if any
+                let errorCode = response.error.map { " (\($0._code))" } ?? ""
+
+                nkLog(network: "\(code) \(method) \(url) \(responseStatus)\(errorCode)")
             }
         case .verbose:
             nkLog(debug: "Network response result: \(date) " + responseDebugDescription)
