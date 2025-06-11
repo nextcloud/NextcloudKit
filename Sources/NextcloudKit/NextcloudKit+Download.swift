@@ -59,8 +59,8 @@ public extension NextcloudKit {
                 if etag != nil {
                     etag = etag?.replacingOccurrences(of: "\"", with: "")
                 }
-                if let dateString = self.nkCommonInstance.findHeader("Date", allHeaderFields: response.response?.allHeaderFields) {
-                    date = self.nkCommonInstance.convertDate(dateString, format: "EEE, dd MMM y HH:mm:ss zzz")
+                if let dateRaw = self.nkCommonInstance.findHeader("Date", allHeaderFields: response.response?.allHeaderFields) {
+                    date = dateRaw.parsedDate(using: "yyyy-MM-dd HH:mm:ss")
                 }
 
                 options.queue.async { completionHandler(account, etag, date, length, response, nil, .success) }

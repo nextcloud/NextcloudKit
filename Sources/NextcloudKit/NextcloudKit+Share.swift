@@ -435,7 +435,7 @@ public extension NextcloudKit {
         share.canEdit = json["can_edit"].boolValue
         share.displaynameFileOwner = json["displayname_file_owner"].stringValue
         share.displaynameOwner = json["displayname_owner"].stringValue
-        if let expiration = json["expiration"].string, let date = self.nkCommonInstance.convertDate(expiration, format: "YYYY-MM-dd HH:mm:ss") {
+        if let expiration = json["expiration"].string, let date = expiration.parsedDate(using: "YYYY-MM-dd HH:mm:ss") {
             share.expirationDate = date as NSDate
         }
         share.fileParent = json["file_parent"].intValue

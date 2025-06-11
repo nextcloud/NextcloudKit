@@ -50,9 +50,9 @@ public func nkLog(stop message: String) {
 /// Logs a custom tagged message.
 /// - Parameters:
 ///   - tag: A custom uppercase tag, e.g. \"PUSH\", \"SYNC\", \"AUTH\".
-///   - typeTag: the type tag .info, .debug, .warning, .error, .success ..
+///   - emoji: the type tag .info, .debug, .warning, .error, .success ..
 ///   - message: The message to log.
 @inlinable
-public func nkLog(tag: String, emonji: NKLogTagEmoji  = .debug, message: String) {
-    NKLogFileManager.shared.writeLog(tag: tag, emonji: emonji, message: message)
+public func nkLog(tag: String, emoji: NKLogTagEmoji  = .debug, message: String) {
+    NKLogFileManager.shared.writeLog(tag: tag, emoji: emoji, message: message)
 }

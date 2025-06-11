@@ -44,12 +44,11 @@ final class NKMonitor: EventMonitor, Sendable {
             nkCommonInstance.appendServerErrorAccount(account, errorCode: statusCode)
         }
 
-        let date = nkCommonInstance.convertDate(Date(), format: "yyyy-MM-dd' 'HH:mm:ss") ?? "unknown"
-        let resultString = String(describing: response.result)
-
         DispatchQueue.global(qos: .utility).async {
             switch NKLogFileManager.shared.logLevel {
             case .normal:
+                let resultString = String(describing: response.result)
+
                 if let request = response.request {
                     nkLog(info: "Network response request: \(request), result: \(resultString)")
                 } else {
@@ -68,6 +67,8 @@ final class NKMonitor: EventMonitor, Sendable {
             case .verbose:
                 let debugDesc = String(describing: response)
                 let headerFields = String(describing: response.response?.allHeaderFields ?? [:])
+                let date = Date().formatted(using: "yyyy-MM-dd' 'HH:mm:ss")
+
 
                 nkLog(debug: "Network response result: \(date) " + debugDesc)
                 nkLog(debug: "Network response all headers: \(date) " + headerFields)

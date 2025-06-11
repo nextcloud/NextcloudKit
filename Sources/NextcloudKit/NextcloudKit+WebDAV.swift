@@ -33,7 +33,7 @@ public extension NextcloudKit {
             var date: Date?
             let ocId = self.nkCommonInstance.findHeader("oc-fileid", allHeaderFields: response.response?.allHeaderFields)
             if let dateString = self.nkCommonInstance.findHeader("date", allHeaderFields: response.response?.allHeaderFields) {
-                date = self.nkCommonInstance.convertDate(dateString, format: "EEE, dd MMM y HH:mm:ss zzz")
+                date = dateString.parsedDate(using: "EEE, dd MMM y HH:mm:ss zzz")
             }
             let result = self.evaluateResponse(response)
 
@@ -355,12 +355,12 @@ public extension NextcloudKit {
         var greaterDateString: String?, lessDateString: String?
         let href = "/files/" + nkSession.userId + path
         if let lessDate = lessDate as? Date {
-            lessDateString = self.nkCommonInstance.convertDate(lessDate, format: "yyyy-MM-dd'T'HH:mm:ssZZZZZ")
+            lessDateString = lessDate.formatted(using: "yyyy-MM-dd'T'HH:mm:ssZZZZZ")
         } else if let lessDate = lessDate as? Int {
             lessDateString = String(lessDate)
         }
         if let greaterDate = greaterDate as? Date {
-            greaterDateString = self.nkCommonInstance.convertDate(greaterDate, format: "yyyy-MM-dd'T'HH:mm:ssZZZZZ")
+            greaterDateString = greaterDate.formatted(using: "yyyy-MM-dd'T'HH:mm:ssZZZZZ")
         } else if let greaterDate = greaterDate as? Int {
             greaterDateString = String(greaterDate)
         }

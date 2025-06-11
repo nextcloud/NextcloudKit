@@ -509,24 +509,6 @@ public struct NKCommon: Sendable {
         return serverUrl.asUrl
     }
 
-    public func convertDate(_ dateString: String, format: String) -> Date? {
-        if dateString.isEmpty { return nil }
-        let dateFormatter = DateFormatter()
-
-        dateFormatter.locale = Locale(identifier: "en_US_POSIX")
-        dateFormatter.dateFormat = format
-        guard let date = dateFormatter.date(from: dateString) else { return nil }
-        return date
-    }
-
-    func convertDate(_ date: Date, format: String) -> String? {
-        let dateFormatter = DateFormatter()
-
-        dateFormatter.locale = Locale(identifier: "en_US_POSIX")
-        dateFormatter.dateFormat = format
-        return dateFormatter.string(from: date)
-    }
-
     func findHeader(_ header: String, allHeaderFields: [AnyHashable: Any]?) -> String? {
         guard let allHeaderFields = allHeaderFields else { return nil }
         let keyValues = allHeaderFields.map { (String(describing: $0.key).lowercased(), String(describing: $0.value)) }

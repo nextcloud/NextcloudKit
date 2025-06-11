@@ -199,11 +199,11 @@ public final class NKBackground: NSObject, URLSessionTaskDelegate, URLSessionDel
                 etag = self.nkCommonInstance.findHeader("etag", allHeaderFields: header)
             }
             if etag != nil { etag = etag?.replacingOccurrences(of: "\"", with: "") }
-            if let dateString = self.nkCommonInstance.findHeader("date", allHeaderFields: header) {
-                date = self.nkCommonInstance.convertDate(dateString, format: "EEE, dd MMM y HH:mm:ss zzz")
+            if let dateRaw = self.nkCommonInstance.findHeader("date", allHeaderFields: header) {
+                date = dateRaw.parsedDate(using: "EEE, dd MMM y HH:mm:ss zzz")
             }
             if let dateString = header["Last-Modified"] as? String {
-                dateLastModified = self.nkCommonInstance.convertDate(dateString, format: "EEE, dd MMM y HH:mm:ss zzz")
+                dateLastModified = dateString.parsedDate(using: "EEE, dd MMM y HH:mm:ss zzz")
             }
             length = header["Content-Length"] as? Int64 ?? 0
         }

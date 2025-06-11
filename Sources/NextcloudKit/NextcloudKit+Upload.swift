@@ -69,8 +69,8 @@ public extension NextcloudKit {
             if etag != nil {
                 etag = etag?.replacingOccurrences(of: "\"", with: "")
             }
-            if let dateString = self.nkCommonInstance.findHeader("date", allHeaderFields: response.response?.allHeaderFields) {
-                date = self.nkCommonInstance.convertDate(dateString, format: "EEE, dd MMM y HH:mm:ss zzz")
+            if let dateRaw = self.nkCommonInstance.findHeader("date", allHeaderFields: response.response?.allHeaderFields) {
+                date = dateRaw.parsedDate(using: "EEE, dd MMM y HH:mm:ss zzz")
             }
             
             if !uploadCompleted {

@@ -772,10 +772,9 @@ public extension NextcloudKit {
 
                     activity.app = subJson["app"].stringValue
                     activity.idActivity = subJson["activity_id"].intValue
-                    if let datetime = subJson["datetime"].string {
-                        if let date = self.nkCommonInstance.convertDate(datetime, format: "yyyy-MM-dd'T'HH:mm:ssZZZZZ") {
-                            activity.date = date
-                        }
+                    if let datetime = subJson["datetime"].string,
+                       let date = datetime.parsedDate(using: "yyyy-MM-dd'T'HH:mm:ssZZZZZ") {
+                        activity.date = date
                     }
                     activity.icon = subJson["icon"].stringValue
                     activity.link = subJson["link"].stringValue
@@ -851,10 +850,9 @@ public extension NextcloudKit {
                             } catch {}
                         }
                         notification.app = subJson["app"].stringValue
-                        if let datetime = subJson["datetime"].string {
-                            if let date = self.nkCommonInstance.convertDate(datetime, format: "yyyy-MM-dd'T'HH:mm:ssZZZZZ") {
-                                notification.date = date as Date
-                            }
+                        if let datetime = subJson["datetime"].string,
+                           let date = datetime.parsedDate(using: "yyyy-MM-dd'T'HH:mm:ssZZZZZ") {
+                            notification.date = date
                         }
                         notification.icon = subJson["icon"].string
                         notification.idNotification = subJson["notification_id"].intValue
