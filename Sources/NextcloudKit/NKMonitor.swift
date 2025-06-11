@@ -62,8 +62,7 @@ final class NKMonitor: EventMonitor, Sendable {
                    let code = response.response?.statusCode {
 
                     let responseStatus = (200..<300).contains(code) ? "RESPONSE: SUCCESS" : "RESPONSE: ERROR"
-                    let errorCode = response.error.map { " (\($0._code))" } ?? ""
-                    nkLog(network: "\(code) \(method) \(url) \(responseStatus)\(errorCode)")
+                    nkLog(network: "\(code) \(method) \(url) \(responseStatus)")
                 }
 
             case .verbose:
