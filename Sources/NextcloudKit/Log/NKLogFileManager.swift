@@ -4,19 +4,19 @@
 
 import Foundation
 
-/// Defines the severity level of a log message.
-/// Defines the level of log verbosity.
+// Defines the severity level of a log message.
+// Defines the level of log verbosity.
 public enum NKLogLevel: Int, CaseIterable, Identifiable, Comparable {
-    /// Logging is disabled.
+    // Logging is disabled.
     case disabled = 0
 
-    /// Logs basic request lifecycle for developers (request started, response result).
+    // Logs basic request lifecycle for developers (request started, response result).
     case compact = 1
 
-    /// Logs important info such as result content, errors.
+    // Logs important info such as result content, errors.
     case normal = 2
 
-    /// Logs detailed debug info like headers and bodies.
+    // Logs detailed debug info like headers and bodies.
     case verbose = 3
 
     // Needed for Picker
@@ -38,7 +38,7 @@ public enum NKLogLevel: Int, CaseIterable, Identifiable, Comparable {
     }
 }
 
-/// Type for writes a emonji in writeLog(tag: ...)
+/// Type for writes a emoji in writeLog(tag: ...)
 public enum NKLogTagEmoji: String {
     case error = "[ERROR]"
     case success = "[SUCCESS]"
@@ -83,6 +83,10 @@ public final class NKLogFileManager {
     private let rotationQueue = DispatchQueue(label: "LogRotationQueue")
     private let fileManager = FileManager.default
 
+    /// Cache for dynamic format strings, populated at runtime. Thread-safe via serial queue.
+    private static var cachedDynamicFormatters: [String: DateFormatter] = [:]
+    private static let formatterAccessQueue = DispatchQueue(label: "com.yourapp.dateformatter.cache")
+
     // MARK: - Initialization
 
     private init(logLevel: NKLogLevel = .normal) {
@@ -99,8 +103,7 @@ public final class NKLogFileManager {
 
     /// Sets configuration parameters for the logger.
     /// - Parameters:
-    ///   - logLevel: The  log level.
-    ///
+    ///   - logLevel: The NKLogLevel { disabled .. verbose }
     private func setConfiguration(logLevel: NKLogLevel) {
         self.logLevel = logLevel
     }
@@ -142,13 +145,13 @@ public final class NKLogFileManager {
     /// Writes a tagged log message with a specific log level.
     /// - Parameters:
     ///   - tag: A custom tag to classify the log message (e.g. "SYNC", "AUTH").
-    ///   - typeTag: the type tag .info, .debug, .warning, .error, .success ..
+    ///   - emoji: .info, .debug, .warning, .error, .success ..
     ///   - message: The log message content.
-    public func writeLog(tag: String, emonji: NKLogTagEmoji, message: String) {
+    public func writeLog(tag: String, emoji: NKLogTagEmoji, message: String) {
         guard !tag.isEmpty else { return }
 
         let taggedMessage = "[\(tag.uppercased())] \(message)"
-        writeLog(taggedMessage, emonji: emonji)
+        writeLog(taggedMessage, emoji: emoji)
     }
 
     /// Writes a log message with an optional typeTag to determine console emoji.
@@ -157,8 +160,8 @@ public final class NKLogFileManager {
     ///
     /// - Parameters:
     ///   - message: The log message to record.
-    ///   - typeTag: Optional log type tag to determine console emoji (e.g. [INFO], [ERROR]).
-    public func writeLog(_ message: String?, emonji: NKLogTagEmoji? = nil) {
+    ///   - emoji: Optional type to determine console emoji (e.g. [INFO], [ERROR]).
+    public func writeLog(_ message: String?, emoji: NKLogTagEmoji? = nil) {
         guard logLevel != .disabled, let message = message else { return }
 
         let fileTimestamp = Self.stableTimestampString()
@@ -166,7 +169,7 @@ public final class NKLogFileManager {
         let fileLine = "\(fileTimestamp) \(message)\n"
 
         // Determine which emoji to display in console
-        let emoji = emonji.map { emojiColored($0.rawValue) } ?? emojiColored(message)
+        let emoji = emoji.map { emojiColored($0.rawValue) } ?? emojiColored(message)
 
         // Visual message with inline replacements
         let visualMessage = message
@@ -253,33 +256,89 @@ public final class NKLogFileManager {
         }
     }
 
-    // MARK: - Date Helpers
+    // MARK: - Cached DateFormatters
 
-    private static func currentDateString() -> String {
+    /// Cached formatter for "yyyy-MM-dd". Uses current calendar, locale, and time zone.
+    private static let cachedCurrentDateFormatter: DateFormatter = {
         let formatter = DateFormatter()
         formatter.calendar = Calendar.current
         formatter.locale = Locale.current
         formatter.timeZone = TimeZone.current
         formatter.dateFormat = "yyyy-MM-dd"
-        return formatter.string(from: Date())
-    }
+        return formatter
+    }()
 
-    private static func stableTimestampString() -> String {
+    /// Cached formatter for "yyyy-MM-dd HH:mm:ss". Uses en_US_POSIX locale and Gregorian calendar for stable output.
+    private static let cachedStableTimestampFormatter: DateFormatter = {
         let formatter = DateFormatter()
         formatter.calendar = Calendar(identifier: .gregorian)
         formatter.locale = Locale(identifier: "en_US_POSIX")
         formatter.timeZone = TimeZone.current
         formatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
-        return formatter.string(from: Date())
-    }
+        return formatter
+    }()
 
-    private static func localizedTimestampString() -> String {
+    /// Cached formatter using `.short` dateStyle and `.medium` timeStyle with current calendar and locale.
+    private static let cachedLocalizedTimestampFormatter: DateFormatter = {
         let formatter = DateFormatter()
         formatter.calendar = Calendar.current
         formatter.locale = Locale.current
         formatter.timeZone = TimeZone.current
         formatter.dateStyle = .short
         formatter.timeStyle = .medium
-        return formatter.string(from: Date())
+        return formatter
+    }()
+
+    /// Returns a cached `DateFormatter` instance for the given format string.
+    /// Formatters are created on-demand and reused to improve performance.
+    private static func cachedFormatter(for format: String) -> DateFormatter {
+        return formatterAccessQueue.sync {
+            if let formatter = cachedDynamicFormatters[format] {
+                return formatter
+            }
+
+            let formatter = DateFormatter()
+            formatter.dateFormat = format
+            formatter.calendar = Calendar(identifier: .gregorian)
+            formatter.locale = Locale(identifier: "en_US_POSIX")
+            formatter.timeZone = TimeZone(secondsFromGMT: 0)
+            cachedDynamicFormatters[format] = formatter
+            return formatter
+        }
     }
-}
+
+    /// Converts a `String` into a `Date` using a cached formatter for the specified format.
+    /// - Parameters:
+    ///   - string: The date string to convert.
+    ///   - format: The format pattern (e.g., "EEE, dd MMM y HH:mm:ss zzz").
+    /// - Returns: A `Date` object if parsing succeeds; otherwise `nil`.
+    public func convertDate(_ string: String, format: String) -> Date? {
+        let formatter = Self.cachedFormatter(for: format)
+        return formatter.date(from: string)
+    }
+
+    /// Converts a `Date` to a `String` using a cached formatter for the specified format.
+    /// - Parameters:
+    ///   - date: The `Date` to format.
+    ///   - format: The format string (e.g., "yyyy-MM-dd HH:mm:ss").
+    /// - Returns: The formatted date string.
+    public func convertDate(_ date: Date, format: String) -> String {
+        let formatter = Self.cachedFormatter(for: format)
+        return formatter.string(from: date)
+    }
+
+    /// Returns today's date string in "yyyy-MM-dd" format using a cached formatter.
+    private static func currentDateString() -> String {
+        return cachedCurrentDateFormatter.string(from: Date())
+    }
+
+    /// Returns a stable timestamp string in "yyyy-MM-dd HH:mm:ss" format using a cached formatter.
+    private static func stableTimestampString() -> String {
+        return cachedStableTimestampFormatter.string(from: Date())
+    }
+
+    /// Returns a localized timestamp string using short date and medium time styles.
+    private static func localizedTimestampString() -> String {
+        return cachedLocalizedTimestampFormatter.string(from: Date())
+    }
+ }
