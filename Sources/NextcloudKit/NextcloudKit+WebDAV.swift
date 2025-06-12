@@ -11,7 +11,7 @@ public extension NextcloudKit {
                       account: String,
                       options: NKRequestOptions = NKRequestOptions(),
                       taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-                      completion: @escaping (_ account: String, _ ocId: String?, _ date: Date?, _ responseData: AFDataResponse<Data?>?, _ error: NKError) -> Void) {
+                      completion: @escaping (_ account: String, _ ocId: String?, _ date: Date?, _ responseData: AFDataResponse<Data>?, _ error: NKError) -> Void) {
         guard let url = serverUrlFileName.encodedToUrl,
               let nkSession = nkCommonInstance.getSession(account: account),
               let headers = nkCommonInstance.getStandardHeaders(account: account, options: options) else {
@@ -29,32 +29,23 @@ public extension NextcloudKit {
         nkSession.sessionData.request(urlRequest, interceptor: NKInterceptor(nkCommonInstance: nkCommonInstance)).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
             task.taskDescription = options.taskDescription
             taskHandler(task)
-        }.response(queue: self.nkCommonInstance.backgroundQueue) { response in
-            if self.nkCommonInstance.levelLog > 0 {
-                debugPrint(response)
+        }.responseData(queue: self.nkCommonInstance.backgroundQueue) { response in
+            var date: Date?
+            let ocId = self.nkCommonInstance.findHeader("oc-fileid", allHeaderFields: response.response?.allHeaderFields)
+            if let dateString = self.nkCommonInstance.findHeader("date", allHeaderFields: response.response?.allHeaderFields) {
+                date = dateString.parsedDate(using: "EEE, dd MMM y HH:mm:ss zzz")
             }
-            switch response.result {
-            case .failure(let error):
-                let error = NKError(error: error, afResponse: response, responseData: response.data)
-                options.queue.async { completion(account, nil, nil, response, error) }
-            case .success:
-                let ocId = self.nkCommonInstance.findHeader("oc-fileid", allHeaderFields: response.response?.allHeaderFields)
-                if let dateString = self.nkCommonInstance.findHeader("date", allHeaderFields: response.response?.allHeaderFields) {
-                    if let date = self.nkCommonInstance.convertDate(dateString, format: "EEE, dd MMM y HH:mm:ss zzz") {
-                        options.queue.async { completion(account, ocId, date, response, .success) }
-                    } else {
-                        options.queue.async { completion(account, nil, nil, response, .invalidDate) }
-                    }
-                } else {
-                    options.queue.async { completion(account, nil, nil, response, .invalidDate) }
-                }
+            let result = self.evaluateResponse(response)
+
+            options.queue.async {
+                completion(account, ocId, date, response, result)
             }
         }
     }
 
     func createFolderAsync(serverUrlFileName: String,
                            account: String,
-                           options: NKRequestOptions = NKRequestOptions()) async -> (account: String, ocId: String?, date: Date?, responseData: AFDataResponse<Data?>?, error: NKError) {
+                           options: NKRequestOptions = NKRequestOptions()) async -> (account: String, ocId: String?, date: Date?, responseData: AFDataResponse<Data>?, error: NKError) {
         await withUnsafeContinuation({ continuation in
             NextcloudKit.shared.createFolder(serverUrlFileName: serverUrlFileName, account: account, options: options) { account, ocId, date, responseData, error in
                 continuation.resume(returning: (account: account, ocId: ocId, date: date, responseData: responseData, error: error))
@@ -66,7 +57,7 @@ public extension NextcloudKit {
                             account: String,
                             options: NKRequestOptions = NKRequestOptions(),
                             taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-                            completion: @escaping (_ account: String, _ responseData: AFDataResponse<Data?>?, _ error: NKError) -> Void) {
+                            completion: @escaping (_ account: String, _ responseData: AFDataResponse<Data>?, _ error: NKError) -> Void) {
         guard let url = serverUrlFileName.encodedToUrl,
               let nkSession = nkCommonInstance.getSession(account: account),
               let headers = nkCommonInstance.getStandardHeaders(account: account, options: options) else {
@@ -83,23 +74,18 @@ public extension NextcloudKit {
         nkSession.sessionData.request(urlRequest, interceptor: NKInterceptor(nkCommonInstance: nkCommonInstance)).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
             task.taskDescription = options.taskDescription
             taskHandler(task)
-        }.response(queue: self.nkCommonInstance.backgroundQueue) { response in
-            if self.nkCommonInstance.levelLog > 0 {
-                debugPrint(response)
-            }
-            switch response.result {
-            case .failure(let error):
-                let error = NKError(error: error, afResponse: response, responseData: response.data)
-                options.queue.async { completion(account, response, error) }
-            case .success:
-                options.queue.async { completion(account, response, .success) }
+        }.responseData(queue: self.nkCommonInstance.backgroundQueue) { response in
+            let result = self.evaluateResponse(response)
+
+            options.queue.async {
+                completion(account, response, result)
             }
         }
     }
 
     func deleteFileOrFolderAsync(serverUrlFileName: String,
                                  account: String,
-                                 options: NKRequestOptions = NKRequestOptions()) async -> (account: String, responseData: AFDataResponse<Data?>?, error: NKError) {
+                                 options: NKRequestOptions = NKRequestOptions()) async -> (account: String, responseData: AFDataResponse<Data>?, error: NKError) {
         await withUnsafeContinuation({ continuation in
             NextcloudKit.shared.deleteFileOrFolder(serverUrlFileName: serverUrlFileName, account: account, options: options) { account, responseData, error in
                 continuation.resume(returning: (account: account, responseData: responseData, error: error))
@@ -113,7 +99,7 @@ public extension NextcloudKit {
                           account: String,
                           options: NKRequestOptions = NKRequestOptions(),
                           taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-                          completion: @escaping (_ account: String, _ responseData: AFDataResponse<Data?>?, _ error: NKError) -> Void) {
+                          completion: @escaping (_ account: String, _ responseData: AFDataResponse<Data>?, _ error: NKError) -> Void) {
         guard let url = serverUrlFileNameSource.encodedToUrl,
               let nkSession = nkCommonInstance.getSession(account: account),
               var headers = nkCommonInstance.getStandardHeaders(account: account, options: options) else {
@@ -137,16 +123,11 @@ public extension NextcloudKit {
         nkSession.sessionData.request(urlRequest, interceptor: NKInterceptor(nkCommonInstance: nkCommonInstance)).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
             task.taskDescription = options.taskDescription
             taskHandler(task)
-        }.response(queue: self.nkCommonInstance.backgroundQueue) { response in
-            if self.nkCommonInstance.levelLog > 0 {
-                debugPrint(response)
-            }
-            switch response.result {
-            case .failure(let error):
-                let error = NKError(error: error, afResponse: response, responseData: response.data)
-                options.queue.async { completion(account, response, error) }
-            case .success:
-                options.queue.async { completion(account, response, .success) }
+        }.responseData(queue: self.nkCommonInstance.backgroundQueue) { response in
+            let result = self.evaluateResponse(response)
+
+            options.queue.async {
+                completion(account, response, result)
             }
         }
     }
@@ -155,7 +136,7 @@ public extension NextcloudKit {
                                serverUrlFileNameDestination: String,
                                overwrite: Bool,
                                account: String,
-                               options: NKRequestOptions = NKRequestOptions()) async -> (account: String, responseData: AFDataResponse<Data?>?, error: NKError) {
+                               options: NKRequestOptions = NKRequestOptions()) async -> (account: String, responseData: AFDataResponse<Data>?, error: NKError) {
         await withUnsafeContinuation({ continuation in
             NextcloudKit.shared.moveFileOrFolder(serverUrlFileNameSource: serverUrlFileNameSource, serverUrlFileNameDestination: serverUrlFileNameDestination, overwrite: overwrite, account: account, options: options) { account, responseData, error in
                 continuation.resume(returning: (account: account, responseData: responseData, error: error))
@@ -169,7 +150,7 @@ public extension NextcloudKit {
                           account: String,
                           options: NKRequestOptions = NKRequestOptions(),
                           taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-                          completion: @escaping (_ account: String, _ responseData: AFDataResponse<Data?>?, _ error: NKError) -> Void) {
+                          completion: @escaping (_ account: String, _ responseData: AFDataResponse<Data>?, _ error: NKError) -> Void) {
         guard let url = serverUrlFileNameSource.encodedToUrl,
               let nkSession = nkCommonInstance.getSession(account: account),
               var headers = nkCommonInstance.getStandardHeaders(account: account, options: options) else {
@@ -194,16 +175,11 @@ public extension NextcloudKit {
         nkSession.sessionData.request(urlRequest, interceptor: NKInterceptor(nkCommonInstance: nkCommonInstance)).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
             task.taskDescription = options.taskDescription
             taskHandler(task)
-        }.response(queue: self.nkCommonInstance.backgroundQueue) { response in
-            if self.nkCommonInstance.levelLog > 0 {
-                debugPrint(response)
-            }
-            switch response.result {
-            case .failure(let error):
-                let error = NKError(error: error, afResponse: response, responseData: response.data)
-                options.queue.async { completion(account, response, error) }
-            case .success:
-                options.queue.async { completion(account, response, .success) }
+        }.responseData(queue: self.nkCommonInstance.backgroundQueue) { response in
+            let result = self.evaluateResponse(response)
+
+            options.queue.async {
+                completion(account, response, result)
             }
         }
     }
@@ -212,7 +188,7 @@ public extension NextcloudKit {
                                serverUrlFileNameDestination: String,
                                overwrite: Bool,
                                account: String,
-                               options: NKRequestOptions = NKRequestOptions()) async -> (account: String, responseData: AFDataResponse<Data?>?, error: NKError) {
+                               options: NKRequestOptions = NKRequestOptions()) async -> (account: String, responseData: AFDataResponse<Data>?, error: NKError) {
         await withUnsafeContinuation({ continuation in
             NextcloudKit.shared.copyFileOrFolder(serverUrlFileNameSource: serverUrlFileNameSource, serverUrlFileNameDestination: serverUrlFileNameDestination, overwrite: overwrite, account: account, options: options) { account, responseData, error in
                 continuation.resume(returning: (account: account, responseData: responseData, error: error))
@@ -264,9 +240,6 @@ public extension NextcloudKit {
             task.taskDescription = options.taskDescription
             taskHandler(task)
         }.responseData(queue: self.nkCommonInstance.backgroundQueue) { response in
-            if self.nkCommonInstance.levelLog > 0 {
-                debugPrint(response)
-            }
             switch response.result {
             case .failure(let error):
                 let error = NKError(error: error, afResponse: response, responseData: response.data)
@@ -382,12 +355,12 @@ public extension NextcloudKit {
         var greaterDateString: String?, lessDateString: String?
         let href = "/files/" + nkSession.userId + path
         if let lessDate = lessDate as? Date {
-            lessDateString = self.nkCommonInstance.convertDate(lessDate, format: "yyyy-MM-dd'T'HH:mm:ssZZZZZ")
+            lessDateString = lessDate.formatted(using: "yyyy-MM-dd'T'HH:mm:ssZZZZZ")
         } else if let lessDate = lessDate as? Int {
             lessDateString = String(lessDate)
         }
         if let greaterDate = greaterDate as? Date {
-            greaterDateString = self.nkCommonInstance.convertDate(greaterDate, format: "yyyy-MM-dd'T'HH:mm:ssZZZZZ")
+            greaterDateString = greaterDate.formatted(using: "yyyy-MM-dd'T'HH:mm:ssZZZZZ")
         } else if let greaterDate = greaterDate as? Int {
             greaterDateString = String(greaterDate)
         }
@@ -438,9 +411,6 @@ public extension NextcloudKit {
             task.taskDescription = options.taskDescription
             taskHandler(task)
         }.responseData(queue: self.nkCommonInstance.backgroundQueue) { response in
-            if self.nkCommonInstance.levelLog > 0 {
-                debugPrint(response)
-            }
             switch response.result {
             case .failure(let error):
                 let error = NKError(error: error, afResponse: response, responseData: response.data)
@@ -461,7 +431,7 @@ public extension NextcloudKit {
                      account: String,
                      options: NKRequestOptions = NKRequestOptions(),
                      taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-                     completion: @escaping (_ account: String, _ responseData: AFDataResponse<Data?>?, _ error: NKError) -> Void) {
+                     completion: @escaping (_ account: String, _ responseData: AFDataResponse<Data>?, _ error: NKError) -> Void) {
         ///
         options.contentType = "application/xml"
         ///
@@ -488,16 +458,11 @@ public extension NextcloudKit {
         nkSession.sessionData.request(urlRequest, interceptor: NKInterceptor(nkCommonInstance: nkCommonInstance)).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
             task.taskDescription = options.taskDescription
             taskHandler(task)
-        }.response(queue: self.nkCommonInstance.backgroundQueue) { response in
-            if self.nkCommonInstance.levelLog > 0 {
-                debugPrint(response)
-            }
-            switch response.result {
-            case .failure(let error):
-                let error = NKError(error: error, afResponse: response, responseData: response.data)
-                options.queue.async { completion(account, response, error) }
-            case .success:
-                options.queue.async { completion(account, response, .success) }
+        }.responseData(queue: self.nkCommonInstance.backgroundQueue) { response in
+            let result = self.evaluateResponse(response)
+
+            options.queue.async {
+                completion(account, response, result)
             }
         }
     }
@@ -546,9 +511,6 @@ public extension NextcloudKit {
             task.taskDescription = options.taskDescription
             taskHandler(task)
         }.responseData(queue: self.nkCommonInstance.backgroundQueue) { response in
-            if self.nkCommonInstance.levelLog > 0 {
-                debugPrint(response)
-            }
             switch response.result {
             case .failure(let error):
                 let error = NKError(error: error, afResponse: response, responseData: response.data)
@@ -612,9 +574,6 @@ public extension NextcloudKit {
             task.taskDescription = options.taskDescription
             taskHandler(task)
         }.responseData(queue: self.nkCommonInstance.backgroundQueue) { response in
-            if self.nkCommonInstance.levelLog > 0 {
-                debugPrint(response)
-            }
             switch response.result {
             case .failure(let error):
                 let error = NKError(error: error, afResponse: response, responseData: response.data)

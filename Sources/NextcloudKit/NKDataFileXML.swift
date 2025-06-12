@@ -308,7 +308,8 @@ public class NKDataFileXML: NSObject {
 
             let propstat = element["d:propstat"][0]
 
-            if let getlastmodified = propstat["d:prop", "d:getlastmodified"].text, let date = self.nkCommonInstance.convertDate(getlastmodified, format: "EEE, dd MMM y HH:mm:ss zzz") {
+            if let getlastmodified = propstat["d:prop", "d:getlastmodified"].text,
+               let date = getlastmodified.parsedDate(using: "EEE, dd MMM y HH:mm:ss zzz") { 
                 file.date = date
             }
 
@@ -600,7 +601,8 @@ public class NKDataFileXML: NSObject {
 
             let propstat = element["d:propstat"][0]
 
-            if let getlastmodified = propstat["d:prop", "d:getlastmodified"].text, let date = self.nkCommonInstance.convertDate(getlastmodified, format: "EEE, dd MMM y HH:mm:ss zzz") {
+            if let getlastmodified = propstat["d:prop", "d:getlastmodified"].text,
+               let date = getlastmodified.parsedDate(using: "EEE, dd MMM y HH:mm:ss zzz") {
                 file.date = date
             }
 
@@ -678,7 +680,8 @@ public class NKDataFileXML: NSObject {
                 item.actorType = value
             }
 
-            if let creationDateTime = element["d:propstat", "d:prop", "oc:creationDateTime"].text, let date = self.nkCommonInstance.convertDate(creationDateTime, format: "EEE, dd MMM y HH:mm:ss zzz") {
+            if let creationDateTime = element["d:propstat", "d:prop", "oc:creationDateTime"].text,
+               let date = creationDateTime.parsedDate(using: "EEE, dd MMM y HH:mm:ss zzz") {
                 item.creationDateTime = date
             }
 

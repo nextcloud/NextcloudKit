@@ -22,6 +22,10 @@ open class NextcloudKit {
 #endif
     public var nkCommonInstance = NKCommon()
 
+    internal func log(debug message: String) {
+        NKLogFileManager.shared.writeLog(debug: message)
+    }
+
     internal lazy var unauthorizedSession: Alamofire.Session = {
         let configuration = URLSessionConfiguration.af.default
         configuration.requestCachePolicy = .reloadIgnoringLocalCacheData
@@ -71,14 +75,6 @@ open class NextcloudKit {
         if removeAllCachedResponses {
             URLCache.shared.removeAllCachedResponses()
         }
-    }
-
-    public func setupLog(pathLog: String,
-                         levelLog: Int,
-                         copyLogToDocumentDirectory: Bool) {
-        self.nkCommonInstance.pathLog = pathLog
-        self.nkCommonInstance.levelLog = levelLog
-        self.nkCommonInstance.copyLogToDocumentDirectory = copyLogToDocumentDirectory
     }
 
     public func appendSession(account: String,
@@ -192,4 +188,27 @@ open class NextcloudKit {
         reachabilityManager?.stopListening()
     }
 #endif
+
+    /// Evaluates an Alamofire response and returns the appropriate NKError.
+    /// Treats `inputDataNilOrZeroLength` as `.success`.
+    func evaluateResponse<Data>(_ response: AFDataResponse<Data>) -> NKError {
+        if let afError = response.error?.asAFError {
+            if afError.isExplicitlyCancelledError {
+                return .cancelled
+            }
+        }
+
+        switch response.result {
+        case .failure(let error):
+            if let afError = error.asAFError,
+               case .responseSerializationFailed(let reason) = afError,
+               case .inputDataNilOrZeroLength = reason {
+                return .success
+            } else {
+                return NKError(error: error, afResponse: response, responseData: response.data)
+            }
+        case .success:
+            return .success
+        }
+    }
 }

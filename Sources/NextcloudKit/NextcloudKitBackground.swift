@@ -59,7 +59,6 @@ public final class NKBackground: NSObject, URLSessionTaskDelegate, URLSessionDel
         let task = nkSession.sessionDownloadBackground.downloadTask(with: request)
         task.taskDescription = taskDescription
         task.resume()
-        self.nkCommonInstance.writeLog("Network start download file: \(serverUrlFileName)")
 
         return (task, .success)
     }
@@ -135,7 +134,6 @@ public final class NKBackground: NSObject, URLSessionTaskDelegate, URLSessionDel
         let task = uploadSession?.uploadTask(with: request, fromFile: URL(fileURLWithPath: fileNameLocalPath))
         task?.taskDescription = taskDescription
         task?.resume()
-        self.nkCommonInstance.writeLog("Network start upload file: \(serverUrlFileName)")
 
         return (task, .success)
     }
@@ -201,11 +199,11 @@ public final class NKBackground: NSObject, URLSessionTaskDelegate, URLSessionDel
                 etag = self.nkCommonInstance.findHeader("etag", allHeaderFields: header)
             }
             if etag != nil { etag = etag?.replacingOccurrences(of: "\"", with: "") }
-            if let dateString = self.nkCommonInstance.findHeader("date", allHeaderFields: header) {
-                date = self.nkCommonInstance.convertDate(dateString, format: "EEE, dd MMM y HH:mm:ss zzz")
+            if let dateRaw = self.nkCommonInstance.findHeader("date", allHeaderFields: header) {
+                date = dateRaw.parsedDate(using: "EEE, dd MMM y HH:mm:ss zzz")
             }
             if let dateString = header["Last-Modified"] as? String {
-                dateLastModified = self.nkCommonInstance.convertDate(dateString, format: "EEE, dd MMM y HH:mm:ss zzz")
+                dateLastModified = dateString.parsedDate(using: "EEE, dd MMM y HH:mm:ss zzz")
             }
             length = header["Content-Length"] as? Int64 ?? 0
         }
@@ -215,23 +213,13 @@ public final class NKBackground: NSObject, URLSessionTaskDelegate, URLSessionDel
         } else if task is URLSessionUploadTask {
             self.nkCommonInstance.delegate?.uploadComplete(fileName: fileName, serverUrl: serverUrl, ocId: ocId, etag: etag, date: date, size: task.countOfBytesExpectedToSend, task: task, error: nkError)
         }
-
-        if nkError.errorCode == 0 {
-            self.nkCommonInstance.writeLog("Network completed file: \(serverUrl)/\(fileName)")
-        } else {
-            self.nkCommonInstance.writeLog("Network completed file: \(serverUrl)/\(fileName) with error code \(nkError.errorCode) and error description " + nkError.errorDescription)
-        }
     }
 
     public func urlSession(_ session: URLSession, didReceive challenge: URLAuthenticationChallenge, completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
         if self.nkCommonInstance.delegate == nil {
-            self.nkCommonInstance.writeLog("[WARNING] URLAuthenticationChallenge, no delegate found, perform with default handling")
             completionHandler(URLSession.AuthChallengeDisposition.performDefaultHandling, nil)
         } else {
             self.nkCommonInstance.delegate?.authenticationChallenge(session, didReceive: challenge, completionHandler: { authChallengeDisposition, credential in
-                if self.nkCommonInstance.levelLog > 1 {
-                    self.nkCommonInstance.writeLog("[INFO AUTH] Challenge Disposition: \(authChallengeDisposition.rawValue)")
-                }
                 completionHandler(authChallengeDisposition, credential)
             })
         }

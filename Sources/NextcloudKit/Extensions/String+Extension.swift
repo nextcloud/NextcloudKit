@@ -28,4 +28,8 @@ extension String {
     public var fileExtension: String {
         return String(NSString(string: self).pathExtension)
     }
+
+    func parsedDate(using format: String) -> Date? {
+        NKLogFileManager.shared.convertDate(self, format: format)
+    }
 }

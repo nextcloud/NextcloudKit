@@ -14,7 +14,7 @@ public extension NextcloudKit {
                   requestHandler: @escaping (_ request: DownloadRequest) -> Void = { _ in },
                   taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
                   progressHandler: @escaping (_ progress: Progress) -> Void = { _ in },
-                  completionHandler: @escaping (_ account: String, _ etag: String?, _ date: Date?, _ lenght: Int64, _ responseData: AFDownloadResponse<URL?>?, _ afError: AFError?, _ nKError: NKError) -> Void) {
+                  completionHandler: @escaping (_ account: String, _ etag: String?, _ date: Date?, _ lenght: Int64, _ responseData: AFDownloadResponse<Data>?, _ afError: AFError?, _ nKError: NKError) -> Void) {
         var convertible: URLConvertible?
         if serverUrlFileName is URL {
             convertible = serverUrlFileName as? URLConvertible
@@ -38,7 +38,7 @@ public extension NextcloudKit {
             options.queue.async { taskHandler(task) }
         } .downloadProgress { progress in
             options.queue.async { progressHandler(progress) }
-        } .response(queue: self.nkCommonInstance.backgroundQueue) { response in
+        } .responseData(queue: self.nkCommonInstance.backgroundQueue) { response in
             switch response.result {
             case .failure(let error):
                 let resultError = NKError(error: error, afResponse: response, responseData: nil)
@@ -59,8 +59,8 @@ public extension NextcloudKit {
                 if etag != nil {
                     etag = etag?.replacingOccurrences(of: "\"", with: "")
                 }
-                if let dateString = self.nkCommonInstance.findHeader("Date", allHeaderFields: response.response?.allHeaderFields) {
-                    date = self.nkCommonInstance.convertDate(dateString, format: "EEE, dd MMM y HH:mm:ss zzz")
+                if let dateRaw = self.nkCommonInstance.findHeader("Date", allHeaderFields: response.response?.allHeaderFields) {
+                    date = dateRaw.parsedDate(using: "yyyy-MM-dd HH:mm:ss")
                 }
 
                 options.queue.async { completionHandler(account, etag, date, length, response, nil, .success) }

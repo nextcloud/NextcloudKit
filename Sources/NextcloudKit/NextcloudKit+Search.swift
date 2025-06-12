@@ -44,9 +44,6 @@ public extension NextcloudKit {
             task.taskDescription = options.taskDescription
             taskHandler(task)
         }.responseData(queue: self.nkCommonInstance.backgroundQueue) { response in
-            if self.nkCommonInstance.levelLog > 0 {
-                debugPrint(response)
-            }
             switch response.result {
             case .success(let jsonData):
                 let json = JSON(jsonData)
@@ -135,9 +132,6 @@ public extension NextcloudKit {
             task.taskDescription = options.taskDescription
             taskHandler(task)
         }.responseData(queue: self.nkCommonInstance.backgroundQueue) { response in
-            if self.nkCommonInstance.levelLog > 0 {
-                debugPrint(response)
-            }
             switch response.result {
             case .success(let jsonData):
                 let json = JSON(jsonData)

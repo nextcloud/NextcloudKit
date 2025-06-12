@@ -71,9 +71,6 @@ public extension NextcloudKit {
             task.taskDescription = options.taskDescription
             taskHandler(task)
         }.responseData(queue: self.nkCommonInstance.backgroundQueue) { response in
-        if self.nkCommonInstance.levelLog > 0 {
-                debugPrint(response)
-            }
             switch response.result {
             case .failure(let error):
                 let error = NKError(error: error, afResponse: response, responseData: response.data)
@@ -134,9 +131,6 @@ public extension NextcloudKit {
             task.taskDescription = options.taskDescription
             taskHandler(task)
         }.responseData(queue: self.nkCommonInstance.backgroundQueue) { response in
-            if self.nkCommonInstance.levelLog > 0 {
-                debugPrint(response)
-            }
             switch response.result {
             case .failure(let error):
                 let error = NKError(error: error, afResponse: response, responseData: response.data)
@@ -304,9 +298,6 @@ public extension NextcloudKit {
             task.taskDescription = options.taskDescription
             taskHandler(task)
         }.responseData(queue: self.nkCommonInstance.backgroundQueue) { response in
-            if self.nkCommonInstance.levelLog > 0 {
-                debugPrint(response)
-            }
             switch response.result {
             case .failure(let error):
                 let error = NKError(error: error, afResponse: response, responseData: response.data)
@@ -391,9 +382,6 @@ public extension NextcloudKit {
             task.taskDescription = options.taskDescription
             taskHandler(task)
         }.responseData(queue: self.nkCommonInstance.backgroundQueue) { response in
-            if self.nkCommonInstance.levelLog > 0 {
-                debugPrint(response)
-            }
             switch response.result {
             case .failure(let error):
                 let error = NKError(error: error, afResponse: response, responseData: response.data)
@@ -417,7 +405,7 @@ public extension NextcloudKit {
                      account: String,
                      options: NKRequestOptions = NKRequestOptions(),
                      taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-                     completion: @escaping (_ account: String, _ responseData: AFDataResponse<Data?>?, _ error: NKError) -> Void) {
+                     completion: @escaping (_ account: String, _ responseData: AFDataResponse<Data>?, _ error: NKError) -> Void) {
         let endpoint = "ocs/v2.php/apps/files_sharing/api/v1/shares/\(idShare)"
         guard let nkSession = nkCommonInstance.getSession(account: account),
               let url = nkCommonInstance.createStandardUrl(serverUrl: nkSession.urlBase, endpoint: endpoint, options: options),
@@ -428,16 +416,11 @@ public extension NextcloudKit {
         nkSession.sessionData.request(url, method: .delete, encoding: URLEncoding.default, headers: headers, interceptor: NKInterceptor(nkCommonInstance: nkCommonInstance)).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
             task.taskDescription = options.taskDescription
             taskHandler(task)
-        }.response(queue: self.nkCommonInstance.backgroundQueue) { response in
-            if self.nkCommonInstance.levelLog > 0 {
-                debugPrint(response)
-            }
-            switch response.result {
-            case .failure(let error):
-                let error = NKError(error: error, afResponse: response, responseData: response.data)
-                options.queue.async { completion(account, response, error) }
-            case .success:
-                options.queue.async { completion(account, response, .success) }
+        }.responseData(queue: self.nkCommonInstance.backgroundQueue) { response in
+            let result = self.evaluateResponse(response)
+
+            options.queue.async {
+                completion(account, response, result)
             }
         }
     }
@@ -452,7 +435,7 @@ public extension NextcloudKit {
         share.canEdit = json["can_edit"].boolValue
         share.displaynameFileOwner = json["displayname_file_owner"].stringValue
         share.displaynameOwner = json["displayname_owner"].stringValue
-        if let expiration = json["expiration"].string, let date = self.nkCommonInstance.convertDate(expiration, format: "YYYY-MM-dd HH:mm:ss") {
+        if let expiration = json["expiration"].string, let date = expiration.parsedDate(using: "YYYY-MM-dd HH:mm:ss") {
             share.expirationDate = date as NSDate
         }
         share.fileParent = json["file_parent"].intValue

@@ -23,9 +23,6 @@ public extension NextcloudKit {
             task.taskDescription = options.taskDescription
             taskHandler(task)
         }.responseData(queue: self.nkCommonInstance.backgroundQueue) { response in
-            if self.nkCommonInstance.levelLog > 0 {
-                debugPrint(response)
-            }
             switch response.result {
             case .failure(let error):
                 let error = NKError(error: error, afResponse: response, responseData: response.data)
@@ -37,7 +34,7 @@ public extension NextcloudKit {
                 if 200..<300 ~= statusCode {
                     let dict = TaskTypes.deserialize(from: data)
                     let result = dict?.types.map({$0})
-                    var filteredResult = result?
+                    let filteredResult = result?
                         .filter({ $0.inputShape?.input?.type == supportedTaskType && $0.outputShape?.output?.type == supportedTaskType })
                         .sorted(by: {$0.id! < $1.id!})
                     options.queue.async { completion(account, filteredResult, response, .success) }
@@ -68,9 +65,6 @@ public extension NextcloudKit {
             task.taskDescription = options.taskDescription
             taskHandler(task)
         }.responseData(queue: self.nkCommonInstance.backgroundQueue) { response in
-            if self.nkCommonInstance.levelLog > 0 {
-                debugPrint(response)
-            }
             switch response.result {
             case .failure(let error):
                 let error = NKError(error: error, afResponse: response, responseData: response.data)
@@ -105,9 +99,6 @@ public extension NextcloudKit {
             task.taskDescription = options.taskDescription
             taskHandler(task)
         }.responseData(queue: self.nkCommonInstance.backgroundQueue) { response in
-            if self.nkCommonInstance.levelLog > 0 {
-                debugPrint(response)
-            }
             switch response.result {
             case .failure(let error):
                 let error = NKError(error: error, afResponse: response, responseData: response.data)
@@ -142,9 +133,6 @@ public extension NextcloudKit {
             task.taskDescription = options.taskDescription
             taskHandler(task)
         }.responseData(queue: self.nkCommonInstance.backgroundQueue) { response in
-            if self.nkCommonInstance.levelLog > 0 {
-                debugPrint(response)
-            }
             switch response.result {
             case .failure(let error):
                 let error = NKError(error: error, afResponse: response, responseData: response.data)

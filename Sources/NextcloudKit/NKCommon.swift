@@ -128,45 +128,10 @@ public struct NKCommon: Sendable {
 #endif
     internal var internalTypeIdentifiers = ThreadSafeArray<UTTypeConformsToServer>()
 
-    public var filenamePathLog: String = ""
-    public var levelLog: Int = 0
-    public var copyLogToDocumentDirectory: Bool = false
-    public var printLog: Bool = true
-
-    private var internalFilenameLog: String = "communication.log"
-    public var filenameLog: String {
-        get {
-            return internalFilenameLog
-        }
-        set(newVal) {
-            if !newVal.isEmpty {
-                internalFilenameLog = newVal
-                internalFilenameLog = internalPathLog + "/" + internalFilenameLog
-            }
-        }
-    }
-
-    private var internalPathLog: String = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true).first!
-    public var pathLog: String {
-        get {
-            return internalPathLog
-        }
-        set(newVal) {
-            var tempVal = newVal
-            if tempVal.last == "/" {
-                tempVal = String(tempVal.dropLast())
-            }
-            if !tempVal.isEmpty {
-                internalPathLog = tempVal
-                filenamePathLog = internalPathLog + "/" + internalFilenameLog
-            }
-        }
-    }
-
     // MARK: - Init
 
     init() {
-        filenamePathLog = internalPathLog + "/" + internalFilenameLog
+
     }
 
     // MARK: - Type Identifier
@@ -544,24 +509,6 @@ public struct NKCommon: Sendable {
         return serverUrl.asUrl
     }
 
-    public func convertDate(_ dateString: String, format: String) -> Date? {
-        if dateString.isEmpty { return nil }
-        let dateFormatter = DateFormatter()
-
-        dateFormatter.locale = Locale(identifier: "en_US_POSIX")
-        dateFormatter.dateFormat = format
-        guard let date = dateFormatter.date(from: dateString) else { return nil }
-        return date
-    }
-
-    func convertDate(_ date: Date, format: String) -> String? {
-        let dateFormatter = DateFormatter()
-
-        dateFormatter.locale = Locale(identifier: "en_US_POSIX")
-        dateFormatter.dateFormat = format
-        return dateFormatter.string(from: date)
-    }
-
     func findHeader(_ header: String, allHeaderFields: [AnyHashable: Any]?) -> String? {
         guard let allHeaderFields = allHeaderFields else { return nil }
         let keyValues = allHeaderFields.map { (String(describing: $0.key).lowercased(), String(describing: $0.value)) }
@@ -616,92 +563,5 @@ public struct NKCommon: Sendable {
             }
         }
         return nil
-    }
-
-    // MARK: - Log
-
-    public func clearFileLog() {
-        FileManager.default.createFile(atPath: filenamePathLog, contents: nil, attributes: nil)
-        if copyLogToDocumentDirectory, let path = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true).first {
-            let filenameCopyToDocumentDirectory = path + "/" + filenameLog
-            FileManager.default.createFile(atPath: filenameCopyToDocumentDirectory, contents: nil, attributes: nil)
-
-        }
-    }
-
-    ///
-    /// Write a message with an "[DEBUG] " prefix to the log.
-    ///
-    public func writeLog(debug message: String) {
-        writeLog("[DEBUG] \(message)")
-    }
-
-    ///
-    /// Write a message with an "[INFO] " prefix to the log.
-    ///
-    public func writeLog(info message: String) {
-        writeLog("[INFO] \(message)")
-    }
-
-    ///
-    /// Write a message with an "[WARNING] " prefix to the log.
-    ///
-    public func writeLog(warning message: String) {
-        writeLog("[WARNING] \(message)")
-    }
-
-    ///
-    /// Write a message with an "[ERROR] " prefix to the log.
-    ///
-    public func writeLog(error message: String) {
-        writeLog("[ERROR] \(message)")
-    }
-
-    ///
-    /// Write an arbitrary string to the log.
-    ///
-    /// Does not write anything, should `text` be `nil`.
-    ///
-    public func writeLog(_ text: String?) {
-        guard let text = text else {
-            return
-        }
-
-        guard let date = self.convertDate(Date(), format: "yyyy-MM-dd' 'HH:mm:ss") else {
-            return
-        }
-
-        let textToWrite = "\(date) " + text + "\n"
-
-        if printLog {
-            print(textToWrite)
-        }
-
-        if levelLog > 0 {
-            logQueue.async(flags: .barrier) {
-                self.writeLogToDisk(filename: self.filenamePathLog, text: textToWrite)
-
-                if self.copyLogToDocumentDirectory, let path = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true).first {
-                    let filenameCopyToDocumentDirectory = path + "/" + self.filenameLog
-                    self.writeLogToDisk(filename: filenameCopyToDocumentDirectory, text: textToWrite)
-                }
-            }
-        }
-    }
-
-    private func writeLogToDisk(filename: String, text: String) {
-        guard let data = text.data(using: .utf8) else {
-            return
-        }
-
-        if !FileManager.default.fileExists(atPath: filename) {
-            FileManager.default.createFile(atPath: filename, contents: nil, attributes: nil)
-        }
-
-        if let fileHandle = FileHandle(forWritingAtPath: filename) {
-            fileHandle.seekToEndOfFile()
-            fileHandle.write(data)
-            fileHandle.closeFile()
-        }
     }
  }
