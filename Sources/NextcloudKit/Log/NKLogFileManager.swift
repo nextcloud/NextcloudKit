@@ -64,8 +64,8 @@ public final class NKLogFileManager {
     /// - Parameters:
     ///   - minLevel: The minimum log level to be recorded.
 
-    public static func configure(logLevel: NKLogLevel = .normal) {
-        shared.setConfiguration(logLevel: logLevel)
+    public static func configure(logLevel: NKLogLevel = .normal, fileEmoji: Bool = false) {
+        shared.setConfiguration(logLevel: logLevel, fileEmoji: fileEmoji)
     }
 
     /// Returns the file URL of the currently active log file.
@@ -82,6 +82,7 @@ public final class NKLogFileManager {
     private let logQueue = DispatchQueue(label: "LogWriterQueue", attributes: .concurrent)
     private let rotationQueue = DispatchQueue(label: "LogRotationQueue")
     private let fileManager = FileManager.default
+    private var fileEmoji: Bool = false
 
     // Cache for dynamic format strings, populated at runtime. Thread-safe via serial queue.
     private static var cachedDynamicFormatters: [String: DateFormatter] = [:]
@@ -89,8 +90,9 @@ public final class NKLogFileManager {
 
     // MARK: - Initialization
 
-    private init(logLevel: NKLogLevel = .normal) {
+    private init(logLevel: NKLogLevel = .normal, fileEmoji: Bool = false) {
         self.logLevel = logLevel
+        self.fileEmoji = fileEmoji
 
         let documents = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
         let logsFolder = documents.appendingPathComponent("Logs", isDirectory: true)
@@ -104,8 +106,9 @@ public final class NKLogFileManager {
     /// Sets configuration parameters for the logger.
     /// - Parameters:
     ///   - logLevel: The NKLogLevel { disabled .. verbose }
-    private func setConfiguration(logLevel: NKLogLevel) {
+    private func setConfiguration(logLevel: NKLogLevel, fileEmoji: Bool = false) {
         self.logLevel = logLevel
+        self.fileEmoji = fileEmoji
     }
 
     // MARK: - Public API
@@ -185,7 +188,11 @@ public final class NKLogFileManager {
         }
 
         logQueue.async {
-            self.appendToLog(fileLine)
+            if self.fileEmoji {
+                self.appendToLog(consoleLine)
+            } else {
+                self.appendToLog(fileLine)
+            }
         }
     }
 
