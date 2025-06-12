@@ -7,6 +7,10 @@ import Alamofire
 import SwiftyJSON
 
 public extension NextcloudKit {
+    /// - Parameters:
+    ///   - account: The account to query.
+    ///   - options: Optional request options (defaults to standard).
+    /// - Returns: Tuple with NKError and optional NKTermsOfService.
     func getTermsOfService(account: String,
                            options: NKRequestOptions = NKRequestOptions(),
                            request: @escaping (DataRequest?) -> Void = { _ in },
@@ -43,6 +47,34 @@ public extension NextcloudKit {
         options.queue.async { request(tosRequest) }
     }
 
+    /// Async wrapper for `getTermsOfService(account:options:...)`
+    /// - Parameters:
+    ///   - account: The account to query.
+    ///   - options: Optional request options (defaults to standard).
+    /// - Returns: Tuple with NKError and optional NKTermsOfService.
+    func getTermsOfServiceAsync(account: String,
+                                options: NKRequestOptions = NKRequestOptions(),
+                                request: ((DataRequest?) -> Void)? = nil,
+                                taskHandler: ((URLSessionTask) -> Void)? = nil
+    ) async -> (error: NKError, tos: NKTermsOfService?) {
+        await withCheckedContinuation { continuation in
+            self.getTermsOfService(
+                account: account,
+                options: options,
+                request: request ?? { _ in },
+                taskHandler: taskHandler ?? { _ in }
+            ) { _, tos, _, error in
+                continuation.resume(returning: (error, tos))
+            }
+        }
+    }
+
+    /// - Parameters:
+    ///   - termId: The ID of the ToS to sign.
+    ///   - account: The user account.
+    ///   - options: Optional request options.
+    ///   - taskHandler: Optional URLSession task handler.
+    /// - Returns: NKError and AFDataResponse<Data>?
     func signTermsOfService(termId: String,
                             account: String,
                             options: NKRequestOptions = NKRequestOptions(),
@@ -77,6 +109,30 @@ public extension NextcloudKit {
                 options.queue.async { completion(account, response, error) }
             case .success:
                 options.queue.async { completion(account, response, .success) }
+            }
+        }
+    }
+
+    /// Async wrapper for `signTermsOfService`
+    /// - Parameters:
+    ///   - termId: The ID of the ToS to sign.
+    ///   - account: The user account.
+    ///   - options: Optional request options.
+    ///   - taskHandler: Optional URLSession task handler.
+    /// - Returns: NKError and AFDataResponse<Data>?
+    func signTermsOfServiceAsync(termId: String,
+                                 account: String,
+                                 options: NKRequestOptions = NKRequestOptions(),
+                                 taskHandler: ((URLSessionTask) -> Void)? = nil
+    ) async -> (error: NKError, response: AFDataResponse<Data>?) {
+        await withCheckedContinuation { continuation in
+            self.signTermsOfService(
+                termId: termId,
+                account: account,
+                options: options,
+                taskHandler: taskHandler ?? { _ in }
+            ) { _, responseData, error in
+                continuation.resume(returning: (error, responseData))
             }
         }
     }

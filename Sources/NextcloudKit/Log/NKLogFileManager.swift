@@ -83,7 +83,7 @@ public final class NKLogFileManager {
     private let rotationQueue = DispatchQueue(label: "LogRotationQueue")
     private let fileManager = FileManager.default
 
-    /// Cache for dynamic format strings, populated at runtime. Thread-safe via serial queue.
+    // Cache for dynamic format strings, populated at runtime. Thread-safe via serial queue.
     private static var cachedDynamicFormatters: [String: DateFormatter] = [:]
     private static let formatterAccessQueue = DispatchQueue(label: "com.yourapp.dateformatter.cache")
 

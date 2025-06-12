@@ -4,8 +4,8 @@
 
 import Foundation
 
-/// Public logging helpers for apps using the NextcloudKit library.
-/// These functions internally use `NKLogFileManager.shared`.
+// Public logging helpers for apps using the NextcloudKit library.
+// These functions internally use `NKLogFileManager.shared`.
 
 @inlinable
 public func nkLog(debug message: String) {

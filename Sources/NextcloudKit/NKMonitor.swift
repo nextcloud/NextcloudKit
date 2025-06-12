@@ -69,7 +69,6 @@ final class NKMonitor: EventMonitor, Sendable {
                 let headerFields = String(describing: response.response?.allHeaderFields ?? [:])
                 let date = Date().formatted(using: "yyyy-MM-dd' 'HH:mm:ss")
 
-
                 nkLog(debug: "Network response result: \(date) " + debugDesc)
                 nkLog(debug: "Network response all headers: \(date) " + headerFields)
 
