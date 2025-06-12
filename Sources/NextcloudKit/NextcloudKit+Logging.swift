@@ -9,7 +9,7 @@ public extension NextcloudKit {
     }
 
     /// Configure the shared logger from NextcloudKit
-    static func configureLogger(logLevel: NKLogLevel = .normal) {
-        NKLogFileManager.configure(logLevel: logLevel)
+    static func configureLogger(logLevel: NKLogLevel = .normal, fileEmoji: Bool = false) {
+        NKLogFileManager.configure(logLevel: logLevel, fileEmoji: fileEmoji)
     }
 }
