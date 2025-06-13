@@ -138,7 +138,7 @@ public extension NextcloudKit {
         do {
             fsAttributes = try FileManager.default.attributesOfFileSystem(forPath: "/")
         } catch {
-            return completion(account, nil, nil, nil, NKError(errorCode: NKError.chunkNoEnoughMemory))
+            return completion(account, nil, nil, .errorChunkNoEnoughMemory)
         }
         let freeDisk = ((fsAttributes[FileAttributeKey.systemFreeSize] ?? 0) as? Int64) ?? 0
         #elseif os(visionOS) || os(iOS)
