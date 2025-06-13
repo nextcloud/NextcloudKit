@@ -490,6 +490,8 @@ final public class NCCapabilities: Sendable {
         public var capabilityForbiddenFileNameExtensions: [String]         = []
         public var capabilityRecommendations: Bool                         = false
         public var capabilityTermsOfService: Bool                          = false
+
+        public init() {}
     }
 
     // MARK: - Public API
