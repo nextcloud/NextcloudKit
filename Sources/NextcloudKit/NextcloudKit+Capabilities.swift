@@ -449,7 +449,7 @@ actor CapabilitiesStore {
 
 /// Singleton container and public API for accessing and caching capabilities.
 final public class NCCapabilities: Sendable {
-    static let shared = NCCapabilities()
+    public static let shared = NCCapabilities()
 
     private let store = CapabilitiesStore()
 
