@@ -498,7 +498,7 @@ final public class NCCapabilities: Sendable {
         let group = DispatchGroup()
 
         group.enter()
-        Task.detached(priority: .utility) {
+        Task.detached(priority: .userInitiated) {
             await self.store.set(account, value: capabilities)
             group.leave()
         }
@@ -524,7 +524,7 @@ final public class NCCapabilities: Sendable {
         var result: Capabilities?
 
         group.enter()
-        Task.detached(priority: .utility) {
+        Task.detached(priority: .userInitiated) {
             result = await self.store.get(account)
             group.leave()
         }
