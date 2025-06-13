@@ -431,15 +431,6 @@ actor CapabilitiesStore {
     func set(_ account: String, value: NCCapabilities.Capabilities) {
         store[account] = value
     }
-
-    func shouldDisableSharesView(for account: String) -> Bool {
-        guard let capability = store[account] else {
-            return true
-        }
-        return (!capability.fileSharingApiEnabled &&
-                !capability.filesComments &&
-                capability.activity.isEmpty)
-    }
 }
 
 /// Singleton container and public API for accessing and caching capabilities.
@@ -496,10 +487,6 @@ final public class NCCapabilities: Sendable {
 
     // MARK: - Public API
 
-    public func disableSharesView(for account: String) async -> Bool {
-        await store.shouldDisableSharesView(for: account)
-    }
-
     public func appendCapabilities(for account: String, capabilities: Capabilities) async {
         await store.set(account, value: capabilities)
     }
@@ -511,28 +498,34 @@ final public class NCCapabilities: Sendable {
         let group = DispatchGroup()
 
         group.enter()
-        Task {
-            await store.set(account, value: capabilities)
+        Task.detached(priority: .utility) {
+            await self.store.set(account, value: capabilities)
             group.leave()
         }
 
         group.wait()
     }
 
-    public func getCapabilities(for account: String) async -> Capabilities {
-        await store.get(account) ?? Capabilities()
+    public func getCapabilities(for account: String?) async -> Capabilities {
+        guard let account else {
+            return Capabilities()
+        }
+        return await store.get(account) ?? Capabilities()
     }
 
     /// Synchronously retrieves capabilities for the given account.
     /// Blocks the current thread until the async actor returns.
     /// Use only outside the Swift async context (never from another actor or async function).
-    public func getCapabilitiesBlocking(for account: String) -> Capabilities {
+    public func getCapabilitiesBlocking(for account: String?) -> Capabilities {
+        guard let account else {
+            return Capabilities()
+        }
         let group = DispatchGroup()
         var result: Capabilities?
 
         group.enter()
-        Task {
-            result = await store.get(account)
+        Task.detached(priority: .utility) {
+            result = await self.store.get(account)
             group.leave()
         }
 
