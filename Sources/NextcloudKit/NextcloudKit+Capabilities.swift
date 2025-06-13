@@ -498,11 +498,28 @@ final public class NCCapabilities: Sendable {
         await store.shouldDisableSharesView(for: account)
     }
 
+    public func appendCapabilities(for account: String, capabilities: Capabilities) async {
+        await store.set(account, value: capabilities)
+    }
+
     public func getCapabilities(for account: String) async -> Capabilities? {
         await store.get(account)
     }
 
-    public func appendCapabilities(for account: String, capabilities: Capabilities) async {
-        await store.set(account, value: capabilities)
+    /// Synchronously retrieves capabilities for the given account.
+    /// Blocks the current thread until the async actor returns.
+    /// Use only outside the Swift async context (never from another actor or async function).
+    public func getCapabilitiesBlocking(for account: String) -> Capabilities? {
+        let group = DispatchGroup()
+        var result: Capabilities?
+
+        group.enter()
+        Task {
+            result = await store.get(account)
+            group.leave()
+        }
+
+        group.wait()
+        return result
     }
 }
