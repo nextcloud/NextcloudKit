@@ -410,9 +410,8 @@ public extension NextcloudKit {
             capabilities.termsOfService = json.termsOfService?.enabled ?? false
 
             // Persist capabilities in shared store
-            await NCCapabilities.shared.appendCapabilities(for: account, capabilities: capabilities)
+            await NCCapabilities.shared.appendCapabilitiesAsync(for: account, capabilities: capabilities)
             return capabilities
-
         } catch {
             nkLog(error: "Could not decode json capabilities: \(error.localizedDescription)")
             throw error
@@ -487,7 +486,7 @@ final public class NCCapabilities: Sendable {
 
     // MARK: - Public API
 
-    public func appendCapabilities(for account: String, capabilities: Capabilities) async {
+    public func appendCapabilitiesAsync(for account: String, capabilities: Capabilities) async {
         await store.set(account, value: capabilities)
     }
 
@@ -506,7 +505,7 @@ final public class NCCapabilities: Sendable {
         group.wait()
     }
 
-    public func getCapabilities(for account: String?) async -> Capabilities {
+    public func getCapabilitiesAsync(for account: String?) async -> Capabilities {
         guard let account else {
             return Capabilities()
         }
