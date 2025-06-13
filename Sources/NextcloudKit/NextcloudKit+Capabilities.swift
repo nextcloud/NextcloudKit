@@ -350,64 +350,64 @@ public extension NextcloudKit {
             let capabilities = NCCapabilities.Capabilities()
 
             // Version info
-            capabilities.capabilityServerVersion = data.version.string
-            capabilities.capabilityServerVersionMajor = data.version.major
+            capabilities.serverVersion = data.version.string
+            capabilities.serverVersionMajor = data.version.major
 
             // Populate capabilities from decoded JSON
-            capabilities.capabilityFileSharingApiEnabled = json.filessharing?.apienabled ?? false
-            capabilities.capabilityFileSharingDefaultPermission = json.filessharing?.defaultpermissions ?? 0
-            capabilities.capabilityFileSharingPubPasswdEnforced = json.filessharing?.ncpublic?.password?.enforced ?? false
-            capabilities.capabilityFileSharingPubExpireDateEnforced = json.filessharing?.ncpublic?.expiredate?.enforced ?? false
-            capabilities.capabilityFileSharingPubExpireDateDays = json.filessharing?.ncpublic?.expiredate?.days ?? 0
-            capabilities.capabilityFileSharingInternalExpireDateEnforced = json.filessharing?.ncpublic?.expiredateinternal?.enforced ?? false
-            capabilities.capabilityFileSharingInternalExpireDateDays = json.filessharing?.ncpublic?.expiredateinternal?.days ?? 0
-            capabilities.capabilityFileSharingRemoteExpireDateEnforced = json.filessharing?.ncpublic?.expiredateremote?.enforced ?? false
-            capabilities.capabilityFileSharingRemoteExpireDateDays = json.filessharing?.ncpublic?.expiredateremote?.days ?? 0
-            capabilities.capabilityFileSharingDownloadLimit = json.downloadLimit?.enabled ?? false
-            capabilities.capabilityFileSharingDownloadLimitDefaultLimit = json.downloadLimit?.defaultLimit ?? 1
+            capabilities.fileSharingApiEnabled = json.filessharing?.apienabled ?? false
+            capabilities.fileSharingDefaultPermission = json.filessharing?.defaultpermissions ?? 0
+            capabilities.fileSharingPubPasswdEnforced = json.filessharing?.ncpublic?.password?.enforced ?? false
+            capabilities.fileSharingPubExpireDateEnforced = json.filessharing?.ncpublic?.expiredate?.enforced ?? false
+            capabilities.fileSharingPubExpireDateDays = json.filessharing?.ncpublic?.expiredate?.days ?? 0
+            capabilities.fileSharingInternalExpireDateEnforced = json.filessharing?.ncpublic?.expiredateinternal?.enforced ?? false
+            capabilities.fileSharingInternalExpireDateDays = json.filessharing?.ncpublic?.expiredateinternal?.days ?? 0
+            capabilities.fileSharingRemoteExpireDateEnforced = json.filessharing?.ncpublic?.expiredateremote?.enforced ?? false
+            capabilities.fileSharingRemoteExpireDateDays = json.filessharing?.ncpublic?.expiredateremote?.days ?? 0
+            capabilities.fileSharingDownloadLimit = json.downloadLimit?.enabled ?? false
+            capabilities.fileSharingDownloadLimitDefaultLimit = json.downloadLimit?.defaultLimit ?? 1
 
-            capabilities.capabilityThemingColor = json.theming?.color ?? ""
-            capabilities.capabilityThemingColorElement = json.theming?.colorelement ?? ""
-            capabilities.capabilityThemingColorText = json.theming?.colortext ?? ""
-            capabilities.capabilityThemingName = json.theming?.name ?? ""
-            capabilities.capabilityThemingSlogan = json.theming?.slogan ?? ""
+            capabilities.themingColor = json.theming?.color ?? ""
+            capabilities.themingColorElement = json.theming?.colorelement ?? ""
+            capabilities.themingColorText = json.theming?.colortext ?? ""
+            capabilities.themingName = json.theming?.name ?? ""
+            capabilities.themingSlogan = json.theming?.slogan ?? ""
 
-            capabilities.capabilityE2EEEnabled = json.endtoendencryption?.enabled ?? false
-            capabilities.capabilityE2EEApiVersion = json.endtoendencryption?.apiversion ?? ""
+            capabilities.e2EEEnabled = json.endtoendencryption?.enabled ?? false
+            capabilities.e2EEApiVersion = json.endtoendencryption?.apiversion ?? ""
 
-            capabilities.capabilityRichDocumentsEnabled = json.richdocuments?.directediting ?? false
-            capabilities.capabilityRichDocumentsMimetypes.removeAll()
-            capabilities.capabilityRichDocumentsMimetypes = json.richdocuments?.mimetypes ?? []
+            capabilities.richDocumentsEnabled = json.richdocuments?.directediting ?? false
+            capabilities.richDocumentsMimetypes.removeAll()
+            capabilities.richDocumentsMimetypes = json.richdocuments?.mimetypes ?? []
 
-            capabilities.capabilityAssistantEnabled = json.assistant?.enabled ?? false
+            capabilities.assistantEnabled = json.assistant?.enabled ?? false
 
-            capabilities.capabilityActivityEnabled = json.activity != nil
-            capabilities.capabilityActivity = json.activity?.apiv2 ?? []
+            capabilities.activityEnabled = json.activity != nil
+            capabilities.activity = json.activity?.apiv2 ?? []
 
-            capabilities.capabilityNotification = json.notifications?.ocsendpoints ?? []
+            capabilities.notification = json.notifications?.ocsendpoints ?? []
 
-            capabilities.capabilityFilesUndelete = json.files?.undelete ?? false
-            capabilities.capabilityFilesLockVersion = json.files?.locking ?? ""
-            capabilities.capabilityFilesComments = json.files?.comments ?? false
-            capabilities.capabilityFilesBigfilechunking = json.files?.bigfilechunking ?? false
+            capabilities.filesUndelete = json.files?.undelete ?? false
+            capabilities.filesLockVersion = json.files?.locking ?? ""
+            capabilities.filesComments = json.files?.comments ?? false
+            capabilities.filesBigfilechunking = json.files?.bigfilechunking ?? false
 
-            capabilities.capabilityUserStatusEnabled = json.userstatus?.enabled ?? false
-            capabilities.capabilityExternalSites = json.external != nil
-            capabilities.capabilityGroupfoldersEnabled = json.groupfolders?.hasGroupFolders ?? false
+            capabilities.userStatusEnabled = json.userstatus?.enabled ?? false
+            capabilities.externalSites = json.external != nil
+            capabilities.groupfoldersEnabled = json.groupfolders?.hasGroupFolders ?? false
 
-            if capabilities.capabilityServerVersionMajor >= 28 {
+            if capabilities.serverVersionMajor >= 28 {
                 capabilities.isLivePhotoServerAvailable = true
             }
 
-            capabilities.capabilitySecurityGuardDiagnostics = json.securityguard?.diagnostics ?? false
+            capabilities.securityGuardDiagnostics = json.securityguard?.diagnostics ?? false
 
-            capabilities.capabilityForbiddenFileNames = json.files?.forbiddenFileNames ?? []
-            capabilities.capabilityForbiddenFileNameBasenames = json.files?.forbiddenFileNameBasenames ?? []
-            capabilities.capabilityForbiddenFileNameCharacters = json.files?.forbiddenFileNameCharacters ?? []
-            capabilities.capabilityForbiddenFileNameExtensions = json.files?.forbiddenFileNameExtensions ?? []
+            capabilities.forbiddenFileNames = json.files?.forbiddenFileNames ?? []
+            capabilities.forbiddenFileNameBasenames = json.files?.forbiddenFileNameBasenames ?? []
+            capabilities.forbiddenFileNameCharacters = json.files?.forbiddenFileNameCharacters ?? []
+            capabilities.forbiddenFileNameExtensions = json.files?.forbiddenFileNameExtensions ?? []
 
-            capabilities.capabilityRecommendations = json.recommendations?.enabled ?? false
-            capabilities.capabilityTermsOfService = json.termsOfService?.enabled ?? false
+            capabilities.recommendations = json.recommendations?.enabled ?? false
+            capabilities.termsOfService = json.termsOfService?.enabled ?? false
 
             // Persist capabilities in shared store
             await NCCapabilities.shared.appendCapabilities(for: account, capabilities: capabilities)
@@ -436,9 +436,9 @@ actor CapabilitiesStore {
         guard let capability = store[account] else {
             return true
         }
-        return (!capability.capabilityFileSharingApiEnabled &&
-                !capability.capabilityFilesComments &&
-                capability.capabilityActivity.isEmpty)
+        return (!capability.fileSharingApiEnabled &&
+                !capability.filesComments &&
+                capability.activity.isEmpty)
     }
 }
 
@@ -449,47 +449,47 @@ final public class NCCapabilities: Sendable {
     private let store = CapabilitiesStore()
 
     public class Capabilities: @unchecked Sendable {
-        public var capabilityServerVersionMajor: Int                       = 0
-        public var capabilityServerVersion: String                         = ""
-        public var capabilityFileSharingApiEnabled: Bool                   = false
-        public var capabilityFileSharingPubPasswdEnforced: Bool            = false
-        public var capabilityFileSharingPubExpireDateEnforced: Bool        = false
-        public var capabilityFileSharingPubExpireDateDays: Int             = 0
-        public var capabilityFileSharingInternalExpireDateEnforced: Bool   = false
-        public var capabilityFileSharingInternalExpireDateDays: Int        = 0
-        public var capabilityFileSharingRemoteExpireDateEnforced: Bool     = false
-        public var capabilityFileSharingRemoteExpireDateDays: Int          = 0
-        public var capabilityFileSharingDefaultPermission: Int             = 0
-        public var capabilityFileSharingDownloadLimit: Bool                = false
-        public var capabilityFileSharingDownloadLimitDefaultLimit: Int     = 1
-        public var capabilityThemingColor: String                          = ""
-        public var capabilityThemingColorElement: String                   = ""
-        public var capabilityThemingColorText: String                      = ""
-        public var capabilityThemingName: String                           = ""
-        public var capabilityThemingSlogan: String                         = ""
-        public var capabilityE2EEEnabled: Bool                             = false
-        public var capabilityE2EEApiVersion: String                        = ""
-        public var capabilityRichDocumentsEnabled: Bool                    = false
-        public var capabilityRichDocumentsMimetypes: [String] = []
-        public var capabilityActivity: [String] = []
-        public var capabilityNotification: [String] = []
-        public var capabilityFilesUndelete: Bool                           = false
-        public var capabilityFilesLockVersion: String                      = ""    // NC 24
-        public var capabilityFilesComments: Bool                           = false // NC 20
-        public var capabilityFilesBigfilechunking: Bool                    = false
-        public var capabilityUserStatusEnabled: Bool                       = false
-        public var capabilityExternalSites: Bool                           = false
-        public var capabilityActivityEnabled: Bool                         = false
-        public var capabilityGroupfoldersEnabled: Bool                     = false // NC27
-        public var capabilityAssistantEnabled: Bool                        = false // NC28
-        public var isLivePhotoServerAvailable: Bool                        = false // NC28
-        public var capabilitySecurityGuardDiagnostics                      = false
-        public var capabilityForbiddenFileNames: [String]                  = []
-        public var capabilityForbiddenFileNameBasenames: [String]          = []
-        public var capabilityForbiddenFileNameCharacters: [String]         = []
-        public var capabilityForbiddenFileNameExtensions: [String]         = []
-        public var capabilityRecommendations: Bool                         = false
-        public var capabilityTermsOfService: Bool                          = false
+        public var serverVersionMajor: Int                       = 0
+        public var serverVersion: String                         = ""
+        public var fileSharingApiEnabled: Bool                   = false
+        public var fileSharingPubPasswdEnforced: Bool            = false
+        public var fileSharingPubExpireDateEnforced: Bool        = false
+        public var fileSharingPubExpireDateDays: Int             = 0
+        public var fileSharingInternalExpireDateEnforced: Bool   = false
+        public var fileSharingInternalExpireDateDays: Int        = 0
+        public var fileSharingRemoteExpireDateEnforced: Bool     = false
+        public var fileSharingRemoteExpireDateDays: Int          = 0
+        public var fileSharingDefaultPermission: Int             = 0
+        public var fileSharingDownloadLimit: Bool                = false
+        public var fileSharingDownloadLimitDefaultLimit: Int     = 1
+        public var themingColor: String                          = ""
+        public var themingColorElement: String                   = ""
+        public var themingColorText: String                      = ""
+        public var themingName: String                           = ""
+        public var themingSlogan: String                         = ""
+        public var e2EEEnabled: Bool                             = false
+        public var e2EEApiVersion: String                        = ""
+        public var richDocumentsEnabled: Bool                    = false
+        public var richDocumentsMimetypes: [String] = []
+        public var activity: [String] = []
+        public var notification: [String] = []
+        public var filesUndelete: Bool                           = false
+        public var filesLockVersion: String                      = ""    // NC 24
+        public var filesComments: Bool                           = false // NC 20
+        public var filesBigfilechunking: Bool                    = false
+        public var userStatusEnabled: Bool                       = false
+        public var externalSites: Bool                           = false
+        public var activityEnabled: Bool                         = false
+        public var groupfoldersEnabled: Bool                     = false // NC27
+        public var assistantEnabled: Bool                        = false // NC28
+        public var isLivePhotoServerAvailable: Bool              = false // NC28
+        public var securityGuardDiagnostics                      = false
+        public var forbiddenFileNames: [String]                  = []
+        public var forbiddenFileNameBasenames: [String]          = []
+        public var forbiddenFileNameCharacters: [String]         = []
+        public var forbiddenFileNameExtensions: [String]         = []
+        public var recommendations: Bool                         = false
+        public var termsOfService: Bool                          = false
 
         public init() {}
     }
