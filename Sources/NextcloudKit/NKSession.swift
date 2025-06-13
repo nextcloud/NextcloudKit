@@ -12,7 +12,6 @@ public struct NKSession: Sendable {
     public var password: String
     public var account: String
     public var userAgent: String
-    public var nextcloudVersion: Int
     public let groupIdentifier: String
     public let httpMaximumConnectionsPerHost: Int
     public let httpMaximumConnectionsPerHostInDownload: Int
@@ -33,7 +32,6 @@ public struct NKSession: Sendable {
          password: String,
          account: String,
          userAgent: String,
-         nextcloudVersion: Int,
          groupIdentifier: String,
          httpMaximumConnectionsPerHost: Int,
          httpMaximumConnectionsPerHostInDownload: Int,
@@ -44,7 +42,6 @@ public struct NKSession: Sendable {
         self.password = password
         self.account = account
         self.userAgent = userAgent
-        self.nextcloudVersion = nextcloudVersion
         self.groupIdentifier = groupIdentifier
         self.httpMaximumConnectionsPerHost = httpMaximumConnectionsPerHost
         self.httpMaximumConnectionsPerHostInDownload = httpMaximumConnectionsPerHostInDownload

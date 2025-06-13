@@ -353,11 +353,6 @@ public extension NextcloudKit {
             capabilities.capabilityServerVersion = data.version.string
             capabilities.capabilityServerVersionMajor = data.version.major
 
-            // Update NextcloudKit session if needed
-            if capabilities.capabilityServerVersionMajor > 0 {
-                NextcloudKit.shared.updateSession(account: account, nextcloudVersion: capabilities.capabilityServerVersionMajor)
-            }
-
             // Populate capabilities from decoded JSON
             capabilities.capabilityFileSharingApiEnabled = json.filessharing?.apienabled ?? false
             capabilities.capabilityFileSharingDefaultPermission = json.filessharing?.defaultpermissions ?? 0
