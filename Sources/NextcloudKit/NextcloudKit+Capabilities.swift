@@ -336,6 +336,10 @@ public extension NextcloudKit {
             let ocs: Ocs
         }
 
+        if NKLogFileManager.shared.logLevel >= .normal {
+            jsonData.printJson()
+        }
+
         do {
             // Decode the full JSON structure
             let decoded = try JSONDecoder().decode(CapabilityNextcloud.self, from: jsonData)
@@ -415,7 +419,7 @@ public extension NextcloudKit {
             return capabilities
 
         } catch {
-            nkLog(debug: "Could not decode json capabilities: \(error.localizedDescription)")
+            nkLog(error: "Could not decode json capabilities: \(error.localizedDescription)")
             throw error
         }
     }
