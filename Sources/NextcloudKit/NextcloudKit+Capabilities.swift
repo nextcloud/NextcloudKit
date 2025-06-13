@@ -502,6 +502,21 @@ final public class NCCapabilities: Sendable {
         await store.set(account, value: capabilities)
     }
 
+    /// Synchronously stores capabilities for the given account.
+    /// Blocks the current thread until the async actor completes.
+    /// Use only outside of async/actor contexts.
+    public func appendCapabilitiesBlocking(for account: String, capabilities: Capabilities) {
+        let group = DispatchGroup()
+
+        group.enter()
+        Task {
+            await store.set(account, value: capabilities)
+            group.leave()
+        }
+
+        group.wait()
+    }
+
     public func getCapabilities(for account: String) async -> Capabilities? {
         await store.get(account)
     }
