@@ -31,19 +31,19 @@ final class NKInterceptor: RequestInterceptor, Sendable {
 
             if let array = groupDefaults.array(forKey: nkCommonInstance.groupDefaultsUnauthorized) as? [String],
                array.contains(account) {
-                nkLog(tag: "AUTH", message: "Unauthorized for account: \(account)")
+                nkLog(tag: "AUTH", emoji: .error, message: "Unauthorized for account: \(account)")
                 let error = AFError.responseValidationFailed(reason: .unacceptableStatusCode(code: 401))
                 return completion(.failure(error))
 
             } else if let array = groupDefaults.array(forKey: nkCommonInstance.groupDefaultsUnavailable) as? [String],
                       array.contains(account) {
-                nkLog(tag: "SERVICE", message: "Unavailable for account: \(account)")
+                nkLog(tag: "SERVICE", emoji: .error, message: "Unavailable for account: \(account)")
                 let error = AFError.responseValidationFailed(reason: .unacceptableStatusCode(code: 503))
                 return completion(.failure(error))
 
             } else if let array = groupDefaults.array(forKey: nkCommonInstance.groupDefaultsToS) as? [String],
                       array.contains(account) {
-                nkLog(tag: "TOS", message: "Terms of service error for account: \(account)")
+                nkLog(tag: "TOS", emoji: .error, message: "Terms of service error for account: \(account)")
                 let error = AFError.responseValidationFailed(reason: .unacceptableStatusCode(code: 403))
                 return completion(.failure(error))
             }
