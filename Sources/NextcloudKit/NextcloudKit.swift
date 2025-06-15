@@ -83,13 +83,12 @@ open class NextcloudKit {
                               userId: String,
                               password: String,
                               userAgent: String,
-                              nextcloudVersion: Int,
                               httpMaximumConnectionsPerHost: Int = 6,
                               httpMaximumConnectionsPerHostInDownload: Int = 6,
                               httpMaximumConnectionsPerHostInUpload: Int = 6,
                               groupIdentifier: String) {
         if nkCommonInstance.nksessions.filter({ $0.account == account }).first != nil {
-            return updateSession(account: account, urlBase: urlBase, userId: userId, password: password, userAgent: userAgent, nextcloudVersion: nextcloudVersion)
+            return updateSession(account: account, urlBase: urlBase, userId: userId, password: password, userAgent: userAgent)
         }
         
         let nkSession = NKSession(
@@ -100,7 +99,6 @@ open class NextcloudKit {
             password: password,
             account: account,
             userAgent: userAgent,
-            nextcloudVersion: nextcloudVersion,
             groupIdentifier: groupIdentifier,
             httpMaximumConnectionsPerHost: httpMaximumConnectionsPerHost,
             httpMaximumConnectionsPerHostInDownload: httpMaximumConnectionsPerHostInDownload,
@@ -116,7 +114,6 @@ open class NextcloudKit {
                               userId: String? = nil,
                               password: String? = nil,
                               userAgent: String? = nil,
-                              nextcloudVersion: Int? = nil,
                               replaceWithAccount: String? = nil) {
         guard var nkSession = nkCommonInstance.nksessions.filter({ $0.account == account }).first else { return }
         if let urlBase {
@@ -133,9 +130,6 @@ open class NextcloudKit {
         }
         if let userAgent {
             nkSession.userAgent = userAgent
-        }
-        if let nextcloudVersion {
-            nkSession.nextcloudVersion = nextcloudVersion
         }
         if let replaceWithAccount {
             nkSession.account = replaceWithAccount
