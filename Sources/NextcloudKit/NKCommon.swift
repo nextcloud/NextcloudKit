@@ -411,6 +411,7 @@ public struct NKCommon: Sendable {
         guard let groupDefaults = UserDefaults(suiteName: groupIdentifier) else {
             return
         }
+        let capabilities = NCCapabilities.shared.getCapabilitiesBlocking(for: account)
 
         /// Unavailable
         if errorCode == 503 {
@@ -429,7 +430,7 @@ public struct NKCommon: Sendable {
                 groupDefaults.set(array, forKey: NextcloudKit.shared.nkCommonInstance.groupDefaultsUnauthorized)
             }
         /// ToS
-        } else if errorCode == 403 {
+        } else if errorCode == 403, capabilities.termsOfService {
             var array = groupDefaults.array(forKey: NextcloudKit.shared.nkCommonInstance.groupDefaultsToS) as? [String] ?? []
 
             if !array.contains(account) {

@@ -21,7 +21,7 @@ public final class NKBackground: NSObject, URLSessionTaskDelegate, URLSessionDel
         var url: URL?
         let groupDefaults = UserDefaults(suiteName: NextcloudKit.shared.nkCommonInstance.groupIdentifier)
 
-        /// Check error in groupDefaults
+        /// Check if error is in groupDefaults
         if let array = groupDefaults?.array(forKey: NextcloudKit.shared.nkCommonInstance.groupDefaultsUnauthorized) as? [String],
            array.contains(account) {
             return (nil, .unauthorizedError)
@@ -77,7 +77,7 @@ public final class NKBackground: NSObject, URLSessionTaskDelegate, URLSessionDel
         var uploadSession: URLSession?
         let groupDefaults = UserDefaults(suiteName: NextcloudKit.shared.nkCommonInstance.groupIdentifier)
 
-        /// Check error in groupDefaults
+        /// Check if error is in groupDefaults
         if let array = groupDefaults?.array(forKey: NextcloudKit.shared.nkCommonInstance.groupDefaultsUnauthorized) as? [String],
            array.contains(account) {
             return (nil, .unauthorizedError)
