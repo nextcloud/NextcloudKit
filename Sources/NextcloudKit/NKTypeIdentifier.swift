@@ -79,7 +79,7 @@ public enum TypeIconFile: String, CaseIterable, Codable, Equatable, Sendable {
 // MARK: - Centralized Per-Account TypeIdentifier Manager
 
 public actor NCTypeIdentifiers {
-    static let shared = NCTypeIdentifiers()
+    public static let shared = NCTypeIdentifiers()
 
     private var utiCache: [String: String] = [:]
     private var mimeTypeCache: [String: String] = [:]
