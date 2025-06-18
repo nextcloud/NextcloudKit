@@ -525,7 +525,7 @@ public class NKDataFileXML: NSObject {
                 file.downloadLimits.append(NKDownloadLimit(count: count, limit: limit, token: token))
             }
 
-            let results = await NCTypeIdentifiers.shared.getInternalType(fileName: file.fileName, mimeType: file.contentType, directory: file.directory, account: nkSession.account)
+            let results = await NKTypeIdentifiers.shared.getInternalType(fileName: file.fileName, mimeType: file.contentType, directory: file.directory, account: nkSession.account)
 
             file.contentType = results.mimeType
             file.iconName = results.iconName
@@ -632,7 +632,7 @@ public class NKDataFileXML: NSObject {
                 file.trashbinDeletionTime = Date(timeIntervalSince1970: trashbinDeletionTimeDouble)
             }
 
-            let results = await NCTypeIdentifiers.shared.getInternalType(fileName: file.fileName, mimeType: file.contentType, directory: file.directory, account: nkSession.account)
+            let results = await NKTypeIdentifiers.shared.getInternalType(fileName: file.fileName, mimeType: file.contentType, directory: file.directory, account: nkSession.account)
 
             file.contentType = results.mimeType
             file.classFile = results.classFile
