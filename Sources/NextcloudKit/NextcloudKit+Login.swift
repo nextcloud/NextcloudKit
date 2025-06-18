@@ -41,7 +41,7 @@ public extension NextcloudKit {
                 let error = NKError(error: error, afResponse: response, responseData: response.data)
                 options.queue.async { completion(nil, response, error) }
             case .success(let data):
-                let apppassword = NKDataFileXML(nkCommonInstance: self.nkCommonInstance).convertDataAppPassword(data: data)
+                let apppassword = NKDataFileXML().convertDataAppPassword(data: data)
                 options.queue.async { completion(apppassword, response, .success) }
             }
         }

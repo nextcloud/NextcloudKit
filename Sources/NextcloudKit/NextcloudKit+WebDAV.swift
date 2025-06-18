@@ -229,7 +229,7 @@ public extension NextcloudKit {
                 urlRequest.httpBody = requestBody
                 urlRequest.timeoutInterval = options.timeout
             } else {
-                urlRequest.httpBody = NKDataFileXML(nkCommonInstance: self.nkCommonInstance).getRequestBodyFile(createProperties: options.createProperties, removeProperties: options.removeProperties).data(using: .utf8)
+                urlRequest.httpBody = NKDataFileXML().getRequestBodyFile(createProperties: options.createProperties, removeProperties: options.removeProperties).data(using: .utf8)
             }
         } catch {
             return options.queue.async { completion(account, nil, nil, NKError(error: error)) }
@@ -244,12 +244,13 @@ public extension NextcloudKit {
                 let error = NKError(error: error, afResponse: response, responseData: response.data)
                 options.queue.async { completion(account, nil, response, error) }
             case .success:
-                guard let xmlData = response.data else {
+                guard let xmlData = response.data,
+                      let baseUrl = self.nkCommonInstance.getHostName(urlString: nkSession.urlBase) else {
                     return options.queue.async { completion(account, nil, response, .xmlError) }
                 }
 
                 Task {
-                    let files = await NKDataFileXML(nkCommonInstance: self.nkCommonInstance).convertDataFile(xmlData: xmlData, nkSession: nkSession, showHiddenFiles: showHiddenFiles, includeHiddenFiles: includeHiddenFiles)
+                    let files = await NKDataFileXML().convertDataFile(xmlData: xmlData, nkSession: nkSession, baseUrl: baseUrl, showHiddenFiles: showHiddenFiles, includeHiddenFiles: includeHiddenFiles)
 
                     options.queue.async {
                         completion(account, files, response, .success)
@@ -283,11 +284,11 @@ public extension NextcloudKit {
         }
         var httpBody: Data?
         if let fileId = fileId {
-            httpBody = String(format: NKDataFileXML(nkCommonInstance: self.nkCommonInstance).getRequestBodySearchFileId(createProperties: options.createProperties, removeProperties: options.removeProperties), nkSession.userId, fileId).data(using: .utf8)
+            httpBody = String(format: NKDataFileXML().getRequestBodySearchFileId(createProperties: options.createProperties, removeProperties: options.removeProperties), nkSession.userId, fileId).data(using: .utf8)
         } else if let link = link {
             let linkArray = link.components(separatedBy: "/")
             if let fileId = linkArray.last {
-                httpBody = String(format: NKDataFileXML(nkCommonInstance: self.nkCommonInstance).getRequestBodySearchFileId(createProperties: options.createProperties, removeProperties: options.removeProperties), nkSession.userId, fileId).data(using: .utf8)
+                httpBody = String(format: NKDataFileXML().getRequestBodySearchFileId(createProperties: options.createProperties, removeProperties: options.removeProperties), nkSession.userId, fileId).data(using: .utf8)
             }
         }
         guard let httpBody = httpBody else {
@@ -332,7 +333,7 @@ public extension NextcloudKit {
               let href = ("/files/" + nkSession.userId).urlEncoded  else {
             return options.queue.async { completion(account, nil, nil, .urlError) }
         }
-        let requestBody = String(format: NKDataFileXML(nkCommonInstance: self.nkCommonInstance).getRequestBodySearchFileName(createProperties: options.createProperties, removeProperties: options.removeProperties), href, depth, "%" + literal + "%")
+        let requestBody = String(format: NKDataFileXML().getRequestBodySearchFileName(createProperties: options.createProperties, removeProperties: options.removeProperties), href, depth, "%" + literal + "%")
         if let httpBody = requestBody.data(using: .utf8) {
             search(serverUrl: serverUrl, httpBody: httpBody, showHiddenFiles: showHiddenFiles, includeHiddenFiles: includeHiddenFiles, account: account, options: options) { task in
                 taskHandler(task)
@@ -371,7 +372,7 @@ public extension NextcloudKit {
         guard let lessDateString, let greaterDateString else {
             return options.queue.async { completion(account, files, nil, .invalidDate) }
         }
-        guard let httpBody = String(format: NKDataFileXML(nkCommonInstance: self.nkCommonInstance).getRequestBodySearchMedia(createProperties: options.createProperties, removeProperties: options.removeProperties), href, elementDate, elementDate, lessDateString, elementDate, greaterDateString, String(limit)).data(using: .utf8) else {
+        guard let httpBody = String(format: NKDataFileXML().getRequestBodySearchMedia(createProperties: options.createProperties, removeProperties: options.removeProperties), href, elementDate, elementDate, lessDateString, elementDate, greaterDateString, String(limit)).data(using: .utf8) else {
             return options.queue.async { completion(account, files, nil, .invalidData) }
         }
 
@@ -419,9 +420,9 @@ public extension NextcloudKit {
                 let error = NKError(error: error, afResponse: response, responseData: response.data)
                 options.queue.async { completion(account, nil, response, error) }
             case .success:
-                if let xmlData = response.data {
+                if let xmlData = response.data, let baseUrl = self.nkCommonInstance.getHostName(urlString: nkSession.urlBase) {
                     Task {
-                        let files = await NKDataFileXML(nkCommonInstance: self.nkCommonInstance).convertDataFile(xmlData: xmlData, nkSession: nkSession, showHiddenFiles: showHiddenFiles, includeHiddenFiles: includeHiddenFiles)
+                        let files = await NKDataFileXML().convertDataFile(xmlData: xmlData, nkSession: nkSession, baseUrl: baseUrl, showHiddenFiles: showHiddenFiles, includeHiddenFiles: includeHiddenFiles)
                         options.queue.async {
                             completion(account, files, response, .success)
                         }
@@ -457,7 +458,7 @@ public extension NextcloudKit {
 
         do {
             try urlRequest = URLRequest(url: url, method: method, headers: headers)
-            let body = NSString(format: NKDataFileXML(nkCommonInstance: self.nkCommonInstance).requestBodyFileSetFavorite as NSString, (favorite ? 1 : 0)) as String
+            let body = NSString(format: NKDataFileXML().requestBodyFileSetFavorite as NSString, (favorite ? 1 : 0)) as String
             urlRequest.httpBody = body.data(using: .utf8)
             urlRequest.timeoutInterval = options.timeout
         } catch {
@@ -509,7 +510,7 @@ public extension NextcloudKit {
 
         do {
             try urlRequest = URLRequest(url: url, method: method, headers: headers)
-            urlRequest.httpBody = NKDataFileXML(nkCommonInstance: self.nkCommonInstance).getRequestBodyFileListingFavorites(createProperties: options.createProperties, removeProperties: options.removeProperties).data(using: .utf8)
+            urlRequest.httpBody = NKDataFileXML().getRequestBodyFileListingFavorites(createProperties: options.createProperties, removeProperties: options.removeProperties).data(using: .utf8)
             urlRequest.timeoutInterval = options.timeout
         } catch {
             return options.queue.async { completion(account, nil, nil, NKError(error: error)) }
@@ -524,9 +525,9 @@ public extension NextcloudKit {
                 let error = NKError(error: error, afResponse: response, responseData: response.data)
                 options.queue.async { completion(account, nil, response, error) }
             case .success:
-                if let xmlData = response.data {
+                if let xmlData = response.data, let baseUrl = self.nkCommonInstance.getHostName(urlString: nkSession.urlBase) {
                     Task {
-                        let files = await NKDataFileXML(nkCommonInstance: self.nkCommonInstance).convertDataFile(xmlData: xmlData, nkSession: nkSession, showHiddenFiles: showHiddenFiles, includeHiddenFiles: includeHiddenFiles)
+                        let files = await NKDataFileXML().convertDataFile(xmlData: xmlData, nkSession: nkSession, baseUrl: baseUrl, showHiddenFiles: showHiddenFiles, includeHiddenFiles: includeHiddenFiles)
                         options.queue.async {
                             completion(account, files, response, .success)
                         }
@@ -577,7 +578,7 @@ public extension NextcloudKit {
 
         do {
             try urlRequest = URLRequest(url: url, method: method, headers: headers)
-            urlRequest.httpBody = NKDataFileXML(nkCommonInstance: self.nkCommonInstance).requestBodyTrash.data(using: .utf8)
+            urlRequest.httpBody = NKDataFileXML().requestBodyTrash.data(using: .utf8)
             urlRequest.timeoutInterval = options.timeout
         } catch {
             return options.queue.async { completion(account, nil, nil, NKError(error: error)) }
@@ -592,11 +593,11 @@ public extension NextcloudKit {
                 let error = NKError(error: error, afResponse: response, responseData: response.data)
                 options.queue.async { completion(account, nil, response, error) }
             case .success:
-                if let xmlData = response.data {
+                if let xmlData = response.data, let baseUrl = self.nkCommonInstance.getHostName(urlString: nkSession.urlBase) {
                     Task {
-                        let ss = await NKDataFileXML(nkCommonInstance: self.nkCommonInstance).convertDataTrash(xmlData: xmlData, nkSession: nkSession, showHiddenFiles: showHiddenFiles)
+                        let items = await NKDataFileXML().convertDataTrash(xmlData: xmlData, nkSession: nkSession, baseUrl: baseUrl, showHiddenFiles: showHiddenFiles)
                         options.queue.async {
-                            completion(account, ss, response, .success)
+                            completion(account, items, response, .success)
                         }
                     }
                 } else {

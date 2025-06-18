@@ -27,7 +27,7 @@ public extension NextcloudKit {
 
         do {
             try urlRequest = URLRequest(url: url, method: method, headers: headers)
-            urlRequest.httpBody = NKDataFileXML(nkCommonInstance: self.nkCommonInstance).requestBodyComments.data(using: .utf8)
+            urlRequest.httpBody = NKDataFileXML().requestBodyComments.data(using: .utf8)
         } catch {
             return options.queue.async { completion(account, nil, nil, NKError(error: error)) }
         }
@@ -42,7 +42,7 @@ public extension NextcloudKit {
                 options.queue.async { completion(account, nil, response, error) }
             case .success:
                 if let xmlData = response.data {
-                    let items = NKDataFileXML(nkCommonInstance: self.nkCommonInstance).convertDataComments(xmlData: xmlData)
+                    let items = NKDataFileXML().convertDataComments(xmlData: xmlData)
                     options.queue.async { completion(account, items, response, .success) }
                 } else {
                     options.queue.async { completion(account, nil, response, .invalidData) }
@@ -113,7 +113,7 @@ public extension NextcloudKit {
 
         do {
             try urlRequest = URLRequest(url: url, method: method, headers: headers)
-            let parameters = String(format: NKDataFileXML(nkCommonInstance: self.nkCommonInstance).requestBodyCommentsUpdate, message)
+            let parameters = String(format: NKDataFileXML().requestBodyCommentsUpdate, message)
             urlRequest.httpBody = parameters.data(using: .utf8)
         } catch {
             return options.queue.async { completion(account, nil, NKError(error: error)) }
@@ -179,7 +179,7 @@ public extension NextcloudKit {
 
         do {
             try urlRequest = URLRequest(url: url, method: method, headers: headers)
-            let parameters = String(format: NKDataFileXML(nkCommonInstance: self.nkCommonInstance).requestBodyCommentsMarkAsRead)
+            let parameters = String(format: NKDataFileXML().requestBodyCommentsMarkAsRead)
             urlRequest.httpBody = parameters.data(using: .utf8)
         } catch {
             return options.queue.async { completion(account, nil, NKError(error: error)) }

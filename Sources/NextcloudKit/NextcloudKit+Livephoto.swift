@@ -26,7 +26,7 @@ public extension NextcloudKit {
         var urlRequest: URLRequest
         do {
             try urlRequest = URLRequest(url: url, method: method, headers: headers)
-            let parameters = String(format: NKDataFileXML(nkCommonInstance: self.nkCommonInstance).requestBodyLivephoto, livePhotoFile)
+            let parameters = String(format: NKDataFileXML().requestBodyLivephoto, livePhotoFile)
             urlRequest.httpBody = parameters.data(using: .utf8)
         } catch {
             return options.queue.async { completion(account, nil, NKError(error: error)) }

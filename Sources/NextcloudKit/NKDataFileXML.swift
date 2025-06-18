@@ -7,7 +7,6 @@ import Foundation
 import SwiftyXMLParser
 
 public class NKDataFileXML: NSObject {
-    var nkCommonInstance: NKCommon
     let requestBodyComments =
     """
     <?xml version=\"1.0\" encoding=\"UTF-8\"?>
@@ -243,22 +242,14 @@ public class NKDataFileXML: NSObject {
     </d:propertyupdate>
     """
 
-    public init(nkCommonInstance: NKCommon) {
-        self.nkCommonInstance = nkCommonInstance
-        super.init()
-    }
-
     func convertDataAppPassword(data: Data) -> String? {
         let xml = XML.parse(data)
         return xml["ocs", "data", "apppassword"].text
     }
 
-    func convertDataFile(xmlData: Data, nkSession: NKSession, showHiddenFiles: Bool, includeHiddenFiles: [String]) async -> [NKFile] {
+    func convertDataFile(xmlData: Data, nkSession: NKSession, baseUrl: String, showHiddenFiles: Bool, includeHiddenFiles: [String]) async -> [NKFile] {
         var files: [NKFile] = []
         let rootFiles = "/" + nkSession.dav + "/files/"
-        guard let baseUrl = self.nkCommonInstance.getHostName(urlString: nkSession.urlBase) else {
-            return files
-        }
         let xml = XML.parse(xmlData)
         let elements = xml["d:multistatus", "d:response"]
 
@@ -567,12 +558,9 @@ public class NKDataFileXML: NSObject {
         return files
     }
 
-    func convertDataTrash(xmlData: Data, nkSession: NKSession, showHiddenFiles: Bool) async -> [NKTrash] {
+    func convertDataTrash(xmlData: Data, nkSession: NKSession, baseUrl: String, showHiddenFiles: Bool) async -> [NKTrash] {
         var files: [NKTrash] = []
         var first: Bool = true
-        guard let baseUrl = self.nkCommonInstance.getHostName(urlString: nkSession.urlBase) else {
-            return files
-        }
         let xml = XML.parse(xmlData)
         let elements = xml["d:multistatus", "d:response"]
 
