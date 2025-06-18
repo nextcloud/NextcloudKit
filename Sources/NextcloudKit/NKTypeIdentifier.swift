@@ -78,7 +78,7 @@ public enum TypeIconFile: String, CaseIterable, Codable, Equatable, Sendable {
 
 // MARK: - Centralized Per-Account TypeIdentifier Manager
 
-actor NCTypeIdentifiers {
+public actor NCTypeIdentifiers {
     static let shared = NCTypeIdentifiers()
 
     private var utiCache: [String: String] = [:]
@@ -86,11 +86,11 @@ actor NCTypeIdentifiers {
     private var filePropertiesCache: [String: NKFileProperty] = [:]
     private var identifiersByAccount: [String: [UTTypeConformsToServer]] = [:]
 
-    func clearInternalTypeIdentifier(for account: String) {
+    public func clearInternalTypeIdentifier(for account: String) {
         identifiersByAccount[account] = []
     }
 
-    func addInternalTypeIdentifier(_ identifier: UTTypeConformsToServer) {
+    public func addInternalTypeIdentifier(_ identifier: UTTypeConformsToServer) {
         let account = identifier.account
         if !identifiersByAccount[account, default: []].contains(where: {
             $0.typeIdentifier == identifier.typeIdentifier &&
@@ -100,11 +100,11 @@ actor NCTypeIdentifiers {
         }
     }
 
-    func getAll(for account: String) -> [UTTypeConformsToServer] {
+    public func getAll(for account: String) -> [UTTypeConformsToServer] {
         identifiersByAccount[account] ?? []
     }
 
-    func getInternalType(fileName: String, mimeType inputMimeType: String, directory: Bool, account: String) -> (mimeType: String, classFile: String, iconName: String, typeIdentifier: String, fileNameWithoutExt: String, ext: String) {
+    public func getInternalType(fileName: String, mimeType inputMimeType: String, directory: Bool, account: String) -> (mimeType: String, classFile: String, iconName: String, typeIdentifier: String, fileNameWithoutExt: String, ext: String) {
         var ext = (fileName as NSString).pathExtension.lowercased()
         var mimeType = inputMimeType
         var classFile = "", iconName = "", typeIdentifier = "", fileNameWithoutExt = ""
