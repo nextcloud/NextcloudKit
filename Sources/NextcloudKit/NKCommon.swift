@@ -108,14 +108,7 @@ public struct NKCommon: Sendable {
         case xls = "xls"
     }
 
-    public struct UTTypeConformsToServer: Sendable {
-        var typeIdentifier: String
-        var classFile: String
-        var editor: String
-        var iconName: String
-        var name: String
-        var account: String
-    }
+   
 
 #if swift(<6.0)
     internal var utiCache = NSCache<NSString, CFString>()
@@ -126,7 +119,6 @@ public struct NKCommon: Sendable {
     internal var mimeTypeCache = [String: String]()
     internal var filePropertiesCache = [String: NKFileProperty]()
 #endif
-    internal var internalTypeIdentifiers = ThreadSafeArray<UTTypeConformsToServer>()
 
     // MARK: - Init
 
@@ -136,18 +128,16 @@ public struct NKCommon: Sendable {
 
     // MARK: - Type Identifier
 
-    mutating public func clearInternalTypeIdentifier(account: String) {
-        internalTypeIdentifiers = internalTypeIdentifiers.filter({ $0.account != account })
-    }
-
-    mutating public func addInternalTypeIdentifier(typeIdentifier: String, classFile: String, editor: String, iconName: String, name: String, account: String) {
-        if !internalTypeIdentifiers.contains(where: { $0.typeIdentifier == typeIdentifier && $0.editor == editor && $0.account == account}) {
-            let newUTI = UTTypeConformsToServer(typeIdentifier: typeIdentifier, classFile: classFile, editor: editor, iconName: iconName, name: name, account: account)
-            internalTypeIdentifiers.append(newUTI)
-        }
-    }
-
-    mutating public func getInternalType(fileName: String, mimeType: String, directory: Bool, account: String) -> (mimeType: String, classFile: String, iconName: String, typeIdentifier: String, fileNameWithoutExt: String, ext: String) {
+    mutating public func getInternalType(fileName: String,
+                                         mimeType: String,
+                                         directory: Bool,
+                                         account: String) ->
+    (mimeType: String,
+     classFile: String,
+     iconName: String,
+     typeIdentifier: String,
+     fileNameWithoutExt: String,
+     ext: String) {
         var ext = (fileName as NSString).pathExtension.lowercased()
         var mimeType = mimeType
         var classFile = "", iconName = "", typeIdentifier = "", fileNameWithoutExt = ""
@@ -280,10 +270,70 @@ public struct NKCommon: Sendable {
             fileProperty.iconName = TypeIconFile.txt.rawValue
             fileProperty.name = "text"
         } else {
-            if let result = internalTypeIdentifiers.first(where: {$0.typeIdentifier == typeIdentifier}) {
-                fileProperty.classFile = result.classFile
-                fileProperty.iconName = result.iconName
-                fileProperty.name = result.name
+            if typeIdentifier == "text/plain" {
+                fileProperty.classFile = TypeClassFile.document.rawValue
+                fileProperty.iconName = TypeIconFile.document.rawValue
+                fileProperty.name = "markdown"
+            } else if typeIdentifier == "text/html" {
+                fileProperty.classFile = TypeClassFile.document.rawValue
+                fileProperty.iconName = TypeIconFile.document.rawValue
+                fileProperty.name = "markdown"
+            } else if typeIdentifier == "net.daringfireball.markdown" {
+                fileProperty.classFile = TypeClassFile.document.rawValue
+                fileProperty.iconName = TypeIconFile.document.rawValue
+                fileProperty.name = "markdown"
+            } else if typeIdentifier == "text/x-markdown" {
+                fileProperty.classFile = TypeClassFile.document.rawValue
+                fileProperty.iconName = TypeIconFile.document.rawValue
+                fileProperty.name = "markdown"
+            } else if typeIdentifier == "org.oasis-open.opendocument.text" {
+                fileProperty.classFile = TypeClassFile.document.rawValue
+                fileProperty.iconName = TypeIconFile.document.rawValue
+                fileProperty.name = "document"
+            } else if typeIdentifier == "org.openxmlformats.wordprocessingml.document" {
+                fileProperty.classFile = TypeClassFile.document.rawValue
+                fileProperty.iconName = TypeIconFile.document.rawValue
+                fileProperty.name = "document"
+            } else if typeIdentifier == "com.microsoft.word.doc" {
+                fileProperty.classFile = TypeClassFile.document.rawValue
+                fileProperty.iconName = TypeIconFile.document.rawValue
+                fileProperty.name = "document"
+            } else if typeIdentifier == "com.apple.iwork.keynote.key" {
+                fileProperty.classFile = TypeClassFile.document.rawValue
+                fileProperty.iconName = TypeIconFile.document.rawValue
+                fileProperty.name = "pages"
+            } else if typeIdentifier == "org.oasis-open.opendocument.spreadsheet" {
+                fileProperty.classFile = TypeClassFile.document.rawValue
+                fileProperty.iconName = TypeIconFile.xls.rawValue
+                fileProperty.name = "sheet"
+            } else if typeIdentifier == "org.openxmlformats.spreadsheetml.sheet" {
+                fileProperty.classFile = TypeClassFile.document.rawValue
+                fileProperty.iconName = TypeIconFile.xls.rawValue
+                fileProperty.name = "sheet"
+            } else if typeIdentifier == "com.microsoft.excel.xls" {
+                fileProperty.classFile = TypeClassFile.document.rawValue
+                fileProperty.iconName = TypeIconFile.xls.rawValue
+                fileProperty.name = "sheet"
+            } else if typeIdentifier == "com.apple.iwork.numbers.numbers" {
+                fileProperty.classFile = TypeClassFile.document.rawValue
+                fileProperty.iconName = TypeIconFile.xls.rawValue
+                fileProperty.name = "numbers"
+            } else if typeIdentifier == "org.oasis-open.opendocument.presentation" {
+                fileProperty.classFile = TypeClassFile.document.rawValue
+                fileProperty.iconName = TypeIconFile.ppt.rawValue
+                fileProperty.name = "presentation"
+            } else if typeIdentifier == "org.openxmlformats.presentationml.presentation" {
+                fileProperty.classFile = TypeClassFile.document.rawValue
+                fileProperty.iconName = TypeIconFile.ppt.rawValue
+                fileProperty.name = "presentation"
+            } else if typeIdentifier == "com.microsoft.powerpoint.ppt" {
+                fileProperty.classFile = TypeClassFile.document.rawValue
+                fileProperty.iconName = TypeIconFile.ppt.rawValue
+                fileProperty.name = "presentation"
+            } else if typeIdentifier == "com.apple.iwork.keynote.key" {
+                fileProperty.classFile = TypeClassFile.document.rawValue
+                fileProperty.iconName = TypeIconFile.ppt.rawValue
+                fileProperty.name = "keynote"
             } else {
                 if UTTypeConformsTo(inUTI, kUTTypeContent) {
                     fileProperty.classFile = TypeClassFile.document.rawValue
