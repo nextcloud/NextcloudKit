@@ -2,6 +2,14 @@
 import Foundation
 import UniformTypeIdentifiers
 
+// MARK: - UTType Extension
+
+extension UTType {
+    static let zipArchive = UTType(importedAs: "public.zip-archive")
+}
+
+// MARK: - Data Models
+
 public struct UTTypeConformsToServer: Sendable, Equatable, Hashable, Codable {
     public let typeIdentifier: String
     public let classFile: String
@@ -28,16 +36,8 @@ public struct UTTypeConformsToServer: Sendable, Equatable, Hashable, Codable {
 }
 
 public enum TypeClassFile: String, CaseIterable, Codable, Equatable, Sendable {
-    case audio
-    case compress
-    case directory
-    case document
-    case image
-    case unknow
-    case url
-    case video
+    case audio, compress, directory, document, image, unknow, url, video
 
-    /// Optional: human-readable label (useful for UI or logs)
     public var displayName: String {
         switch self {
         case .audio: return "Audio"
@@ -53,21 +53,10 @@ public enum TypeClassFile: String, CaseIterable, Codable, Equatable, Sendable {
 }
 
 public enum TypeIconFile: String, CaseIterable, Codable, Equatable, Sendable {
-    case audio
-    case code
-    case compress
-    case directory
-    case document
-    case image
-    case movie
-    case pdf
-    case ppt
-    case txt
+    case audio, code, compress, directory, document, image, movie, pdf, ppt, txt
     case unknow = "file"
-    case url
-    case xls
+    case url, xls
 
-    /// Optional: Human-readable label
     public var displayName: String {
         switch self {
         case .audio: return "Audio"
@@ -87,47 +76,35 @@ public enum TypeIconFile: String, CaseIterable, Codable, Equatable, Sendable {
     }
 }
 
-extension UTType {
-    static let zipArchive = UTType(importedAs: "public.zip-archive")
-}
+// MARK: - Centralized Per-Account TypeIdentifier Manager
 
-/// Thread-safe actor to manage UTI resolution, MIME types, file classification and custom overrides
-actor NKTypeIdentifiers {
-    static let shared = NKTypeIdentifiers()
+actor NCTypeIdentifiers {
+    static let shared = NCTypeIdentifiers()
 
-    private var utiCache: [String: String] = [:]                     // ext -> UTI identifier
-    private var mimeTypeCache: [String: String] = [:]               // UTI identifier -> MIME type
-    private var filePropertiesCache: [String: NKFileProperty] = [:] // UTI identifier -> NKFileProperty
-    private var internalTypeIdentifiers: [UTTypeConformsToServer] = []
+    private var utiCache: [String: String] = [:]
+    private var mimeTypeCache: [String: String] = [:]
+    private var filePropertiesCache: [String: NKFileProperty] = [:]
+    private var identifiersByAccount: [String: [UTTypeConformsToServer]] = [:]
 
-    // MARK: - Public Methods
-
-    func clearInternalTypeIdentifier(account: String) {
-        internalTypeIdentifiers.removeAll { $0.account == account }
+    func clearInternalTypeIdentifier(for account: String) {
+        identifiersByAccount[account] = []
     }
 
-    func addInternalTypeIdentifier(typeIdentifier: String, classFile: String, editor: String, iconName: String, name: String, account: String) {
-        let exists = internalTypeIdentifiers.contains {
-            $0.typeIdentifier == typeIdentifier &&
-            $0.editor == editor &&
-            $0.account == account
+    func addInternalTypeIdentifier(_ identifier: UTTypeConformsToServer) {
+        let account = identifier.account
+        if !identifiersByAccount[account, default: []].contains(where: {
+            $0.typeIdentifier == identifier.typeIdentifier &&
+            $0.editor == identifier.editor
+        }) {
+            identifiersByAccount[account, default: []].append(identifier)
         }
+    }
 
-        if !exists {
-            let newUTI = UTTypeConformsToServer(
-                typeIdentifier: typeIdentifier,
-                classFile: classFile,
-                editor: editor,
-                iconName: iconName,
-                name: name,
-                account: account
-            )
-            internalTypeIdentifiers.append(newUTI)
-        }
+    func getAll(for account: String) -> [UTTypeConformsToServer] {
+        identifiersByAccount[account] ?? []
     }
 
     func getInternalType(fileName: String, mimeType inputMimeType: String, directory: Bool, account: String) -> (mimeType: String, classFile: String, iconName: String, typeIdentifier: String, fileNameWithoutExt: String, ext: String) {
-
         var ext = (fileName as NSString).pathExtension.lowercased()
         var mimeType = inputMimeType
         var classFile = "", iconName = "", typeIdentifier = "", fileNameWithoutExt = ""
@@ -166,7 +143,7 @@ actor NKTypeIdentifiers {
                 if let cached = filePropertiesCache[uti.identifier] {
                     fileProperty = cached
                 } else {
-                    fileProperty = getFileProperties(for: uti)
+                    fileProperty = getFileProperties(for: uti, account: account)
                     filePropertiesCache[uti.identifier] = fileProperty
                 }
 
@@ -178,7 +155,7 @@ actor NKTypeIdentifiers {
         return (mimeType, classFile, iconName, typeIdentifier, fileNameWithoutExt, ext)
     }
 
-    func getFileProperties(for uti: UTType) -> NKFileProperty {
+    private func getFileProperties(for uti: UTType, account: String) -> NKFileProperty {
         let fileProperty = NKFileProperty()
 
         if let ext = uti.preferredFilenameExtension {
@@ -219,7 +196,8 @@ actor NKTypeIdentifiers {
             fileProperty.iconName = TypeIconFile.txt.rawValue
             fileProperty.name = "text"
         } else {
-            if let result = internalTypeIdentifiers.first(where: { $0.typeIdentifier == uti.identifier }) {
+            let overrides = identifiersByAccount[account] ?? []
+            if let result = overrides.first(where: { $0.typeIdentifier == uti.identifier }) {
                 fileProperty.classFile = result.classFile
                 fileProperty.iconName = result.iconName
                 fileProperty.name = result.name
@@ -237,4 +215,3 @@ actor NKTypeIdentifiers {
         return fileProperty
     }
 }
-

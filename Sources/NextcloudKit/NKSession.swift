@@ -17,7 +17,6 @@ public struct NKSession: Sendable {
     public let httpMaximumConnectionsPerHostInDownload: Int
     public let httpMaximumConnectionsPerHostInUpload: Int
     public let dav: String = "remote.php/dav"
-    public var internalTypeIdentifiers: [NKCommon.UTTypeConformsToServer] = []
     public let sessionData: Alamofire.Session
     public let sessionDataNoCache: Alamofire.Session
     public let sessionDownloadBackground: URLSession

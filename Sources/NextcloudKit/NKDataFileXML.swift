@@ -253,7 +253,7 @@ public class NKDataFileXML: NSObject {
         return xml["ocs", "data", "apppassword"].text
     }
 
-    func convertDataFile(xmlData: Data, nkSession: NKSession, showHiddenFiles: Bool, includeHiddenFiles: [String]) -> [NKFile] {
+    func convertDataFile(xmlData: Data, nkSession: NKSession, showHiddenFiles: Bool, includeHiddenFiles: [String]) async -> [NKFile] {
         var files: [NKFile] = []
         let rootFiles = "/" + nkSession.dav + "/files/"
         guard let baseUrl = self.nkCommonInstance.getHostName(urlString: nkSession.urlBase) else {
@@ -534,7 +534,7 @@ public class NKDataFileXML: NSObject {
                 file.downloadLimits.append(NKDownloadLimit(count: count, limit: limit, token: token))
             }
 
-            let results = self.nkCommonInstance.getInternalType(fileName: file.fileName, mimeType: file.contentType, directory: file.directory, account: nkSession.account)
+            let results = await NCTypeIdentifiers.shared.getInternalType(fileName: file.fileName, mimeType: file.contentType, directory: file.directory, account: nkSession.account)
 
             file.contentType = results.mimeType
             file.iconName = results.iconName
@@ -557,8 +557,8 @@ public class NKDataFileXML: NSObject {
             }
             if index < files.count - 1,
                (files[index].fileName as NSString).deletingPathExtension == (files[index + 1].fileName as NSString) .deletingPathExtension,
-               files[index].classFile == NKCommon.TypeClassFile.image.rawValue,
-               files[index + 1].classFile == NKCommon.TypeClassFile.video.rawValue {
+               files[index].classFile == TypeClassFile.image.rawValue,
+               files[index + 1].classFile == TypeClassFile.video.rawValue {
                 files[index].livePhotoFile = files[index + 1].fileId
                 files[index + 1].livePhotoFile = files[index].fileId
             }
@@ -567,7 +567,7 @@ public class NKDataFileXML: NSObject {
         return files
     }
 
-    func convertDataTrash(xmlData: Data, nkSession: NKSession, showHiddenFiles: Bool) -> [NKTrash] {
+    func convertDataTrash(xmlData: Data, nkSession: NKSession, showHiddenFiles: Bool) async -> [NKTrash] {
         var files: [NKTrash] = []
         var first: Bool = true
         guard let baseUrl = self.nkCommonInstance.getHostName(urlString: nkSession.urlBase) else {
@@ -581,7 +581,7 @@ public class NKDataFileXML: NSObject {
                 first = false
                 continue
             }
-            let file = NKTrash()
+            var file = NKTrash()
             if let href = element["d:href"].text {
                 var fileNamePath = href
 
@@ -644,7 +644,7 @@ public class NKDataFileXML: NSObject {
                 file.trashbinDeletionTime = Date(timeIntervalSince1970: trashbinDeletionTimeDouble)
             }
 
-            let results = self.nkCommonInstance.getInternalType(fileName: file.trashbinFileName, mimeType: file.contentType, directory: file.directory, account: nkSession.account)
+            let results = await NCTypeIdentifiers.shared.getInternalType(fileName: file.fileName, mimeType: file.contentType, directory: file.directory, account: nkSession.account)
 
             file.contentType = results.mimeType
             file.classFile = results.classFile
