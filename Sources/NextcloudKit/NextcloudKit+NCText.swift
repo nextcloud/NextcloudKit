@@ -28,24 +28,24 @@ public extension NextcloudKit {
                 options.queue.async { completion(account, nil, nil, response, error) }
             case .success(let responseData):
                 Task {
-                                    do {
-                                        let (editors, creators) = try NKEditorDetailsConverter.from(data: responseData)
-                                        let capabilities = await NKCapabilities.shared.getCapabilitiesAsync(for: account)
-                                        capabilities.editors = editors
-                                        capabilities.creators = creators
-                                        await NKCapabilities.shared.appendCapabilitiesAsync(for: account, capabilities: capabilities)
+                    do {
+                        let (editors, creators) = try NKEditorDetailsConverter.from(data: responseData)
+                        let capabilities = await NKCapabilities.shared.getCapabilitiesAsync(for: account)
+                        capabilities.editors = editors
+                        capabilities.creators = creators
+                        await NKCapabilities.shared.appendCapabilitiesAsync(for: account, capabilities: capabilities)
 
-                                        options.queue.async {
-                                            completion(account, editors, creators, response, .success)
-                                        }
+                        options.queue.async {
+                            completion(account, editors, creators, response, .success)
+                        }
 
-                                    } catch {
-                                        nkLog(error: "Parsing error in NKEditorDetailsConverter: \(error)")
-                                        options.queue.async {
-                                            completion(account, nil, nil, response, .invalidData)
-                                        }
-                                    }
-                                }
+                    } catch {
+                        nkLog(error: "Parsing error in NKEditorDetailsConverter: \(error)")
+                        options.queue.async {
+                            completion(account, nil, nil, response, .invalidData)
+                        }
+                    }
+                }
             }
         }
     }
