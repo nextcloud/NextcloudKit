@@ -205,7 +205,6 @@ public extension NextcloudKit {
                           options: NKRequestOptions = NKRequestOptions(),
                           taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
                           completion: @escaping (_ account: String, _ files: [NKFile]?, _ responseData: AFDataResponse<Data>?, _ error: NKError) -> Void) {
-        var files: [NKFile] = []
         var serverUrlFileName = serverUrlFileName
         ///
         options.contentType = "application/xml"
@@ -233,7 +232,7 @@ public extension NextcloudKit {
                 urlRequest.httpBody = NKDataFileXML(nkCommonInstance: self.nkCommonInstance).getRequestBodyFile(createProperties: options.createProperties, removeProperties: options.removeProperties).data(using: .utf8)
             }
         } catch {
-            return options.queue.async { completion(account, files, nil, NKError(error: error)) }
+            return options.queue.async { completion(account, nil, nil, NKError(error: error)) }
         }
 
         nkSession.sessionData.request(urlRequest, interceptor: NKInterceptor(nkCommonInstance: nkCommonInstance)).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
@@ -243,13 +242,15 @@ public extension NextcloudKit {
             switch response.result {
             case .failure(let error):
                 let error = NKError(error: error, afResponse: response, responseData: response.data)
-                options.queue.async { completion(account, files, response, error) }
+                options.queue.async { completion(account, nil, response, error) }
             case .success:
                 if let xmlData = response.data {
-                    files = NKDataFileXML(nkCommonInstance: self.nkCommonInstance).convertDataFile(xmlData: xmlData, nkSession: nkSession, showHiddenFiles: showHiddenFiles, includeHiddenFiles: includeHiddenFiles)
-                    options.queue.async { completion(account, files, response, .success) }
+                    Task {
+                        let files = await NKDataFileXML(nkCommonInstance: self.nkCommonInstance).convertDataFile(xmlData: xmlData, nkSession: nkSession, showHiddenFiles: showHiddenFiles, includeHiddenFiles: includeHiddenFiles)
+                        options.queue.async { completion(account, files, response, .success) }
+                    }
                 } else {
-                    options.queue.async { completion(account, files, response, .xmlError) }
+                    options.queue.async { completion(account, nil, response, .xmlError) }
                 }
             }
         }
@@ -393,9 +394,8 @@ public extension NextcloudKit {
               let headers = nkCommonInstance.getStandardHeaders(account: account, options: options) else {
             return options.queue.async { completion(account, nil, nil, .urlError) }
         }
-        var files: [NKFile] = []
         guard let url = (serverUrl + "/" + nkSession.dav).encodedToUrl else {
-            return options.queue.async { completion(account, files, nil, .urlError) }
+            return options.queue.async { completion(account, nil, nil, .urlError) }
         }
         let method = HTTPMethod(rawValue: "SEARCH")
         var urlRequest: URLRequest
@@ -404,7 +404,7 @@ public extension NextcloudKit {
             urlRequest.httpBody = httpBody
             urlRequest.timeoutInterval = options.timeout
         } catch {
-            return options.queue.async { completion(account, files, nil, NKError(error: error)) }
+            return options.queue.async { completion(account, nil, nil, NKError(error: error)) }
         }
 
         nkSession.sessionData.request(urlRequest, interceptor: NKInterceptor(nkCommonInstance: nkCommonInstance)).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
@@ -414,13 +414,15 @@ public extension NextcloudKit {
             switch response.result {
             case .failure(let error):
                 let error = NKError(error: error, afResponse: response, responseData: response.data)
-                options.queue.async { completion(account, files, response, error) }
+                options.queue.async { completion(account, nil, response, error) }
             case .success:
                 if let xmlData = response.data {
-                    files = NKDataFileXML(nkCommonInstance: self.nkCommonInstance).convertDataFile(xmlData: xmlData, nkSession: nkSession, showHiddenFiles: showHiddenFiles, includeHiddenFiles: includeHiddenFiles)
-                    options.queue.async { completion(account, files, response, .success) }
+                    Task {
+                        let files = await NKDataFileXML(nkCommonInstance: self.nkCommonInstance).convertDataFile(xmlData: xmlData, nkSession: nkSession, showHiddenFiles: showHiddenFiles, includeHiddenFiles: includeHiddenFiles)
+                        options.queue.async { completion(account, files, response, .success) }
+                    }
                 } else {
-                    options.queue.async { completion(account, files, response, .xmlError) }
+                    options.queue.async { completion(account, nil, response, .xmlError) }
                 }
             }
         }
@@ -492,9 +494,8 @@ public extension NextcloudKit {
             return options.queue.async { completion(account, nil, nil, .urlError) }
         }
         let serverUrlFileName = nkSession.urlBase + "/" + nkSession.dav + "/files/" + nkSession.userId
-        var files: [NKFile] = []
         guard let url = serverUrlFileName.encodedToUrl else {
-            return options.queue.async { completion(account, files, nil, .urlError) }
+            return options.queue.async { completion(account, nil, nil, .urlError) }
         }
         let method = HTTPMethod(rawValue: "REPORT")
         var urlRequest: URLRequest
@@ -504,7 +505,7 @@ public extension NextcloudKit {
             urlRequest.httpBody = NKDataFileXML(nkCommonInstance: self.nkCommonInstance).getRequestBodyFileListingFavorites(createProperties: options.createProperties, removeProperties: options.removeProperties).data(using: .utf8)
             urlRequest.timeoutInterval = options.timeout
         } catch {
-            return options.queue.async { completion(account, files, nil, NKError(error: error)) }
+            return options.queue.async { completion(account, nil, nil, NKError(error: error)) }
         }
 
         nkSession.sessionData.request(urlRequest, interceptor: NKInterceptor(nkCommonInstance: nkCommonInstance)).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
@@ -514,13 +515,15 @@ public extension NextcloudKit {
             switch response.result {
             case .failure(let error):
                 let error = NKError(error: error, afResponse: response, responseData: response.data)
-                options.queue.async { completion(account, files, response, error) }
+                options.queue.async { completion(account, nil, response, error) }
             case .success:
                 if let xmlData = response.data {
-                    files = NKDataFileXML(nkCommonInstance: self.nkCommonInstance).convertDataFile(xmlData: xmlData, nkSession: nkSession, showHiddenFiles: showHiddenFiles, includeHiddenFiles: includeHiddenFiles)
-                    options.queue.async { completion(account, files, response, .success) }
+                    Task {
+                        let files = await NKDataFileXML(nkCommonInstance: self.nkCommonInstance).convertDataFile(xmlData: xmlData, nkSession: nkSession, showHiddenFiles: showHiddenFiles, includeHiddenFiles: includeHiddenFiles)
+                        options.queue.async { completion(account, files, response, .success) }
+                    }
                 } else {
-                    options.queue.async { completion(account, files, response, .xmlError) }
+                    options.queue.async { completion(account, nil, response, .xmlError) }
                 }
             }
         }
@@ -554,9 +557,8 @@ public extension NextcloudKit {
         if let filename {
             serverUrlFileName = serverUrlFileName + filename
         }
-        var items: [NKTrash] = []
         guard let url = serverUrlFileName.encodedToUrl else {
-            return options.queue.async { completion(account, items, nil, .urlError) }
+            return options.queue.async { completion(account, nil, nil, .urlError) }
         }
         let method = HTTPMethod(rawValue: "PROPFIND")
         headers.update(name: "Depth", value: "1")
@@ -567,7 +569,7 @@ public extension NextcloudKit {
             urlRequest.httpBody = NKDataFileXML(nkCommonInstance: self.nkCommonInstance).requestBodyTrash.data(using: .utf8)
             urlRequest.timeoutInterval = options.timeout
         } catch {
-            return options.queue.async { completion(account, items, nil, NKError(error: error)) }
+            return options.queue.async { completion(account, nil, nil, NKError(error: error)) }
         }
 
         nkSession.sessionData.request(urlRequest, interceptor: NKInterceptor(nkCommonInstance: nkCommonInstance)).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
@@ -577,13 +579,15 @@ public extension NextcloudKit {
             switch response.result {
             case .failure(let error):
                 let error = NKError(error: error, afResponse: response, responseData: response.data)
-                options.queue.async { completion(account, items, response, error) }
+                options.queue.async { completion(account, nil, response, error) }
             case .success:
                 if let xmlData = response.data {
-                    items = NKDataFileXML(nkCommonInstance: self.nkCommonInstance).convertDataTrash(xmlData: xmlData, nkSession: nkSession, showHiddenFiles: showHiddenFiles)
-                    options.queue.async { completion(account, items, response, .success) }
+                    Task {
+                        let items = await NKDataFileXML(nkCommonInstance: self.nkCommonInstance).convertDataTrash(xmlData: xmlData, nkSession: nkSession, showHiddenFiles: showHiddenFiles)
+                        options.queue.async { completion(account, items, response, .success) }
+                    }
                 } else {
-                    options.queue.async { completion(account, items, response, .xmlError) }
+                    options.queue.async { completion(account, nil, response, .xmlError) }
                 }
             }
         }

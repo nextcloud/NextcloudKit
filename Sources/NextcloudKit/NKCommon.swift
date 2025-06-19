@@ -12,11 +12,18 @@ import MobileCoreServices
 import CoreServices
 #endif
 
+public enum TypeReachability: Int {
+    case unknown = 0
+    case notReachable = 1
+    case reachableEthernetOrWiFi = 2
+    case reachableCellular = 3
+}
+
 public protocol NextcloudKitDelegate: AnyObject, Sendable {
     func authenticationChallenge(_ session: URLSession, didReceive challenge: URLAuthenticationChallenge, completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void)
     func urlSessionDidFinishEvents(forBackgroundURLSession session: URLSession)
 
-    func networkReachabilityObserver(_ typeReachability: NKCommon.TypeReachability)
+    func networkReachabilityObserver(_ typeReachability: TypeReachability)
 
     func request<Value>(_ request: DataRequest, didParseResponse response: AFDataResponse<Value>)
 
@@ -33,7 +40,7 @@ public extension NextcloudKitDelegate {
     func authenticationChallenge(_ session: URLSession, didReceive challenge: URLAuthenticationChallenge, completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) { }
     func urlSessionDidFinishEvents(forBackgroundURLSession session: URLSession) { }
 
-    func networkReachabilityObserver(_ typeReachability: NKCommon.TypeReachability) { }
+    func networkReachabilityObserver(_ typeReachability: TypeReachability) { }
 
     func request<Value>(_ request: DataRequest, didParseResponse response: AFDataResponse<Value>) { }
 
@@ -50,6 +57,8 @@ public struct NKCommon: Sendable {
     public var nksessions = ThreadSafeArray<NKSession>()
     public var delegate: NextcloudKitDelegate?
     public var groupIdentifier: String?
+
+    public let typeIdentifiers = NKTypeIdentifiers()
 
     // Foreground
     public let identifierSessionDownload: String = "com.nextcloud.nextcloudkit.session.download"
@@ -74,268 +83,11 @@ public struct NKCommon: Sendable {
     public let groupDefaultsUnavailable = "Unavailable"
     public let groupDefaultsToS = "ToS"
 
-    public enum TypeReachability: Int {
-        case unknown = 0
-        case notReachable = 1
-        case reachableEthernetOrWiFi = 2
-        case reachableCellular = 3
-    }
 
-    public enum TypeClassFile: String {
-        case audio = "audio"
-        case compress = "compress"
-        case directory = "directory"
-        case document = "document"
-        case image = "image"
-        case unknow = "unknow"
-        case url = "url"
-        case video = "video"
-    }
-
-    public enum TypeIconFile: String {
-        case audio = "audio"
-        case code = "code"
-        case compress = "compress"
-        case directory = "directory"
-        case document = "document"
-        case image = "image"
-        case movie = "movie"
-        case pdf = "pdf"
-        case ppt = "ppt"
-        case txt = "txt"
-        case unknow = "file"
-        case url = "url"
-        case xls = "xls"
-    }
-
-   
-
-#if swift(<6.0)
-    internal var utiCache = NSCache<NSString, CFString>()
-    internal var mimeTypeCache = NSCache<CFString, NSString>()
-    internal var filePropertiesCache = NSCache<CFString, NKFileProperty>()
-#else
-    internal var utiCache = [String: String]()
-    internal var mimeTypeCache = [String: String]()
-    internal var filePropertiesCache = [String: NKFileProperty]()
-#endif
 
     // MARK: - Init
 
-    init() {
-
-    }
-
-    // MARK: - Type Identifier
-
-    mutating public func getInternalType(fileName: String,
-                                         mimeType: String,
-                                         directory: Bool,
-                                         account: String) ->
-    (mimeType: String,
-     classFile: String,
-     iconName: String,
-     typeIdentifier: String,
-     fileNameWithoutExt: String,
-     ext: String) {
-        var ext = (fileName as NSString).pathExtension.lowercased()
-        var mimeType = mimeType
-        var classFile = "", iconName = "", typeIdentifier = "", fileNameWithoutExt = ""
-        var inUTI: CFString?
-
-#if swift(<6.0)
-        if let cachedUTI = utiCache.object(forKey: ext as NSString) {
-            inUTI = cachedUTI
-        }
-#else
-        if let cachedUTI = utiCache[ext] {
-            inUTI = cachedUTI as CFString
-        }
-#endif
-        if inUTI == nil {
-            if let unmanagedFileUTI = UTTypeCreatePreferredIdentifierForTag(kUTTagClassFilenameExtension, ext as CFString, nil) {
-                inUTI = unmanagedFileUTI.takeRetainedValue()
-                if let inUTI {
-#if swift(<6.0)
-                    utiCache.setObject(inUTI, forKey: ext as NSString)
-#else
-                    utiCache[ext] = inUTI as String
-#endif
-                }
-            }
-        }
-
-        if let inUTI {
-            typeIdentifier = inUTI as String
-            fileNameWithoutExt = (fileName as NSString).deletingPathExtension
-
-            // contentType detect
-            if mimeType.isEmpty {
-#if swift(<6.0)
-                if let cachedMimeUTI = mimeTypeCache.object(forKey: inUTI) {
-                    mimeType = cachedMimeUTI as String
-                }
-#else
-                if let cachedMimeUTI = mimeTypeCache[inUTI as String] {
-                    mimeType = cachedMimeUTI
-                }
-#endif
-
-                if mimeType.isEmpty {
-                    if let mimeUTI = UTTypeCopyPreferredTagWithClass(inUTI, kUTTagClassMIMEType) {
-                        let mimeUTIString = mimeUTI.takeRetainedValue() as String
-
-                        mimeType = mimeUTIString
-#if swift(<6.0)
-                        mimeTypeCache.setObject(mimeUTIString as NSString, forKey: inUTI)
-#else
-                        mimeTypeCache[inUTI as String] = mimeUTIString as String
-#endif
-                    }
-                }
-            }
-
-            if directory {
-                mimeType = "httpd/unix-directory"
-                classFile = TypeClassFile.directory.rawValue
-                iconName = TypeIconFile.directory.rawValue
-                typeIdentifier = kUTTypeFolder as String
-                fileNameWithoutExt = fileName
-                ext = ""
-            } else {
-                var fileProperties: NKFileProperty
-
-#if swift(<6.0)
-                if let cachedFileProperties = filePropertiesCache.object(forKey: inUTI) {
-                    fileProperties = cachedFileProperties
-                } else {
-                    fileProperties = getFileProperties(inUTI: inUTI, account: account)
-                    filePropertiesCache.setObject(fileProperties, forKey: inUTI)
-                }
-#else
-                if let cachedFileProperties = filePropertiesCache[inUTI as String] {
-                    fileProperties = cachedFileProperties
-                } else {
-                    fileProperties = getFileProperties(inUTI: inUTI)
-                    filePropertiesCache[inUTI as String] = fileProperties
-                }
-#endif
-
-                classFile = fileProperties.classFile
-                iconName = fileProperties.iconName
-            }
-        }
-        return(mimeType: mimeType, classFile: classFile, iconName: iconName, typeIdentifier: typeIdentifier, fileNameWithoutExt: fileNameWithoutExt, ext: ext)
-    }
-
-    public func getFileProperties(inUTI: CFString, account: String) -> NKFileProperty {
-        let fileProperty = NKFileProperty()
-        let typeIdentifier: String = inUTI as String
-        let capabilities = NKCapabilities.shared.getCapabilitiesBlocking(for: account)
-
-        if let fileExtension = UTTypeCopyPreferredTagWithClass(inUTI as CFString, kUTTagClassFilenameExtension) {
-            fileProperty.ext = String(fileExtension.takeRetainedValue())
-        }
-
-        if UTTypeConformsTo(inUTI, kUTTypeImage) {
-            fileProperty.classFile = TypeClassFile.image.rawValue
-            fileProperty.iconName = TypeIconFile.image.rawValue
-            fileProperty.name = "image"
-        } else if UTTypeConformsTo(inUTI, kUTTypeMovie) {
-            fileProperty.classFile = TypeClassFile.video.rawValue
-            fileProperty.iconName = TypeIconFile.movie.rawValue
-            fileProperty.name = "movie"
-        } else if UTTypeConformsTo(inUTI, kUTTypeAudio) {
-            fileProperty.classFile = TypeClassFile.audio.rawValue
-            fileProperty.iconName = TypeIconFile.audio.rawValue
-            fileProperty.name = "audio"
-        } else if UTTypeConformsTo(inUTI, kUTTypeZipArchive) {
-            fileProperty.classFile = TypeClassFile.compress.rawValue
-            fileProperty.iconName = TypeIconFile.compress.rawValue
-            fileProperty.name = "archive"
-        } else if UTTypeConformsTo(inUTI, kUTTypeHTML) {
-            fileProperty.classFile = TypeClassFile.document.rawValue
-            fileProperty.iconName = TypeIconFile.code.rawValue
-            fileProperty.name = "code"
-        } else if UTTypeConformsTo(inUTI, kUTTypePDF) {
-            fileProperty.classFile = TypeClassFile.document.rawValue
-            fileProperty.iconName = TypeIconFile.pdf.rawValue
-            fileProperty.name = "document"
-        } else if UTTypeConformsTo(inUTI, kUTTypeRTF) {
-            fileProperty.classFile = TypeClassFile.document.rawValue
-            fileProperty.iconName = TypeIconFile.txt.rawValue
-            fileProperty.name = "document"
-        } else if UTTypeConformsTo(inUTI, kUTTypeText) {
-            if fileProperty.ext.isEmpty { fileProperty.ext = "txt" }
-            fileProperty.classFile = TypeClassFile.document.rawValue
-            fileProperty.iconName = TypeIconFile.txt.rawValue
-            fileProperty.name = "text"
-        } else if typeIdentifier == "text/plain" {
-            fileProperty.classFile = TypeClassFile.document.rawValue
-            fileProperty.iconName = TypeIconFile.document.rawValue
-            fileProperty.name = "markdown"
-        } else if typeIdentifier == "text/html" {
-            fileProperty.classFile = TypeClassFile.document.rawValue
-            fileProperty.iconName = TypeIconFile.document.rawValue
-            fileProperty.name = "markdown"
-        } else if typeIdentifier == "net.daringfireball.markdown" {
-            fileProperty.classFile = TypeClassFile.document.rawValue
-            fileProperty.iconName = TypeIconFile.document.rawValue
-            fileProperty.name = "markdown"
-        } else if typeIdentifier == "text/x-markdown" {
-            fileProperty.classFile = TypeClassFile.document.rawValue
-            fileProperty.iconName = TypeIconFile.document.rawValue
-            fileProperty.name = "markdown"
-        } else if typeIdentifier == "com.microsoft.word.doc" {
-            fileProperty.classFile = TypeClassFile.document.rawValue
-            fileProperty.iconName = TypeIconFile.document.rawValue
-            fileProperty.name = "document"
-        } else if typeIdentifier == "com.apple.iwork.keynote.key" {
-            fileProperty.classFile = TypeClassFile.document.rawValue
-            fileProperty.iconName = TypeIconFile.document.rawValue
-            fileProperty.name = "pages"
-        } else if typeIdentifier == "com.microsoft.excel.xls" {
-            fileProperty.classFile = TypeClassFile.document.rawValue
-            fileProperty.iconName = TypeIconFile.xls.rawValue
-            fileProperty.name = "sheet"
-        } else if typeIdentifier == "com.apple.iwork.numbers.numbers" {
-            fileProperty.classFile = TypeClassFile.document.rawValue
-            fileProperty.iconName = TypeIconFile.xls.rawValue
-            fileProperty.name = "numbers"
-        } else if typeIdentifier == "com.microsoft.powerpoint.ppt" {
-            fileProperty.classFile = TypeClassFile.document.rawValue
-            fileProperty.iconName = TypeIconFile.ppt.rawValue
-            fileProperty.name = "presentation"
-        } else if typeIdentifier == "com.apple.iwork.keynote.key" {
-            fileProperty.classFile = TypeClassFile.document.rawValue
-            fileProperty.iconName = TypeIconFile.ppt.rawValue
-            fileProperty.name = "keynote"
-        } else {
-            // Added UTI for Collabora
-            for mimeType in capabilities.richDocumentsMimetypes {
-                if typeIdentifier == mimeType {
-                    fileProperty.classFile = TypeClassFile.document.rawValue
-                    fileProperty.iconName = TypeIconFile.document.rawValue
-                    fileProperty.name = "document"
-
-                    return fileProperty
-                }
-            }
-
-
-
-            if UTTypeConformsTo(inUTI, kUTTypeContent) {
-                fileProperty.classFile = TypeClassFile.document.rawValue
-                fileProperty.iconName = TypeIconFile.document.rawValue
-                fileProperty.name = "document"
-            } else {
-                fileProperty.classFile = TypeClassFile.unknow.rawValue
-                fileProperty.iconName = TypeIconFile.unknow.rawValue
-                fileProperty.name = "file"
-            }
-        }
-        return fileProperty
-    }
+    init() { }
 
     // MARK: - Chunked File
 

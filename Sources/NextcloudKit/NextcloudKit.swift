@@ -167,13 +167,13 @@ open class NextcloudKit {
         reachabilityManager?.startListening(onUpdatePerforming: { status in
             switch status {
             case .unknown:
-                self.nkCommonInstance.delegate?.networkReachabilityObserver(NKCommon.TypeReachability.unknown)
+                self.nkCommonInstance.delegate?.networkReachabilityObserver(TypeReachability.unknown)
             case .notReachable:
-                self.nkCommonInstance.delegate?.networkReachabilityObserver(NKCommon.TypeReachability.notReachable)
+                self.nkCommonInstance.delegate?.networkReachabilityObserver(TypeReachability.notReachable)
             case .reachable(.ethernetOrWiFi):
-                self.nkCommonInstance.delegate?.networkReachabilityObserver(NKCommon.TypeReachability.reachableEthernetOrWiFi)
+                self.nkCommonInstance.delegate?.networkReachabilityObserver(TypeReachability.reachableEthernetOrWiFi)
             case .reachable(.cellular):
-                self.nkCommonInstance.delegate?.networkReachabilityObserver(NKCommon.TypeReachability.reachableCellular)
+                self.nkCommonInstance.delegate?.networkReachabilityObserver(TypeReachability.reachableCellular)
             }
         })
     }
