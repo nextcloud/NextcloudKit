@@ -209,7 +209,7 @@ public struct NKCommon: Sendable {
                 if let cachedFileProperties = filePropertiesCache.object(forKey: inUTI) {
                     fileProperties = cachedFileProperties
                 } else {
-                    fileProperties = getFileProperties(inUTI: inUTI)
+                    fileProperties = getFileProperties(inUTI: inUTI, account: account)
                     filePropertiesCache.setObject(fileProperties, forKey: inUTI)
                 }
 #else
@@ -228,9 +228,10 @@ public struct NKCommon: Sendable {
         return(mimeType: mimeType, classFile: classFile, iconName: iconName, typeIdentifier: typeIdentifier, fileNameWithoutExt: fileNameWithoutExt, ext: ext)
     }
 
-    public func getFileProperties(inUTI: CFString) -> NKFileProperty {
+    public func getFileProperties(inUTI: CFString, account: String) -> NKFileProperty {
         let fileProperty = NKFileProperty()
         let typeIdentifier: String = inUTI as String
+        let capabilities = NCCapabilities.shared.getCapabilitiesBlocking(for: account)
 
         if let fileExtension = UTTypeCopyPreferredTagWithClass(inUTI as CFString, kUTTagClassFilenameExtension) {
             fileProperty.ext = String(fileExtension.takeRetainedValue())
@@ -269,81 +270,92 @@ public struct NKCommon: Sendable {
             fileProperty.classFile = TypeClassFile.document.rawValue
             fileProperty.iconName = TypeIconFile.txt.rawValue
             fileProperty.name = "text"
+        } else if typeIdentifier == "text/plain" {
+            fileProperty.classFile = TypeClassFile.document.rawValue
+            fileProperty.iconName = TypeIconFile.document.rawValue
+            fileProperty.name = "markdown"
+        } else if typeIdentifier == "text/html" {
+            fileProperty.classFile = TypeClassFile.document.rawValue
+            fileProperty.iconName = TypeIconFile.document.rawValue
+            fileProperty.name = "markdown"
+        } else if typeIdentifier == "net.daringfireball.markdown" {
+            fileProperty.classFile = TypeClassFile.document.rawValue
+            fileProperty.iconName = TypeIconFile.document.rawValue
+            fileProperty.name = "markdown"
+        } else if typeIdentifier == "text/x-markdown" {
+            fileProperty.classFile = TypeClassFile.document.rawValue
+            fileProperty.iconName = TypeIconFile.document.rawValue
+            fileProperty.name = "markdown"
+        } else if typeIdentifier == "org.oasis-open.opendocument.text" {
+            fileProperty.classFile = TypeClassFile.document.rawValue
+            fileProperty.iconName = TypeIconFile.document.rawValue
+            fileProperty.name = "document"
+        } else if typeIdentifier == "org.openxmlformats.wordprocessingml.document" {
+            fileProperty.classFile = TypeClassFile.document.rawValue
+            fileProperty.iconName = TypeIconFile.document.rawValue
+            fileProperty.name = "document"
+        } else if typeIdentifier == "com.microsoft.word.doc" {
+            fileProperty.classFile = TypeClassFile.document.rawValue
+            fileProperty.iconName = TypeIconFile.document.rawValue
+            fileProperty.name = "document"
+        } else if typeIdentifier == "com.apple.iwork.keynote.key" {
+            fileProperty.classFile = TypeClassFile.document.rawValue
+            fileProperty.iconName = TypeIconFile.document.rawValue
+            fileProperty.name = "pages"
+        } else if typeIdentifier == "org.oasis-open.opendocument.spreadsheet" {
+            fileProperty.classFile = TypeClassFile.document.rawValue
+            fileProperty.iconName = TypeIconFile.xls.rawValue
+            fileProperty.name = "sheet"
+        } else if typeIdentifier == "org.openxmlformats.spreadsheetml.sheet" {
+            fileProperty.classFile = TypeClassFile.document.rawValue
+            fileProperty.iconName = TypeIconFile.xls.rawValue
+            fileProperty.name = "sheet"
+        } else if typeIdentifier == "com.microsoft.excel.xls" {
+            fileProperty.classFile = TypeClassFile.document.rawValue
+            fileProperty.iconName = TypeIconFile.xls.rawValue
+            fileProperty.name = "sheet"
+        } else if typeIdentifier == "com.apple.iwork.numbers.numbers" {
+            fileProperty.classFile = TypeClassFile.document.rawValue
+            fileProperty.iconName = TypeIconFile.xls.rawValue
+            fileProperty.name = "numbers"
+        } else if typeIdentifier == "org.oasis-open.opendocument.presentation" {
+            fileProperty.classFile = TypeClassFile.document.rawValue
+            fileProperty.iconName = TypeIconFile.ppt.rawValue
+            fileProperty.name = "presentation"
+        } else if typeIdentifier == "org.openxmlformats.presentationml.presentation" {
+            fileProperty.classFile = TypeClassFile.document.rawValue
+            fileProperty.iconName = TypeIconFile.ppt.rawValue
+            fileProperty.name = "presentation"
+        } else if typeIdentifier == "com.microsoft.powerpoint.ppt" {
+            fileProperty.classFile = TypeClassFile.document.rawValue
+            fileProperty.iconName = TypeIconFile.ppt.rawValue
+            fileProperty.name = "presentation"
+        } else if typeIdentifier == "com.apple.iwork.keynote.key" {
+            fileProperty.classFile = TypeClassFile.document.rawValue
+            fileProperty.iconName = TypeIconFile.ppt.rawValue
+            fileProperty.name = "keynote"
         } else {
-            if typeIdentifier == "text/plain" {
-                fileProperty.classFile = TypeClassFile.document.rawValue
-                fileProperty.iconName = TypeIconFile.document.rawValue
-                fileProperty.name = "markdown"
-            } else if typeIdentifier == "text/html" {
-                fileProperty.classFile = TypeClassFile.document.rawValue
-                fileProperty.iconName = TypeIconFile.document.rawValue
-                fileProperty.name = "markdown"
-            } else if typeIdentifier == "net.daringfireball.markdown" {
-                fileProperty.classFile = TypeClassFile.document.rawValue
-                fileProperty.iconName = TypeIconFile.document.rawValue
-                fileProperty.name = "markdown"
-            } else if typeIdentifier == "text/x-markdown" {
-                fileProperty.classFile = TypeClassFile.document.rawValue
-                fileProperty.iconName = TypeIconFile.document.rawValue
-                fileProperty.name = "markdown"
-            } else if typeIdentifier == "org.oasis-open.opendocument.text" {
-                fileProperty.classFile = TypeClassFile.document.rawValue
-                fileProperty.iconName = TypeIconFile.document.rawValue
-                fileProperty.name = "document"
-            } else if typeIdentifier == "org.openxmlformats.wordprocessingml.document" {
-                fileProperty.classFile = TypeClassFile.document.rawValue
-                fileProperty.iconName = TypeIconFile.document.rawValue
-                fileProperty.name = "document"
-            } else if typeIdentifier == "com.microsoft.word.doc" {
-                fileProperty.classFile = TypeClassFile.document.rawValue
-                fileProperty.iconName = TypeIconFile.document.rawValue
-                fileProperty.name = "document"
-            } else if typeIdentifier == "com.apple.iwork.keynote.key" {
-                fileProperty.classFile = TypeClassFile.document.rawValue
-                fileProperty.iconName = TypeIconFile.document.rawValue
-                fileProperty.name = "pages"
-            } else if typeIdentifier == "org.oasis-open.opendocument.spreadsheet" {
-                fileProperty.classFile = TypeClassFile.document.rawValue
-                fileProperty.iconName = TypeIconFile.xls.rawValue
-                fileProperty.name = "sheet"
-            } else if typeIdentifier == "org.openxmlformats.spreadsheetml.sheet" {
-                fileProperty.classFile = TypeClassFile.document.rawValue
-                fileProperty.iconName = TypeIconFile.xls.rawValue
-                fileProperty.name = "sheet"
-            } else if typeIdentifier == "com.microsoft.excel.xls" {
-                fileProperty.classFile = TypeClassFile.document.rawValue
-                fileProperty.iconName = TypeIconFile.xls.rawValue
-                fileProperty.name = "sheet"
-            } else if typeIdentifier == "com.apple.iwork.numbers.numbers" {
-                fileProperty.classFile = TypeClassFile.document.rawValue
-                fileProperty.iconName = TypeIconFile.xls.rawValue
-                fileProperty.name = "numbers"
-            } else if typeIdentifier == "org.oasis-open.opendocument.presentation" {
-                fileProperty.classFile = TypeClassFile.document.rawValue
-                fileProperty.iconName = TypeIconFile.ppt.rawValue
-                fileProperty.name = "presentation"
-            } else if typeIdentifier == "org.openxmlformats.presentationml.presentation" {
-                fileProperty.classFile = TypeClassFile.document.rawValue
-                fileProperty.iconName = TypeIconFile.ppt.rawValue
-                fileProperty.name = "presentation"
-            } else if typeIdentifier == "com.microsoft.powerpoint.ppt" {
-                fileProperty.classFile = TypeClassFile.document.rawValue
-                fileProperty.iconName = TypeIconFile.ppt.rawValue
-                fileProperty.name = "presentation"
-            } else if typeIdentifier == "com.apple.iwork.keynote.key" {
-                fileProperty.classFile = TypeClassFile.document.rawValue
-                fileProperty.iconName = TypeIconFile.ppt.rawValue
-                fileProperty.name = "keynote"
-            } else {
-                if UTTypeConformsTo(inUTI, kUTTypeContent) {
+            // Added UTI for Collabora
+            for mimeType in capabilities.richDocumentsMimetypes {
+                if typeIdentifier == mimeType {
                     fileProperty.classFile = TypeClassFile.document.rawValue
                     fileProperty.iconName = TypeIconFile.document.rawValue
                     fileProperty.name = "document"
-                } else {
-                    fileProperty.classFile = TypeClassFile.unknow.rawValue
-                    fileProperty.iconName = TypeIconFile.unknow.rawValue
-                    fileProperty.name = "file"
+
+                    return fileProperty
                 }
+            }
+
+
+
+            if UTTypeConformsTo(inUTI, kUTTypeContent) {
+                fileProperty.classFile = TypeClassFile.document.rawValue
+                fileProperty.iconName = TypeIconFile.document.rawValue
+                fileProperty.name = "document"
+            } else {
+                fileProperty.classFile = TypeClassFile.unknow.rawValue
+                fileProperty.iconName = TypeIconFile.unknow.rawValue
+                fileProperty.name = "file"
             }
         }
         return fileProperty
