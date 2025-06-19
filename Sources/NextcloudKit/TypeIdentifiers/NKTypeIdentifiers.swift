@@ -81,3 +81,42 @@ public actor NKTypeIdentifiers {
         return (mimeType: mimeType, classFile: classFile, iconName: iconName, typeIdentifier: typeIdentifier, fileNameWithoutExt: fileNameWithoutExt, ext: ext)
     }
 }
+
+public final class NKTypeIdentifiersHelper {
+    private let actor: NKTypeIdentifiers
+
+    public init(actor: NKTypeIdentifiers) {
+        self.actor = actor
+    }
+
+    public func getInternalTypeSync(fileName: String, mimeType: String, directory: Bool, account: String) -> (mimeType: String,
+                                                                                                              classFile: String,
+                                                                                                              iconName: String,
+                                                                                                              typeIdentifier: String,
+                                                                                                              fileNameWithoutExt: String,
+                                                                                                              ext: String) {
+        var result: (
+            mimeType: String,
+            classFile: String,
+            iconName: String,
+            typeIdentifier: String,
+            fileNameWithoutExt: String,
+            ext: String
+        )!
+
+        let semaphore = DispatchSemaphore(value: 0)
+
+        Task {
+            result = await actor.getInternalType(
+                fileName: fileName,
+                mimeType: mimeType,
+                directory: directory,
+                account: account
+            )
+            semaphore.signal()
+        }
+
+        semaphore.wait()
+        return result
+    }
+}
