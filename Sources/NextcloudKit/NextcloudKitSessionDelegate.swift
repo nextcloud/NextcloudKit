@@ -13,7 +13,7 @@ import UIKit
 import Alamofire
 import SwiftyJSON
 
-final class NextcloudKitSessionDelegate: SessionDelegate {
+final class NextcloudKitSessionDelegate: SessionDelegate, @unchecked Sendable {
     public let nkCommonInstance: NKCommon?
 
     public init(fileManager: FileManager = .default, nkCommonInstance: NKCommon? = nil) {

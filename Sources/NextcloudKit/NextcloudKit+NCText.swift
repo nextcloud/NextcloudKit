@@ -10,14 +10,12 @@ public extension NextcloudKit {
     func textObtainEditorDetails(account: String,
                                  options: NKRequestOptions = NKRequestOptions(),
                                  taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-                                 completion: @escaping (_ account: String, _  editors: [NKEditorDetailsEditors], _ creators: [NKEditorDetailsCreators], _ responseData: AFDataResponse<Data>?, _ error: NKError) -> Void) {
+                                 completion: @escaping (_ account: String, _  editors: [NKEditorDetailsEditor]?, _ creators: [NKEditorDetailsCreator]?, _ responseData: AFDataResponse<Data>?, _ error: NKError) -> Void) {
         let endpoint = "ocs/v2.php/apps/files/api/v1/directEditing"
-        var editors: [NKEditorDetailsEditors] = []
-        var creators: [NKEditorDetailsCreators] = []
         guard let nkSession = nkCommonInstance.getSession(account: account),
               let url = nkCommonInstance.createStandardUrl(serverUrl: nkSession.urlBase, endpoint: endpoint, options: options),
               let headers = nkCommonInstance.getStandardHeaders(account: account, options: options) else {
-            return options.queue.async { completion(account, editors, creators, nil, .urlError) }
+            return options.queue.async { completion(account, nil, nil, nil, .urlError) }
         }
 
         nkSession.sessionData.request(url, method: .get, encoding: URLEncoding.default, headers: headers, interceptor: NKInterceptor(nkCommonInstance: nkCommonInstance)).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
@@ -27,49 +25,34 @@ public extension NextcloudKit {
             switch response.result {
             case .failure(let error):
                 let error = NKError(error: error, afResponse: response, responseData: response.data)
-                options.queue.async { completion(account, editors, creators, response, error) }
-            case .success(let jsonData):
-                let json = JSON(jsonData)
-                let ocsdataeditors = json["ocs"]["data"]["editors"]
-                for (_, subJson): (String, JSON) in ocsdataeditors {
-                    let editor = NKEditorDetailsEditors()
+                options.queue.async { completion(account, nil, nil, response, error) }
+            case .success(let responseData):
+                Task {
+                                    do {
+                                        let (editors, creators) = try NKEditorDetailsConverter.from(data: responseData)
+                                        let capabilities = await NCCapabilities.shared.getCapabilitiesAsync(for: account)
+                                        capabilities.editors = editors
+                                        capabilities.creators = creators
+                                        await NCCapabilities.shared.appendCapabilitiesAsync(for: account, capabilities: capabilities)
 
-                    if let mimetypes = subJson["mimetypes"].array {
-                        for mimetype in mimetypes {
-                            editor.mimetypes.append(mimetype.stringValue)
-                        }
-                    }
-                    editor.name = subJson["name"].stringValue
-                    if let optionalMimetypes = subJson["optionalMimetypes"].array {
-                        for optionalMimetype in optionalMimetypes {
-                            editor.optionalMimetypes.append(optionalMimetype.stringValue)
-                        }
-                    }
-                    editor.secure = subJson["secure"].intValue
-                    editors.append(editor)
-                }
+                                        options.queue.async {
+                                            completion(account, editors, creators, response, .success)
+                                        }
 
-                let ocsdatacreators = json["ocs"]["data"]["creators"]
-                for (_, subJson): (String, JSON) in ocsdatacreators {
-                    let creator = NKEditorDetailsCreators()
-
-                    creator.editor = subJson["editor"].stringValue
-                    creator.ext = subJson["extension"].stringValue
-                    creator.identifier = subJson["id"].stringValue
-                    creator.mimetype = subJson["mimetype"].stringValue
-                    creator.name = subJson["name"].stringValue
-                    creator.templates = subJson["templates"].intValue
-                    creators.append(creator)
-                }
-
-                options.queue.async { completion(account, editors, creators, response, .success) }
+                                    } catch {
+                                        nkLog(error: "Parsing error in NKEditorDetailsConverter: \(error)")
+                                        options.queue.async {
+                                            completion(account, nil, nil, response, .invalidData)
+                                        }
+                                    }
+                                }
             }
         }
     }
 
     func textObtainEditorDetailsAsync(account: String,
                                      options: NKRequestOptions = NKRequestOptions(),
-                                     taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in }) async -> (account: String, editors: [NKEditorDetailsEditors], creators: [NKEditorDetailsCreators], responseData: AFDataResponse<Data>?, error: NKError) {
+                                     taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in }) async -> (account: String, editors: [NKEditorDetailsEditor]?, creators: [NKEditorDetailsCreator]?, responseData: AFDataResponse<Data>?, error: NKError) {
         await withUnsafeContinuation { continuation in
             textObtainEditorDetails(account: account,
                                     options: options,
@@ -118,9 +101,8 @@ public extension NextcloudKit {
     func textGetListOfTemplates(account: String,
                                 options: NKRequestOptions = NKRequestOptions(),
                                 taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-                                completion: @escaping (_ account: String, _ templates: [NKEditorTemplates]?, _ responseData: AFDataResponse<Data>?, _ error: NKError) -> Void) {
+                                completion: @escaping (_ account: String, _ templates: [NKEditorTemplate]?, _ responseData: AFDataResponse<Data>?, _ error: NKError) -> Void) {
         let endpoint = "ocs/v2.php/apps/files/api/v1/directEditing/templates/text/textdocumenttemplate"
-        var templates: [NKEditorTemplates] = []
         guard let nkSession = nkCommonInstance.getSession(account: account),
               let url = nkCommonInstance.createStandardUrl(serverUrl: nkSession.urlBase, endpoint: endpoint, options: options),
               let headers = nkCommonInstance.getStandardHeaders(account: account, options: options) else {
@@ -134,28 +116,29 @@ public extension NextcloudKit {
             switch response.result {
             case .failure(let error):
                 let error = NKError(error: error, afResponse: response, responseData: response.data)
-                options.queue.async { completion(account, templates, response, error) }
-            case .success(let jsonData):
-                let json = JSON(jsonData)
-                let ocsdatatemplates = json["ocs"]["data"]["editors"]
-
-                for (_, subJson): (String, JSON) in ocsdatatemplates {
-                    let template = NKEditorTemplates()
-
-                    template.ext = subJson["extension"].stringValue
-                    template.identifier = subJson["id"].stringValue
-                    template.name = subJson["name"].stringValue
-                    template.preview = subJson["preview"].stringValue
-                    templates.append(template)
+                options.queue.async { completion(account, nil, response, error) }
+            case .success(let data):
+                Task {
+                    do {
+                        let decoded = try JSONDecoder().decode(NKEditorTemplateResponse.self, from: data)
+                        let templates = decoded.ocs.data.editors
+                        // Update capabilities
+                        let capabilities = await NCCapabilities.shared.getCapabilitiesAsync(for: account)
+                        capabilities.templates = templates
+                        await NCCapabilities.shared.appendCapabilitiesAsync(for: account, capabilities: capabilities)
+                        
+                        options.queue.async { completion(account, templates, response, .success) }
+                    } catch {
+                        nkLog(error: "Failed to decode template list: \(error)")
+                        options.queue.async { completion(account, nil, response, .invalidData) }
+                    }
                 }
-
-                options.queue.async { completion(account, templates, response, .success) }
             }
         }
     }
 
     func textGetListOfTemplatesAsync(account: String,
-                                     options: NKRequestOptions = NKRequestOptions()) async -> (account: String, templates: [NKEditorTemplates]?, responseData: AFDataResponse<Data>?, error: NKError) {
+                                     options: NKRequestOptions = NKRequestOptions()) async -> (account: String, templates: [NKEditorTemplate]?, responseData: AFDataResponse<Data>?, error: NKError) {
         await withUnsafeContinuation({ continuation in
             textGetListOfTemplates(account: account) { account, templates, responseData, error in
                 continuation.resume(returning: (account: account, templates: templates, responseData: responseData, error: error))
