@@ -12,7 +12,7 @@ import MobileCoreServices
 import CoreServices
 #endif
 
-public enum TypeReachability: Int {
+public enum NKTypeReachability: Int {
     case unknown = 0
     case notReachable = 1
     case reachableEthernetOrWiFi = 2
@@ -23,7 +23,7 @@ public protocol NextcloudKitDelegate: AnyObject, Sendable {
     func authenticationChallenge(_ session: URLSession, didReceive challenge: URLAuthenticationChallenge, completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void)
     func urlSessionDidFinishEvents(forBackgroundURLSession session: URLSession)
 
-    func networkReachabilityObserver(_ typeReachability: TypeReachability)
+    func networkReachabilityObserver(_ typeReachability: NKTypeReachability)
 
     func request<Value>(_ request: DataRequest, didParseResponse response: AFDataResponse<Value>)
 
@@ -40,7 +40,7 @@ public extension NextcloudKitDelegate {
     func authenticationChallenge(_ session: URLSession, didReceive challenge: URLAuthenticationChallenge, completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) { }
     func urlSessionDidFinishEvents(forBackgroundURLSession session: URLSession) { }
 
-    func networkReachabilityObserver(_ typeReachability: TypeReachability) { }
+    func networkReachabilityObserver(_ typeReachability: NKTypeReachability) { }
 
     func request<Value>(_ request: DataRequest, didParseResponse response: AFDataResponse<Value>) { }
 

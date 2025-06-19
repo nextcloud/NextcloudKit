@@ -1,7 +1,18 @@
+// SPDX-FileCopyrightText: Nextcloud GmbH
+// SPDX-FileCopyrightText: 2025 Marino Faggiana
+// SPDX-License-Identifier: GPL-3.0-or-later
+
 import Foundation
 import MobileCoreServices
 
-public enum TypeClassFile: String {
+public class NKFileProperty: NSObject {
+    public var classFile: NKTypeClassFile = .unknow
+    public var iconName: NKTypeIconFile = .unknow
+    public var name: String = ""
+    public var ext: String = ""
+}
+
+public enum NKTypeClassFile: String {
     case audio = "audio"
     case compress = "compress"
     case directory = "directory"
@@ -12,14 +23,14 @@ public enum TypeClassFile: String {
     case video = "video"
 }
 
-public enum TypeIconFile: String {
+public enum NKTypeIconFile: String {
     case audio = "audio"
     case code = "code"
     case compress = "compress"
     case directory = "directory"
     case document = "document"
     case image = "image"
-    case movie = "movie"
+    case video = "video"
     case pdf = "pdf"
     case ppt = "ppt"
     case txt = "txt"
@@ -45,84 +56,84 @@ public final class NKFilePropertyResolver {
 
         // Well-known UTI type classifications
         if UTTypeConformsTo(inUTI, kUTTypeImage) {
-            fileProperty.classFile = TypeClassFile.image.rawValue
-            fileProperty.iconName = TypeIconFile.image.rawValue
+            fileProperty.classFile = .image
+            fileProperty.iconName = .image
             fileProperty.name = "image"
         } else if UTTypeConformsTo(inUTI, kUTTypeMovie) {
-            fileProperty.classFile = TypeClassFile.video.rawValue
-            fileProperty.iconName = TypeIconFile.movie.rawValue
+            fileProperty.classFile = .video
+            fileProperty.iconName = .video
             fileProperty.name = "movie"
         } else if UTTypeConformsTo(inUTI, kUTTypeAudio) {
-            fileProperty.classFile = TypeClassFile.audio.rawValue
-            fileProperty.iconName = TypeIconFile.audio.rawValue
+            fileProperty.classFile = .audio
+            fileProperty.iconName = .audio
             fileProperty.name = "audio"
         } else if UTTypeConformsTo(inUTI, kUTTypeZipArchive) {
-            fileProperty.classFile = TypeClassFile.compress.rawValue
-            fileProperty.iconName = TypeIconFile.compress.rawValue
+            fileProperty.classFile = .compress
+            fileProperty.iconName = .compress
             fileProperty.name = "archive"
         } else if UTTypeConformsTo(inUTI, kUTTypeHTML) {
-            fileProperty.classFile = TypeClassFile.document.rawValue
-            fileProperty.iconName = TypeIconFile.code.rawValue
+            fileProperty.classFile = .document
+            fileProperty.iconName = .code
             fileProperty.name = "code"
         } else if UTTypeConformsTo(inUTI, kUTTypePDF) {
-            fileProperty.classFile = TypeClassFile.document.rawValue
-            fileProperty.iconName = TypeIconFile.pdf.rawValue
+            fileProperty.classFile = .document
+            fileProperty.iconName = .pdf
             fileProperty.name = "document"
         } else if UTTypeConformsTo(inUTI, kUTTypeRTF) {
-            fileProperty.classFile = TypeClassFile.document.rawValue
-            fileProperty.iconName = TypeIconFile.txt.rawValue
+            fileProperty.classFile = .document
+            fileProperty.iconName = .txt
             fileProperty.name = "document"
         } else if UTTypeConformsTo(inUTI, kUTTypeText) {
             if fileProperty.ext.isEmpty { fileProperty.ext = "txt" }
-            fileProperty.classFile = TypeClassFile.document.rawValue
-            fileProperty.iconName = TypeIconFile.txt.rawValue
+            fileProperty.classFile = .document
+            fileProperty.iconName = .txt
             fileProperty.name = "text"
         } else {
             // Special-case identifiers
             switch typeIdentifier {
             case "text/plain", "text/html", "net.daringfireball.markdown", "text/x-markdown":
-                fileProperty.classFile = TypeClassFile.document.rawValue
-                fileProperty.iconName = TypeIconFile.document.rawValue
+                fileProperty.classFile = .document
+                fileProperty.iconName = .document
                 fileProperty.name = "markdown"
 
             case "com.microsoft.word.doc":
-                fileProperty.classFile = TypeClassFile.document.rawValue
-                fileProperty.iconName = TypeIconFile.document.rawValue
+                fileProperty.classFile = .document
+                fileProperty.iconName = .document
                 fileProperty.name = "document"
 
             case "com.apple.iwork.keynote.key":
-                fileProperty.classFile = TypeClassFile.document.rawValue
-                fileProperty.iconName = TypeIconFile.ppt.rawValue
+                fileProperty.classFile = .document
+                fileProperty.iconName = .ppt
                 fileProperty.name = "keynote"
 
             case "com.microsoft.excel.xls":
-                fileProperty.classFile = TypeClassFile.document.rawValue
-                fileProperty.iconName = TypeIconFile.xls.rawValue
+                fileProperty.classFile = .document
+                fileProperty.iconName = .xls
                 fileProperty.name = "sheet"
 
             case "com.apple.iwork.numbers.numbers":
-                fileProperty.classFile = TypeClassFile.document.rawValue
-                fileProperty.iconName = TypeIconFile.xls.rawValue
+                fileProperty.classFile = .document
+                fileProperty.iconName = .xls
                 fileProperty.name = "numbers"
 
             case "com.microsoft.powerpoint.ppt":
-                fileProperty.classFile = TypeClassFile.document.rawValue
-                fileProperty.iconName = TypeIconFile.ppt.rawValue
+                fileProperty.classFile = .document
+                fileProperty.iconName = .ppt
                 fileProperty.name = "presentation"
 
             default:
                 // Check against Collabora mimetypes
                 if capabilities.richDocumentsMimetypes.contains(typeIdentifier) {
-                    fileProperty.classFile = TypeClassFile.document.rawValue
-                    fileProperty.iconName = TypeIconFile.document.rawValue
+                    fileProperty.classFile = .document
+                    fileProperty.iconName = .document
                     fileProperty.name = "document"
                 } else if UTTypeConformsTo(inUTI, kUTTypeContent) {
-                    fileProperty.classFile = TypeClassFile.document.rawValue
-                    fileProperty.iconName = TypeIconFile.document.rawValue
+                    fileProperty.classFile = .document
+                    fileProperty.iconName = .document
                     fileProperty.name = "document"
                 } else {
-                    fileProperty.classFile = TypeClassFile.unknow.rawValue
-                    fileProperty.iconName = TypeIconFile.unknow.rawValue
+                    fileProperty.classFile = .unknow
+                    fileProperty.iconName = .unknow
                     fileProperty.name = "file"
                 }
             }

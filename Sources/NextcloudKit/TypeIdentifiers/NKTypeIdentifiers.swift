@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: Nextcloud GmbH
+// SPDX-FileCopyrightText: 2025 Marino Faggiana
+// SPDX-License-Identifier: GPL-3.0-or-later
 
 import Foundation
 import MobileCoreServices
@@ -13,17 +16,12 @@ public actor NKTypeIdentifiers {
     public init() {}
 
     /// Resolves internal type metadata for a given file.
-    public func getInternalType(fileName: String,
-                                mimeType inputMimeType: String,
-                                directory: Bool,
-                                account: String) -> (
-        mimeType: String,
-        classFile: String,
-        iconName: String,
-        typeIdentifier: String,
-        fileNameWithoutExt: String,
-        ext: String
-    ) {
+    public func getInternalType(fileName: String, mimeType inputMimeType: String, directory: Bool, account: String) -> (mimeType: String,
+                                                                                                                        classFile: String,
+                                                                                                                        iconName: String,
+                                                                                                                        typeIdentifier: String,
+                                                                                                                        fileNameWithoutExt: String,
+                                                                                                                        ext: String) {
         var ext = (fileName as NSString).pathExtension.lowercased()
         var mimeType = inputMimeType
         var classFile = ""
@@ -60,8 +58,8 @@ public actor NKTypeIdentifiers {
             // Directory override
             if directory {
                 mimeType = "httpd/unix-directory"
-                classFile = TypeClassFile.directory.rawValue
-                iconName = TypeIconFile.directory.rawValue
+                classFile = NKTypeClassFile.directory.rawValue
+                iconName = NKTypeIconFile.directory.rawValue
                 typeIdentifier = kUTTypeFolder as String
                 fileNameWithoutExt = fileName
                 ext = ""
@@ -75,18 +73,11 @@ public actor NKTypeIdentifiers {
                     filePropertiesCache[typeIdentifier] = fileProps
                 }
 
-                classFile = fileProps.classFile
-                iconName = fileProps.iconName
+                classFile = fileProps.classFile.rawValue
+                iconName = fileProps.iconName.rawValue
             }
         }
 
-        return (
-            mimeType: mimeType,
-            classFile: classFile,
-            iconName: iconName,
-            typeIdentifier: typeIdentifier,
-            fileNameWithoutExt: fileNameWithoutExt,
-            ext: ext
-        )
+        return (mimeType: mimeType, classFile: classFile, iconName: iconName, typeIdentifier: typeIdentifier, fileNameWithoutExt: fileNameWithoutExt, ext: ext)
     }
 }

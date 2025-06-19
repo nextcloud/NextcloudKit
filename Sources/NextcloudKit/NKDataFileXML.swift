@@ -557,8 +557,8 @@ public class NKDataFileXML: NSObject {
             }
             if index < files.count - 1,
                (files[index].fileName as NSString).deletingPathExtension == (files[index + 1].fileName as NSString) .deletingPathExtension,
-               files[index].classFile == TypeClassFile.image.rawValue,
-               files[index + 1].classFile == TypeClassFile.video.rawValue {
+               files[index].classFile == NKTypeClassFile.image.rawValue,
+               files[index + 1].classFile == NKTypeClassFile.video.rawValue {
                 files[index].livePhotoFile = files[index + 1].fileId
                 files[index + 1].livePhotoFile = files[index].fileId
             }
