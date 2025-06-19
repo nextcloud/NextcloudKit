@@ -72,4 +72,11 @@ public struct NKEditorTemplate: Codable, Sendable {
         case name
         case preview
     }
+
+    public init(ext: String = "", identifier: String = "", name: String = "", preview: String = "") {
+        self.ext = ext
+        self.identifier = identifier
+        self.name = name
+        self.preview = preview
+    }
 }
