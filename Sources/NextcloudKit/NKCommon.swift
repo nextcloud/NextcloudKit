@@ -286,14 +286,6 @@ public struct NKCommon: Sendable {
             fileProperty.classFile = TypeClassFile.document.rawValue
             fileProperty.iconName = TypeIconFile.document.rawValue
             fileProperty.name = "markdown"
-        } else if typeIdentifier == "org.oasis-open.opendocument.text" {
-            fileProperty.classFile = TypeClassFile.document.rawValue
-            fileProperty.iconName = TypeIconFile.document.rawValue
-            fileProperty.name = "document"
-        } else if typeIdentifier == "org.openxmlformats.wordprocessingml.document" {
-            fileProperty.classFile = TypeClassFile.document.rawValue
-            fileProperty.iconName = TypeIconFile.document.rawValue
-            fileProperty.name = "document"
         } else if typeIdentifier == "com.microsoft.word.doc" {
             fileProperty.classFile = TypeClassFile.document.rawValue
             fileProperty.iconName = TypeIconFile.document.rawValue
@@ -302,14 +294,6 @@ public struct NKCommon: Sendable {
             fileProperty.classFile = TypeClassFile.document.rawValue
             fileProperty.iconName = TypeIconFile.document.rawValue
             fileProperty.name = "pages"
-        } else if typeIdentifier == "org.oasis-open.opendocument.spreadsheet" {
-            fileProperty.classFile = TypeClassFile.document.rawValue
-            fileProperty.iconName = TypeIconFile.xls.rawValue
-            fileProperty.name = "sheet"
-        } else if typeIdentifier == "org.openxmlformats.spreadsheetml.sheet" {
-            fileProperty.classFile = TypeClassFile.document.rawValue
-            fileProperty.iconName = TypeIconFile.xls.rawValue
-            fileProperty.name = "sheet"
         } else if typeIdentifier == "com.microsoft.excel.xls" {
             fileProperty.classFile = TypeClassFile.document.rawValue
             fileProperty.iconName = TypeIconFile.xls.rawValue
@@ -318,14 +302,6 @@ public struct NKCommon: Sendable {
             fileProperty.classFile = TypeClassFile.document.rawValue
             fileProperty.iconName = TypeIconFile.xls.rawValue
             fileProperty.name = "numbers"
-        } else if typeIdentifier == "org.oasis-open.opendocument.presentation" {
-            fileProperty.classFile = TypeClassFile.document.rawValue
-            fileProperty.iconName = TypeIconFile.ppt.rawValue
-            fileProperty.name = "presentation"
-        } else if typeIdentifier == "org.openxmlformats.presentationml.presentation" {
-            fileProperty.classFile = TypeClassFile.document.rawValue
-            fileProperty.iconName = TypeIconFile.ppt.rawValue
-            fileProperty.name = "presentation"
         } else if typeIdentifier == "com.microsoft.powerpoint.ppt" {
             fileProperty.classFile = TypeClassFile.document.rawValue
             fileProperty.iconName = TypeIconFile.ppt.rawValue
