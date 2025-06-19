@@ -7,6 +7,8 @@ public enum NKEditorDetailsConverter {
     /// - Returns: A tuple with editors and creators.
     /// - Throws: Decoding error if parsing fails.
     public static func from(data: Data) throws -> (editors: [NKEditorDetailsEditor], creators: [NKEditorDetailsCreator]) {
+        data.printJson()
+
         let decoded = try JSONDecoder().decode(NKEditorDetailsResponse.self, from: data)
         let editors = decoded.ocs.data.editorsArray()
         let creators = decoded.ocs.data.creatorsArray()
