@@ -231,7 +231,7 @@ public struct NKCommon: Sendable {
     public func getFileProperties(inUTI: CFString, account: String) -> NKFileProperty {
         let fileProperty = NKFileProperty()
         let typeIdentifier: String = inUTI as String
-        let capabilities = NCCapabilities.shared.getCapabilitiesBlocking(for: account)
+        let capabilities = NKCapabilities.shared.getCapabilitiesBlocking(for: account)
 
         if let fileExtension = UTTypeCopyPreferredTagWithClass(inUTI as CFString, kUTTagClassFilenameExtension) {
             fileProperty.ext = String(fileExtension.takeRetainedValue())
@@ -449,7 +449,7 @@ public struct NKCommon: Sendable {
         guard let groupDefaults = UserDefaults(suiteName: groupIdentifier) else {
             return
         }
-        let capabilities = NCCapabilities.shared.getCapabilitiesBlocking(for: account)
+        let capabilities = NKCapabilities.shared.getCapabilitiesBlocking(for: account)
 
         /// Unavailable
         if errorCode == 503 {
