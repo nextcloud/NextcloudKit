@@ -61,10 +61,10 @@ public struct NKEditorDetailsCreator: Codable, Sendable {
 }
 
 public struct NKEditorTemplate: Codable, Sendable {
-    public let ext: String
-    public let identifier: String
-    public let name: String
-    public let preview: String
+    public var ext: String
+    public var identifier: String
+    public var name: String
+    public var preview: String
 
     enum CodingKeys: String, CodingKey {
         case ext = "extension"
