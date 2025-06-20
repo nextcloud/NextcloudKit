@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 import Foundation
-import MobileCoreServices
+import UniformTypeIdentifiers
 
 /// Actor responsible for resolving file type metadata (UTI, MIME type, icon, class file, etc.) in a thread-safe manner.
 public actor NKTypeIdentifiers {
@@ -28,16 +28,13 @@ public actor NKTypeIdentifiers {
         var iconName = ""
         var typeIdentifier = ""
         var fileNameWithoutExt = ""
-
-        var uti: CFString?
+        var uti: String?
 
         // UTI cache
         if let cachedUTI = utiCache[ext] {
-            uti = cachedUTI as CFString
-        } else if let unmanagedUTI = UTTypeCreatePreferredIdentifierForTag(kUTTagClassFilenameExtension, ext as CFString, nil) {
-            let resolvedUTI = unmanagedUTI.takeRetainedValue()
-            uti = resolvedUTI
-            utiCache[ext] = resolvedUTI as String
+            uti = cachedUTI
+        } else if let type = UTType(filenameExtension: ext) {
+            utiCache[ext] = type.identifier
         }
 
         if let uti {
@@ -48,10 +45,10 @@ public actor NKTypeIdentifiers {
             if mimeType.isEmpty {
                 if let cachedMime = mimeTypeCache[typeIdentifier] {
                     mimeType = cachedMime
-                } else if let mime = UTTypeCopyPreferredTagWithClass(uti, kUTTagClassMIMEType) {
-                    let mimeStr = mime.takeRetainedValue() as String
-                    mimeType = mimeStr
-                    mimeTypeCache[typeIdentifier] = mimeStr
+                } else if let type = UTType(typeIdentifier),
+                          let resolvedMime = type.preferredMIMEType {
+                    mimeType = resolvedMime
+                    mimeTypeCache[typeIdentifier] = resolvedMime
                 }
             }
 
@@ -60,7 +57,7 @@ public actor NKTypeIdentifiers {
                 mimeType = "httpd/unix-directory"
                 classFile = NKTypeClassFile.directory.rawValue
                 iconName = NKTypeIconFile.directory.rawValue
-                typeIdentifier = kUTTypeFolder as String
+                typeIdentifier = UTType.folder.identifier
                 fileNameWithoutExt = fileName
                 ext = ""
             } else {

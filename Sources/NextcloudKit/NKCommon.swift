@@ -6,12 +6,6 @@
 import Foundation
 import Alamofire
 
-#if os(iOS)
-import MobileCoreServices
-#else
-import CoreServices
-#endif
-
 public enum NKTypeReachability: Int {
     case unknown = 0
     case notReachable = 1
