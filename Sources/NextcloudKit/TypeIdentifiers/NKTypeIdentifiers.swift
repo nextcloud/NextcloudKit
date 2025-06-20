@@ -35,6 +35,7 @@ public actor NKTypeIdentifiers {
             uti = cachedUTI
         } else if let type = UTType(filenameExtension: ext) {
             utiCache[ext] = type.identifier
+            uti = type.identifier
         }
 
         if let uti {
