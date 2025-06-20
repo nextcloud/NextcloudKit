@@ -18,7 +18,7 @@ public struct NKTypeIdentifierCache: Sendable {
 /// Actor responsible for resolving file type metadata (UTI, MIME type, icon, etc.) in a thread-safe manner.
 public actor NKTypeIdentifiers {
     /// Cache by file extension
-    private var filePropertyCache: [String: NKTypeIdentifierCache] = [:]
+    private var typeIdentifierCache: [String: NKTypeIdentifierCache] = [:]
     /// Internal file type resolver
     private let resolver = NKFilePropertyResolver()
 
@@ -34,7 +34,7 @@ public actor NKTypeIdentifiers {
         var fileNameWithoutExt = (fileName as NSString).deletingPathExtension
 
         // Check cache
-        if let cached = filePropertyCache[ext] {
+        if let cached = typeIdentifierCache[ext] {
             return cached
         }
 
@@ -75,7 +75,7 @@ public actor NKTypeIdentifiers {
             ext: ext
         )
 
-        filePropertyCache[ext] = result
+        typeIdentifierCache[ext] = result
         return result
     }
 }
