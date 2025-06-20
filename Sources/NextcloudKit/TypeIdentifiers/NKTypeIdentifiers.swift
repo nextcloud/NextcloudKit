@@ -5,10 +5,18 @@
 import Foundation
 import UniformTypeIdentifiers
 
+public struct NKTypeIdentifierCache: Sendable {
+    public let mimeType: String
+    public let classFile: String
+    public let iconName: String
+    public let typeIdentifier: String
+    public let fileNameWithoutExt: String
+    public let ext: String
+}
+
 /// Actor responsible for resolving file type metadata (UTI, MIME type, icon, class file, etc.) in a thread-safe manner.
 public actor NKTypeIdentifiers {
-
-    private var utiCache: [String: String] = [:]
+    private var filePropertyCache: [String: NKTypeIdentifierCache] = [:]
     private var mimeTypeCache: [String: String] = [:]
     private var filePropertiesCache: [String: NKFileProperty] = [:]
     private let resolver = NKFilePropertyResolver()
@@ -16,67 +24,80 @@ public actor NKTypeIdentifiers {
     public init() {}
 
     /// Resolves internal type metadata for a given file.
-    public func getInternalType(fileName: String, mimeType inputMimeType: String, directory: Bool, account: String) -> (mimeType: String,
-                                                                                                                        classFile: String,
-                                                                                                                        iconName: String,
-                                                                                                                        typeIdentifier: String,
-                                                                                                                        fileNameWithoutExt: String,
-                                                                                                                        ext: String) {
+    public func getInternalType(fileName: String, mimeType inputMimeType: String, directory: Bool, account: String) -> NKTypeIdentifierCache {
+        // Extract file extension
         var ext = (fileName as NSString).pathExtension.lowercased()
         var mimeType = inputMimeType
         var classFile = ""
         var iconName = ""
         var typeIdentifier = ""
-        var fileNameWithoutExt = ""
-        var uti: String?
+        var fileNameWithoutExt = (fileName as NSString).deletingPathExtension
 
-        // UTI cache
-        if let cachedUTI = utiCache[ext] {
-            uti = cachedUTI
-        } else if let type = UTType(filenameExtension: ext) {
-            utiCache[ext] = type.identifier
-            uti = type.identifier
+        // Try cached result
+        if let cached = filePropertyCache[ext] {
+            return cached
         }
 
-        if let uti {
-            typeIdentifier = uti as String
-            fileNameWithoutExt = (fileName as NSString).deletingPathExtension
+        // Resolve UTI from extension
+        guard let type = UTType(filenameExtension: ext) else {
+            return NKTypeIdentifierCache(
+                mimeType: mimeType,
+                classFile: classFile,
+                iconName: iconName,
+                typeIdentifier: typeIdentifier,
+                fileNameWithoutExt: fileNameWithoutExt,
+                ext: ext
+            )
+        }
 
-            // MIME type detection
-            if mimeType.isEmpty {
-                if let cachedMime = mimeTypeCache[typeIdentifier] {
-                    mimeType = cachedMime
-                } else if let type = UTType(typeIdentifier),
-                          let resolvedMime = type.preferredMIMEType {
-                    mimeType = resolvedMime
-                    mimeTypeCache[typeIdentifier] = resolvedMime
-                }
+        let uti = type.identifier
+        typeIdentifier = uti
+
+        // Detect MIME type from UTI
+        if mimeType.isEmpty {
+            if let cachedMime = mimeTypeCache[typeIdentifier] {
+                mimeType = cachedMime
+            } else if let mime = UTType(typeIdentifier)?.preferredMIMEType {
+                mimeType = mime
+                mimeTypeCache[typeIdentifier] = mime
             }
+        }
 
-            // Directory override
-            if directory {
-                mimeType = "httpd/unix-directory"
-                classFile = NKTypeClassFile.directory.rawValue
-                iconName = NKTypeIconFile.directory.rawValue
-                typeIdentifier = UTType.folder.identifier
-                fileNameWithoutExt = fileName
-                ext = ""
+        // Special case for folders
+        if directory {
+            mimeType = "httpd/unix-directory"
+            classFile = NKTypeClassFile.directory.rawValue
+            iconName = NKTypeIconFile.directory.rawValue
+            typeIdentifier = UTType.folder.identifier
+            fileNameWithoutExt = fileName
+            ext = ""
+        } else {
+            // Lookup file classification and icon
+            let fileProps: NKFileProperty
+            if let cachedProps = filePropertiesCache[typeIdentifier] {
+                fileProps = cachedProps
             } else {
-                let fileProps: NKFileProperty
-
-                if let cached = filePropertiesCache[typeIdentifier] {
-                    fileProps = cached
-                } else {
-                    fileProps = resolver.resolve(inUTI: uti, account: account)
-                    filePropertiesCache[typeIdentifier] = fileProps
-                }
-
-                classFile = fileProps.classFile.rawValue
-                iconName = fileProps.iconName.rawValue
+                fileProps = resolver.resolve(inUTI: typeIdentifier, account: account)
+                filePropertiesCache[typeIdentifier] = fileProps
             }
+
+            classFile = fileProps.classFile.rawValue
+            iconName = fileProps.iconName.rawValue
         }
 
-        return (mimeType: mimeType, classFile: classFile, iconName: iconName, typeIdentifier: typeIdentifier, fileNameWithoutExt: fileNameWithoutExt, ext: ext)
+        // Step 7: Assemble cache object
+        let result = NKTypeIdentifierCache(
+            mimeType: mimeType,
+            classFile: classFile,
+            iconName: iconName,
+            typeIdentifier: typeIdentifier,
+            fileNameWithoutExt: fileNameWithoutExt,
+            ext: ext
+        )
+
+        // Step 8: Cache result for reuse
+        filePropertyCache[ext] = result
+        return result
     }
 }
 
@@ -87,19 +108,8 @@ public final class NKTypeIdentifiersHelper {
         self.actor = actor
     }
 
-    public func getInternalTypeSync(fileName: String, mimeType: String, directory: Bool, account: String) -> (mimeType: String,
-                                                                                                              classFile: String,
-                                                                                                              iconName: String,
-                                                                                                              typeIdentifier: String,
-                                                                                                              fileNameWithoutExt: String,
-                                                                                                              ext: String) {
-        var result: (mimeType: String,
-                     classFile: String,
-                     iconName: String,
-                     typeIdentifier: String,
-                     fileNameWithoutExt: String,
-                     ext: String)!
-
+    public func getInternalTypeSync(fileName: String, mimeType: String, directory: Bool, account: String) -> NKTypeIdentifierCache {
+        var result: NKTypeIdentifierCache?
         let semaphore = DispatchSemaphore(value: 0)
 
         Task {
@@ -113,6 +123,6 @@ public final class NKTypeIdentifiersHelper {
         }
 
         semaphore.wait()
-        return result
+        return result!
     }
 }
