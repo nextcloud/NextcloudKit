@@ -44,6 +44,14 @@ public final class SynchronizedNKSessionArray: @unchecked Sendable {
         queue.sync { array }
     }
 
+    /// Calls the given closure on each session in the array, in order.
+    /// - Parameter body: A closure that takes a `NKSession` as a parameter.
+    public func forEach(_ body: (NKSession) -> Void) {
+        queue.sync {
+            array.forEach(body)
+        }
+    }
+
     /// Returns the first session matching a given account string.
     /// - Parameter account: The account identifier string to match.
     /// - Returns: A `NKSession` instance if found, otherwise `nil`.
