@@ -22,7 +22,7 @@ public extension NextcloudKit {
             convertible = (serverUrlFileName as? String)?.encodedToUrl
         }
         guard let url = convertible,
-              let nkSession = nkCommonInstance.getSession(account: account),
+              let nkSession = nkCommonInstance.nksessions.session(forAccount: account),
               let headers = nkCommonInstance.getStandardHeaders(account: account, options: options) else {
             return options.queue.async { completionHandler(account, nil, nil, 0, nil, nil, .urlError) }
         }

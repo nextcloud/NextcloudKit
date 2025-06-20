@@ -53,7 +53,7 @@ public enum NKLogTagEmoji: String {
 /// A logger that writes log messages to a file in a subdirectory of the user's Documents folder,
 /// rotates the log daily
 /// Compatible with iOS 13.0+ and Swift 6.
-public final class NKLogFileManager {
+public final class NKLogFileManager: @unchecked Sendable {
 
     // MARK: - Singleton
 
@@ -79,13 +79,13 @@ public final class NKLogFileManager {
     private let logDirectory: URL
     public var logLevel: NKLogLevel
     private var currentLogDate: String
-    private let logQueue = DispatchQueue(label: "LogWriterQueue", attributes: .concurrent)
-    private let rotationQueue = DispatchQueue(label: "LogRotationQueue")
+    private let logQueue = DispatchQueue(label: "com.nextcloud.LogWriterQueue", attributes: .concurrent)
+    private let rotationQueue = DispatchQueue(label: "com.nextcloud.LogRotationQueue")
     private let fileManager = FileManager.default
 
     // Cache for dynamic format strings, populated at runtime. Thread-safe via serial queue.
     private static var cachedDynamicFormatters: [String: DateFormatter] = [:]
-    private static let formatterAccessQueue = DispatchQueue(label: "com.yourapp.dateformatter.cache")
+    private static let formatterAccessQueue = DispatchQueue(label: "com.nextcloud.dateformatter.cache")
 
     // MARK: - Initialization
 

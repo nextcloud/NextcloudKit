@@ -25,9 +25,9 @@ public extension NextcloudKit {
     func getCapabilities(account: String,
                          options: NKRequestOptions = NKRequestOptions(),
                          taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-                         completion: @escaping (_ account: String, _ capabilities: NCCapabilities.Capabilities?, _ responseData: AFDataResponse<Data>?, _ error: NKError) -> Void) {
+                         completion: @escaping (_ account: String, _ capabilities: NKCapabilities.Capabilities?, _ responseData: AFDataResponse<Data>?, _ error: NKError) -> Void) {
         let endpoint = "ocs/v1.php/cloud/capabilities"
-        guard let nkSession = nkCommonInstance.getSession(account: account),
+        guard let nkSession = nkCommonInstance.nksessions.session(forAccount: account),
               let url = nkCommonInstance.createStandardUrl(serverUrl: nkSession.urlBase, endpoint: endpoint, options: options),
               let headers = nkCommonInstance.getStandardHeaders(account: account, options: options) else {
             return options.queue.async { completion(account, nil, nil, .urlError) }
@@ -68,7 +68,7 @@ public extension NextcloudKit {
     func getCapabilitiesAsync(account: String,
                               options: NKRequestOptions = NKRequestOptions(),
                               taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in }) async -> (account: String,
-                                                                                                            capabilities: NCCapabilities.Capabilities?,
+                                                                                                            capabilities: NKCapabilities.Capabilities?,
                                                                                                             responseData: AFDataResponse<Data>?,
                                                                                                             error: NKError) {
         await withUnsafeContinuation { continuation in
@@ -86,7 +86,7 @@ public extension NextcloudKit {
     ///   - data: The raw JSON data returned from the capabilities endpoint.
     /// - Returns: A fully populated `NCCapabilities.Capabilities` object.
     /// - Throws: An error if decoding fails or data is missing.
-    func setCapabilitiesAsync(account: String, data: Data? = nil) async throws -> NCCapabilities.Capabilities {
+    func setCapabilitiesAsync(account: String, data: Data? = nil) async throws -> NKCapabilities.Capabilities {
         guard let jsonData = data else {
             throw NSError(domain: "SetCapabilities", code: 0, userInfo: [NSLocalizedDescriptionKey: "Missing JSON data"])
         }
@@ -347,7 +347,7 @@ public extension NextcloudKit {
             let json = data.capabilities
 
             // Initialize capabilities
-            let capabilities = NCCapabilities.Capabilities()
+            let capabilities = NKCapabilities.Capabilities()
 
             // Version info
             capabilities.serverVersion = data.version.string
@@ -410,7 +410,7 @@ public extension NextcloudKit {
             capabilities.termsOfService = json.termsOfService?.enabled ?? false
 
             // Persist capabilities in shared store
-            await NCCapabilities.shared.appendCapabilitiesAsync(for: account, capabilities: capabilities)
+            await NKCapabilities.shared.appendCapabilitiesAsync(for: account, capabilities: capabilities)
             return capabilities
         } catch {
             nkLog(error: "Could not decode json capabilities: \(error.localizedDescription)")
@@ -421,65 +421,69 @@ public extension NextcloudKit {
 
 /// A concurrency-safe store for capabilities associated with Nextcloud accounts.
 actor CapabilitiesStore {
-    private var store: [String: NCCapabilities.Capabilities] = [:]
+    private var store: [String: NKCapabilities.Capabilities] = [:]
 
-    func get(_ account: String) -> NCCapabilities.Capabilities? {
+    func get(_ account: String) -> NKCapabilities.Capabilities? {
         return store[account]
     }
 
-    func set(_ account: String, value: NCCapabilities.Capabilities) {
+    func set(_ account: String, value: NKCapabilities.Capabilities) {
         store[account] = value
     }
 }
 
 /// Singleton container and public API for accessing and caching capabilities.
-final public class NCCapabilities: Sendable {
-    public static let shared = NCCapabilities()
+final public class NKCapabilities: Sendable {
+    public static let shared = NKCapabilities()
 
     private let store = CapabilitiesStore()
 
     public class Capabilities: @unchecked Sendable {
-        public var serverVersionMajor: Int                       = 0
-        public var serverVersion: String                         = ""
-        public var fileSharingApiEnabled: Bool                   = false
-        public var fileSharingPubPasswdEnforced: Bool            = false
-        public var fileSharingPubExpireDateEnforced: Bool        = false
-        public var fileSharingPubExpireDateDays: Int             = 0
-        public var fileSharingInternalExpireDateEnforced: Bool   = false
-        public var fileSharingInternalExpireDateDays: Int        = 0
-        public var fileSharingRemoteExpireDateEnforced: Bool     = false
-        public var fileSharingRemoteExpireDateDays: Int          = 0
-        public var fileSharingDefaultPermission: Int             = 0
-        public var fileSharingDownloadLimit: Bool                = false
-        public var fileSharingDownloadLimitDefaultLimit: Int     = 1
-        public var themingColor: String                          = ""
-        public var themingColorElement: String                   = ""
-        public var themingColorText: String                      = ""
-        public var themingName: String                           = ""
-        public var themingSlogan: String                         = ""
-        public var e2EEEnabled: Bool                             = false
-        public var e2EEApiVersion: String                        = ""
-        public var richDocumentsEnabled: Bool                    = false
-        public var richDocumentsMimetypes: [String] = []
-        public var activity: [String] = []
-        public var notification: [String] = []
-        public var filesUndelete: Bool                           = false
-        public var filesLockVersion: String                      = ""    // NC 24
-        public var filesComments: Bool                           = false // NC 20
-        public var filesBigfilechunking: Bool                    = false
-        public var userStatusEnabled: Bool                       = false
-        public var externalSites: Bool                           = false
-        public var activityEnabled: Bool                         = false
-        public var groupfoldersEnabled: Bool                     = false // NC27
-        public var assistantEnabled: Bool                        = false // NC28
-        public var isLivePhotoServerAvailable: Bool              = false // NC28
-        public var securityGuardDiagnostics                      = false
-        public var forbiddenFileNames: [String]                  = []
-        public var forbiddenFileNameBasenames: [String]          = []
-        public var forbiddenFileNameCharacters: [String]         = []
-        public var forbiddenFileNameExtensions: [String]         = []
-        public var recommendations: Bool                         = false
-        public var termsOfService: Bool                          = false
+        public var serverVersionMajor: Int                          = 0
+        public var serverVersion: String                            = ""
+        public var fileSharingApiEnabled: Bool                      = false
+        public var fileSharingPubPasswdEnforced: Bool               = false
+        public var fileSharingPubExpireDateEnforced: Bool           = false
+        public var fileSharingPubExpireDateDays: Int                = 0
+        public var fileSharingInternalExpireDateEnforced: Bool      = false
+        public var fileSharingInternalExpireDateDays: Int           = 0
+        public var fileSharingRemoteExpireDateEnforced: Bool        = false
+        public var fileSharingRemoteExpireDateDays: Int             = 0
+        public var fileSharingDefaultPermission: Int                = 0
+        public var fileSharingDownloadLimit: Bool                   = false
+        public var fileSharingDownloadLimitDefaultLimit: Int        = 1
+        public var themingColor: String                             = ""
+        public var themingColorElement: String                      = ""
+        public var themingColorText: String                         = ""
+        public var themingName: String                              = ""
+        public var themingSlogan: String                            = ""
+        public var e2EEEnabled: Bool                                = false
+        public var e2EEApiVersion: String                           = ""
+        public var richDocumentsEnabled: Bool                       = false
+        public var richDocumentsMimetypes: [String]                 = []
+        public var activity: [String]                               = []
+        public var notification: [String]                           = []
+        public var filesUndelete: Bool                              = false
+        public var filesLockVersion: String                         = ""    // NC 24
+        public var filesComments: Bool                              = false // NC 20
+        public var filesBigfilechunking: Bool                       = false
+        public var userStatusEnabled: Bool                          = false
+        public var externalSites: Bool                              = false
+        public var activityEnabled: Bool                            = false
+        public var groupfoldersEnabled: Bool                        = false // NC27
+        public var assistantEnabled: Bool                           = false // NC28
+        public var isLivePhotoServerAvailable: Bool                 = false // NC28
+        public var securityGuardDiagnostics                         = false
+        public var forbiddenFileNames: [String]                     = []
+        public var forbiddenFileNameBasenames: [String]             = []
+        public var forbiddenFileNameCharacters: [String]            = []
+        public var forbiddenFileNameExtensions: [String]            = []
+        public var recommendations: Bool                            = false
+        public var termsOfService: Bool                             = false
+
+        public var directEditingEditors: [NKEditorDetailsEditor]    = []
+        public var directEditingCreators: [NKEditorDetailsCreator]  = []
+        public var directEditingTemplates: [NKEditorTemplate]       = []
 
         public init() {}
     }

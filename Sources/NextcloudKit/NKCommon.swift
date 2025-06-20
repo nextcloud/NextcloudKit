@@ -6,17 +6,18 @@
 import Foundation
 import Alamofire
 
-#if os(iOS)
-import MobileCoreServices
-#else
-import CoreServices
-#endif
+public enum NKTypeReachability: Int {
+    case unknown = 0
+    case notReachable = 1
+    case reachableEthernetOrWiFi = 2
+    case reachableCellular = 3
+}
 
 public protocol NextcloudKitDelegate: AnyObject, Sendable {
     func authenticationChallenge(_ session: URLSession, didReceive challenge: URLAuthenticationChallenge, completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void)
     func urlSessionDidFinishEvents(forBackgroundURLSession session: URLSession)
 
-    func networkReachabilityObserver(_ typeReachability: NKCommon.TypeReachability)
+    func networkReachabilityObserver(_ typeReachability: NKTypeReachability)
 
     func request<Value>(_ request: DataRequest, didParseResponse response: AFDataResponse<Value>)
 
@@ -33,7 +34,7 @@ public extension NextcloudKitDelegate {
     func authenticationChallenge(_ session: URLSession, didReceive challenge: URLAuthenticationChallenge, completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) { }
     func urlSessionDidFinishEvents(forBackgroundURLSession session: URLSession) { }
 
-    func networkReachabilityObserver(_ typeReachability: NKCommon.TypeReachability) { }
+    func networkReachabilityObserver(_ typeReachability: NKTypeReachability) { }
 
     func request<Value>(_ request: DataRequest, didParseResponse response: AFDataResponse<Value>) { }
 
@@ -47,9 +48,10 @@ public extension NextcloudKitDelegate {
 }
 
 public struct NKCommon: Sendable {
-    public var nksessions = ThreadSafeArray<NKSession>()
+    public var nksessions = SynchronizedNKSessionArray()
     public var delegate: NextcloudKitDelegate?
     public var groupIdentifier: String?
+    public let typeIdentifiers: NKTypeIdentifiers = .shared
 
     // Foreground
     public let identifierSessionDownload: String = "com.nextcloud.nextcloudkit.session.download"
@@ -74,230 +76,11 @@ public struct NKCommon: Sendable {
     public let groupDefaultsUnavailable = "Unavailable"
     public let groupDefaultsToS = "ToS"
 
-    public enum TypeReachability: Int {
-        case unknown = 0
-        case notReachable = 1
-        case reachableEthernetOrWiFi = 2
-        case reachableCellular = 3
-    }
 
-    public enum TypeClassFile: String {
-        case audio = "audio"
-        case compress = "compress"
-        case directory = "directory"
-        case document = "document"
-        case image = "image"
-        case unknow = "unknow"
-        case url = "url"
-        case video = "video"
-    }
-
-    public enum TypeIconFile: String {
-        case audio = "audio"
-        case code = "code"
-        case compress = "compress"
-        case directory = "directory"
-        case document = "document"
-        case image = "image"
-        case movie = "movie"
-        case pdf = "pdf"
-        case ppt = "ppt"
-        case txt = "txt"
-        case unknow = "file"
-        case url = "url"
-        case xls = "xls"
-    }
-
-    public struct UTTypeConformsToServer: Sendable {
-        var typeIdentifier: String
-        var classFile: String
-        var editor: String
-        var iconName: String
-        var name: String
-        var account: String
-    }
-
-#if swift(<6.0)
-    internal var utiCache = NSCache<NSString, CFString>()
-    internal var mimeTypeCache = NSCache<CFString, NSString>()
-    internal var filePropertiesCache = NSCache<CFString, NKFileProperty>()
-#else
-    internal var utiCache = [String: String]()
-    internal var mimeTypeCache = [String: String]()
-    internal var filePropertiesCache = [String: NKFileProperty]()
-#endif
-    internal var internalTypeIdentifiers = ThreadSafeArray<UTTypeConformsToServer>()
 
     // MARK: - Init
 
-    init() {
-
-    }
-
-    // MARK: - Type Identifier
-
-    mutating public func clearInternalTypeIdentifier(account: String) {
-        internalTypeIdentifiers = internalTypeIdentifiers.filter({ $0.account != account })
-    }
-
-    mutating public func addInternalTypeIdentifier(typeIdentifier: String, classFile: String, editor: String, iconName: String, name: String, account: String) {
-        if !internalTypeIdentifiers.contains(where: { $0.typeIdentifier == typeIdentifier && $0.editor == editor && $0.account == account}) {
-            let newUTI = UTTypeConformsToServer(typeIdentifier: typeIdentifier, classFile: classFile, editor: editor, iconName: iconName, name: name, account: account)
-            internalTypeIdentifiers.append(newUTI)
-        }
-    }
-
-    mutating public func getInternalType(fileName: String, mimeType: String, directory: Bool, account: String) -> (mimeType: String, classFile: String, iconName: String, typeIdentifier: String, fileNameWithoutExt: String, ext: String) {
-        var ext = (fileName as NSString).pathExtension.lowercased()
-        var mimeType = mimeType
-        var classFile = "", iconName = "", typeIdentifier = "", fileNameWithoutExt = ""
-        var inUTI: CFString?
-
-#if swift(<6.0)
-        if let cachedUTI = utiCache.object(forKey: ext as NSString) {
-            inUTI = cachedUTI
-        }
-#else
-        if let cachedUTI = utiCache[ext] {
-            inUTI = cachedUTI as CFString
-        }
-#endif
-        if inUTI == nil {
-            if let unmanagedFileUTI = UTTypeCreatePreferredIdentifierForTag(kUTTagClassFilenameExtension, ext as CFString, nil) {
-                inUTI = unmanagedFileUTI.takeRetainedValue()
-                if let inUTI {
-#if swift(<6.0)
-                    utiCache.setObject(inUTI, forKey: ext as NSString)
-#else
-                    utiCache[ext] = inUTI as String
-#endif
-                }
-            }
-        }
-
-        if let inUTI {
-            typeIdentifier = inUTI as String
-            fileNameWithoutExt = (fileName as NSString).deletingPathExtension
-
-            // contentType detect
-            if mimeType.isEmpty {
-#if swift(<6.0)
-                if let cachedMimeUTI = mimeTypeCache.object(forKey: inUTI) {
-                    mimeType = cachedMimeUTI as String
-                }
-#else
-                if let cachedMimeUTI = mimeTypeCache[inUTI as String] {
-                    mimeType = cachedMimeUTI
-                }
-#endif
-
-                if mimeType.isEmpty {
-                    if let mimeUTI = UTTypeCopyPreferredTagWithClass(inUTI, kUTTagClassMIMEType) {
-                        let mimeUTIString = mimeUTI.takeRetainedValue() as String
-
-                        mimeType = mimeUTIString
-#if swift(<6.0)
-                        mimeTypeCache.setObject(mimeUTIString as NSString, forKey: inUTI)
-#else
-                        mimeTypeCache[inUTI as String] = mimeUTIString as String
-#endif
-                    }
-                }
-            }
-
-            if directory {
-                mimeType = "httpd/unix-directory"
-                classFile = TypeClassFile.directory.rawValue
-                iconName = TypeIconFile.directory.rawValue
-                typeIdentifier = kUTTypeFolder as String
-                fileNameWithoutExt = fileName
-                ext = ""
-            } else {
-                var fileProperties: NKFileProperty
-
-#if swift(<6.0)
-                if let cachedFileProperties = filePropertiesCache.object(forKey: inUTI) {
-                    fileProperties = cachedFileProperties
-                } else {
-                    fileProperties = getFileProperties(inUTI: inUTI)
-                    filePropertiesCache.setObject(fileProperties, forKey: inUTI)
-                }
-#else
-                if let cachedFileProperties = filePropertiesCache[inUTI as String] {
-                    fileProperties = cachedFileProperties
-                } else {
-                    fileProperties = getFileProperties(inUTI: inUTI)
-                    filePropertiesCache[inUTI as String] = fileProperties
-                }
-#endif
-
-                classFile = fileProperties.classFile
-                iconName = fileProperties.iconName
-            }
-        }
-        return(mimeType: mimeType, classFile: classFile, iconName: iconName, typeIdentifier: typeIdentifier, fileNameWithoutExt: fileNameWithoutExt, ext: ext)
-    }
-
-    public func getFileProperties(inUTI: CFString) -> NKFileProperty {
-        let fileProperty = NKFileProperty()
-        let typeIdentifier: String = inUTI as String
-
-        if let fileExtension = UTTypeCopyPreferredTagWithClass(inUTI as CFString, kUTTagClassFilenameExtension) {
-            fileProperty.ext = String(fileExtension.takeRetainedValue())
-        }
-
-        if UTTypeConformsTo(inUTI, kUTTypeImage) {
-            fileProperty.classFile = TypeClassFile.image.rawValue
-            fileProperty.iconName = TypeIconFile.image.rawValue
-            fileProperty.name = "image"
-        } else if UTTypeConformsTo(inUTI, kUTTypeMovie) {
-            fileProperty.classFile = TypeClassFile.video.rawValue
-            fileProperty.iconName = TypeIconFile.movie.rawValue
-            fileProperty.name = "movie"
-        } else if UTTypeConformsTo(inUTI, kUTTypeAudio) {
-            fileProperty.classFile = TypeClassFile.audio.rawValue
-            fileProperty.iconName = TypeIconFile.audio.rawValue
-            fileProperty.name = "audio"
-        } else if UTTypeConformsTo(inUTI, kUTTypeZipArchive) {
-            fileProperty.classFile = TypeClassFile.compress.rawValue
-            fileProperty.iconName = TypeIconFile.compress.rawValue
-            fileProperty.name = "archive"
-        } else if UTTypeConformsTo(inUTI, kUTTypeHTML) {
-            fileProperty.classFile = TypeClassFile.document.rawValue
-            fileProperty.iconName = TypeIconFile.code.rawValue
-            fileProperty.name = "code"
-        } else if UTTypeConformsTo(inUTI, kUTTypePDF) {
-            fileProperty.classFile = TypeClassFile.document.rawValue
-            fileProperty.iconName = TypeIconFile.pdf.rawValue
-            fileProperty.name = "document"
-        } else if UTTypeConformsTo(inUTI, kUTTypeRTF) {
-            fileProperty.classFile = TypeClassFile.document.rawValue
-            fileProperty.iconName = TypeIconFile.txt.rawValue
-            fileProperty.name = "document"
-        } else if UTTypeConformsTo(inUTI, kUTTypeText) {
-            if fileProperty.ext.isEmpty { fileProperty.ext = "txt" }
-            fileProperty.classFile = TypeClassFile.document.rawValue
-            fileProperty.iconName = TypeIconFile.txt.rawValue
-            fileProperty.name = "text"
-        } else {
-            if let result = internalTypeIdentifiers.first(where: {$0.typeIdentifier == typeIdentifier}) {
-                fileProperty.classFile = result.classFile
-                fileProperty.iconName = result.iconName
-                fileProperty.name = result.name
-            } else {
-                if UTTypeConformsTo(inUTI, kUTTypeContent) {
-                    fileProperty.classFile = TypeClassFile.document.rawValue
-                    fileProperty.iconName = TypeIconFile.document.rawValue
-                    fileProperty.name = "document"
-                } else {
-                    fileProperty.classFile = TypeClassFile.unknow.rawValue
-                    fileProperty.iconName = TypeIconFile.unknow.rawValue
-                    fileProperty.name = "file"
-                }
-            }
-        }
-        return fileProperty
-    }
+    init() { }
 
     // MARK: - Chunked File
 
@@ -411,7 +194,7 @@ public struct NKCommon: Sendable {
         guard let groupDefaults = UserDefaults(suiteName: groupIdentifier) else {
             return
         }
-        let capabilities = NCCapabilities.shared.getCapabilitiesBlocking(for: account)
+        let capabilities = NKCapabilities.shared.getCapabilitiesBlocking(for: account)
 
         /// Unavailable
         if errorCode == 503 {
@@ -446,18 +229,12 @@ public struct NKCommon: Sendable {
         return "\(identifier).\(account)"
     }
 
-    public func getSession(account: String) -> NKSession? {
-        var session: NKSession?
-        nksessions.forEach { result in
-            if result.account == account {
-                session = result
-            }
-        }
-        return session
-    }
+
 
     public func getStandardHeaders(account: String, options: NKRequestOptions? = nil) -> HTTPHeaders? {
-        guard let session = nksessions.filter({ $0.account == account }).first else { return nil}
+        guard let session = nksessions.session(forAccount: account) else {
+            return nil
+        }
         var headers: HTTPHeaders = []
 
         headers.update(.authorization(username: session.user, password: session.password))

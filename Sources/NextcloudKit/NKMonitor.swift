@@ -7,7 +7,7 @@ import Alamofire
 
 final class NKMonitor: EventMonitor, Sendable {
     let nkCommonInstance: NKCommon
-    let queue = DispatchQueue(label: "com.nextcloudkit.monitor")
+    let queue = DispatchQueue(label: "com.nextcloud.NKMonitor")
 
     init(nkCommonInstance: NKCommon) {
         self.nkCommonInstance = nkCommonInstance
