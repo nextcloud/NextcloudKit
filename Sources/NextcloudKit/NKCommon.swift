@@ -54,7 +54,7 @@ public extension NextcloudKitDelegate {
 }
 
 public struct NKCommon: Sendable {
-    public var nksessions = ThreadSafeArray<NKSession>()
+    public var nksessions = SynchronizedNKSessionArray()
     public var delegate: NextcloudKitDelegate?
     public var groupIdentifier: String?
 
@@ -236,18 +236,12 @@ public struct NKCommon: Sendable {
         return "\(identifier).\(account)"
     }
 
-    public func getSession(account: String) -> NKSession? {
-        var session: NKSession?
-        nksessions.forEach { result in
-            if result.account == account {
-                session = result
-            }
-        }
-        return session
-    }
+
 
     public func getStandardHeaders(account: String, options: NKRequestOptions? = nil) -> HTTPHeaders? {
-        guard let session = nksessions.filter({ $0.account == account }).first else { return nil}
+        guard let session = nksessions.session(forAccount: account) else {
+            return nil
+        }
         var headers: HTTPHeaders = []
 
         headers.update(.authorization(username: session.user, password: session.password))

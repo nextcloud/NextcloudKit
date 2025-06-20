@@ -16,7 +16,7 @@ public extension NextcloudKit {
         if let userId = userId {
             endpoint = "ocs/v2.php/apps/user_status/api/v1/user_status/\(userId)"
         }
-        guard let nkSession = nkCommonInstance.getSession(account: account),
+        guard let nkSession = nkCommonInstance.nksessions.session(forAccount: account),
               let url = nkCommonInstance.createStandardUrl(serverUrl: nkSession.urlBase, endpoint: endpoint, options: options),
               let headers = nkCommonInstance.getStandardHeaders(account: account, options: options) else {
             return options.queue.async { completion(account, nil, nil, nil, nil, false, nil, false, nil, nil, .urlError) }
@@ -75,7 +75,7 @@ public extension NextcloudKit {
                        taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
                        completion: @escaping (_ account: String, _ responseData: AFDataResponse<Data>?, _ error: NKError) -> Void) {
         let endpoint = "ocs/v2.php/apps/user_status/api/v1/user_status/status"
-        guard let nkSession = nkCommonInstance.getSession(account: account),
+        guard let nkSession = nkCommonInstance.nksessions.session(forAccount: account),
               let url = nkCommonInstance.createStandardUrl(serverUrl: nkSession.urlBase, endpoint: endpoint, options: options),
               let headers = nkCommonInstance.getStandardHeaders(account: account, options: options) else {
             return options.queue.async { completion(account, nil, .urlError) }
@@ -111,7 +111,7 @@ public extension NextcloudKit {
                                     taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
                                     completion: @escaping (_ account: String, _ responseData: AFDataResponse<Data>?, _ error: NKError) -> Void) {
         let endpoint = "ocs/v2.php/apps/user_status/api/v1/user_status/message/predefined"
-        guard let nkSession = nkCommonInstance.getSession(account: account),
+        guard let nkSession = nkCommonInstance.nksessions.session(forAccount: account),
               let url = nkCommonInstance.createStandardUrl(serverUrl: nkSession.urlBase, endpoint: endpoint, options: options),
               let headers = nkCommonInstance.getStandardHeaders(account: account, options: options) else {
             return options.queue.async { completion(account, nil, .urlError) }
@@ -152,7 +152,7 @@ public extension NextcloudKit {
                                      taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
                                      completion: @escaping (_ account: String, _ responseData: AFDataResponse<Data>?, _ error: NKError) -> Void) {
         let endpoint = "ocs/v2.php/apps/user_status/api/v1/user_status/message/custom"
-        guard let nkSession = nkCommonInstance.getSession(account: account),
+        guard let nkSession = nkCommonInstance.nksessions.session(forAccount: account),
               let url = nkCommonInstance.createStandardUrl(serverUrl: nkSession.urlBase, endpoint: endpoint, options: options),
               let headers = nkCommonInstance.getStandardHeaders(account: account, options: options) else {
             return options.queue.async { completion(account, nil, .urlError) }
@@ -193,7 +193,7 @@ public extension NextcloudKit {
                       taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
                       completion: @escaping (_ account: String, _ responseData: AFDataResponse<Data>?, _ error: NKError) -> Void) {
         let endpoint = "ocs/v2.php/apps/user_status/api/v1/user_status/message"
-        guard let nkSession = nkCommonInstance.getSession(account: account),
+        guard let nkSession = nkCommonInstance.nksessions.session(forAccount: account),
               let url = nkCommonInstance.createStandardUrl(serverUrl: nkSession.urlBase, endpoint: endpoint, options: options),
               let headers = nkCommonInstance.getStandardHeaders(account: account, options: options) else {
             return options.queue.async { completion(account, nil, .urlError) }
@@ -225,7 +225,7 @@ public extension NextcloudKit {
                                          taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
                                          completion: @escaping (_ account: String, _ userStatuses: [NKUserStatus]?, _ responseData: AFDataResponse<Data>?, _ error: NKError) -> Void) {
         let endpoint = "ocs/v2.php/apps/user_status/api/v1/predefined_statuses"
-        guard let nkSession = nkCommonInstance.getSession(account: account),
+        guard let nkSession = nkCommonInstance.nksessions.session(forAccount: account),
               let url = nkCommonInstance.createStandardUrl(serverUrl: nkSession.urlBase, endpoint: endpoint, options: options),
               let headers = nkCommonInstance.getStandardHeaders(account: account, options: options) else {
             return options.queue.async { completion(account, nil, nil, .urlError) }
@@ -275,7 +275,7 @@ public extension NextcloudKit {
                                        taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
                                        completion: @escaping (_ account: String, _ userStatuses: [NKUserStatus]?, _ responseData: AFDataResponse<Data>?, _ error: NKError) -> Void) {
         let endpoint = "ocs/v2.php/apps/user_status/api/v1/statuses"
-        guard let nkSession = nkCommonInstance.getSession(account: account),
+        guard let nkSession = nkCommonInstance.nksessions.session(forAccount: account),
               let url = nkCommonInstance.createStandardUrl(serverUrl: nkSession.urlBase, endpoint: endpoint, options: options),
               let headers = nkCommonInstance.getStandardHeaders(account: account, options: options) else {
             return options.queue.async { completion(account, nil, nil, .urlError) }

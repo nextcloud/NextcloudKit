@@ -15,7 +15,7 @@ public extension NextcloudKit {
         let endpoint = makeEndpoint(with: token)
         let options = NKRequestOptions()
 
-        guard let nkSession = nkCommonInstance.getSession(account: account),
+        guard let nkSession = nkCommonInstance.nksessions.session(forAccount: account),
               let url = nkCommonInstance.createStandardUrl(serverUrl: nkSession.urlBase, endpoint: endpoint, options: options),
               let headers = nkCommonInstance.getStandardHeaders(account: account, options: options) else {
             return options.queue.async {
@@ -80,7 +80,7 @@ public extension NextcloudKit {
         let endpoint = makeEndpoint(with: token)
         let options = NKRequestOptions()
 
-        guard let nkSession = nkCommonInstance.getSession(account: account),
+        guard let nkSession = nkCommonInstance.nksessions.session(forAccount: account),
               let url = nkCommonInstance.createStandardUrl(serverUrl: nkSession.urlBase, endpoint: endpoint, options: options),
               let headers = nkCommonInstance.getStandardHeaders(account: account, options: options) else {
             return options.queue.async {
@@ -113,7 +113,7 @@ public extension NextcloudKit {
         let options = NKRequestOptions()
         options.contentType = "application/json"
 
-        guard let nkSession = nkCommonInstance.getSession(account: account),
+        guard let nkSession = nkCommonInstance.nksessions.session(forAccount: account),
               let url = nkCommonInstance.createStandardUrl(serverUrl: nkSession.urlBase, endpoint: endpoint, options: options),
               let headers = nkCommonInstance.getStandardHeaders(account: account, options: options),
               var urlRequest = try? URLRequest(url: url, method: .put, headers: headers) else {

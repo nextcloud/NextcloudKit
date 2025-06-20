@@ -13,7 +13,7 @@ public extension NextcloudKit {
                                 taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
                                 completion: @escaping (_ account: String, _  url: String?, _ responseData: AFDataResponse<Data>?, _ error: NKError) -> Void) {
         let endpoint = "ocs/v2.php/apps/richdocuments/api/v1/document"
-        guard let nkSession = nkCommonInstance.getSession(account: account),
+        guard let nkSession = nkCommonInstance.nksessions.session(forAccount: account),
               let url = nkCommonInstance.createStandardUrl(serverUrl: nkSession.urlBase, endpoint: endpoint, options: options),
               let headers = nkCommonInstance.getStandardHeaders(account: account, options: options) else {
             return options.queue.async { completion(account, nil, nil, .urlError) }
@@ -46,7 +46,7 @@ public extension NextcloudKit {
                                    taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
                                    completion: @escaping (_ account: String, _ templates: [NKRichdocumentsTemplate]?, _ responseData: AFDataResponse<Data>?, _ error: NKError) -> Void) {
         let endpoint = "ocs/v2.php/apps/richdocuments/api/v1/templates/\(typeTemplate)"
-        guard let nkSession = nkCommonInstance.getSession(account: account),
+        guard let nkSession = nkCommonInstance.nksessions.session(forAccount: account),
               let url = nkCommonInstance.createStandardUrl(serverUrl: nkSession.urlBase, endpoint: endpoint, options: options),
               let headers = nkCommonInstance.getStandardHeaders(account: account, options: options) else {
             return options.queue.async { completion(account, nil, nil, .urlError) }
@@ -101,7 +101,7 @@ public extension NextcloudKit {
                              taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
                              completion: @escaping (_ account: String, _  url: String?, _ responseData: AFDataResponse<Data>?, _ error: NKError) -> Void) {
         let endpoint = "ocs/v2.php/apps/richdocuments/api/v1/templates/new"
-        guard let nkSession = nkCommonInstance.getSession(account: account),
+        guard let nkSession = nkCommonInstance.nksessions.session(forAccount: account),
               let url = nkCommonInstance.createStandardUrl(serverUrl: nkSession.urlBase, endpoint: endpoint, options: options),
               let headers = nkCommonInstance.getStandardHeaders(account: account, options: options) else {
             return options.queue.async { completion(account, nil, nil, .urlError) }
@@ -134,7 +134,7 @@ public extension NextcloudKit {
                                   taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
                                   completion: @escaping (_ account: String, _  url: String?, _ responseData: AFDataResponse<Data>?, _ error: NKError) -> Void) {
         let endpoint = "index.php/apps/richdocuments/assets"
-        guard let nkSession = nkCommonInstance.getSession(account: account),
+        guard let nkSession = nkCommonInstance.nksessions.session(forAccount: account),
               let url = nkCommonInstance.createStandardUrl(serverUrl: nkSession.urlBase, endpoint: endpoint, options: options),
               let headers = nkCommonInstance.getStandardHeaders(account: account, options: options) else {
             return options.queue.async { completion(account, nil, nil, .urlError) }

@@ -39,7 +39,7 @@ public final class NKBackground: NSObject, URLSessionTaskDelegate, URLSessionDel
             url = (serverUrlFileName as? String)?.encodedToUrl as? URL
         }
 
-        guard let nkSession = nkCommonInstance.getSession(account: account),
+        guard let nkSession = nkCommonInstance.nksessions.session(forAccount: account),
               let urlForRequest = url
         else {
             return (nil, .urlError)
@@ -95,7 +95,7 @@ public final class NKBackground: NSObject, URLSessionTaskDelegate, URLSessionDel
             url = (serverUrlFileName as? String)?.encodedToUrl as? URL
         }
 
-        guard let nkSession = nkCommonInstance.getSession(account: account),
+        guard let nkSession = nkCommonInstance.nksessions.session(forAccount: account),
               let urlForRequest = url
         else {
             return (nil, .urlError)

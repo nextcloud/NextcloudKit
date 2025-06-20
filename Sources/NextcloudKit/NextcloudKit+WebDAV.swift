@@ -13,7 +13,7 @@ public extension NextcloudKit {
                       taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
                       completion: @escaping (_ account: String, _ ocId: String?, _ date: Date?, _ responseData: AFDataResponse<Data>?, _ error: NKError) -> Void) {
         guard let url = serverUrlFileName.encodedToUrl,
-              let nkSession = nkCommonInstance.getSession(account: account),
+              let nkSession = nkCommonInstance.nksessions.session(forAccount: account),
               let headers = nkCommonInstance.getStandardHeaders(account: account, options: options) else {
             return options.queue.async { completion(account, nil, nil, nil, .urlError) }
         }
@@ -59,7 +59,7 @@ public extension NextcloudKit {
                             taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
                             completion: @escaping (_ account: String, _ responseData: AFDataResponse<Data>?, _ error: NKError) -> Void) {
         guard let url = serverUrlFileName.encodedToUrl,
-              let nkSession = nkCommonInstance.getSession(account: account),
+              let nkSession = nkCommonInstance.nksessions.session(forAccount: account),
               let headers = nkCommonInstance.getStandardHeaders(account: account, options: options) else {
             return options.queue.async { completion(account, nil, .urlError) }
         }
@@ -101,7 +101,7 @@ public extension NextcloudKit {
                           taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
                           completion: @escaping (_ account: String, _ responseData: AFDataResponse<Data>?, _ error: NKError) -> Void) {
         guard let url = serverUrlFileNameSource.encodedToUrl,
-              let nkSession = nkCommonInstance.getSession(account: account),
+              let nkSession = nkCommonInstance.nksessions.session(forAccount: account),
               var headers = nkCommonInstance.getStandardHeaders(account: account, options: options) else {
             return options.queue.async { completion(account, nil, .urlError) }
         }
@@ -152,7 +152,7 @@ public extension NextcloudKit {
                           taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
                           completion: @escaping (_ account: String, _ responseData: AFDataResponse<Data>?, _ error: NKError) -> Void) {
         guard let url = serverUrlFileNameSource.encodedToUrl,
-              let nkSession = nkCommonInstance.getSession(account: account),
+              let nkSession = nkCommonInstance.nksessions.session(forAccount: account),
               var headers = nkCommonInstance.getStandardHeaders(account: account, options: options) else {
             return options.queue.async { completion(account, nil, .urlError) }
         }
@@ -209,7 +209,7 @@ public extension NextcloudKit {
         ///
         options.contentType = "application/xml"
         ///
-        guard let nkSession = nkCommonInstance.getSession(account: account),
+        guard let nkSession = nkCommonInstance.nksessions.session(forAccount: account),
               let url = serverUrlFileName.encodedToUrl,
               var headers = nkCommonInstance.getStandardHeaders(account: account, options: options) else {
             return options.queue.async { completion(account, nil, nil, .urlError) }
@@ -275,7 +275,7 @@ public extension NextcloudKit {
                            options: NKRequestOptions = NKRequestOptions(),
                            taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
                            completion: @escaping (_ account: String, _ file: NKFile?, _ responseData: AFDataResponse<Data>?, _ error: NKError) -> Void) {
-        guard let nkSession = nkCommonInstance.getSession(account: account) else {
+        guard let nkSession = nkCommonInstance.nksessions.session(forAccount: account) else {
             return options.queue.async { completion(account, nil, nil, .urlError) }
         }
         var httpBody: Data?
@@ -325,7 +325,7 @@ public extension NextcloudKit {
                        options: NKRequestOptions = NKRequestOptions(),
                        taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
                        completion: @escaping (_ account: String, _ files: [NKFile]?, _ responseData: AFDataResponse<Data>?, _ error: NKError) -> Void) {
-        guard let nkSession = nkCommonInstance.getSession(account: account),
+        guard let nkSession = nkCommonInstance.nksessions.session(forAccount: account),
               let href = ("/files/" + nkSession.userId).urlEncoded  else {
             return options.queue.async { completion(account, nil, nil, .urlError) }
         }
@@ -348,7 +348,7 @@ public extension NextcloudKit {
                      options: NKRequestOptions = NKRequestOptions(),
                      taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
                      completion: @escaping (_ account: String, _ files: [NKFile]?, _ responseData: AFDataResponse<Data>?, _ error: NKError) -> Void) {
-        guard let nkSession = nkCommonInstance.getSession(account: account) else {
+        guard let nkSession = nkCommonInstance.nksessions.session(forAccount: account) else {
             return options.queue.async { completion(account, nil, nil, .urlError) }
         }
         let files: [NKFile] = []
@@ -390,7 +390,7 @@ public extension NextcloudKit {
         ///
         options.contentType = "application/xml"
         ///
-        guard let nkSession = nkCommonInstance.getSession(account: account),
+        guard let nkSession = nkCommonInstance.nksessions.session(forAccount: account),
               let headers = nkCommonInstance.getStandardHeaders(account: account, options: options) else {
             return options.queue.async { completion(account, nil, nil, .urlError) }
         }
@@ -437,7 +437,7 @@ public extension NextcloudKit {
         ///
         options.contentType = "application/xml"
         ///
-        guard let nkSession = nkCommonInstance.getSession(account: account),
+        guard let nkSession = nkCommonInstance.nksessions.session(forAccount: account),
               let headers = nkCommonInstance.getStandardHeaders(account: account, options: options) else {
             return options.queue.async { completion(account, nil, .urlError) }
         }
@@ -489,7 +489,7 @@ public extension NextcloudKit {
         ///
         options.contentType = "application/xml"
         ///
-        guard let nkSession = nkCommonInstance.getSession(account: account),
+        guard let nkSession = nkCommonInstance.nksessions.session(forAccount: account),
               let headers = nkCommonInstance.getStandardHeaders(account: account, options: options) else {
             return options.queue.async { completion(account, nil, nil, .urlError) }
         }
@@ -549,7 +549,7 @@ public extension NextcloudKit {
         ///
         options.contentType = "application/xml"
         ///
-        guard let nkSession = nkCommonInstance.getSession(account: account),
+        guard let nkSession = nkCommonInstance.nksessions.session(forAccount: account),
               var headers = nkCommonInstance.getStandardHeaders(account: account, options: options) else {
             return options.queue.async { completion(account, nil, nil, .urlError) }
         }

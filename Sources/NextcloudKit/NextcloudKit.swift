@@ -87,10 +87,10 @@ open class NextcloudKit {
                               httpMaximumConnectionsPerHostInDownload: Int = 6,
                               httpMaximumConnectionsPerHostInUpload: Int = 6,
                               groupIdentifier: String) {
-        if nkCommonInstance.nksessions.filter({ $0.account == account }).first != nil {
+        if nkCommonInstance.nksessions.contains(account: account) {
             return updateSession(account: account, urlBase: urlBase, userId: userId, password: password, userAgent: userAgent)
         }
-        
+
         let nkSession = NKSession(
             nkCommonInstance: nkCommonInstance,
             urlBase: urlBase,
@@ -115,7 +115,10 @@ open class NextcloudKit {
                               password: String? = nil,
                               userAgent: String? = nil,
                               replaceWithAccount: String? = nil) {
-        guard var nkSession = nkCommonInstance.nksessions.filter({ $0.account == account }).first else { return }
+        guard var nkSession = nkCommonInstance.nksessions.session(forAccount: account) else {
+            return
+        }
+
         if let urlBase {
             nkSession.urlBase = urlBase
         }
@@ -136,18 +139,10 @@ open class NextcloudKit {
         }
     }
 
-    public func removeSession(account: String) {
-        if let index = nkCommonInstance.nksessions.index(where: { $0.account == account}) {
-            nkCommonInstance.nksessions.remove(at: index)
-        }
-    }
-
-    public func getSession(account: String) -> NKSession? {
-        return nkCommonInstance.nksessions.filter({ $0.account == account }).first
-    }
-
     public func deleteCookieStorageForAccount(_ account: String) {
-        guard let nkSession = nkCommonInstance.nksessions.filter({ $0.account == account }).first else { return }
+        guard let nkSession = nkCommonInstance.nksessions.session(forAccount: account) else {
+            return
+        }
 
         if let cookieStore = nkSession.sessionData.session.configuration.httpCookieStorage {
             for cookie in cookieStore.cookies ?? [] {
