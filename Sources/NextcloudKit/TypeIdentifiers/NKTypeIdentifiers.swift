@@ -1,10 +1,7 @@
-// SPDX-FileCopyrightText: Nextcloud GmbH
-// SPDX-FileCopyrightText: 2025 Marino Faggiana
-// SPDX-License-Identifier: GPL-3.0-or-later
-
 import Foundation
 import UniformTypeIdentifiers
 
+/// Resolved file type metadata, used for cache and classification
 public struct NKTypeIdentifierCache: Sendable {
     public let mimeType: String
     public let classFile: String
@@ -14,18 +11,19 @@ public struct NKTypeIdentifierCache: Sendable {
     public let ext: String
 }
 
-/// Actor responsible for resolving file type metadata (UTI, MIME type, icon, class file, etc.) in a thread-safe manner.
-/// Actor responsible for resolving file type metadata (UTI, MIME type, icon, etc.) in a thread-safe manner.
+/// Actor responsible for resolving file type metadata (UTI, MIME type, icon, class file, etc.)
 public actor NKTypeIdentifiers {
-    /// Cache by file extension
-    private var typeIdentifierCache: [String: NKTypeIdentifierCache] = [:]
-    /// Internal file type resolver
+    public static let shared = NKTypeIdentifiers()
+    // Cache: extension → resolved type info
+    private var filePropertyCache: [String: NKTypeIdentifierCache] = [:]
+    // Internal resolver
     private let resolver = NKFilePropertyResolver()
 
     public init() {}
 
-    /// Resolves internal type metadata for a given file.
+    /// Resolves type info from file name and optional MIME type
     public func getInternalType(fileName: String, mimeType inputMimeType: String, directory: Bool, account: String) -> NKTypeIdentifierCache {
+
         var ext = (fileName as NSString).pathExtension.lowercased()
         var mimeType = inputMimeType
         var classFile = ""
@@ -33,39 +31,40 @@ public actor NKTypeIdentifiers {
         var typeIdentifier = ""
         var fileNameWithoutExt = (fileName as NSString).deletingPathExtension
 
-        // Check cache
-        if let cached = typeIdentifierCache[ext] {
-            return cached
-        }
-
-        // Fallback if no extension (e.g. ".bashrc" or folder)
+        // Use full name if no extension
         if ext.isEmpty {
             fileNameWithoutExt = fileName
         }
 
-        // Resolve UTType from extension or fallback to .data
+        // Check cache first
+        if let cached = filePropertyCache[ext] {
+            return cached
+        }
+
+        // Resolve UTType
         let type = UTType(filenameExtension: ext) ?? .data
         typeIdentifier = type.identifier
 
-        // Resolve MIME type if not provided
+        // Resolve MIME type
         if mimeType.isEmpty {
             mimeType = type.preferredMIMEType ?? "application/octet-stream"
         }
 
-        // Special case: folders
+        // Handle folder case
         if directory {
             mimeType = "httpd/unix-directory"
             classFile = NKTypeClassFile.directory.rawValue
             iconName = NKTypeIconFile.directory.rawValue
             typeIdentifier = UTType.folder.identifier
-            ext = ""
             fileNameWithoutExt = fileName
+            ext = ""
         } else {
             let props = resolver.resolve(inUTI: typeIdentifier, account: account)
             classFile = props.classFile.rawValue
             iconName = props.iconName.rawValue
         }
 
+        // Construct result
         let result = NKTypeIdentifierCache(
             mimeType: mimeType,
             classFile: classFile,
@@ -75,18 +74,30 @@ public actor NKTypeIdentifiers {
             ext: ext
         )
 
-        typeIdentifierCache[ext] = result
+        // Cache it
+        filePropertyCache[ext] = result
         return result
+    }
+
+    /// Clears the internal cache (used for testing or reset)
+    public func clearCache() {
+        filePropertyCache.removeAll()
     }
 }
 
+/// Helper class to access NKTypeIdentifiers from sync contexts (e.g. in legacy code or libraries).
 public final class NKTypeIdentifiersHelper {
+    public static let shared = NKTypeIdentifiersHelper()
+
+    /// Internal actor reference (uses NKTypeIdentifiers.shared by default)
     private let actor: NKTypeIdentifiers
 
-    public init(actor: NKTypeIdentifiers) {
+    /// Init with optional custom actor (useful for testing)
+    public init(actor: NKTypeIdentifiers = .shared) {
         self.actor = actor
     }
 
+    /// Synchronously resolves file type info by calling the async actor inside a semaphore block.
     public func getInternalTypeSync(fileName: String, mimeType: String, directory: Bool, account: String) -> NKTypeIdentifierCache {
         var result: NKTypeIdentifierCache?
         let semaphore = DispatchSemaphore(value: 0)

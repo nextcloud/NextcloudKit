@@ -51,8 +51,7 @@ public struct NKCommon: Sendable {
     public var nksessions = SynchronizedNKSessionArray()
     public var delegate: NextcloudKitDelegate?
     public var groupIdentifier: String?
-
-    public let typeIdentifiers = NKTypeIdentifiers()
+    public let typeIdentifiers: NKTypeIdentifiers = .shared
 
     // Foreground
     public let identifierSessionDownload: String = "com.nextcloud.nextcloudkit.session.download"
