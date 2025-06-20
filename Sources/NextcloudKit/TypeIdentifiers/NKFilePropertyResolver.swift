@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 import Foundation
-import MobileCoreServices
+import UniformTypeIdentifiers
 
 public class NKFileProperty: NSObject {
     public var classFile: NKTypeClassFile = .unknow
@@ -39,19 +39,36 @@ public enum NKTypeIconFile: String {
     case xls = "xls"
 }
 
+public enum NKTypeIdentifierResolver {
+
+    public static func preferredFileExtension(for uti: String) -> String? {
+        UTType(uti)?.preferredFilenameExtension
+    }
+
+    public static func typeIdentifier(forExtension ext: String) -> String? {
+        UTType(filenameExtension: ext)?.identifier
+    }
+
+    public static func typeIdentifier(forMIME mime: String) -> String? {
+        UTType(mimeType: mime)?.identifier
+    }
+}
+
 /// Class responsible for resolving NKFileProperty information from a given UTI.
 public final class NKFilePropertyResolver {
 
     public init() {}
 
-    public func resolve(inUTI: CFString, account: String) -> NKFileProperty {
+    public func resolve(inUTI: String, account: String) -> NKFileProperty {
         let fileProperty = NKFileProperty()
         let typeIdentifier = inUTI as String
         let capabilities = NKCapabilities.shared.getCapabilitiesBlocking(for: account)
+        let utiString = inUTI as String
 
         // Preferred extension
-        if let fileExtension = UTTypeCopyPreferredTagWithClass(inUTI, kUTTagClassFilenameExtension) {
-            fileProperty.ext = fileExtension.takeRetainedValue() as String
+        if let type = UTType(utiString),
+           let ext = type.preferredFilenameExtension {
+            fileProperty.ext = ext
         }
 
         // Collabora Nextcloud Text Office
@@ -99,49 +116,66 @@ public final class NKFilePropertyResolver {
         }
 
         // Well-known UTI type classifications
-        if UTTypeConformsTo(inUTI, kUTTypeImage) {
-            fileProperty.classFile = .image
-            fileProperty.iconName = .image
-            fileProperty.name = "image"
-        } else if UTTypeConformsTo(inUTI, kUTTypeMovie) {
-            fileProperty.classFile = .video
-            fileProperty.iconName = .video
-            fileProperty.name = "movie"
-        } else if UTTypeConformsTo(inUTI, kUTTypeAudio) {
-            fileProperty.classFile = .audio
-            fileProperty.iconName = .audio
-            fileProperty.name = "audio"
-        } else if UTTypeConformsTo(inUTI, kUTTypeZipArchive) {
-            fileProperty.classFile = .compress
-            fileProperty.iconName = .compress
-            fileProperty.name = "archive"
-        } else if UTTypeConformsTo(inUTI, kUTTypeHTML) {
-            fileProperty.classFile = .document
-            fileProperty.iconName = .code
-            fileProperty.name = "code"
-        } else if UTTypeConformsTo(inUTI, kUTTypePDF) {
-            fileProperty.classFile = .document
-            fileProperty.iconName = .pdf
-            fileProperty.name = "document"
-        } else if UTTypeConformsTo(inUTI, kUTTypeRTF) {
-            fileProperty.classFile = .document
-            fileProperty.iconName = .txt
-            fileProperty.name = "document"
-        } else if UTTypeConformsTo(inUTI, kUTTypeText) {
-            if fileProperty.ext.isEmpty { fileProperty.ext = "txt" }
-            fileProperty.classFile = .document
-            fileProperty.iconName = .txt
-            fileProperty.name = "text"
-        } else {
-            if UTTypeConformsTo(inUTI, kUTTypeContent) {
+        if let type = UTType(utiString) {
+            if type.conforms(to: .image) {
+                fileProperty.classFile = .image
+                fileProperty.iconName = .image
+                fileProperty.name = "image"
+
+            } else if type.conforms(to: .movie) {
+                fileProperty.classFile = .video
+                fileProperty.iconName = .video
+                fileProperty.name = "movie"
+
+            } else if type.conforms(to: .audio) {
+                fileProperty.classFile = .audio
+                fileProperty.iconName = .audio
+                fileProperty.name = "audio"
+
+            } else if type.conforms(to: .zip) {
+                fileProperty.classFile = .compress
+                fileProperty.iconName = .compress
+                fileProperty.name = "archive"
+
+            } else if type.conforms(to: .html) {
+                fileProperty.classFile = .document
+                fileProperty.iconName = .code
+                fileProperty.name = "code"
+
+            } else if type.conforms(to: .pdf) {
+                fileProperty.classFile = .document
+                fileProperty.iconName = .pdf
+                fileProperty.name = "document"
+
+            } else if type.conforms(to: .rtf) {
+                fileProperty.classFile = .document
+                fileProperty.iconName = .txt
+                fileProperty.name = "document"
+
+            } else if type.conforms(to: .text) {
+                // Default to .txt if extension is empty
+                if fileProperty.ext.isEmpty {
+                    fileProperty.ext = "txt"
+                }
+                fileProperty.classFile = .document
+                fileProperty.iconName = .txt
+                fileProperty.name = "text"
+
+            } else if type.conforms(to: .content) {
                 fileProperty.classFile = .document
                 fileProperty.iconName = .document
                 fileProperty.name = "document"
+
             } else {
                 fileProperty.classFile = .unknow
                 fileProperty.iconName = .unknow
                 fileProperty.name = "file"
             }
+        } else {
+            // tipo UTI non valido
+            fileProperty.classFile = .unknow
+            fileProperty.iconName = .unknow
+            fileProperty.name = "file"
         }
 
         return fileProperty
