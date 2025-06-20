@@ -39,21 +39,6 @@ public enum NKTypeIconFile: String {
     case xls = "xls"
 }
 
-public enum NKTypeIdentifierResolver {
-
-    public static func preferredFileExtension(for uti: String) -> String? {
-        UTType(uti)?.preferredFilenameExtension
-    }
-
-    public static func typeIdentifier(forExtension ext: String) -> String? {
-        UTType(filenameExtension: ext)?.identifier
-    }
-
-    public static func typeIdentifier(forMIME mime: String) -> String? {
-        UTType(mimeType: mime)?.identifier
-    }
-}
-
 /// Class responsible for resolving NKFileProperty information from a given UTI.
 public final class NKFilePropertyResolver {
 
