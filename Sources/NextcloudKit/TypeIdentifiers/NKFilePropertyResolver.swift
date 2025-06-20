@@ -54,6 +54,50 @@ public final class NKFilePropertyResolver {
             fileProperty.ext = fileExtension.takeRetainedValue() as String
         }
 
+        // Collabora Nextcloud Text Office
+        if capabilities.richDocumentsMimetypes.contains(typeIdentifier) {
+            fileProperty.classFile = .document
+            fileProperty.iconName = .document
+            fileProperty.name = "document"
+
+            return fileProperty
+        }
+
+        // Special-case identifiers
+        switch typeIdentifier {
+        case "text/plain", "text/html", "net.daringfireball.markdown", "text/x-markdown":
+            fileProperty.classFile = .document
+            fileProperty.iconName = .document
+            fileProperty.name = "markdown"
+            return fileProperty
+        case "com.microsoft.word.doc":
+            fileProperty.classFile = .document
+            fileProperty.iconName = .document
+            fileProperty.name = "document"
+            return fileProperty
+        case "com.apple.iwork.keynote.key":
+            fileProperty.classFile = .document
+            fileProperty.iconName = .ppt
+            fileProperty.name = "keynote"
+            return fileProperty
+        case "com.microsoft.excel.xls":
+            fileProperty.classFile = .document
+            fileProperty.iconName = .xls
+            fileProperty.name = "sheet"
+            return fileProperty
+        case "com.apple.iwork.numbers.numbers":
+            fileProperty.classFile = .document
+            fileProperty.iconName = .xls
+            fileProperty.name = "numbers"
+            return fileProperty
+        case "com.microsoft.powerpoint.ppt":
+            fileProperty.classFile = .document
+            fileProperty.iconName = .ppt
+            fileProperty.name = "presentation"
+        default:
+            break
+        }
+
         // Well-known UTI type classifications
         if UTTypeConformsTo(inUTI, kUTTypeImage) {
             fileProperty.classFile = .image
@@ -89,53 +133,14 @@ public final class NKFilePropertyResolver {
             fileProperty.iconName = .txt
             fileProperty.name = "text"
         } else {
-            // Special-case identifiers
-            switch typeIdentifier {
-            case "text/plain", "text/html", "net.daringfireball.markdown", "text/x-markdown":
-                fileProperty.classFile = .document
-                fileProperty.iconName = .document
-                fileProperty.name = "markdown"
-
-            case "com.microsoft.word.doc":
+            if UTTypeConformsTo(inUTI, kUTTypeContent) {
                 fileProperty.classFile = .document
                 fileProperty.iconName = .document
                 fileProperty.name = "document"
-
-            case "com.apple.iwork.keynote.key":
-                fileProperty.classFile = .document
-                fileProperty.iconName = .ppt
-                fileProperty.name = "keynote"
-
-            case "com.microsoft.excel.xls":
-                fileProperty.classFile = .document
-                fileProperty.iconName = .xls
-                fileProperty.name = "sheet"
-
-            case "com.apple.iwork.numbers.numbers":
-                fileProperty.classFile = .document
-                fileProperty.iconName = .xls
-                fileProperty.name = "numbers"
-
-            case "com.microsoft.powerpoint.ppt":
-                fileProperty.classFile = .document
-                fileProperty.iconName = .ppt
-                fileProperty.name = "presentation"
-
-            default:
-                // Check against Collabora mimetypes
-                if capabilities.richDocumentsMimetypes.contains(typeIdentifier) {
-                    fileProperty.classFile = .document
-                    fileProperty.iconName = .document
-                    fileProperty.name = "document"
-                } else if UTTypeConformsTo(inUTI, kUTTypeContent) {
-                    fileProperty.classFile = .document
-                    fileProperty.iconName = .document
-                    fileProperty.name = "document"
-                } else {
-                    fileProperty.classFile = .unknow
-                    fileProperty.iconName = .unknow
-                    fileProperty.name = "file"
-                }
+            } else {
+                fileProperty.classFile = .unknow
+                fileProperty.iconName = .unknow
+                fileProperty.name = "file"
             }
         }
 

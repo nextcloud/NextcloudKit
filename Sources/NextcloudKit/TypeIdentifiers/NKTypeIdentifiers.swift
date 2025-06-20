@@ -95,14 +95,12 @@ public final class NKTypeIdentifiersHelper {
                                                                                                               typeIdentifier: String,
                                                                                                               fileNameWithoutExt: String,
                                                                                                               ext: String) {
-        var result: (
-            mimeType: String,
-            classFile: String,
-            iconName: String,
-            typeIdentifier: String,
-            fileNameWithoutExt: String,
-            ext: String
-        )!
+        var result: (mimeType: String,
+                     classFile: String,
+                     iconName: String,
+                     typeIdentifier: String,
+                     fileNameWithoutExt: String,
+                     ext: String)!
 
         let semaphore = DispatchSemaphore(value: 0)
 
