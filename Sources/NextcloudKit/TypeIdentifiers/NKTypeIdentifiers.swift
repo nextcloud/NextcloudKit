@@ -75,7 +75,10 @@ public actor NKTypeIdentifiers {
         )
 
         // Cache it
-        filePropertyCache[ext] = result
+        if !ext.isEmpty {
+            filePropertyCache[ext] = result
+        }
+
         return result
     }
 
