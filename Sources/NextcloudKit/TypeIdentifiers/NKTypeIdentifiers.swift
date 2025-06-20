@@ -15,17 +15,17 @@ public struct NKTypeIdentifierCache: Sendable {
 }
 
 /// Actor responsible for resolving file type metadata (UTI, MIME type, icon, class file, etc.) in a thread-safe manner.
+/// Actor responsible for resolving file type metadata (UTI, MIME type, icon, etc.) in a thread-safe manner.
 public actor NKTypeIdentifiers {
+    /// Cache by file extension
     private var filePropertyCache: [String: NKTypeIdentifierCache] = [:]
-    private var mimeTypeCache: [String: String] = [:]
-    private var filePropertiesCache: [String: NKFileProperty] = [:]
+    /// Internal file type resolver
     private let resolver = NKFilePropertyResolver()
 
     public init() {}
 
     /// Resolves internal type metadata for a given file.
     public func getInternalType(fileName: String, mimeType inputMimeType: String, directory: Bool, account: String) -> NKTypeIdentifierCache {
-        // Extract file extension
         var ext = (fileName as NSString).pathExtension.lowercased()
         var mimeType = inputMimeType
         var classFile = ""
@@ -33,59 +33,39 @@ public actor NKTypeIdentifiers {
         var typeIdentifier = ""
         var fileNameWithoutExt = (fileName as NSString).deletingPathExtension
 
-        // Try cached result
+        // Check cache
         if let cached = filePropertyCache[ext] {
             return cached
         }
 
-        // Resolve UTI from extension
-        guard let type = UTType(filenameExtension: ext) else {
-            return NKTypeIdentifierCache(
-                mimeType: mimeType,
-                classFile: classFile,
-                iconName: iconName,
-                typeIdentifier: typeIdentifier,
-                fileNameWithoutExt: fileNameWithoutExt,
-                ext: ext
-            )
+        // Fallback if no extension (e.g. ".bashrc" or folder)
+        if ext.isEmpty {
+            fileNameWithoutExt = fileName
         }
 
-        let uti = type.identifier
-        typeIdentifier = uti
+        // Resolve UTType from extension or fallback to .data
+        let type = UTType(filenameExtension: ext) ?? .data
+        typeIdentifier = type.identifier
 
-        // Detect MIME type from UTI
+        // Resolve MIME type if not provided
         if mimeType.isEmpty {
-            if let cachedMime = mimeTypeCache[typeIdentifier] {
-                mimeType = cachedMime
-            } else if let mime = UTType(typeIdentifier)?.preferredMIMEType {
-                mimeType = mime
-                mimeTypeCache[typeIdentifier] = mime
-            }
+            mimeType = type.preferredMIMEType ?? "application/octet-stream"
         }
 
-        // Special case for folders
+        // Special case: folders
         if directory {
             mimeType = "httpd/unix-directory"
             classFile = NKTypeClassFile.directory.rawValue
             iconName = NKTypeIconFile.directory.rawValue
             typeIdentifier = UTType.folder.identifier
-            fileNameWithoutExt = fileName
             ext = ""
+            fileNameWithoutExt = fileName
         } else {
-            // Lookup file classification and icon
-            let fileProps: NKFileProperty
-            if let cachedProps = filePropertiesCache[typeIdentifier] {
-                fileProps = cachedProps
-            } else {
-                fileProps = resolver.resolve(inUTI: typeIdentifier, account: account)
-                filePropertiesCache[typeIdentifier] = fileProps
-            }
-
-            classFile = fileProps.classFile.rawValue
-            iconName = fileProps.iconName.rawValue
+            let props = resolver.resolve(inUTI: typeIdentifier, account: account)
+            classFile = props.classFile.rawValue
+            iconName = props.iconName.rawValue
         }
 
-        // Step 7: Assemble cache object
         let result = NKTypeIdentifierCache(
             mimeType: mimeType,
             classFile: classFile,
@@ -95,7 +75,6 @@ public actor NKTypeIdentifiers {
             ext: ext
         )
 
-        // Step 8: Cache result for reuse
         filePropertyCache[ext] = result
         return result
     }
