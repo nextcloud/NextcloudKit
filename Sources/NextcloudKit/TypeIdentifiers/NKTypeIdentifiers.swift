@@ -21,7 +21,7 @@ public actor NKTypeIdentifiers {
 
     private init() {}
 
-    /// Resolves type info from file name and optional MIME type
+    // Resolves type info from file name and optional MIME type
     public func getInternalType(fileName: String, mimeType inputMimeType: String, directory: Bool, account: String) -> NKTypeIdentifierCache {
 
         var ext = (fileName as NSString).pathExtension.lowercased()
@@ -82,7 +82,7 @@ public actor NKTypeIdentifiers {
         return result
     }
 
-    /// Clears the internal cache (used for testing or reset)
+    // Clears the internal cache (used for testing or reset)
     public func clearCache() {
         filePropertyCache.removeAll()
     }
@@ -92,19 +92,19 @@ public actor NKTypeIdentifiers {
 public final class NKTypeIdentifiersHelper {
     public static let shared = NKTypeIdentifiersHelper()
 
-    /// Internal actor reference (uses NKTypeIdentifiers.shared by default)
+    // Internal actor reference (uses NKTypeIdentifiers.shared by default)
     private let actor: NKTypeIdentifiers
 
     private init() {
         self.actor = .shared
     }
 
-    /// Init with optional custom actor (useful for testing)
+    // Init with optional custom actor (useful for testing)
     public init(actor: NKTypeIdentifiers = .shared) {
         self.actor = actor
     }
 
-    /// Synchronously resolves file type info by calling the async actor inside a semaphore block.
+    // Synchronously resolves file type info by calling the async actor inside a semaphore block.
     public func getInternalTypeSync(fileName: String, mimeType: String, directory: Bool, account: String) -> NKTypeIdentifierCache {
         var result: NKTypeIdentifierCache?
         let semaphore = DispatchSemaphore(value: 0)
