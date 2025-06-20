@@ -19,7 +19,7 @@ public actor NKTypeIdentifiers {
     // Internal resolver
     private let resolver = NKFilePropertyResolver()
 
-    public init() {}
+    private init() {}
 
     /// Resolves type info from file name and optional MIME type
     public func getInternalType(fileName: String, mimeType inputMimeType: String, directory: Bool, account: String) -> NKTypeIdentifierCache {
@@ -94,6 +94,10 @@ public final class NKTypeIdentifiersHelper {
 
     /// Internal actor reference (uses NKTypeIdentifiers.shared by default)
     private let actor: NKTypeIdentifiers
+
+    private init() {
+        self.actor = .shared
+    }
 
     /// Init with optional custom actor (useful for testing)
     public init(actor: NKTypeIdentifiers = .shared) {
