@@ -80,7 +80,7 @@ public struct NKFile: Sendable {
     }
     public var exifPhotos: [[String: String?]]
     public var placePhotos: String?
-    public var typeIdentifier: String?
+    public var typeIdentifier: String
 
     public init(
         account: String = "",
