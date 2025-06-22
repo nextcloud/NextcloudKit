@@ -540,6 +540,8 @@ public class NKDataFileXML: NSObject {
             file.iconName = results.iconName
             file.name = "files"
             file.classFile = results.classFile
+            file.typeIdentifier = results.typeIdentifier
+
             file.urlBase = nkSession.urlBase
             file.user = nkSession.user
             file.userId = nkSession.userId
@@ -649,6 +651,7 @@ public class NKDataFileXML: NSObject {
             file.contentType = results.mimeType
             file.classFile = results.classFile
             file.iconName = results.iconName
+            file.typeIdentifier = results.typeIdentifier
 
             files.append(file)
         }
