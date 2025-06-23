@@ -39,11 +39,10 @@ public extension NextcloudKit {
         } .downloadProgress { progress in
             options.queue.async { progressHandler(progress) }
         } .responseData(queue: self.nkCommonInstance.backgroundQueue) { response in
-            let headers = response.response?.allHeaderFields
             switch response.result {
             case .failure(let error):
                 let resultError = NKError(error: error, afResponse: response, responseData: nil)
-                options.queue.async { completionHandler(account, nil, nil, 0, headers, error, resultError) }
+                options.queue.async { completionHandler(account, nil, nil, 0, response.response?.allHeaderFields, error, resultError) }
             case .success:
                 var date: Date?
                 var etag: String?
@@ -64,7 +63,7 @@ public extension NextcloudKit {
                     date = dateRaw.parsedDate(using: "yyyy-MM-dd HH:mm:ss")
                 }
 
-                options.queue.async { completionHandler(account, etag, date, length, headers, nil, .success) }
+                options.queue.async { completionHandler(account, etag, date, length, response.response?.allHeaderFields, nil, .success) }
             }
         }
 

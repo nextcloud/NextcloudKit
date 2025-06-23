@@ -17,7 +17,7 @@ public extension NextcloudKit {
                 requestHandler: @escaping (_ request: UploadRequest) -> Void = { _ in },
                 taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
                 progressHandler: @escaping (_ progress: Progress) -> Void = { _ in },
-                completionHandler: @escaping (_ account: String, _ ocId: String?, _ etag: String?, _ date: Date?, _ size: Int64, _ responseData: AFDataResponse<Data>?, _ nkError: NKError) -> Void) {
+                completionHandler: @escaping (_ account: String, _ ocId: String?, _ etag: String?, _ date: Date?, _ size: Int64, _ headers: [AnyHashable: Any]?, _ nkError: NKError) -> Void) {
         var convertible: URLConvertible?
         var uploadedSize: Int64 = 0
         var uploadCompleted = false
@@ -81,7 +81,7 @@ public extension NextcloudKit {
             }
 
             options.queue.async {
-                completionHandler(account, ocId, etag, date, uploadedSize, response, result)
+                completionHandler(account, ocId, etag, date, uploadedSize, response.response?.allHeaderFields, result)
             }
         }
 
