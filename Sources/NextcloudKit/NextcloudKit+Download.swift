@@ -14,7 +14,7 @@ public extension NextcloudKit {
                   requestHandler: @escaping (_ request: DownloadRequest) -> Void = { _ in },
                   taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
                   progressHandler: @escaping (_ progress: Progress) -> Void = { _ in },
-                  completionHandler: @escaping (_ account: String, _ etag: String?, _ date: Date?, _ lenght: Int64, _ afError: AFError?, _ nKError: NKError) -> Void) {
+                  completionHandler: @escaping (_ account: String, _ etag: String?, _ date: Date?, _ lenght: Int64, _ headers: [AnyHashable: Any]?, _ afError: AFError?, _ nKError: NKError) -> Void) {
         var convertible: URLConvertible?
         if serverUrlFileName is URL {
             convertible = serverUrlFileName as? URLConvertible
@@ -24,7 +24,7 @@ public extension NextcloudKit {
         guard let url = convertible,
               let nkSession = nkCommonInstance.nksessions.session(forAccount: account),
               let headers = nkCommonInstance.getStandardHeaders(account: account, options: options) else {
-            return options.queue.async { completionHandler(account, nil, nil, 0, nil, .urlError) }
+            return options.queue.async { completionHandler(account, nil, nil, 0, nil, nil, .urlError) }
         }
         var destination: Alamofire.DownloadRequest.Destination?
         let fileNamePathLocalDestinationURL = NSURL.fileURL(withPath: fileNameLocalPath)
@@ -39,10 +39,11 @@ public extension NextcloudKit {
         } .downloadProgress { progress in
             options.queue.async { progressHandler(progress) }
         } .responseData(queue: self.nkCommonInstance.backgroundQueue) { response in
+            let headers = response.response?.allHeaderFields
             switch response.result {
             case .failure(let error):
                 let resultError = NKError(error: error, afResponse: response, responseData: nil)
-                options.queue.async { completionHandler(account, nil, nil, 0, error, resultError) }
+                options.queue.async { completionHandler(account, nil, nil, 0, headers, error, resultError) }
             case .success:
                 var date: Date?
                 var etag: String?
@@ -63,7 +64,7 @@ public extension NextcloudKit {
                     date = dateRaw.parsedDate(using: "yyyy-MM-dd HH:mm:ss")
                 }
 
-                options.queue.async { completionHandler(account, etag, date, length, nil, .success) }
+                options.queue.async { completionHandler(account, etag, date, length, headers, nil, .success) }
             }
         }
 
