@@ -163,6 +163,29 @@ public extension NextcloudKit {
         }
     }
 
+    // Async wrapper for getE2EEMetadata
+    func getE2EEMetadataAsync(fileId: String,
+                              e2eToken: String? = nil,
+                              account: String,
+                              options: NKRequestOptions = NKRequestOptions(),
+                              taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in }) async -> Result<(e2eMetadata: String?, signature: String?, responseData: AFDataResponse<Data>), NKError> {
+        await withCheckedContinuation { continuation in
+            getE2EEMetadata(
+                fileId: fileId,
+                e2eToken: e2eToken,
+                account: account,
+                options: options,
+                taskHandler: taskHandler
+            ) { account, e2eMetadata, signature, responseData, error in
+                if error == .success {
+                    continuation.resume(returning: .success((e2eMetadata, signature, responseData!)))
+                } else {
+                    continuation.resume(returning: .failure(error))
+                }
+            }
+        }
+    }
+
     func putE2EEMetadata(fileId: String,
                          e2eToken: String,
                          e2eMetadata: String?,
