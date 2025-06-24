@@ -13,7 +13,7 @@ public extension NextcloudKit {
                       taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
                       completion: @escaping (_ account: String, _ responseData: AFDataResponse<Data>?, _ error: NKError) -> Void) {
         guard let url = serverUrlfileNamePath.encodedToUrl,
-              let nkSession = nkCommonInstance.getSession(account: account) else {
+              let nkSession = nkCommonInstance.nksessions.session(forAccount: account) else {
             return options.queue.async { completion(account, nil, .urlError) }
         }
         let method = HTTPMethod(rawValue: "PROPPATCH")

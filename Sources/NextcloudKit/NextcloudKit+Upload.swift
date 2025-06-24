@@ -17,7 +17,7 @@ public extension NextcloudKit {
                 requestHandler: @escaping (_ request: UploadRequest) -> Void = { _ in },
                 taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
                 progressHandler: @escaping (_ progress: Progress) -> Void = { _ in },
-                completionHandler: @escaping (_ account: String, _ ocId: String?, _ etag: String?, _ date: Date?, _ size: Int64, _ responseData: AFDataResponse<Data>?, _ nkError: NKError) -> Void) {
+                completionHandler: @escaping (_ account: String, _ ocId: String?, _ etag: String?, _ date: Date?, _ size: Int64, _ headers: [AnyHashable: Any]?, _ nkError: NKError) -> Void) {
         var convertible: URLConvertible?
         var uploadedSize: Int64 = 0
         var uploadCompleted = false
@@ -28,7 +28,7 @@ public extension NextcloudKit {
             convertible = (serverUrlFileName as? String)?.encodedToUrl
         }
         guard let url = convertible,
-              let nkSession = nkCommonInstance.getSession(account: account),
+              let nkSession = nkCommonInstance.nksessions.session(forAccount: account),
               var headers = nkCommonInstance.getStandardHeaders(account: account, options: options) else {
             return options.queue.async { completionHandler(account, nil, nil, nil, 0, nil, .urlError) }
         }
@@ -81,7 +81,7 @@ public extension NextcloudKit {
             }
 
             options.queue.async {
-                completionHandler(account, ocId, etag, date, uploadedSize, response, result)
+                completionHandler(account, ocId, etag, date, uploadedSize, response.response?.allHeaderFields, result)
             }
         }
 
@@ -120,7 +120,7 @@ public extension NextcloudKit {
                      uploaded: @escaping (_ fileChunk: (fileName: String, size: Int64)) -> Void = { _ in },
                      completion: @escaping (_ account: String, _ filesChunk: [(fileName: String, size: Int64)]?, _ file: NKFile?, _ error: NKError) -> Void) {
 
-        guard let nkSession = nkCommonInstance.getSession(account: account) else {
+        guard let nkSession = nkCommonInstance.nksessions.session(forAccount: account) else {
             return completion(account, nil, nil, .urlError)
         }
         let fileNameLocalSize = self.nkCommonInstance.getFileSize(filePath: directory + "/" + fileName)
