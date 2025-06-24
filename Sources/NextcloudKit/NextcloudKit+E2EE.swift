@@ -168,7 +168,7 @@ public extension NextcloudKit {
                               e2eToken: String? = nil,
                               account: String,
                               options: NKRequestOptions = NKRequestOptions(),
-                              taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in }) async -> (account: String, e2eToken: String?, responseData: AFDataResponse<Data>?, error: NKError)  {
+                              taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in }) async -> (account: String, e2eMetadata: String?, signature: String?, responseData: AFDataResponse<Data>?, error: NKError)  {
         await withCheckedContinuation { continuation in
             getE2EEMetadata(
                 fileId: fileId,
@@ -177,7 +177,7 @@ public extension NextcloudKit {
                 options: options,
                 taskHandler: taskHandler
             ) { account, e2eMetadata, signature, responseData, error in
-                continuation.resume(returning: (account: account, e2eToken: e2eToken, responseData: responseData, error: error))
+                continuation.resume(returning: (account: account, e2eMetadata: e2eMetadata, signature: signature, responseData: responseData, error: error))
             }
         }
     }
