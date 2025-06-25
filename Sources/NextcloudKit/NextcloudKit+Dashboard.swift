@@ -42,6 +42,29 @@ public extension NextcloudKit {
         options.queue.async { request(dashboardRequest) }
     }
 
+    func getDashboardWidgetAsync(account: String,
+                                 options: NKRequestOptions = NKRequestOptions(),
+                                 taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in }) async -> (account: String,
+                                                                                                               dashboardWidgets: [NCCDashboardWidget]?,
+                                                                                                               responseData: AFDataResponse<Data>?,
+                                                                                                               request: DataRequest?,
+                                                                                                               task: URLSessionTask?,
+                                                                                                               error: NKError) {
+        await withCheckedContinuation { continuation in
+            var capturedRequest: DataRequest?
+            var capturedTask: URLSessionTask?
+
+            getDashboardWidget(account: account, options: options, request: { req in
+                    capturedRequest = req
+            }, taskHandler: { task in
+                capturedTask = task
+                taskHandler(task) // lo inoltriamo comunque al chiamante
+            }, completion: { account, widgets, response, error in
+                continuation.resume(returning: (account, widgets, response, capturedRequest, capturedTask, error))
+            })
+        }
+    }
+
     func getDashboardWidgetsApplication(_ items: String,
                                         account: String,
                                         options: NKRequestOptions = NKRequestOptions(),
@@ -76,6 +99,30 @@ public extension NextcloudKit {
             }
         }
         options.queue.async { request(dashboardRequest) }
+    }
+
+    func getDashboardWidgetsApplicationAsync(_ items: String,
+                                             account: String,
+                                             options: NKRequestOptions = NKRequestOptions(),
+                                             taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in }) async -> (account: String,
+                                                                                                                           dashboardApplications: [NCCDashboardApplication]?,
+                                                                                                                           responseData: AFDataResponse<Data>?,
+                                                                                                                           request: DataRequest?,
+                                                                                                                           task: URLSessionTask?,
+                                                                                                                           error: NKError) {
+        await withCheckedContinuation { continuation in
+            var capturedRequest: DataRequest?
+            var capturedTask: URLSessionTask?
+
+            getDashboardWidgetsApplication(items, account: account, options: options, request: { req in
+                    capturedRequest = req
+            }, taskHandler: { task in
+                capturedTask = task
+                taskHandler(task) // propaghiamo al chiamante
+            }, completion: { account, apps, response, error in
+                continuation.resume(returning: (account, apps, response, capturedRequest, capturedTask, error ))
+            })
+        }
     }
 }
 
