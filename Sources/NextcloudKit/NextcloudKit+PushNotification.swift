@@ -50,6 +50,13 @@ public extension NextcloudKit {
         }
     }
 
+    func subscribingPushNotificationAsync(serverUrl: String, pushTokenHash: String, devicePublicKey: String, proxyServerUrl: String, account: String, options: NKRequestOptions = NKRequestOptions()) async -> (account: String, deviceIdentifier: String?, signature: String?,publicKey: String?, responseData: AFDataResponse<Data>?, error: NKError) {
+        await withCheckedContinuation { continuation in
+            subscribingPushNotification(serverUrl: serverUrl, pushTokenHash: pushTokenHash, devicePublicKey: devicePublicKey, proxyServerUrl: proxyServerUrl, account: account, options: options, taskHandler: { _ in }, completion: { account, deviceIdentifier, signature, publicKey, responseData, error in continuation.resume( returning: (account, deviceIdentifier, signature, publicKey, responseData, error))
+            })
+        }
+    }
+
     func unsubscribingPushNotification(serverUrl: String,
                                        account: String,
                                        options: NKRequestOptions = NKRequestOptions(),
@@ -74,6 +81,15 @@ public extension NextcloudKit {
                 options.queue.async { completion(account, response, .success) }
             }
         }
+    }
+
+    func unsubscribingPushNotificationAsync(serverUrl: String, account: String, options: NKRequestOptions = NKRequestOptions()) async -> (account: String, responseData: AFDataResponse<Data>?, error: NKError) {
+        await withCheckedContinuation { continuation in
+            unsubscribingPushNotification(serverUrl: serverUrl, account: account, options: options, taskHandler: { _ in },
+                                          completion: { account, responseData, error in
+                continuation.resume(returning: (account, responseData, error)
+                )}
+            )}
     }
 
     func subscribingPushProxy(proxyServerUrl: String,
@@ -113,6 +129,33 @@ public extension NextcloudKit {
         }
     }
 
+    func subscribingPushProxyAsync(
+        proxyServerUrl: String,
+        pushToken: String,
+        deviceIdentifier: String,
+        signature: String,
+        publicKey: String,
+        account: String,
+        options: NKRequestOptions = NKRequestOptions()) async -> (account: String,
+                                                                  responseData: AFDataResponse<Data>?,
+                                                                  error: NKError) {
+        await withCheckedContinuation { continuation in
+            subscribingPushProxy(
+                proxyServerUrl: proxyServerUrl,
+                pushToken: pushToken,
+                deviceIdentifier: deviceIdentifier,
+                signature: signature,
+                publicKey: publicKey,
+                account: account,
+                options: options,
+                taskHandler: { _ in },
+                completion: { account, responseData, error in
+                    continuation.resume(returning: (account, responseData, error))
+                }
+            )
+        }
+    }
+
     func unsubscribingPushProxy(proxyServerUrl: String,
                                 deviceIdentifier: String,
                                 signature: String,
@@ -145,6 +188,32 @@ public extension NextcloudKit {
             case .success:
                 options.queue.async { completion(account, response, .success) }
             }
+        }
+    }
+
+    func unsubscribingPushProxyAsync(
+        proxyServerUrl: String,
+        deviceIdentifier: String,
+        signature: String,
+        publicKey: String,
+        account: String,
+        options: NKRequestOptions = NKRequestOptions()
+    ) async -> (account: String,
+                responseData: AFDataResponse<Data>?,
+                error: NKError) {
+        await withCheckedContinuation { continuation in
+            unsubscribingPushProxy(
+                proxyServerUrl: proxyServerUrl,
+                deviceIdentifier: deviceIdentifier,
+                signature: signature,
+                publicKey: publicKey,
+                account: account,
+                options: options,
+                taskHandler: { _ in },
+                completion: { account, responseData, error in
+                    continuation.resume(returning: (account, responseData, error))
+                }
+            )
         }
     }
 }
