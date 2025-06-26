@@ -50,10 +50,43 @@ public extension NextcloudKit {
         }
     }
 
-    func subscribingPushNotificationAsync(serverUrl: String, pushTokenHash: String, devicePublicKey: String, proxyServerUrl: String, account: String, options: NKRequestOptions = NKRequestOptions()) async -> (account: String, deviceIdentifier: String?, signature: String?,publicKey: String?, responseData: AFDataResponse<Data>?, error: NKError) {
+    func subscribingPushNotificationAsync(
+        serverUrl: String,
+        pushTokenHash: String,
+        devicePublicKey: String,
+        proxyServerUrl: String,
+        account: String,
+        options: NKRequestOptions = NKRequestOptions()
+    ) async -> (
+        account: String,
+        deviceIdentifier: String?,
+        signature: String?,
+        publicKey: String?,
+        responseData: AFDataResponse<Data>?,
+        error: NKError
+    ) {
         await withCheckedContinuation { continuation in
-            subscribingPushNotification(serverUrl: serverUrl, pushTokenHash: pushTokenHash, devicePublicKey: devicePublicKey, proxyServerUrl: proxyServerUrl, account: account, options: options, taskHandler: { _ in }, completion: { account, deviceIdentifier, signature, publicKey, responseData, error in continuation.resume( returning: (account, deviceIdentifier, signature, publicKey, responseData, error))
-            })
+            subscribingPushNotification(
+                serverUrl: serverUrl,
+                pushTokenHash: pushTokenHash,
+                devicePublicKey: devicePublicKey,
+                proxyServerUrl: proxyServerUrl,
+                account: account,
+                options: options,
+                taskHandler: { _ in },
+                completion: { account, deviceIdentifier, signature, publicKey, responseData, error in
+                    continuation.resume(
+                        returning: (
+                            account,
+                            deviceIdentifier,
+                            signature,
+                            publicKey,
+                            responseData,
+                            error
+                        )
+                    )
+                }
+            )
         }
     }
 
@@ -83,13 +116,32 @@ public extension NextcloudKit {
         }
     }
 
-    func unsubscribingPushNotificationAsync(serverUrl: String, account: String, options: NKRequestOptions = NKRequestOptions()) async -> (account: String, responseData: AFDataResponse<Data>?, error: NKError) {
+    func unsubscribingPushNotificationAsync(
+        serverUrl: String,
+        account: String,
+        options: NKRequestOptions = NKRequestOptions()
+    ) async -> (
+        account: String,
+        responseData: AFDataResponse<Data>?,
+        error: NKError
+    ) {
         await withCheckedContinuation { continuation in
-            unsubscribingPushNotification(serverUrl: serverUrl, account: account, options: options, taskHandler: { _ in },
-                                          completion: { account, responseData, error in
-                continuation.resume(returning: (account, responseData, error)
-                )}
-            )}
+            unsubscribingPushNotification(
+                serverUrl: serverUrl,
+                account: account,
+                options: options,
+                taskHandler: { _ in },
+                completion: { account, responseData, error in
+                    continuation.resume(
+                        returning: (
+                            account,
+                            responseData,
+                            error
+                        )
+                    )
+                }
+            )
+        }
     }
 
     func subscribingPushProxy(proxyServerUrl: String,
