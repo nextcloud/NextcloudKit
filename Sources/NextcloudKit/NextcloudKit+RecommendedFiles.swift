@@ -7,6 +7,15 @@ import Alamofire
 import SwiftyJSON
 
 public extension NextcloudKit {
+    // Retrieves a list of recommended files from the server.
+    //
+    // Parameters:
+    // - account: The Nextcloud account used to perform the request.
+    // - options: Optional configuration for headers, queue, versioning, etc.
+    // - request: Optional callback to observe or manipulate the underlying DataRequest.
+    // - taskHandler: Callback triggered when the URLSessionTask is created.
+    // - completion: Completion handler returning the account, the list of recommendations,
+    //               the raw response data, and an NKError result.
     func getRecommendedFiles(account: String,
                              options: NKRequestOptions = NKRequestOptions(),
                              request: @escaping (DataRequest?) -> Void = { _ in },
@@ -48,12 +57,36 @@ public extension NextcloudKit {
         options.queue.async { request(tosRequest) }
     }
 
+    /// Asynchronously fetches a list of recommended files for the given account.
+    ///
+    /// - Parameters:
+    ///   - account: The Nextcloud account requesting the recommendations.
+    ///   - options: Optional configuration for queue, headers, etc.
+    ///   - request: Optional callback to capture the DataRequest object.
+    ///   - taskHandler: Optional handler for the URLSessionTask.
+    /// - Returns: A tuple containing the account, list of recommended files, raw response data, and NKError result.
     func getRecommendedFilesAsync(account: String,
-                                  options: NKRequestOptions = NKRequestOptions()) async -> (account: String, recommendations: [NKRecommendation]?, responseData: AFDataResponse<Data>?, error: NKError) {
-        await withUnsafeContinuation({ continuation in
-            NextcloudKit.shared.getRecommendedFiles(account: account, options: options) { account, recommendations, responseData, error in
-            continuation.resume(returning: (account: account, recommendations: recommendations, responseData: responseData, error: error))
+                                  options: NKRequestOptions = NKRequestOptions(),
+                                  request: @escaping (DataRequest?) -> Void = { _ in },
+                                  taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in }
+    ) async -> (
+        account: String,
+        recommendations: [NKRecommendation]?,
+        responseData: AFDataResponse<Data>?,
+        error: NKError
+    ) {
+        await withCheckedContinuation { continuation in
+            getRecommendedFiles(account: account,
+                                options: options,
+                                request: request,
+                                taskHandler: taskHandler) { account, recommendations, responseData, error in
+                continuation.resume(returning: (
+                    account: account,
+                    recommendations: recommendations,
+                    responseData: responseData,
+                    error: error
+                ))
             }
-        })
+        }
     }
 }
