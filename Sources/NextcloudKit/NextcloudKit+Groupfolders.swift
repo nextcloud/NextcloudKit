@@ -8,6 +8,15 @@ import Alamofire
 import SwiftyJSON
 
 public extension NextcloudKit {
+    /// Retrieves the list of available group folders for the given Nextcloud account.
+    /// Group folders are shared spaces available across users and groups,
+    /// managed via the groupfolders app.
+    ///
+    /// Parameters:
+    /// - account: The Nextcloud account requesting the list of group folders.
+    /// - options: Optional request options (e.g., API version, custom headers, queue).
+    /// - taskHandler: Closure to access the underlying URLSessionTask.
+    /// - completion: Completion handler returning the account, list of group folders, response, and any NKError.
     func getGroupfolders(account: String,
                          options: NKRequestOptions = NKRequestOptions(),
                          taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
@@ -43,6 +52,35 @@ public extension NextcloudKit {
                     }
                 }
                 options.queue.async { completion(account, results, response, .success) }
+            }
+        }
+    }
+
+    /// Asynchronously retrieves the list of Groupfolders associated with the given account.
+    /// - Parameters:
+    ///   - account: The Nextcloud account identifier.
+    ///   - options: Optional request configuration (headers, queue, etc.).
+    ///   - taskHandler: Optional monitoring of the `URLSessionTask`.
+    /// - Returns: A tuple containing the account, an optional array of `NKGroupfolders`, the response data, and an `NKError`.
+    func getGroupfoldersAsync(account: String,
+                              options: NKRequestOptions = NKRequestOptions(),
+                              taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in }
+    ) async -> (
+        account: String,
+        results: [NKGroupfolders]?,
+        responseData: AFDataResponse<Data>?,
+        error: NKError
+    ) {
+        await withCheckedContinuation { continuation in
+            getGroupfolders(account: account,
+                            options: options,
+                            taskHandler: taskHandler) { account, results, responseData, error in
+                continuation.resume(returning: (
+                    account: account,
+                    results: results,
+                    responseData: responseData,
+                    error: error
+                ))
             }
         }
     }

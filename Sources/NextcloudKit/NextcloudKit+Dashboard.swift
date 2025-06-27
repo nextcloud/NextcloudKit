@@ -7,6 +7,15 @@ import Alamofire
 import SwiftyJSON
 
 public extension NextcloudKit {
+    /// Retrieves the list of dashboard widgets available for the specified Nextcloud account.
+    /// This typically calls the dashboard API endpoint and returns a list of `NCCDashboardWidget` items.
+    ///
+    /// Parameters:
+    /// - account: The Nextcloud account performing the request.
+    /// - options: Optional request options such as custom headers or retry policy (default is empty).
+    /// - request: A closure that receives the underlying Alamofire `DataRequest`, useful for inspection or mutation.
+    /// - taskHandler: A closure to access the `URLSessionTask` for progress or cancellation control.
+    /// - completion: Completion handler returning the account, list of widgets, the raw response, and any NKError.
     func getDashboardWidget(account: String,
                             options: NKRequestOptions = NKRequestOptions(),
                             request: @escaping (DataRequest?) -> Void = { _ in },
@@ -42,29 +51,48 @@ public extension NextcloudKit {
         options.queue.async { request(dashboardRequest) }
     }
 
+    /// Asynchronously fetches the dashboard widgets available for a specific account.
+    /// - Parameters:
+    ///   - account: The account from which to fetch the widgets.
+    ///   - options: Optional configuration for the request.
+    ///   - request: Optional handler to capture the `DataRequest`.
+    ///   - taskHandler: Optional handler for the `URLSessionTask`.
+    /// - Returns: A tuple with the account, list of widgets, raw response, and NKError.
     func getDashboardWidgetAsync(account: String,
                                  options: NKRequestOptions = NKRequestOptions(),
-                                 taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in }) async -> (account: String,
-                                                                                                               dashboardWidgets: [NCCDashboardWidget]?,
-                                                                                                               responseData: AFDataResponse<Data>?,
-                                                                                                               request: DataRequest?,
-                                                                                                               task: URLSessionTask?,
-                                                                                                               error: NKError) {
+                                 request: @escaping (DataRequest?) -> Void = { _ in },
+                                 taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in }
+    ) async -> (
+        account: String,
+        dashboardWidgets: [NCCDashboardWidget]?,
+        responseData: AFDataResponse<Data>?,
+        error: NKError
+    ) {
         await withCheckedContinuation { continuation in
-            var capturedRequest: DataRequest?
-            var capturedTask: URLSessionTask?
-
-            getDashboardWidget(account: account, options: options, request: { req in
-                    capturedRequest = req
-            }, taskHandler: { task in
-                capturedTask = task
-                taskHandler(task) // lo inoltriamo comunque al chiamante
-            }, completion: { account, widgets, response, error in
-                continuation.resume(returning: (account, widgets, response, capturedRequest, capturedTask, error))
-            })
+            getDashboardWidget(account: account,
+                               options: options,
+                               request: request,
+                               taskHandler: taskHandler) { account, dashboardWidgets, responseData, error in
+                continuation.resume(returning: (
+                    account: account,
+                    dashboardWidgets: dashboardWidgets,
+                    responseData: responseData,
+                    error: error
+                ))
+            }
         }
     }
 
+    /// Retrieves the list of dashboard application widgets for the specified account and item string.
+    /// This is typically used to fetch available dashboard apps filtered by `items` (e.g., "weather,tasks").
+    ///
+    /// Parameters:
+    /// - items: A comma-separated string representing widget types or categories to fetch.
+    /// - account: The Nextcloud account performing the request.
+    /// - options: Optional request options (default is empty).
+    /// - request: A closure that receives the underlying Alamofire `DataRequest`, useful for inspection or mutation.
+    /// - taskHandler: A closure to access the `URLSessionTask` for progress or cancellation.
+    /// - completion: Completion handler returning the account, list of applications, response, and error.
     func getDashboardWidgetsApplication(_ items: String,
                                         account: String,
                                         options: NKRequestOptions = NKRequestOptions(),
@@ -101,27 +129,38 @@ public extension NextcloudKit {
         options.queue.async { request(dashboardRequest) }
     }
 
+    /// Asynchronously fetches dashboard widgets tied to specific applications.
+    /// - Parameters:
+    ///   - items: A comma-separated list of app IDs (e.g., "files,calendar").
+    ///   - account: The account performing the request.
+    ///   - options: Optional request configuration.
+    ///   - request: Handler for the `DataRequest` (if needed).
+    ///   - taskHandler: Handler for the underlying `URLSessionTask`.
+    /// - Returns: A tuple with account, dashboard applications, response data, and NKError.
     func getDashboardWidgetsApplicationAsync(_ items: String,
                                              account: String,
                                              options: NKRequestOptions = NKRequestOptions(),
-                                             taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in }) async -> (account: String,
-                                                                                                                           dashboardApplications: [NCCDashboardApplication]?,
-                                                                                                                           responseData: AFDataResponse<Data>?,
-                                                                                                                           request: DataRequest?,
-                                                                                                                           task: URLSessionTask?,
-                                                                                                                           error: NKError) {
+                                             request: @escaping (DataRequest?) -> Void = { _ in },
+                                             taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in }
+    ) async -> (
+        account: String,
+        dashboardApplications: [NCCDashboardApplication]?,
+        responseData: AFDataResponse<Data>?,
+        error: NKError
+    ) {
         await withCheckedContinuation { continuation in
-            var capturedRequest: DataRequest?
-            var capturedTask: URLSessionTask?
-
-            getDashboardWidgetsApplication(items, account: account, options: options, request: { req in
-                    capturedRequest = req
-            }, taskHandler: { task in
-                capturedTask = task
-                taskHandler(task) // propaghiamo al chiamante
-            }, completion: { account, apps, response, error in
-                continuation.resume(returning: (account, apps, response, capturedRequest, capturedTask, error ))
-            })
+            getDashboardWidgetsApplication(items,
+                                           account: account,
+                                           options: options,
+                                           request: request,
+                                           taskHandler: taskHandler) { account, dashboardApplications, responseData, error in
+                continuation.resume(returning: (
+                    account: account,
+                    dashboardApplications: dashboardApplications,
+                    responseData: responseData,
+                    error: error
+                ))
+            }
         }
     }
 }

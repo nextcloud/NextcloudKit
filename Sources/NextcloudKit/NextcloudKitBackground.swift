@@ -14,6 +14,17 @@ public final class NKBackground: NSObject, URLSessionTaskDelegate, URLSessionDel
 
     // MARK: - Download
 
+    /// Starts a download task for a file from the server to a local path.
+    ///
+    /// - Parameters:
+    ///   - serverUrlFileName: The URL or URL string of the file to download.
+    ///   - fileNameLocalPath: The local file path where the downloaded file will be saved.
+    ///   - taskDescription: Optional description to set on the URLSession task.
+    ///   - account: The Nextcloud account associated with the download.
+    ///
+    /// - Returns: A tuple containing:
+    ///   - URLSessionDownloadTask?: The download task if created successfully.
+    ///   - error: An `NKError` indicating success or failure in starting the download.
     public func download(serverUrlFileName: Any,
                          fileNameLocalPath: String,
                          taskDescription: String? = nil,
@@ -63,8 +74,46 @@ public final class NKBackground: NSObject, URLSessionTaskDelegate, URLSessionDel
         return (task, .success)
     }
 
+    /// Asynchronously starts a download task for a file.
+    ///
+    /// - Parameters: Same as the synchronous version.
+    ///
+    /// - Returns: A tuple containing:
+    ///   - downloadTask: The `URLSessionDownloadTask?` if successfully created.
+    ///   - error: The `NKError` result.
+    public func downloadAsync(serverUrlFileName: Any,
+                              fileNameLocalPath: String,
+                              taskDescription: String? = nil,
+                              account: String) async -> (
+        downloadTask: URLSessionDownloadTask?,
+        error: NKError
+    ) {
+        await withCheckedContinuation { continuation in
+            let (task, error) = download(serverUrlFileName: serverUrlFileName,
+                                         fileNameLocalPath: fileNameLocalPath,
+                                         taskDescription: taskDescription,
+                                         account: account)
+            continuation.resume(returning: (downloadTask: task, error: error))
+        }
+    }
+
     // MARK: - Upload
 
+    /// Starts an upload task to send a local file to the server.
+    ///
+    /// - Parameters:
+    ///   - serverUrlFileName: The server URL or URL string where the file will be uploaded.
+    ///   - fileNameLocalPath: The local file path of the file to upload.
+    ///   - dateCreationFile: Optional creation date metadata for the file.
+    ///   - dateModificationFile: Optional modification date metadata for the file.
+    ///   - taskDescription: Optional description to set on the URLSession task.
+    ///   - overwrite: Boolean indicating whether to overwrite existing files on the server.
+    ///   - account: The Nextcloud account associated with the upload.
+    ///   - sessionIdentifier: A string identifier for the upload session.
+    ///
+    /// - Returns: A tuple containing:
+    ///   - URLSessionUploadTask?: The upload task if created successfully.
+    ///   - error: An `NKError` indicating success or failure in starting the upload.
     public func upload(serverUrlFileName: Any,
                        fileNameLocalPath: String,
                        dateCreationFile: Date?,
@@ -136,6 +185,37 @@ public final class NKBackground: NSObject, URLSessionTaskDelegate, URLSessionDel
         task?.resume()
 
         return (task, .success)
+    }
+
+    /// Asynchronously starts an upload task to send a local file.
+    ///
+    /// - Parameters: Same as the synchronous version.
+    ///
+    /// - Returns: A tuple containing:
+    ///   - uploadTask: The `URLSessionUploadTask?` if successfully created.
+    ///   - error: The `NKError` result.
+    public func uploadAsync(serverUrlFileName: Any,
+                            fileNameLocalPath: String,
+                            dateCreationFile: Date?,
+                            dateModificationFile: Date?,
+                            taskDescription: String? = nil,
+                            overwrite: Bool = false,
+                            account: String,
+                            sessionIdentifier: String) async -> (
+        uploadTask: URLSessionUploadTask?,
+        error: NKError
+    ) {
+        await withCheckedContinuation { continuation in
+            let (task, error) = upload(serverUrlFileName: serverUrlFileName,
+                                       fileNameLocalPath: fileNameLocalPath,
+                                       dateCreationFile: dateCreationFile,
+                                       dateModificationFile: dateModificationFile,
+                                       taskDescription: taskDescription,
+                                       overwrite: overwrite,
+                                       account: account,
+                                       sessionIdentifier: sessionIdentifier)
+            continuation.resume(returning: (uploadTask: task, error: error))
+        }
     }
 
     // MARK: - SessionDelegate

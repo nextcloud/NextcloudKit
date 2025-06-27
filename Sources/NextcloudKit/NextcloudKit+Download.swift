@@ -7,6 +7,18 @@ import Alamofire
 import SwiftyJSON
 
 public extension NextcloudKit {
+    /// Downloads a remote file and stores it at a local path for the specified Nextcloud account.
+    /// It provides detailed progress, headers, and metadata such as ETag, last modified date, and content length.
+    ///
+    /// Parameters:
+    /// - serverUrlFileName: A value representing the remote file URL or path (typically String or URL).
+    /// - fileNameLocalPath: The local filesystem path where the file should be saved.
+    /// - account: The Nextcloud account performing the download.
+    /// - options: Optional request options (default is empty).
+    /// - requestHandler: Closure to access the Alamofire `DownloadRequest` (for customization, inspection, etc.).
+    /// - taskHandler: Closure to access the underlying `URLSessionTask` (e.g. for progress or cancellation).
+    /// - progressHandler: Closure that receives periodic progress updates.
+    /// - completionHandler: Completion closure returning metadata: account, ETag, modification date, content length, headers, AFError, and NKError.
     func download(serverUrlFileName: Any,
                   fileNameLocalPath: String,
                   account: String,
@@ -68,5 +80,52 @@ public extension NextcloudKit {
         }
 
         options.queue.async { requestHandler(request) }
+    }
+
+    /// Asynchronously downloads a file to the specified local path, with optional progress and task tracking.
+    /// - Parameters:
+    ///   - serverUrlFileName: A URL or object convertible to a URL string.
+    ///   - fileNameLocalPath: Destination path for the local file.
+    ///   - account: The Nextcloud account used for the request.
+    ///   - options: Optional request configuration.
+    ///   - requestHandler: Handler for accessing the `DownloadRequest`.
+    ///   - taskHandler: Handler for monitoring the `URLSessionTask`.
+    ///   - progressHandler: Progress tracking callback.
+    /// - Returns: A tuple with account, etag, date, content length, headers, Alamofire error, and internal NKError.
+    func downloadAsync(serverUrlFileName: Any,
+                       fileNameLocalPath: String,
+                       account: String,
+                       options: NKRequestOptions = NKRequestOptions(),
+                       requestHandler: @escaping (_ request: DownloadRequest) -> Void = { _ in },
+                       taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
+                       progressHandler: @escaping (_ progress: Progress) -> Void = { _ in }
+    ) async -> (
+        account: String,
+        etag: String?,
+        date: Date?,
+        length: Int64,
+        headers: [AnyHashable: Any]?,
+        afError: AFError?,
+        nkError: NKError
+    ) {
+        await withCheckedContinuation { continuation in
+            download(serverUrlFileName: serverUrlFileName,
+                     fileNameLocalPath: fileNameLocalPath,
+                     account: account,
+                     options: options,
+                     requestHandler: requestHandler,
+                     taskHandler: taskHandler,
+                     progressHandler: progressHandler) { account, etag, date, length, headers, afError, nkError in
+                continuation.resume(returning: (
+                    account: account,
+                    etag: etag,
+                    date: date,
+                    length: length,
+                    headers: headers,
+                    afError: afError,
+                    nkError: nkError
+                ))
+            }
+        }
     }
 }

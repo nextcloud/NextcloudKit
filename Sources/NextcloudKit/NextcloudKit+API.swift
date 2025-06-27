@@ -31,6 +31,14 @@ public class NKNotifications: NSObject {
 }
 
 public extension NextcloudKit {
+    /// Checks if the specified server URL is reachable and returns the raw HTTP response.
+    /// Used to verify the availability and responsiveness of a Nextcloud server.
+    ///
+    /// Parameters:
+    /// - serverUrl: Full URL of the Nextcloud server to check.
+    /// - options: Optional request options (e.g. custom headers, queue).
+    /// - taskHandler: Closure to access the URLSessionTask (default is no-op).
+    /// - completion: Completion handler with the raw HTTP response and any NKError.
     func checkServer(serverUrl: String,
                      options: NKRequestOptions = NKRequestOptions(),
                      taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
@@ -50,8 +58,43 @@ public extension NextcloudKit {
         }
     }
 
+    /// Asynchronously checks the specified server URL and returns the HTTP response and error.
+    /// - Parameters:
+    ///   - serverUrl: The URL of the server to check.
+    ///   - options: Optional request options.
+    ///   - taskHandler: Optional closure to access the session task.
+    /// - Returns: A tuple containing the raw response and NKError, with named values.
+    func checkServerAsync(serverUrl: String,
+                          options: NKRequestOptions = NKRequestOptions(),
+                          taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in }
+    ) async -> (
+        responseData: AFDataResponse<Data>?,
+        error: NKError
+    ) {
+        await withCheckedContinuation { continuation in
+            checkServer(serverUrl: serverUrl,
+                        options: options,
+                        taskHandler: taskHandler) { responseData, error in
+                continuation.resume(returning: (
+                    responseData: responseData,
+                    error: error
+                ))
+            }
+        }
+    }
+
     // MARK: -
 
+    /// Executes a generic HTTP request using the given relative endpoint path and HTTP method.
+    /// Commonly used for flexible OCS or WebDAV API calls without dedicated wrappers.
+    ///
+    /// Parameters:
+    /// - endpoint: The relative API path (e.g. "ocs/v2.php/apps/...") to be appended to the base server URL.
+    /// - account: The Nextcloud account initiating the request.
+    /// - method: The HTTP method as a string ("GET", "POST", "DELETE", etc).
+    /// - options: Optional request options such as custom headers, versioning, queue.
+    /// - taskHandler: Optional closure to access the underlying URLSessionTask.
+    /// - completion: Completion handler returning the account, raw response, and any NKError.
     func generalWithEndpoint(_ endpoint: String,
                              account: String,
                              method: String,
@@ -76,8 +119,49 @@ public extension NextcloudKit {
         }
     }
 
+    /// Asynchronously performs a generic request using the specified endpoint and method.
+    /// - Parameters:
+    ///   - endpoint: Relative path to the server API.
+    ///   - account: The account initiating the request.
+    ///   - method: HTTP method string.
+    ///   - options: Optional request configuration.
+    ///   - taskHandler: Closure to access the URLSessionTask.
+    /// - Returns: A tuple with named values: account, raw response, and error.
+    func generalWithEndpointAsync(_ endpoint: String,
+                                   account: String,
+                                   method: String,
+                                   options: NKRequestOptions = NKRequestOptions(),
+                                   taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in }
+    ) async -> (
+        account: String,
+        responseData: AFDataResponse<Data>?,
+        error: NKError
+    ) {
+        await withCheckedContinuation { continuation in
+            generalWithEndpoint(endpoint,
+                                account: account,
+                                method: method,
+                                options: options,
+                                taskHandler: taskHandler) { account, responseData, error in
+                continuation.resume(returning: (
+                    account: account,
+                    responseData: responseData,
+                    error: error
+                ))
+            }
+        }
+    }
+
     // MARK: -
 
+    /// Retrieves the list of external sites configured in the Nextcloud instance.
+    /// These are typically links to external services or resources displayed in the web UI.
+    ///
+    /// Parameters:
+    /// - account: The Nextcloud account making the request.
+    /// - options: Optional request options for custom headers, versioning, queue, etc.
+    /// - taskHandler: Closure to access the URLSessionTask (default is no-op).
+    /// - completion: Completion handler returning the account, list of external sites, response, and any NKError.
     func getExternalSite(account: String,
                          options: NKRequestOptions = NKRequestOptions(),
                          taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
@@ -116,14 +200,31 @@ public extension NextcloudKit {
         }
     }
 
+    /// Asynchronously retrieves the list of external sites for the specified account.
+    /// - Parameters:
+    ///   - account: The Nextcloud account making the request.
+    ///   - options: Optional request configuration.
+    ///   - taskHandler: Closure to access the URLSessionTask.
+    /// - Returns: A tuple containing account, external sites array, raw response, and error.
     func getExternalSiteAsync(account: String,
                               options: NKRequestOptions = NKRequestOptions(),
-                              taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in }) async -> (account: String, externalSite: [NKExternalSite], responseData: AFDataResponse<Data>?, error: NKError) {
-        await withUnsafeContinuation { continuation in
+                              taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in }
+    ) async -> (
+        account: String,
+        externalSite: [NKExternalSite],
+        responseData: AFDataResponse<Data>?,
+        error: NKError
+    ) {
+        await withCheckedContinuation { continuation in
             getExternalSite(account: account,
                             options: options,
                             taskHandler: taskHandler) { account, externalSite, responseData, error in
-                continuation.resume(returning: (account, externalSite, responseData, error))
+                continuation.resume(returning: (
+                    account: account,
+                    externalSite: externalSite,
+                    responseData: responseData,
+                    error: error
+                ))
             }
         }
     }
@@ -148,6 +249,13 @@ public extension NextcloudKit {
         case failure(NKError)
     }
 
+    /// Retrieves the status information of a Nextcloud server.
+    ///
+    /// Parameters:
+    /// - serverUrl: The base URL of the Nextcloud server (e.g., https://cloud.example.com).
+    /// - options: Optional request configuration (e.g., headers, queue, etc.).
+    /// - taskHandler: Callback for the underlying URLSessionTask.
+    /// - completion: Returns the raw response and a `ServerInfoResult` containing server status information or an error.
     func getServerStatus(serverUrl: String,
                          options: NKRequestOptions = NKRequestOptions(),
                          taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
@@ -199,20 +307,42 @@ public extension NextcloudKit {
         }
     }
 
+    /// Asynchronously retrieves the status information of a Nextcloud server.
+    /// - Parameters:
+    ///   - serverUrl: The server's base URL (e.g., https://cloud.example.com).
+    ///   - options: Optional request configuration (e.g., version, queue, headers).
+    ///   - taskHandler: Optional callback to monitor the underlying URLSessionTask.
+    /// - Returns: A tuple containing the AFDataResponse and the ServerInfoResult.
     func getServerStatusAsync(serverUrl: String,
                               options: NKRequestOptions = NKRequestOptions(),
-                              taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in }) async -> (responseData: AFDataResponse<Data>?, result: ServerInfoResult) {
-        await withUnsafeContinuation { continuation in
+                              taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in }
+    ) async -> (
+        responseData: AFDataResponse<Data>?,
+        result: ServerInfoResult
+    ) {
+        await withCheckedContinuation { continuation in
             getServerStatus(serverUrl: serverUrl,
                             options: options,
                             taskHandler: taskHandler) { responseData, result in
-                continuation.resume(returning: (responseData, result))
+                continuation.resume(returning: (
+                    responseData: responseData,
+                    result: result
+                ))
             }
         }
     }
 
     // MARK: -
 
+    /// Downloads a file preview (thumbnail) from the specified URL for a given Nextcloud account.
+    ///
+    /// Parameters:
+    /// - url: The full URL of the preview image to download.
+    /// - account: The Nextcloud account used for the request.
+    /// - etag: Optional entity tag used for cache validation.
+    /// - options: Optional request configuration (e.g., headers, queue, version).
+    /// - taskHandler: Callback for the underlying `URLSessionTask`.
+    /// - completion: Returns the account, raw response data, and an `NKError` representing the result of the operation.
     func downloadPreview(url: URL,
                          account: String,
                          etag: String? = nil,
@@ -242,16 +372,54 @@ public extension NextcloudKit {
         }
     }
 
+    /// Asynchronously downloads a preview image (e.g., thumbnail) from the provided URL.
+    /// - Parameters:
+    ///   - url: The full URL of the preview image.
+    ///   - account: The Nextcloud account making the request.
+    ///   - etag: Optional ETag used to validate cache.
+    ///   - options: Additional request options including version, headers, and queues.
+    ///   - taskHandler: Optional handler for monitoring the URLSessionTask.
+    /// - Returns: A tuple containing the account identifier, response data, and an `NKError` object.
     func downloadPreviewAsync(url: URL,
                               account: String,
-                              options: NKRequestOptions = NKRequestOptions()) async -> (account: String, responseData: AFDataResponse<Data>?, error: NKError) {
-        await withUnsafeContinuation({ continuation in
-            NextcloudKit.shared.downloadPreview(url: url, account: account, options: options) { account, responseData, error in
-                continuation.resume(returning: (account: account, responseData: responseData, error: error))
+                              etag: String? = nil,
+                              options: NKRequestOptions = NKRequestOptions(),
+                              taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in }
+    ) async -> (
+        account: String,
+        responseData: AFDataResponse<Data>?,
+        error: NKError
+    ) {
+        await withCheckedContinuation { continuation in
+            downloadPreview(url: url,
+                            account: account,
+                            etag: etag,
+                            options: options,
+                            taskHandler: taskHandler) { account, responseData, error in
+                continuation.resume(returning: (
+                    account: account,
+                    responseData: responseData,
+                    error: error
+                ))
             }
-        })
+        }
     }
 
+    /// Downloads a preview (thumbnail) of a file with specified dimensions and parameters.
+    ///
+    /// Parameters:
+    /// - fileId: The identifier of the file to generate a preview for.
+    /// - width: The desired width of the preview image (default is 1024).
+    /// - height: The desired height of the preview image (default is 1024).
+    /// - etag: Optional entity tag used for caching validation.
+    /// - crop: Indicates whether the image should be cropped (1 = true, default).
+    /// - cropMode: The cropping mode (default is "cover").
+    /// - forceIcon: If set to 1, forces icon generation (default is 0).
+    /// - mimeFallback: If set to 1, fallback to MIME-type icon if preview is unavailable (default is 0).
+    /// - account: The Nextcloud account performing the operation.
+    /// - options: Optional request configuration (headers, versioning, etc.).
+    /// - taskHandler: Callback for the `URLSessionTask`.
+    /// - completion: Returns the account, final width and height used, etag, response data, and any error encountered.
     func downloadPreview(fileId: String,
                          width: Int = 1024,
                          height: Int = 1024,
@@ -291,17 +459,77 @@ public extension NextcloudKit {
         }
     }
 
+    /// Asynchronously downloads a preview by file ID with specified dimensions and parameters.
+    /// - Parameters:
+    ///   - fileId: The unique identifier of the file.
+    ///   - width: Desired preview width (default: 1024).
+    ///   - height: Desired preview height (default: 1024).
+    ///   - etag: Optional ETag for cache validation.
+    ///   - crop: Crop flag (default: 1).
+    ///   - cropMode: Crop mode (default: "cover").
+    ///   - forceIcon: Force icon flag (default: 0).
+    ///   - mimeFallback: MIME fallback flag (default: 0).
+    ///   - account: The account identifier.
+    ///   - options: Optional request options.
+    ///   - taskHandler: Optional closure to handle the URLSessionTask.
+    /// - Returns: A tuple containing account, dimensions, ETag, response and error.
     func downloadPreviewAsync(fileId: String,
+                              width: Int = 1024,
+                              height: Int = 1024,
                               etag: String? = nil,
+                              crop: Int = 1,
+                              cropMode: String = "cover",
+                              forceIcon: Int = 0,
+                              mimeFallback: Int = 0,
                               account: String,
-                              options: NKRequestOptions = NKRequestOptions()) async -> (account: String, width: Int, height: Int, etag: String?, responseData: AFDataResponse<Data>?, error: NKError) {
-        await withUnsafeContinuation({ continuation in
-            NextcloudKit.shared.downloadPreview(fileId: fileId, etag: etag, account: account, options: options) { account, width, height, etag, responseData, error in
-                continuation.resume(returning: (account: account, width: width, height: height, etag: etag, responseData: responseData, error: error))
+                              options: NKRequestOptions = NKRequestOptions(),
+                              taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in }
+    ) async -> (
+        account: String,
+        width: Int,
+        height: Int,
+        etag: String?,
+        responseData: AFDataResponse<Data>?,
+        error: NKError
+    ) {
+        await withCheckedContinuation { continuation in
+            downloadPreview(fileId: fileId,
+                            width: width,
+                            height: height,
+                            etag: etag,
+                            crop: crop,
+                            cropMode: cropMode,
+                            forceIcon: forceIcon,
+                            mimeFallback: mimeFallback,
+                            account: account,
+                            options: options,
+                            taskHandler: taskHandler) { account, w, h, tag, responseData, error in
+                continuation.resume(returning: (
+                    account: account,
+                    width: w,
+                    height: h,
+                    etag: tag,
+                    responseData: responseData,
+                    error: error
+                ))
             }
-        })
+        }
     }
 
+    /// Downloads a preview (thumbnail) for a file located in the trashbin.
+    ///
+    /// Parameters:
+    /// - fileId: The identifier of the trashed file.
+    /// - width: Desired width of the preview image (default is 512).
+    /// - height: Desired height of the preview image (default is 512).
+    /// - crop: Indicates whether the image should be cropped (1 = true, default).
+    /// - cropMode: The cropping mode (e.g., "cover").
+    /// - forceIcon: Forces use of the filetype icon instead of generating a preview (0 = false, default).
+    /// - mimeFallback: Uses MIME-type fallback if preview is unavailable (0 = false, default).
+    /// - account: The Nextcloud account making the request.
+    /// - options: Request customization options (headers, queue, version, etc.).
+    /// - taskHandler: Callback to inspect the underlying URLSessionTask.
+    /// - completion: Returns the account, final width/height, preview response data, and NKError.
     func downloadTrashPreview(fileId: String,
                               width: Int = 512,
                               height: Int = 512,
@@ -335,6 +563,70 @@ public extension NextcloudKit {
         }
     }
 
+    /// Asynchronously downloads a preview of a trashed file using specified rendering options.
+    /// - Parameters:
+    ///   - fileId: The identifier of the trashed file.
+    ///   - width: Desired width of the preview image.
+    ///   - height: Desired height of the preview image.
+    ///   - crop: Whether to crop the image (1 = true, 0 = false).
+    ///   - cropMode: Cropping mode to apply (e.g., "cover").
+    ///   - forceIcon: Whether to return an icon instead of a generated preview.
+    ///   - mimeFallback: Whether to fallback to MIME-type icon if no preview is available.
+    ///   - account: Account making the preview request.
+    ///   - options: Optional request configuration (queue, headers, etc.).
+    ///   - taskHandler: Handler to observe the URLSessionTask.
+    /// - Returns: A tuple with account, final width and height used, responseData, and NKError.
+    func downloadTrashPreviewAsync(fileId: String,
+                                   width: Int = 512,
+                                   height: Int = 512,
+                                   crop: Int = 1,
+                                   cropMode: String = "cover",
+                                   forceIcon: Int = 0,
+                                   mimeFallback: Int = 0,
+                                   account: String,
+                                   options: NKRequestOptions = NKRequestOptions(),
+                                   taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in }
+    ) async -> (
+        account: String,
+        width: Int,
+        height: Int,
+        responseData: AFDataResponse<Data>?,
+        error: NKError
+    ) {
+        await withCheckedContinuation { continuation in
+            downloadTrashPreview(fileId: fileId,
+                                 width: width,
+                                 height: height,
+                                 crop: crop,
+                                 cropMode: cropMode,
+                                 forceIcon: forceIcon,
+                                 mimeFallback: mimeFallback,
+                                 account: account,
+                                 options: options,
+                                 taskHandler: taskHandler) { account, resolvedWidth, resolvedHeight, responseData, error in
+                continuation.resume(returning: (
+                    account: account,
+                    width: resolvedWidth,
+                    height: resolvedHeight,
+                    responseData: responseData,
+                    error: error
+                ))
+            }
+        }
+    }
+
+    /// Downloads a user's avatar image from the server and optionally stores it locally.
+    ///
+    /// Parameters:
+    /// - user: The user identifier for whom the avatar is requested.
+    /// - fileNameLocalPath: The local file path where the avatar image will be saved.
+    /// - sizeImage: The size of the avatar to request (in pixels).
+    /// - avatarSizeRounded: If greater than 0, the avatar will be rounded to this size (in pixels).
+    /// - etag: Optional ETag string to validate the cache.
+    /// - account: The Nextcloud account performing the operation.
+    /// - options: Optional request options (queue, headers, etc.).
+    /// - taskHandler: Callback for the underlying URLSessionTask.
+    /// - completion: Returns the account, avatar image, original image, ETag, response data, and NKError.
     func downloadAvatar(user: String,
                         fileNameLocalPath: String,
                         sizeImage: Int,
@@ -436,6 +728,17 @@ public extension NextcloudKit {
         }
     }
 
+    /// Asynchronously downloads an avatar image for the specified user.
+    /// - Parameters:
+    ///   - user: The username associated with the avatar.
+    ///   - fileNameLocalPath: Path on disk to save the avatar.
+    ///   - sizeImage: Desired size (in pixels) of the avatar image.
+    ///   - avatarSizeRounded: Optional rounding for avatar (e.g., 128px).
+    ///   - etag: Optional ETag for cache validation.
+    ///   - account: The Nextcloud account to perform the download.
+    ///   - options: Request configuration (queue, headers, etc.).
+    ///   - taskHandler: Optional observer for the download task.
+    /// - Returns: A tuple with account, final avatar image, original image, resulting ETag, response and NKError.
     func downloadAvatarAsync(user: String,
                              fileNameLocalPath: String,
                              sizeImage: Int,
@@ -443,8 +746,16 @@ public extension NextcloudKit {
                              etag: String?,
                              account: String,
                              options: NKRequestOptions = NKRequestOptions(),
-                             taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in }) async -> (account: String, imageAvatar: UIImage?, imageOriginal: UIImage?, etag: String?, responseData: AFDataResponse<Data>?, error: NKError) {
-        await withUnsafeContinuation { continuation in
+                             taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in }
+    ) async -> (
+        account: String,
+        imageAvatar: UIImage?,
+        imageOriginal: UIImage?,
+        etag: String?,
+        responseData: AFDataResponse<Data>?,
+        error: NKError
+    ) {
+        await withCheckedContinuation { continuation in
             downloadAvatar(user: user,
                            fileNameLocalPath: fileNameLocalPath,
                            sizeImage: sizeImage,
@@ -453,11 +764,26 @@ public extension NextcloudKit {
                            account: account,
                            options: options,
                            taskHandler: taskHandler) { account, imageAvatar, imageOriginal, etag, responseData, error in
-                continuation.resume(returning: (account, imageAvatar, imageOriginal, etag, responseData, error))
+                continuation.resume(returning: (
+                    account: account,
+                    imageAvatar: imageAvatar,
+                    imageOriginal: imageOriginal,
+                    etag: etag,
+                    responseData: responseData,
+                    error: error
+                ))
             }
         }
     }
 
+    /// Downloads generic raw content from a given server URL using the specified account.
+    ///
+    /// Parameters:
+    /// - serverUrl: The full URL string of the content to be downloaded.
+    /// - account: The Nextcloud account to use for the request.
+    /// - options: Optional configuration including headers, queue, and version.
+    /// - taskHandler: Optional callback for monitoring the URLSessionTask.
+    /// - completion: Returns the account, response data, and NKError representing the outcome.
     func downloadContent(serverUrl: String,
                          account: String,
                          options: NKRequestOptions = NKRequestOptions(),
@@ -483,8 +809,46 @@ public extension NextcloudKit {
         }
     }
 
+    /// Asynchronously downloads raw content from a specified URL.
+    /// - Parameters:
+    ///   - serverUrl: The direct URL of the content to download.
+    ///   - account: The Nextcloud account used to authenticate the request.
+    ///   - options: Request customization such as headers, queue, etc.
+    ///   - taskHandler: Optional monitoring for the URLSession task.
+    /// - Returns: A tuple containing the account, response data, and resulting NKError.
+    func downloadContentAsync(serverUrl: String,
+                              account: String,
+                              options: NKRequestOptions = NKRequestOptions(),
+                              taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in }
+    ) async -> (
+        account: String,
+        responseData: AFDataResponse<Data>?,
+        error: NKError
+    ) {
+        await withCheckedContinuation { continuation in
+            downloadContent(serverUrl: serverUrl,
+                            account: account,
+                            options: options,
+                            taskHandler: taskHandler) { account, responseData, error in
+                continuation.resume(returning: (
+                    account: account,
+                    responseData: responseData,
+                    error: error
+                ))
+            }
+        }
+    }
+
     // MARK: -
 
+    /// Retrieves user profile metadata for a specific user in the Nextcloud instance.
+    ///
+    /// Parameters:
+    /// - account: The account used to perform the request.
+    /// - userId: The user identifier whose metadata is being retrieved.
+    /// - options: Additional request configuration (e.g., headers, API version, execution queue).
+    /// - taskHandler: Optional callback invoked with the underlying URLSessionTask.
+    /// - completion: Returns the account, parsed user profile (`NKUserProfile`), response metadata, and any `NKError` encountered.
     func getUserMetadata(account: String,
                          userId: String,
                          options: NKRequestOptions = NKRequestOptions(),
@@ -520,16 +884,45 @@ public extension NextcloudKit {
         }
     }
 
+    /// Asynchronously retrieves the metadata for a specific user profile.
+    /// - Parameters:
+    ///   - account: The Nextcloud account making the request.
+    ///   - userId: The ID of the user whose metadata is being requested.
+    ///   - options: Optional request configuration (headers, version, etc.).
+    ///   - taskHandler: Optional handler for observing the URLSessionTask.
+    /// - Returns: A tuple with the account, user profile, response data, and resulting error.
     func getUserMetadataAsync(account: String,
                               userId: String,
-                              options: NKRequestOptions = NKRequestOptions()) async -> (account: String, userProfile: NKUserProfile?, responseData: AFDataResponse<Data>?, error: NKError) {
-        await withUnsafeContinuation({ continuation in
-            NextcloudKit.shared.getUserMetadata(account: account, userId: userId) { account, userProfile, responseData, error in
-                continuation.resume(returning: (account: account, userProfile: userProfile, responseData: responseData, error: error))
+                              options: NKRequestOptions = NKRequestOptions(),
+                              taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in }
+    ) async -> (
+        account: String,
+        userProfile: NKUserProfile?,
+        responseData: AFDataResponse<Data>?,
+        error: NKError
+    ) {
+        await withCheckedContinuation { continuation in
+            getUserMetadata(account: account,
+                            userId: userId,
+                            options: options,
+                            taskHandler: taskHandler) { account, userProfile, responseData, error in
+                continuation.resume(returning: (
+                    account: account,
+                    userProfile: userProfile,
+                    responseData: responseData,
+                    error: error
+                ))
             }
-        })
+        }
     }
 
+    /// Fetches the metadata of the currently authenticated user.
+    ///
+    /// Parameters:
+    /// - account: The Nextcloud account performing the request.
+    /// - options: Additional request configuration (e.g., custom headers, API version, execution queue).
+    /// - taskHandler: Optional callback invoked with the underlying URLSessionTask.
+    /// - completion: Returns the account, parsed user profile (`NKUserProfile`), response metadata, and any `NKError` encountered.
     func getUserProfile(account: String,
                         options: NKRequestOptions = NKRequestOptions(),
                         taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
@@ -560,6 +953,35 @@ public extension NextcloudKit {
                 } else {
                     options.queue.async { completion(account, nil, response, NKError(rootJson: json, fallbackStatusCode: response.response?.statusCode)) }
                 }
+            }
+        }
+    }
+
+    /// Asynchronously fetches the profile metadata of the currently logged-in user.
+    /// - Parameters:
+    ///   - account: The Nextcloud account making the request.
+    ///   - options: Optional request configuration (e.g. headers, version, etc.).
+    ///   - taskHandler: Optional handler for observing the URLSessionTask.
+    /// - Returns: A tuple containing the account, user profile object, full response data, and any NKError.
+    func getUserProfileAsync(account: String,
+                             options: NKRequestOptions = NKRequestOptions(),
+                             taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in }
+    ) async -> (
+        account: String,
+        userProfile: NKUserProfile?,
+        responseData: AFDataResponse<Data>?,
+        error: NKError
+    ) {
+        await withCheckedContinuation { continuation in
+            getUserProfile(account: account,
+                           options: options,
+                           taskHandler: taskHandler) { account, userProfile, responseData, error in
+                continuation.resume(returning: (
+                    account: account,
+                    userProfile: userProfile,
+                    responseData: responseData,
+                    error: error
+                ))
             }
         }
     }
@@ -610,6 +1032,15 @@ public extension NextcloudKit {
     }
     // MARK: -
 
+    /// Checks the remote wipe status for a specific account and token.
+    ///
+    /// Parameters:
+    /// - serverUrl: The base server URL to perform the request.
+    /// - token: The authentication or wipe token to validate.
+    /// - account: The Nextcloud account performing the request.
+    /// - options: Optional configuration for the request (e.g., headers, version, queue).
+    /// - taskHandler: Optional callback to observe the underlying URLSessionTask.
+    /// - completion: Returns the account, wipe status (true if a wipe is required), raw response data, and NKError if any.
     func getRemoteWipeStatus(serverUrl: String,
                              token: String,
                              account: String,
@@ -645,6 +1076,50 @@ public extension NextcloudKit {
         }
     }
 
+    /// Asynchronously checks the remote wipe status for the given account and token.
+    /// - Parameters:
+    ///   - serverUrl: Base server URL used for the API request.
+    ///   - token: Token used to query remote wipe status.
+    ///   - account: Nextcloud account identifier.
+    ///   - options: Request options such as headers, version, and dispatch queue.
+    ///   - taskHandler: Callback for observing the URLSessionTask, if needed.
+    /// - Returns: A tuple with the account, wipe status flag, response data, and NKError.
+    func getRemoteWipeStatusAsync(serverUrl: String,
+                                  token: String,
+                                  account: String,
+                                  options: NKRequestOptions = NKRequestOptions(),
+                                  taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in }
+    ) async -> (
+        account: String,
+        wipe: Bool,
+        responseData: AFDataResponse<Data>?,
+        error: NKError
+    ) {
+        await withCheckedContinuation { continuation in
+            getRemoteWipeStatus(serverUrl: serverUrl,
+                                token: token,
+                                account: account,
+                                options: options,
+                                taskHandler: taskHandler) { account, wipe, responseData, error in
+                continuation.resume(returning: (
+                    account: account,
+                    wipe: wipe,
+                    responseData: responseData,
+                    error: error
+                ))
+            }
+        }
+    }
+
+    /// Notifies the server that the remote wipe operation has been completed.
+    ///
+    /// Parameters:
+    /// - serverUrl: The base server URL used to send the wipe completion notification.
+    /// - token: The remote wipe token associated with the account.
+    /// - account: The Nextcloud account that performed the wipe.
+    /// - options: Optional configuration for request (headers, queue, version, etc.).
+    /// - taskHandler: Callback for the underlying URLSessionTask if monitoring is needed.
+    /// - completion: Returns the account, raw response data, and NKError.
     func setRemoteWipeCompletition(serverUrl: String,
                                    token: String,
                                    account: String,
@@ -678,8 +1153,53 @@ public extension NextcloudKit {
         }
     }
 
+    /// Asynchronously notifies the server that remote wipe has been completed for the given account and token.
+    /// - Parameters:
+    ///   - serverUrl: The base URL of the Nextcloud server.
+    ///   - token: Remote wipe token associated with the account.
+    ///   - account: Identifier of the Nextcloud account.
+    ///   - options: Configuration object for headers, versioning, and dispatching.
+    ///   - taskHandler: Optional observer for the created URLSessionTask.
+    /// - Returns: A tuple with account, raw response data, and NKError.
+    func setRemoteWipeCompletitionAsync(serverUrl: String,
+                                        token: String,
+                                        account: String,
+                                        options: NKRequestOptions = NKRequestOptions(),
+                                        taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in }
+    ) async -> (
+        account: String,
+        responseData: AFDataResponse<Data>?,
+        error: NKError
+    ) {
+        await withCheckedContinuation { continuation in
+            setRemoteWipeCompletition(serverUrl: serverUrl,
+                                      token: token,
+                                      account: account,
+                                      options: options,
+                                      taskHandler: taskHandler) { account, responseData, error in
+                continuation.resume(returning: (
+                    account: account,
+                    responseData: responseData,
+                    error: error
+                ))
+            }
+        }
+    }
+
     // MARK: -
 
+    /// Retrieves a list of activities for the current account.
+    ///
+    /// Parameters:
+    /// - since: The timestamp (as Unix epoch) to fetch activities after.
+    /// - limit: The maximum number of activities to retrieve.
+    /// - objectId: Optional object ID to filter activities (e.g., file ID).
+    /// - objectType: Optional object type to filter (e.g., "files").
+    /// - previews: Whether to include preview data for activities.
+    /// - account: The Nextcloud account requesting the activity feed.
+    /// - options: Optional request configuration (headers, queue, version, etc.).
+    /// - taskHandler: Callback for the underlying URLSessionTask.
+    /// - completion: Returns the account, array of NKActivity objects, the timestamp of the first known activity, last returned activity, raw response, and NKError.
     func getActivity(since: Int,
                      limit: Int,
                      objectId: String?,
@@ -776,8 +1296,64 @@ public extension NextcloudKit {
         }
     }
 
+    /// Asynchronously fetches the list of activities from the server.
+    ///
+    /// - Parameters:
+    ///   - since: Epoch timestamp for filtering activities (only newer ones will be returned).
+    ///   - limit: Maximum number of activities to retrieve.
+    ///   - objectId: Optional object ID to filter (e.g., file or folder ID).
+    ///   - objectType: Optional object type (e.g., "files").
+    ///   - previews: Whether to include thumbnails/previews for the activities.
+    ///   - account: The Nextcloud account to use for authentication.
+    ///   - options: Request customization including queue and headers.
+    ///   - taskHandler: Optional callback for URLSession task monitoring.
+    /// - Returns: A tuple containing account, activities array, first known activity timestamp, last given activity timestamp, full response, and error.
+    func getActivityAsync(since: Int,
+                          limit: Int,
+                          objectId: String?,
+                          objectType: String?,
+                          previews: Bool,
+                          account: String,
+                          options: NKRequestOptions = NKRequestOptions(),
+                          taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in }
+    ) async -> (
+        account: String,
+        activities: [NKActivity],
+        activityFirstKnown: Int,
+        activityLastGiven: Int,
+        responseData: AFDataResponse<Data>?,
+        error: NKError
+    ) {
+        await withCheckedContinuation { continuation in
+            getActivity(since: since,
+                        limit: limit,
+                        objectId: objectId,
+                        objectType: objectType,
+                        previews: previews,
+                        account: account,
+                        options: options,
+                        taskHandler: taskHandler) { account, activities, firstKnown, lastGiven, responseData, error in
+                continuation.resume(returning: (
+                    account: account,
+                    activities: activities,
+                    activityFirstKnown: firstKnown,
+                    activityLastGiven: lastGiven,
+                    responseData: responseData,
+                    error: error
+                ))
+            }
+        }
+    }
+
     // MARK: -
 
+    /// Retrieves all notifications associated with the current account.
+    ///
+    /// Parameters:
+    /// - account: The Nextcloud account from which to retrieve notifications.
+    /// - options: Optional request configuration (headers, queue, version, etc.).
+    /// - taskHandler: Callback for the underlying URLSessionTask.
+    /// - completion: Returns the account, list of NKNotifications, raw response data, and NKError.
     func getNotifications(account: String,
                           options: NKRequestOptions = NKRequestOptions(),
                           taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
@@ -845,6 +1421,46 @@ public extension NextcloudKit {
         }
     }
 
+    /// Asynchronously fetches notifications for the given account.
+    ///
+    /// - Parameters:
+    ///   - account: The Nextcloud account used to authenticate the request.
+    ///   - options: Request configuration including queue and headers.
+    ///   - taskHandler: Optional callback to monitor the URLSessionTask.
+    /// - Returns: A tuple containing the account, notifications array (optional), response data (optional), and the resulting NKError.
+    func getNotificationsAsync(account: String,
+                               options: NKRequestOptions = NKRequestOptions(),
+                               taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in }
+    ) async -> (
+        account: String,
+        notifications: [NKNotifications]?,
+        responseData: AFDataResponse<Data>?,
+        error: NKError
+    ) {
+        await withCheckedContinuation { continuation in
+            getNotifications(account: account,
+                             options: options,
+                             taskHandler: taskHandler) { account, notifications, responseData, error in
+                continuation.resume(returning: (
+                    account: account,
+                    notifications: notifications,
+                    responseData: responseData,
+                    error: error
+                ))
+            }
+        }
+    }
+
+    /// Performs an action on a specific notification by ID (e.g., mark as read or delete).
+    ///
+    /// Parameters:
+    /// - serverUrl: Optional custom server URL override. If nil, the default account URL is used.
+    /// - idNotification: The ID of the notification to act upon.
+    /// - method: The HTTP method to use for the action (e.g., "DELETE" or "POST").
+    /// - account: The account associated with the notification.
+    /// - options: Optional request configuration (headers, queue, version, etc.).
+    /// - taskHandler: Callback for the underlying URLSessionTask.
+    /// - completion: Returns the account, raw response data, and NKError result.
     func setNotification(serverUrl: String?,
                          idNotification: Int,
                          method: String,
@@ -882,8 +1498,53 @@ public extension NextcloudKit {
         }
     }
 
+    /// Asynchronously sets or deletes a notification by its ID.
+    ///
+    /// - Parameters:
+    ///   - serverUrl: Optional server URL override for the request.
+    ///   - idNotification: The unique identifier of the notification to process.
+    ///   - method: HTTP method to execute ("POST", "DELETE", etc.).
+    ///   - account: The account context for the operation.
+    ///   - options: Request options including queue, headers, etc.
+    ///   - taskHandler: Optional callback to monitor the task.
+    /// - Returns: A tuple containing the account, response data, and NKError.
+    func setNotificationAsync(serverUrl: String?,
+                              idNotification: Int,
+                              method: String,
+                              account: String,
+                              options: NKRequestOptions = NKRequestOptions(),
+                              taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in }
+    ) async -> (
+        account: String,
+        responseData: AFDataResponse<Data>?,
+        error: NKError
+    ) {
+        await withCheckedContinuation { continuation in
+            setNotification(serverUrl: serverUrl,
+                            idNotification: idNotification,
+                            method: method,
+                            account: account,
+                            options: options,
+                            taskHandler: taskHandler) { account, responseData, error in
+                continuation.resume(returning: (
+                    account: account,
+                    responseData: responseData,
+                    error: error
+                ))
+            }
+        }
+    }
+
     // MARK: -
 
+    // Fetches a direct download URL for a given file ID.
+    //
+    // Parameters:
+    // - fileId: The unique identifier of the file to download.
+    // - account: The account used to perform the request.
+    // - options: Optional request configuration (headers, queue, version, etc.).
+    // - taskHandler: Callback triggered with the URLSessionTask created.
+    // - completion: Returns the account, the direct download URL (if available), raw response data, and NKError result.
     func getDirectDownload(fileId: String,
                            account: String,
                            options: NKRequestOptions = NKRequestOptions(),
@@ -917,8 +1578,49 @@ public extension NextcloudKit {
         }
     }
 
+    /// Asynchronously retrieves the direct download link for a specified file.
+    ///
+    /// - Parameters:
+    ///   - fileId: The file identifier for which to get the direct download URL.
+    ///   - account: The account to use for the request.
+    ///   - options: Optional request settings (e.g., headers, versioning).
+    ///   - taskHandler: Callback to observe the URLSessionTask.
+    /// - Returns: A tuple containing the account, the direct download URL, the raw response, and NKError.
+    func getDirectDownloadAsync(fileId: String,
+                                account: String,
+                                options: NKRequestOptions = NKRequestOptions(),
+                                taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in }
+    ) async -> (
+        account: String,
+        url: String?,
+        responseData: AFDataResponse<Data>?,
+        error: NKError
+    ) {
+        await withCheckedContinuation { continuation in
+            getDirectDownload(fileId: fileId,
+                              account: account,
+                              options: options,
+                              taskHandler: taskHandler) { account, url, responseData, error in
+                continuation.resume(returning: (
+                    account: account,
+                    url: url,
+                    responseData: responseData,
+                    error: error
+                ))
+            }
+        }
+    }
+
     // MARK: -
 
+    // Sends client diagnostics data to the remote server.
+    //
+    // Parameters:
+    // - data: The raw diagnostic payload to be sent.
+    // - account: The account used for the request.
+    // - options: Optional request configuration (e.g., headers, queue, version).
+    // - taskHandler: Callback triggered with the underlying URLSessionTask.
+    // - completion: Returns the account, raw response data, and NKError result.
     func sendClientDiagnosticsRemoteOperation(data: Data,
                                               account: String,
                                               options: NKRequestOptions = NKRequestOptions(),
@@ -955,20 +1657,33 @@ public extension NextcloudKit {
         }
     }
 
-    func sendClientDiagnosticsRemoteOperationAsync(
-        data: Data,
+    /// Asynchronously sends diagnostic data to the server.
+    ///
+    /// - Parameters:
+    ///   - data: Raw diagnostic information to upload.
+    ///   - account: The account associated with the request.
+    ///   - options: Optional request configuration parameters.
+    ///   - taskHandler: Callback for tracking the associated URLSessionTask.
+    /// - Returns: A tuple containing the account, the response data, and the NKError result.
+    func sendClientDiagnosticsRemoteOperationAsync(data: Data,
+                                                   account: String,
+                                                   options: NKRequestOptions = NKRequestOptions(),
+                                                   taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in }
+    ) async -> (
         account: String,
-        options: NKRequestOptions = NKRequestOptions(),
-        taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in }
-    ) async -> (responseData: AFDataResponse<Data>?, error: NKError) {
-        await withUnsafeContinuation { continuation in
-            sendClientDiagnosticsRemoteOperation(
-                data: data,
-                account: account,
-                options: options,
-                taskHandler: taskHandler
-            ) { _, responseData, error in
-                continuation.resume(returning: (responseData, error))
+        responseData: AFDataResponse<Data>?,
+        error: NKError
+    ) {
+        await withCheckedContinuation { continuation in
+            sendClientDiagnosticsRemoteOperation(data: data,
+                                                 account: account,
+                                                 options: options,
+                                                 taskHandler: taskHandler) { account, responseData, error in
+                continuation.resume(returning: (
+                    account: account,
+                    responseData: responseData,
+                    error: error
+                ))
             }
         }
     }

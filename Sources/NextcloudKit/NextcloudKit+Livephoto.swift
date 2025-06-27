@@ -6,6 +6,15 @@ import Foundation
 import Alamofire
 
 public extension NextcloudKit {
+    /// Associates a Live Photo video file with a photo on the server.
+    ///
+    /// Parameters:
+    /// - serverUrlfileNamePath: The full server path to the original photo.
+    /// - livePhotoFile: The local path to the Live Photo video file (.mov).
+    /// - account: The account performing the operation.
+    /// - options: Optional request configuration (e.g., headers, queue, version).
+    /// - taskHandler: Callback for tracking the underlying URLSessionTask.
+    /// - completion: Returns the account, raw response data, and NKError result.
     func setLivephoto(serverUrlfileNamePath: String,
                       livePhotoFile: String,
                       account: String,
@@ -46,14 +55,37 @@ public extension NextcloudKit {
         }
     }
 
+    /// Asynchronously attaches a Live Photo video file to an existing image on the server.
+    ///
+    /// - Parameters:
+    ///   - serverUrlfileNamePath: The full server-side path of the target image.
+    ///   - livePhotoFile: Local file path of the Live Photo (.mov).
+    ///   - account: The Nextcloud account to use for the request.
+    ///   - options: Optional request context and headers.
+    ///   - taskHandler: Optional callback to observe the URLSessionTask.
+    /// - Returns: A tuple with the account, response data, and NKError result.
     func setLivephotoAsync(serverUrlfileNamePath: String,
                            livePhotoFile: String,
                            account: String,
-                           options: NKRequestOptions = NKRequestOptions()) async -> (account: String, responseData: AFDataResponse<Data>?, error: NKError) {
-        await withUnsafeContinuation({ continuation in
-            NextcloudKit.shared.setLivephoto(serverUrlfileNamePath: serverUrlfileNamePath, livePhotoFile: livePhotoFile, account: account, options: options) { account, responseData, error in
-                continuation.resume(returning: (account: account, responseData: responseData, error: error))
+                           options: NKRequestOptions = NKRequestOptions(),
+                           taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in }
+    ) async -> (
+        account: String,
+        responseData: AFDataResponse<Data>?,
+        error: NKError
+    ) {
+        await withCheckedContinuation { continuation in
+            setLivephoto(serverUrlfileNamePath: serverUrlfileNamePath,
+                         livePhotoFile: livePhotoFile,
+                         account: account,
+                         options: options,
+                         taskHandler: taskHandler) { account, responseData, error in
+                continuation.resume(returning: (
+                    account: account,
+                    responseData: responseData,
+                    error: error
+                ))
             }
-        })
+        }
     }
 }
