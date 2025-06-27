@@ -49,26 +49,35 @@ public extension NextcloudKit {
         }
     }
 
-    /// Asynchronously locks or unlocks a file depending on `shouldLock`.
+    /// Asynchronously locks or unlocks a file on the server via WebDAV.
     /// - Parameters:
-    ///   - serverUrlFileName: Encoded file URL to act on.
-    ///   - shouldLock: Whether to lock (`true`) or unlock (`false`) the file.
-    ///   - account: The Nextcloud account performing the request.
-    ///   - options: Optional request options.
-    ///   - taskHandler: Optional closure to access the session task.
-    /// - Returns: A tuple containing the account, response, and NKError.
+    ///   - serverUrlFileName: The server-side full URL of the file to lock or unlock.
+    ///   - shouldLock: `true` to lock the file, `false` to unlock it.
+    ///   - account: The Nextcloud account performing the action.
+    ///   - options: Optional request configuration (headers, queue, etc.).
+    ///   - taskHandler: Optional monitoring of the `URLSessionTask`.
+    /// - Returns: A tuple containing the account, the server response, and any error encountered.
     func lockUnlockFileAsync(serverUrlFileName: String,
                              shouldLock: Bool,
                              account: String,
                              options: NKRequestOptions = NKRequestOptions(),
-                             taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in }) async -> (String, AFDataResponse<Data>?, NKError) {
+                             taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in }
+    ) async -> (
+        account: String,
+        responseData: AFDataResponse<Data>?,
+        error: NKError
+    ) {
         await withCheckedContinuation { continuation in
             lockUnlockFile(serverUrlFileName: serverUrlFileName,
                            shouldLock: shouldLock,
                            account: account,
                            options: options,
-                           taskHandler: taskHandler) { account, response, error in
-                continuation.resume(returning: (account, response, error))
+                           taskHandler: taskHandler) { account, responseData, error in
+                continuation.resume(returning: (
+                    account: account,
+                    responseData: responseData,
+                    error: error
+                ))
             }
         }
     }

@@ -7,6 +7,14 @@ import Alamofire
 import SwiftyJSON
 
 public extension NextcloudKit {
+    // Retrieves the list of supported text processing task types from the server.
+    // These types define the kinds of operations (e.g., summarization, translation) supported by the assistant API.
+    //
+    // Parameters:
+    // - account: The Nextcloud account initiating the request.
+    // - options: Optional configuration for the HTTP request.
+    // - taskHandler: Optional closure to access the underlying URLSessionTask.
+    // - completion: Completion handler providing the account, available task types, response, and NKError.
     func textProcessingGetTypes(account: String,
                                 options: NKRequestOptions = NKRequestOptions(),
                                 taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
@@ -40,24 +48,47 @@ public extension NextcloudKit {
         }
     }
 
-    /// Asynchronously retrieves available text processing task types for the given account.
+    /// Asynchronously retrieves available text processing task types from the server.
     /// - Parameters:
-    ///   - account: The account identifier.
+    ///   - account: The Nextcloud account initiating the request.
     ///   - options: Optional request options.
-    ///   - taskHandler: Optional closure to access the `URLSessionTask`.
-    /// - Returns: A tuple with account, list of task types, response data, and error.
+    ///   - taskHandler: Closure to access the session task.
+    /// - Returns: A tuple with named values for account, list of task types, response, and error.
     func textProcessingGetTypesAsync(account: String,
                                      options: NKRequestOptions = NKRequestOptions(),
-                                     taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in }) async -> (String, [NKTextProcessingTaskType]?, AFDataResponse<Data>?, NKError) {
+                                     taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in }
+    ) async -> (
+        account: String,
+        types: [NKTextProcessingTaskType]?,
+        responseData: AFDataResponse<Data>?,
+        error: NKError
+    ) {
         await withCheckedContinuation { continuation in
             textProcessingGetTypes(account: account,
                                    options: options,
                                    taskHandler: taskHandler) { account, types, responseData, error in
-                continuation.resume(returning: (account, types, responseData, error))
+                continuation.resume(returning: (
+                    account: account,
+                    types: types,
+                    responseData: responseData,
+                    error: error
+                ))
             }
         }
     }
 
+    // Schedules a new text processing task on the server (e.g., translation, summary, etc.).
+    // The request includes the input text, the type of task to execute, and a unique identifier.
+    //
+    // Parameters:
+    // - input: The raw input string to be processed.
+    // - typeId: The identifier of the task type (e.g., "summarize", "translate").
+    // - appId: The application identifier (default is "assistant").
+    // - identifier: A client-side unique string to track this task.
+    // - account: The Nextcloud account executing the request.
+    // - options: Optional request configuration (headers, queue, etc.).
+    // - taskHandler: Optional closure to access the URLSessionTask.
+    // - completion: Completion handler returning the account, resulting task object, response, and any NKError.
     func textProcessingSchedule(input: String,
                                 typeId: String,
                                 appId: String = "assistant",
@@ -96,23 +127,29 @@ public extension NextcloudKit {
         }
     }
 
-    /// Asynchronously schedules a text processing task.
+    /// Asynchronously schedules a text processing task on the server.
     /// - Parameters:
-    ///   - input: The input string to be processed.
-    ///   - typeId: The identifier of the processing type.
-    ///   - appId: The app identifier (default: "assistant").
-    ///   - identifier: The task identifier.
-    ///   - account: The account identifier.
-    ///   - options: Optional request options.
-    ///   - taskHandler: Optional closure to access the URLSessionTask.
-    /// - Returns: A tuple with account, the scheduled task, response data, and error.
+    ///   - input: Input string to process.
+    ///   - typeId: Task type identifier.
+    ///   - appId: Optional app ID, defaults to "assistant".
+    ///   - identifier: Unique task identifier.
+    ///   - account: Nextcloud account.
+    ///   - options: Request configuration.
+    ///   - taskHandler: Optional access to the URLSessionTask.
+    /// - Returns: A tuple with named values for account, task object, raw response, and error.
     func textProcessingScheduleAsync(input: String,
                                      typeId: String,
                                      appId: String = "assistant",
                                      identifier: String,
                                      account: String,
                                      options: NKRequestOptions = NKRequestOptions(),
-                                     taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in }) async -> (String, NKTextProcessingTask?, AFDataResponse<Data>?, NKError) {
+                                     taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in }
+    ) async -> (
+        account: String,
+        task: NKTextProcessingTask?,
+        responseData: AFDataResponse<Data>?,
+        error: NKError
+    ) {
         await withCheckedContinuation { continuation in
             textProcessingSchedule(input: input,
                                    typeId: typeId,
@@ -121,11 +158,25 @@ public extension NextcloudKit {
                                    account: account,
                                    options: options,
                                    taskHandler: taskHandler) { account, task, responseData, error in
-                continuation.resume(returning: (account, task, responseData, error))
+                continuation.resume(returning: (
+                    account: account,
+                    task: task,
+                    responseData: responseData,
+                    error: error
+                ))
             }
         }
     }
 
+    // Retrieves the current status and data of a previously scheduled text processing task.
+    // Useful for polling or checking the result of a long-running task by its unique ID.
+    //
+    // Parameters:
+    // - taskId: The server-side ID of the text processing task to retrieve.
+    // - account: The Nextcloud account making the request.
+    // - options: Optional request configuration.
+    // - taskHandler: Optional closure to access the URLSessionTask.
+    // - completion: Completion handler returning the account, task object, raw response, and NKError.
     func textProcessingGetTask(taskId: Int,
                                account: String,
                                options: NKRequestOptions = NKRequestOptions(),
@@ -160,27 +211,47 @@ public extension NextcloudKit {
         }
     }
 
-    /// Asynchronously retrieves a specific text processing task by ID.
+    /// Asynchronously retrieves the details of a specific text processing task.
     /// - Parameters:
-    ///   - taskId: The unique identifier of the text processing task.
-    ///   - account: The account identifier.
-    ///   - options: Optional request options.
-    ///   - taskHandler: Optional closure to access the URLSessionTask.
-    /// - Returns: A tuple with account, the task (if found), response data, and error.
+    ///   - taskId: The ID of the task to fetch.
+    ///   - account: The account used for the request.
+    ///   - options: Optional configuration.
+    ///   - taskHandler: Closure to access the session task.
+    /// - Returns: A tuple with named values for account, task object, response, and error.
     func textProcessingGetTaskAsync(taskId: Int,
                                     account: String,
                                     options: NKRequestOptions = NKRequestOptions(),
-                                    taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in }) async -> (String, NKTextProcessingTask?, AFDataResponse<Data>?, NKError) {
+                                    taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in }
+    ) async -> (
+        account: String,
+        task: NKTextProcessingTask?,
+        responseData: AFDataResponse<Data>?,
+        error: NKError
+    ) {
         await withCheckedContinuation { continuation in
             textProcessingGetTask(taskId: taskId,
                                   account: account,
                                   options: options,
                                   taskHandler: taskHandler) { account, task, responseData, error in
-                continuation.resume(returning: (account, task, responseData, error))
+                continuation.resume(returning: (
+                    account: account,
+                    task: task,
+                    responseData: responseData,
+                    error: error
+                ))
             }
         }
     }
 
+    // Deletes a specific text processing task on the server.
+    // This is used to cancel or clean up tasks that are no longer needed.
+    //
+    // Parameters:
+    // - taskId: The ID of the task to be deleted.
+    // - account: The Nextcloud account making the request.
+    // - options: Optional request configuration.
+    // - taskHandler: Optional closure to access the URLSessionTask.
+    // - completion: Completion handler returning the account, deleted task object, raw response, and NKError.
     func textProcessingDeleteTask(taskId: Int,
                                   account: String,
                                   options: NKRequestOptions = NKRequestOptions(),
@@ -215,27 +286,47 @@ public extension NextcloudKit {
         }
     }
 
-    /// Asynchronously deletes a text processing task by its ID.
+    /// Asynchronously deletes a scheduled text processing task from the server.
     /// - Parameters:
-    ///   - taskId: The ID of the task to delete.
-    ///   - account: The account identifier.
-    ///   - options: Optional request options.
-    ///   - taskHandler: Optional closure to access the URLSessionTask.
-    /// - Returns: A tuple with account, the deleted task (if returned), response data, and error.
+    ///   - taskId: ID of the task to delete.
+    ///   - account: Account executing the deletion.
+    ///   - options: Request options.
+    ///   - taskHandler: Callback for the underlying URLSessionTask.
+    /// - Returns: A tuple with named values for account, deleted task object, response, and error.
     func textProcessingDeleteTaskAsync(taskId: Int,
                                        account: String,
                                        options: NKRequestOptions = NKRequestOptions(),
-                                       taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in }) async -> (String, NKTextProcessingTask?, AFDataResponse<Data>?, NKError) {
+                                       taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in }
+    ) async -> (
+        account: String,
+        task: NKTextProcessingTask?,
+        responseData: AFDataResponse<Data>?,
+        error: NKError
+    ) {
         await withCheckedContinuation { continuation in
             textProcessingDeleteTask(taskId: taskId,
                                      account: account,
                                      options: options,
                                      taskHandler: taskHandler) { account, task, responseData, error in
-                continuation.resume(returning: (account, task, responseData, error))
+                continuation.resume(returning: (
+                    account: account,
+                    task: task,
+                    responseData: responseData,
+                    error: error
+                ))
             }
         }
     }
 
+    // Retrieves a list of all text processing tasks associated with a specific app ID.
+    // This includes both pending and completed tasks, useful for tracking the assistant's activity.
+    //
+    // Parameters:
+    // - appId: Identifier of the application requesting the tasks (e.g., "assistant").
+    // - account: The Nextcloud account making the request.
+    // - options: Optional HTTP request configuration.
+    // - taskHandler: Optional closure to access the URLSessionTask.
+    // - completion: Completion handler returning the account, task list, raw response, and NKError.
     func textProcessingTaskList(appId: String,
                                 account: String,
                                 options: NKRequestOptions = NKRequestOptions(),
@@ -270,23 +361,34 @@ public extension NextcloudKit {
         }
     }
 
-    /// Asynchronously retrieves the list of text processing tasks for the given app and account.
+    /// Asynchronously retrieves all text processing tasks associated with a specific app ID.
     /// - Parameters:
-    ///   - appId: The application identifier (e.g., "assistant").
-    ///   - account: The account identifier.
-    ///   - options: Optional request options.
-    ///   - taskHandler: Optional closure to access the URLSessionTask.
-    /// - Returns: A tuple with account, task list (if any), response data, and error.
+    ///   - appId: The application identifier to filter the task list.
+    ///   - account: The account performing the request.
+    ///   - options: Optional request configuration.
+    ///   - taskHandler: Callback for the URLSessionTask.
+    /// - Returns: A tuple with named values for account, task list, response, and error.
     func textProcessingTaskListAsync(appId: String,
                                      account: String,
                                      options: NKRequestOptions = NKRequestOptions(),
-                                     taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in }) async -> (String, [NKTextProcessingTask]?, AFDataResponse<Data>?, NKError) {
+                                     taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in }
+    ) async -> (
+        account: String,
+        task: [NKTextProcessingTask]?,
+        responseData: AFDataResponse<Data>?,
+        error: NKError
+    ) {
         await withCheckedContinuation { continuation in
             textProcessingTaskList(appId: appId,
                                    account: account,
                                    options: options,
-                                   taskHandler: taskHandler) { account, taskList, responseData, error in
-                continuation.resume(returning: (account, taskList, responseData, error))
+                                   taskHandler: taskHandler) { account, task, responseData, error in
+                continuation.resume(returning: (
+                    account: account,
+                    task: task,
+                    responseData: responseData,
+                    error: error
+                ))
             }
         }
     }

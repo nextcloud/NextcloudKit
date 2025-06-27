@@ -56,20 +56,31 @@ public extension NextcloudKit {
         }
     }
 
-    /// Asynchronously retrieves the list of group folders for the specified account.
+    /// Asynchronously retrieves the list of Groupfolders associated with the given account.
     /// - Parameters:
-    ///   - account: The Nextcloud account requesting group folders.
-    ///   - options: Optional request configuration.
-    ///   - taskHandler: Optional closure to access the session task.
-    /// - Returns: A tuple containing the account, parsed list of group folders, raw response, and NKError.
+    ///   - account: The Nextcloud account identifier.
+    ///   - options: Optional request configuration (headers, queue, etc.).
+    ///   - taskHandler: Optional monitoring of the `URLSessionTask`.
+    /// - Returns: A tuple containing the account, an optional array of `NKGroupfolders`, the response data, and an `NKError`.
     func getGroupfoldersAsync(account: String,
                               options: NKRequestOptions = NKRequestOptions(),
-                              taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in }) async -> (String, [NKGroupfolders]?, AFDataResponse<Data>?, NKError) {
+                              taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in }
+    ) async -> (
+        account: String,
+        results: [NKGroupfolders]?,
+        responseData: AFDataResponse<Data>?,
+        error: NKError
+    ) {
         await withCheckedContinuation { continuation in
             getGroupfolders(account: account,
                             options: options,
                             taskHandler: taskHandler) { account, results, responseData, error in
-                continuation.resume(returning: (account, results, responseData, error))
+                continuation.resume(returning: (
+                    account: account,
+                    results: results,
+                    responseData: responseData,
+                    error: error
+                ))
             }
         }
     }

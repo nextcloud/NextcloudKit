@@ -55,26 +55,35 @@ public extension NextcloudKit {
         }
     }
 
-    /// Asynchronously marks or unmarks a folder as E2EE for the specified account.
+    /// Asynchronously marks or unmarks a folder for end-to-end encryption.
     /// - Parameters:
     ///   - fileId: The ID of the folder.
-    ///   - delete: Whether to remove (`true`) or set (`false`) the E2EE mark.
-    ///   - account: The account performing the request.
-    ///   - options: Optional request options (default is empty).
-    ///   - taskHandler: Optional closure to access the URLSessionTask.
-    /// - Returns: A tuple containing the account, raw response, and NKError.
+    ///   - delete: Whether to remove the E2EE marker (true) or set it (false).
+    ///   - account: The Nextcloud account used for the request.
+    ///   - options: Request configuration and context.
+    ///   - taskHandler: Optional monitoring of the underlying URLSessionTask.
+    /// - Returns: A tuple with account, responseData and NKError.
     func markE2EEFolderAsync(fileId: String,
                              delete: Bool,
                              account: String,
                              options: NKRequestOptions = NKRequestOptions(),
-                             taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in }) async -> (String, AFDataResponse<Data>?, NKError) {
+                             taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in }
+    ) async -> (
+        account: String,
+        responseData: AFDataResponse<Data>?,
+        error: NKError
+    ) {
         await withCheckedContinuation { continuation in
             markE2EEFolder(fileId: fileId,
                            delete: delete,
                            account: account,
                            options: options,
                            taskHandler: taskHandler) { account, responseData, error in
-                continuation.resume(returning: (account, responseData, error))
+                continuation.resume(returning: (
+                    account: account,
+                    responseData: responseData,
+                    error: error
+                ))
             }
         }
     }
@@ -142,23 +151,29 @@ public extension NextcloudKit {
         }
     }
 
-    /// Asynchronously locks or unlocks an E2EE folder for the given account using the specified method and token.
+    /// Asynchronously locks or unlocks a folder for end-to-end encryption.
     /// - Parameters:
-    ///   - fileId: The ID of the folder to lock/unlock.
-    ///   - e2eToken: Optional E2EE token to lock the folder (nil for unlock).
-    ///   - e2eCounter: Optional counter value (used for token freshness).
-    ///   - method: The HTTP method to use (e.g. "LOCK", "PUT").
-    ///   - account: The account performing the operation.
-    ///   - options: Optional request options (default is empty).
-    ///   - taskHandler: Optional closure to access the URLSessionTask.
-    /// - Returns: A tuple with the account, resulting E2EE token (if any), raw response, and NKError.
+    ///   - fileId: The ID of the folder.
+    ///   - e2eToken: Optional encryption token to include in the request.
+    ///   - e2eCounter: Optional counter string to include.
+    ///   - method: HTTP method ("LOCK" or "UNLOCK").
+    ///   - account: The Nextcloud account used for the request.
+    ///   - options: Request configuration and context.
+    ///   - taskHandler: Optional monitoring of the underlying URLSessionTask.
+    /// - Returns: A tuple with account, returned e2eToken, responseData and NKError.
     func lockE2EEFolderAsync(fileId: String,
                              e2eToken: String?,
                              e2eCounter: String?,
                              method: String,
                              account: String,
                              options: NKRequestOptions = NKRequestOptions(),
-                             taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in }) async -> (String, String?, AFDataResponse<Data>?, NKError) {
+                             taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in }
+    ) async -> (
+        account: String,
+        e2eToken: String?,
+        responseData: AFDataResponse<Data>?,
+        error: NKError
+    ) {
         await withCheckedContinuation { continuation in
             lockE2EEFolder(fileId: fileId,
                            e2eToken: e2eToken,
@@ -166,8 +181,13 @@ public extension NextcloudKit {
                            method: method,
                            account: account,
                            options: options,
-                           taskHandler: taskHandler) { account, e2eToken, responseData, error in
-                continuation.resume(returning: (account, e2eToken, responseData, error))
+                           taskHandler: taskHandler) { account, token, responseData, error in
+                continuation.resume(returning: (
+                    account: account,
+                    e2eToken: token,
+                    responseData: responseData,
+                    error: error
+                ))
             }
         }
     }
@@ -227,26 +247,39 @@ public extension NextcloudKit {
         }
     }
 
-    /// Asynchronously retrieves E2EE metadata and signature for a specific file.
+    /// Asynchronously fetches the E2EE metadata and signature for a given file.
     /// - Parameters:
-    ///   - fileId: The ID of the file to retrieve metadata for.
-    ///   - e2eToken: Optional E2EE token.
-    ///   - account: The Nextcloud account requesting metadata.
-    ///   - options: Optional request options.
-    ///   - taskHandler: Optional closure to access the task.
-    /// - Returns: A tuple containing the account, E2EE metadata, signature, raw response, and NKError.
+    ///   - fileId: The ID of the file.
+    ///   - e2eToken: Optional encryption token to include.
+    ///   - account: The Nextcloud account used for the request.
+    ///   - options: Request configuration and context.
+    ///   - taskHandler: Optional monitoring of the underlying URLSessionTask.
+    /// - Returns: A tuple with account, metadata, signature, response data and error result.
     func getE2EEMetadataAsync(fileId: String,
                               e2eToken: String?,
                               account: String,
                               options: NKRequestOptions = NKRequestOptions(),
-                              taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in }) async -> (String, String?, String?, AFDataResponse<Data>?, NKError) {
+                              taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in }
+    ) async -> (
+        account: String,
+        e2eMetadata: String?,
+        signature: String?,
+        responseData: AFDataResponse<Data>?,
+        error: NKError
+    ) {
         await withCheckedContinuation { continuation in
             getE2EEMetadata(fileId: fileId,
                             e2eToken: e2eToken,
                             account: account,
                             options: options,
-                            taskHandler: taskHandler) { account, metadata, signature, response, error in
-                continuation.resume(returning: (account, metadata, signature, response, error))
+                            taskHandler: taskHandler) { account, metadata, signature, responseData, error in
+                continuation.resume(returning: (
+                    account: account,
+                    e2eMetadata: metadata,
+                    signature: signature,
+                    responseData: responseData,
+                    error: error
+                ))
             }
         }
     }
@@ -316,17 +349,17 @@ public extension NextcloudKit {
         }
     }
 
-    /// Asynchronously uploads E2EE metadata for a file using a given method, token and optional signature.
+    /// Asynchronously stores E2EE metadata on the server for the specified file.
     /// - Parameters:
-    ///   - fileId: The ID of the file to update metadata for.
-    ///   - e2eToken: The E2EE token used for authentication.
-    ///   - e2eMetadata: Optional encrypted metadata.
-    ///   - signature: Optional cryptographic signature (added to header).
-    ///   - method: HTTP method to use (e.g., "PUT").
-    ///   - account: The account performing the operation.
-    ///   - options: Optional request options.
-    ///   - taskHandler: Optional closure to access the session task.
-    /// - Returns: A tuple containing the account, stored metadata (if any), response, and NKError.
+    ///   - fileId: The file identifier.
+    ///   - e2eToken: The encryption token required for authorization.
+    ///   - e2eMetadata: Optional metadata to store.
+    ///   - signature: Optional digital signature to validate the metadata.
+    ///   - method: The HTTP method to be used ("POST", "PUT").
+    ///   - account: The Nextcloud account to use.
+    ///   - options: Optional request context and headers.
+    ///   - taskHandler: Optional monitoring of the URLSessionTask.
+    /// - Returns: A tuple with account, metadata, response data, and error result.
     func putE2EEMetadataAsync(fileId: String,
                               e2eToken: String,
                               e2eMetadata: String?,
@@ -334,7 +367,13 @@ public extension NextcloudKit {
                               method: String,
                               account: String,
                               options: NKRequestOptions = NKRequestOptions(),
-                              taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in }) async -> (String, String?, AFDataResponse<Data>?, NKError) {
+                              taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in }
+    ) async -> (
+        account: String,
+        metadata: String?,
+        responseData: AFDataResponse<Data>?,
+        error: NKError
+    ) {
         await withCheckedContinuation { continuation in
             putE2EEMetadata(fileId: fileId,
                             e2eToken: e2eToken,
@@ -343,8 +382,13 @@ public extension NextcloudKit {
                             method: method,
                             account: account,
                             options: options,
-                            taskHandler: taskHandler) { account, metadata, response, error in
-                continuation.resume(returning: (account, metadata, response, error))
+                            taskHandler: taskHandler) { account, metadata, responseData, error in
+                continuation.resume(returning: (
+                    account: account,
+                    metadata: metadata,
+                    responseData: responseData,
+                    error: error
+                ))
             }
         }
     }
@@ -412,23 +456,38 @@ public extension NextcloudKit {
         }
     }
 
-    /// Asynchronously retrieves the E2EE public certificate for the current or specified user.
+    /// Asynchronously retrieves the public E2EE certificate.
+    /// If `user` is provided, retrieves the certificate for that user.
+    /// If `user` is nil, retrieves the certificate for the current session user.
     /// - Parameters:
-    ///   - user: Optional username to query (nil fetches current user).
-    ///   - account: The Nextcloud account performing the request.
-    ///   - options: Optional request options.
-    ///   - taskHandler: Closure to access the session task.
-    /// - Returns: A tuple with account, current user's certificate, specified user's certificate (if any), response, and NKError.
+    ///   - user: Optional user ID to fetch the certificate for.
+    ///   - account: The account to use for the request.
+    ///   - options: Optional request context (headers, queue, etc.).
+    ///   - taskHandler: Optional observer for the URLSession task.
+    /// - Returns: A tuple containing account, current user’s certificate, optional target user’s certificate, response data, and an error if any.
     func getE2EECertificateAsync(user: String? = nil,
                                  account: String,
                                  options: NKRequestOptions = NKRequestOptions(),
-                                 taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in }) async -> (String, String?, String?, AFDataResponse<Data>?, NKError) {
+                                 taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in }
+    ) async -> (
+        account: String,
+        certificate: String?,
+        certificateUser: String?,
+        responseData: AFDataResponse<Data>?,
+        error: NKError
+    ) {
         await withCheckedContinuation { continuation in
             getE2EECertificate(user: user,
                                account: account,
                                options: options,
-                               taskHandler: taskHandler) { account, certificate, certificateUser, response, error in
-                continuation.resume(returning: (account, certificate, certificateUser, response, error))
+                               taskHandler: taskHandler) { account, certificate, certificateUser, responseData, error in
+                continuation.resume(returning: (
+                    account: account,
+                    certificate: certificate,
+                    certificateUser: certificateUser,
+                    responseData: responseData,
+                    error: error
+                ))
             }
         }
     }
@@ -478,20 +537,31 @@ public extension NextcloudKit {
         }
     }
 
-    /// Asynchronously retrieves the private E2EE key for the given account.
+    /// Asynchronously retrieves the private E2EE key for the current user.
     /// - Parameters:
-    ///   - account: The account requesting the private key.
-    ///   - options: Optional request options.
-    ///   - taskHandler: Closure to access the URLSessionTask.
-    /// - Returns: A tuple containing the account, private key (if any), response, and NKError.
+    ///   - account: The Nextcloud account to authenticate the request.
+    ///   - options: Optional request options (API version, headers, etc.).
+    ///   - taskHandler: Optional callback for task creation.
+    /// - Returns: A tuple containing the account, the private key string (if available), the response, and the error.
     func getE2EEPrivateKeyAsync(account: String,
                                 options: NKRequestOptions = NKRequestOptions(),
-                                taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in }) async -> (String, String?, AFDataResponse<Data>?, NKError) {
+                                taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in }
+    ) async -> (
+        account: String,
+        privateKey: String?,
+        responseData: AFDataResponse<Data>?,
+        error: NKError
+    ) {
         await withCheckedContinuation { continuation in
             getE2EEPrivateKey(account: account,
                               options: options,
-                              taskHandler: taskHandler) { account, key, response, error in
-                continuation.resume(returning: (account, key, response, error))
+                              taskHandler: taskHandler) { account, privateKey, responseData, error in
+                continuation.resume(returning: (
+                    account: account,
+                    privateKey: privateKey,
+                    responseData: responseData,
+                    error: error
+                ))
             }
         }
     }
@@ -541,20 +611,31 @@ public extension NextcloudKit {
         }
     }
 
-    /// Asynchronously retrieves the server’s E2EE public key for the specified account.
+    /// Asynchronously retrieves the server's public key for end-to-end encryption.
     /// - Parameters:
-    ///   - account: The Nextcloud account performing the request.
-    ///   - options: Optional request options.
-    ///   - taskHandler: Closure to access the session task.
-    /// - Returns: A tuple with account, public key (if any), raw response, and NKError.
+    ///   - account: The Nextcloud account used for the request.
+    ///   - options: Optional request configuration (API version, headers, etc.).
+    ///   - taskHandler: Optional monitoring of the underlying URLSessionTask.
+    /// - Returns: A tuple with account, publicKey string, AFDataResponse, and NKError.
     func getE2EEPublicKeyAsync(account: String,
                                options: NKRequestOptions = NKRequestOptions(),
-                               taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in }) async -> (String, String?, AFDataResponse<Data>?, NKError) {
+                               taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in }
+    ) async -> (
+        account: String,
+        publicKey: String?,
+        responseData: AFDataResponse<Data>?,
+        error: NKError
+    ) {
         await withCheckedContinuation { continuation in
             getE2EEPublicKey(account: account,
                              options: options,
-                             taskHandler: taskHandler) { account, key, response, error in
-                continuation.resume(returning: (account, key, response, error))
+                             taskHandler: taskHandler) { account, publicKey, responseData, error in
+                continuation.resume(returning: (
+                    account: account,
+                    publicKey: publicKey,
+                    responseData: responseData,
+                    error: error
+                ))
             }
         }
     }
@@ -608,23 +689,34 @@ public extension NextcloudKit {
         }
     }
 
-    /// Asynchronously requests a signed E2EE public key from the server by submitting a CSR.
+    /// Asynchronously submits a CSR (Certificate Signing Request) to obtain a signed E2EE certificate.
     /// - Parameters:
-    ///   - certificate: The certificate signing request (CSR) string.
-    ///   - account: The Nextcloud account performing the request.
-    ///   - options: Optional request options.
-    ///   - taskHandler: Closure to access the session task.
-    /// - Returns: A tuple containing the account, signed public key (if any), response, and NKError.
+    ///   - certificate: The CSR string to be signed.
+    ///   - account: The Nextcloud account used for the request.
+    ///   - options: Optional request configuration.
+    ///   - taskHandler: Optional monitoring of the URLSessionTask.
+    /// - Returns: A tuple containing the account, signed certificate, response data, and error.
     func signE2EECertificateAsync(certificate: String,
                                   account: String,
                                   options: NKRequestOptions = NKRequestOptions(),
-                                  taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in }) async -> (String, String?, AFDataResponse<Data>?, NKError) {
+                                  taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in }
+    ) async -> (
+        account: String,
+        certificate: String?,
+        responseData: AFDataResponse<Data>?,
+        error: NKError
+    ) {
         await withCheckedContinuation { continuation in
             signE2EECertificate(certificate: certificate,
                                 account: account,
                                 options: options,
-                                taskHandler: taskHandler) { account, signedCert, response, error in
-                continuation.resume(returning: (account, signedCert, response, error))
+                                taskHandler: taskHandler) { account, certificate, responseData, error in
+                continuation.resume(returning: (
+                    account: account,
+                    certificate: certificate,
+                    responseData: responseData,
+                    error: error
+                ))
             }
         }
     }
@@ -677,23 +769,34 @@ public extension NextcloudKit {
         }
     }
 
-    /// Asynchronously stores the given E2EE private key for the specified account.
+    /// Asynchronously stores the E2EE private key on the server for the specified account.
     /// - Parameters:
-    ///   - privateKey: The PEM-formatted private key to store.
+    ///   - privateKey: The private key to be saved.
     ///   - account: The Nextcloud account performing the operation.
-    ///   - options: Optional request options.
-    ///   - taskHandler: Closure to access the session task.
-    /// - Returns: A tuple with account, echoed private key (if any), response, and NKError.
+    ///   - options: Optional request configuration.
+    ///   - taskHandler: Optional monitoring of the URLSessionTask.
+    /// - Returns: A tuple containing the account, echoed private key, response data, and error.
     func storeE2EEPrivateKeyAsync(privateKey: String,
                                   account: String,
                                   options: NKRequestOptions = NKRequestOptions(),
-                                  taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in }) async -> (String, String?, AFDataResponse<Data>?, NKError) {
+                                  taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in }
+    ) async -> (
+        account: String,
+        privateKey: String?,
+        responseData: AFDataResponse<Data>?,
+        error: NKError
+    ) {
         await withCheckedContinuation { continuation in
             storeE2EEPrivateKey(privateKey: privateKey,
                                 account: account,
                                 options: options,
-                                taskHandler: taskHandler) { account, key, response, error in
-                continuation.resume(returning: (account, key, response, error))
+                                taskHandler: taskHandler) { account, privateKey, responseData, error in
+                continuation.resume(returning: (
+                    account: account,
+                    privateKey: privateKey,
+                    responseData: responseData,
+                    error: error
+                ))
             }
         }
     }
@@ -735,20 +838,29 @@ public extension NextcloudKit {
         }
     }
 
-    /// Asynchronously deletes the E2EE public certificate for the given account.
+    /// Asynchronously deletes the E2EE public certificate from the server for the given account.
     /// - Parameters:
-    ///   - account: The Nextcloud account performing the deletion.
-    ///   - options: Optional request options.
-    ///   - taskHandler: Closure to access the session task.
-    /// - Returns: A tuple containing the account, response, and NKError.
+    ///   - account: The Nextcloud account to remove the certificate from.
+    ///   - options: Optional request configuration.
+    ///   - taskHandler: Optional monitoring of the URLSessionTask.
+    /// - Returns: A tuple containing the account, response data, and error.
     func deleteE2EECertificateAsync(account: String,
                                     options: NKRequestOptions = NKRequestOptions(),
-                                    taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in }) async -> (String, AFDataResponse<Data>?, NKError) {
+                                    taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in }
+    ) async -> (
+        account: String,
+        responseData: AFDataResponse<Data>?,
+        error: NKError
+    ) {
         await withCheckedContinuation { continuation in
             deleteE2EECertificate(account: account,
                                   options: options,
-                                  taskHandler: taskHandler) { account, response, error in
-                continuation.resume(returning: (account, response, error))
+                                  taskHandler: taskHandler) { account, responseData, error in
+                continuation.resume(returning: (
+                    account: account,
+                    responseData: responseData,
+                    error: error
+                ))
             }
         }
     }
@@ -791,20 +903,29 @@ public extension NextcloudKit {
         }
     }
 
-    /// Asynchronously deletes the E2EE private key for the given account.
+    /// Asynchronously deletes the E2EE private key from the server for the specified account.
     /// - Parameters:
-    ///   - account: The Nextcloud account performing the deletion.
-    ///   - options: Optional request options.
-    ///   - taskHandler: Closure to access the session task.
-    /// - Returns: A tuple containing the account, response, and NKError.
+    ///   - account: The Nextcloud account for which the private key will be deleted.
+    ///   - options: Optional request configuration and headers.
+    ///   - taskHandler: Optional monitoring of the URLSessionTask.
+    /// - Returns: A tuple containing the account, response data, and error.
     func deleteE2EEPrivateKeyAsync(account: String,
                                    options: NKRequestOptions = NKRequestOptions(),
-                                   taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in }) async -> (String, AFDataResponse<Data>?, NKError) {
+                                   taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in }
+    ) async -> (
+        account: String,
+        responseData: AFDataResponse<Data>?,
+        error: NKError
+    ) {
         await withCheckedContinuation { continuation in
             deleteE2EEPrivateKey(account: account,
                                  options: options,
-                                 taskHandler: taskHandler) { account, response, error in
-                continuation.resume(returning: (account, response, error))
+                                 taskHandler: taskHandler) { account, responseData, error in
+                continuation.resume(returning: (
+                    account: account,
+                    responseData: responseData,
+                    error: error
+                ))
             }
         }
     }
