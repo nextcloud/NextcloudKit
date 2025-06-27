@@ -7,17 +7,17 @@ import Alamofire
 import SwiftyJSON
 
 public extension NextcloudKit {
-    // Sends a WebDAV LOCK or UNLOCK request for a file on the server,
-    // depending on the `shouldLock` flag. This is used to prevent or release
-    // concurrent edits on a file.
-    //
-    // Parameters:
-    // - serverUrlFileName: Fully qualified and encoded URL of the file to lock/unlock.
-    // - shouldLock: Pass `true` to lock the file, `false` to unlock it.
-    // - account: The Nextcloud account performing the operation.
-    // - options: Optional request options (e.g. headers, queue).
-    // - taskHandler: Closure to access the URLSessionTask.
-    // - completion: Completion handler returning the account, response, and NKError.
+    /// Sends a WebDAV LOCK or UNLOCK request for a file on the server,
+    /// depending on the `shouldLock` flag. This is used to prevent or release
+    /// concurrent edits on a file.
+    ///
+    /// Parameters:
+    /// - serverUrlFileName: Fully qualified and encoded URL of the file to lock/unlock.
+    /// - shouldLock: Pass `true` to lock the file, `false` to unlock it.
+    /// - account: The Nextcloud account performing the operation.
+    /// - options: Optional request options (e.g. headers, queue).
+    /// - taskHandler: Closure to access the URLSessionTask.
+    /// - completion: Completion handler returning the account, response, and NKError.
     func lockUnlockFile(serverUrlFileName: String,
                         shouldLock: Bool,
                         account: String,

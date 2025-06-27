@@ -7,15 +7,15 @@ import Alamofire
 import SwiftyJSON
 
 public extension NextcloudKit {
-    // Retrieves the list of dashboard widgets available for the specified Nextcloud account.
-    // This typically calls the dashboard API endpoint and returns a list of `NCCDashboardWidget` items.
-    //
-    // Parameters:
-    // - account: The Nextcloud account performing the request.
-    // - options: Optional request options such as custom headers or retry policy (default is empty).
-    // - request: A closure that receives the underlying Alamofire `DataRequest`, useful for inspection or mutation.
-    // - taskHandler: A closure to access the `URLSessionTask` for progress or cancellation control.
-    // - completion: Completion handler returning the account, list of widgets, the raw response, and any NKError.
+    /// Retrieves the list of dashboard widgets available for the specified Nextcloud account.
+    /// This typically calls the dashboard API endpoint and returns a list of `NCCDashboardWidget` items.
+    ///
+    /// Parameters:
+    /// - account: The Nextcloud account performing the request.
+    /// - options: Optional request options such as custom headers or retry policy (default is empty).
+    /// - request: A closure that receives the underlying Alamofire `DataRequest`, useful for inspection or mutation.
+    /// - taskHandler: A closure to access the `URLSessionTask` for progress or cancellation control.
+    /// - completion: Completion handler returning the account, list of widgets, the raw response, and any NKError.
     func getDashboardWidget(account: String,
                             options: NKRequestOptions = NKRequestOptions(),
                             request: @escaping (DataRequest?) -> Void = { _ in },
@@ -83,16 +83,16 @@ public extension NextcloudKit {
         }
     }
 
-    // Retrieves the list of dashboard application widgets for the specified account and item string.
-    // This is typically used to fetch available dashboard apps filtered by `items` (e.g., "weather,tasks").
-    //
-    // Parameters:
-    // - items: A comma-separated string representing widget types or categories to fetch.
-    // - account: The Nextcloud account performing the request.
-    // - options: Optional request options (default is empty).
-    // - request: A closure that receives the underlying Alamofire `DataRequest`, useful for inspection or mutation.
-    // - taskHandler: A closure to access the `URLSessionTask` for progress or cancellation.
-    // - completion: Completion handler returning the account, list of applications, response, and error.
+    /// Retrieves the list of dashboard application widgets for the specified account and item string.
+    /// This is typically used to fetch available dashboard apps filtered by `items` (e.g., "weather,tasks").
+    ///
+    /// Parameters:
+    /// - items: A comma-separated string representing widget types or categories to fetch.
+    /// - account: The Nextcloud account performing the request.
+    /// - options: Optional request options (default is empty).
+    /// - request: A closure that receives the underlying Alamofire `DataRequest`, useful for inspection or mutation.
+    /// - taskHandler: A closure to access the `URLSessionTask` for progress or cancellation.
+    /// - completion: Completion handler returning the account, list of applications, response, and error.
     func getDashboardWidgetsApplication(_ items: String,
                                         account: String,
                                         options: NKRequestOptions = NKRequestOptions(),

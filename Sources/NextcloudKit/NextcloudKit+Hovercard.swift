@@ -7,6 +7,13 @@ import Alamofire
 import SwiftyJSON
 
 public extension NextcloudKit {
+    /// Retrieves the hovercard information for a specific user from the Nextcloud server.
+    /// - Parameters:
+    ///   - userId: The identifier of the user whose hovercard is being requested.
+    ///   - account: The Nextcloud account used to perform the request.
+    ///   - options: Optional request options for customizing the API call.
+    ///   - taskHandler: Closure for observing the underlying `URLSessionTask`.
+    ///   - completion: Completion handler returning the account, the `NKHovercard` result, raw response data, and any error encountered.
     func getHovercard(for userId: String,
                       account: String,
                       options: NKRequestOptions = NKRequestOptions(),
@@ -38,6 +45,38 @@ public extension NextcloudKit {
                     return
                 }
                 options.queue.async { completion(account, result, response, .success) }
+            }
+        }
+    }
+
+    /// Asynchronously retrieves the hovercard information for a specific user from the Nextcloud server.
+    /// - Parameters:
+    ///   - userId: The identifier of the user whose hovercard is being requested.
+    ///   - account: The Nextcloud account used to perform the request.
+    ///   - options: Optional request options for customizing the API call.
+    ///   - taskHandler: Closure for observing the underlying `URLSessionTask`.
+    /// - Returns: A tuple containing the account, the `NKHovercard` result, raw response data, and any error encountered.
+    func getHovercardAsync(for userId: String,
+                           account: String,
+                           options: NKRequestOptions = NKRequestOptions(),
+                           taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in }
+    ) async -> (
+        account: String,
+        result: NKHovercard?,
+        responseData: AFDataResponse<Data>?,
+        error: NKError
+    ) {
+        await withCheckedContinuation { continuation in
+            getHovercard(for: userId,
+                         account: account,
+                         options: options,
+                         taskHandler: taskHandler) { account, result, responseData, error in
+                continuation.resume(returning: (
+                    account: account,
+                    result: result,
+                    responseData: responseData,
+                    error: error
+                ))
             }
         }
     }

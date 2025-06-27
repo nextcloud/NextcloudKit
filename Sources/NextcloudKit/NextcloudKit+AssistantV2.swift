@@ -7,15 +7,15 @@ import Alamofire
 import SwiftyJSON
 
 public extension NextcloudKit {
-    // Retrieves the list of supported task types for a specific account and task category.
-    // Typically used to discover available AI or text processing capabilities.
-    //
-    // Parameters:
-    // - account: The Nextcloud account making the request.
-    // - supportedTaskType: Type of tasks to retrieve, default is "Text".
-    // - options: Optional HTTP request configuration.
-    // - taskHandler: Optional closure to access the URLSessionTask.
-    // - completion: Completion handler returning the account, list of supported types, raw response, and NKError.
+    /// Retrieves the list of supported task types for a specific account and task category.
+    /// Typically used to discover available AI or text processing capabilities.
+    ///
+    /// Parameters:
+    /// - account: The Nextcloud account making the request.
+    /// - supportedTaskType: Type of tasks to retrieve, default is "Text".
+    /// - options: Optional HTTP request configuration.
+    /// - taskHandler: Optional closure to access the URLSessionTask.
+    /// - completion: Completion handler returning the account, list of supported types, raw response, and NKError.
     func textProcessingGetTypesV2(account: String,
                                   supportedTaskType: String = "Text",
                                   options: NKRequestOptions = NKRequestOptions(),
@@ -86,16 +86,16 @@ public extension NextcloudKit {
         }
     }
 
-    // Schedules a new text processing task for a specific account and task type.
-    // Useful for initiating assistant-based text analysis, generation, or transformation.
-    //
-    // Parameters:
-    // - input: The input text to be processed.
-    // - taskType: The specific task type to execute (e.g., summarization, sentiment analysis).
-    // - account: The Nextcloud account initiating the task.
-    // - options: Optional HTTP request configuration.
-    // - taskHandler: Optional closure to access the underlying URLSessionTask.
-    // - completion: Completion handler returning the account, scheduled task, raw response, and NKError.
+    /// Schedules a new text processing task for a specific account and task type.
+    /// Useful for initiating assistant-based text analysis, generation, or transformation.
+    ///
+    /// Parameters:
+    /// - input: The input text to be processed.
+    /// - taskType: The specific task type to execute (e.g., summarization, sentiment analysis).
+    /// - account: The Nextcloud account initiating the task.
+    /// - options: Optional HTTP request configuration.
+    /// - taskHandler: Optional closure to access the underlying URLSessionTask.
+    /// - completion: Completion handler returning the account, scheduled task, raw response, and NKError.
     func textProcessingScheduleV2(input: String,
                                   taskType: TaskTypeData,
                                   account: String,
@@ -169,15 +169,15 @@ public extension NextcloudKit {
         }
     }
 
-    // Retrieves all scheduled text processing tasks of a specific type for the given account.
-    // Useful for listing and tracking tasks like summarization, transcription, or classification.
-    //
-    // Parameters:
-    // - taskType: Identifier of the task type to filter tasks (e.g., "Text").
-    // - account: The Nextcloud account performing the request.
-    // - options: Optional HTTP request configuration.
-    // - taskHandler: Optional closure to access the underlying URLSessionTask.
-    // - completion: Completion handler returning the account, list of tasks, raw response, and NKError.
+    /// Retrieves all scheduled text processing tasks of a specific type for the given account.
+    /// Useful for listing and tracking tasks like summarization, transcription, or classification.
+    ///
+    /// Parameters:
+    /// - taskType: Identifier of the task type to filter tasks (e.g., "Text").
+    /// - account: The Nextcloud account performing the request.
+    /// - options: Optional HTTP request configuration.
+    /// - taskHandler: Optional closure to access the underlying URLSessionTask.
+    /// - completion: Completion handler returning the account, list of tasks, raw response, and NKError.
     func textProcessingGetTasksV2(taskType: String,
                                   account: String,
                                   options: NKRequestOptions = NKRequestOptions(),
@@ -244,15 +244,15 @@ public extension NextcloudKit {
         }
     }
 
-    // Deletes a scheduled text processing task with a specific identifier.
-    // Useful for canceling tasks that are no longer needed or invalid.
-    //
-    // Parameters:
-    // - taskId: The unique identifier of the task to delete.
-    // - account: The Nextcloud account executing the deletion.
-    // - options: Optional HTTP request configuration.
-    // - taskHandler: Optional closure to access the underlying URLSessionTask.
-    // - completion: Completion handler returning the account, raw response, and NKError.
+    /// Deletes a scheduled text processing task with a specific identifier.
+    /// Useful for canceling tasks that are no longer needed or invalid.
+    ///
+    /// Parameters:
+    /// - taskId: The unique identifier of the task to delete.
+    /// - account: The Nextcloud account executing the deletion.
+    /// - options: Optional HTTP request configuration.
+    /// - taskHandler: Optional closure to access the underlying URLSessionTask.
+    /// - completion: Completion handler returning the account, raw response, and NKError.
     func textProcessingDeleteTaskV2(taskId: Int64,
                                     account: String,
                                     options: NKRequestOptions = NKRequestOptions(),

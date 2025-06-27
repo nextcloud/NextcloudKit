@@ -6,15 +6,15 @@ import Foundation
 import Alamofire
 
 public extension NextcloudKit {
-    // Associates a Live Photo video file with a photo on the server.
-    //
-    // Parameters:
-    // - serverUrlfileNamePath: The full server path to the original photo.
-    // - livePhotoFile: The local path to the Live Photo video file (.mov).
-    // - account: The account performing the operation.
-    // - options: Optional request configuration (e.g., headers, queue, version).
-    // - taskHandler: Callback for tracking the underlying URLSessionTask.
-    // - completion: Returns the account, raw response data, and NKError result.
+    /// Associates a Live Photo video file with a photo on the server.
+    ///
+    /// Parameters:
+    /// - serverUrlfileNamePath: The full server path to the original photo.
+    /// - livePhotoFile: The local path to the Live Photo video file (.mov).
+    /// - account: The account performing the operation.
+    /// - options: Optional request configuration (e.g., headers, queue, version).
+    /// - taskHandler: Callback for tracking the underlying URLSessionTask.
+    /// - completion: Returns the account, raw response data, and NKError result.
     func setLivephoto(serverUrlfileNamePath: String,
                       livePhotoFile: String,
                       account: String,

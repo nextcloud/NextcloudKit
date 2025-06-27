@@ -8,15 +8,15 @@ import Alamofire
 import SwiftyJSON
 
 public extension NextcloudKit {
-    // Retrieves the list of available group folders for the given Nextcloud account.
-    // Group folders are shared spaces available across users and groups,
-    // managed via the groupfolders app.
-    //
-    // Parameters:
-    // - account: The Nextcloud account requesting the list of group folders.
-    // - options: Optional request options (e.g., API version, custom headers, queue).
-    // - taskHandler: Closure to access the underlying URLSessionTask.
-    // - completion: Completion handler returning the account, list of group folders, response, and any NKError.
+    /// Retrieves the list of available group folders for the given Nextcloud account.
+    /// Group folders are shared spaces available across users and groups,
+    /// managed via the groupfolders app.
+    ///
+    /// Parameters:
+    /// - account: The Nextcloud account requesting the list of group folders.
+    /// - options: Optional request options (e.g., API version, custom headers, queue).
+    /// - taskHandler: Closure to access the underlying URLSessionTask.
+    /// - completion: Completion handler returning the account, list of group folders, response, and any NKError.
     func getGroupfolders(account: String,
                          options: NKRequestOptions = NKRequestOptions(),
                          taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },

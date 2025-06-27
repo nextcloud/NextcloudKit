@@ -9,16 +9,16 @@ import SwiftyJSON
 public extension NextcloudKit {
     // MARK: - App Password
 
-    // Retrieves an app password (token) for the given user credentials and server URL.
-    //
-    // Parameters:
-    // - url: The base server URL (e.g., https://cloud.example.com).
-    // - user: The username for authentication.
-    // - password: The user's password.
-    // - userAgent: Optional user-agent string to include in the request.
-    // - options: Optional request configuration (headers, queue, etc.).
-    // - taskHandler: Callback for observing the underlying URLSessionTask.
-    // - completion: Returns the token string (if any), raw response data, and NKError result.
+    /// Retrieves an app password (token) for the given user credentials and server URL.
+    ///
+    /// Parameters:
+    /// - url: The base server URL (e.g., https://cloud.example.com).
+    /// - user: The username for authentication.
+    /// - password: The user's password.
+    /// - userAgent: Optional user-agent string to include in the request.
+    /// - options: Optional request configuration (headers, queue, etc.).
+    /// - taskHandler: Callback for observing the underlying URLSessionTask.
+    /// - completion: Returns the token string (if any), raw response data, and NKError result.
     func getAppPassword(url: String,
                         user: String,
                         password: String,
@@ -95,17 +95,17 @@ public extension NextcloudKit {
         }
     }
 
-    // Deletes the app password (token) for a specific account using basic authentication.
-    //
-    // Parameters:
-    // - serverUrl: The full server URL (e.g., https://cloud.example.com).
-    // - username: The username associated with the app password.
-    // - password: The password or app password used for authentication.
-    // - userAgent: Optional user-agent string for the request.
-    // - account: The logical account identifier used in the app.
-    // - options: Optional request configuration (headers, queues, etc.).
-    // - taskHandler: Callback to observe the underlying URLSessionTask.
-    // - completion: Returns the raw response and a possible NKError result.
+    /// Deletes the app password (token) for a specific account using basic authentication.
+    ///
+    /// Parameters:
+    /// - serverUrl: The full server URL (e.g., https://cloud.example.com).
+    /// - username: The username associated with the app password.
+    /// - password: The password or app password used for authentication.
+    /// - userAgent: Optional user-agent string for the request.
+    /// - account: The logical account identifier used in the app.
+    /// - options: Optional request configuration (headers, queues, etc.).
+    /// - taskHandler: Callback to observe the underlying URLSessionTask.
+    /// - completion: Returns the raw response and a possible NKError result.
     func deleteAppPassword(serverUrl: String,
                            username: String,
                            password: String,
@@ -219,6 +219,19 @@ public extension NextcloudKit {
         }
     }
 
+    /// Starts the Login Flow v2 process by requesting a login token and associated parameters from the server.
+    ///
+    /// - Parameters:
+    ///   - serverUrl: The base URL of the Nextcloud server used to initiate the login flow.
+    ///   - options: An optional `NKRequestOptions` object containing configuration such as API version, custom headers, and execution queue.
+    ///   - taskHandler: A closure that provides the `URLSessionTask` used for the request. Useful for monitoring or cancellation.
+    ///
+    /// - Completion:
+    ///   - token: The login token used for polling the login status.
+    ///   - endpoint: The endpoint URL to be polled to check login completion.
+    ///   - login: A user-visible login URL that can be presented to complete authentication.
+    ///   - responseData: The raw `AFDataResponse<Data>` received from the server.
+    ///   - error: An `NKError` object representing success or failure of the operation.
     func getLoginFlowV2(serverUrl: String,
                         options: NKRequestOptions = NKRequestOptions(),
                         taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
@@ -252,14 +265,45 @@ public extension NextcloudKit {
         }
     }
 
-    // Polls the login flow V2 endpoint to retrieve login credentials (OAuth-style).
-    //
-    // Parameters:
-    // - token: The login flow token to poll for.
-    // - endpoint: The base URL endpoint (e.g., https://cloud.example.com).
-    // - options: Optional request configuration (version, headers, queues, etc.).
-    // - taskHandler: Callback to observe the underlying URLSessionTask.
-    // - completion: Returns the discovered server URL, loginName, appPassword, the raw response data, and any NKError.
+    /// Asynchronously initiates the Login Flow v2 process to obtain authentication parameters.
+    /// - Parameters:
+    ///   - serverUrl: The base URL of the Nextcloud server.
+    ///   - options: Optional request configuration for API version, queue, etc.
+    ///   - taskHandler: Optional callback to observe the `URLSessionTask`.
+    /// - Returns: A tuple containing the login token, polling endpoint, login URL, response data, and any encountered error.
+    func getLoginFlowV2Async(serverUrl: String,
+                             options: NKRequestOptions = NKRequestOptions(),
+                             taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in }
+    ) async -> (
+        token: String?,
+        endpoint: String?,
+        login: String?,
+        responseData: AFDataResponse<Data>?,
+        error: NKError
+    ) {
+        await withCheckedContinuation { continuation in
+            getLoginFlowV2(serverUrl: serverUrl,
+                           options: options,
+                           taskHandler: taskHandler) { token, endpoint, login, responseData, error in
+                continuation.resume(returning: (
+                    token: token,
+                    endpoint: endpoint,
+                    login: login,
+                    responseData: responseData,
+                    error: error
+                ))
+            }
+        }
+    }
+
+    /// Polls the login flow V2 endpoint to retrieve login credentials (OAuth-style).
+    ///
+    /// Parameters:
+    /// - token: The login flow token to poll for.
+    /// - endpoint: The base URL endpoint (e.g., https://cloud.example.com).
+    /// - options: Optional request configuration (version, headers, queues, etc.).
+    /// - taskHandler: Callback to observe the underlying URLSessionTask.
+    /// - completion: Returns the discovered server URL, loginName, appPassword, the raw response data, and any NKError.
     func getLoginFlowV2Poll(token: String,
                             endpoint: String,
                             options: NKRequestOptions = NKRequestOptions(),

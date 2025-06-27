@@ -7,18 +7,18 @@ import Alamofire
 import SwiftyJSON
 
 public extension NextcloudKit {
-    // Downloads a remote file and stores it at a local path for the specified Nextcloud account.
-    // It provides detailed progress, headers, and metadata such as ETag, last modified date, and content length.
-    //
-    // Parameters:
-    // - serverUrlFileName: A value representing the remote file URL or path (typically String or URL).
-    // - fileNameLocalPath: The local filesystem path where the file should be saved.
-    // - account: The Nextcloud account performing the download.
-    // - options: Optional request options (default is empty).
-    // - requestHandler: Closure to access the Alamofire `DownloadRequest` (for customization, inspection, etc.).
-    // - taskHandler: Closure to access the underlying `URLSessionTask` (e.g. for progress or cancellation).
-    // - progressHandler: Closure that receives periodic progress updates.
-    // - completionHandler: Completion closure returning metadata: account, ETag, modification date, content length, headers, AFError, and NKError.
+    /// Downloads a remote file and stores it at a local path for the specified Nextcloud account.
+    /// It provides detailed progress, headers, and metadata such as ETag, last modified date, and content length.
+    ///
+    /// Parameters:
+    /// - serverUrlFileName: A value representing the remote file URL or path (typically String or URL).
+    /// - fileNameLocalPath: The local filesystem path where the file should be saved.
+    /// - account: The Nextcloud account performing the download.
+    /// - options: Optional request options (default is empty).
+    /// - requestHandler: Closure to access the Alamofire `DownloadRequest` (for customization, inspection, etc.).
+    /// - taskHandler: Closure to access the underlying `URLSessionTask` (e.g. for progress or cancellation).
+    /// - progressHandler: Closure that receives periodic progress updates.
+    /// - completionHandler: Completion closure returning metadata: account, ETag, modification date, content length, headers, AFError, and NKError.
     func download(serverUrlFileName: Any,
                   fileNameLocalPath: String,
                   account: String,

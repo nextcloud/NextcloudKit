@@ -7,16 +7,16 @@ import Alamofire
 import SwiftyJSON
 
 public extension NextcloudKit {
-    // Marks or unmarks a folder as End-to-End Encrypted (E2EE) for a given Nextcloud account.
-    // Depending on the `delete` flag, this function either enables or disables the E2EE status for the folder.
-    //
-    // Parameters:
-    // - fileId: The identifier of the folder to mark/unmark.
-    // - delete: If `true`, removes the E2EE mark; if `false`, adds the E2EE mark.
-    // - account: The Nextcloud account performing the operation.
-    // - options: Optional request options (default is empty).
-    // - taskHandler: Closure to access the `URLSessionTask` (default is no-op).
-    // - completion: Completion handler returning the account, raw response, and any NKError.
+    /// Marks or unmarks a folder as End-to-End Encrypted (E2EE) for a given Nextcloud account.
+    /// Depending on the `delete` flag, this function either enables or disables the E2EE status for the folder.
+    ///
+    /// - Parameters:
+    ///   - fileId: The identifier of the folder to mark/unmark.
+    ///   - delete: If `true`, removes the E2EE mark; if `false`, adds the E2EE mark.
+    ///   - account: The Nextcloud account performing the operation.
+    ///   - options: Optional request options (default is empty).
+    ///   - taskHandler: Closure to access the `URLSessionTask` (default is no-op).
+    ///   - completion: Completion handler returning the account, raw response, and any NKError.
     func markE2EEFolder(fileId: String,
                         delete: Bool,
                         account: String,
@@ -88,19 +88,19 @@ public extension NextcloudKit {
         }
     }
 
-    // Locks or unlocks a folder for End-to-End Encryption (E2EE) using a provided token and counter.
-    // Depending on the HTTP `method` (e.g. "LOCK", "UNLOCK", "PUT"), the operation will either lock the folder,
-    // refresh the E2EE token, or perform another action defined by the server API.
-    //
-    // Parameters:
-    // - fileId: The identifier of the folder to lock or unlock.
-    // - e2eToken: Optional E2EE token used to lock the folder (nil if unlocking).
-    // - e2eCounter: Optional counter value for token freshness or verification.
-    // - method: The HTTP method to use for the request (e.g., "LOCK", "PUT", etc.).
-    // - account: The Nextcloud account performing the request.
-    // - options: Optional request options (default is empty).
-    // - taskHandler: Closure to access the `URLSessionTask` (default is no-op).
-    // - completion: Completion handler returning the account, updated E2EE token, raw response, and any NKError.
+    /// Locks or unlocks a folder for End-to-End Encryption (E2EE) using a provided token and counter.
+    /// Depending on the HTTP `method` (e.g. "LOCK", "UNLOCK", "PUT"), the operation will either lock the folder,
+    /// refresh the E2EE token, or perform another action defined by the server API.
+    ///
+    /// - Parameters:
+    ///   - fileId: The identifier of the folder to lock or unlock.
+    ///   - e2eToken: Optional E2EE token used to lock the folder (nil if unlocking).
+    ///   - e2eCounter: Optional counter value for token freshness or verification.
+    ///   - method: The HTTP method to use for the request (e.g., "LOCK", "PUT", etc.).
+    ///   - account: The Nextcloud account performing the request.
+    ///   - options: Optional request options (default is empty).
+    ///   - taskHandler: Closure to access the `URLSessionTask` (default is no-op).
+    ///   - completion: Completion handler returning the account, updated E2EE token, raw response, and any NKError.
     func lockE2EEFolder(fileId: String,
                         e2eToken: String?,
                         e2eCounter: String?,
@@ -192,18 +192,18 @@ public extension NextcloudKit {
         }
     }
 
-    // Retrieves E2EE metadata and signature for a specific file from the Nextcloud E2EE API.
-    // It supports different API versions via the `options.version` property (default is "v1").
-    // This request is authenticated and validated, and returns both metadata and signature
-    // (from header `X-NC-E2EE-SIGNATURE`) if the operation is successful.
-    //
-    // Parameters:
-    // - fileId: The file identifier to retrieve metadata for.
-    // - e2eToken: Optional E2EE token used for authorization or context.
-    // - account: The Nextcloud account performing the request.
-    // - options: Optional request options (includes version, queue, task description, etc.).
-    // - taskHandler: Closure to access the URLSessionTask for progress or control.
-    // - completion: Completion handler returning the account, metadata string, signature string, response, and NKError.
+    /// Retrieves E2EE metadata and signature for a specific file from the Nextcloud E2EE API.
+    /// It supports different API versions via the `options.version` property (default is "v1").
+    /// This request is authenticated and validated, and returns both metadata and signature
+    /// (from header `X-NC-E2EE-SIGNATURE`) if the operation is successful.
+    ///
+    /// - Parameters:
+    ///   - fileId: The file identifier to retrieve metadata for.
+    ///   - e2eToken: Optional E2EE token used for authorization or context.
+    ///   - account: The Nextcloud account performing the request.
+    ///   - options: Optional request options (includes version, queue, task description, etc.).
+    ///   - taskHandler: Closure to access the URLSessionTask for progress or control.
+    ///   - completion: Completion handler returning the account, metadata string, signature string, response, and NKError.
     func getE2EEMetadata(fileId: String,
                          e2eToken: String?,
                          account: String,
@@ -284,20 +284,20 @@ public extension NextcloudKit {
         }
     }
 
-    // Uploads E2EE metadata for a specific file on the Nextcloud server, using the specified HTTP method.
-    // The request includes the E2E token and optional metadata and signature. The server may return the
-    // stored metadata back in the response.
-    //
-    // Parameters:
-    // - fileId: The identifier of the file to update metadata for.
-    // - e2eToken: Required token used to authorize the E2EE update.
-    // - e2eMetadata: Optional encrypted metadata payload to be stored.
-    // - signature: Optional signature for integrity/authentication (added to header).
-    // - method: The HTTP method to use (e.g., "PUT", "POST").
-    // - account: The Nextcloud account performing the request.
-    // - options: Optional request options (includes version, queue, etc.).
-    // - taskHandler: Closure to access the URLSessionTask.
-    // - completion: Completion handler returning the account, stored metadata (if any), response, and NKError.
+    /// Uploads E2EE metadata for a specific file on the Nextcloud server, using the specified HTTP method.
+    /// The request includes the E2E token and optional metadata and signature. The server may return the
+    /// stored metadata back in the response.
+    ///
+    /// - Parameters:
+    ///   - fileId: The identifier of the file to update metadata for.
+    ///   - e2eToken: Required token used to authorize the E2EE update.
+    ///   - e2eMetadata: Optional encrypted metadata payload to be stored.
+    ///   - signature: Optional signature for integrity/authentication (added to header).
+    ///   - method: The HTTP method to use (e.g., "PUT", "POST").
+    ///   - account: The Nextcloud account performing the request.
+    ///   - options: Optional request options (includes version, queue, etc.).
+    ///   - taskHandler: Closure to access the URLSessionTask.
+    ///   - completion: Completion handler returning the account, stored metadata (if any), response, and NKError.
     func putE2EEMetadata(fileId: String,
                          e2eToken: String,
                          e2eMetadata: String?,
@@ -395,16 +395,16 @@ public extension NextcloudKit {
 
     // MARK: -
 
-    // Retrieves the public E2EE certificate (public key) for the given account or a specified user.
-    // If `user` is nil, the certificate for the current account is returned.
-    // If `user` is provided, the request fetches the public key of that user using a `users=[...]` query parameter.
-    //
-    // Parameters:
-    // - user: Optional username to fetch the public key for. If nil, fetches the current user's key.
-    // - account: The Nextcloud account performing the request.
-    // - options: Optional request options (includes version, task description, queue, etc.).
-    // - taskHandler: Closure to access the URLSessionTask.
-    // - completion: Completion handler returning the account, the certificate string, the certificate user (if applicable), the raw response, and any NKError.
+    /// Retrieves the public E2EE certificate (public key) for the given account or a specified user.
+    /// If `user` is nil, the certificate for the current account is returned.
+    /// If `user` is provided, the request fetches the public key of that user using a `users=[...]` query parameter.
+    ///
+    /// - Parameters:
+    ///   - user: Optional username to fetch the public key for. If nil, fetches the current user's key.
+    ///   - account: The Nextcloud account performing the request.
+    ///   - options: Optional request options (includes version, task description, queue, etc.).
+    ///   - taskHandler: Closure to access the URLSessionTask.
+    ///   - completion: Completion handler returning the account, the certificate string, the certificate user (if applicable), the raw response, and any NKError.
     func getE2EECertificate(user: String? = nil,
                             account: String,
                             options: NKRequestOptions = NKRequestOptions(),
@@ -492,15 +492,15 @@ public extension NextcloudKit {
         }
     }
 
-    // Retrieves the private E2EE key for the current account from the Nextcloud server.
-    // This key is typically encrypted and used for decrypting user data locally.
-    // The endpoint used is versioned via `options.version` (default: "v1").
-    //
-    // Parameters:
-    // - account: The Nextcloud account requesting the private key.
-    // - options: Optional request options (includes version, queue, etc.).
-    // - taskHandler: Closure to access the URLSessionTask.
-    // - completion: Completion handler returning the account, private key string, raw response, and NKError.
+    /// Retrieves the private E2EE key for the current account from the Nextcloud server.
+    /// This key is typically encrypted and used for decrypting user data locally.
+    /// The endpoint used is versioned via `options.version` (default: "v1").
+    ///
+    /// - Parameters:
+    ///   - account: The Nextcloud account requesting the private key.
+    ///   - options: Optional request options (includes version, queue, etc.).
+    ///   - taskHandler: Closure to access the URLSessionTask.
+    ///   - completion: Completion handler returning the account, private key string, raw response, and NKError.
     func getE2EEPrivateKey(account: String,
                            options: NKRequestOptions = NKRequestOptions(),
                            taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
@@ -566,15 +566,15 @@ public extension NextcloudKit {
         }
     }
 
-    // Retrieves the server's E2EE public key for the current Nextcloud instance.
-    // This key is used by clients to encrypt data that will be sent to the server.
-    // The request targets the `server-key` endpoint and returns the PEM-formatted public key.
-    //
-    // Parameters:
-    // - account: The Nextcloud account performing the request.
-    // - options: Optional request options (includes version, queue, etc.).
-    // - taskHandler: Closure to access the URLSessionTask.
-    // - completion: Completion handler returning the account, public key string, raw response, and NKError.
+    /// Retrieves the server's E2EE public key for the current Nextcloud instance.
+    /// This key is used by clients to encrypt data that will be sent to the server.
+    /// The request targets the `server-key` endpoint and returns the PEM-formatted public key.
+    ///
+    /// - Parameters:
+    ///   - account: The Nextcloud account performing the request.
+    ///   - options: Optional request options (includes version, queue, etc.).
+    ///   - taskHandler: Closure to access the URLSessionTask.
+    ///   - completion: Completion handler returning the account, public key string, raw response, and NKError.
     func getE2EEPublicKey(account: String,
                           options: NKRequestOptions = NKRequestOptions(),
                           taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
@@ -640,16 +640,16 @@ public extension NextcloudKit {
         }
     }
 
-    // Sends a certificate signing request (CSR) to the server in order to obtain a signed E2EE public certificate.
-    // The server responds with a signed public key associated with the account.
-    // The request is sent via HTTP POST to the `/public-key` endpoint.
-    //
-    // Parameters:
-    // - certificate: The CSR (Certificate Signing Request) in string format to be signed by the server.
-    // - account: The Nextcloud account performing the request.
-    // - options: Optional request options (e.g., version, queue, headers).
-    // - taskHandler: Closure to access the URLSessionTask.
-    // - completion: Completion handler returning the account, signed certificate string, response, and NKError.
+    /// Sends a certificate signing request (CSR) to the server in order to obtain a signed E2EE public certificate.
+    /// The server responds with a signed public key associated with the account.
+    /// The request is sent via HTTP POST to the `/public-key` endpoint.
+    ///
+    /// - Parameters:
+    ///   - certificate: The CSR (Certificate Signing Request) in string format to be signed by the server.
+    ///   - account: The Nextcloud account performing the request.
+    ///   - options: Optional request options (e.g., version, queue, headers).
+    ///   - taskHandler: Closure to access the URLSessionTask.
+    ///   - completion: Completion handler returning the account, signed certificate string, response, and NKError.
     func signE2EECertificate(certificate: String,
                              account: String,
                              options: NKRequestOptions = NKRequestOptions(),
@@ -721,16 +721,16 @@ public extension NextcloudKit {
         }
     }
 
-    // Stores the user's E2EE private key securely on the Nextcloud server.
-    // This is typically done during initial key setup or key backup.
-    // The private key is sent as a POST parameter to the `/private-key` endpoint.
-    //
-    // Parameters:
-    // - privateKey: The PEM-formatted private key string to be stored on the server.
-    // - account: The Nextcloud account performing the operation.
-    // - options: Optional request options (versioning, queue dispatch, headers, etc.).
-    // - taskHandler: Closure to access the URLSessionTask.
-    // - completion: Completion handler returning the account, stored private key (as echoed back), response, and NKError.
+    /// Stores the user's E2EE private key securely on the Nextcloud server.
+    /// This is typically done during initial key setup or key backup.
+    /// The private key is sent as a POST parameter to the `/private-key` endpoint.
+    ///
+    /// - Parameters:
+    ///   - privateKey: The PEM-formatted private key string to be stored on the server.
+    ///   - account: The Nextcloud account performing the operation.
+    ///   - options: Optional request options (versioning, queue dispatch, headers, etc.).
+    ///   - taskHandler: Closure to access the URLSessionTask.
+    ///   - completion: Completion handler returning the account, stored private key (as echoed back), response, and NKError.
     func storeE2EEPrivateKey(privateKey: String,
                              account: String,
                              options: NKRequestOptions = NKRequestOptions(),
@@ -801,15 +801,15 @@ public extension NextcloudKit {
         }
     }
 
-    // Deletes the currently stored E2EE public certificate from the Nextcloud server.
-    // This is typically used during key revocation or reinitialization of E2EE.
-    // The request targets the `public-key` endpoint with the HTTP DELETE method.
-    //
-    // Parameters:
-    // - account: The Nextcloud account requesting the deletion of the certificate.
-    // - options: Optional request options (e.g., version, dispatch queue, headers).
-    // - taskHandler: Closure to access the URLSessionTask.
-    // - completion: Completion handler returning the account, raw response, and NKError.
+    /// Deletes the currently stored E2EE public certificate from the Nextcloud server.
+    /// This is typically used during key revocation or reinitialization of E2EE.
+    /// The request targets the `public-key` endpoint with the HTTP DELETE method.
+    ///
+    /// - Parameters:
+    ///   - account: The Nextcloud account requesting the deletion of the certificate.
+    ///   - options: Optional request options (e.g., version, dispatch queue, headers).
+    ///   - taskHandler: Closure to access the URLSessionTask.
+    ///   - completion: Completion handler returning the account, raw response, and NKError.
     func deleteE2EECertificate(account: String,
                                options: NKRequestOptions = NKRequestOptions(),
                                taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
@@ -865,15 +865,15 @@ public extension NextcloudKit {
         }
     }
 
-    // Deletes the user's E2EE private key stored on the Nextcloud server.
-    // This operation is typically performed when revoking access to the encrypted data,
-    // or during account reset scenarios.
-    //
-    // Parameters:
-    // - account: The Nextcloud account requesting the deletion of its private key.
-    // - options: Optional request options (API version, dispatch queue, headers).
-    // - taskHandler: Closure to access the URLSessionTask.
-    // - completion: Completion handler returning the account, raw response, and NKError.
+    /// Deletes the user's E2EE private key stored on the Nextcloud server.
+    /// This operation is typically performed when revoking access to the encrypted data,
+    /// or during account reset scenarios.
+    ///
+    /// - Parameters:
+    ///   - account: The Nextcloud account requesting the deletion of its private key.
+    ///   - options: Optional request options (API version, dispatch queue, headers).
+    ///   - taskHandler: Closure to access the URLSessionTask.
+    ///   - completion: Completion handler returning the account, raw response, and NKError.
     func deleteE2EEPrivateKey(account: String,
                               options: NKRequestOptions = NKRequestOptions(),
                               taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
