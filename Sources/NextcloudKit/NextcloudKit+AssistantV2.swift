@@ -45,6 +45,27 @@ public extension NextcloudKit {
         }
     }
 
+    /// Asynchronously retrieves available task types (v2) for the given account and supported task type.
+    /// - Parameters:
+    ///   - account: The account identifier.
+    ///   - supportedTaskType: The supported type (e.g. "Text", default: "Text").
+    ///   - options: Optional request options.
+    ///   - taskHandler: Optional closure to access the URLSessionTask.
+    /// - Returns: A tuple with account, list of task types (if any), response data, and error.
+    func textProcessingGetTypesV2Async(account: String,
+                                       supportedTaskType: String = "Text",
+                                       options: NKRequestOptions = NKRequestOptions(),
+                                       taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in }) async -> (String, [TaskTypeData]?, AFDataResponse<Data>?, NKError) {
+        await withCheckedContinuation { continuation in
+            textProcessingGetTypesV2(account: account,
+                                     supportedTaskType: supportedTaskType,
+                                     options: options,
+                                     taskHandler: taskHandler) { account, types, responseData, error in
+                continuation.resume(returning: (account, types, responseData, error))
+            }
+        }
+    }
+
     func textProcessingScheduleV2(input: String,
                                   taskType: TaskTypeData,
                                   account: String,
@@ -83,6 +104,30 @@ public extension NextcloudKit {
         }
     }
 
+    /// Asynchronously schedules a text processing task using V2 API.
+    /// - Parameters:
+    ///   - input: The input text to process.
+    ///   - taskType: The task type data (e.g., summarization, translation).
+    ///   - account: The account identifier.
+    ///   - options: Optional request options.
+    ///   - taskHandler: Optional closure to access the URLSessionTask.
+    /// - Returns: A tuple with account, scheduled task (if any), response data, and error.
+    func textProcessingScheduleV2Async(input: String,
+                                       taskType: TaskTypeData,
+                                       account: String,
+                                       options: NKRequestOptions = NKRequestOptions(),
+                                       taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in }) async -> (String, AssistantTask?, AFDataResponse<Data>?, NKError) {
+        await withCheckedContinuation { continuation in
+            textProcessingScheduleV2(input: input,
+                                     taskType: taskType,
+                                     account: account,
+                                     options: options,
+                                     taskHandler: taskHandler) { account, task, responseData, error in
+                continuation.resume(returning: (account, task, responseData, error))
+            }
+        }
+    }
+
     func textProcessingGetTasksV2(taskType: String,
                                   account: String,
                                   options: NKRequestOptions = NKRequestOptions(),
@@ -117,6 +162,27 @@ public extension NextcloudKit {
         }
     }
 
+    /// Asynchronously retrieves the list of tasks for a given task type using V2 API.
+    /// - Parameters:
+    ///   - taskType: The type of tasks to retrieve (e.g., "summary").
+    ///   - account: The account identifier.
+    ///   - options: Optional request options.
+    ///   - taskHandler: Optional closure to access the URLSessionTask.
+    /// - Returns: A tuple with account, list of tasks (if any), response data, and error.
+    func textProcessingGetTasksV2Async(taskType: String,
+                                       account: String,
+                                       options: NKRequestOptions = NKRequestOptions(),
+                                       taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in }) async -> (String, TaskList?, AFDataResponse<Data>?, NKError) {
+        await withCheckedContinuation { continuation in
+            textProcessingGetTasksV2(taskType: taskType,
+                                     account: account,
+                                     options: options,
+                                     taskHandler: taskHandler) { account, tasks, responseData, error in
+                continuation.resume(returning: (account, tasks, responseData, error))
+            }
+        }
+    }
+
     func textProcessingDeleteTaskV2(taskId: Int64,
                                     account: String,
                                     options: NKRequestOptions = NKRequestOptions(),
@@ -145,6 +211,27 @@ public extension NextcloudKit {
                 } else {
                     options.queue.async { completion(account, response, NKError(rootJson: json, fallbackStatusCode: response.response?.statusCode)) }
                 }
+            }
+        }
+    }
+
+    /// Asynchronously deletes a text processing task (V2) by its ID.
+    /// - Parameters:
+    ///   - taskId: The ID of the task to delete (Int64).
+    ///   - account: The account identifier.
+    ///   - options: Optional request options.
+    ///   - taskHandler: Optional closure to access the URLSessionTask.
+    /// - Returns: A tuple with account, response data, and error.
+    func textProcessingDeleteTaskV2Async(taskId: Int64,
+                                         account: String,
+                                         options: NKRequestOptions = NKRequestOptions(),
+                                         taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in }) async -> (String, AFDataResponse<Data>?, NKError) {
+        await withCheckedContinuation { continuation in
+            textProcessingDeleteTaskV2(taskId: taskId,
+                                       account: account,
+                                       options: options,
+                                       taskHandler: taskHandler) { account, responseData, error in
+                continuation.resume(returning: (account, responseData, error))
             }
         }
     }
