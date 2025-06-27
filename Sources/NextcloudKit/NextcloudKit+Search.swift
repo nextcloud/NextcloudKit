@@ -197,6 +197,51 @@ public extension NextcloudKit {
 
         return requestSearchProvider
     }
+
+    // Asynchronously performs a search request using the specified provider.
+    //
+    // Parameters:
+    // - id: The identifier of the search provider to use.
+    // - term: The search query string.
+    // - limit: Optional limit for number of results.
+    // - cursor: Optional pagination cursor.
+    // - timeout: The timeout for the request.
+    // - account: The Nextcloud account performing the request.
+    // - options: Optional configuration options for the request.
+    // - taskHandler: Callback to observe the created task.
+    // Returns: A tuple containing the account, search result, response data, and error.
+    func searchProviderAsync(_ id: String,
+                             term: String,
+                             limit: Int? = nil,
+                             cursor: Int? = nil,
+                             timeout: TimeInterval = 60,
+                             account: String,
+                             options: NKRequestOptions = NKRequestOptions(),
+                             taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in }
+    ) async -> (
+        account: String,
+        searchResult: NKSearchResult?,
+        responseData: AFDataResponse<Data>?,
+        error: NKError
+    ) {
+        await withCheckedContinuation { continuation in
+            _ = searchProvider(id,
+                               term: term,
+                               limit: limit,
+                               cursor: cursor,
+                               timeout: timeout,
+                               account: account,
+                               options: options,
+                               taskHandler: taskHandler) { account, result, responseData, error in
+                continuation.resume(returning: (
+                    account: account,
+                    searchResult: result,
+                    responseData: responseData,
+                    error: error
+                ))
+            }
+        }
+    }
 }
 
 public class NKSearchResult: NSObject {

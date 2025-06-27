@@ -7,6 +7,27 @@ import Alamofire
 import SwiftyJSON
 
 public extension NextcloudKit {
+    // Uploads a file to the Nextcloud server.
+    //
+    // Parameters:
+    // - serverUrlFileName: The remote server URL or path where the file will be uploaded.
+    // - fileNameLocalPath: The local file path to be uploaded.
+    // - dateCreationFile: Optional creation date to include in headers (X-OC-CTime).
+    // - dateModificationFile: Optional modification date to include in headers (X-OC-MTime).
+    // - overwrite: If true, the remote file will be overwritten if it already exists.
+    // - account: The account associated with the upload session.
+    // - options: Optional configuration for the request (headers, queue, timeout, etc.).
+    // - requestHandler: Called with the created UploadRequest.
+    // - taskHandler: Called with the underlying URLSessionTask when it's created.
+    // - progressHandler: Called periodically with upload progress.
+    // - completionHandler: Called at the end of the upload with:
+    //     - account: The account used,
+    //     - ocId: The server-side file identifier,
+    //     - etag: The entity tag for versioning,
+    //     - date: The server date of the operation,
+    //     - size: The total uploaded size in bytes,
+    //     - headers: The response headers,
+    //     - nkError: The result status.
     func upload(serverUrlFileName: Any,
                 fileNameLocalPath: String,
                 dateCreationFile: Date? = nil,
@@ -88,17 +109,88 @@ public extension NextcloudKit {
         options.queue.async { requestHandler(request) }
     }
 
-    /// - Parameters:
-    ///     - directory: The local directory where is the file to be split
-    ///     - fileName: The name of the file to be splites
-    ///     - date: If exist the date of file
-    ///     - creationDate: If exist the creation date of file
-    ///     - serverUrl: The serverURL where the file will be deposited once reassembled
-    ///     - chunkFolder: The name of temp folder, usually NSUUID().uuidString
-    ///     - filesChunk: The struct it will contain all file names with the increment size  still to be sent.
-    ///                Example filename: "3","4","5" .... size: 30000000, 40000000, 43000000
-    ///     - chunkSizeInMB: Size in MB of chunk
+    // Asynchronously uploads a file to the Nextcloud server.
+    //
+    // - Parameters are the same as the synchronous version.
+    //
+    // - Returns: A tuple with:
+    //   - account: The account used for the upload.
+    //   - ocId: The remote file identifier returned by the server.
+    //   - etag: The file etag returned by the server.
+    //   - date: The server timestamp.
+    //   - size: The size of the uploaded file in bytes.
+    //   - headers: The raw HTTP response headers.
+    //   - error: The NKError result of the upload.
+    func uploadAsync(serverUrlFileName: Any,
+                     fileNameLocalPath: String,
+                     dateCreationFile: Date? = nil,
+                     dateModificationFile: Date? = nil,
+                     overwrite: Bool = false,
+                     account: String,
+                     options: NKRequestOptions = NKRequestOptions(),
+                     requestHandler: @escaping (_ request: UploadRequest) -> Void = { _ in },
+                     taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
+                     progressHandler: @escaping (_ progress: Progress) -> Void = { _ in }
+    ) async -> (
+        account: String,
+        ocId: String?,
+        etag: String?,
+        date: Date?,
+        size: Int64,
+        headers: [AnyHashable: Any]?,
+        error: NKError
+    ) {
+        await withCheckedContinuation { continuation in
+            upload(serverUrlFileName: serverUrlFileName,
+                   fileNameLocalPath: fileNameLocalPath,
+                   dateCreationFile: dateCreationFile,
+                   dateModificationFile: dateModificationFile,
+                   overwrite: overwrite,
+                   account: account,
+                   options: options,
+                   requestHandler: requestHandler,
+                   taskHandler: taskHandler,
+                   progressHandler: progressHandler) { account, ocId, etag, date, size, headers, error in
+                continuation.resume(returning: (
+                    account: account,
+                    ocId: ocId,
+                    etag: etag,
+                    date: date,
+                    size: size,
+                    headers: headers,
+                    error: error
+                ))
+            }
+        }
+    }
 
+    // Uploads a file in multiple chunks to the Nextcloud server using TUS-like behavior.
+    //
+    // Parameters:
+    // - directory: The local directory containing the original file.
+    // - fileChunksOutputDirectory: Optional custom output directory for chunks (default is same as `directory`).
+    // - fileName: Name of the original file to split and upload.
+    // - destinationFileName: Optional custom filename to be used on the server.
+    // - date: The modification date to be set on the uploaded file.
+    // - creationDate: The creation date to be set on the uploaded file.
+    // - serverUrl: The destination server path.
+    // - chunkFolder: A temporary folder name (usually a UUID).
+    // - filesChunk: List of chunk identifiers and their expected sizes.
+    // - chunkSize: Size of each chunk in bytes.
+    // - account: The Nextcloud account used for authentication.
+    // - options: Request options (headers, queue, etc.).
+    // - numChunks: Callback invoked with total number of chunks.
+    // - counterChunk: Callback invoked with the index of the chunk being uploaded.
+    // - start: Called when chunk upload begins, with the full chunk list.
+    // - requestHandler: Handler to inspect the upload request.
+    // - taskHandler: Handler to inspect the upload task.
+    // - progressHandler: Progress callback with expected bytes, transferred bytes, and fraction completed.
+    // - uploaded: Called each time a chunk is successfully uploaded.
+    // - completion: Called when all chunks are uploaded and reassembled. Returns:
+    //     - account: The user account used.
+    //     - filesChunk: Remaining chunks (if any).
+    //     - file: The final `NKFile` metadata for the uploaded file.
+    //     - error: Upload result as `NKError`.
     func uploadChunk(directory: String,
                      fileChunksOutputDirectory: String? = nil,
                      fileName: String,
@@ -119,7 +211,6 @@ public extension NextcloudKit {
                      progressHandler: @escaping (_ totalBytesExpected: Int64, _ totalBytes: Int64, _ fractionCompleted: Double) -> Void = { _, _, _ in },
                      uploaded: @escaping (_ fileChunk: (fileName: String, size: Int64)) -> Void = { _ in },
                      completion: @escaping (_ account: String, _ filesChunk: [(fileName: String, size: Int64)]?, _ file: NKFile?, _ error: NKError) -> Void) {
-
         guard let nkSession = nkCommonInstance.nksessions.session(forAccount: account) else {
             return completion(account, nil, nil, .urlError)
         }
@@ -257,6 +348,69 @@ public extension NextcloudKit {
                         return completion(account, filesChunkOutput, file, error)
                     }
                 }
+            }
+        }
+    }
+
+    // Asynchronously uploads a file in chunks and assembles it on the Nextcloud server.
+    //
+    // - Parameters: Same as the sync version.
+    // - Returns: A tuple containing:
+    //   - account: The user account used.
+    //   - remainingChunks: Remaining chunks if any failed (or nil if success).
+    //   - file: The final file metadata object.
+    //   - error: Upload result as `NKError`.
+    func uploadChunkAsync(directory: String,
+                          fileChunksOutputDirectory: String? = nil,
+                          fileName: String,
+                          destinationFileName: String? = nil,
+                          date: Date?,
+                          creationDate: Date?,
+                          serverUrl: String,
+                          chunkFolder: String,
+                          filesChunk: [(fileName: String, size: Int64)],
+                          chunkSize: Int,
+                          account: String,
+                          options: NKRequestOptions = NKRequestOptions(),
+                          numChunks: @escaping (_ num: Int) -> Void = { _ in },
+                          counterChunk: @escaping (_ counter: Int) -> Void = { _ in },
+                          start: @escaping (_ filesChunk: [(fileName: String, size: Int64)]) -> Void = { _ in },
+                          requestHandler: @escaping (_ request: UploadRequest) -> Void = { _ in },
+                          taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
+                          progressHandler: @escaping (_ totalBytesExpected: Int64, _ totalBytes: Int64, _ fractionCompleted: Double) -> Void = { _, _, _ in },
+                          uploaded: @escaping (_ fileChunk: (fileName: String, size: Int64)) -> Void = { _ in }
+    ) async -> (
+        account: String,
+        remainingChunks: [(fileName: String, size: Int64)]?,
+        file: NKFile?,
+        error: NKError
+    ) {
+        await withCheckedContinuation { continuation in
+            uploadChunk(directory: directory,
+                        fileChunksOutputDirectory: fileChunksOutputDirectory,
+                        fileName: fileName,
+                        destinationFileName: destinationFileName,
+                        date: date,
+                        creationDate: creationDate,
+                        serverUrl: serverUrl,
+                        chunkFolder: chunkFolder,
+                        filesChunk: filesChunk,
+                        chunkSize: chunkSize,
+                        account: account,
+                        options: options,
+                        numChunks: numChunks,
+                        counterChunk: counterChunk,
+                        start: start,
+                        requestHandler: requestHandler,
+                        taskHandler: taskHandler,
+                        progressHandler: progressHandler,
+                        uploaded: uploaded) { account, remaining, file, error in
+                continuation.resume(returning: (
+                    account: account,
+                    remainingChunks: remaining,
+                    file: file,
+                    error: error
+                ))
             }
         }
     }
