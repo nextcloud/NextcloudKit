@@ -7,27 +7,27 @@ import Alamofire
 import SwiftyJSON
 
 public extension NextcloudKit {
-    // Uploads a file to the Nextcloud server.
-    //
-    // Parameters:
-    // - serverUrlFileName: The remote server URL or path where the file will be uploaded.
-    // - fileNameLocalPath: The local file path to be uploaded.
-    // - dateCreationFile: Optional creation date to include in headers (X-OC-CTime).
-    // - dateModificationFile: Optional modification date to include in headers (X-OC-MTime).
-    // - overwrite: If true, the remote file will be overwritten if it already exists.
-    // - account: The account associated with the upload session.
-    // - options: Optional configuration for the request (headers, queue, timeout, etc.).
-    // - requestHandler: Called with the created UploadRequest.
-    // - taskHandler: Called with the underlying URLSessionTask when it's created.
-    // - progressHandler: Called periodically with upload progress.
-    // - completionHandler: Called at the end of the upload with:
-    //     - account: The account used,
-    //     - ocId: The server-side file identifier,
-    //     - etag: The entity tag for versioning,
-    //     - date: The server date of the operation,
-    //     - size: The total uploaded size in bytes,
-    //     - headers: The response headers,
-    //     - nkError: The result status.
+    /// Uploads a file to the Nextcloud server.
+    ///
+    /// - Parameters:
+    ///   - serverUrlFileName: The remote server URL or path where the file will be uploaded.
+    ///   - fileNameLocalPath: The local file path to be uploaded.
+    ///   - dateCreationFile: Optional creation date to include in headers (X-OC-CTime).
+    ///   - dateModificationFile: Optional modification date to include in headers (X-OC-MTime).
+    ///   - overwrite: If true, the remote file will be overwritten if it already exists.
+    ///   - account: The account associated with the upload session.
+    ///   - options: Optional configuration for the request (headers, queue, timeout, etc.).
+    ///   - requestHandler: Called with the created UploadRequest.
+    ///   - taskHandler: Called with the underlying URLSessionTask when it's created.
+    ///   - progressHandler: Called periodically with upload progress.
+    ///   - completionHandler: Called at the end of the upload with:
+    ///     - account: The account used.
+    ///     - ocId: The server-side file identifier.
+    ///     - etag: The entity tag for versioning.
+    ///     - date: The server date of the operation.
+    ///     - size: The total uploaded size in bytes.
+    ///     - headers: The response headers.
+    ///     - nkError: The result status.
     func upload(serverUrlFileName: Any,
                 fileNameLocalPath: String,
                 dateCreationFile: Date? = nil,
@@ -76,7 +76,7 @@ public extension NextcloudKit {
         } .responseData(queue: self.nkCommonInstance.backgroundQueue) { response in
             var ocId: String?, etag: String?, date: Date?
             var result: NKError
-            
+
             if self.nkCommonInstance.findHeader("oc-fileid", allHeaderFields: response.response?.allHeaderFields) != nil {
                 ocId = self.nkCommonInstance.findHeader("oc-fileid", allHeaderFields: response.response?.allHeaderFields)
             } else if self.nkCommonInstance.findHeader("fileid", allHeaderFields: response.response?.allHeaderFields) != nil {
@@ -93,7 +93,7 @@ public extension NextcloudKit {
             if let dateRaw = self.nkCommonInstance.findHeader("date", allHeaderFields: response.response?.allHeaderFields) {
                 date = dateRaw.parsedDate(using: "EEE, dd MMM y HH:mm:ss zzz")
             }
-            
+
             if !uploadCompleted {
                 nkLog(error: "Upload incomplete: only \(uploadedSize) bytes sent.")
                 result = .uploadIncomplete
@@ -109,18 +109,28 @@ public extension NextcloudKit {
         options.queue.async { requestHandler(request) }
     }
 
-    // Asynchronously uploads a file to the Nextcloud server.
-    //
-    // - Parameters are the same as the synchronous version.
-    //
-    // - Returns: A tuple with:
-    //   - account: The account used for the upload.
-    //   - ocId: The remote file identifier returned by the server.
-    //   - etag: The file etag returned by the server.
-    //   - date: The server timestamp.
-    //   - size: The size of the uploaded file in bytes.
-    //   - headers: The raw HTTP response headers.
-    //   - error: The NKError result of the upload.
+    /// Asynchronously uploads a file to the Nextcloud server.
+    ///
+    /// - Parameters:
+    ///   - serverUrlFileName: The remote server URL or path where the file will be uploaded.
+    ///   - fileNameLocalPath: The local file path to be uploaded.
+    ///   - dateCreationFile: Optional creation date to include in headers (X-OC-CTime).
+    ///   - dateModificationFile: Optional modification date to include in headers (X-OC-MTime).
+    ///   - overwrite: If true, the remote file will be overwritten if it already exists.
+    ///   - account: The account associated with the upload session.
+    ///   - options: Optional configuration for the request (headers, queue, timeout, etc.).
+    ///   - requestHandler: Called with the created UploadRequest.
+    ///   - taskHandler: Called with the underlying URLSessionTask when it's created.
+    ///   - progressHandler: Called periodically with upload progress.
+    ///
+    /// - Returns: A tuple containing:
+    ///   - account: The account used for the upload.
+    ///   - ocId: The remote file identifier returned by the server.
+    ///   - etag: The file etag returned by the server.
+    ///   - date: The server timestamp.
+    ///   - size: The size of the uploaded file in bytes.
+    ///   - headers: The raw HTTP response headers.
+    ///   - error: The NKError result of the upload.
     func uploadAsync(serverUrlFileName: Any,
                      fileNameLocalPath: String,
                      dateCreationFile: Date? = nil,
@@ -164,33 +174,33 @@ public extension NextcloudKit {
         }
     }
 
-    // Uploads a file in multiple chunks to the Nextcloud server using TUS-like behavior.
-    //
-    // Parameters:
-    // - directory: The local directory containing the original file.
-    // - fileChunksOutputDirectory: Optional custom output directory for chunks (default is same as `directory`).
-    // - fileName: Name of the original file to split and upload.
-    // - destinationFileName: Optional custom filename to be used on the server.
-    // - date: The modification date to be set on the uploaded file.
-    // - creationDate: The creation date to be set on the uploaded file.
-    // - serverUrl: The destination server path.
-    // - chunkFolder: A temporary folder name (usually a UUID).
-    // - filesChunk: List of chunk identifiers and their expected sizes.
-    // - chunkSize: Size of each chunk in bytes.
-    // - account: The Nextcloud account used for authentication.
-    // - options: Request options (headers, queue, etc.).
-    // - numChunks: Callback invoked with total number of chunks.
-    // - counterChunk: Callback invoked with the index of the chunk being uploaded.
-    // - start: Called when chunk upload begins, with the full chunk list.
-    // - requestHandler: Handler to inspect the upload request.
-    // - taskHandler: Handler to inspect the upload task.
-    // - progressHandler: Progress callback with expected bytes, transferred bytes, and fraction completed.
-    // - uploaded: Called each time a chunk is successfully uploaded.
-    // - completion: Called when all chunks are uploaded and reassembled. Returns:
-    //     - account: The user account used.
-    //     - filesChunk: Remaining chunks (if any).
-    //     - file: The final `NKFile` metadata for the uploaded file.
-    //     - error: Upload result as `NKError`.
+    /// Uploads a file in multiple chunks to the Nextcloud server using TUS-like behavior.
+    ///
+    /// - Parameters:
+    ///   - directory: The local directory containing the original file.
+    ///   - fileChunksOutputDirectory: Optional custom output directory for chunks (default is same as `directory`).
+    ///   - fileName: Name of the original file to split and upload.
+    ///   - destinationFileName: Optional custom filename to be used on the server.
+    ///   - date: The modification date to be set on the uploaded file.
+    ///   - creationDate: The creation date to be set on the uploaded file.
+    ///   - serverUrl: The destination server path.
+    ///   - chunkFolder: A temporary folder name (usually a UUID).
+    ///   - filesChunk: List of chunk identifiers and their expected sizes.
+    ///   - chunkSize: Size of each chunk in bytes.
+    ///   - account: The Nextcloud account used for authentication.
+    ///   - options: Request options (headers, queue, etc.).
+    ///   - numChunks: Callback invoked with total number of chunks.
+    ///   - counterChunk: Callback invoked with the index of the chunk being uploaded.
+    ///   - start: Called when chunk upload begins, with the full chunk list.
+    ///   - requestHandler: Handler to inspect the upload request.
+    ///   - taskHandler: Handler to inspect the upload task.
+    ///   - progressHandler: Progress callback with expected bytes, transferred bytes, and fraction completed.
+    ///   - uploaded: Called each time a chunk is successfully uploaded.
+    ///   - completion: Called when all chunks are uploaded and reassembled. Returns:
+    ///     - account: The user account used.
+    ///     - filesChunk: Remaining chunks (if any).
+    ///     - file: The final `NKFile` metadata for the uploaded file.
+    ///     - error: Upload result as `NKError`.
     func uploadChunk(directory: String,
                      fileChunksOutputDirectory: String? = nil,
                      fileName: String,
@@ -352,14 +362,14 @@ public extension NextcloudKit {
         }
     }
 
-    // Asynchronously uploads a file in chunks and assembles it on the Nextcloud server.
-    //
-    // - Parameters: Same as the sync version.
-    // - Returns: A tuple containing:
-    //   - account: The user account used.
-    //   - remainingChunks: Remaining chunks if any failed (or nil if success).
-    //   - file: The final file metadata object.
-    //   - error: Upload result as `NKError`.
+    /// Asynchronously uploads a file in chunks and assembles it on the Nextcloud server.
+    ///
+    /// - Parameters: Same as the sync version.
+    /// - Returns: A tuple containing:
+    ///   - account: The user account used.
+    ///   - remainingChunks: Remaining chunks if any failed (or nil if success).
+    ///   - file: The final file metadata object.
+    ///   - error: Upload result as `NKError`.
     func uploadChunkAsync(directory: String,
                           fileChunksOutputDirectory: String? = nil,
                           fileName: String,

@@ -7,15 +7,15 @@ import Alamofire
 import SwiftyJSON
 
 public extension NextcloudKit {
-    // Requests a URL for editing or viewing a file via the Richdocuments (Collabora/OnlyOffice) app.
-    //
-    // Parameters:
-    // - fileID: The unique identifier of the file for which the document URL is requested.
-    // - account: The Nextcloud account performing the request.
-    // - options: Optional configuration such as custom headers, queue, or API version.
-    // - taskHandler: Callback invoked when the underlying URLSessionTask is created.
-    // - completion: Completion handler returning the account, document URL (if available),
-    //               the raw HTTP response, and an NKError object.
+    /// Requests a URL for editing or viewing a file via the Richdocuments (Collabora/OnlyOffice) app.
+    ///
+    /// Parameters:
+    /// - fileID: The unique identifier of the file for which the document URL is requested.
+    /// - account: The Nextcloud account performing the request.
+    /// - options: Optional configuration such as custom headers, queue, or API version.
+    /// - taskHandler: Callback invoked when the underlying URLSessionTask is created.
+    /// - completion: Completion handler returning the account, document URL (if available),
+    ///               the raw HTTP response, and an NKError object.
     func createUrlRichdocuments(fileID: String,
                                 account: String,
                                 options: NKRequestOptions = NKRequestOptions(),
@@ -82,14 +82,14 @@ public extension NextcloudKit {
         }
     }
 
-    // Retrieves the list of Richdocuments templates of a given type (e.g., "document", "spreadsheet").
-    //
-    // Parameters:
-    // - typeTemplate: The type of template to retrieve (e.g., "document", "presentation").
-    // - account: The Nextcloud account performing the request.
-    // - options: Optional configuration (headers, queue, API version, etc.).
-    // - taskHandler: Callback invoked when the underlying URLSessionTask is created.
-    // - completion: Completion handler returning the account, array of templates, response data, and NKError.
+    /// Retrieves the list of Richdocuments templates of a given type (e.g., "document", "spreadsheet").
+    ///
+    /// Parameters:
+    /// - typeTemplate: The type of template to retrieve (e.g., "document", "presentation").
+    /// - account: The Nextcloud account performing the request.
+    /// - options: Optional configuration (headers, queue, API version, etc.).
+    /// - taskHandler: Callback invoked when the underlying URLSessionTask is created.
+    /// - completion: Completion handler returning the account, array of templates, response data, and NKError.
     func getTemplatesRichdocuments(typeTemplate: String,
                                    account: String,
                                    options: NKRequestOptions = NKRequestOptions(),
@@ -167,15 +167,15 @@ public extension NextcloudKit {
         }
     }
 
-    // Creates a new Richdocuments file using a specific template.
-    //
-    // Parameters:
-    // - path: The target path where the new document should be created.
-    // - templateId: The ID of the Richdocuments template to use.
-    // - account: The Nextcloud account performing the request.
-    // - options: Optional request configuration (headers, queue, API version, etc.).
-    // - taskHandler: Callback invoked when the underlying URLSessionTask is created.
-    // - completion: Completion handler returning the account, resulting file URL, raw response, and NKError.
+    /// Creates a new Richdocuments file using a specific template.
+    ///
+    /// Parameters:
+    /// - path: The target path where the new document should be created.
+    /// - templateId: The ID of the Richdocuments template to use.
+    /// - account: The Nextcloud account performing the request.
+    /// - options: Optional request configuration (headers, queue, API version, etc.).
+    /// - taskHandler: Callback invoked when the underlying URLSessionTask is created.
+    /// - completion: Completion handler returning the account, resulting file URL, raw response, and NKError.
     func createRichdocuments(path: String,
                              templateId: String,
                              account: String,
@@ -246,14 +246,14 @@ public extension NextcloudKit {
         }
     }
 
-    // Creates a new Richdocuments file based on a default asset (no template).
-    //
-    // Parameters:
-    // - path: The destination path where the asset will be created.
-    // - account: The Nextcloud account initiating the creation.
-    // - options: Optional configuration for the request (e.g. headers, queue, API version).
-    // - taskHandler: Callback invoked when the underlying URLSessionTask is created.
-    // - completion: Completion handler returning account, resulting file URL, raw response data, and NKError.
+    /// Creates a new Richdocuments file based on a default asset (no template).
+    ///
+    /// Parameters:
+    /// - path: The destination path where the asset will be created.
+    /// - account: The Nextcloud account initiating the creation.
+    /// - options: Optional configuration for the request (e.g. headers, queue, API version).
+    /// - taskHandler: Callback invoked when the underlying URLSessionTask is created.
+    /// - completion: Completion handler returning account, resulting file URL, raw response data, and NKError.
     func createAssetRichdocuments(path: String,
                                   account: String,
                                   options: NKRequestOptions = NKRequestOptions(),

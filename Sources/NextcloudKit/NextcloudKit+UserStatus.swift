@@ -7,25 +7,25 @@ import Alamofire
 import SwiftyJSON
 
 public extension NextcloudKit {
-    // Retrieves the user status from the Nextcloud server.
-    //
-    // Parameters:
-    // - userId: Optional user ID to query (if nil, fetches the status for the authenticated user).
-    // - account: The Nextcloud account identifier.
-    // - options: Optional request options (headers, queue, version, etc.).
-    // - taskHandler: Callback for monitoring the `URLSessionTask`.
-    // - completion: Returns multiple values:
-    //     - account: The user account used.
-    //     - clearAt: Optional expiration `Date` of the status.
-    //     - icon: Optional status icon name.
-    //     - message: Optional status message.
-    //     - messageId: Optional ID of the predefined message.
-    //     - messageIsPredefined: Indicates whether the message is predefined.
-    //     - status: Optional raw status value.
-    //     - statusIsUserDefined: Indicates if the status was set manually by the user.
-    //     - userId: The actual user ID returned by the server.
-    //     - responseData: Raw response data from the server.
-    //     - error: Result as `NKError`.
+    /// Retrieves the user status from the Nextcloud server.
+    ///
+    /// - Parameters:
+    ///   - userId: Optional user ID to query (if `nil`, fetches the status for the authenticated user).
+    ///   - account: The Nextcloud account identifier.
+    ///   - options: Optional request options (headers, queue, version, etc.).
+    ///   - taskHandler: Callback for monitoring the `URLSessionTask`.
+    ///   - completion: Completion handler returning:
+    ///     - account: The user account used.
+    ///     - clearAt: Optional expiration `Date` of the status.
+    ///     - icon: Optional status icon name.
+    ///     - message: Optional status message.
+    ///     - messageId: Optional ID of the predefined message.
+    ///     - messageIsPredefined: Indicates whether the message is predefined.
+    ///     - status: Optional raw status value.
+    ///     - statusIsUserDefined: Indicates if the status was set manually by the user.
+    ///     - userId: The actual user ID returned by the server.
+    ///     - responseData: Raw response data from the server.
+    ///     - error: Result as `NKError`.
     func getUserStatus(userId: String? = nil,
                        account: String,
                        options: NKRequestOptions = NKRequestOptions(),
@@ -74,10 +74,10 @@ public extension NextcloudKit {
         }
     }
 
-    // Asynchronously retrieves the user status from the Nextcloud server.
-    //
-    // - Parameters: Same as the sync version.
-    // - Returns: A tuple with explicitly named values describing the user status.
+    /// Asynchronously retrieves the user status from the Nextcloud server.
+    ///
+    /// - Parameters: Same as the sync version.
+    /// - Returns: A tuple with explicitly named values describing the user status.
     func getUserStatusAsync(userId: String? = nil,
                             account: String,
                             options: NKRequestOptions = NKRequestOptions(),
@@ -118,14 +118,14 @@ public extension NextcloudKit {
     }
 
 
-    // Sets the current user status on the Nextcloud server.
-    //
-    // Parameters:
-    // - status: The raw status value to be set (e.g. "online", "away", etc.).
-    // - account: The Nextcloud account performing the operation.
-    // - options: Optional request configuration.
-    // - taskHandler: Callback for the underlying `URLSessionTask`.
-    // - completion: Returns the account, the raw response data, and any resulting NKError.
+    /// Sets the current user status on the Nextcloud server.
+    ///
+    /// Parameters:
+    /// - status: The raw status value to be set (e.g. "online", "away", etc.).
+    /// - account: The Nextcloud account performing the operation.
+    /// - options: Optional request configuration.
+    /// - taskHandler: Callback for the underlying `URLSessionTask`.
+    /// - completion: Returns the account, the raw response data, and any resulting NKError.
     func setUserStatus(status: String,
                        account: String,
                        options: NKRequestOptions = NKRequestOptions(),
@@ -188,7 +188,6 @@ public extension NextcloudKit {
         }
     }
 
-
     /// Sets a predefined custom message for the user's status on the Nextcloud server.
     ///
     /// - Parameters:
@@ -241,15 +240,15 @@ public extension NextcloudKit {
         }
     }
 
-    // Asynchronously sets a predefined custom message with optional expiration.
-    //
-    // Parameters:
-    // - messageId: The identifier of the predefined message to set.
-    // - clearAt: Expiration timestamp (UNIX time) after which the message is cleared (optional, use 0 to skip).
-    // - account: The Nextcloud account performing the operation.
-    // - options: Optional request configuration (headers, queue, etc.).
-    // - taskHandler: Callback for monitoring the underlying URLSessionTask.
-    // - Returns: A tuple containing the account identifier, the raw response, and any resulting NKError.
+    /// Asynchronously sets a predefined custom message with optional expiration.
+    ///
+    /// Parameters:
+    /// - messageId: The identifier of the predefined message to set.
+    /// - clearAt: Expiration timestamp (UNIX time) after which the message is cleared (optional, use 0 to skip).
+    /// - account: The Nextcloud account performing the operation.
+    /// - options: Optional request configuration (headers, queue, etc.).
+    /// - taskHandler: Callback for monitoring the underlying URLSessionTask.
+    /// - Returns: A tuple containing the account identifier, the raw response, and any resulting NKError.
     func setCustomMessagePredefinedAsync(messageId: String,
                                          clearAt: Double,
                                          account: String,
@@ -275,19 +274,19 @@ public extension NextcloudKit {
         }
     }
 
-    // Sets a custom user-defined status message on the Nextcloud server.
-    //
-    // Parameters:
-    // - statusIcon: Optional icon name representing the status.
-    // - message: The custom status message string to display to other users.
-    // - clearAt: Expiration timestamp (in UNIX time format) for the status message; use 0 to disable automatic clearing.
-    // - account: The Nextcloud account identifier on which to apply the status.
-    // - options: Optional request configuration such as headers, queue, or task description.
-    // - taskHandler: Closure invoked when the URLSessionTask is created, used for task tracking or debugging.
-    // - completion: Completion handler returning:
-    //     - account: The account identifier used.
-    //     - responseData: The raw Alamofire response data (if any).
-    //     - error: An `NKError` indicating success or failure.
+    /// Sets a custom user-defined status message on the Nextcloud server.
+    ///
+    /// Parameters:
+    /// - statusIcon: Optional icon name representing the status.
+    /// - message: The custom status message string to display to other users.
+    /// - clearAt: Expiration timestamp (in UNIX time format) for the status message; use 0 to disable automatic clearing.
+    /// - account: The Nextcloud account identifier on which to apply the status.
+    /// - options: Optional request configuration such as headers, queue, or task description.
+    /// - taskHandler: Closure invoked when the URLSessionTask is created, used for task tracking or debugging.
+    /// - completion: Completion handler returning:
+    ///     - account: The account identifier used.
+    ///     - responseData: The raw Alamofire response data (if any).
+    ///     - error: An `NKError` indicating success or failure.
     func setCustomMessageUserDefined(statusIcon: String?,
                                      message: String,
                                      clearAt: Double,
@@ -332,17 +331,17 @@ public extension NextcloudKit {
         }
     }
 
-    // Asynchronously sets a custom user-defined status message.
-    //
-    // Parameters:
-    // - statusIcon: Optional icon to display with the message.
-    // - message: The custom status message string.
-    // - clearAt: Timestamp (UNIX time) when the message should expire (use 0 to skip).
-    // - account: The Nextcloud account performing the operation.
-    // - options: Request options such as headers, task description, queue.
-    // - taskHandler: Callback for URLSessionTask monitoring.
-    //
-    // Returns: A tuple containing account, responseData, and any resulting NKError.
+    /// Asynchronously sets a custom user-defined status message.
+    ///
+    /// Parameters:
+    /// - statusIcon: Optional icon to display with the message.
+    /// - message: The custom status message string.
+    /// - clearAt: Timestamp (UNIX time) when the message should expire (use 0 to skip).
+    /// - account: The Nextcloud account performing the operation.
+    /// - options: Request options such as headers, task description, queue.
+    /// - taskHandler: Callback for URLSessionTask monitoring.
+    ///
+    /// Returns: A tuple containing account, responseData, and any resulting NKError.
     func setCustomMessageUserDefinedAsync(statusIcon: String?,
                                           message: String,
                                           clearAt: Double,
@@ -370,16 +369,16 @@ public extension NextcloudKit {
         }
     }
 
-    // Clears any custom or predefined user status message currently set on the Nextcloud server.
-    //
-    // Parameters:
-    // - account: The Nextcloud account identifier whose status message should be cleared.
-    // - options: Optional request configuration such as custom headers, dispatch queue, or task description.
-    // - taskHandler: Closure called when the `URLSessionTask` is created, useful for debugging or tracking purposes.
-    // - completion: Completion handler returning:
-    //     - account: The account identifier used.
-    //     - responseData: The raw Alamofire response object, if available.
-    //     - error: An `NKError` representing the result of the operation (success or failure).
+    /// Clears any custom or predefined user status message currently set on the Nextcloud server.
+    ///
+    /// Parameters:
+    /// - account: The Nextcloud account identifier whose status message should be cleared.
+    /// - options: Optional request configuration such as custom headers, dispatch queue, or task description.
+    /// - taskHandler: Closure called when the `URLSessionTask` is created, useful for debugging or tracking purposes.
+    /// - completion: Completion handler returning:
+    ///     - account: The account identifier used.
+    ///     - responseData: The raw Alamofire response object, if available.
+    ///     - error: An `NKError` representing the result of the operation (success or failure).
     func clearMessage(account: String,
                       options: NKRequestOptions = NKRequestOptions(),
                       taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
@@ -412,17 +411,17 @@ public extension NextcloudKit {
         }
     }
 
-    // Asynchronously clears any user status message (custom or predefined) on the Nextcloud server.
-    //
-    // Parameters:
-    // - account: The Nextcloud account identifier whose status message will be cleared.
-    // - options: Optional `NKRequestOptions` to customize the request (e.g., headers, queue).
-    // - taskHandler: Callback triggered upon creation of the `URLSessionTask`.
-    //
-    // Returns: A tuple containing:
-    // - account: The account identifier used for the operation.
-    // - responseData: The raw `AFDataResponse<Data>` object returned by Alamofire.
-    // - error: The resulting `NKError`, either `.success` or a failure case.
+    /// Asynchronously clears any user status message (custom or predefined) on the Nextcloud server.
+    ///
+    /// Parameters:
+    /// - account: The Nextcloud account identifier whose status message will be cleared.
+    /// - options: Optional `NKRequestOptions` to customize the request (e.g., headers, queue).
+    /// - taskHandler: Callback triggered upon creation of the `URLSessionTask`.
+    ///
+    /// Returns: A tuple containing:
+    /// - account: The account identifier used for the operation.
+    /// - responseData: The raw `AFDataResponse<Data>` object returned by Alamofire.
+    /// - error: The resulting `NKError`, either `.success` or a failure case.
     func clearMessageAsync(account: String,
                            options: NKRequestOptions = NKRequestOptions(),
                            taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in }
@@ -444,18 +443,17 @@ public extension NextcloudKit {
         }
     }
 
-    // Retrieves the list of predefined user statuses (e.g., "Available", "Away", "Do not disturb") from the Nextcloud server.
-    //
-    // Parameters:
-    // - account: The Nextcloud account identifier performing the request.
-    // - options: Optional `NKRequestOptions` to customize the request (e.g., custom headers, queue).
-    // - taskHandler: Callback triggered when the `URLSessionTask` is created.
-    //
-    // Returns: A tuple containing:
-    // - account: The account identifier used for the request.
-    // - userStatuses: An optional array of predefined `NKUserStatus` objects.
-    // - responseData: Raw `AFDataResponse<Data>` from Alamofire.
-    // - error: Resulting `NKError` describing success or failure.
+    /// Retrieves the list of predefined user statuses (e.g., "Available", "Away", "Do not disturb") from the Nextcloud server.
+    ///
+    /// - Parameters:
+    ///   - account: The Nextcloud account identifier performing the request.
+    ///   - options: Optional `NKRequestOptions` to customize the request (e.g., custom headers, queue).
+    ///   - taskHandler: Callback triggered when the `URLSessionTask` is created.
+    ///   - completion: Completion handler returning:
+    ///     - account: The account identifier used for the request.
+    ///     - userStatuses: An optional array of predefined `NKUserStatus` objects.
+    ///     - responseData: Raw `AFDataResponse<Data>` from Alamofire.
+    ///     - error: Resulting `NKError` describing success or failure.
     func getUserStatusPredefinedStatuses(account: String,
                                          options: NKRequestOptions = NKRequestOptions(),
                                          taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },

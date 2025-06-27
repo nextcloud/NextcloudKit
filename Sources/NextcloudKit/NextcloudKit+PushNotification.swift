@@ -7,17 +7,17 @@ import Alamofire
 import SwiftyJSON
 
 public extension NextcloudKit {
-    // Subscribes the current device to push notifications.
-    //
-    // Parameters:
-    // - serverUrl: The base server URL for the Nextcloud instance.
-    // - pushTokenHash: Hashed device push token, used for identification.
-    // - devicePublicKey: The public key of the device for encryption/authentication.
-    // - proxyServerUrl: The URL of the proxy push server.
-    // - account: The Nextcloud account performing the subscription.
-    // - options: Optional request configuration (headers, version, etc.).
-    // - taskHandler: Callback to monitor the `URLSessionTask`.
-    // - completion: Returns the account, device identifier, push signature, public key, response data, and NKError.
+    /// Subscribes the current device to push notifications.
+    ///
+    /// Parameters:
+    /// - serverUrl: The base server URL for the Nextcloud instance.
+    /// - pushTokenHash: Hashed device push token, used for identification.
+    /// - devicePublicKey: The public key of the device for encryption/authentication.
+    /// - proxyServerUrl: The URL of the proxy push server.
+    /// - account: The Nextcloud account performing the subscription.
+    /// - options: Optional request configuration (headers, version, etc.).
+    /// - taskHandler: Callback to monitor the `URLSessionTask`.
+    /// - completion: Returns the account, device identifier, push signature, public key, response data, and NKError.
     func subscribingPushNotification(serverUrl: String,
                                      pushTokenHash: String,
                                      devicePublicKey: String,
@@ -107,14 +107,14 @@ public extension NextcloudKit {
         }
     }
 
-    // Unsubscribes the current device from push notifications.
-    //
-    // Parameters:
-    // - serverUrl: The base server URL of the Nextcloud instance.
-    // - account: The Nextcloud account performing the unsubscription.
-    // - options: Optional request configuration (headers, queue, etc.).
-    // - taskHandler: Callback to monitor the `URLSessionTask`.
-    // - completion: Returns the account, raw response data, and NKError.
+    /// Unsubscribes the current device from push notifications.
+    ///
+    /// Parameters:
+    /// - serverUrl: The base server URL of the Nextcloud instance.
+    /// - account: The Nextcloud account performing the unsubscription.
+    /// - options: Optional request configuration (headers, queue, etc.).
+    /// - taskHandler: Callback to monitor the `URLSessionTask`.
+    /// - completion: Returns the account, raw response data, and NKError.
     func unsubscribingPushNotification(serverUrl: String,
                                        account: String,
                                        options: NKRequestOptions = NKRequestOptions(),
@@ -172,18 +172,18 @@ public extension NextcloudKit {
         }
     }
 
-    // Subscribes a device to the push proxy server for receiving push notifications.
-    //
-    // Parameters:
-    // - proxyServerUrl: The URL of the push proxy server.
-    // - pushToken: The token representing the push notification subscription.
-    // - deviceIdentifier: A unique identifier for the device.
-    // - signature: A signature to validate the subscription.
-    // - publicKey: The public key associated with the device.
-    // - account: The Nextcloud account performing the subscription.
-    // - options: Optional request customization.
-    // - taskHandler: Callback for tracking the underlying URLSessionTask.
-    // - completion: Returns the account, raw response data, and NKError.
+    /// Subscribes a device to the push proxy server for receiving push notifications.
+    ///
+    /// Parameters:
+    /// - proxyServerUrl: The URL of the push proxy server.
+    /// - pushToken: The token representing the push notification subscription.
+    /// - deviceIdentifier: A unique identifier for the device.
+    /// - signature: A signature to validate the subscription.
+    /// - publicKey: The public key associated with the device.
+    /// - account: The Nextcloud account performing the subscription.
+    /// - options: Optional request customization.
+    /// - taskHandler: Callback for tracking the underlying URLSessionTask.
+    /// - completion: Returns the account, raw response data, and NKError.
     func subscribingPushProxy(proxyServerUrl: String,
                               pushToken: String,
                               deviceIdentifier: String,
@@ -264,17 +264,17 @@ public extension NextcloudKit {
         }
     }
 
-    // Unsubscribes a device from the push proxy server.
-    //
-    // Parameters:
-    // - proxyServerUrl: The URL of the push proxy server.
-    // - deviceIdentifier: A unique identifier for the device.
-    // - signature: A cryptographic signature to authenticate the request.
-    // - publicKey: The public key associated with the device.
-    // - account: The Nextcloud account initiating the request.
-    // - options: Optional configuration for the request (queue, headers, version, etc.).
-    // - taskHandler: Callback triggered when the underlying URLSessionTask is created.
-    // - completion: Completion handler with account, response data, and NKError result.
+    /// Unsubscribes a device from the push proxy server.
+    ///
+    /// Parameters:
+    /// - proxyServerUrl: The URL of the push proxy server.
+    /// - deviceIdentifier: A unique identifier for the device.
+    /// - signature: A cryptographic signature to authenticate the request.
+    /// - publicKey: The public key associated with the device.
+    /// - account: The Nextcloud account initiating the request.
+    /// - options: Optional configuration for the request (queue, headers, version, etc.).
+    /// - taskHandler: Callback triggered when the underlying URLSessionTask is created.
+    /// - completion: Completion handler with account, response data, and NKError result.
     func unsubscribingPushProxy(proxyServerUrl: String,
                                 deviceIdentifier: String,
                                 signature: String,

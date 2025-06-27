@@ -7,13 +7,13 @@ import Alamofire
 import SwiftyJSON
 
 public extension NextcloudKit {
-    // Retrieves the list of editors and creators for collaborative text editing.
-    //
-    // Parameters:
-    // - account: The account from which to fetch the editor details.
-    // - options: Optional request configuration such as headers, queue, or API version.
-    // - taskHandler: Callback to track the underlying URLSessionTask.
-    // - completion: Returns the account, array of editors, array of creators, the raw response data, and NKError.
+    /// Retrieves the list of editors and creators for collaborative text editing.
+    ///
+    /// Parameters:
+    /// - account: The account from which to fetch the editor details.
+    /// - options: Optional request configuration such as headers, queue, or API version.
+    /// - taskHandler: Callback to track the underlying URLSessionTask.
+    /// - completion: Returns the account, array of editors, array of creators, the raw response data, and NKError.
     func textObtainEditorDetails(account: String,
                                  options: NKRequestOptions = NKRequestOptions(),
                                  taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
@@ -89,16 +89,16 @@ public extension NextcloudKit {
         }
     }
 
-    // Opens a file using the specified text editor and returns the access URL.
-    //
-    // Parameters:
-    // - fileNamePath: The path of the file to open on the server.
-    // - fileId: Optional file identifier used to reference the file more precisely.
-    // - editor: The identifier of the text editor to use.
-    // - account: The account initiating the file open request.
-    // - options: Optional configuration for the request (headers, API version, etc.).
-    // - taskHandler: Callback triggered with the underlying URLSessionTask.
-    // - completion: Returns the account, the resulting file editor URL, raw response data, and an NKError.
+    /// Opens a file using the specified text editor and returns the access URL.
+    ///
+    /// Parameters:
+    /// - fileNamePath: The path of the file to open on the server.
+    /// - fileId: Optional file identifier used to reference the file more precisely.
+    /// - editor: The identifier of the text editor to use.
+    /// - account: The account initiating the file open request.
+    /// - options: Optional configuration for the request (headers, API version, etc.).
+    /// - taskHandler: Callback triggered with the underlying URLSessionTask.
+    /// - completion: Returns the account, the resulting file editor URL, raw response data, and an NKError.
     func textOpenFile(fileNamePath: String,
                       fileId: String? = nil,
                       editor: String,
@@ -174,13 +174,13 @@ public extension NextcloudKit {
         }
     }
 
-    // Retrieves the list of available editor templates for the given account.
-    //
-    // Parameters:
-    // - account: The account requesting the list of templates.
-    // - options: Optional request configuration such as headers, queue, or API version.
-    // - taskHandler: Callback triggered with the underlying URLSessionTask.
-    // - completion: Returns the account, an optional array of NKEditorTemplate, the raw response, and an NKError.
+    /// Retrieves the list of available editor templates for the given account.
+    ///
+    /// Parameters:
+    /// - account: The account requesting the list of templates.
+    /// - options: Optional request configuration such as headers, queue, or API version.
+    /// - taskHandler: Callback triggered with the underlying URLSessionTask.
+    /// - completion: Returns the account, an optional array of NKEditorTemplate, the raw response, and an NKError.
     func textGetListOfTemplates(account: String,
                                 options: NKRequestOptions = NKRequestOptions(),
                                 taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
@@ -250,17 +250,17 @@ public extension NextcloudKit {
         }
     }
 
-    // Creates a new file using a specific editor, creator, and template.
-    //
-    // Parameters:
-    // - fileNamePath: The full destination path where the new file will be created.
-    // - editorId: The identifier of the editor to use (e.g., "richdocuments").
-    // - creatorId: The identifier of the creator (e.g., "document", "spreadsheet").
-    // - templateId: The identifier of the template to use for this file.
-    // - account: The account performing the operation.
-    // - options: Optional request configuration (headers, queue, version, etc.).
-    // - taskHandler: Callback to monitor the underlying URLSessionTask.
-    // - completion: Returns the account, the resulting file URL (if any), the raw response, and NKError.
+    /// Creates a new file using a specific editor, creator, and template.
+    ///
+    /// Parameters:
+    /// - fileNamePath: The full destination path where the new file will be created.
+    /// - editorId: The identifier of the editor to use (e.g., "richdocuments").
+    /// - creatorId: The identifier of the creator (e.g., "document", "spreadsheet").
+    /// - templateId: The identifier of the template to use for this file.
+    /// - account: The account performing the operation.
+    /// - options: Optional request configuration (headers, queue, version, etc.).
+    /// - taskHandler: Callback to monitor the underlying URLSessionTask.
+    /// - completion: Returns the account, the resulting file URL (if any), the raw response, and NKError.
     func textCreateFile(fileNamePath: String,
                         editorId: String,
                         creatorId: String,

@@ -7,15 +7,15 @@ import Alamofire
 import SwiftyJSON
 
 public extension NextcloudKit {
-    // Retrieves a list of recommended files from the server.
-    //
-    // Parameters:
-    // - account: The Nextcloud account used to perform the request.
-    // - options: Optional configuration for headers, queue, versioning, etc.
-    // - request: Optional callback to observe or manipulate the underlying DataRequest.
-    // - taskHandler: Callback triggered when the URLSessionTask is created.
-    // - completion: Completion handler returning the account, the list of recommendations,
-    //               the raw response data, and an NKError result.
+    /// Retrieves a list of recommended files from the server.
+    ///
+    /// Parameters:
+    /// - account: The Nextcloud account used to perform the request.
+    /// - options: Optional configuration for headers, queue, versioning, etc.
+    /// - request: Optional callback to observe or manipulate the underlying DataRequest.
+    /// - taskHandler: Callback triggered when the URLSessionTask is created.
+    /// - completion: Completion handler returning the account, the list of recommendations,
+    ///               the raw response data, and an NKError result.
     func getRecommendedFiles(account: String,
                              options: NKRequestOptions = NKRequestOptions(),
                              request: @escaping (DataRequest?) -> Void = { _ in },
