@@ -58,6 +58,8 @@ public struct NKCommon: Sendable {
     public let identifierSessionUpload: String = "com.nextcloud.nextcloudkit.session.upload"
     // Background
     public let identifierSessionDownloadBackground: String = "com.nextcloud.session.downloadbackground"
+    public let identifierSessionDownloadBackgroundExt: String = "com.nextcloud.session.downloadextension"
+
     public let identifierSessionUploadBackground: String = "com.nextcloud.session.uploadbackground"
     public let identifierSessionUploadBackgroundWWan: String = "com.nextcloud.session.uploadbackgroundWWan"
     public let identifierSessionUploadBackgroundExt: String = "com.nextcloud.session.uploadextension"

@@ -28,9 +28,11 @@ public final class NKBackground: NSObject, URLSessionTaskDelegate, URLSessionDel
     public func download(serverUrlFileName: Any,
                          fileNameLocalPath: String,
                          taskDescription: String? = nil,
+                         account: String,
                          automaticResume: Bool = true,
-                         account: String) -> (URLSessionDownloadTask?, error: NKError) {
+                         sessionIdentifier: String) -> (URLSessionDownloadTask?, error: NKError) {
         var url: URL?
+        var downloadSession: URLSession?
         let groupDefaults = UserDefaults(suiteName: NextcloudKit.shared.nkCommonInstance.groupIdentifier)
 
         /// Check if error is in groupDefaults
@@ -68,11 +70,17 @@ public final class NKBackground: NSObject, URLSessionTaskDelegate, URLSessionDel
         request.setValue(nkSession.userAgent, forHTTPHeaderField: "User-Agent")
         request.setValue("Basic \(base64LoginString)", forHTTPHeaderField: "Authorization")
 
-        let task = nkSession.sessionDownloadBackground.downloadTask(with: request)
-        task.taskDescription = taskDescription
+        if sessionIdentifier == nkCommonInstance.identifierSessionDownloadBackground {
+            downloadSession = nkSession.sessionDownloadBackground
+        } else if sessionIdentifier == nkCommonInstance.identifierSessionDownloadBackgroundExt {
+            downloadSession = nkSession.sessionDownloadBackgroundExt
+        }
+
+        let task = downloadSession?.downloadTask(with: request)
+        task?.taskDescription = taskDescription
 
         if automaticResume {
-            task.resume()
+            task?.resume()
         }
 
         return (task, .success)
@@ -88,8 +96,9 @@ public final class NKBackground: NSObject, URLSessionTaskDelegate, URLSessionDel
     public func downloadAsync(serverUrlFileName: Any,
                               fileNameLocalPath: String,
                               taskDescription: String? = nil,
+                              account: String,
                               automaticResume: Bool = true,
-                              account: String) async -> (
+                              sessionIdentifier: String) async -> (
         downloadTask: URLSessionDownloadTask?,
         error: NKError
     ) {
@@ -97,8 +106,9 @@ public final class NKBackground: NSObject, URLSessionTaskDelegate, URLSessionDel
             let (task, error) = download(serverUrlFileName: serverUrlFileName,
                                          fileNameLocalPath: fileNameLocalPath,
                                          taskDescription: taskDescription,
+                                         account: account,
                                          automaticResume: automaticResume,
-                                         account: account)
+                                         sessionIdentifier: sessionIdentifier)
             continuation.resume(returning: (downloadTask: task, error: error))
         }
     }

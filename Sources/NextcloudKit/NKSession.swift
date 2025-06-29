@@ -20,6 +20,7 @@ public struct NKSession: Sendable {
     public let sessionData: Alamofire.Session
     public let sessionDataNoCache: Alamofire.Session
     public let sessionDownloadBackground: URLSession
+    public let sessionDownloadBackgroundExt: URLSession
     public let sessionUploadBackground: URLSession
     public let sessionUploadBackgroundWWan: URLSession
     public let sessionUploadBackgroundExt: URLSession
@@ -47,10 +48,10 @@ public struct NKSession: Sendable {
         self.httpMaximumConnectionsPerHostInUpload = httpMaximumConnectionsPerHostInUpload
 
         let backgroundSessionDelegate = NKBackground(nkCommonInstance: nkCommonInstance)
-        /// Strange but works ?!?!
+        // Strange but works ?!?!
         let sharedCookieStorage = user + "@" + urlBase
 
-        /// SessionData Alamofire
+        // SessionData Alamofire
         let configurationSessionData = URLSessionConfiguration.af.default
         configurationSessionData.requestCachePolicy = .useProtocolCachePolicy
         configurationSessionData.httpMaximumConnectionsPerHost = httpMaximumConnectionsPerHost
@@ -67,7 +68,7 @@ public struct NKSession: Sendable {
                                         serializationQueue: nkCommonInstance.serializationQueue,
                                         eventMonitors: [NKMonitor(nkCommonInstance: nkCommonInstance)])
 
-        /// SessionDataNoCache Alamofire
+        // SessionDataNoCache Alamofire
         let configurationSessionDataNoCache = URLSessionConfiguration.af.default
         configurationSessionDataNoCache.requestCachePolicy = .reloadIgnoringLocalAndRemoteCacheData
         configurationSessionDataNoCache.httpMaximumConnectionsPerHost = httpMaximumConnectionsPerHost
@@ -80,7 +81,7 @@ public struct NKSession: Sendable {
                                                serializationQueue: nkCommonInstance.serializationQueue,
                                                eventMonitors: [NKMonitor(nkCommonInstance: nkCommonInstance)])
 
-        /// Session Download Background
+        // Session Download Background
         let configurationDownloadBackground = URLSessionConfiguration.background(withIdentifier: NKCommon().getSessionConfigurationIdentifier(NKCommon().identifierSessionDownloadBackground, account: account))
         configurationDownloadBackground.allowsCellularAccess = true
 
@@ -99,7 +100,27 @@ public struct NKSession: Sendable {
         configurationDownloadBackground.httpCookieStorage = HTTPCookieStorage.sharedCookieStorage(forGroupContainerIdentifier: sharedCookieStorage)
         sessionDownloadBackground = URLSession(configuration: configurationDownloadBackground, delegate: backgroundSessionDelegate, delegateQueue: OperationQueue.main)
 
-        /// Session Upload Background
+        // Session Download Background Extension
+        let configurationDownloadBackgroundExt = URLSessionConfiguration.background(withIdentifier: NKCommon().identifierSessionDownloadBackgroundExt + UUID().uuidString)
+        configurationDownloadBackgroundExt.allowsCellularAccess = true
+
+        if #available(macOS 11, *) {
+            configurationDownloadBackgroundExt.sessionSendsLaunchEvents = true
+        }
+
+        configurationDownloadBackgroundExt.isDiscretionary = false
+        configurationDownloadBackgroundExt.httpMaximumConnectionsPerHost = self.httpMaximumConnectionsPerHostInDownload
+        configurationDownloadBackgroundExt.requestCachePolicy = .useProtocolCachePolicy
+        configurationDownloadBackgroundExt.sharedContainerIdentifier = groupIdentifier
+
+        #if os(iOS) || targetEnvironment(macCatalyst)
+            configurationDownloadBackgroundExt.multipathServiceType = .handover
+        #endif
+
+        configurationDownloadBackgroundExt.httpCookieStorage = HTTPCookieStorage.sharedCookieStorage(forGroupContainerIdentifier: sharedCookieStorage)
+        sessionDownloadBackgroundExt = URLSession(configuration: configurationDownloadBackgroundExt, delegate: backgroundSessionDelegate, delegateQueue: OperationQueue.main)
+
+        // Session Upload Background
         let configurationUploadBackground = URLSessionConfiguration.background(withIdentifier: NKCommon().getSessionConfigurationIdentifier(NKCommon().identifierSessionUploadBackground, account: account))
         configurationUploadBackground.allowsCellularAccess = true
 
@@ -118,7 +139,7 @@ public struct NKSession: Sendable {
         configurationUploadBackground.httpCookieStorage = HTTPCookieStorage.sharedCookieStorage(forGroupContainerIdentifier: sharedCookieStorage)
         sessionUploadBackground = URLSession(configuration: configurationUploadBackground, delegate: backgroundSessionDelegate, delegateQueue: OperationQueue.main)
 
-        /// Session Upload Background WWan
+        // Session Upload Background WWan
         let configurationUploadBackgroundWWan = URLSessionConfiguration.background(withIdentifier: NKCommon().getSessionConfigurationIdentifier(NKCommon().identifierSessionUploadBackgroundWWan, account: account))
         configurationUploadBackgroundWWan.allowsCellularAccess = false
 
@@ -132,7 +153,7 @@ public struct NKSession: Sendable {
         configurationUploadBackgroundWWan.httpCookieStorage = HTTPCookieStorage.sharedCookieStorage(forGroupContainerIdentifier: sharedCookieStorage)
         sessionUploadBackgroundWWan = URLSession(configuration: configurationUploadBackgroundWWan, delegate: backgroundSessionDelegate, delegateQueue: OperationQueue.main)
 
-        /// Session Upload Background Extension
+        // Session Upload Background Extension
         let configurationUploadBackgroundExt = URLSessionConfiguration.background(withIdentifier: NKCommon().identifierSessionUploadBackgroundExt + UUID().uuidString)
         configurationUploadBackgroundExt.allowsCellularAccess = true
 
