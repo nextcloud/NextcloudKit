@@ -28,6 +28,7 @@ public final class NKBackground: NSObject, URLSessionTaskDelegate, URLSessionDel
     public func download(serverUrlFileName: Any,
                          fileNameLocalPath: String,
                          taskDescription: String? = nil,
+                         automaticResume: Bool = true,
                          account: String) -> (URLSessionDownloadTask?, error: NKError) {
         var url: URL?
         let groupDefaults = UserDefaults(suiteName: NextcloudKit.shared.nkCommonInstance.groupIdentifier)
@@ -69,7 +70,10 @@ public final class NKBackground: NSObject, URLSessionTaskDelegate, URLSessionDel
 
         let task = nkSession.sessionDownloadBackground.downloadTask(with: request)
         task.taskDescription = taskDescription
-        task.resume()
+
+        if automaticResume {
+            task.resume()
+        }
 
         return (task, .success)
     }
@@ -84,6 +88,7 @@ public final class NKBackground: NSObject, URLSessionTaskDelegate, URLSessionDel
     public func downloadAsync(serverUrlFileName: Any,
                               fileNameLocalPath: String,
                               taskDescription: String? = nil,
+                              automaticResume: Bool = true,
                               account: String) async -> (
         downloadTask: URLSessionDownloadTask?,
         error: NKError
@@ -92,6 +97,7 @@ public final class NKBackground: NSObject, URLSessionTaskDelegate, URLSessionDel
             let (task, error) = download(serverUrlFileName: serverUrlFileName,
                                          fileNameLocalPath: fileNameLocalPath,
                                          taskDescription: taskDescription,
+                                         automaticResume: automaticResume,
                                          account: account)
             continuation.resume(returning: (downloadTask: task, error: error))
         }
@@ -121,6 +127,7 @@ public final class NKBackground: NSObject, URLSessionTaskDelegate, URLSessionDel
                        taskDescription: String? = nil,
                        overwrite: Bool = false,
                        account: String,
+                       automaticResume: Bool = true,
                        sessionIdentifier: String) -> (URLSessionUploadTask?, error: NKError) {
         var url: URL?
         var uploadSession: URLSession?
@@ -182,7 +189,10 @@ public final class NKBackground: NSObject, URLSessionTaskDelegate, URLSessionDel
 
         let task = uploadSession?.uploadTask(with: request, fromFile: URL(fileURLWithPath: fileNameLocalPath))
         task?.taskDescription = taskDescription
-        task?.resume()
+
+        if automaticResume {
+            task?.resume()
+        }
 
         return (task, .success)
     }
@@ -201,6 +211,7 @@ public final class NKBackground: NSObject, URLSessionTaskDelegate, URLSessionDel
                             taskDescription: String? = nil,
                             overwrite: Bool = false,
                             account: String,
+                            automaticResume: Bool = true,
                             sessionIdentifier: String) async -> (
         uploadTask: URLSessionUploadTask?,
         error: NKError
@@ -213,6 +224,7 @@ public final class NKBackground: NSObject, URLSessionTaskDelegate, URLSessionDel
                                        taskDescription: taskDescription,
                                        overwrite: overwrite,
                                        account: account,
+                                       automaticResume: automaticResume,
                                        sessionIdentifier: sessionIdentifier)
             continuation.resume(returning: (uploadTask: task, error: error))
         }
