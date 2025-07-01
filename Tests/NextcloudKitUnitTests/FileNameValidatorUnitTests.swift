@@ -101,6 +101,31 @@ class FileNameValidatorUnitTests: XCTestCase {
 
     func testFilePathWithNestedFolder() {
         let folderPath = "validFolder/secondValidFolder/CON"
+        let filePaths = ["file1.txt", "file2.doc", "file3."]
+
+        let result = fileNameValidator.checkFolderPath(folderPath)
+        XCTAssertFalse(result)
+
+        filePaths.forEach { path in
+            let result = fileNameValidator.checkFileName(path)
+
+            if path == "file3." {
+                XCTAssertNotNil(result?.errorDescription)
+            } else {
+                XCTAssertNil(result?.errorDescription)
+            }
+        }
+    }
+
+    func testOnlyFolderPath() {
+        let folderPath = "/A1/Aaaww/W/C2/"
+
+        let result = fileNameValidator.checkFolderPath(folderPath)
+        XCTAssertTrue(result)
+    }
+
+    func testOnlyFolderPathWithOneReservedName() {
+        let folderPath = "/A1/Aaaww/CON/W/C2/"
 
         let result = fileNameValidator.checkFolderPath(folderPath)
         XCTAssertFalse(result)
