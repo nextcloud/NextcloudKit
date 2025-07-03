@@ -93,6 +93,39 @@ public extension NextcloudKit {
         }
     }
 
+    /// Asynchronously reads shares for a given account using the provided parameters.
+    /// - Parameters:
+    ///   - parameters: The `NKShareParameter` object containing filters and options for the request.
+    ///   - account: The account identifier for which to fetch shares.
+    ///   - options: Optional `NKRequestOptions` to customize the request (default is empty).
+    ///   - taskHandler: Closure called when the underlying `URLSessionTask` is created, useful for tracking or cancellation.
+    /// - Returns: A tuple containing:
+    ///   - `account`: The account used for the request.
+    ///   - `shares`: An optional array of `NKShare` objects returned by the server.
+    ///   - `responseData`: The raw Alamofire response object.
+    ///   - `error`: An `NKError` indicating the result of the request.
+    func readSharesAsync(parameters: NKShareParameter,
+                         account: String,
+                         options: NKRequestOptions = NKRequestOptions(),
+                         taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in }) async -> (account: String, shares: [NKShare]?, responseData: AFDataResponse<Data>?, error: NKError) {
+
+        await withCheckedContinuation { continuation in
+            readShares(
+                parameters: parameters,
+                account: account,
+                options: options,
+                taskHandler: taskHandler
+            ) { account, shares, responseData, error in
+                continuation.resume(returning: (
+                    account: account,
+                    shares: shares,
+                    responseData: responseData,
+                    error: error
+                ))
+            }
+        }
+    }
+
     /*
     * @param search         The search string
     * @param itemType       The type which is shared (e.g. file or folder)
