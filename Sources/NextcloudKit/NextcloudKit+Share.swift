@@ -299,39 +299,19 @@ public extension NextcloudKit {
     * @param attributes     There is currently only one share attribute “download” from the scope “permissions”. This attribute is only valid for user and group shares, not for public link shares.
     */
 
-    /*
-    func createShareLink(path: String,
-                         hideDownload: Bool = false,
-                         publicUpload: Bool = false,
-                         password: String? = nil,
-                         permissions: Int = 1,
-                         account: String,
-                         options: NKRequestOptions = NKRequestOptions(),
-                         taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-                         completion: @escaping (_ account: String, _ share: NKShare?, _ responseData: AFDataResponse<Data>?, _ error: NKError) -> Void) {
-        createShare(path: path, shareType: 3, shareWith: nil, publicUpload: publicUpload, hideDownload: hideDownload, password: password, permissions: permissions, account: account, options: options) { task in
-            task.taskDescription = options.taskDescription
-            taskHandler(task)
-        } completion: { account, share, responseData, error in
-            completion(account, share, responseData, error)
-        }
-    }
-    */
-
-
-    private func createShare(path: String,
-                             shareType: Int,
-                             shareWith: String?,
-                             publicUpload: Bool? = nil,
-                             note: String? = nil,
-                             hideDownload: Bool? = nil,
-                             password: String? = nil,
-                             permissions: Int = 1,
-                             attributes: String? = nil,
-                             account: String,
-                             options: NKRequestOptions = NKRequestOptions(),
-                             taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-                             completion: @escaping (_ account: String, _ share: NKShare?, _ responseData: AFDataResponse<Data>?, _ error: NKError) -> Void) {
+    func createShare(path: String,
+                     shareType: Int,
+                     shareWith: String?,
+                     publicUpload: Bool? = nil,
+                     note: String? = nil,
+                     hideDownload: Bool? = nil,
+                     password: String? = nil,
+                     permissions: Int = 1,
+                     attributes: String? = nil,
+                     account: String,
+                     options: NKRequestOptions = NKRequestOptions(),
+                     taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
+                     completion: @escaping (_ account: String, _ share: NKShare?, _ responseData: AFDataResponse<Data>?, _ error: NKError) -> Void) {
         let endpoint = "ocs/v2.php/apps/files_sharing/api/v1/shares"
         guard let nkSession = nkCommonInstance.nksessions.session(forAccount: account),
               let url = nkCommonInstance.createStandardUrl(serverUrl: nkSession.urlBase, endpoint: endpoint, options: options),
