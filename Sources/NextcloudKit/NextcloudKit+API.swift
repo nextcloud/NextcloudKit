@@ -637,7 +637,7 @@ public extension NextcloudKit {
                         fileNameLocalPath: String,
                         sizeImage: Int,
                         avatarSizeRounded: Int = 0,
-                        etag: String?,
+                        etagResource: String?,
                         account: String,
                         options: NKRequestOptions = NKRequestOptions(),
                         taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
@@ -649,9 +649,9 @@ public extension NextcloudKit {
             return options.queue.async { completion(account, nil, nil, nil, nil, .urlError) }
         }
 
-        if var etag = etag {
-            etag = "\"" + etag + "\""
-            headers.update(name: "If-None-Match", value: etag)
+        if var etagResource = etagResource {
+            etagResource = "\"" + etagResource + "\""
+            headers.update(name: "If-None-Match", value: etagResource)
         }
 
         nkSession.sessionData.request(url, method: .get, encoding: URLEncoding.default, headers: headers, interceptor: NKInterceptor(nkCommonInstance: nkCommonInstance)).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
@@ -749,7 +749,7 @@ public extension NextcloudKit {
                              fileNameLocalPath: String,
                              sizeImage: Int,
                              avatarSizeRounded: Int = 0,
-                             etag: String?,
+                             etagResource: String?,
                              account: String,
                              options: NKRequestOptions = NKRequestOptions(),
                              taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in }
@@ -766,7 +766,7 @@ public extension NextcloudKit {
                            fileNameLocalPath: fileNameLocalPath,
                            sizeImage: sizeImage,
                            avatarSizeRounded: avatarSizeRounded,
-                           etag: etag,
+                           etagResource: etagResource,
                            account: account,
                            options: options,
                            taskHandler: taskHandler) { account, imageAvatar, imageOriginal, etag, responseData, error in
