@@ -244,17 +244,29 @@ public extension NextcloudKit {
         let freeDisk = ((fsAttributes[FileAttributeKey.systemFreeSize] ?? 0) as? Int64) ?? 0
         #elseif os(visionOS) || os(iOS)
         var freeDisk: Int64 = 0
-        let fileURL = URL(fileURLWithPath: directory as String)
+        let outputPath = fileChunksOutputDirectory ?? directory
+        let outputURL = URL(fileURLWithPath: outputPath)
+
         do {
-            let values = try fileURL.resourceValues(forKeys: [.volumeAvailableCapacityForImportantUsageKey])
-            if let capacity = values.volumeAvailableCapacityForImportantUsage {
-                freeDisk = capacity
+            let keys: Set<URLResourceKey> = [
+                .volumeAvailableCapacityForImportantUsageKey,
+                .volumeAvailableCapacityKey
+            ]
+            let values = try outputURL.resourceValues(forKeys: keys)
+
+            if let importantUsage = values.volumeAvailableCapacityForImportantUsage {
+                freeDisk = importantUsage
+            } else if let legacyCapacity = values.volumeAvailableCapacity {
+                freeDisk = Int64(legacyCapacity)
             }
-        } catch { }
+        } catch {
+            // fallback zero
+            freeDisk = 0
+        }
         #endif
 
         #if os(visionOS) || os(iOS)
-        if freeDisk < fileNameLocalSize * 4 {
+        if freeDisk < fileNameLocalSize * 2 {
             // It seems there is not enough space to send the file
             return completion(account, nil, nil, .errorChunkNoEnoughMemory)
         }
