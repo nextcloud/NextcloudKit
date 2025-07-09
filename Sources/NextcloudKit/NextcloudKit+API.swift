@@ -411,7 +411,7 @@ public extension NextcloudKit {
     /// - fileId: The identifier of the file to generate a preview for.
     /// - width: The desired width of the preview image (default is 1024).
     /// - height: The desired height of the preview image (default is 1024).
-    /// - etag: Optional entity tag used for caching validation.
+    /// - etag: Optional entity tag used for caching validation. ()
     /// - crop: Indicates whether the image should be cropped (1 = true, default).
     /// - cropMode: The cropping mode (default is "cover").
     /// - forceIcon: If set to 1, forces icon generation (default is 0).
@@ -423,7 +423,8 @@ public extension NextcloudKit {
     func downloadPreview(fileId: String,
                          width: Int = 1024,
                          height: Int = 1024,
-                         etag: String? = nil,
+                         etag: String,
+                         etagResource: String? = nil,
                          crop: Int = 1,
                          cropMode: String = "cover",
                          forceIcon: Int = 0,
@@ -432,17 +433,19 @@ public extension NextcloudKit {
                          options: NKRequestOptions = NKRequestOptions(),
                          taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
                          completion: @escaping (_ account: String, _ width: Int, _ height: Int, _ etag: String?, _ responseData: AFDataResponse<Data>?, _ error: NKError) -> Void) {
-        let etagResource: String = etag ?? ""
-        let endpoint = "index.php/core/preview?fileId=\(fileId)&x=\(width)&y=\(height)&a=\(crop)&mode=\(cropMode)&forceIcon=\(forceIcon)&mimeFallback=\(mimeFallback)&etag=\(etagResource)"
+        //
+        // Adding the etag as a parameter in the endpoint URL is used to prevent URLCache from being used in case the image has been overwritten.
+        //
+        let endpoint = "index.php/core/preview?fileId=\(fileId)&x=\(width)&y=\(height)&a=\(crop)&mode=\(cropMode)&forceIcon=\(forceIcon)&mimeFallback=\(mimeFallback)&etag=\(etag)"
         guard let nkSession = nkCommonInstance.nksessions.session(forAccount: account),
               let url = nkCommonInstance.createStandardUrl(serverUrl: nkSession.urlBase, endpoint: endpoint, options: options),
               var headers = nkCommonInstance.getStandardHeaders(account: account, options: options) else {
             return options.queue.async { completion(account, width, height, nil, nil, .urlError) }
         }
 
-        if var etag = etag {
-            etag = "\"" + etag + "\""
-            headers.update(name: "If-None-Match", value: etag)
+        if var etagResource = etagResource {
+            etagResource = "\"" + etagResource + "\""
+            headers.update(name: "If-None-Match", value: etagResource)
         }
 
         nkSession.sessionData.request(url, method: .get, encoding: URLEncoding.default, headers: headers, interceptor: NKInterceptor(nkCommonInstance: nkCommonInstance)).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
@@ -477,7 +480,8 @@ public extension NextcloudKit {
     func downloadPreviewAsync(fileId: String,
                               width: Int = 1024,
                               height: Int = 1024,
-                              etag: String? = nil,
+                              etag: String,
+                              etagResource: String? = nil,
                               crop: Int = 1,
                               cropMode: String = "cover",
                               forceIcon: Int = 0,
@@ -498,6 +502,7 @@ public extension NextcloudKit {
                             width: width,
                             height: height,
                             etag: etag,
+                            etagResource: etagResource,
                             crop: crop,
                             cropMode: cropMode,
                             forceIcon: forceIcon,
