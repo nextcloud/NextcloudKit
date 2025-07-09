@@ -95,7 +95,9 @@ public struct NKCommon: Sendable {
                             counterChunk: @escaping (_ counter: Int) -> Void = { _ in },
                             completion: @escaping (_ filesChunk: [(fileName: String, size: Int64)]) -> Void = { _ in }) {
         // Check if filesChunk is empty
-        if !filesChunk.isEmpty { return completion(filesChunk) }
+        if !filesChunk.isEmpty {
+            return completion(filesChunk)
+        }
 
         defer {
             NotificationCenter.default.removeObserver(self, name: notificationCenterChunkedFileStop, object: nil)
@@ -113,14 +115,19 @@ public struct NKCommon: Sendable {
         let bufferSize = 1000000
         var stop: Bool = false
 
-        NotificationCenter.default.addObserver(forName: notificationCenterChunkedFileStop, object: nil, queue: nil) { _ in stop = true }
+        NotificationCenter.default.addObserver(forName: notificationCenterChunkedFileStop, object: nil, queue: nil) { _ in
+            stop = true
+        }
 
         // If max chunk count is > 10000 (max count), add + 100 MB to the chunk size to reduce the count. This is an edge case.
-        var num: Int = Int(getFileSize(filePath: inputDirectory + "/" + fileName) / Int64(chunkSize))
+        let inputFilePath = inputDirectory + "/" + fileName
+        let totalSize = getFileSize(filePath: inputFilePath)
+        var num: Int = Int(totalSize / Int64(chunkSize))
+
         if num > 10000 {
-            chunkSize = chunkSize + 100000000
+            chunkSize += 100_000_000
+            num = Int(totalSize / Int64(chunkSize)) // ricalcolo
         }
-        num = Int(getFileSize(filePath: inputDirectory + "/" + fileName) / Int64(chunkSize))
         numChunks(num)
 
         if !fileManager.fileExists(atPath: outputDirectory, isDirectory: &isDirectory) {
@@ -132,7 +139,7 @@ public struct NKCommon: Sendable {
         }
 
         do {
-            reader = try .init(forReadingFrom: URL(fileURLWithPath: inputDirectory + "/" + fileName))
+            reader = try .init(forReadingFrom: URL(fileURLWithPath: inputFilePath))
         } catch {
             return completion([])
         }
@@ -152,7 +159,7 @@ public struct NKCommon: Sendable {
                 }
 
                 let chunkRemaining: Int = chunkSize - chunk
-                let buffer = reader?.readData(ofLength: min(bufferSize, chunkRemaining))
+                let rawBuffer = reader?.readData(ofLength: min(bufferSize, chunkRemaining))
 
                 if writer == nil {
                     let fileNameChunk = String(counter)
@@ -167,10 +174,11 @@ public struct NKCommon: Sendable {
                     filesChunk.append((fileName: fileNameChunk, size: 0))
                 }
 
-                if let buffer = buffer {
-                    writer?.write(buffer)
-                    chunk = chunk + buffer.count
-                    return buffer.count
+                if let rawBuffer = rawBuffer {
+                    let safeBuffer = Data(rawBuffer) // secure copy
+                    writer?.write(safeBuffer)
+                    chunk = chunk + safeBuffer.count
+                    return safeBuffer.count
                 }
                 filesChunk = []
                 return 0
