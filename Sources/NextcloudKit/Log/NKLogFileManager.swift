@@ -63,9 +63,27 @@ public final class NKLogFileManager: @unchecked Sendable {
     /// Configures the shared logger instance.
     /// - Parameters:
     ///   - minLevel: The minimum log level to be recorded.
-
     public static func configure(logLevel: NKLogLevel = .normal) {
         shared.setConfiguration(logLevel: logLevel)
+    }
+
+    /// Creates the "Logs" folder inside the user's Documents directory if it does not already exist.
+    ///
+    /// This static method delegates to the singleton instance (`shared`) and ensures
+    /// that the log folder structure is created or re-created when needed.
+    ///
+    /// This is useful in scenarios where the log folder may have been deleted externally
+    /// (e.g., by iTunes File Sharing, iCloud Drive sync conflicts, or cleanup tools),
+    /// and must be re-initialized manually.
+    ///
+    /// The folder path is:
+    /// `~/Documents/Logs`
+    ///
+    /// If the folder already exists, the method does nothing. If creation fails, the error is silently ignored.
+    ///
+    /// - Note: This does not create or write any log file, only the folder itself.
+    public static func createLogsFolder() {
+        shared.createLogsFolder()
     }
 
     /// Returns the file URL of the currently active log file.
@@ -98,6 +116,28 @@ public final class NKLogFileManager: @unchecked Sendable {
             try? FileManager.default.createDirectory(at: logsFolder, withIntermediateDirectories: true)
         }
         self.logDirectory = logsFolder
+        self.currentLogDate = Self.currentDateString()
+    }
+
+    /// Creates the "Logs" folder inside the user's Documents directory if it does not already exist.
+    ///
+    /// This method performs the following steps:
+    /// - Retrieves the path to the `.documentDirectory` using `FileManager`.
+    /// - Appends a "Logs" subdirectory path.
+    /// - Checks if the folder already exists.
+    /// - If not, it creates the folder, including any intermediate directories.
+    /// - Finally, it sets the `logDirectory` and initializes the current log date.
+    ///
+    /// If folder creation fails, the method silently ignores the error.
+    ///
+    /// - Note: The `logDirectory` property will point to the created `Logs` folder.
+    ///
+    private func createLogsFolder() {
+        let documents = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
+        let logsFolder = documents.appendingPathComponent("Logs", isDirectory: true)
+        if !FileManager.default.fileExists(atPath: logsFolder.path) {
+            try? FileManager.default.createDirectory(at: logsFolder, withIntermediateDirectories: true)
+        }
         self.currentLogDate = Self.currentDateString()
     }
 
@@ -242,6 +282,11 @@ public final class NKLogFileManager: @unchecked Sendable {
 
     private func appendToLog(_ message: String) {
         let logPath = logDirectory.appendingPathComponent(logFileName)
+
+        // Ensure log directory exists
+        if !fileManager.fileExists(atPath: logDirectory.path) {
+            try? fileManager.createDirectory(at: logDirectory, withIntermediateDirectories: true)
+        }
 
         guard let data = message.data(using: .utf8) else { return }
 
