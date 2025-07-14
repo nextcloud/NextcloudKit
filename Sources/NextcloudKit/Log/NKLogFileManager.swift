@@ -66,6 +66,7 @@ public final class NKLogFileManager: @unchecked Sendable {
 
     public static func configure(logLevel: NKLogLevel = .normal) {
         shared.setConfiguration(logLevel: logLevel)
+        shared.createLogsFolder()
     }
 
     /// Returns the file URL of the currently active log file.
@@ -98,6 +99,28 @@ public final class NKLogFileManager: @unchecked Sendable {
             try? FileManager.default.createDirectory(at: logsFolder, withIntermediateDirectories: true)
         }
         self.logDirectory = logsFolder
+        self.currentLogDate = Self.currentDateString()
+    }
+
+    /// Creates the "Logs" folder inside the user's Documents directory if it does not already exist.
+    ///
+    /// This method performs the following steps:
+    /// - Retrieves the path to the `.documentDirectory` using `FileManager`.
+    /// - Appends a "Logs" subdirectory path.
+    /// - Checks if the folder already exists.
+    /// - If not, it creates the folder, including any intermediate directories.
+    /// - Finally, it sets the `logDirectory` and initializes the current log date.
+    ///
+    /// If folder creation fails, the method silently ignores the error.
+    ///
+    /// - Note: The `logDirectory` property will point to the created `Logs` folder.
+    ///
+    private func createLogsFolder() {
+        let documents = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
+        let logsFolder = documents.appendingPathComponent("Logs", isDirectory: true)
+        if !FileManager.default.fileExists(atPath: logsFolder.path) {
+            try? FileManager.default.createDirectory(at: logsFolder, withIntermediateDirectories: true)
+        }
         self.currentLogDate = Self.currentDateString()
     }
 
