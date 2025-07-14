@@ -63,9 +63,26 @@ public final class NKLogFileManager: @unchecked Sendable {
     /// Configures the shared logger instance.
     /// - Parameters:
     ///   - minLevel: The minimum log level to be recorded.
-
     public static func configure(logLevel: NKLogLevel = .normal) {
         shared.setConfiguration(logLevel: logLevel)
+    }
+
+    /// Creates the "Logs" folder inside the user's Documents directory if it does not already exist.
+    ///
+    /// This static method delegates to the singleton instance (`shared`) and ensures
+    /// that the log folder structure is created or re-created when needed.
+    ///
+    /// This is useful in scenarios where the log folder may have been deleted externally
+    /// (e.g., by iTunes File Sharing, iCloud Drive sync conflicts, or cleanup tools),
+    /// and must be re-initialized manually.
+    ///
+    /// The folder path is:
+    /// `~/Documents/Logs`
+    ///
+    /// If the folder already exists, the method does nothing. If creation fails, the error is silently ignored.
+    ///
+    /// - Note: This does not create or write any log file, only the folder itself.
+    public static func createLogsFolder() {
         shared.createLogsFolder()
     }
 
@@ -265,6 +282,11 @@ public final class NKLogFileManager: @unchecked Sendable {
 
     private func appendToLog(_ message: String) {
         let logPath = logDirectory.appendingPathComponent(logFileName)
+
+        // Ensure log directory exists
+        if !fileManager.fileExists(atPath: logDirectory.path) {
+            try? fileManager.createDirectory(at: logDirectory, withIntermediateDirectories: true)
+        }
 
         guard let data = message.data(using: .utf8) else { return }
 
