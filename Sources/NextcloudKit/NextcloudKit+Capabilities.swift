@@ -525,16 +525,15 @@ final public class NKCapabilities: Sendable {
         var result: Capabilities?
         let semaphore = DispatchSemaphore(value: 0)
 
-        Task.detached(priority: .userInitiated) {
-            let value = await self.store.get(account)
-            result = value
-            semaphore.signal()
+        let queue = DispatchQueue(label: "CapabilitiesBlockingQueue")
+        queue.async {
+            Task {
+                result = await self.store.get(account)
+                semaphore.signal()
+            }
         }
 
-        // Aspetta al massimo 5 secondi per evitare blocchi infiniti
-        let timeout = DispatchTime.now() + .seconds(5)
-        _ = semaphore.wait(timeout: timeout)
-
+        _ = semaphore.wait(timeout: .now() + 1)
         return result ?? Capabilities()
     }
 }
