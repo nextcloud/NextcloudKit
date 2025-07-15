@@ -41,7 +41,9 @@ final class NKMonitor: EventMonitor, Sendable {
            let headerCheckInterceptor = request.request?.allHTTPHeaderFields?[nkCommonInstance.headerCheckInterceptor],
            headerCheckInterceptor.lowercased() == "true",
            let account = request.request?.allHTTPHeaderFields?[nkCommonInstance.headerAccount] {
-            nkCommonInstance.appendServerErrorAccount(account, errorCode: statusCode)
+            Task {
+                await nkCommonInstance.appendServerErrorAccount(account, errorCode: statusCode)
+            }
         }
 
         DispatchQueue.global(qos: .utility).async {

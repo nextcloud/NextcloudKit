@@ -26,8 +26,7 @@ public actor NKTypeIdentifiers {
     private init() {}
 
     // Resolves type info from file name and optional MIME type
-    public func getInternalType(fileName: String, mimeType inputMimeType: String, directory: Bool, account: String) -> NKTypeIdentifierCache {
-
+    public func getInternalType(fileName: String, mimeType inputMimeType: String, directory: Bool, account: String) async -> NKTypeIdentifierCache {
         var ext = (fileName as NSString).pathExtension.lowercased()
         var mimeType = inputMimeType
         var classFile = ""
@@ -63,7 +62,7 @@ public actor NKTypeIdentifiers {
             fileNameWithoutExt = fileName
             ext = ""
         } else {
-            let props = resolver.resolve(inUTI: typeIdentifier, account: account)
+            let props = await resolver.resolve(inUTI: typeIdentifier, account: account)
             classFile = props.classFile.rawValue
             iconName = props.iconName.rawValue
         }

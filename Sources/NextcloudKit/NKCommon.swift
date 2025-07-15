@@ -200,11 +200,11 @@ public struct NKCommon: Sendable {
 
     // MARK: - Server Error GroupDefaults
 
-    public func appendServerErrorAccount(_ account: String, errorCode: Int) {
+    public func appendServerErrorAccount(_ account: String, errorCode: Int) async {
         guard let groupDefaults = UserDefaults(suiteName: groupIdentifier) else {
             return
         }
-        let capabilities = NKCapabilities.shared.getCapabilitiesBlocking(for: account)
+        let capabilities =  await NKCapabilities.shared.getCapabilities(for: account)
 
         /// Unavailable
         if errorCode == 503 {
