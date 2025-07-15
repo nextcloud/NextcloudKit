@@ -520,19 +520,21 @@ final public class NKCapabilities: Sendable {
     /// Blocks the current thread until the async actor returns.
     /// Use only outside the Swift async context (never from another actor or async function).
     public func getCapabilitiesBlocking(for account: String?) -> Capabilities {
-        guard let account else {
-            return Capabilities()
-        }
-        let group = DispatchGroup()
+        guard let account else { return Capabilities() }
+
         var result: Capabilities?
+        let semaphore = DispatchSemaphore(value: 0)
 
-        group.enter()
         Task.detached(priority: .userInitiated) {
-            result = await self.store.get(account)
-            group.leave()
+            let value = await self.store.get(account)
+            result = value
+            semaphore.signal()
         }
 
-        group.wait()
+        // Aspetta al massimo 5 secondi per evitare blocchi infiniti
+        let timeout = DispatchTime.now() + .seconds(5)
+        _ = semaphore.wait(timeout: timeout)
+
         return result ?? Capabilities()
     }
 }
