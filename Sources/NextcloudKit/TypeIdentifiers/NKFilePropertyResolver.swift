@@ -44,10 +44,10 @@ public final class NKFilePropertyResolver {
 
     public init() {}
 
-    public func resolve(inUTI: String, account: String) -> NKFileProperty {
+    public func resolve(inUTI: String, account: String) async -> NKFileProperty {
         let fileProperty = NKFileProperty()
         let typeIdentifier = inUTI as String
-        let capabilities = NKCapabilities.shared.getCapabilitiesBlocking(for: account)
+        let capabilities = await NKCapabilities.shared.getCapabilities(for: account)
         let utiString = inUTI as String
 
         // Preferred extension

@@ -410,7 +410,7 @@ public extension NextcloudKit {
             capabilities.termsOfService = json.termsOfService?.enabled ?? false
 
             // Persist capabilities in shared store
-            await NKCapabilities.shared.appendCapabilitiesAsync(for: account, capabilities: capabilities)
+            await NKCapabilities.shared.setCapabilities(for: account, capabilities: capabilities)
             return capabilities
         } catch {
             nkLog(error: "Could not decode json capabilities: \(error.localizedDescription)")
@@ -490,49 +490,14 @@ final public class NKCapabilities: Sendable {
 
     // MARK: - Public API
 
-    public func appendCapabilitiesAsync(for account: String, capabilities: Capabilities) async {
+    public func setCapabilities(for account: String, capabilities: Capabilities) async {
         await store.set(account, value: capabilities)
     }
 
-    /// Synchronously stores capabilities for the given account.
-    /// Blocks the current thread until the async actor completes.
-    /// Use only outside of async/actor contexts.
-    public func appendCapabilitiesBlocking(for account: String, capabilities: Capabilities) {
-        let group = DispatchGroup()
-
-        group.enter()
-        Task.detached(priority: .userInitiated) {
-            await self.store.set(account, value: capabilities)
-            group.leave()
-        }
-
-        group.wait()
-    }
-
-    public func getCapabilitiesAsync(for account: String?) async -> Capabilities {
+    public func getCapabilities(for account: String?) async -> Capabilities {
         guard let account else {
             return Capabilities()
         }
         return await store.get(account) ?? Capabilities()
-    }
-
-    /// Synchronously retrieves capabilities for the given account.
-    /// Blocks the current thread until the async actor returns.
-    /// Use only outside the Swift async context (never from another actor or async function).
-    public func getCapabilitiesBlocking(for account: String?) -> Capabilities {
-        guard let account else {
-            return Capabilities()
-        }
-        let group = DispatchGroup()
-        var result: Capabilities?
-
-        group.enter()
-        Task.detached(priority: .userInitiated) {
-            result = await self.store.get(account)
-            group.leave()
-        }
-
-        group.wait()
-        return result ?? Capabilities()
     }
 }

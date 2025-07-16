@@ -78,8 +78,6 @@ public struct NKCommon: Sendable {
     public let groupDefaultsUnavailable = "Unavailable"
     public let groupDefaultsToS = "ToS"
 
-
-
     // MARK: - Init
 
     init() { }
@@ -200,11 +198,11 @@ public struct NKCommon: Sendable {
 
     // MARK: - Server Error GroupDefaults
 
-    public func appendServerErrorAccount(_ account: String, errorCode: Int) {
+    public func appendServerErrorAccount(_ account: String, errorCode: Int) async {
         guard let groupDefaults = UserDefaults(suiteName: groupIdentifier) else {
             return
         }
-        let capabilities = NKCapabilities.shared.getCapabilitiesBlocking(for: account)
+        let capabilities = await NKCapabilities.shared.getCapabilities(for: account)
 
         /// Unavailable
         if errorCode == 503 {
@@ -238,8 +236,6 @@ public struct NKCommon: Sendable {
     public func getSessionConfigurationIdentifier(_ identifier: String, account: String) -> String {
         return "\(identifier).\(account)"
     }
-
-
 
     public func getStandardHeaders(account: String, options: NKRequestOptions? = nil) -> HTTPHeaders? {
         guard let session = nksessions.session(forAccount: account) else {
