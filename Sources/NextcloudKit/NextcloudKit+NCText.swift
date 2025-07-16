@@ -40,7 +40,7 @@ public extension NextcloudKit {
                         let capabilities = await NKCapabilities.shared.getCapabilities(for: account)
                         capabilities.directEditingEditors = editors
                         capabilities.directEditingCreators = creators
-                        await NKCapabilities.shared.appendCapabilities(for: account, capabilities: capabilities)
+                        await NKCapabilities.shared.setCapabilities(for: account, capabilities: capabilities)
 
                         options.queue.async {
                             completion(account, editors, creators, response, .success)
@@ -208,8 +208,8 @@ public extension NextcloudKit {
                         // Update capabilities
                         let capabilities = await NKCapabilities.shared.getCapabilities(for: account)
                         capabilities.directEditingTemplates = templates
-                        await NKCapabilities.shared.appendCapabilities(for: account, capabilities: capabilities)
-                        
+                        await NKCapabilities.shared.setCapabilities(for: account, capabilities: capabilities)
+
                         options.queue.async { completion(account, templates, response, .success) }
                     } catch {
                         nkLog(error: "Failed to decode template list: \(error)")
