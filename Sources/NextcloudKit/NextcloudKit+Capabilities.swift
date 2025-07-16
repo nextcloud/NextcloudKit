@@ -430,6 +430,10 @@ actor CapabilitiesStore {
     func set(_ account: String, value: NKCapabilities.Capabilities) {
         store[account] = value
     }
+
+    func remove(_ account: String) {
+        store.removeValue(forKey: account)
+    }
 }
 
 /// Singleton container and public API for accessing and caching capabilities.
@@ -499,5 +503,9 @@ final public class NKCapabilities: Sendable {
             return Capabilities()
         }
         return await store.get(account) ?? Capabilities()
+    }
+
+    public func removeCapabilities(for account: String) async {
+        await store.remove(account)
     }
 }
