@@ -90,39 +90,3 @@ public actor NKTypeIdentifiers {
         filePropertyCache.removeAll()
     }
 }
-
-/// Helper class to access NKTypeIdentifiers from sync contexts (e.g. in legacy code or libraries).
-public final class NKTypeIdentifiersHelper {
-    public static let shared = NKTypeIdentifiersHelper()
-
-    // Internal actor reference (uses NKTypeIdentifiers.shared by default)
-    private let actor: NKTypeIdentifiers
-
-    private init() {
-        self.actor = .shared
-    }
-
-    // Init with optional custom actor (useful for testing)
-    public init(actor: NKTypeIdentifiers = .shared) {
-        self.actor = actor
-    }
-
-    // Synchronously resolves file type info by calling the async actor inside a semaphore block.
-    public func getInternalTypeSync(fileName: String, mimeType: String, directory: Bool, account: String) -> NKTypeIdentifierCache {
-        var result: NKTypeIdentifierCache?
-        let semaphore = DispatchSemaphore(value: 0)
-
-        Task {
-            result = await actor.getInternalType(
-                fileName: fileName,
-                mimeType: mimeType,
-                directory: directory,
-                account: account
-            )
-            semaphore.signal()
-        }
-
-        semaphore.wait()
-        return result!
-    }
-}
