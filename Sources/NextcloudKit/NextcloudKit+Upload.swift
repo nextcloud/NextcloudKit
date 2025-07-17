@@ -220,6 +220,7 @@ public extension NextcloudKit {
                      taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
                      progressHandler: @escaping (_ totalBytesExpected: Int64, _ totalBytes: Int64, _ fractionCompleted: Double) -> Void = { _, _, _ in },
                      uploaded: @escaping (_ fileChunk: (fileName: String, size: Int64)) -> Void = { _ in },
+                     assemble: @escaping () -> Void = { },
                      completion: @escaping (_ account: String, _ filesChunk: [(fileName: String, size: Int64)]?, _ file: NKFile?, _ error: NKError) -> Void) {
         guard let nkSession = nkCommonInstance.nksessions.session(forAccount: account) else {
             return completion(account, nil, nil, .urlError)
@@ -373,6 +374,8 @@ public extension NextcloudKit {
                 let assembleTimeMax: Double = 30 * 60   // 30 min
                 options.timeout = max(assembleTimeMin, min(assembleTimePerGB * assembleSizeInGB, assembleTimeMax))
 
+                assemble()
+
                 self.moveFileOrFolder(serverUrlFileNameSource: serverUrlFileNameSource, serverUrlFileNameDestination: serverUrlFileName, overwrite: true, account: account, options: options) { _, _, error in
                     guard error == .success else {
                         return completion(account, filesChunkOutput, nil,.errorChunkMoveFile)
@@ -414,13 +417,9 @@ public extension NextcloudKit {
                           requestHandler: @escaping (_ request: UploadRequest) -> Void = { _ in },
                           taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
                           progressHandler: @escaping (_ totalBytesExpected: Int64, _ totalBytes: Int64, _ fractionCompleted: Double) -> Void = { _, _, _ in },
+                          assemble: @escaping () -> Void = { },
                           uploaded: @escaping (_ fileChunk: (fileName: String, size: Int64)) -> Void = { _ in }
-    ) async -> (
-        account: String,
-        remainingChunks: [(fileName: String, size: Int64)]?,
-        file: NKFile?,
-        error: NKError
-    ) {
+    ) async -> (account: String, remainingChunks: [(fileName: String, size: Int64)]?, file: NKFile?, error: NKError) {
         await withCheckedContinuation { continuation in
             uploadChunk(directory: directory,
                         fileChunksOutputDirectory: fileChunksOutputDirectory,
@@ -440,13 +439,9 @@ public extension NextcloudKit {
                         requestHandler: requestHandler,
                         taskHandler: taskHandler,
                         progressHandler: progressHandler,
-                        uploaded: uploaded) { account, remaining, file, error in
-                continuation.resume(returning: (
-                    account: account,
-                    remainingChunks: remaining,
-                    file: file,
-                    error: error
-                ))
+                        uploaded: uploaded,
+                        assemble: assemble) { account, remaining, file, error in
+                continuation.resume(returning: (account: account, remainingChunks: remaining, file: file, error: error))
             }
         }
     }
