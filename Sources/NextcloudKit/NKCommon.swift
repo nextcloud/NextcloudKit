@@ -91,27 +91,27 @@ public struct NKCommon: Sendable {
                             filesChunk: [(fileName: String, size: Int64)],
                             numChunks: @escaping (_ num: Int) -> Void = { _ in },
                             counterChunk: @escaping (_ counter: Int) -> Void = { _ in },
-                            completion: @escaping (_ filesChunk: [(fileName: String, size: Int64)]) -> Void = { _ in }) {
-        // Check if filesChunk is empty
+                            completion: @escaping (_ filesChunk: [(fileName: String, size: Int64)], _ error: Error?) -> Void = { _, _ in }) {
+        // Return existing chunks immediately
         if !filesChunk.isEmpty {
-            return completion(filesChunk)
+            return completion(filesChunk, nil)
         }
 
         defer {
             NotificationCenter.default.removeObserver(self, name: notificationCenterChunkedFileStop, object: nil)
         }
 
-        let fileManager: FileManager = .default
+        let fileManager = FileManager.default
         var isDirectory: ObjCBool = false
         var reader: FileHandle?
         var writer: FileHandle?
-        var chunk: Int = 0
-        var counter: Int = 1
+        var chunkWrittenBytes = 0
+        var counter = 1
         var incrementalSize: Int64 = 0
         var filesChunk: [(fileName: String, size: Int64)] = []
         var chunkSize = chunkSize
-        let bufferSize = 1000000
-        var stop: Bool = false
+        let bufferSize = 1_000_000
+        var stop = false
 
         NotificationCenter.default.addObserver(forName: notificationCenterChunkedFileStop, object: nil, queue: nil) { _ in
             stop = true
@@ -122,78 +122,121 @@ public struct NKCommon: Sendable {
         let totalSize = getFileSize(filePath: inputFilePath)
         var num: Int = Int(totalSize / Int64(chunkSize))
 
-        if num > 10000 {
+        if num > 10_000 {
             chunkSize += 100_000_000
-            num = Int(totalSize / Int64(chunkSize)) // ricalcolo
+            num = Int(totalSize / Int64(chunkSize))
         }
         numChunks(num)
 
+        // Create output directory if needed
         if !fileManager.fileExists(atPath: outputDirectory, isDirectory: &isDirectory) {
             do {
                 try fileManager.createDirectory(atPath: outputDirectory, withIntermediateDirectories: true, attributes: nil)
             } catch {
-                return completion([])
+                return completion([], NSError(domain: "chunkedFile", code: -2,userInfo: [NSLocalizedDescriptionKey: "Failed to create the output directory for file chunks."]))
             }
         }
 
+        // Open input file
         do {
             reader = try .init(forReadingFrom: URL(fileURLWithPath: inputFilePath))
         } catch {
-            return completion([])
+            return completion([], NSError(domain: "chunkedFile", code: -1, userInfo: [NSLocalizedDescriptionKey: "Failed to open the input file for reading."]))
         }
 
-        repeat {
+        outerLoop: repeat {
             if stop {
-                return completion([])
+                return completion([], NSError(domain: "chunkedFile", code: -5, userInfo: [NSLocalizedDescriptionKey: "Chunking was stopped by user request or system notification."]))
             }
-            if autoreleasepool(invoking: { () -> Int in
-                if chunk >= chunkSize {
-                    writer?.closeFile()
-                    writer = nil
-                    chunk = 0
-                    counterChunk(counter)
-                    debugPrint("[DEBUG] Counter: \(counter)")
-                    counter += 1
+
+            let result = autoreleasepool(invoking: { () -> Int in
+                let remaining = chunkSize - chunkWrittenBytes
+                guard let rawBuffer = reader?.readData(ofLength: min(bufferSize, remaining)) else {
+                    return -1 // Error: read failed
                 }
 
-                let chunkRemaining: Int = chunkSize - chunk
-                let rawBuffer = reader?.readData(ofLength: min(bufferSize, chunkRemaining))
+                if rawBuffer.isEmpty {
+                    // Final flush of last chunk
+                    if writer != nil {
+                        writer?.closeFile()
+                        writer = nil
+                        counterChunk(counter)
+                        debugPrint("[DEBUG] Final chunk closed: \(counter)")
+                        counter += 1
+                    }
+                    return 0 // End of file
+                }
+
+                let safeBuffer = Data(rawBuffer)
+
 
                 if writer == nil {
                     let fileNameChunk = String(counter)
                     let outputFileName = outputDirectory + "/" + fileNameChunk
                     fileManager.createFile(atPath: outputFileName, contents: nil, attributes: nil)
                     do {
-                        writer = try .init(forWritingTo: URL(fileURLWithPath: outputFileName))
+                        writer = try FileHandle(forWritingTo: URL(fileURLWithPath: outputFileName))
                     } catch {
-                        filesChunk = []
-                        return 0
+                        return -2 // Error: cannot create writer
                     }
                     filesChunk.append((fileName: fileNameChunk, size: 0))
                 }
 
-                if let rawBuffer = rawBuffer {
-                    let safeBuffer = Data(rawBuffer) // secure copy
-                    writer?.write(safeBuffer)
-                    chunk = chunk + safeBuffer.count
-                    return safeBuffer.count
+                // Check free disk space
+                if let free = try? URL(fileURLWithPath: outputDirectory)
+                    .resourceValues(forKeys: [.volumeAvailableCapacityForImportantUsageKey])
+                    .volumeAvailableCapacityForImportantUsage,
+                   free < Int64(safeBuffer.count * 2) {
+                    return -3 // Not enough disk space
                 }
-                filesChunk = []
-                return 0
-            }) == 0 { break }
+
+                do {
+                    try writer?.write(contentsOf: safeBuffer)
+                    chunkWrittenBytes += safeBuffer.count
+                    if chunkWrittenBytes >= chunkSize {
+                        writer?.closeFile()
+                        writer = nil
+                        chunkWrittenBytes = 0
+                        counterChunk(counter)
+                        debugPrint("[DEBUG] Chunk completed: \(counter)")
+                        counter += 1
+                    }
+                    return 1 // OK
+                } catch {
+                    return -4 // Write error
+                }
+            })
+
+            switch result {
+            case -1:
+                return completion([], NSError(domain: "chunkedFile", code: -1, userInfo: [NSLocalizedDescriptionKey: "Failed to read data from the input file."]))
+            case -2:
+                return completion([], NSError(domain: "chunkedFile", code: -2, userInfo: [NSLocalizedDescriptionKey: "Failed to open the output chunk file for writing."]))
+            case -3:
+                return completion([], NSError(domain: "chunkedFile", code: -3, userInfo: [NSLocalizedDescriptionKey: "There is not enough available disk space to proceed."]))
+            case -4:
+                return completion([], NSError(domain: "chunkedFile", code: -4, userInfo: [NSLocalizedDescriptionKey: "Failed to write data to chunk file."]))
+            case 0:
+                break outerLoop
+            case 1:
+                continue
+            default:
+                break
+            }
         } while true
 
         writer?.closeFile()
         reader?.closeFile()
 
-        counter = 0
-        for fileChunk in filesChunk {
-            let size = getFileSize(filePath: outputDirectory + "/" + fileChunk.fileName)
-            incrementalSize = incrementalSize + size
-            filesChunk[counter].size = incrementalSize
-            counter += 1
+        // Update incremental chunk sizes
+        for i in 0..<filesChunk.count {
+            let path = outputDirectory + "/" + filesChunk[i].fileName
+            let size = getFileSize(filePath: path)
+            incrementalSize += size
+            filesChunk[i].size = incrementalSize
         }
-        return completion(filesChunk)
+
+        completion(filesChunk, nil)
     }
 
     // MARK: - Server Error GroupDefaults

@@ -220,6 +220,7 @@ public extension NextcloudKit {
                      taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
                      progressHandler: @escaping (_ totalBytesExpected: Int64, _ totalBytes: Int64, _ fractionCompleted: Double) -> Void = { _, _, _ in },
                      uploaded: @escaping (_ fileChunk: (fileName: String, size: Int64)) -> Void = { _ in },
+                     assemble: @escaping () -> Void = { },
                      completion: @escaping (_ account: String, _ filesChunk: [(fileName: String, size: Int64)]?, _ file: NKFile?, _ error: NKError) -> Void) {
         guard let nkSession = nkCommonInstance.nksessions.session(forAccount: account) else {
             return completion(account, nil, nil, .urlError)
@@ -233,7 +234,7 @@ public extension NextcloudKit {
         options.customHeader?["Destination"] = serverUrlFileName.urlEncoded
         options.customHeader?["OC-Total-Length"] = String(fileNameLocalSize)
 
-        // check space
+        // Check available disk space
         #if os(macOS)
         var fsAttributes: [FileAttributeKey: Any]
         do {
@@ -266,13 +267,14 @@ public extension NextcloudKit {
         #endif
 
         #if os(visionOS) || os(iOS)
-        if freeDisk < fileNameLocalSize * 2 {
+        if freeDisk < fileNameLocalSize * 3 {
             // It seems there is not enough space to send the file
             return completion(account, nil, nil, .errorChunkNoEnoughMemory)
         }
         #endif
 
-        func createFolder(completion: @escaping (_ errorCode: NKError) -> Void) {
+        // Ensure upload chunk folder exists
+        func createFolderIfNeeded(completion: @escaping (_ errorCode: NKError) -> Void) {
             readFileOrFolder(serverUrlFileName: serverUrlChunkFolder, depth: "0", account: account, options: options) { _, _, _, error in
                 if error == .success {
                     completion(NKError())
@@ -286,22 +288,33 @@ public extension NextcloudKit {
             }
         }
 
-        createFolder { error in
+        createFolderIfNeeded { error in
             guard error == .success else {
                 return completion(account, nil, nil, .errorChunkCreateFolder)
             }
+            let outputDirectory = fileChunksOutputDirectory ?? directory
             var uploadNKError = NKError()
 
-            let outputDirectory = fileChunksOutputDirectory ?? directory
-            self.nkCommonInstance.chunkedFile(inputDirectory: directory, outputDirectory: outputDirectory, fileName: fileName, chunkSize: chunkSize, filesChunk: filesChunk) { num in
+
+            self.nkCommonInstance.chunkedFile(inputDirectory: directory,
+                                              outputDirectory: outputDirectory,
+                                              fileName: fileName,
+                                              chunkSize: chunkSize,
+                                              filesChunk: filesChunk) { num in
                 numChunks(num)
             } counterChunk: { counter in
                 counterChunk(counter)
-            } completion: { filesChunk in
-                if filesChunk.isEmpty {
-                    // The file for sending could not be created
-                    return completion(account, nil, nil, .errorChunkFilesEmpty)
+            } completion: { filesChunk, error in
+
+                // Check chunking error
+                if let error {
+                    return completion(account, nil, nil, NKError(error: error))
                 }
+
+                guard !filesChunk.isEmpty else {
+                    return completion(account, nil, nil, NKError(error: NSError(domain: "chunkedFile", code: -5,userInfo: [NSLocalizedDescriptionKey: "Files empty."])))
+                }
+
                 var filesChunkOutput = filesChunk
                 start(filesChunkOutput)
 
@@ -309,10 +322,12 @@ public extension NextcloudKit {
                     let serverUrlFileName = serverUrlChunkFolder + "/" + fileChunk.fileName
                     let fileNameLocalPath = outputDirectory + "/" + fileChunk.fileName
                     let fileSize = self.nkCommonInstance.getFileSize(filePath: fileNameLocalPath)
+
                     if fileSize == 0 {
                         // The file could not be sent
-                        return completion(account, nil, nil, .errorChunkFileNull)
+                        return completion(account, nil, nil, NKError(error: NSError(domain: "chunkedFile", code: -6,userInfo: [NSLocalizedDescriptionKey: "File empty."])))
                     }
+
                     let semaphore = DispatchSemaphore(value: 0)
                     self.upload(serverUrlFileName: serverUrlFileName, fileNameLocalPath: fileNameLocalPath, account: account, options: options, requestHandler: { request in
                         requestHandler(request)
@@ -359,6 +374,8 @@ public extension NextcloudKit {
                 let assembleTimeMax: Double = 30 * 60   // 30 min
                 options.timeout = max(assembleTimeMin, min(assembleTimePerGB * assembleSizeInGB, assembleTimeMax))
 
+                assemble()
+
                 self.moveFileOrFolder(serverUrlFileNameSource: serverUrlFileNameSource, serverUrlFileNameDestination: serverUrlFileName, overwrite: true, account: account, options: options) { _, _, error in
                     guard error == .success else {
                         return completion(account, filesChunkOutput, nil,.errorChunkMoveFile)
@@ -400,13 +417,9 @@ public extension NextcloudKit {
                           requestHandler: @escaping (_ request: UploadRequest) -> Void = { _ in },
                           taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
                           progressHandler: @escaping (_ totalBytesExpected: Int64, _ totalBytes: Int64, _ fractionCompleted: Double) -> Void = { _, _, _ in },
+                          assemble: @escaping () -> Void = { },
                           uploaded: @escaping (_ fileChunk: (fileName: String, size: Int64)) -> Void = { _ in }
-    ) async -> (
-        account: String,
-        remainingChunks: [(fileName: String, size: Int64)]?,
-        file: NKFile?,
-        error: NKError
-    ) {
+    ) async -> (account: String, remainingChunks: [(fileName: String, size: Int64)]?, file: NKFile?, error: NKError) {
         await withCheckedContinuation { continuation in
             uploadChunk(directory: directory,
                         fileChunksOutputDirectory: fileChunksOutputDirectory,
@@ -426,13 +439,9 @@ public extension NextcloudKit {
                         requestHandler: requestHandler,
                         taskHandler: taskHandler,
                         progressHandler: progressHandler,
-                        uploaded: uploaded) { account, remaining, file, error in
-                continuation.resume(returning: (
-                    account: account,
-                    remainingChunks: remaining,
-                    file: file,
-                    error: error
-                ))
+                        uploaded: uploaded,
+                        assemble: assemble) { account, remaining, file, error in
+                continuation.resume(returning: (account: account, remainingChunks: remaining, file: file, error: error))
             }
         }
     }
