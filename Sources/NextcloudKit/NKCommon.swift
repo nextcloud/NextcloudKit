@@ -13,6 +13,28 @@ public enum NKTypeReachability: Int {
     case reachableCellular = 3
 }
 
+enum ChunkedFileError: Error, Equatable {
+    case noSpaceAvailable
+    case cannotCreateOutputDirectory
+    case cannotOpenInputFile
+    case writeFailed(Error)
+    case stoppedByNotification
+
+    static func == (lhs: ChunkedFileError, rhs: ChunkedFileError) -> Bool {
+        switch (lhs, rhs) {
+        case (.noSpaceAvailable, .noSpaceAvailable),
+             (.cannotCreateOutputDirectory, .cannotCreateOutputDirectory),
+             (.cannotOpenInputFile, .cannotOpenInputFile),
+             (.stoppedByNotification, .stoppedByNotification):
+            return true
+        case (.writeFailed, .writeFailed):
+            return false // Not comparable
+        default:
+            return false
+        }
+    }
+}
+
 public protocol NextcloudKitDelegate: AnyObject, Sendable {
     func authenticationChallenge(_ session: URLSession, didReceive challenge: URLAuthenticationChallenge, completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void)
     func urlSessionDidFinishEvents(forBackgroundURLSession session: URLSession)
@@ -91,10 +113,10 @@ public struct NKCommon: Sendable {
                             filesChunk: [(fileName: String, size: Int64)],
                             numChunks: @escaping (_ num: Int) -> Void = { _ in },
                             counterChunk: @escaping (_ counter: Int) -> Void = { _ in },
-                            completion: @escaping (_ filesChunk: [(fileName: String, size: Int64)]) -> Void = { _ in }) {
+                            completion: @escaping (_ filesChunk: [(fileName: String, size: Int64)], _ error: Error?) -> Void = { _, _ in }) {
         // Check if filesChunk is empty
         if !filesChunk.isEmpty {
-            return completion(filesChunk)
+            return completion(filesChunk, nil)
         }
 
         defer {
@@ -110,7 +132,7 @@ public struct NKCommon: Sendable {
         var incrementalSize: Int64 = 0
         var filesChunk: [(fileName: String, size: Int64)] = []
         var chunkSize = chunkSize
-        let bufferSize = 1000000
+        let bufferSize = 1_000_000
         var stop: Bool = false
 
         NotificationCenter.default.addObserver(forName: notificationCenterChunkedFileStop, object: nil, queue: nil) { _ in
@@ -122,31 +144,34 @@ public struct NKCommon: Sendable {
         let totalSize = getFileSize(filePath: inputFilePath)
         var num: Int = Int(totalSize / Int64(chunkSize))
 
-        if num > 10000 {
+        if num > 10_000 {
             chunkSize += 100_000_000
-            num = Int(totalSize / Int64(chunkSize)) // ricalcolo
+            num = Int(totalSize / Int64(chunkSize))
         }
         numChunks(num)
 
+        // Create output directory if needed
         if !fileManager.fileExists(atPath: outputDirectory, isDirectory: &isDirectory) {
             do {
                 try fileManager.createDirectory(atPath: outputDirectory, withIntermediateDirectories: true, attributes: nil)
             } catch {
-                return completion([])
+                return completion([], ChunkedFileError.cannotCreateOutputDirectory)
             }
         }
 
+        // Open input file
         do {
             reader = try .init(forReadingFrom: URL(fileURLWithPath: inputFilePath))
         } catch {
-            return completion([])
+            return completion([], ChunkedFileError.cannotOpenInputFile)
         }
 
         repeat {
             if stop {
-                return completion([])
+                return completion([], ChunkedFileError.stoppedByNotification)
             }
-            if autoreleasepool(invoking: { () -> Int in
+
+            let result = autoreleasepool(invoking: { () -> Int in
                 if chunk >= chunkSize {
                     writer?.closeFile()
                     writer = nil
@@ -159,6 +184,13 @@ public struct NKCommon: Sendable {
                 let chunkRemaining: Int = chunkSize - chunk
                 let rawBuffer = reader?.readData(ofLength: min(bufferSize, chunkRemaining))
 
+                guard let rawBuffer else {
+                    return 0 // end of file
+                }
+
+                let safeBuffer = Data(rawBuffer)
+
+                // Create writer if needed
                 if writer == nil {
                     let fileNameChunk = String(counter)
                     let outputFileName = outputDirectory + "/" + fileNameChunk
@@ -166,34 +198,54 @@ public struct NKCommon: Sendable {
                     do {
                         writer = try .init(forWritingTo: URL(fileURLWithPath: outputFileName))
                     } catch {
-                        filesChunk = []
-                        return 0
+                        return -2
                     }
                     filesChunk.append((fileName: fileNameChunk, size: 0))
                 }
 
-                if let rawBuffer = rawBuffer {
-                    let safeBuffer = Data(rawBuffer) // secure copy
-                    writer?.write(safeBuffer)
-                    chunk = chunk + safeBuffer.count
-                    return safeBuffer.count
+
+                // Check free space before writing
+                if let free = try? URL(fileURLWithPath: outputDirectory).resourceValues(forKeys: [.volumeAvailableCapacityForImportantUsageKey]).volumeAvailableCapacityForImportantUsage,
+                   free < Int64(safeBuffer.count * 2) {
+                    return -1 // not enough space
                 }
-                filesChunk = []
-                return 0
-            }) == 0 { break }
+
+                // Write chunk to file
+                do {
+                    try writer?.write(contentsOf: safeBuffer)
+                    chunk += safeBuffer.count
+                    return 1
+                } catch {
+                    return -2
+                }
+            })
+
+            switch result {
+            case -1:
+                return completion([], ChunkedFileError.noSpaceAvailable)
+            case -2:
+                return completion([], ChunkedFileError.writeFailed(NSError(domain: "chunkedFile", code: -2)))
+            case 0:
+                break // EOF
+            case 1:
+                continue // success
+            default:
+                break
+            }
         } while true
 
         writer?.closeFile()
         reader?.closeFile()
 
-        counter = 0
-        for fileChunk in filesChunk {
-            let size = getFileSize(filePath: outputDirectory + "/" + fileChunk.fileName)
-            incrementalSize = incrementalSize + size
-            filesChunk[counter].size = incrementalSize
-            counter += 1
+        // Update incremental chunk sizes
+        for i in 0..<filesChunk.count {
+            let path = outputDirectory + "/" + filesChunk[i].fileName
+            let size = getFileSize(filePath: path)
+            incrementalSize += size
+            filesChunk[i].size = incrementalSize
         }
-        return completion(filesChunk)
+
+        completion(filesChunk, nil)
     }
 
     // MARK: - Server Error GroupDefaults
