@@ -306,16 +306,12 @@ public extension NextcloudKit {
             } completion: { filesChunk, error in
 
                 // Check chunking error
-                if let error = error {
-                    if (error as? ChunkedFileError) == .noSpaceAvailable {
-                        return completion(account, nil, nil, .errorChunkNoEnoughMemory)
-                    } else {
-                        return completion(account, nil, nil, .errorChunkFilesEmpty)
-                    }
+                if let error {
+                    return completion(account, nil, nil, NKError(error: error))
                 }
 
                 guard !filesChunk.isEmpty else {
-                    return completion(account, nil, nil, .errorChunkFilesEmpty)
+                    return completion(account, nil, nil, NKError(error: NSError(domain: "chunkedFile", code: -5,userInfo: [NSLocalizedDescriptionKey: "Files empty."])))
                 }
 
                 var filesChunkOutput = filesChunk
@@ -328,7 +324,7 @@ public extension NextcloudKit {
 
                     if fileSize == 0 {
                         // The file could not be sent
-                        return completion(account, nil, nil, .errorChunkFileNull)
+                        return completion(account, nil, nil, NKError(error: NSError(domain: "chunkedFile", code: -6,userInfo: [NSLocalizedDescriptionKey: "File empty."])))
                     }
 
                     let semaphore = DispatchSemaphore(value: 0)

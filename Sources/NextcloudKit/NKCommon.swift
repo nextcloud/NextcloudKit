@@ -13,28 +13,6 @@ public enum NKTypeReachability: Int {
     case reachableCellular = 3
 }
 
-enum ChunkedFileError: Error, Equatable {
-    case noSpaceAvailable
-    case cannotCreateOutputDirectory
-    case cannotOpenInputFile
-    case writeFailed(Error)
-    case stoppedByNotification
-
-    static func == (lhs: ChunkedFileError, rhs: ChunkedFileError) -> Bool {
-        switch (lhs, rhs) {
-        case (.noSpaceAvailable, .noSpaceAvailable),
-             (.cannotCreateOutputDirectory, .cannotCreateOutputDirectory),
-             (.cannotOpenInputFile, .cannotOpenInputFile),
-             (.stoppedByNotification, .stoppedByNotification):
-            return true
-        case (.writeFailed, .writeFailed):
-            return false // Not comparable
-        default:
-            return false
-        }
-    }
-}
-
 public protocol NextcloudKitDelegate: AnyObject, Sendable {
     func authenticationChallenge(_ session: URLSession, didReceive challenge: URLAuthenticationChallenge, completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void)
     func urlSessionDidFinishEvents(forBackgroundURLSession session: URLSession)
@@ -155,7 +133,7 @@ public struct NKCommon: Sendable {
             do {
                 try fileManager.createDirectory(atPath: outputDirectory, withIntermediateDirectories: true, attributes: nil)
             } catch {
-                return completion([], ChunkedFileError.cannotCreateOutputDirectory)
+                return completion([], NSError(domain: "chunkedFile", code: -2,userInfo: [NSLocalizedDescriptionKey: "Failed to create the output directory for file chunks."]))
             }
         }
 
@@ -163,12 +141,12 @@ public struct NKCommon: Sendable {
         do {
             reader = try .init(forReadingFrom: URL(fileURLWithPath: inputFilePath))
         } catch {
-            return completion([], ChunkedFileError.cannotOpenInputFile)
+            return completion([], NSError(domain: "chunkedFile", code: -1, userInfo: [NSLocalizedDescriptionKey: "Failed to open the input file for reading."]))
         }
 
-        repeat {
+        outerLoop: repeat {
             if stop {
-                return completion([], ChunkedFileError.stoppedByNotification)
+                return completion([], NSError(domain: "chunkedFile", code: -5, userInfo: [NSLocalizedDescriptionKey: "Chunking was stopped by user request or system notification."]))
             }
 
             let result = autoreleasepool(invoking: { () -> Int in
@@ -231,15 +209,15 @@ public struct NKCommon: Sendable {
 
             switch result {
             case -1:
-                return completion([], ChunkedFileError.writeFailed(NSError(domain: "chunkedFile", code: -1)))
+                return completion([], NSError(domain: "chunkedFile", code: -1, userInfo: [NSLocalizedDescriptionKey: "Failed to read data from the input file."]))
             case -2:
-                return completion([], ChunkedFileError.writeFailed(NSError(domain: "chunkedFile", code: -2)))
+                return completion([], NSError(domain: "chunkedFile", code: -2, userInfo: [NSLocalizedDescriptionKey: "Failed to open the output chunk file for writing."]))
             case -3:
-                return completion([], ChunkedFileError.noSpaceAvailable)
+                return completion([], NSError(domain: "chunkedFile", code: -3, userInfo: [NSLocalizedDescriptionKey: "There is not enough available disk space to proceed."]))
             case -4:
-                return completion([], ChunkedFileError.writeFailed(NSError(domain: "chunkedFile", code: -4)))
+                return completion([], NSError(domain: "chunkedFile", code: -4, userInfo: [NSLocalizedDescriptionKey: "Failed to write data to chunk file."]))
             case 0:
-                break
+                break outerLoop
             case 1:
                 continue
             default:
