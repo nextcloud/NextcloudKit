@@ -184,8 +184,8 @@ public struct NKCommon: Sendable {
                 let chunkRemaining: Int = chunkSize - chunk
                 let rawBuffer = reader?.readData(ofLength: min(bufferSize, chunkRemaining))
 
-                guard let rawBuffer else {
-                    return 0 // end of file
+                guard let rawBuffer = reader?.readData(ofLength: min(bufferSize, chunkRemaining)), !rawBuffer.isEmpty else {
+                    return 0 // EOF
                 }
 
                 let safeBuffer = Data(rawBuffer)
@@ -226,9 +226,9 @@ public struct NKCommon: Sendable {
             case -2:
                 return completion([], ChunkedFileError.writeFailed(NSError(domain: "chunkedFile", code: -2)))
             case 0:
-                break // EOF
+                break // EOF reached
             case 1:
-                continue // success
+                continue // keep chunking
             default:
                 break
             }
