@@ -114,7 +114,7 @@ public struct NKCommon: Sendable {
                             numChunks: @escaping (_ num: Int) -> Void = { _ in },
                             counterChunk: @escaping (_ counter: Int) -> Void = { _ in },
                             completion: @escaping (_ filesChunk: [(fileName: String, size: Int64)], _ error: Error?) -> Void = { _, _ in }) {
-        // Check if filesChunk is empty
+        // Return existing chunks immediately
         if !filesChunk.isEmpty {
             return completion(filesChunk, nil)
         }
@@ -123,17 +123,17 @@ public struct NKCommon: Sendable {
             NotificationCenter.default.removeObserver(self, name: notificationCenterChunkedFileStop, object: nil)
         }
 
-        let fileManager: FileManager = .default
+        let fileManager = FileManager.default
         var isDirectory: ObjCBool = false
         var reader: FileHandle?
         var writer: FileHandle?
-        var chunk: Int = 0
-        var counter: Int = 1
+        var chunkWrittenBytes = 0
+        var counter = 1
         var incrementalSize: Int64 = 0
         var filesChunk: [(fileName: String, size: Int64)] = []
         var chunkSize = chunkSize
         let bufferSize = 1_000_000
-        var stop: Bool = false
+        var stop = false
 
         NotificationCenter.default.addObserver(forName: notificationCenterChunkedFileStop, object: nil, queue: nil) { _ in
             stop = true
@@ -172,63 +172,76 @@ public struct NKCommon: Sendable {
             }
 
             let result = autoreleasepool(invoking: { () -> Int in
-                if chunk >= chunkSize {
-                    writer?.closeFile()
-                    writer = nil
-                    chunk = 0
-                    counterChunk(counter)
-                    debugPrint("[DEBUG] Counter: \(counter)")
-                    counter += 1
+                let remaining = chunkSize - chunkWrittenBytes
+                guard let rawBuffer = reader?.readData(ofLength: min(bufferSize, remaining)) else {
+                    return -1 // Error: read failed
                 }
 
-                let chunkRemaining: Int = chunkSize - chunk
-                let rawBuffer = reader?.readData(ofLength: min(bufferSize, chunkRemaining))
-
-                guard let rawBuffer = reader?.readData(ofLength: min(bufferSize, chunkRemaining)), !rawBuffer.isEmpty else {
-                    return 0 // EOF
+                if rawBuffer.isEmpty {
+                    // Final flush of last chunk
+                    if writer != nil {
+                        writer?.closeFile()
+                        writer = nil
+                        counterChunk(counter)
+                        debugPrint("[DEBUG] Final chunk closed: \(counter)")
+                        counter += 1
+                    }
+                    return 0 // End of file
                 }
 
                 let safeBuffer = Data(rawBuffer)
 
-                // Create writer if needed
+
                 if writer == nil {
                     let fileNameChunk = String(counter)
                     let outputFileName = outputDirectory + "/" + fileNameChunk
                     fileManager.createFile(atPath: outputFileName, contents: nil, attributes: nil)
                     do {
-                        writer = try .init(forWritingTo: URL(fileURLWithPath: outputFileName))
+                        writer = try FileHandle(forWritingTo: URL(fileURLWithPath: outputFileName))
                     } catch {
-                        return -2
+                        return -2 // Error: cannot create writer
                     }
                     filesChunk.append((fileName: fileNameChunk, size: 0))
                 }
 
-
-                // Check free space before writing
-                if let free = try? URL(fileURLWithPath: outputDirectory).resourceValues(forKeys: [.volumeAvailableCapacityForImportantUsageKey]).volumeAvailableCapacityForImportantUsage,
+                // Check free disk space
+                if let free = try? URL(fileURLWithPath: outputDirectory)
+                    .resourceValues(forKeys: [.volumeAvailableCapacityForImportantUsageKey])
+                    .volumeAvailableCapacityForImportantUsage,
                    free < Int64(safeBuffer.count * 2) {
-                    return -1 // not enough space
+                    return -3 // Not enough disk space
                 }
 
-                // Write chunk to file
                 do {
                     try writer?.write(contentsOf: safeBuffer)
-                    chunk += safeBuffer.count
-                    return 1
+                    chunkWrittenBytes += safeBuffer.count
+                    if chunkWrittenBytes >= chunkSize {
+                        writer?.closeFile()
+                        writer = nil
+                        chunkWrittenBytes = 0
+                        counterChunk(counter)
+                        debugPrint("[DEBUG] Chunk completed: \(counter)")
+                        counter += 1
+                    }
+                    return 1 // OK
                 } catch {
-                    return -2
+                    return -4 // Write error
                 }
             })
 
             switch result {
             case -1:
-                return completion([], ChunkedFileError.noSpaceAvailable)
+                return completion([], ChunkedFileError.writeFailed(NSError(domain: "chunkedFile", code: -1)))
             case -2:
                 return completion([], ChunkedFileError.writeFailed(NSError(domain: "chunkedFile", code: -2)))
+            case -3:
+                return completion([], ChunkedFileError.noSpaceAvailable)
+            case -4:
+                return completion([], ChunkedFileError.writeFailed(NSError(domain: "chunkedFile", code: -4)))
             case 0:
-                break // EOF reached
+                break
             case 1:
-                continue // keep chunking
+                continue
             default:
                 break
             }
