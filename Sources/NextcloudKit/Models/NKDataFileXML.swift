@@ -300,7 +300,7 @@ public class NKDataFileXML: NSObject {
                 // ServerUrl
                 if href == rootFiles + nkSession.user + "/" {
                     file.fileName = "."
-                    file.serverUrl = ".."
+                    file.serverUrl = baseUrl + rootFiles + nkSession.user
                 } else {
                     file.serverUrl = baseUrl + file.path.dropLast()
                 }
