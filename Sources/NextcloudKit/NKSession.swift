@@ -101,7 +101,7 @@ public struct NKSession: Sendable {
         sessionDownloadBackground = URLSession(configuration: configurationDownloadBackground, delegate: backgroundSessionDelegate, delegateQueue: OperationQueue.main)
 
         // Session Download Background Extension
-        let configurationDownloadBackgroundExt = URLSessionConfiguration.background(withIdentifier: NKCommon().identifierSessionDownloadBackgroundExt)
+        let configurationDownloadBackgroundExt = URLSessionConfiguration.background(withIdentifier: NKCommon().identifierSessionDownloadBackgroundExt + UUID().uuidString)
         configurationDownloadBackgroundExt.allowsCellularAccess = true
 
         if #available(macOS 11, *) {
@@ -154,7 +154,7 @@ public struct NKSession: Sendable {
         sessionUploadBackgroundWWan = URLSession(configuration: configurationUploadBackgroundWWan, delegate: backgroundSessionDelegate, delegateQueue: OperationQueue.main)
 
         // Session Upload Background Extension
-        let configurationUploadBackgroundExt = URLSessionConfiguration.background(withIdentifier: NKCommon().identifierSessionUploadBackgroundExt)
+        let configurationUploadBackgroundExt = URLSessionConfiguration.background(withIdentifier: NKCommon().identifierSessionUploadBackgroundExt + UUID().uuidString)
         configurationUploadBackgroundExt.allowsCellularAccess = true
 
         if #available(macOS 11, *) {
