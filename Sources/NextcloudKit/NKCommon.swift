@@ -53,6 +53,9 @@ public struct NKCommon: Sendable {
     public var groupIdentifier: String?
     public let typeIdentifiers: NKTypeIdentifiers = .shared
 
+    // Roor fileName folder
+    public let rootFileName: String = ".__NC_ROOT__"
+
     // Foreground
     public let identifierSessionDownload: String = "com.nextcloud.nextcloudkit.session.download"
     public let identifierSessionUpload: String = "com.nextcloud.nextcloudkit.session.upload"

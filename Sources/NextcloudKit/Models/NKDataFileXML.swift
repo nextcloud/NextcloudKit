@@ -253,7 +253,7 @@ public class NKDataFileXML: NSObject {
         return xml["ocs", "data", "apppassword"].text
     }
 
-    func convertDataFile(xmlData: Data, nkSession: NKSession, showHiddenFiles: Bool, includeHiddenFiles: [String]) async -> [NKFile] {
+    func convertDataFile(xmlData: Data, nkSession: NKSession, rootFileName: String, showHiddenFiles: Bool, includeHiddenFiles: [String]) async -> [NKFile] {
         var files: [NKFile] = []
         let rootFiles = "/" + nkSession.dav + "/files/"
         guard let baseUrl = self.nkCommonInstance.getHostName(urlString: nkSession.urlBase) else {
@@ -299,7 +299,7 @@ public class NKDataFileXML: NSObject {
 
                 // ServerUrl
                 if href == rootFiles + nkSession.user + "/" {
-                    file.fileName = "."
+                    file.fileName = rootFileName
                     file.serverUrl = baseUrl + rootFiles + nkSession.user
                 } else {
                     file.serverUrl = baseUrl + file.path.dropLast()
