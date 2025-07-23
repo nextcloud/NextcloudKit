@@ -62,7 +62,8 @@ public actor NKTypeIdentifiers {
             fileNameWithoutExt = fileName
             ext = ""
         } else {
-            let props = await resolver.resolve(inUTI: typeIdentifier, account: account)
+            let capabilities = await NKCapabilities.shared.getCapabilities(for: account)
+            let props = resolver.resolve(inUTI: typeIdentifier, capabilities: capabilities)
             classFile = props.classFile.rawValue
             iconName = props.iconName.rawValue
         }
@@ -88,5 +89,60 @@ public actor NKTypeIdentifiers {
     // Clears the internal cache (used for testing or reset)
     public func clearCache() {
         filePropertyCache.removeAll()
+    }
+}
+
+/// Helper class to access NKTypeIdentifiers from sync contexts (e.g. in legacy code or libraries).
+public final class NKTypeIdentifiersHelper {
+    public static let shared = NKTypeIdentifiersHelper()
+
+    // Resolves type info from file name and optional MIME type
+    public func getInternalType(fileName: String, mimeType inputMimeType: String, directory: Bool, capabilities: NKCapabilities.Capabilities) -> NKTypeIdentifierCache {
+        var ext = (fileName as NSString).pathExtension.lowercased()
+        var mimeType = inputMimeType
+        var classFile = ""
+        var iconName = ""
+        var typeIdentifier = ""
+        var fileNameWithoutExt = (fileName as NSString).deletingPathExtension
+
+        // Use full name if no extension
+        if ext.isEmpty {
+            fileNameWithoutExt = fileName
+        }
+
+        // Resolve UTType
+        let type = UTType(filenameExtension: ext) ?? .data
+        typeIdentifier = type.identifier
+
+        // Resolve MIME type
+        if mimeType.isEmpty {
+            mimeType = type.preferredMIMEType ?? "application/octet-stream"
+        }
+
+        // Handle folder case
+        if directory {
+            mimeType = "httpd/unix-directory"
+            classFile = NKTypeClassFile.directory.rawValue
+            iconName = NKTypeIconFile.directory.rawValue
+            typeIdentifier = UTType.folder.identifier
+            fileNameWithoutExt = fileName
+            ext = ""
+        } else {
+            let props = NKFilePropertyResolver().resolve(inUTI: typeIdentifier, capabilities: capabilities)
+            classFile = props.classFile.rawValue
+            iconName = props.iconName.rawValue
+        }
+
+        // Construct result
+        let result = NKTypeIdentifierCache(
+            mimeType: mimeType,
+            classFile: classFile,
+            iconName: iconName,
+            typeIdentifier: typeIdentifier,
+            fileNameWithoutExt: fileNameWithoutExt,
+            ext: ext
+        )
+
+        return result
     }
 }
