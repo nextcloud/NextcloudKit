@@ -86,6 +86,16 @@ public actor NKTypeIdentifiers {
         return result
     }
 
+    // Clears the internal cache (used for testing or reset)
+    public func clearCache() {
+        filePropertyCache.removeAll()
+    }
+}
+
+/// Helper class to access NKTypeIdentifiers from sync contexts (e.g. in legacy code or libraries).
+public final class NKTypeIdentifiersHelper {
+    public static let shared = NKTypeIdentifiersHelper()
+
     // Resolves type info from file name and optional MIME type
     public func getInternalType(fileName: String, mimeType inputMimeType: String, directory: Bool, capabilities: NKCapabilities.Capabilities) -> NKTypeIdentifierCache {
         var ext = (fileName as NSString).pathExtension.lowercased()
@@ -98,11 +108,6 @@ public actor NKTypeIdentifiers {
         // Use full name if no extension
         if ext.isEmpty {
             fileNameWithoutExt = fileName
-        }
-
-        // Check cache first
-        if let cached = filePropertyCache[ext] {
-            return cached
         }
 
         // Resolve UTType
@@ -123,7 +128,7 @@ public actor NKTypeIdentifiers {
             fileNameWithoutExt = fileName
             ext = ""
         } else {
-            let props = resolver.resolve(inUTI: typeIdentifier, capabilities: capabilities)
+            let props = NKFilePropertyResolver().resolve(inUTI: typeIdentifier, capabilities: capabilities)
             classFile = props.classFile.rawValue
             iconName = props.iconName.rawValue
         }
@@ -138,16 +143,6 @@ public actor NKTypeIdentifiers {
             ext: ext
         )
 
-        // Cache it
-        if !ext.isEmpty {
-            filePropertyCache[ext] = result
-        }
-
         return result
-    }
-
-    // Clears the internal cache (used for testing or reset)
-    public func clearCache() {
-        filePropertyCache.removeAll()
     }
 }
