@@ -297,18 +297,6 @@ public struct NKCommon: Sendable {
             headers.update(.userAgent(customUserAgent))
         }
         headers.update(.contentType(contentType))
-
-        /*
-        if let contentType = options?.contentType {
-            headers.update(.contentType(contentType))
-        } else {
-            headers.update(.contentType("application/x-www-form-urlencoded"))
-        }
-        if options?.contentType != "application/xml" {
-            headers.update(name: "Accept", value: "application/json")
-        }
-        */
-
         headers.update(name: "OCS-APIRequest", value: "true")
         for (key, value) in options?.customHeader ?? [:] {
             headers.update(name: key, value: value)
