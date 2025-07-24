@@ -65,6 +65,7 @@ public extension NextcloudKit {
         if overwrite {
             headers.update(name: "Overwrite", value: "true")
         }
+        headers.update(.contentType("application/octet-stream"))
 
         let request = nkSession.sessionData.upload(fileNameLocalPathUrl, to: url, method: .put, headers: headers, interceptor: NKInterceptor(nkCommonInstance: nkCommonInstance), fileManager: .default).validate(statusCode: 200..<300).onURLSessionTaskCreation(perform: { task in
             task.taskDescription = options.taskDescription
