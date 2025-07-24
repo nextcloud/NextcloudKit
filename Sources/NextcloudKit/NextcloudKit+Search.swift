@@ -36,7 +36,7 @@ public extension NextcloudKit {
                        completion: @escaping (_ account: String, _ responseData: AFDataResponse<Data>?, _ error: NKError) -> Void) {
         let endpoint = "ocs/v2.php/search/providers"
         guard let nkSession = nkCommonInstance.nksessions.session(forAccount: account),
-              let url = nkCommonInstance.createStandardUrl(serverUrl: nkSession.urlBase, endpoint: endpoint, options: options),
+              let url = nkCommonInstance.createStandardUrl(serverUrl: nkSession.urlBase, endpoint: endpoint),
               let headers = nkCommonInstance.getStandardHeaders(account: account, options: options) else {
             return options.queue.async { completion(account, nil, .urlError) }
         }
@@ -163,7 +163,7 @@ public extension NextcloudKit {
         if let cursor = cursor {
             endpoint += "&cursor=\(cursor)"
         }
-        guard let url = self.nkCommonInstance.createStandardUrl(serverUrl: nkSession.urlBase, endpoint: endpoint, options: options)
+        guard let url = self.nkCommonInstance.createStandardUrl(serverUrl: nkSession.urlBase, endpoint: endpoint)
         else {
             completion(account, nil, nil, .urlError)
             return nil

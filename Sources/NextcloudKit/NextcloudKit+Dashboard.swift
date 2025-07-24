@@ -23,7 +23,7 @@ public extension NextcloudKit {
                             completion: @escaping (_ account: String, _ dashboardWidgets: [NCCDashboardWidget]?, _ responseData: AFDataResponse<Data>?, _ error: NKError) -> Void) {
         let endpoint = "ocs/v2.php/apps/dashboard/api/v1/widgets"
         guard let nkSession = nkCommonInstance.nksessions.session(forAccount: account),
-              let url = nkCommonInstance.createStandardUrl(serverUrl: nkSession.urlBase, endpoint: endpoint, options: options),
+              let url = nkCommonInstance.createStandardUrl(serverUrl: nkSession.urlBase, endpoint: endpoint),
               let headers = nkCommonInstance.getStandardHeaders(account: account, options: options) else {
             return options.queue.async { completion(account, nil, nil, .urlError) }
         }
@@ -101,7 +101,7 @@ public extension NextcloudKit {
                                         completion: @escaping (_ account: String, _ dashboardApplications: [NCCDashboardApplication]?, _ responseData: AFDataResponse<Data>?, _ error: NKError) -> Void) {
         let endpoint = "ocs/v2.php/apps/dashboard/api/v1/widget-items?widgets[]=\(items)"
         guard let nkSession = nkCommonInstance.nksessions.session(forAccount: account),
-              let url = nkCommonInstance.createStandardUrl(serverUrl: nkSession.urlBase, endpoint: endpoint, options: options),
+              let url = nkCommonInstance.createStandardUrl(serverUrl: nkSession.urlBase, endpoint: endpoint),
               let headers = nkCommonInstance.getStandardHeaders(account: account, options: options) else {
             return options.queue.async { completion(account, nil, nil, .urlError) }
         }

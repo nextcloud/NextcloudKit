@@ -22,12 +22,9 @@ public extension NextcloudKit {
                              taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
                              completion: @escaping (_ account: String, _ recommendations: [NKRecommendation]?, _ responseData: AFDataResponse<Data>?, _ error: NKError) -> Void) {
         let endpoint = "ocs/v2.php/apps/recommendations/api/v1/recommendations"
-        ///
-        options.contentType = "application/xml"
-        ///
         guard let nkSession = nkCommonInstance.nksessions.session(forAccount: account),
-              let url = nkCommonInstance.createStandardUrl(serverUrl: nkSession.urlBase, endpoint: endpoint, options: options),
-              let headers = nkCommonInstance.getStandardHeaders(account: account, options: options) else {
+              let url = nkCommonInstance.createStandardUrl(serverUrl: nkSession.urlBase, endpoint: endpoint),
+              let headers = nkCommonInstance.getStandardHeaders(account: account, options: options, contentType: "application/xml") else {
             return options.queue.async { completion(account, nil, nil, .urlError) }
         }
 

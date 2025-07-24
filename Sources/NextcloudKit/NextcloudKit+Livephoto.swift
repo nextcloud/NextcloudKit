@@ -26,10 +26,7 @@ public extension NextcloudKit {
             return options.queue.async { completion(account, nil, .urlError) }
         }
         let method = HTTPMethod(rawValue: "PROPPATCH")
-        ///
-        options.contentType = "application/xml"
-        ///
-        guard let headers = nkCommonInstance.getStandardHeaders(account: account, options: options) else {
+        guard let headers = nkCommonInstance.getStandardHeaders(account: account, options: options, contentType: "application/xml") else {
             return options.queue.async { completion(account, nil, .urlError) }
         }
         var urlRequest: URLRequest

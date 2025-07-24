@@ -28,7 +28,7 @@ public extension NextcloudKit {
                          completion: @escaping (_ account: String, _ capabilities: NKCapabilities.Capabilities?, _ responseData: AFDataResponse<Data>?, _ error: NKError) -> Void) {
         let endpoint = "ocs/v1.php/cloud/capabilities"
         guard let nkSession = nkCommonInstance.nksessions.session(forAccount: account),
-              let url = nkCommonInstance.createStandardUrl(serverUrl: nkSession.urlBase, endpoint: endpoint, options: options),
+              let url = nkCommonInstance.createStandardUrl(serverUrl: nkSession.urlBase, endpoint: endpoint),
               let headers = nkCommonInstance.getStandardHeaders(account: account, options: options) else {
             return options.queue.async { completion(account, nil, nil, .urlError) }
         }
