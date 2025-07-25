@@ -23,7 +23,7 @@ public extension NextcloudKit {
                          completion: @escaping (_ account: String, _ results: [NKGroupfolders]?, _ responseData: AFDataResponse<Data>?, _ error: NKError) -> Void) {
         let endpoint = "index.php/apps/groupfolders/folders?applicable=1"
         guard let nkSession = nkCommonInstance.nksessions.session(forAccount: account),
-              let url = nkCommonInstance.createStandardUrl(serverUrl: nkSession.urlBase, endpoint: endpoint, options: options),
+              let url = nkCommonInstance.createStandardUrl(serverUrl: nkSession.urlBase, endpoint: endpoint),
               let headers = nkCommonInstance.getStandardHeaders(account: account, options: options) else {
             return options.queue.async { completion(account, nil, nil, .urlError) }
         }

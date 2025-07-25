@@ -177,6 +177,7 @@ public final class NKBackground: NSObject, URLSessionTaskDelegate, URLSessionDel
         request.httpMethod = "PUT"
         request.setValue(nkSession.userAgent, forHTTPHeaderField: "User-Agent")
         request.setValue("Basic \(base64LoginString)", forHTTPHeaderField: "Authorization")
+        request.setValue("application/octet-stream", forHTTPHeaderField: "Content-Type")
         if overwrite {
             request.setValue("true", forHTTPHeaderField: "Overwrite")
         }

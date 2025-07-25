@@ -18,7 +18,7 @@ public extension NextcloudKit {
                            completion: @escaping (_ account: String, _ tos: NKTermsOfService?, _ responseData: AFDataResponse<Data>?, _ error: NKError) -> Void) {
         let endpoint = "ocs/v2.php/apps/terms_of_service/terms"
         guard let nkSession = nkCommonInstance.nksessions.session(forAccount: account),
-              let url = nkCommonInstance.createStandardUrl(serverUrl: nkSession.urlBase, endpoint: endpoint, options: options),
+              let url = nkCommonInstance.createStandardUrl(serverUrl: nkSession.urlBase, endpoint: endpoint),
               let headers = nkCommonInstance.getStandardHeaders(account: account, options: options) else {
             return options.queue.async { completion(account, nil, nil, .urlError) }
         }
@@ -82,12 +82,9 @@ public extension NextcloudKit {
                             completion: @escaping (_ account: String, _ responseData: AFDataResponse<Data>?, _ error: NKError) -> Void) {
         let endpoint = "ocs/v2.php/apps/terms_of_service/sign"
         var urlRequest: URLRequest
-        ///
-        options.contentType = "application/json"
-        ///
         guard let nkSession = nkCommonInstance.nksessions.session(forAccount: account),
-              let url = nkCommonInstance.createStandardUrl(serverUrl: nkSession.urlBase, endpoint: endpoint, options: options),
-              let headers = nkCommonInstance.getStandardHeaders(account: account, options: options) else {
+              let url = nkCommonInstance.createStandardUrl(serverUrl: nkSession.urlBase, endpoint: endpoint),
+              let headers = nkCommonInstance.getStandardHeaders(account: account, options: options, contentType: "application/json") else {
             return options.queue.async { completion(account, nil, .urlError) }
         }
 

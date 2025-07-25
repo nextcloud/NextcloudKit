@@ -27,7 +27,7 @@ public extension NextcloudKit {
                         taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
                         completion: @escaping (_ token: String?, _ responseData: AFDataResponse<Data>?, _ error: NKError) -> Void) {
         let endpoint = "ocs/v2.php/core/getapppassword"
-        guard let url = self.nkCommonInstance.createStandardUrl(serverUrl: url, endpoint: endpoint, options: options) else {
+        guard let url = self.nkCommonInstance.createStandardUrl(serverUrl: url, endpoint: endpoint) else {
             return options.queue.async { completion(nil, nil, .urlError) }
         }
         var headers: HTTPHeaders = [.authorization(username: user, password: password)]
@@ -116,7 +116,7 @@ public extension NextcloudKit {
                            completion: @escaping (_ responseData: AFDataResponse<Data>?, _ error: NKError) -> Void) {
         let endpoint = "ocs/v2.php/core/apppassword"
         guard let nkSession = nkCommonInstance.nksessions.session(forAccount: account),
-              let url = self.nkCommonInstance.createStandardUrl(serverUrl: serverUrl, endpoint: endpoint, options: options) else {
+              let url = self.nkCommonInstance.createStandardUrl(serverUrl: serverUrl, endpoint: endpoint) else {
             return options.queue.async { completion(nil, .urlError) }
         }
         var headers: HTTPHeaders = [.authorization(username: username, password: password)]
@@ -237,7 +237,7 @@ public extension NextcloudKit {
                         taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
                         completion: @escaping (_ token: String?, _ endpoint: String?, _ login: String?, _ responseData: AFDataResponse<Data>?, _ error: NKError) -> Void) {
         let endpoint = "index.php/login/v2"
-        guard let url = nkCommonInstance.createStandardUrl(serverUrl: serverUrl, endpoint: endpoint, options: options) else {
+        guard let url = nkCommonInstance.createStandardUrl(serverUrl: serverUrl, endpoint: endpoint) else {
             return options.queue.async { completion(nil, nil, nil, nil, .urlError) }
         }
         var headers: HTTPHeaders?

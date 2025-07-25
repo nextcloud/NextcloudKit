@@ -24,7 +24,7 @@ public extension NextcloudKit {
         let options = NKRequestOptions()
 
         guard let nkSession = nkCommonInstance.nksessions.session(forAccount: account),
-              let url = nkCommonInstance.createStandardUrl(serverUrl: nkSession.urlBase, endpoint: endpoint, options: options),
+              let url = nkCommonInstance.createStandardUrl(serverUrl: nkSession.urlBase, endpoint: endpoint),
               let headers = nkCommonInstance.getStandardHeaders(account: account, options: options) else {
             return options.queue.async {
                 completion(nil, .urlError)
@@ -119,7 +119,7 @@ public extension NextcloudKit {
         let options = NKRequestOptions()
 
         guard let nkSession = nkCommonInstance.nksessions.session(forAccount: account),
-              let url = nkCommonInstance.createStandardUrl(serverUrl: nkSession.urlBase, endpoint: endpoint, options: options),
+              let url = nkCommonInstance.createStandardUrl(serverUrl: nkSession.urlBase, endpoint: endpoint),
               let headers = nkCommonInstance.getStandardHeaders(account: account, options: options) else {
             return options.queue.async {
                 completion(.urlError)
@@ -172,11 +172,9 @@ public extension NextcloudKit {
     func setShareDownloadLimit(account: String, token: String, limit: Int, completion: @escaping (_ error: NKError) -> Void) {
         let endpoint = makeEndpoint(with: token)
         let options = NKRequestOptions()
-        options.contentType = "application/json"
-
         guard let nkSession = nkCommonInstance.nksessions.session(forAccount: account),
-              let url = nkCommonInstance.createStandardUrl(serverUrl: nkSession.urlBase, endpoint: endpoint, options: options),
-              let headers = nkCommonInstance.getStandardHeaders(account: account, options: options),
+              let url = nkCommonInstance.createStandardUrl(serverUrl: nkSession.urlBase, endpoint: endpoint),
+              let headers = nkCommonInstance.getStandardHeaders(account: account, options: options, contentType: "application/json"),
               var urlRequest = try? URLRequest(url: url, method: .put, headers: headers) else {
             return options.queue.async {
                 completion(.urlError)

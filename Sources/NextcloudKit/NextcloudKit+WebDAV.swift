@@ -376,12 +376,9 @@ public extension NextcloudKit {
                           taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
                           completion: @escaping (_ account: String, _ files: [NKFile]?, _ responseData: AFDataResponse<Data>?, _ error: NKError) -> Void) {
         var serverUrlFileName = serverUrlFileName
-        ///
-        options.contentType = "application/xml"
-        ///
         guard let nkSession = nkCommonInstance.nksessions.session(forAccount: account),
               let url = serverUrlFileName.encodedToUrl,
-              var headers = nkCommonInstance.getStandardHeaders(account: account, options: options) else {
+              var headers = nkCommonInstance.getStandardHeaders(account: account, options: options, contentType: "application/xml") else {
             return options.queue.async { completion(account, nil, nil, .urlError) }
         }
         if depth == "0", serverUrlFileName.last == "/" {
@@ -857,11 +854,8 @@ public extension NextcloudKit {
                         options: NKRequestOptions = NKRequestOptions(),
                         taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
                         completion: @escaping (_ account: String, _ files: [NKFile]?, _ responseData: AFDataResponse<Data>?, _ error: NKError) -> Void) {
-        ///
-        options.contentType = "application/xml"
-        ///
         guard let nkSession = nkCommonInstance.nksessions.session(forAccount: account),
-              let headers = nkCommonInstance.getStandardHeaders(account: account, options: options) else {
+              let headers = nkCommonInstance.getStandardHeaders(account: account, options: options, contentType: "application/xml") else {
             return options.queue.async { completion(account, nil, nil, .urlError) }
         }
         guard let url = (serverUrl + "/" + nkSession.dav).encodedToUrl else {
@@ -963,11 +957,8 @@ public extension NextcloudKit {
                      options: NKRequestOptions = NKRequestOptions(),
                      taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
                      completion: @escaping (_ account: String, _ responseData: AFDataResponse<Data>?, _ error: NKError) -> Void) {
-        //
-        options.contentType = "application/xml"
-        //
         guard let nkSession = nkCommonInstance.nksessions.session(forAccount: account),
-              let headers = nkCommonInstance.getStandardHeaders(account: account, options: options) else {
+              let headers = nkCommonInstance.getStandardHeaders(account: account, options: options, contentType: "application/xml") else {
             return options.queue.async { completion(account, nil, .urlError) }
         }
         let serverUrlFileName = nkSession.urlBase + "/" + nkSession.dav + "/files/" + nkSession.userId + "/" + fileName
@@ -1050,11 +1041,8 @@ public extension NextcloudKit {
                           options: NKRequestOptions = NKRequestOptions(),
                           taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
                           completion: @escaping (_ account: String, _ files: [NKFile]?, _ responseData: AFDataResponse<Data>?, _ error: NKError) -> Void) {
-        //
-        options.contentType = "application/xml"
-        //
         guard let nkSession = nkCommonInstance.nksessions.session(forAccount: account),
-              let headers = nkCommonInstance.getStandardHeaders(account: account, options: options) else {
+              let headers = nkCommonInstance.getStandardHeaders(account: account, options: options, contentType: "application/xml") else {
             return options.queue.async { completion(account, nil, nil, .urlError) }
         }
         let serverUrlFileName = nkSession.urlBase + "/" + nkSession.dav + "/files/" + nkSession.userId
@@ -1148,11 +1136,8 @@ public extension NextcloudKit {
                       options: NKRequestOptions = NKRequestOptions(),
                       taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
                       completion: @escaping (_ account: String, _ items: [NKTrash]?, _ responseData: AFDataResponse<Data>?, _ error: NKError) -> Void) {
-        //
-        options.contentType = "application/xml"
-        //
         guard let nkSession = nkCommonInstance.nksessions.session(forAccount: account),
-              var headers = nkCommonInstance.getStandardHeaders(account: account, options: options) else {
+              var headers = nkCommonInstance.getStandardHeaders(account: account, options: options, contentType: "application/xml") else {
             return options.queue.async { completion(account, nil, nil, .urlError) }
         }
         var serverUrlFileName = nkSession.urlBase + "/" + nkSession.dav + "/trashbin/" + nkSession.userId + "/trash/"

@@ -283,7 +283,9 @@ public struct NKCommon: Sendable {
         return "\(identifier).\(account)"
     }
 
-    public func getStandardHeaders(account: String, options: NKRequestOptions? = nil) -> HTTPHeaders? {
+    public func getStandardHeaders(account: String,
+                                   options: NKRequestOptions? = nil,
+                                   contentType: String = "application/x-www-form-urlencoded") -> HTTPHeaders? {
         guard let session = nksessions.session(forAccount: account) else {
             return nil
         }
@@ -294,14 +296,7 @@ public struct NKCommon: Sendable {
         if let customUserAgent = options?.customUserAgent {
             headers.update(.userAgent(customUserAgent))
         }
-        if let contentType = options?.contentType {
-            headers.update(.contentType(contentType))
-        } else {
-            headers.update(.contentType("application/x-www-form-urlencoded"))
-        }
-        if options?.contentType != "application/xml" {
-            headers.update(name: "Accept", value: "application/json")
-        }
+        headers.update(.contentType(contentType))
         headers.update(name: "OCS-APIRequest", value: "true")
         for (key, value) in options?.customHeader ?? [:] {
             headers.update(name: key, value: value)
@@ -328,10 +323,7 @@ public struct NKCommon: Sendable {
         return headers
     }
 
-    public func createStandardUrl(serverUrl: String, endpoint: String, options: NKRequestOptions) -> URLConvertible? {
-        if let endpoint = options.endpoint {
-            return URL(string: endpoint)
-        }
+    public func createStandardUrl(serverUrl: String, endpoint: String) -> URLConvertible? {
         guard var serverUrl = serverUrl.urlEncoded else { return nil }
 
         if serverUrl.last != "/" { serverUrl = serverUrl + "/" }
