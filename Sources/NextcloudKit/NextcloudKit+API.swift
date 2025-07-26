@@ -864,7 +864,7 @@ public extension NextcloudKit {
 
         guard let nkSession = nkCommonInstance.nksessions.session(forAccount: account),
               let url = nkCommonInstance.createStandardUrl(serverUrl: nkSession.urlBase, endpoint: endpoint),
-              let headers = nkCommonInstance.getStandardHeaders(account: account, options: options, accept: "application/json") else {
+              let headers = nkCommonInstance.getStandardHeaders(account: account, options: options) else {
             return options.queue.async { completion(account, nil, nil, .urlError) }
         }
 
@@ -934,7 +934,7 @@ public extension NextcloudKit {
         let endpoint = "ocs/v2.php/cloud/user"
         guard let nkSession = nkCommonInstance.nksessions.session(forAccount: account),
               let url = nkCommonInstance.createStandardUrl(serverUrl: nkSession.urlBase, endpoint: endpoint),
-              let headers = nkCommonInstance.getStandardHeaders(account: account, options: options, accept: "application/json") else {
+              let headers = nkCommonInstance.getStandardHeaders(account: account, options: options) else {
             return options.queue.async { completion(account, nil, nil, .urlError) }
         }
 
