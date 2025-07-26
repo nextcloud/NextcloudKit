@@ -297,6 +297,7 @@ public struct NKCommon: Sendable {
             headers.update(.userAgent(customUserAgent))
         }
         headers.update(.contentType(contentType))
+        headers.update(name: "Accept", value: contentType)
         headers.update(name: "OCS-APIRequest", value: "true")
         for (key, value) in options?.customHeader ?? [:] {
             headers.update(name: key, value: value)
