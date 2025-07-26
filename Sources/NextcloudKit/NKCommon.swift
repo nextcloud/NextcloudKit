@@ -285,7 +285,8 @@ public struct NKCommon: Sendable {
 
     public func getStandardHeaders(account: String,
                                    options: NKRequestOptions? = nil,
-                                   contentType: String = "application/x-www-form-urlencoded") -> HTTPHeaders? {
+                                   contentType: String? = nil,
+                                   accept: String? = nil) -> HTTPHeaders? {
         guard let session = nksessions.session(forAccount: account) else {
             return nil
         }
@@ -296,8 +297,12 @@ public struct NKCommon: Sendable {
         if let customUserAgent = options?.customUserAgent {
             headers.update(.userAgent(customUserAgent))
         }
-        headers.update(.contentType(contentType))
-        headers.update(name: "Accept", value: contentType)
+        if let contentType {
+            headers.update(.contentType(contentType))
+        }
+        if let accept {
+            headers.update(name: "Accept", value: accept)
+        }
         headers.update(name: "OCS-APIRequest", value: "true")
         for (key, value) in options?.customHeader ?? [:] {
             headers.update(name: key, value: value)

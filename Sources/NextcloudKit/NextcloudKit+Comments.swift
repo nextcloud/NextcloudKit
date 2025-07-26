@@ -21,7 +21,7 @@ public extension NextcloudKit {
                      taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
                      completion: @escaping (_ account: String, _ items: [NKComments]?, _ responseData: AFDataResponse<Data>?, _ error: NKError) -> Void) {
         guard let nkSession = nkCommonInstance.nksessions.session(forAccount: account),
-              let headers = nkCommonInstance.getStandardHeaders(account: account, options: options, contentType: "application/xml") else {
+              let headers = nkCommonInstance.getStandardHeaders(account: account, options: options, accept: "application/xml") else {
             return options.queue.async { completion(account, nil, nil, .urlError) }
         }
         let serverUrlEndpoint = nkSession.urlBase + "/" + nkSession.dav + "/comments/files/\(fileId)"

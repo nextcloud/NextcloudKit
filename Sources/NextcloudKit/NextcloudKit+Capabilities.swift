@@ -29,7 +29,7 @@ public extension NextcloudKit {
         let endpoint = "ocs/v1.php/cloud/capabilities"
         guard let nkSession = nkCommonInstance.nksessions.session(forAccount: account),
               let url = nkCommonInstance.createStandardUrl(serverUrl: nkSession.urlBase, endpoint: endpoint),
-              let headers = nkCommonInstance.getStandardHeaders(account: account, options: options, contentType: "application/json") else {
+              let headers = nkCommonInstance.getStandardHeaders(account: account, options: options, accept: "application/json") else {
             return options.queue.async { completion(account, nil, nil, .urlError) }
         }
 

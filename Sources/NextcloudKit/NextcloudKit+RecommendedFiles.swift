@@ -24,7 +24,7 @@ public extension NextcloudKit {
         let endpoint = "ocs/v2.php/apps/recommendations/api/v1/recommendations"
         guard let nkSession = nkCommonInstance.nksessions.session(forAccount: account),
               let url = nkCommonInstance.createStandardUrl(serverUrl: nkSession.urlBase, endpoint: endpoint),
-              let headers = nkCommonInstance.getStandardHeaders(account: account, options: options, contentType: "application/xml") else {
+              let headers = nkCommonInstance.getStandardHeaders(account: account, options: options, accept: "application/xml") else {
             return options.queue.async { completion(account, nil, nil, .urlError) }
         }
 
