@@ -1137,7 +1137,7 @@ public extension NextcloudKit {
                       taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
                       completion: @escaping (_ account: String, _ items: [NKTrash]?, _ responseData: AFDataResponse<Data>?, _ error: NKError) -> Void) {
         guard let nkSession = nkCommonInstance.nksessions.session(forAccount: account),
-              var headers = nkCommonInstance.getStandardHeaders(account: account, options: option) else {
+              var headers = nkCommonInstance.getStandardHeaders(account: account, options: options) else {
             return options.queue.async { completion(account, nil, nil, .urlError) }
         }
         var serverUrlFileName = nkSession.urlBase + "/" + nkSession.dav + "/trashbin/" + nkSession.userId + "/trash/"
