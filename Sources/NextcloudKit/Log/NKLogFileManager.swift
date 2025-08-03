@@ -150,36 +150,36 @@ public final class NKLogFileManager: @unchecked Sendable {
 
     // MARK: - Public API
 
-    public func writeLog(debug message: String) {
-        writeLog("[DEBUG] \(message)")
+    public func writeLog(debug message: String, minimumLogLevel: NKLogLevel = .compact) {
+        writeLog("[DEBUG] \(message)", minimumLogLevel: minimumLogLevel)
     }
 
-    public func writeLog(info message: String) {
-        writeLog("[INFO] \(message)")
+    public func writeLog(info message: String, minimumLogLevel: NKLogLevel = .compact) {
+        writeLog("[INFO] \(message)", minimumLogLevel: minimumLogLevel)
     }
 
-    public func writeLog(warning message: String) {
-        writeLog("[WARNING] \(message)")
+    public func writeLog(warning message: String, minimumLogLevel: NKLogLevel = .compact) {
+        writeLog("[WARNING] \(message)", minimumLogLevel: minimumLogLevel)
     }
 
-    public func writeLog(error message: String) {
-        writeLog("[ERROR] \(message)")
+    public func writeLog(error message: String, minimumLogLevel: NKLogLevel = .compact) {
+        writeLog("[ERROR] \(message)", minimumLogLevel: minimumLogLevel)
     }
 
-    public func writeLog(success message: String) {
-        writeLog("[SUCCESS] \(message)")
+    public func writeLog(success message: String, minimumLogLevel: NKLogLevel = .compact) {
+        writeLog("[SUCCESS] \(message)", minimumLogLevel: minimumLogLevel)
     }
 
-    public func writeLog(network message: String) {
-        writeLog("[NETWORK] \(message)")
+    public func writeLog(network message: String, minimumLogLevel: NKLogLevel = .compact) {
+        writeLog("[NETWORK] \(message)", minimumLogLevel: minimumLogLevel)
     }
 
-    public func writeLog(start message: String) {
-        writeLog("[START] \(message)")
+    public func writeLog(start message: String, minimumLogLevel: NKLogLevel = .compact) {
+        writeLog("[START] \(message)", minimumLogLevel: minimumLogLevel)
     }
 
-    public func writeLog(stop message: String) {
-        writeLog("[STOP] \(message)")
+    public func writeLog(stop message: String, minimumLogLevel: NKLogLevel = .compact) {
+        writeLog("[STOP] \(message)", minimumLogLevel: minimumLogLevel)
     }
 
     /// Writes a tagged log message with a specific log level.
@@ -187,11 +187,11 @@ public final class NKLogFileManager: @unchecked Sendable {
     ///   - tag: A custom tag to classify the log message (e.g. "SYNC", "AUTH").
     ///   - emoji: .info, .debug, .warning, .error, .success ..
     ///   - message: The log message content.
-    public func writeLog(tag: String, emoji: NKLogTagEmoji, message: String) {
+    public func writeLog(tag: String, emoji: NKLogTagEmoji, message: String, minimumLogLevel: NKLogLevel = .compact) {
         guard !tag.isEmpty else { return }
 
         let taggedMessage = "[\(tag.uppercased())] \(message)"
-        writeLog(taggedMessage, emoji: emoji)
+        writeLog(taggedMessage, emoji: emoji, minimumLogLevel: minimumLogLevel)
     }
 
     /// Writes a log message with an optional typeTag to determine console emoji.
@@ -201,8 +201,14 @@ public final class NKLogFileManager: @unchecked Sendable {
     /// - Parameters:
     ///   - message: The log message to record.
     ///   - emoji: Optional type to determine console emoji (e.g. [INFO], [ERROR]).
-    public func writeLog(_ message: String?, emoji: NKLogTagEmoji? = nil) {
-        guard logLevel != .disabled, let message = message else { return }
+    public func writeLog(_ message: String?, emoji: NKLogTagEmoji? = nil, minimumLogLevel: NKLogLevel = .compact) {
+        guard logLevel != .disabled,
+              let message = message else {
+            return
+        }
+        if minimumLogLevel > logLevel {
+            return
+        }
 
         let fileTimestamp = Self.stableTimestampString()
         let consoleTimestamp = Self.localizedTimestampString()
