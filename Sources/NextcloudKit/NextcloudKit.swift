@@ -22,8 +22,8 @@ open class NextcloudKit {
 #endif
     public var nkCommonInstance = NKCommon()
 
-    internal func log(debug message: String) {
-        NKLogFileManager.shared.writeLog(debug: message)
+    internal func log(debug message: String, minimumLogLevel: NKLogLevel = .compact) {
+        NKLogFileManager.shared.writeLog(debug: message, minimumLogLevel: minimumLogLevel)
     }
 
     internal lazy var unauthorizedSession: Alamofire.Session = {
