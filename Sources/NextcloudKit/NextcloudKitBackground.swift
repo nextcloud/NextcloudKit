@@ -143,6 +143,10 @@ public final class NKBackground: NSObject, URLSessionTaskDelegate, URLSessionDel
         var uploadSession: URLSession?
         let groupDefaults = UserDefaults(suiteName: NextcloudKit.shared.nkCommonInstance.groupIdentifier)
 
+        guard FileManager.default.fileExists(atPath: fileNameLocalPath) else {
+            return (nil, .urlError)
+        }
+
         /// Check if error is in groupDefaults
         if let array = groupDefaults?.array(forKey: NextcloudKit.shared.nkCommonInstance.groupDefaultsUnauthorized) as? [String],
            array.contains(account) {
