@@ -38,7 +38,7 @@ public extension NextcloudKit {
                 requestHandler: @escaping (_ request: UploadRequest) -> Void = { _ in },
                 taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
                 progressHandler: @escaping (_ progress: Progress) -> Void = { _ in },
-                completionHandler: @escaping (_ account: String, _ ocId: String?, _ etag: String?, _ date: Date?, _ size: Int64, _ headers: [AnyHashable: Any]?, _ nkError: NKError) -> Void) {
+                completionHandler: @escaping (_ account: String, _ ocId: String?, _ etag: String?, _ date: Date?, _ size: Int64, _ response: AFDataResponse<Data>?, _ nkError: NKError) -> Void) {
         var convertible: URLConvertible?
         var uploadedSize: Int64 = 0
 
@@ -93,7 +93,7 @@ public extension NextcloudKit {
             }
 
             options.queue.async {
-                completionHandler(account, ocId, etag, date, uploadedSize, response.response?.allHeaderFields, self.evaluateResponse(response))
+                completionHandler(account, ocId, etag, date, uploadedSize, response, self.evaluateResponse(response))
             }
         }
 
@@ -138,7 +138,7 @@ public extension NextcloudKit {
         etag: String?,
         date: Date?,
         size: Int64,
-        headers: [AnyHashable: Any]?,
+        response: AFDataResponse<Data>?,
         error: NKError
     ) {
         await withCheckedContinuation { continuation in
@@ -151,14 +151,14 @@ public extension NextcloudKit {
                    options: options,
                    requestHandler: requestHandler,
                    taskHandler: taskHandler,
-                   progressHandler: progressHandler) { account, ocId, etag, date, size, headers, error in
+                   progressHandler: progressHandler) { account, ocId, etag, date, size, response, error in
                 continuation.resume(returning: (
                     account: account,
                     ocId: ocId,
                     etag: etag,
                     date: date,
                     size: size,
-                    headers: headers,
+                    response: response,
                     error: error
                 ))
             }
