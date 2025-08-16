@@ -97,7 +97,9 @@ public extension NextcloudKit {
             }
         }
 
-        options.queue.async { requestHandler(request) }
+        options.queue.async {
+            requestHandler(request)
+        }
     }
 
     /// Asynchronously uploads a file to the Nextcloud server.

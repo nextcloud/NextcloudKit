@@ -178,13 +178,13 @@ open class NextcloudKit {
     }
 #endif
 
+    /*
     /// Evaluates an Alamofire response and returns the appropriate NKError.
-    /// Treats `inputDataNilOrZeroLength` as `.success`.
     func evaluateResponse<Data>(_ response: AFDataResponse<Data>) -> NKError {
-        if let afError = response.error?.asAFError {
-            if afError.isExplicitlyCancelledError {
-                return .cancelled
-            }
+        // Treat explicit cancellations as a first-class outcome
+        if let afError = response.error?.asAFError,
+            afError.isExplicitlyCancelledError {
+            return .cancelled
         }
 
         switch response.result {
@@ -198,6 +198,44 @@ open class NextcloudKit {
             }
         case .success:
             return .success
+        }
+    }
+    */
+    
+    /// Evaluates an Alamofire response and returns the appropriate NKError.
+    func evaluateResponse<Data>(_ response: AFDataResponse<Data>) -> NKError {
+        // Treat explicit cancellations as a first-class outcome
+        if let afError = response.error?.asAFError,
+            afError.isExplicitlyCancelledError {
+            return .cancelled
+        }
+
+        // Prefer HTTP status code over serializer outcome for uploads
+        let statusCode = response.response?.statusCode
+        if let code = statusCode {
+            // Success on any 2xx; explicitly include 204/205 which carry no body by definition
+            if (200...299).contains(code) || code == 204 || code == 205 {
+                return .success
+            }
+        }
+
+        // Fall back to Alamofire's result only if HTTP status wasn't clearly successful
+        switch response.result {
+        case .success:
+            return .success
+
+        case .failure(let error):
+            // If the only failure reason is "no data" but status is actually OK, still succeed
+            if let afError = error.asAFError,
+               case .responseSerializationFailed(let reason) = afError,
+               case .inputDataNilOrZeroLength = reason,
+               let code = statusCode,
+               (200...299).contains(code) || code == 204 || code == 205 {
+                return .success
+            }
+
+            // Everything else is a real error: keep the payload for diagnostics
+            return NKError(error: error, afResponse: response, responseData: response.data)
         }
     }
 }
