@@ -178,63 +178,35 @@ open class NextcloudKit {
     }
 #endif
 
-    /*
-    /// Evaluates an Alamofire response and returns the appropriate NKError.
+    /// Evaluates a generic Alamofire response into NKError with simple HTTP-aware rules.
+    /// - Note:
+    ///   - Explicit cancellations return `.cancelled`.
+    ///   - Any HTTP 2xx is considered success, regardless of body presence.
+    ///   - If no HTTP status is available, fall back to Alamofire's `Result`.
     func evaluateResponse<Data>(_ response: AFDataResponse<Data>) -> NKError {
-        // Treat explicit cancellations as a first-class outcome
+        // 1) Cancellations take precedence
         if let afError = response.error?.asAFError,
-            afError.isExplicitlyCancelledError {
+           afError.isExplicitlyCancelledError {
             return .cancelled
         }
 
-        switch response.result {
-        case .failure(let error):
-            if let afError = error.asAFError,
-               case .responseSerializationFailed(let reason) = afError,
-               case .inputDataNilOrZeroLength = reason {
-                return .success
-            } else {
-                return NKError(error: error, afResponse: response, responseData: response.data)
-            }
-        case .success:
-            return .success
-        }
-    }
-    */
-    
-    /// Evaluates an Alamofire response and returns the appropriate NKError.
-    func evaluateResponse<Data>(_ response: AFDataResponse<Data>) -> NKError {
-        // Treat explicit cancellations as a first-class outcome
-        if let afError = response.error?.asAFError,
-            afError.isExplicitlyCancelledError {
-            return .cancelled
-        }
-
-        // Prefer HTTP status code over serializer outcome for uploads
-        let statusCode = response.response?.statusCode
-        if let code = statusCode {
-            // Success on any 2xx; explicitly include 204/205 which carry no body by definition
-            if (200...299).contains(code) || code == 204 || code == 205 {
+        // 2) Prefer HTTP status code when available
+        if let code = response.response?.statusCode {
+            if (200...299).contains(code) {
                 return .success
             }
+            // Non-2xx: let the error flow below (even if serializer said "success")
         }
 
-        // Fall back to Alamofire's result only if HTTP status wasn't clearly successful
+        // 3) Fall back to Alamofire's result (covers transport errors and missing status)
         switch response.result {
         case .success:
             return .success
 
         case .failure(let error):
-            // If the only failure reason is "no data" but status is actually OK, still succeed
-            if let afError = error.asAFError,
-               case .responseSerializationFailed(let reason) = afError,
-               case .inputDataNilOrZeroLength = reason,
-               let code = statusCode,
-               (200...299).contains(code) || code == 204 || code == 205 {
-                return .success
-            }
-
-            // Everything else is a real error: keep the payload for diagnostics
+            // No need to special-case inputDataNilOrZeroLength here:
+            // - If it was a 2xx, we already returned above.
+            // - If it's not 2xx or no status code, it's a real failure for our purposes.
             return NKError(error: error, afResponse: response, responseData: response.data)
         }
     }
