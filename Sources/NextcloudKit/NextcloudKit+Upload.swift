@@ -38,10 +38,9 @@ public extension NextcloudKit {
                 requestHandler: @escaping (_ request: UploadRequest) -> Void = { _ in },
                 taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
                 progressHandler: @escaping (_ progress: Progress) -> Void = { _ in },
-                completionHandler: @escaping (_ account: String, _ ocId: String?, _ etag: String?, _ date: Date?, _ size: Int64, _ headers: [AnyHashable: Any]?, _ nkError: NKError) -> Void) {
+                completionHandler: @escaping (_ account: String, _ ocId: String?, _ etag: String?, _ date: Date?, _ size: Int64, _ response: AFDataResponse<Data>?, _ nkError: NKError) -> Void) {
         var convertible: URLConvertible?
         var uploadedSize: Int64 = 0
-        var uploadCompleted = false
 
         if serverUrlFileName is URL {
             convertible = serverUrlFileName as? URLConvertible
@@ -72,11 +71,9 @@ public extension NextcloudKit {
             options.queue.async { taskHandler(task) }
         }) .uploadProgress { progress in
             uploadedSize = progress.totalUnitCount
-            uploadCompleted = progress.fractionCompleted == 1.0
             options.queue.async { progressHandler(progress) }
         } .responseData(queue: self.nkCommonInstance.backgroundQueue) { response in
             var ocId: String?, etag: String?, date: Date?
-            var result: NKError
 
             if self.nkCommonInstance.findHeader("oc-fileid", allHeaderFields: response.response?.allHeaderFields) != nil {
                 ocId = self.nkCommonInstance.findHeader("oc-fileid", allHeaderFields: response.response?.allHeaderFields)
@@ -95,19 +92,14 @@ public extension NextcloudKit {
                 date = dateRaw.parsedDate(using: "EEE, dd MMM y HH:mm:ss zzz")
             }
 
-            if !uploadCompleted {
-                nkLog(error: "Upload incomplete: only \(uploadedSize) bytes sent.")
-                result = .uploadIncomplete
-            } else {
-                result = self.evaluateResponse(response)
-            }
-
             options.queue.async {
-                completionHandler(account, ocId, etag, date, uploadedSize, response.response?.allHeaderFields, result)
+                completionHandler(account, ocId, etag, date, uploadedSize, response, self.evaluateResponse(response))
             }
         }
 
-        options.queue.async { requestHandler(request) }
+        options.queue.async {
+            requestHandler(request)
+        }
     }
 
     /// Asynchronously uploads a file to the Nextcloud server.
@@ -148,7 +140,7 @@ public extension NextcloudKit {
         etag: String?,
         date: Date?,
         size: Int64,
-        headers: [AnyHashable: Any]?,
+        response: AFDataResponse<Data>?,
         error: NKError
     ) {
         await withCheckedContinuation { continuation in
@@ -161,14 +153,14 @@ public extension NextcloudKit {
                    options: options,
                    requestHandler: requestHandler,
                    taskHandler: taskHandler,
-                   progressHandler: progressHandler) { account, ocId, etag, date, size, headers, error in
+                   progressHandler: progressHandler) { account, ocId, etag, date, size, response, error in
                 continuation.resume(returning: (
                     account: account,
                     ocId: ocId,
                     etag: etag,
                     date: date,
                     size: size,
-                    headers: headers,
+                    response: response,
                     error: error
                 ))
             }
@@ -355,7 +347,7 @@ public extension NextcloudKit {
                 }
 
                 guard uploadNKError == .success else {
-                    return completion(account, filesChunkOutput, nil, .errorChunkFileUpload)
+                    return completion(account, filesChunkOutput, nil, uploadNKError)
                 }
 
                 // Assemble the chunks

@@ -49,9 +49,6 @@ public struct NKError: Error, Equatable {
     public static let forbiddenError = NKError(errorCode: 403, errorDescription: NSLocalizedString("_forbidden_", value: "Forbidden", comment: ""))
     public static let cancelled = NKError(errorCode: -999, errorDescription: NSLocalizedString("_cancelled_", value: "Cancelled", comment: ""))
 
-    public static let uploadIncomplete = NKError(errorCode: -9992, errorDescription: NSLocalizedString("_upload_incomplete_", value: "Upload incomplete", comment: ""))
-
-    public static let errorChunkFileUpload = NKError(errorCode: -9993, errorDescription: NSLocalizedString("_upload_incomplete_", value: "Upload incomplete", comment: ""))
     public static let errorChunkFileNull = NKError(errorCode: -9994, errorDescription: NSLocalizedString("_error_file_null_", value: "File not found", comment: ""))
     public static let errorChunkFilesEmpty = NKError(errorCode: -9995, errorDescription: NSLocalizedString("_chunk_files_empty_", value: "Files not found", comment: ""))
     public static let errorChunkCreateFolder = NKError(errorCode: -9996, errorDescription: NSLocalizedString("_error_create_folder_", value: "Create folder error", comment: ""))
