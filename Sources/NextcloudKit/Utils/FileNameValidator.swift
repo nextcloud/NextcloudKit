@@ -44,7 +44,7 @@ public final class FileNameValidator: Sendable {
     }
 
     public func checkFileName(_ filename: String) -> NKError? {
-        if filename.isEmpty {
+        if filename.trimmingCharacters(in: .whitespaces).isEmpty {
             return fileEmptyNameError()
         }
 
