@@ -339,7 +339,7 @@ public struct NKCommon: Sendable {
         return serverUrl.asUrl
     }
 
-    func findHeader(_ header: String, allHeaderFields: [AnyHashable: Any]?) -> String? {
+    public func findHeader(_ header: String, allHeaderFields: [AnyHashable: Any]?) -> String? {
         guard let allHeaderFields = allHeaderFields else { return nil }
         let keyValues = allHeaderFields.map { (String(describing: $0.key).lowercased(), String(describing: $0.value)) }
 
@@ -349,7 +349,7 @@ public struct NKCommon: Sendable {
         return nil
     }
 
-    func getHostName(urlString: String) -> String? {
+    public func getHostName(urlString: String) -> String? {
         if let url = URL(string: urlString) {
             guard let hostName = url.host else { return nil }
             guard let scheme = url.scheme else { return nil }
@@ -361,7 +361,7 @@ public struct NKCommon: Sendable {
         return nil
     }
 
-    func getHostNameComponent(urlString: String) -> String? {
+    public func getHostNameComponent(urlString: String) -> String? {
         if let url = URL(string: urlString) {
             let components = url.pathComponents
             return components.joined(separator: "")
@@ -369,7 +369,7 @@ public struct NKCommon: Sendable {
         return nil
     }
 
-    func getFileSize(filePath: String) -> Int64 {
+    public func getFileSize(filePath: String) -> Int64 {
         do {
             let attributes = try FileManager.default.attributesOfItem(atPath: filePath)
             return attributes[FileAttributeKey.size] as? Int64 ?? 0
