@@ -150,36 +150,36 @@ public final class NKLogFileManager: @unchecked Sendable {
 
     // MARK: - Public API
 
-    public func writeLog(debug message: String, minimumLogLevel: NKLogLevel = .compact) {
-        writeLog("[DEBUG] \(message)", minimumLogLevel: minimumLogLevel)
+    public func writeLog(debug message: String, minimumLogLevel: NKLogLevel = .compact, consoleOnly: Bool = false) {
+        writeLog("[DEBUG] \(message)", minimumLogLevel: minimumLogLevel, consoleOnly: consoleOnly)
     }
 
-    public func writeLog(info message: String, minimumLogLevel: NKLogLevel = .compact) {
-        writeLog("[INFO] \(message)", minimumLogLevel: minimumLogLevel)
+    public func writeLog(info message: String, minimumLogLevel: NKLogLevel = .compact, consoleOnly: Bool = false) {
+        writeLog("[INFO] \(message)", minimumLogLevel: minimumLogLevel, consoleOnly: consoleOnly)
     }
 
-    public func writeLog(warning message: String, minimumLogLevel: NKLogLevel = .compact) {
-        writeLog("[WARNING] \(message)", minimumLogLevel: minimumLogLevel)
+    public func writeLog(warning message: String, minimumLogLevel: NKLogLevel = .compact, consoleOnly: Bool = false) {
+        writeLog("[WARNING] \(message)", minimumLogLevel: minimumLogLevel, consoleOnly: consoleOnly)
     }
 
-    public func writeLog(error message: String, minimumLogLevel: NKLogLevel = .compact) {
-        writeLog("[ERROR] \(message)", minimumLogLevel: minimumLogLevel)
+    public func writeLog(error message: String, minimumLogLevel: NKLogLevel = .compact, consoleOnly: Bool = false) {
+        writeLog("[ERROR] \(message)", minimumLogLevel: minimumLogLevel, consoleOnly: consoleOnly)
     }
 
-    public func writeLog(success message: String, minimumLogLevel: NKLogLevel = .compact) {
-        writeLog("[SUCCESS] \(message)", minimumLogLevel: minimumLogLevel)
+    public func writeLog(success message: String, minimumLogLevel: NKLogLevel = .compact, consoleOnly: Bool = false) {
+        writeLog("[SUCCESS] \(message)", minimumLogLevel: minimumLogLevel, consoleOnly: consoleOnly)
     }
 
-    public func writeLog(network message: String, minimumLogLevel: NKLogLevel = .compact) {
-        writeLog("[NETWORK] \(message)", minimumLogLevel: minimumLogLevel)
+    public func writeLog(network message: String, minimumLogLevel: NKLogLevel = .compact, consoleOnly: Bool = false) {
+        writeLog("[NETWORK] \(message)", minimumLogLevel: minimumLogLevel, consoleOnly: consoleOnly)
     }
 
-    public func writeLog(start message: String, minimumLogLevel: NKLogLevel = .compact) {
-        writeLog("[START] \(message)", minimumLogLevel: minimumLogLevel)
+    public func writeLog(start message: String, minimumLogLevel: NKLogLevel = .compact, consoleOnly: Bool = false) {
+        writeLog("[START] \(message)", minimumLogLevel: minimumLogLevel, consoleOnly: consoleOnly)
     }
 
-    public func writeLog(stop message: String, minimumLogLevel: NKLogLevel = .compact) {
-        writeLog("[STOP] \(message)", minimumLogLevel: minimumLogLevel)
+    public func writeLog(stop message: String, minimumLogLevel: NKLogLevel = .compact, consoleOnly: Bool = false) {
+        writeLog("[STOP] \(message)", minimumLogLevel: minimumLogLevel, consoleOnly: consoleOnly)
     }
 
     /// Writes a tagged log message with a specific log level.
@@ -187,11 +187,11 @@ public final class NKLogFileManager: @unchecked Sendable {
     ///   - tag: A custom tag to classify the log message (e.g. "SYNC", "AUTH").
     ///   - emoji: .info, .debug, .warning, .error, .success ..
     ///   - message: The log message content.
-    public func writeLog(tag: String, emoji: NKLogTagEmoji, message: String, minimumLogLevel: NKLogLevel = .compact) {
+    public func writeLog(tag: String, emoji: NKLogTagEmoji, message: String, minimumLogLevel: NKLogLevel = .compact, consoleOnly: Bool = false) {
         guard !tag.isEmpty else { return }
 
         let taggedMessage = "[\(tag.uppercased())] \(message)"
-        writeLog(taggedMessage, emoji: emoji, minimumLogLevel: minimumLogLevel)
+        writeLog(taggedMessage, emoji: emoji, minimumLogLevel: minimumLogLevel, consoleOnly: consoleOnly)
     }
 
     /// Writes a log message with an optional typeTag to determine console emoji.
@@ -201,7 +201,7 @@ public final class NKLogFileManager: @unchecked Sendable {
     /// - Parameters:
     ///   - message: The log message to record.
     ///   - emoji: Optional type to determine console emoji (e.g. [INFO], [ERROR]).
-    public func writeLog(_ message: String?, emoji: NKLogTagEmoji? = nil, minimumLogLevel: NKLogLevel = .compact) {
+    public func writeLog(_ message: String?, emoji: NKLogTagEmoji? = nil, minimumLogLevel: NKLogLevel = .compact, consoleOnly: Bool = false) {
         guard logLevel != .disabled,
               let message = message else {
             return
@@ -225,6 +225,10 @@ public final class NKLogFileManager: @unchecked Sendable {
         // Build the console line with emoji
         let consoleLine = "[NKLOG] [\(consoleTimestamp)] \(emoji)\(visualMessage)"
         print(consoleLine)
+
+        if consoleOnly {
+            return
+        }
 
         rotationQueue.sync {
             self.checkForRotation()

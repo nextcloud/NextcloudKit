@@ -8,43 +8,43 @@ import Foundation
 // These functions internally use `NKLogFileManager.shared`.
 
 @inlinable
-public func nkLog(debug message: String, minimumLogLevel: NKLogLevel = .compact) {
-    NKLogFileManager.shared.writeLog(debug: message, minimumLogLevel: minimumLogLevel)
+public func nkLog(debug message: String, minimumLogLevel: NKLogLevel = .compact, consoleOnly: Bool = false) {
+    NKLogFileManager.shared.writeLog(debug: message, minimumLogLevel: minimumLogLevel, consoleOnly: consoleOnly)
 }
 
 @inlinable
-public func nkLog(info message: String, minimumLogLevel: NKLogLevel = .compact) {
-    NKLogFileManager.shared.writeLog(info: message, minimumLogLevel: minimumLogLevel)
+public func nkLog(info message: String, minimumLogLevel: NKLogLevel = .compact, consoleOnly: Bool = false) {
+    NKLogFileManager.shared.writeLog(info: message, minimumLogLevel: minimumLogLevel, consoleOnly: consoleOnly)
 }
 
 @inlinable
-public func nkLog(warning message: String, minimumLogLevel: NKLogLevel = .compact) {
-    NKLogFileManager.shared.writeLog(warning: message, minimumLogLevel: minimumLogLevel)
+public func nkLog(warning message: String, minimumLogLevel: NKLogLevel = .compact, consoleOnly: Bool = false) {
+    NKLogFileManager.shared.writeLog(warning: message, minimumLogLevel: minimumLogLevel, consoleOnly: consoleOnly)
 }
 
 @inlinable
-public func nkLog(error message: String, minimumLogLevel: NKLogLevel = .compact) {
-    NKLogFileManager.shared.writeLog(error: message, minimumLogLevel: minimumLogLevel)
+public func nkLog(error message: String, minimumLogLevel: NKLogLevel = .compact, consoleOnly: Bool = false) {
+    NKLogFileManager.shared.writeLog(error: message, minimumLogLevel: minimumLogLevel, consoleOnly: consoleOnly)
 }
 
 @inlinable
-public func nkLog(success message: String, minimumLogLevel: NKLogLevel = .compact) {
-    NKLogFileManager.shared.writeLog(success: message, minimumLogLevel: minimumLogLevel)
+public func nkLog(success message: String, minimumLogLevel: NKLogLevel = .compact, consoleOnly: Bool = false) {
+    NKLogFileManager.shared.writeLog(success: message, minimumLogLevel: minimumLogLevel, consoleOnly: consoleOnly)
 }
 
 @inlinable
-public func nkLog(network message: String, minimumLogLevel: NKLogLevel = .compact) {
-    NKLogFileManager.shared.writeLog(network: message, minimumLogLevel: minimumLogLevel)
+public func nkLog(network message: String, minimumLogLevel: NKLogLevel = .compact, consoleOnly: Bool = false) {
+    NKLogFileManager.shared.writeLog(network: message, minimumLogLevel: minimumLogLevel, consoleOnly: consoleOnly)
 }
 
 @inlinable
-public func nkLog(start message: String, minimumLogLevel: NKLogLevel = .compact) {
-    NKLogFileManager.shared.writeLog(start: message, minimumLogLevel: minimumLogLevel)
+public func nkLog(start message: String, minimumLogLevel: NKLogLevel = .compact, consoleOnly: Bool = false) {
+    NKLogFileManager.shared.writeLog(start: message, minimumLogLevel: minimumLogLevel, consoleOnly: consoleOnly)
 }
 
 @inlinable
-public func nkLog(stop message: String, minimumLogLevel: NKLogLevel = .compact) {
-    NKLogFileManager.shared.writeLog(stop: message, minimumLogLevel: minimumLogLevel)
+public func nkLog(stop message: String, minimumLogLevel: NKLogLevel = .compact, consoleOnly: Bool = false) {
+    NKLogFileManager.shared.writeLog(stop: message, minimumLogLevel: minimumLogLevel, consoleOnly: consoleOnly)
 }
 
 /// Logs a custom tagged message.
@@ -53,6 +53,6 @@ public func nkLog(stop message: String, minimumLogLevel: NKLogLevel = .compact) 
 ///   - emoji: the type tag .info, .debug, .warning, .error, .success ..
 ///   - message: The message to log.
 @inlinable
-public func nkLog(tag: String, emoji: NKLogTagEmoji  = .debug, message: String, minimumLogLevel: NKLogLevel = .compact) {
-    NKLogFileManager.shared.writeLog(tag: tag, emoji: emoji, message: message, minimumLogLevel: minimumLogLevel)
+public func nkLog(tag: String, emoji: NKLogTagEmoji  = .debug, message: String, minimumLogLevel: NKLogLevel = .compact, consoleOnly: Bool = false) {
+    NKLogFileManager.shared.writeLog(tag: tag, emoji: emoji, message: message, minimumLogLevel: minimumLogLevel, consoleOnly: consoleOnly)
 }
