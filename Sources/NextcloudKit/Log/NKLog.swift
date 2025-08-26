@@ -52,6 +52,8 @@ public func nkLog(stop message: String, minimumLogLevel: NKLogLevel = .compact, 
 ///   - tag: A custom uppercase tag, e.g. \"PUSH\", \"SYNC\", \"AUTH\".
 ///   - emoji: the type tag .info, .debug, .warning, .error, .success ..
 ///   - message: The message to log.
+///   - minimumLogLevel: set the minimun level for write the message
+///   - consoleOnly: if true write the messa only in console
 @inlinable
 public func nkLog(tag: String, emoji: NKLogTagEmoji  = .debug, message: String, minimumLogLevel: NKLogLevel = .compact, consoleOnly: Bool = false) {
     NKLogFileManager.shared.writeLog(tag: tag, emoji: emoji, message: message, minimumLogLevel: minimumLogLevel, consoleOnly: consoleOnly)
