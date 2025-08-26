@@ -187,6 +187,8 @@ public final class NKLogFileManager: @unchecked Sendable {
     ///   - tag: A custom tag to classify the log message (e.g. "SYNC", "AUTH").
     ///   - emoji: .info, .debug, .warning, .error, .success ..
     ///   - message: The log message content.
+    ///   - minimumLogLevel: set the minimun level for write the message
+    ///   - consoleOnly: if true write the messa only in console
     public func writeLog(tag: String, emoji: NKLogTagEmoji, message: String, minimumLogLevel: NKLogLevel = .compact, consoleOnly: Bool = false) {
         guard !tag.isEmpty else { return }
 
@@ -201,6 +203,8 @@ public final class NKLogFileManager: @unchecked Sendable {
     /// - Parameters:
     ///   - message: The log message to record.
     ///   - emoji: Optional type to determine console emoji (e.g. [INFO], [ERROR]).
+    ///   - minimumLogLevel: set the minimun level for write the message
+    ///   - consoleOnly: if true write the messa only in console
     public func writeLog(_ message: String?, emoji: NKLogTagEmoji? = nil, minimumLogLevel: NKLogLevel = .compact, consoleOnly: Bool = false) {
         guard logLevel != .disabled,
               let message = message else {
