@@ -47,6 +47,11 @@ public func nkLog(stop message: String, minimumLogLevel: NKLogLevel = .compact, 
     NKLogFileManager.shared.writeLog(stop: message, minimumLogLevel: minimumLogLevel, consoleOnly: consoleOnly)
 }
 
+@inlinable
+public func nkLog(end message: String, minimumLogLevel: NKLogLevel = .compact, consoleOnly: Bool = false) {
+    NKLogFileManager.shared.writeLog(end: message, minimumLogLevel: minimumLogLevel, consoleOnly: consoleOnly)
+}
+
 /// Logs a custom tagged message.
 /// - Parameters:
 ///   - tag: A custom uppercase tag, e.g. \"PUSH\", \"SYNC\", \"AUTH\".
