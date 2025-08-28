@@ -69,6 +69,13 @@ public final class NKLogFileManager: @unchecked Sendable {
         shared.setConfiguration(logLevel: logLevel)
     }
 
+    /// Configures filter.
+    /// - Parameters:
+    ///   - filter: Set thing must not be logged.
+    public static func setFilter(filter: [String]) {
+        shared.setFilter(filter: filter)
+    }
+
     /// Creates the "Logs" folder inside the user's Documents directory if it does not already exist.
     ///
     /// This static method delegates to the singleton instance (`shared`) and ensures
