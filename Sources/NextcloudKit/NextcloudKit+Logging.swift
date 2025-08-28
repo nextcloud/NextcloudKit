@@ -13,8 +13,13 @@ public extension NextcloudKit {
         NKLogFileManager.configure(logLevel: logLevel)
     }
 
-    /// Configure the shared logger filter from NextcloudKit
-    static func configureLoggerFilter(filter: [String]) {
-        NKLogFileManager.setFilter(filter: filter)
+    /// Configure the shared logger blacklist from NextcloudKit
+    static func configureLoggerBlacklist(blacklist: [String]) {
+        NKLogFileManager.setBlacklist(blacklist: blacklist)
+    }
+
+    /// Configure the shared logger whitelist from NextcloudKit
+    static func configureLoggerWhitelist(whitelist: [String]) {
+        NKLogFileManager.setCandidate(whitelist: whitelist)
     }
 }
