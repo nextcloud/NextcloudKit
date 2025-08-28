@@ -98,6 +98,7 @@ public final class NKLogFileManager: @unchecked Sendable {
     private let logFileName = "log.txt"
     private let logDirectory: URL
     public var logLevel: NKLogLevel
+    public var filter: [String] = []
     private var currentLogDate: String
     private let logQueue = DispatchQueue(label: "com.nextcloud.LogWriterQueue", attributes: .concurrent)
     private let rotationQueue = DispatchQueue(label: "com.nextcloud.LogRotationQueue")
@@ -109,8 +110,11 @@ public final class NKLogFileManager: @unchecked Sendable {
 
     // MARK: - Initialization
 
-    private init(logLevel: NKLogLevel = .normal) {
+    private init(logLevel: NKLogLevel = .normal, filter: [String]? = nil) {
         self.logLevel = logLevel
+        if let filter {
+            self.filter = filter
+        }
 
         let documents = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
         let logsFolder = documents.appendingPathComponent("Logs", isDirectory: true)
@@ -148,6 +152,13 @@ public final class NKLogFileManager: @unchecked Sendable {
     ///   - logLevel: The NKLogLevel { disabled .. verbose }
     private func setConfiguration(logLevel: NKLogLevel) {
         self.logLevel = logLevel
+    }
+
+    /// Sets filter for the logger.
+    /// - Parameters:
+    ///   - filter:
+    private func setFilter(filter: [String]) {
+        self.filter = filter
     }
 
     // MARK: - Public API
@@ -220,7 +231,13 @@ public final class NKLogFileManager: @unchecked Sendable {
               let message = message else {
             return
         }
+        // Minimum level
         if minimumLogLevel > logLevel {
+            return
+        }
+        // Filter
+        let shouldSkip = self.filter.contains { message.contains($0) }
+        if shouldSkip {
             return
         }
 
