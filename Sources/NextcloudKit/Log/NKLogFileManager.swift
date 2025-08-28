@@ -69,6 +69,20 @@ public final class NKLogFileManager: @unchecked Sendable {
         shared.setConfiguration(logLevel: logLevel)
     }
 
+    /// Configures filter.
+    /// - Parameters:
+    ///   - blacklist: Set thing must not be logged.
+    public static func setBlacklist(blacklist: [String]) {
+        shared.setBlacklist(blacklist: blacklist)
+    }
+
+    /// Configures whitelist.
+    /// - Parameters:
+    ///   - whitelist: Set thing must be logged.
+    public static func setCandidate(whitelist: [String]) {
+        shared.setWhitelist(whitelist: whitelist)
+    }
+
     /// Creates the "Logs" folder inside the user's Documents directory if it does not already exist.
     ///
     /// This static method delegates to the singleton instance (`shared`) and ensures
@@ -98,6 +112,8 @@ public final class NKLogFileManager: @unchecked Sendable {
     private let logFileName = "log.txt"
     private let logDirectory: URL
     public var logLevel: NKLogLevel
+    private var blacklist: [String] = []
+    private var whitelist: [String] = []
     private var currentLogDate: String
     private let logQueue = DispatchQueue(label: "com.nextcloud.LogWriterQueue", attributes: .concurrent)
     private let rotationQueue = DispatchQueue(label: "com.nextcloud.LogRotationQueue")
@@ -109,8 +125,14 @@ public final class NKLogFileManager: @unchecked Sendable {
 
     // MARK: - Initialization
 
-    private init(logLevel: NKLogLevel = .normal) {
+    private init(logLevel: NKLogLevel = .normal, blacklist: [String]? = nil, whitelist: [String]? = nil) {
         self.logLevel = logLevel
+        if let blacklist {
+            self.blacklist = blacklist
+        }
+        if let whitelist {
+            self.whitelist = whitelist
+        }
 
         let documents = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
         let logsFolder = documents.appendingPathComponent("Logs", isDirectory: true)
@@ -148,6 +170,20 @@ public final class NKLogFileManager: @unchecked Sendable {
     ///   - logLevel: The NKLogLevel { disabled .. verbose }
     private func setConfiguration(logLevel: NKLogLevel) {
         self.logLevel = logLevel
+    }
+
+    /// Sets blacklist for the logger.
+    /// - Parameters:
+    ///   - blacklist:
+    private func setBlacklist(blacklist: [String]) {
+        self.blacklist = blacklist
+    }
+
+    /// Sets candidate for the logger.
+    /// - Parameters:
+    ///   - whitelist:
+    private func setWhitelist(whitelist: [String]) {
+        self.whitelist = whitelist
     }
 
     // MARK: - Public API
@@ -220,7 +256,16 @@ public final class NKLogFileManager: @unchecked Sendable {
               let message = message else {
             return
         }
+        // Minimum level
         if minimumLogLevel > logLevel {
+            return
+        }
+        // Blacklist
+        if blacklist.contains(where: { message.contains($0) }) {
+            return
+        }
+        // Whitelist
+        if !whitelist.isEmpty, !whitelist.contains(where: { message.contains($0) }) {
             return
         }
 
