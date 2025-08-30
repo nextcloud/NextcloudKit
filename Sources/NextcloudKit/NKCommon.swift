@@ -301,9 +301,9 @@ public struct NKCommon: Sendable {
             headers.update(.contentType(contentType))
         }
         if let accept {
-            headers.update(name: "Accept", value: accept)
+            headers.update(name: "accept", value: accept)
         } else {
-            headers.update(name: "Accept", value: "application/json")
+            headers.update(name: "accept", value: "application/json")
         }
         headers.update(name: "OCS-APIRequest", value: "true")
         for (key, value) in options?.customHeader ?? [:] {
