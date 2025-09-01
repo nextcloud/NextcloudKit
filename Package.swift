@@ -41,28 +41,4 @@ let package = Package(
             name: "NextcloudKitIntegrationTests",
             dependencies: ["NextcloudKit", "Mocker"])
     ]
-
-    /* Test simulate 6
-     targets: [
-         .target(
-             name: "NextcloudKit",
-             dependencies: ["Alamofire", "SwiftyJSON", "SwiftyXMLParser"],
-             swiftSettings: [
-                 .enableUpcomingFeature("StrictConcurrency"), // simulate Swift 6
-                 .enableExperimentalFeature("StrictConcurrency"),
-                 .unsafeFlags(["-Xfrontend", "-warn-concurrency"]),
-                 .unsafeFlags(["-Xfrontend", "-enable-actor-data-race-checks"])
-             ]
-         ),
-         .testTarget(
-             name: "NextcloudKitUnitTests",
-             dependencies: ["NextcloudKit", "Mocker"],
-             resources: [
-                 .process("Resources")
-             ]),
-         .testTarget(
-             name: "NextcloudKitIntegrationTests",
-             dependencies: ["NextcloudKit", "Mocker"])
-     ]
-     */
 )
