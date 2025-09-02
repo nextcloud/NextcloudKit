@@ -447,7 +447,7 @@ public extension NextcloudKit {
 
     func updateShare(idShare: Int,
                      password: String? = nil,
-                     expireDate: String? = nil,
+                     expireDate: String? = "",
                      permissions: Int = 1,
                      publicUpload: Bool? = nil,
                      note: String? = nil,
@@ -464,19 +464,20 @@ public extension NextcloudKit {
               let headers = nkCommonInstance.getStandardHeaders(account: account, options: options) else {
             return options.queue.async { completion(account, nil, nil, .urlError) }
         }
+
         var parameters = [
             "permissions": String(permissions)
         ]
-        if let password, !password.isEmpty {
-            parameters["password"] = password
-        }
-        if let expireDate, !expireDate.isEmpty {
-            parameters["expireDate"] = expireDate
-        }
-        if let note, !note.isEmpty {
+
+        parameters["password"] = password != nil ? password : ""
+        
+        parameters["expireDate"] = expireDate != nil ? expireDate : ""
+
+        if let note {
             parameters["note"] = note
         }
-        if let label, !label.isEmpty {
+        
+        if let label {
             parameters["label"] = label
         }
 
