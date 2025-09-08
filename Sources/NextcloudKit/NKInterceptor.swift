@@ -13,34 +13,37 @@ final class NKInterceptor: RequestInterceptor, Sendable {
     }
 
     func adapt(_ urlRequest: URLRequest, for session: Session, completion: @escaping (Result<URLRequest, Error>) -> Void) {
-        if let url: String = urlRequest.url?.absoluteString,
-           self.nkCommonInstance.levelLog > 0 {
-            debugPrint("[DEBUG] Interceptor request url: " + url)
+        // Log request URL in verbose mode
+        if NKLogFileManager.shared.logLevel == .verbose,
+           let url = urlRequest.url?.absoluteString {
+            nkLog(debug: "Interceptor request url: \(url)")
         }
 
+        // Skip check if explicitly disabled
         if let checkInterceptor = urlRequest.value(forHTTPHeaderField: nkCommonInstance.headerCheckInterceptor),
            checkInterceptor == "false" {
             return completion(.success(urlRequest))
         }
 
+        // Check for special error states via group defaults
         if let account = urlRequest.value(forHTTPHeaderField: nkCommonInstance.headerAccount),
            let groupDefaults = UserDefaults(suiteName: nkCommonInstance.groupIdentifier) {
-            /// Unauthorized
+
             if let array = groupDefaults.array(forKey: nkCommonInstance.groupDefaultsUnauthorized) as? [String],
                array.contains(account) {
-                self.nkCommonInstance.writeLog("[DEBUG] Unauthorized for account: \(account)")
+                nkLog(tag: "AUTH", emoji: .error, message: "Unauthorized for account: \(account)")
                 let error = AFError.responseValidationFailed(reason: .unacceptableStatusCode(code: 401))
                 return completion(.failure(error))
-            /// Unavailable
+
             } else if let array = groupDefaults.array(forKey: nkCommonInstance.groupDefaultsUnavailable) as? [String],
                       array.contains(account) {
-                self.nkCommonInstance.writeLog("[DEBUG] Unavailable for account: \(account)")
+                nkLog(tag: "SERVICE", emoji: .error, message: "Unavailable for account: \(account)")
                 let error = AFError.responseValidationFailed(reason: .unacceptableStatusCode(code: 503))
                 return completion(.failure(error))
-            /// ToS
+
             } else if let array = groupDefaults.array(forKey: nkCommonInstance.groupDefaultsToS) as? [String],
                       array.contains(account) {
-                self.nkCommonInstance.writeLog("[DEBUG] ToS for account: \(account)")
+                nkLog(tag: "TOS", emoji: .error, message: "Terms of service error for account: \(account)")
                 let error = AFError.responseValidationFailed(reason: .unacceptableStatusCode(code: 403))
                 return completion(.failure(error))
             }

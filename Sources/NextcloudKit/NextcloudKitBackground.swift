@@ -14,14 +14,28 @@ public final class NKBackground: NSObject, URLSessionTaskDelegate, URLSessionDel
 
     // MARK: - Download
 
+    /// Starts a download task for a file from the server to a local path.
+    ///
+    /// - Parameters:
+    ///   - serverUrlFileName: The URL or URL string of the file to download.
+    ///   - fileNameLocalPath: The local file path where the downloaded file will be saved.
+    ///   - taskDescription: Optional description to set on the URLSession task.
+    ///   - account: The Nextcloud account associated with the download.
+    ///
+    /// - Returns: A tuple containing:
+    ///   - URLSessionDownloadTask?: The download task if created successfully.
+    ///   - error: An `NKError` indicating success or failure in starting the download.
     public func download(serverUrlFileName: Any,
                          fileNameLocalPath: String,
                          taskDescription: String? = nil,
-                         account: String) -> (URLSessionDownloadTask?, error: NKError) {
+                         account: String,
+                         automaticResume: Bool = true,
+                         sessionIdentifier: String) -> (URLSessionDownloadTask?, error: NKError) {
         var url: URL?
+        var downloadSession: URLSession?
         let groupDefaults = UserDefaults(suiteName: NextcloudKit.shared.nkCommonInstance.groupIdentifier)
 
-        /// Check error in groupDefaults
+        /// Check if error is in groupDefaults
         if let array = groupDefaults?.array(forKey: NextcloudKit.shared.nkCommonInstance.groupDefaultsUnauthorized) as? [String],
            array.contains(account) {
             return (nil, .unauthorizedError)
@@ -39,7 +53,7 @@ public final class NKBackground: NSObject, URLSessionTaskDelegate, URLSessionDel
             url = (serverUrlFileName as? String)?.encodedToUrl as? URL
         }
 
-        guard let nkSession = nkCommonInstance.getSession(account: account),
+        guard var nkSession = nkCommonInstance.nksessions.session(forAccount: account),
               let urlForRequest = url
         else {
             return (nil, .urlError)
@@ -56,16 +70,66 @@ public final class NKBackground: NSObject, URLSessionTaskDelegate, URLSessionDel
         request.setValue(nkSession.userAgent, forHTTPHeaderField: "User-Agent")
         request.setValue("Basic \(base64LoginString)", forHTTPHeaderField: "Authorization")
 
-        let task = nkSession.sessionDownloadBackground.downloadTask(with: request)
-        task.taskDescription = taskDescription
-        task.resume()
-        self.nkCommonInstance.writeLog("Network start download file: \(serverUrlFileName)")
+        if sessionIdentifier == nkCommonInstance.identifierSessionDownloadBackground {
+            downloadSession = nkSession.sessionDownloadBackground
+        } else if sessionIdentifier == nkCommonInstance.identifierSessionDownloadBackgroundExt {
+            downloadSession = nkSession.sessionDownloadBackgroundExt
+        }
+
+        let task = downloadSession?.downloadTask(with: request)
+        task?.taskDescription = taskDescription
+
+        if automaticResume {
+            task?.resume()
+        }
 
         return (task, .success)
     }
 
+    /// Asynchronously starts a download task for a file.
+    ///
+    /// - Parameters: Same as the synchronous version.
+    ///
+    /// - Returns: A tuple containing:
+    ///   - downloadTask: The `URLSessionDownloadTask?` if successfully created.
+    ///   - error: The `NKError` result.
+    public func downloadAsync(serverUrlFileName: Any,
+                              fileNameLocalPath: String,
+                              taskDescription: String? = nil,
+                              account: String,
+                              automaticResume: Bool = true,
+                              sessionIdentifier: String) async -> (
+        downloadTask: URLSessionDownloadTask?,
+        error: NKError
+    ) {
+        await withCheckedContinuation { continuation in
+            let (task, error) = download(serverUrlFileName: serverUrlFileName,
+                                         fileNameLocalPath: fileNameLocalPath,
+                                         taskDescription: taskDescription,
+                                         account: account,
+                                         automaticResume: automaticResume,
+                                         sessionIdentifier: sessionIdentifier)
+            continuation.resume(returning: (downloadTask: task, error: error))
+        }
+    }
+
     // MARK: - Upload
 
+    /// Starts an upload task to send a local file to the server.
+    ///
+    /// - Parameters:
+    ///   - serverUrlFileName: The server URL or URL string where the file will be uploaded.
+    ///   - fileNameLocalPath: The local file path of the file to upload.
+    ///   - dateCreationFile: Optional creation date metadata for the file.
+    ///   - dateModificationFile: Optional modification date metadata for the file.
+    ///   - taskDescription: Optional description to set on the URLSession task.
+    ///   - overwrite: Boolean indicating whether to overwrite existing files on the server.
+    ///   - account: The Nextcloud account associated with the upload.
+    ///   - sessionIdentifier: A string identifier for the upload session.
+    ///
+    /// - Returns: A tuple containing:
+    ///   - URLSessionUploadTask?: The upload task if created successfully.
+    ///   - error: An `NKError` indicating success or failure in starting the upload.
     public func upload(serverUrlFileName: Any,
                        fileNameLocalPath: String,
                        dateCreationFile: Date?,
@@ -73,12 +137,17 @@ public final class NKBackground: NSObject, URLSessionTaskDelegate, URLSessionDel
                        taskDescription: String? = nil,
                        overwrite: Bool = false,
                        account: String,
+                       automaticResume: Bool = true,
                        sessionIdentifier: String) -> (URLSessionUploadTask?, error: NKError) {
         var url: URL?
         var uploadSession: URLSession?
         let groupDefaults = UserDefaults(suiteName: NextcloudKit.shared.nkCommonInstance.groupIdentifier)
 
-        /// Check error in groupDefaults
+        guard FileManager.default.fileExists(atPath: fileNameLocalPath) else {
+            return (nil, .urlError)
+        }
+
+        /// Check if error is in groupDefaults
         if let array = groupDefaults?.array(forKey: NextcloudKit.shared.nkCommonInstance.groupDefaultsUnauthorized) as? [String],
            array.contains(account) {
             return (nil, .unauthorizedError)
@@ -96,7 +165,7 @@ public final class NKBackground: NSObject, URLSessionTaskDelegate, URLSessionDel
             url = (serverUrlFileName as? String)?.encodedToUrl as? URL
         }
 
-        guard let nkSession = nkCommonInstance.getSession(account: account),
+        guard var nkSession = nkCommonInstance.nksessions.session(forAccount: account),
               let urlForRequest = url
         else {
             return (nil, .urlError)
@@ -112,6 +181,7 @@ public final class NKBackground: NSObject, URLSessionTaskDelegate, URLSessionDel
         request.httpMethod = "PUT"
         request.setValue(nkSession.userAgent, forHTTPHeaderField: "User-Agent")
         request.setValue("Basic \(base64LoginString)", forHTTPHeaderField: "Authorization")
+        request.setValue("application/octet-stream", forHTTPHeaderField: "Content-Type")
         if overwrite {
             request.setValue("true", forHTTPHeaderField: "Overwrite")
         }
@@ -134,10 +204,45 @@ public final class NKBackground: NSObject, URLSessionTaskDelegate, URLSessionDel
 
         let task = uploadSession?.uploadTask(with: request, fromFile: URL(fileURLWithPath: fileNameLocalPath))
         task?.taskDescription = taskDescription
-        task?.resume()
-        self.nkCommonInstance.writeLog("Network start upload file: \(serverUrlFileName)")
+
+        if automaticResume {
+            task?.resume()
+        }
 
         return (task, .success)
+    }
+
+    /// Asynchronously starts an upload task to send a local file.
+    ///
+    /// - Parameters: Same as the synchronous version.
+    ///
+    /// - Returns: A tuple containing:
+    ///   - uploadTask: The `URLSessionUploadTask?` if successfully created.
+    ///   - error: The `NKError` result.
+    public func uploadAsync(serverUrlFileName: Any,
+                            fileNameLocalPath: String,
+                            dateCreationFile: Date?,
+                            dateModificationFile: Date?,
+                            taskDescription: String? = nil,
+                            overwrite: Bool = false,
+                            account: String,
+                            automaticResume: Bool = true,
+                            sessionIdentifier: String) async -> (
+        uploadTask: URLSessionUploadTask?,
+        error: NKError
+    ) {
+        await withCheckedContinuation { continuation in
+            let (task, error) = upload(serverUrlFileName: serverUrlFileName,
+                                       fileNameLocalPath: fileNameLocalPath,
+                                       dateCreationFile: dateCreationFile,
+                                       dateModificationFile: dateModificationFile,
+                                       taskDescription: taskDescription,
+                                       overwrite: overwrite,
+                                       account: account,
+                                       automaticResume: automaticResume,
+                                       sessionIdentifier: sessionIdentifier)
+            continuation.resume(returning: (uploadTask: task, error: error))
+        }
     }
 
     // MARK: - SessionDelegate
@@ -201,11 +306,11 @@ public final class NKBackground: NSObject, URLSessionTaskDelegate, URLSessionDel
                 etag = self.nkCommonInstance.findHeader("etag", allHeaderFields: header)
             }
             if etag != nil { etag = etag?.replacingOccurrences(of: "\"", with: "") }
-            if let dateString = self.nkCommonInstance.findHeader("date", allHeaderFields: header) {
-                date = self.nkCommonInstance.convertDate(dateString, format: "EEE, dd MMM y HH:mm:ss zzz")
+            if let dateRaw = self.nkCommonInstance.findHeader("date", allHeaderFields: header) {
+                date = dateRaw.parsedDate(using: "EEE, dd MMM y HH:mm:ss zzz")
             }
             if let dateString = header["Last-Modified"] as? String {
-                dateLastModified = self.nkCommonInstance.convertDate(dateString, format: "EEE, dd MMM y HH:mm:ss zzz")
+                dateLastModified = dateString.parsedDate(using: "EEE, dd MMM y HH:mm:ss zzz")
             }
             length = header["Content-Length"] as? Int64 ?? 0
         }
@@ -215,23 +320,13 @@ public final class NKBackground: NSObject, URLSessionTaskDelegate, URLSessionDel
         } else if task is URLSessionUploadTask {
             self.nkCommonInstance.delegate?.uploadComplete(fileName: fileName, serverUrl: serverUrl, ocId: ocId, etag: etag, date: date, size: task.countOfBytesExpectedToSend, task: task, error: nkError)
         }
-
-        if nkError.errorCode == 0 {
-            self.nkCommonInstance.writeLog("Network completed file: \(serverUrl)/\(fileName)")
-        } else {
-            self.nkCommonInstance.writeLog("Network completed file: \(serverUrl)/\(fileName) with error code \(nkError.errorCode) and error description " + nkError.errorDescription)
-        }
     }
 
     public func urlSession(_ session: URLSession, didReceive challenge: URLAuthenticationChallenge, completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
         if self.nkCommonInstance.delegate == nil {
-            self.nkCommonInstance.writeLog("[WARNING] URLAuthenticationChallenge, no delegate found, perform with default handling")
             completionHandler(URLSession.AuthChallengeDisposition.performDefaultHandling, nil)
         } else {
             self.nkCommonInstance.delegate?.authenticationChallenge(session, didReceive: challenge, completionHandler: { authChallengeDisposition, credential in
-                if self.nkCommonInstance.levelLog > 1 {
-                    self.nkCommonInstance.writeLog("[INFO AUTH] Challenge Disposition: \(authChallengeDisposition.rawValue)")
-                }
                 completionHandler(authChallengeDisposition, credential)
             })
         }

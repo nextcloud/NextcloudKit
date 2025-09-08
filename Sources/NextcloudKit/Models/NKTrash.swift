@@ -5,9 +5,10 @@
 
 import Foundation
 
-public class NKTrash: NSObject {
+public struct NKTrash: Sendable {
     public var ocId = ""
     public var contentType = ""
+    public var typeIdentifier = ""
     public var date = Date()
     public var directory: Bool = false
     public var fileId = ""

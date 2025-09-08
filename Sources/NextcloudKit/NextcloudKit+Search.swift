@@ -9,19 +9,20 @@ import SwiftyJSON
 
 public extension NextcloudKit {
     /// Available NC >= 20
-    /// Search many different datasources in the cloud and combine them into one result.
-    ///
-    /// - Warning: Providers are requested concurrently. Not filtering will result in a high network load.
-    ///
-    /// - SeeAlso:
-    ///  [Nextcloud Search API](https://docs.nextcloud.com/server/latest/developer_manual/digging_deeper/search.html)
+    /// Performs a unified search using multiple providers and returns results asynchronously.
     ///
     /// - Parameters:
-    ///   - term: The search term
-    ///   - options: Additional request options
-    ///   - filter: Filter search provider that should be searched. Default is all available provider..
-    ///   - update: Callback, notifying that a search provider return its result. Does not include previous results.
-    ///   - completion: Callback, notifying that all search providers have been searched. The search is done. Includes all search results.
+    ///   - term: The search term to query.
+    ///   - timeout: The individual request timeout per provider.
+    ///   - timeoutProvider: The maximum time allowed for each provider before being cancelled.
+    ///   - account: The Nextcloud account performing the search.
+    ///   - options: Optional configuration for the request (headers, queue, etc.).
+    ///   - filter: A closure to filter which `NKSearchProvider` are enabled.
+    ///   - request: Callback to access and inspect the underlying `DataRequest?`.
+    ///   - taskHandler: Callback triggered when a `URLSessionTask` is created.
+    ///   - providers: Callback providing the list of providers that will be queried.
+    ///   - update: Called for every result update from a provider.
+    ///   - completion: Called when all providers are finished, returns the response and status.
     func unifiedSearch(term: String,
                        timeout: TimeInterval = 30,
                        timeoutProvider: TimeInterval = 60,
@@ -34,8 +35,8 @@ public extension NextcloudKit {
                        update: @escaping (_ account: String, _ searchResult: NKSearchResult?, _ provider: NKSearchProvider, _ error: NKError) -> Void,
                        completion: @escaping (_ account: String, _ responseData: AFDataResponse<Data>?, _ error: NKError) -> Void) {
         let endpoint = "ocs/v2.php/search/providers"
-        guard let nkSession = nkCommonInstance.getSession(account: account),
-              let url = nkCommonInstance.createStandardUrl(serverUrl: nkSession.urlBase, endpoint: endpoint, options: options),
+        guard let nkSession = nkCommonInstance.nksessions.session(forAccount: account),
+              let url = nkCommonInstance.createStandardUrl(serverUrl: nkSession.urlBase, endpoint: endpoint),
               let headers = nkCommonInstance.getStandardHeaders(account: account, options: options) else {
             return options.queue.async { completion(account, nil, .urlError) }
         }
@@ -44,9 +45,6 @@ public extension NextcloudKit {
             task.taskDescription = options.taskDescription
             taskHandler(task)
         }.responseData(queue: self.nkCommonInstance.backgroundQueue) { response in
-            if self.nkCommonInstance.levelLog > 0 {
-                debugPrint(response)
-            }
             switch response.result {
             case .success(let jsonData):
                 let json = JSON(jsonData)
@@ -79,21 +77,70 @@ public extension NextcloudKit {
         request(requestUnifiedSearch)
     }
 
-    /// Available NC >= 20
-    /// Search many different datasources in the cloud and combine them into one result.
-    ///
-    /// - SeeAlso:
-    ///  [Nextcloud Search API](https://docs.nextcloud.com/server/latest/developer_manual/digging_deeper/search.html)
+    /// Asynchronously performs a unified search and returns the final search response.
     ///
     /// - Parameters:
-    ///   - id: provider id
-    ///   - term: The search term
-    ///   - limit: limit (pagination)
-    ///   - cursor: cursor (pagination)
-    ///   - options: Additional request options
-    ///   - timeout: Filter search provider that should be searched. Default is all available provider..
-    ///   - update: Callback, notifying that a search provider return its result. Does not include previous results.
-    ///   - completion: Callback, notifying that all search results.
+    ///   - term: The string to search for.
+    ///   - timeout: Per-provider timeout in seconds.
+    ///   - timeoutProvider: Overall timeout for a provider.
+    ///   - account: The account used to authenticate the request.
+    ///   - options: Optional parameters for the search.
+    ///   - filter: Closure to filter the search providers.
+    ///   - request: Callback with the underlying `DataRequest?`.
+    ///   - taskHandler: Monitors the task creation.
+    ///   - providers: Callback that reports which providers are used.
+    ///   - update: Callback triggered as results come in from providers.
+    /// - Returns: Final completion with account, raw response data, and NKError.
+    func unifiedSearchAsync(term: String,
+                            timeout: TimeInterval = 30,
+                            timeoutProvider: TimeInterval = 60,
+                            account: String,
+                            options: NKRequestOptions = NKRequestOptions(),
+                            filter: @escaping (NKSearchProvider) -> Bool = { _ in true },
+                            request: @escaping (DataRequest?) -> Void,
+                            taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
+                            providers: @escaping (_ account: String, _ searchProviders: [NKSearchProvider]?) -> Void,
+                            update: @escaping (_ account: String, _ searchResult: NKSearchResult?, _ provider: NKSearchProvider, _ error: NKError) -> Void
+    ) async -> (
+        account: String,
+        responseData: AFDataResponse<Data>?,
+        error: NKError
+    ) {
+        await withCheckedContinuation { continuation in
+            unifiedSearch(term: term,
+                          timeout: timeout,
+                          timeoutProvider: timeoutProvider,
+                          account: account,
+                          options: options,
+                          filter: filter,
+                          request: request,
+                          taskHandler: taskHandler,
+                          providers: providers,
+                          update: update) { account, responseData, error in
+                continuation.resume(returning: (
+                    account: account,
+                    responseData: responseData,
+                    error: error
+                ))
+            }
+        }
+    }
+
+    /// Available NC >= 20
+    /// Performs a search using a specified provider with pagination and timeout support.
+    ///
+    /// - Parameters:
+    ///   - id: The identifier of the search provider to use.
+    ///   - term: The search term.
+    ///   - limit: Optional maximum number of results to return.
+    ///   - cursor: Optional pagination cursor for subsequent requests.
+    ///   - timeout: The timeout interval for the search request.
+    ///   - account: The Nextcloud account performing the search.
+    ///   - options: Optional request configuration such as headers and queue.
+    ///   - taskHandler: Callback to observe the underlying URLSessionTask.
+    ///   - completion: Completion handler returning the account, search results, raw response, and NKError.
+    ///
+    /// - Returns: The underlying DataRequest object if the request was started, otherwise nil.
     func searchProvider(_ id: String,
                         term: String,
                         limit: Int? = nil,
@@ -104,7 +151,7 @@ public extension NextcloudKit {
                         taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
                         completion: @escaping (_ account: String, NKSearchResult?, _ responseData: AFDataResponse<Data>?, _ error: NKError) -> Void) -> DataRequest? {
         guard let term = term.urlEncoded,
-              let nkSession = nkCommonInstance.getSession(account: account),
+              let nkSession = nkCommonInstance.nksessions.session(forAccount: account),
               let headers = nkCommonInstance.getStandardHeaders(account: account, options: options) else {
             completion(account, nil, nil, .urlError)
             return nil
@@ -116,7 +163,7 @@ public extension NextcloudKit {
         if let cursor = cursor {
             endpoint += "&cursor=\(cursor)"
         }
-        guard let url = self.nkCommonInstance.createStandardUrl(serverUrl: nkSession.urlBase, endpoint: endpoint, options: options)
+        guard let url = self.nkCommonInstance.createStandardUrl(serverUrl: nkSession.urlBase, endpoint: endpoint)
         else {
             completion(account, nil, nil, .urlError)
             return nil
@@ -135,9 +182,6 @@ public extension NextcloudKit {
             task.taskDescription = options.taskDescription
             taskHandler(task)
         }.responseData(queue: self.nkCommonInstance.backgroundQueue) { response in
-            if self.nkCommonInstance.levelLog > 0 {
-                debugPrint(response)
-            }
             switch response.result {
             case .success(let jsonData):
                 let json = JSON(jsonData)
@@ -153,6 +197,52 @@ public extension NextcloudKit {
         }
 
         return requestSearchProvider
+    }
+
+    /// Asynchronously performs a search request using the specified provider.
+    ///
+    /// - Parameters:
+    ///   - id: The identifier of the search provider to use.
+    ///   - term: The search query string.
+    ///   - limit: Optional limit for number of results.
+    ///   - cursor: Optional pagination cursor.
+    ///   - timeout: The timeout for the request.
+    ///   - account: The Nextcloud account performing the request.
+    ///   - options: Optional configuration options for the request.
+    ///   - taskHandler: Callback to observe the created task.
+    ///
+    /// - Returns: A tuple containing the account, search result, response data, and error.
+    func searchProviderAsync(_ id: String,
+                             term: String,
+                             limit: Int? = nil,
+                             cursor: Int? = nil,
+                             timeout: TimeInterval = 60,
+                             account: String,
+                             options: NKRequestOptions = NKRequestOptions(),
+                             taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in }
+    ) async -> (
+        account: String,
+        searchResult: NKSearchResult?,
+        responseData: AFDataResponse<Data>?,
+        error: NKError
+    ) {
+        await withCheckedContinuation { continuation in
+            _ = searchProvider(id,
+                               term: term,
+                               limit: limit,
+                               cursor: cursor,
+                               timeout: timeout,
+                               account: account,
+                               options: options,
+                               taskHandler: taskHandler) { account, result, responseData, error in
+                continuation.resume(returning: (
+                    account: account,
+                    searchResult: result,
+                    responseData: responseData,
+                    error: error
+                ))
+            }
+        }
     }
 }
 

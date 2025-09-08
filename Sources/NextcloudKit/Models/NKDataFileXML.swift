@@ -253,7 +253,7 @@ public class NKDataFileXML: NSObject {
         return xml["ocs", "data", "apppassword"].text
     }
 
-    func convertDataFile(xmlData: Data, nkSession: NKSession, showHiddenFiles: Bool, includeHiddenFiles: [String]) -> [NKFile] {
+    func convertDataFile(xmlData: Data, nkSession: NKSession, rootFileName: String, showHiddenFiles: Bool, includeHiddenFiles: [String]) async -> [NKFile] {
         var files: [NKFile] = []
         let rootFiles = "/" + nkSession.dav + "/files/"
         guard let baseUrl = self.nkCommonInstance.getHostName(urlString: nkSession.urlBase) else {
@@ -299,8 +299,8 @@ public class NKDataFileXML: NSObject {
 
                 // ServerUrl
                 if href == rootFiles + nkSession.user + "/" {
-                    file.fileName = "."
-                    file.serverUrl = ".."
+                    file.fileName = rootFileName
+                    file.serverUrl = baseUrl + rootFiles + nkSession.user
                 } else {
                     file.serverUrl = baseUrl + file.path.dropLast()
                 }
@@ -308,7 +308,8 @@ public class NKDataFileXML: NSObject {
 
             let propstat = element["d:propstat"][0]
 
-            if let getlastmodified = propstat["d:prop", "d:getlastmodified"].text, let date = self.nkCommonInstance.convertDate(getlastmodified, format: "EEE, dd MMM y HH:mm:ss zzz") {
+            if let getlastmodified = propstat["d:prop", "d:getlastmodified"].text,
+               let date = getlastmodified.parsedDate(using: "EEE, dd MMM y HH:mm:ss zzz") { 
                 file.date = date
             }
 
@@ -533,12 +534,14 @@ public class NKDataFileXML: NSObject {
                 file.downloadLimits.append(NKDownloadLimit(count: count, limit: limit, token: token))
             }
 
-            let results = self.nkCommonInstance.getInternalType(fileName: file.fileName, mimeType: file.contentType, directory: file.directory, account: nkSession.account)
+            let results = await self.nkCommonInstance.typeIdentifiers.getInternalType(fileName: file.fileName, mimeType: file.contentType, directory: file.directory, account: nkSession.account)
 
             file.contentType = results.mimeType
             file.iconName = results.iconName
             file.name = "files"
             file.classFile = results.classFile
+            file.typeIdentifier = results.typeIdentifier
+
             file.urlBase = nkSession.urlBase
             file.user = nkSession.user
             file.userId = nkSession.userId
@@ -556,8 +559,8 @@ public class NKDataFileXML: NSObject {
             }
             if index < files.count - 1,
                (files[index].fileName as NSString).deletingPathExtension == (files[index + 1].fileName as NSString) .deletingPathExtension,
-               files[index].classFile == NKCommon.TypeClassFile.image.rawValue,
-               files[index + 1].classFile == NKCommon.TypeClassFile.video.rawValue {
+               files[index].classFile == NKTypeClassFile.image.rawValue,
+               files[index + 1].classFile == NKTypeClassFile.video.rawValue {
                 files[index].livePhotoFile = files[index + 1].fileId
                 files[index + 1].livePhotoFile = files[index].fileId
             }
@@ -566,7 +569,7 @@ public class NKDataFileXML: NSObject {
         return files
     }
 
-    func convertDataTrash(xmlData: Data, nkSession: NKSession, showHiddenFiles: Bool) -> [NKTrash] {
+    func convertDataTrash(xmlData: Data, nkSession: NKSession, showHiddenFiles: Bool) async -> [NKTrash] {
         var files: [NKTrash] = []
         var first: Bool = true
         guard let baseUrl = self.nkCommonInstance.getHostName(urlString: nkSession.urlBase) else {
@@ -580,7 +583,7 @@ public class NKDataFileXML: NSObject {
                 first = false
                 continue
             }
-            let file = NKTrash()
+            var file = NKTrash()
             if let href = element["d:href"].text {
                 var fileNamePath = href
 
@@ -600,7 +603,8 @@ public class NKDataFileXML: NSObject {
 
             let propstat = element["d:propstat"][0]
 
-            if let getlastmodified = propstat["d:prop", "d:getlastmodified"].text, let date = self.nkCommonInstance.convertDate(getlastmodified, format: "EEE, dd MMM y HH:mm:ss zzz") {
+            if let getlastmodified = propstat["d:prop", "d:getlastmodified"].text,
+               let date = getlastmodified.parsedDate(using: "EEE, dd MMM y HH:mm:ss zzz") {
                 file.date = date
             }
 
@@ -642,11 +646,12 @@ public class NKDataFileXML: NSObject {
                 file.trashbinDeletionTime = Date(timeIntervalSince1970: trashbinDeletionTimeDouble)
             }
 
-            let results = self.nkCommonInstance.getInternalType(fileName: file.trashbinFileName, mimeType: file.contentType, directory: file.directory, account: nkSession.account)
+            let results = await self.nkCommonInstance.typeIdentifiers.getInternalType(fileName: file.trashbinFileName, mimeType: file.contentType, directory: file.directory, account: nkSession.account)
 
             file.contentType = results.mimeType
             file.classFile = results.classFile
             file.iconName = results.iconName
+            file.typeIdentifier = results.typeIdentifier
 
             files.append(file)
         }
@@ -678,7 +683,8 @@ public class NKDataFileXML: NSObject {
                 item.actorType = value
             }
 
-            if let creationDateTime = element["d:propstat", "d:prop", "oc:creationDateTime"].text, let date = self.nkCommonInstance.convertDate(creationDateTime, format: "EEE, dd MMM y HH:mm:ss zzz") {
+            if let creationDateTime = element["d:propstat", "d:prop", "oc:creationDateTime"].text,
+               let date = creationDateTime.parsedDate(using: "EEE, dd MMM y HH:mm:ss zzz") {
                 item.creationDateTime = date
             }
 

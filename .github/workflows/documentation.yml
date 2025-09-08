@@ -1,0 +1,70 @@
+# SPDX-FileCopyrightText: Nextcloud GmbH
+# SPDX-FileCopyrightText: 2025 Iva Horn
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+name: Documentation
+
+on:
+  push:
+    branches:
+      - main
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-docs:
+    runs-on: macos-latest
+    steps:
+      - uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: latest-stable
+      - uses: actions/checkout@v4
+      - name: Build documentation
+        run: |
+          xcodebuild docbuild \
+            -scheme NextcloudKit \
+            -destination 'platform=macOS' \
+            -skipPackagePluginValidation \
+            -derivedDataPath ./DerivedData
+          $(xcrun --find docc) process-archive \
+            transform-for-static-hosting ./DerivedData/Build/Products/Debug/NextcloudKit.doccarchive \
+            --output-path ./docs \
+            --hosting-base-path /NextcloudKit
+      - name: Create root redirect
+        run: |
+          cat > ./docs/index.html << 'EOF'
+          <!DOCTYPE html>
+          <html>
+          <head>
+            <meta charset="utf-8">
+            <title>NextcloudKit Documentation</title>
+            <meta http-equiv="refresh" content="0; url=./documentation/nextcloudkit/">
+            <link rel="canonical" href="./documentation/nextcloudkit/">
+          </head>
+          <body>
+            <p>Redirecting to <a href="./documentation/nextcloudkit/">NextcloudKit Documentation</a>...</p>
+            <script>
+              window.location.href = "./documentation/nextcloudkit/";
+            </script>
+          </body>
+          </html>
+          EOF
+      - name: Upload static files as artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: ./docs
+  deploy-docs: # See: https://github.com/actions/deploy-pages
+    needs: build-docs
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

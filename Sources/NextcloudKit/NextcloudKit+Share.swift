@@ -61,8 +61,8 @@ public extension NextcloudKit {
                     options: NKRequestOptions = NKRequestOptions(),
                     taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
                     completion: @escaping (_ account: String, _ shares: [NKShare]?, _ responseData: AFDataResponse<Data>?, _ error: NKError) -> Void) {
-        guard let nkSession = nkCommonInstance.getSession(account: account),
-              let url = nkCommonInstance.createStandardUrl(serverUrl: nkSession.urlBase, endpoint: parameters.endpoint, options: options),
+        guard let nkSession = nkCommonInstance.nksessions.session(forAccount: account),
+              let url = nkCommonInstance.createStandardUrl(serverUrl: nkSession.urlBase, endpoint: parameters.endpoint),
               let headers = nkCommonInstance.getStandardHeaders(account: account, options: options) else {
             return options.queue.async { completion(account, nil, nil, .urlError) }
         }
@@ -71,9 +71,6 @@ public extension NextcloudKit {
             task.taskDescription = options.taskDescription
             taskHandler(task)
         }.responseData(queue: self.nkCommonInstance.backgroundQueue) { response in
-        if self.nkCommonInstance.levelLog > 0 {
-                debugPrint(response)
-            }
             switch response.result {
             case .failure(let error):
                 let error = NKError(error: error, afResponse: response, responseData: response.data)
@@ -92,6 +89,39 @@ public extension NextcloudKit {
                     shares.append(share)
                 }
                 options.queue.async { completion(account, shares, response, .success) }
+            }
+        }
+    }
+
+    /// Asynchronously reads shares for a given account using the provided parameters.
+    /// - Parameters:
+    ///   - parameters: The `NKShareParameter` object containing filters and options for the request.
+    ///   - account: The account identifier for which to fetch shares.
+    ///   - options: Optional `NKRequestOptions` to customize the request (default is empty).
+    ///   - taskHandler: Closure called when the underlying `URLSessionTask` is created, useful for tracking or cancellation.
+    /// - Returns: A tuple containing:
+    ///   - `account`: The account used for the request.
+    ///   - `shares`: An optional array of `NKShare` objects returned by the server.
+    ///   - `responseData`: The raw Alamofire response object.
+    ///   - `error`: An `NKError` indicating the result of the request.
+    func readSharesAsync(parameters: NKShareParameter,
+                         account: String,
+                         options: NKRequestOptions = NKRequestOptions(),
+                         taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in }) async -> (account: String, shares: [NKShare]?, responseData: AFDataResponse<Data>?, error: NKError) {
+
+        await withCheckedContinuation { continuation in
+            readShares(
+                parameters: parameters,
+                account: account,
+                options: options,
+                taskHandler: taskHandler
+            ) { account, shares, responseData, error in
+                continuation.resume(returning: (
+                    account: account,
+                    shares: shares,
+                    responseData: responseData,
+                    error: error
+                ))
             }
         }
     }
@@ -117,8 +147,8 @@ public extension NextcloudKit {
         if lookup {
             lookupString = "true"
         }
-        guard let nkSession = nkCommonInstance.getSession(account: account),
-              let url = nkCommonInstance.createStandardUrl(serverUrl: nkSession.urlBase, endpoint: endpoint, options: options),
+        guard let nkSession = nkCommonInstance.nksessions.session(forAccount: account),
+              let url = nkCommonInstance.createStandardUrl(serverUrl: nkSession.urlBase, endpoint: endpoint),
               let headers = nkCommonInstance.getStandardHeaders(account: account, options: options) else {
             return options.queue.async { completion(account, nil, nil, .urlError) }
         }
@@ -134,9 +164,6 @@ public extension NextcloudKit {
             task.taskDescription = options.taskDescription
             taskHandler(task)
         }.responseData(queue: self.nkCommonInstance.backgroundQueue) { response in
-            if self.nkCommonInstance.levelLog > 0 {
-                debugPrint(response)
-            }
             switch response.result {
             case .failure(let error):
                 let error = NKError(error: error, afResponse: response, responseData: response.data)
@@ -202,6 +229,57 @@ public extension NextcloudKit {
         }
     }
 
+    /// Searches for sharees (users, groups, etc.) that can be shared with, using the provided parameters.
+    /// This function performs a paginated server-side lookup of sharees for a given account.
+    /// - Parameters:
+    ///   - search: The search string used to filter sharees (default is empty string).
+    ///   - page: The current page for pagination (default is 1).
+    ///   - perPage: The number of results per page (default is 200).
+    ///   - itemType: The type of item to be shared (e.g., "file").
+    ///   - lookup: Whether to enable extended lookup on the server (default is false).
+    ///   - account: The account identifier associated with the request.
+    ///   - options: Optional request parameters (default is `.init()`).
+    /// - Returns: A tuple containing:
+    ///   - account: The associated account string.
+    ///   - sharees: An optional array of `NKSharee` objects returned by the server.
+    ///   - responseData: The full `AFDataResponse<Data>` from Alamofire.
+    ///   - error: An `NKError` object representing success or failure.
+    func searchShareesAsync(
+        search: String = "",
+        page: Int = 1,
+        perPage: Int = 200,
+        itemType: String = "file",
+        lookup: Bool = false,
+        account: String,
+        options: NKRequestOptions = NKRequestOptions()
+    ) async -> (
+        account: String,
+        sharees: [NKSharee]?,
+        responseData: AFDataResponse<Data>?,
+        error: NKError
+    ) {
+        await withCheckedContinuation { continuation in
+            searchSharees(
+                search: search,
+                page: page,
+                perPage: perPage,
+                itemType: itemType,
+                lookup: lookup,
+                account: account,
+                options: options,
+                taskHandler: { _ in },
+                completion: { account, sharees, responseData, error in
+                    continuation.resume(returning: (
+                        account: account,
+                        sharees: sharees,
+                        responseData: responseData,
+                        error: error
+                    ))
+                }
+            )
+        }
+    }
+
     /*
     * @param path           path of the file/folder being shared. Mandatory argument
     * @param shareType      0 = user, 1 = group, 3 = Public link. Mandatory argument
@@ -221,58 +299,22 @@ public extension NextcloudKit {
     * @param attributes     There is currently only one share attribute “download” from the scope “permissions”. This attribute is only valid for user and group shares, not for public link shares.
     */
 
-    func createShareLink(path: String,
-                         hideDownload: Bool = false,
-                         publicUpload: Bool = false,
-                         password: String? = nil,
-                         permissions: Int = 1,
-                         account: String,
-                         options: NKRequestOptions = NKRequestOptions(),
-                         taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-                         completion: @escaping (_ account: String, _ share: NKShare?, _ responseData: AFDataResponse<Data>?, _ error: NKError) -> Void) {
-        createShare(path: path, shareType: 3, shareWith: nil, publicUpload: publicUpload, hideDownload: hideDownload, password: password, permissions: permissions, account: account, options: options) { task in
-            task.taskDescription = options.taskDescription
-            taskHandler(task)
-        } completion: { account, share, responseData, error in
-            completion(account, share, responseData, error)
-        }
-    }
-
     func createShare(path: String,
                      shareType: Int,
-                     shareWith: String,
-                     password: String? = nil,
+                     shareWith: String?,
+                     publicUpload: Bool? = nil,
                      note: String? = nil,
+                     hideDownload: Bool? = nil,
+                     password: String? = nil,
                      permissions: Int = 1,
                      attributes: String? = nil,
                      account: String,
                      options: NKRequestOptions = NKRequestOptions(),
                      taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
                      completion: @escaping (_ account: String, _ share: NKShare?, _ responseData: AFDataResponse<Data>?, _ error: NKError) -> Void) {
-        createShare(path: path, shareType: shareType, shareWith: shareWith, publicUpload: false, note: note, hideDownload: false, password: password, permissions: permissions, attributes: attributes, account: account, options: options) { task in
-            task.taskDescription = options.taskDescription
-            taskHandler(task)
-        } completion: { account, share, responseData, error in
-            completion(account, share, responseData, error)
-        }
-    }
-
-    private func createShare(path: String,
-                             shareType: Int,
-                             shareWith: String?,
-                             publicUpload: Bool? = nil,
-                             note: String? = nil,
-                             hideDownload: Bool? = nil,
-                             password: String? = nil,
-                             permissions: Int = 1,
-                             attributes: String? = nil,
-                             account: String,
-                             options: NKRequestOptions = NKRequestOptions(),
-                             taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-                             completion: @escaping (_ account: String, _ share: NKShare?, _ responseData: AFDataResponse<Data>?, _ error: NKError) -> Void) {
         let endpoint = "ocs/v2.php/apps/files_sharing/api/v1/shares"
-        guard let nkSession = nkCommonInstance.getSession(account: account),
-              let url = nkCommonInstance.createStandardUrl(serverUrl: nkSession.urlBase, endpoint: endpoint, options: options),
+        guard let nkSession = nkCommonInstance.nksessions.session(forAccount: account),
+              let url = nkCommonInstance.createStandardUrl(serverUrl: nkSession.urlBase, endpoint: endpoint),
               let headers = nkCommonInstance.getStandardHeaders(account: account, options: options) else {
             return options.queue.async { completion(account, nil, nil, .urlError) }
         }
@@ -304,9 +346,6 @@ public extension NextcloudKit {
             task.taskDescription = options.taskDescription
             taskHandler(task)
         }.responseData(queue: self.nkCommonInstance.backgroundQueue) { response in
-            if self.nkCommonInstance.levelLog > 0 {
-                debugPrint(response)
-            }
             switch response.result {
             case .failure(let error):
                 let error = NKError(error: error, afResponse: response, responseData: response.data)
@@ -320,6 +359,69 @@ public extension NextcloudKit {
                     options.queue.async { completion(account, nil, response, NKError(rootJson: json, fallbackStatusCode: response.response?.statusCode)) }
                 }
             }
+        }
+    }
+
+    /// Creates a new share for the specified path and parameters, such as share type, target, permissions, and options.
+    /// This function performs a network request to the server to create the share.
+    /// - Parameters:
+    ///   - path: The file or folder path to be shared.
+    ///   - shareType: The type of share (e.g., 0=user, 1=group, 3=public link).
+    ///   - shareWith: The recipient (username, group name, or nil for public).
+    ///   - publicUpload: Whether to allow public upload (if applicable).
+    ///   - note: Optional note associated with the share.
+    ///   - hideDownload: Whether to hide the download option (if supported).
+    ///   - password: Optional password for protected shares.
+    ///   - permissions: Bitmask representing share permissions (default is 1 = read).
+    ///   - attributes: Optional extended attributes as string.
+    ///   - account: The account making the request.
+    ///   - options: Optional request options (default is `.init()`).
+    /// - Returns: A tuple containing:
+    ///   - account: The account string.
+    ///   - share: An optional `NKShare` object representing the created share.
+    ///   - responseData: The raw `AFDataResponse<Data>` returned by Alamofire.
+    ///   - error: An `NKError` representing the result of the operation.
+    private func createShareAsync(
+        path: String,
+        shareType: Int,
+        shareWith: String?,
+        publicUpload: Bool? = nil,
+        note: String? = nil,
+        hideDownload: Bool? = nil,
+        password: String? = nil,
+        permissions: Int = 1,
+        attributes: String? = nil,
+        account: String,
+        options: NKRequestOptions = NKRequestOptions()
+    ) async -> (
+        account: String,
+        share: NKShare?,
+        responseData: AFDataResponse<Data>?,
+        error: NKError
+    ) {
+        await withCheckedContinuation { continuation in
+            createShare(
+                path: path,
+                shareType: shareType,
+                shareWith: shareWith,
+                publicUpload: publicUpload,
+                note: note,
+                hideDownload: hideDownload,
+                password: password,
+                permissions: permissions,
+                attributes: attributes,
+                account: account,
+                options: options,
+                taskHandler: { _ in },
+                completion: { account, share, responseData, error in
+                    continuation.resume(returning: (
+                        account: account,
+                        share: share,
+                        responseData: responseData,
+                        error: error
+                    ))
+                }
+            )
         }
     }
 
@@ -357,43 +459,40 @@ public extension NextcloudKit {
                      taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
                      completion: @escaping (_ account: String, _ share: NKShare?, _ responseData: AFDataResponse<Data>?, _ error: NKError) -> Void) {
         let endpoint = "ocs/v2.php/apps/files_sharing/api/v1/shares/\(idShare)"
-        guard let nkSession = nkCommonInstance.getSession(account: account),
-              let url = nkCommonInstance.createStandardUrl(serverUrl: nkSession.urlBase, endpoint: endpoint, options: options),
+        guard let nkSession = nkCommonInstance.nksessions.session(forAccount: account),
+              let url = nkCommonInstance.createStandardUrl(serverUrl: nkSession.urlBase, endpoint: endpoint),
               let headers = nkCommonInstance.getStandardHeaders(account: account, options: options) else {
             return options.queue.async { completion(account, nil, nil, .urlError) }
         }
         var parameters = [
             "permissions": String(permissions)
         ]
-        if let password = password {
+        if let password, !password.isEmpty {
             parameters["password"] = password
         }
-        if let expireDate = expireDate {
+        if let expireDate, !expireDate.isEmpty {
             parameters["expireDate"] = expireDate
         }
-        if let note = note {
+        if let note, !note.isEmpty {
             parameters["note"] = note
         }
-        if let label = label {
+        if let label, !label.isEmpty {
             parameters["label"] = label
         }
-        if let publicUpload = publicUpload {
+
+        if let publicUpload {
             parameters["publicUpload"] = publicUpload ? "true" : "false"
         }
+
         parameters["hideDownload"] = hideDownload ? "true" : "false"
         if let attributes = attributes {
             parameters["attributes"] = attributes
-        } else {
-            parameters["attributes"] = "[]"
         }
 
         nkSession.sessionData.request(url, method: .put, parameters: parameters, encoding: URLEncoding.default, headers: headers, interceptor: NKInterceptor(nkCommonInstance: nkCommonInstance)).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
             task.taskDescription = options.taskDescription
             taskHandler(task)
         }.responseData(queue: self.nkCommonInstance.backgroundQueue) { response in
-            if self.nkCommonInstance.levelLog > 0 {
-                debugPrint(response)
-            }
             switch response.result {
             case .failure(let error):
                 let error = NKError(error: error, afResponse: response, responseData: response.data)
@@ -410,6 +509,69 @@ public extension NextcloudKit {
         }
     }
 
+    /// Updates the parameters of an existing share identified by its ID.
+    /// Allows changing settings like password, expiration, permissions, public upload, note, label, etc.
+    /// - Parameters:
+    ///   - idShare: The ID of the share to be updated.
+    ///   - password: Optional new password for the share.
+    ///   - expireDate: Optional new expiration date (in string format).
+    ///   - permissions: Bitmask representing new share permissions (default is 1 = read).
+    ///   - publicUpload: Whether public upload is enabled for the share.
+    ///   - note: Optional note for the share.
+    ///   - label: Optional label for identifying the share.
+    ///   - hideDownload: Whether the download option should be hidden.
+    ///   - attributes: Optional string of encoded attributes.
+    ///   - account: The account performing the update.
+    ///   - options: Optional request options (default is `.init()`).
+    /// - Returns: A tuple containing:
+    ///   - account: The account string.
+    ///   - share: The updated `NKShare` object, or nil on failure.
+    ///   - responseData: The raw `AFDataResponse<Data>` returned by Alamofire.
+    ///   - error: An `NKError` representing the outcome of the operation.
+    func updateShareAsync(
+        idShare: Int,
+        password: String? = nil,
+        expireDate: String? = nil,
+        permissions: Int = 1,
+        publicUpload: Bool? = nil,
+        note: String? = nil,
+        label: String? = nil,
+        hideDownload: Bool,
+        attributes: String? = nil,
+        account: String,
+        options: NKRequestOptions = NKRequestOptions()
+    ) async -> (
+        account: String,
+        share: NKShare?,
+        responseData: AFDataResponse<Data>?,
+        error: NKError
+    ) {
+        await withCheckedContinuation { continuation in
+            updateShare(
+                idShare: idShare,
+                password: password,
+                expireDate: expireDate,
+                permissions: permissions,
+                publicUpload: publicUpload,
+                note: note,
+                label: label,
+                hideDownload: hideDownload,
+                attributes: attributes,
+                account: account,
+                options: options,
+                taskHandler: { _ in },
+                completion: { account, share, responseData, error in
+                    continuation.resume(returning: (
+                        account: account,
+                        share: share,
+                        responseData: responseData,
+                        error: error
+                    ))
+                }
+            )
+        }
+    }
+
     /*
     * @param idShare: Identifier of the share to update
     */
@@ -417,10 +579,10 @@ public extension NextcloudKit {
                      account: String,
                      options: NKRequestOptions = NKRequestOptions(),
                      taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-                     completion: @escaping (_ account: String, _ responseData: AFDataResponse<Data?>?, _ error: NKError) -> Void) {
+                     completion: @escaping (_ account: String, _ responseData: AFDataResponse<Data>?, _ error: NKError) -> Void) {
         let endpoint = "ocs/v2.php/apps/files_sharing/api/v1/shares/\(idShare)"
-        guard let nkSession = nkCommonInstance.getSession(account: account),
-              let url = nkCommonInstance.createStandardUrl(serverUrl: nkSession.urlBase, endpoint: endpoint, options: options),
+        guard let nkSession = nkCommonInstance.nksessions.session(forAccount: account),
+              let url = nkCommonInstance.createStandardUrl(serverUrl: nkSession.urlBase, endpoint: endpoint),
               let headers = nkCommonInstance.getStandardHeaders(account: account, options: options) else {
             return options.queue.async { completion(account, nil, .urlError) }
         }
@@ -428,17 +590,48 @@ public extension NextcloudKit {
         nkSession.sessionData.request(url, method: .delete, encoding: URLEncoding.default, headers: headers, interceptor: NKInterceptor(nkCommonInstance: nkCommonInstance)).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
             task.taskDescription = options.taskDescription
             taskHandler(task)
-        }.response(queue: self.nkCommonInstance.backgroundQueue) { response in
-            if self.nkCommonInstance.levelLog > 0 {
-                debugPrint(response)
+        }.responseData(queue: self.nkCommonInstance.backgroundQueue) { response in
+            let result = self.evaluateResponse(response)
+
+            options.queue.async {
+                completion(account, response, result)
             }
-            switch response.result {
-            case .failure(let error):
-                let error = NKError(error: error, afResponse: response, responseData: response.data)
-                options.queue.async { completion(account, response, error) }
-            case .success:
-                options.queue.async { completion(account, response, .success) }
-            }
+        }
+    }
+
+    /// Deletes an existing share on the server using its share ID.
+    /// This function sends a network request to remove the share for the specified account.
+    /// - Parameters:
+    ///   - idShare: The ID of the share to delete.
+    ///   - account: The account initiating the deletion request.
+    ///   - options: Optional request options (default is `.init()`).
+    /// - Returns: A tuple containing:
+    ///   - account: The account string used for the request.
+    ///   - responseData: The full `AFDataResponse<Data>` returned from the server.
+    ///   - error: An `NKError` representing the result of the deletion operation.
+    func deleteShareAsync(
+        idShare: Int,
+        account: String,
+        options: NKRequestOptions = NKRequestOptions()
+    ) async -> (
+        account: String,
+        responseData: AFDataResponse<Data>?,
+        error: NKError
+    ) {
+        await withCheckedContinuation { continuation in
+            deleteShare(
+                idShare: idShare,
+                account: account,
+                options: options,
+                taskHandler: { _ in },
+                completion: { account, responseData, error in
+                    continuation.resume(returning: (
+                        account: account,
+                        responseData: responseData,
+                        error: error
+                    ))
+                }
+            )
         }
     }
 
@@ -452,7 +645,7 @@ public extension NextcloudKit {
         share.canEdit = json["can_edit"].boolValue
         share.displaynameFileOwner = json["displayname_file_owner"].stringValue
         share.displaynameOwner = json["displayname_owner"].stringValue
-        if let expiration = json["expiration"].string, let date = self.nkCommonInstance.convertDate(expiration, format: "YYYY-MM-dd HH:mm:ss") {
+        if let expiration = json["expiration"].string, let date = expiration.parsedDate(using: "YYYY-MM-dd HH:mm:ss") {
             share.expirationDate = date as NSDate
         }
         share.fileParent = json["file_parent"].intValue
