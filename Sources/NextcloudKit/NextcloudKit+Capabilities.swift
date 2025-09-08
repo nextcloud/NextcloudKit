@@ -127,6 +127,7 @@ public extension NextcloudKit {
                         let assistant: Assistant?
                         let recommendations: Recommendations?
                         let termsOfService: TermsOfService?
+                        let declarativeUI: DeclarativeUI?
 
                         enum CodingKeys: String, CodingKey {
                             case downloadLimit = "downloadlimit"
@@ -140,6 +141,7 @@ public extension NextcloudKit {
                             case assistant
                             case recommendations
                             case termsOfService = "terms_of_service"
+                            case declarativeUI = "declarativeui"
                         }
 
                         struct DownloadLimit: Codable {
@@ -409,6 +411,8 @@ public extension NextcloudKit {
             capabilities.recommendations = json.recommendations?.enabled ?? false
             capabilities.termsOfService = json.termsOfService?.enabled ?? false
 
+            capabilities.declarativeUI = json.declarativeUI
+
             // Persist capabilities in shared store
             await NKCapabilities.shared.setCapabilities(for: account, capabilities: capabilities)
             return capabilities
@@ -484,7 +488,7 @@ final public class NKCapabilities: Sendable {
         public var forbiddenFileNameExtensions: [String]            = []
         public var recommendations: Bool                            = false
         public var termsOfService: Bool                             = false
-
+        public var declarativeUI: DeclarativeUI?                    = nil
         public var directEditingEditors: [NKEditorDetailsEditor]    = []
         public var directEditingCreators: [NKEditorDetailsCreator]  = []
         public var directEditingTemplates: [NKEditorTemplate]       = []
