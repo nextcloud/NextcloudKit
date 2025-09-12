@@ -14,11 +14,11 @@ on:
       - develop
 
 env:
-  DESTINATION_IOS: platform=iOS Simulator,name=iPhone 16,OS=18.1
+  DESTINATION_IOS: platform=iOS Simulator,name=iPhone 16,OS=18.5
   DESTINATION_MACOS: platform=macOS,arch=x86_64
   SCHEME: NextcloudKit
-  SERVER_BRANCH: stable28
-  PHP_VERSION: 8.2
+  SERVER_BRANCH: stable30
+  PHP_VERSION: 8.3
 
 jobs:
   build-and-test:
@@ -60,32 +60,12 @@ jobs:
         ./server/occ config:system:set memcache.distributed --value="\\OC\\Memcache\\APCu"
         ./server/occ background:cron
         PHP_CLI_SERVER_WORKERS=5 php -S localhost:8080 -t server/ &
-#    - name: Setup Bundler and Install Gems
-#      run: |
-#        gem install bundler
-#        bundle install
-#        bundle update
-#    - name: Install docker
-#      run: |
-#        # Workaround for https://github.com/actions/runner-images/issues/8104
-#        brew remove --ignore-dependencies qemu
-#        curl -o ./qemu.rb https://raw.githubusercontent.com/Homebrew/homebrew-core/dc0669eca9479e9eeb495397ba3a7480aaa45c2e/Formula/qemu.rb
-#        brew install ./qemu.rb
-#
-#        brew install docker
-#        colima start
-#    - name: Create docker test server and export enviroment variables
-#      run: |
-#        source ./create-docker-test-server.sh
-#        if [ ! -f ".env-vars" ]; then
-#            touch .env-vars
-#            echo "export TEST_SERVER_URL=$TEST_SERVER_URL" >> .env-vars
-#            echo "export TEST_USER=$TEST_USER" >> .env-vars
-#            echo "export TEST_APP_PASSWORD=$TEST_APP_PASSWORD" >> .env-vars
-#        fi
-#    - name: Generate EnvVars file
-#      run: |
-#        ./generate-env-vars.sh
+
+    - name: Setup Xcode
+      uses: maxim-lobanov/setup-xcode@60606e260d2fc5762a71e64e74b2174e8ea3c8bd # v1.6.0
+      with:
+        xcode-version: latest-stable
+s
     - name: Build & Test NextcloudKit
       run: |
         set -o pipefail && xcodebuild test -scheme "$SCHEME" \
