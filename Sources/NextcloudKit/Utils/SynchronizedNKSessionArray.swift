@@ -75,6 +75,23 @@ public final class SynchronizedNKSessionArray: @unchecked Sendable {
         }
     }
 
+    /// Replaces the first stored session that matches the given account identifier with a new session.
+    ///
+    /// This method performs the replacement in a thread-safe manner using a barrier write
+    /// on the internal concurrent queue. If no session with the specified account is found,
+    /// the array remains unchanged.
+    ///
+    /// - Parameters:
+    ///   - account: The account identifier of the session to replace.
+    ///   - newSession: The `NKSession` instance that will replace the existing one.
+    public func replace(account: String, with newSession: NKSession) {
+        queue.async(flags: .barrier) {
+            if let idx = self.array.firstIndex(where: { $0.account == account }) {
+                self.array[idx] = newSession
+            }
+        }
+    }
+
     // MARK: - Write Operations
 
     /// Appends a new session to the array.
