@@ -10,6 +10,10 @@ public final class FileNameValidator: Sendable {
     private let forbiddenFileNameCharacters: [String]
     private let forbiddenFileNameExtensions: [String]
 
+    public func fileEmptyNameError() -> NKError {
+        NKError(errorCode: NSURLErrorCannotCreateFile, errorDescription: NSLocalizedString("_file_name_empty_", value: "File name cannot be empty.", comment: ""))
+    }
+
     public func fileWithSpaceError() -> NKError {
         NKError(errorCode: NSURLErrorCannotCreateFile, errorDescription: NSLocalizedString("_file_name_validator_error_space_", value: "Name must not contain spaces at the beginning or end.", comment: ""))
     }
@@ -40,6 +44,10 @@ public final class FileNameValidator: Sendable {
     }
 
     public func checkFileName(_ filename: String) -> NKError? {
+        if filename.trimmingCharacters(in: .whitespaces).isEmpty {
+            return fileEmptyNameError()
+        }
+
         if let regex = try? NSRegularExpression(pattern: "[\(forbiddenFileNameCharacters.joined())]"), let invalidCharacterError = checkInvalidCharacters(string: filename, regex: regex) {
             return invalidCharacterError
         }
