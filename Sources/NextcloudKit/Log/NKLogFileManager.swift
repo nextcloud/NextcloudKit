@@ -48,6 +48,8 @@ public enum NKLogTagEmoji: String {
     case network = "[NETWORK]"
     case start = "[START]"
     case stop = "[STOP]"
+    case end = "[END]"
+    case cancel = "[CANCEL]"
 }
 
 /// A logger that writes log messages to a file in a subdirectory of the user's Documents folder,
@@ -65,6 +67,20 @@ public final class NKLogFileManager: @unchecked Sendable {
     ///   - minLevel: The minimum log level to be recorded.
     public static func configure(logLevel: NKLogLevel = .normal) {
         shared.setConfiguration(logLevel: logLevel)
+    }
+
+    /// Configures filter.
+    /// - Parameters:
+    ///   - blacklist: Set thing must not be logged.
+    public static func setBlacklist(blacklist: [String]) {
+        shared.setBlacklist(blacklist: blacklist)
+    }
+
+    /// Configures whitelist.
+    /// - Parameters:
+    ///   - whitelist: Set thing must be logged.
+    public static func setCandidate(whitelist: [String]) {
+        shared.setWhitelist(whitelist: whitelist)
     }
 
     /// Creates the "Logs" folder inside the user's Documents directory if it does not already exist.
@@ -96,6 +112,8 @@ public final class NKLogFileManager: @unchecked Sendable {
     private let logFileName = "log.txt"
     private let logDirectory: URL
     public var logLevel: NKLogLevel
+    private var blacklist: [String] = []
+    private var whitelist: [String] = []
     private var currentLogDate: String
     private let logQueue = DispatchQueue(label: "com.nextcloud.LogWriterQueue", attributes: .concurrent)
     private let rotationQueue = DispatchQueue(label: "com.nextcloud.LogRotationQueue")
@@ -107,8 +125,14 @@ public final class NKLogFileManager: @unchecked Sendable {
 
     // MARK: - Initialization
 
-    private init(logLevel: NKLogLevel = .normal) {
+    private init(logLevel: NKLogLevel = .normal, blacklist: [String]? = nil, whitelist: [String]? = nil) {
         self.logLevel = logLevel
+        if let blacklist {
+            self.blacklist = blacklist
+        }
+        if let whitelist {
+            self.whitelist = whitelist
+        }
 
         let documents = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
         let logsFolder = documents.appendingPathComponent("Logs", isDirectory: true)
@@ -148,38 +172,60 @@ public final class NKLogFileManager: @unchecked Sendable {
         self.logLevel = logLevel
     }
 
+    /// Sets blacklist for the logger.
+    /// - Parameters:
+    ///   - blacklist:
+    private func setBlacklist(blacklist: [String]) {
+        self.blacklist = blacklist
+    }
+
+    /// Sets candidate for the logger.
+    /// - Parameters:
+    ///   - whitelist:
+    private func setWhitelist(whitelist: [String]) {
+        self.whitelist = whitelist
+    }
+
     // MARK: - Public API
 
-    public func writeLog(debug message: String, minimumLogLevel: NKLogLevel = .compact) {
-        writeLog("[DEBUG] \(message)", minimumLogLevel: minimumLogLevel)
+    public func writeLog(debug message: String, minimumLogLevel: NKLogLevel = .compact, consoleOnly: Bool = false) {
+        writeLog("[DEBUG] \(message)", minimumLogLevel: minimumLogLevel, consoleOnly: consoleOnly)
     }
 
-    public func writeLog(info message: String, minimumLogLevel: NKLogLevel = .compact) {
-        writeLog("[INFO] \(message)", minimumLogLevel: minimumLogLevel)
+    public func writeLog(info message: String, minimumLogLevel: NKLogLevel = .compact, consoleOnly: Bool = false) {
+        writeLog("[INFO] \(message)", minimumLogLevel: minimumLogLevel, consoleOnly: consoleOnly)
     }
 
-    public func writeLog(warning message: String, minimumLogLevel: NKLogLevel = .compact) {
-        writeLog("[WARNING] \(message)", minimumLogLevel: minimumLogLevel)
+    public func writeLog(warning message: String, minimumLogLevel: NKLogLevel = .compact, consoleOnly: Bool = false) {
+        writeLog("[WARNING] \(message)", minimumLogLevel: minimumLogLevel, consoleOnly: consoleOnly)
     }
 
-    public func writeLog(error message: String, minimumLogLevel: NKLogLevel = .compact) {
-        writeLog("[ERROR] \(message)", minimumLogLevel: minimumLogLevel)
+    public func writeLog(error message: String, minimumLogLevel: NKLogLevel = .compact, consoleOnly: Bool = false) {
+        writeLog("[ERROR] \(message)", minimumLogLevel: minimumLogLevel, consoleOnly: consoleOnly)
     }
 
-    public func writeLog(success message: String, minimumLogLevel: NKLogLevel = .compact) {
-        writeLog("[SUCCESS] \(message)", minimumLogLevel: minimumLogLevel)
+    public func writeLog(success message: String, minimumLogLevel: NKLogLevel = .compact, consoleOnly: Bool = false) {
+        writeLog("[SUCCESS] \(message)", minimumLogLevel: minimumLogLevel, consoleOnly: consoleOnly)
     }
 
-    public func writeLog(network message: String, minimumLogLevel: NKLogLevel = .compact) {
-        writeLog("[NETWORK] \(message)", minimumLogLevel: minimumLogLevel)
+    public func writeLog(network message: String, minimumLogLevel: NKLogLevel = .compact, consoleOnly: Bool = false) {
+        writeLog("[NETWORK] \(message)", minimumLogLevel: minimumLogLevel, consoleOnly: consoleOnly)
     }
 
-    public func writeLog(start message: String, minimumLogLevel: NKLogLevel = .compact) {
-        writeLog("[START] \(message)", minimumLogLevel: minimumLogLevel)
+    public func writeLog(start message: String, minimumLogLevel: NKLogLevel = .compact, consoleOnly: Bool = false) {
+        writeLog("[START] \(message)", minimumLogLevel: minimumLogLevel, consoleOnly: consoleOnly)
     }
 
-    public func writeLog(stop message: String, minimumLogLevel: NKLogLevel = .compact) {
-        writeLog("[STOP] \(message)", minimumLogLevel: minimumLogLevel)
+    public func writeLog(stop message: String, minimumLogLevel: NKLogLevel = .compact, consoleOnly: Bool = false) {
+        writeLog("[STOP] \(message)", minimumLogLevel: minimumLogLevel, consoleOnly: consoleOnly)
+    }
+
+    public func writeLog(end message: String, minimumLogLevel: NKLogLevel = .compact, consoleOnly: Bool = false) {
+        writeLog("[END] \(message)", minimumLogLevel: minimumLogLevel, consoleOnly: consoleOnly)
+    }
+
+    public func writeLog(cancel message: String, minimumLogLevel: NKLogLevel = .compact, consoleOnly: Bool = false) {
+        writeLog("[CANCEL] \(message)", minimumLogLevel: minimumLogLevel, consoleOnly: consoleOnly)
     }
 
     /// Writes a tagged log message with a specific log level.
@@ -187,11 +233,13 @@ public final class NKLogFileManager: @unchecked Sendable {
     ///   - tag: A custom tag to classify the log message (e.g. "SYNC", "AUTH").
     ///   - emoji: .info, .debug, .warning, .error, .success ..
     ///   - message: The log message content.
-    public func writeLog(tag: String, emoji: NKLogTagEmoji, message: String, minimumLogLevel: NKLogLevel = .compact) {
+    ///   - minimumLogLevel: set the minimun level for write the message
+    ///   - consoleOnly: if true write the messa only in console
+    public func writeLog(tag: String, emoji: NKLogTagEmoji, message: String, minimumLogLevel: NKLogLevel = .compact, consoleOnly: Bool = false) {
         guard !tag.isEmpty else { return }
 
         let taggedMessage = "[\(tag.uppercased())] \(message)"
-        writeLog(taggedMessage, emoji: emoji, minimumLogLevel: minimumLogLevel)
+        writeLog(taggedMessage, emoji: emoji, minimumLogLevel: minimumLogLevel, consoleOnly: consoleOnly)
     }
 
     /// Writes a log message with an optional typeTag to determine console emoji.
@@ -201,12 +249,23 @@ public final class NKLogFileManager: @unchecked Sendable {
     /// - Parameters:
     ///   - message: The log message to record.
     ///   - emoji: Optional type to determine console emoji (e.g. [INFO], [ERROR]).
-    public func writeLog(_ message: String?, emoji: NKLogTagEmoji? = nil, minimumLogLevel: NKLogLevel = .compact) {
+    ///   - minimumLogLevel: set the minimun level for write the message
+    ///   - consoleOnly: if true write the messa only in console
+    public func writeLog(_ message: String?, emoji: NKLogTagEmoji? = nil, minimumLogLevel: NKLogLevel = .compact, consoleOnly: Bool = false) {
         guard logLevel != .disabled,
               let message = message else {
             return
         }
+        // Minimum level
         if minimumLogLevel > logLevel {
+            return
+        }
+        // Blacklist
+        if blacklist.contains(where: { message.contains($0) }) {
+            return
+        }
+        // Whitelist
+        if !whitelist.isEmpty, !whitelist.contains(where: { message.contains($0) }) {
             return
         }
 
@@ -225,6 +284,10 @@ public final class NKLogFileManager: @unchecked Sendable {
         // Build the console line with emoji
         let consoleLine = "[NKLOG] [\(consoleTimestamp)] \(emoji)\(visualMessage)"
         print(consoleLine)
+
+        if consoleOnly {
+            return
+        }
 
         rotationQueue.sync {
             self.checkForRotation()
@@ -252,6 +315,10 @@ public final class NKLogFileManager: @unchecked Sendable {
             return "🚀 "
         } else if message.contains("[STOP]") {
             return "⏹️ "
+        } else if message.contains("[END]") {
+            return "🔚 "
+        } else if message.contains("[CANCEL]") {
+            return "🗑️ "
         } else {
             return ""
         }

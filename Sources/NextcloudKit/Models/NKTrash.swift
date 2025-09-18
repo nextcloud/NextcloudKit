@@ -5,20 +5,41 @@
 
 import Foundation
 
+///
+/// Representation of a trashed item.
+///
 public struct NKTrash: Sendable {
-    public var ocId = ""
-    public var contentType = ""
-    public var typeIdentifier = ""
-    public var date = Date()
-    public var directory: Bool = false
-    public var fileId = ""
-    public var fileName = ""
-    public var filePath = ""
-    public var hasPreview: Bool = false
-    public var iconName = ""
-    public var size: Int64 = 0
-    public var classFile = ""
-    public var trashbinFileName = ""
-    public var trashbinOriginalLocation = ""
-    public var trashbinDeletionTime = Date()
+    public var ocId: String
+    public var contentType: String
+    public var typeIdentifier: String
+    public var date: Date
+    public var directory: Bool
+    public var fileId: String
+    public var fileName: String
+    public var filePath: String
+    public var hasPreview: Bool
+    public var iconName: String
+    public var size: Int64
+    public var classFile: String
+    public var trashbinFileName: String
+    public var trashbinOriginalLocation: String
+    public var trashbinDeletionTime: Date
+
+    public init(ocId: String = "", contentType: String = "", typeIdentifier: String = "", date: Date = Date(), directory: Bool = false, fileId: String = "", fileName: String = "", filePath: String = "", hasPreview: Bool = false, iconName: String = "", size: Int64 = 0, classFile: String = "", trashbinFileName: String = "", trashbinOriginalLocation: String = "", trashbinDeletionTime: Date = Date()) {
+        self.ocId = ocId
+        self.contentType = contentType
+        self.typeIdentifier = typeIdentifier
+        self.date = date
+        self.directory = directory
+        self.fileId = fileId
+        self.fileName = fileName
+        self.filePath = filePath
+        self.hasPreview = hasPreview
+        self.iconName = iconName
+        self.size = size
+        self.classFile = classFile
+        self.trashbinFileName = trashbinFileName
+        self.trashbinOriginalLocation = trashbinOriginalLocation
+        self.trashbinDeletionTime = trashbinDeletionTime
+    }
 }

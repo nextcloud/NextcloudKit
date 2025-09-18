@@ -130,4 +130,18 @@ class FileNameValidatorUnitTests: XCTestCase {
         let result = fileNameValidator.checkFolderPath(folderPath)
         XCTAssertFalse(result)
     }
+
+    func testFileNameEmpty() {
+        let folderPath = "/A1/Aaaww/W/   "
+        let filePaths = ["", " ", "  ", "               "]
+
+        let result = fileNameValidator.checkFolderPath(folderPath)
+        XCTAssertFalse(result)
+
+        filePaths.forEach { path in
+            let result = fileNameValidator.checkFileName(path)
+
+            XCTAssertNotNil(result?.errorDescription)
+        }
+    }
 }

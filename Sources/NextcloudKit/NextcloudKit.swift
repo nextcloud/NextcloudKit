@@ -108,35 +108,45 @@ open class NextcloudKit {
         nkCommonInstance.nksessions.append(nkSession)
     }
 
+    /// Updates an existing `NKSession` stored in the synchronized array.
+    ///
+    /// This method looks up the session by its `account` identifier, applies any non-nil
+    /// parameters to mutate the session, and then replaces the stored value using
+    /// `SynchronizedNKSessionArray.replace(account:with:)`.
+    ///
+    /// - Parameters:
+    ///   - account: The account identifier used to locate the session to update.
+    ///   - urlBase: An optional new base URL for the session.
+    ///   - user: An optional new username for the session.
+    ///   - userId: An optional new user identifier for the session.
+    ///   - password: An optional new password or token for the session.
+    ///   - userAgent: An optional new User-Agent string for the session.
     public func updateSession(account: String,
                               urlBase: String? = nil,
                               user: String? = nil,
                               userId: String? = nil,
                               password: String? = nil,
-                              userAgent: String? = nil,
-                              replaceWithAccount: String? = nil) {
-        guard var nkSession = nkCommonInstance.nksessions.session(forAccount: account) else {
+                              userAgent: String? = nil) {
+        guard var newSession = nkCommonInstance.nksessions.session(forAccount: account) else {
             return
         }
 
         if let urlBase {
-            nkSession.urlBase = urlBase
+            newSession.urlBase = urlBase
         }
         if let user {
-            nkSession.user = user
+            newSession.user = user
         }
         if let userId {
-            nkSession.userId = userId
+            newSession.userId = userId
         }
         if let password {
-            nkSession.password = password
+            newSession.password = password
         }
         if let userAgent {
-            nkSession.userAgent = userAgent
+            newSession.userAgent = userAgent
         }
-        if let replaceWithAccount {
-            nkSession.account = replaceWithAccount
-        }
+        nkCommonInstance.nksessions.replace(account: account, with: newSession)
     }
 
     public func deleteCookieStorageForAccount(_ account: String) {
@@ -178,26 +188,36 @@ open class NextcloudKit {
     }
 #endif
 
-    /// Evaluates an Alamofire response and returns the appropriate NKError.
-    /// Treats `inputDataNilOrZeroLength` as `.success`.
+    /// Evaluates a generic Alamofire response into NKError with simple HTTP-aware rules.
+    /// - Note:
+    ///   - Explicit cancellations return `.cancelled`.
+    ///   - Any HTTP 2xx is considered success, regardless of body presence.
+    ///   - If no HTTP status is available, fall back to Alamofire's `Result`.
     func evaluateResponse<Data>(_ response: AFDataResponse<Data>) -> NKError {
-        if let afError = response.error?.asAFError {
-            if afError.isExplicitlyCancelledError {
-                return .cancelled
-            }
+        // 1) Cancellations take precedence
+        if let afError = response.error?.asAFError,
+           afError.isExplicitlyCancelledError {
+            return .cancelled
         }
 
-        switch response.result {
-        case .failure(let error):
-            if let afError = error.asAFError,
-               case .responseSerializationFailed(let reason) = afError,
-               case .inputDataNilOrZeroLength = reason {
+        // 2) Prefer HTTP status code when available
+        if let code = response.response?.statusCode {
+            if (200...299).contains(code) {
                 return .success
-            } else {
-                return NKError(error: error, afResponse: response, responseData: response.data)
             }
+            // Non-2xx: let the error flow below (even if serializer said "success")
+        }
+
+        // 3) Fall back to Alamofire's result (covers transport errors and missing status)
+        switch response.result {
         case .success:
             return .success
+
+        case .failure(let error):
+            // No need to special-case inputDataNilOrZeroLength here:
+            // - If it was a 2xx, we already returned above.
+            // - If it's not 2xx or no status code, it's a real failure for our purposes.
+            return NKError(error: error, afResponse: response, responseData: response.data)
         }
     }
 }
