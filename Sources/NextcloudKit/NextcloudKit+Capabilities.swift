@@ -301,11 +301,13 @@ public extension NextcloudKit {
                         struct UserStatus: Codable {
                             let enabled: Bool?
                             let restore: Bool?
-                            let supportsemoji: Bool?
+                            let supportsEmoji: Bool?
+                            let supportsBusy: Bool?
 
                             enum CodingKeys: String, CodingKey {
                                 case enabled, restore
-                                case supportsemoji = "supports_emoji"
+                                case supportsEmoji = "supports_emoji"
+                                case supportsBusy = "supports_busy"
                             }
                         }
 
@@ -392,6 +394,8 @@ public extension NextcloudKit {
             capabilities.filesBigfilechunking = json.files?.bigfilechunking ?? false
 
             capabilities.userStatusEnabled = json.userstatus?.enabled ?? false
+            capabilities.userStatusSupportsBusy = json.userstatus?.supportsBusy ?? false
+
             capabilities.externalSites = json.external != nil
             capabilities.groupfoldersEnabled = json.groupfolders?.hasGroupFolders ?? false
 
@@ -472,6 +476,7 @@ final public class NKCapabilities: Sendable {
         public var filesComments: Bool                              = false // NC 20
         public var filesBigfilechunking: Bool                       = false
         public var userStatusEnabled: Bool                          = false
+        public var userStatusSupportsBusy: Bool                     = false
         public var externalSites: Bool                              = false
         public var activityEnabled: Bool                            = false
         public var groupfoldersEnabled: Bool                        = false // NC27
