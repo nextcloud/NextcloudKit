@@ -439,9 +439,8 @@ public extension NextcloudKit {
             capabilities.recommendations = json.recommendations?.enabled ?? false
             capabilities.termsOfService = json.termsOfService?.enabled ?? false
 
-//            capabilities.declarativeUIEnabled = !(json.declarativeUI?.contextMenu.isEmpty ?? false)
-//            capabilities.declarativeUIContextMenu = json.declarativeUI?.contextMenu ?? []
             capabilities.declarativeUI = json.declarativeUI
+
             // Persist capabilities in shared store
             await NKCapabilities.shared.setCapabilities(for: account, capabilities: capabilities)
             return capabilities
