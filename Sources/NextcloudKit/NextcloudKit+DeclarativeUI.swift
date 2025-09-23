@@ -31,7 +31,7 @@ public extension NextcloudKit {
 
         guard let nkSession = nkCommonInstance.nksessions.session(forAccount: account),
         let headers = nkCommonInstance.getStandardHeaders(account: account, options: options) else {
-            return (completion(nil, nil, .urlError))
+            return completion(nil, nil, .urlError)
         }
 
         let httpMethod = HTTPMethod(rawValue: method.uppercased())
@@ -42,7 +42,7 @@ public extension NextcloudKit {
             params.forEach { (key: String, value: String) in
                 switch value {
                 case pEnum.fileId.rawValue:
-                    queryParams[pEnum.fileId.rawValue] = "{\(fileId)}"
+                    queryParams[pEnum.fileId.rawValue] = fileId
                 case pEnum.filePath.rawValue:
                     queryParams[pEnum.filePath.rawValue] = filePath
                 default:
@@ -103,6 +103,7 @@ public extension NextcloudKit {
                           taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
     ) async -> (
         token: String?,
+
         responseData: AFDataResponse<Data>?,
         error: NKError
     ) {
