@@ -136,9 +136,9 @@ public final class NKLogFileManager: @unchecked Sendable {
 
         let documents = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
         let logsFolder = documents.appendingPathComponent("Logs", isDirectory: true)
-        if !FileManager.default.fileExists(atPath: logsFolder.path) {
-            try? FileManager.default.createDirectory(at: logsFolder, withIntermediateDirectories: true)
-        }
+        // if !FileManager.default.fileExists(atPath: logsFolder.path) {
+        //     try? FileManager.default.createDirectory(at: logsFolder, withIntermediateDirectories: true)
+        // }
         self.logDirectory = logsFolder
         self.currentLogDate = Self.currentDateString()
     }
