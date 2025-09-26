@@ -4,7 +4,6 @@
 
 import XCTest
 import Foundation
-import UIKit
 import Alamofire
 import NextcloudKit
 
