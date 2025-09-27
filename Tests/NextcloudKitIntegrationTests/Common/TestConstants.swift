@@ -3,7 +3,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 import Foundation
-import UIKit
 
 public class TestConstants {
     static let timeoutLong: Double = 400
