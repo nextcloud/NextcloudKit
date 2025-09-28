@@ -5,6 +5,9 @@
 
 import Foundation
 
+///
+/// A file or directory on the server.
+///
 public struct NKFile: Sendable {
     public var account: String
     public var classFile: String
@@ -35,13 +38,12 @@ public struct NKFile: Sendable {
     public var ocId: String
     public var ownerId: String
     public var ownerDisplayName: String
-    public var lock: Bool
-    public var lockOwner: String
-    public var lockOwnerEditor: String
-    public var lockOwnerType: Int
-    public var lockOwnerDisplayName: String
-    public var lockTime: Date?
-    public var lockTimeOut: Date?
+
+    ///
+    /// An optional lock on this file. `nil` equals the file not being locked.
+    ///
+    public var lock: NKLock?
+
     public var path: String
     public var permissions: String
     public var quotaUsedBytes: Int64
@@ -107,13 +109,7 @@ public struct NKFile: Sendable {
         ocId: String = "",
         ownerId: String = "",
         ownerDisplayName: String = "",
-        lock: Bool = false,
-        lockOwner: String = "",
-        lockOwnerEditor: String = "",
-        lockOwnerType: Int = 0,
-        lockOwnerDisplayName: String = "",
-        lockTime: Date? = nil,
-        lockTimeOut: Date? = nil,
+        lock: NKLock? = nil,
         path: String = "",
         permissions: String = "",
         quotaUsedBytes: Int64 = 0,
@@ -171,12 +167,6 @@ public struct NKFile: Sendable {
             self.ownerId = ownerId
             self.ownerDisplayName = ownerDisplayName
             self.lock = lock
-            self.lockOwner = lockOwner
-            self.lockOwnerEditor = lockOwnerEditor
-            self.lockOwnerType = lockOwnerType
-            self.lockOwnerDisplayName = lockOwnerDisplayName
-            self.lockTime = lockTime
-            self.lockTimeOut = lockTimeOut
             self.path = path
             self.permissions = permissions
             self.quotaUsedBytes = quotaUsedBytes
