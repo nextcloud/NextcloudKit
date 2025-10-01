@@ -127,7 +127,7 @@ public extension NextcloudKit {
                         let assistant: Assistant?
                         let recommendations: Recommendations?
                         let termsOfService: TermsOfService?
-                        let declarativeUI: DeclarativeUI?
+                        let declarativeUI: NKDeclarativeUICapabilities?
 
                         enum CodingKeys: String, CodingKey {
                             case downloadLimit = "downloadlimit"
@@ -518,7 +518,7 @@ final public class NKCapabilities: Sendable {
         public var termsOfService: Bool                             = false
 //        public var declarativeUIEnabled: Bool                       = false
 //        public var declarativeUIContextMenu: [ContextMenuItem]                       = []
-        public var declarativeUI: DeclarativeUI?                    = nil
+        public var declarativeUI: NKDeclarativeUICapabilities?                    = nil
         public var directEditingEditors: [NKEditorDetailsEditor]    = []
         public var directEditingCreators: [NKEditorDetailsCreator]  = []
         public var directEditingTemplates: [NKEditorTemplate]       = []

@@ -40,7 +40,7 @@ import Alamofire
 //    }
 //}
 
-public struct DeclarativeUI: Codable {
+public struct NKDeclarativeUICapabilities: Codable {
     public let apps: [String: AppContext]
 
     public init(from decoder: Decoder) throws {
