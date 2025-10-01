@@ -16,12 +16,15 @@ import Alamofire
 
 public extension NextcloudKit {
 
+    ///
     /// Retrieves the capabilities of the Nextcloud server for the given account.
+    ///
     /// - Parameters:
     ///   - account: The account identifier.
     ///   - options: Additional request options.
     ///   - taskHandler: Callback for the underlying URL session task.
     ///   - completion: Callback returning parsed capabilities or an error.
+    ///   
     func getCapabilities(account: String,
                          options: NKRequestOptions = NKRequestOptions(),
                          taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
@@ -271,6 +274,15 @@ public extension NextcloudKit {
 
                         struct Files: Codable {
                             let undelete: Bool?
+
+                            ///
+                            /// Whether different lock types as defined in ``NKLockType`` are supported or not.
+                            ///
+                            let lockTypes: Bool?
+
+                            ///
+                            /// The version of the locking API.
+                            ///
                             let locking: String?
                             let comments: Bool?
                             let versioning: Bool?
@@ -284,6 +296,7 @@ public extension NextcloudKit {
                             let forbiddenFileNameExtensions: [String]?
 
                             enum CodingKeys: String, CodingKey {
+                                case lockTypes = "api-feature-lock-type"
                                 case undelete, locking, comments, versioning, directEditing, bigfilechunking
                                 case versiondeletion = "version_deletion"
                                 case versionlabeling = "version_labeling"
@@ -303,11 +316,13 @@ public extension NextcloudKit {
                         struct UserStatus: Codable {
                             let enabled: Bool?
                             let restore: Bool?
-                            let supportsemoji: Bool?
+                            let supportsEmoji: Bool?
+                            let supportsBusy: Bool?
 
                             enum CodingKeys: String, CodingKey {
                                 case enabled, restore
-                                case supportsemoji = "supports_emoji"
+                                case supportsEmoji = "supports_emoji"
+                                case supportsBusy = "supports_busy"
                             }
                         }
 
@@ -417,11 +432,14 @@ public extension NextcloudKit {
             capabilities.notification = json.notifications?.ocsendpoints ?? []
 
             capabilities.filesUndelete = json.files?.undelete ?? false
+            capabilities.filesLockTypes = json.files?.lockTypes ?? false
             capabilities.filesLockVersion = json.files?.locking ?? ""
             capabilities.filesComments = json.files?.comments ?? false
             capabilities.filesBigfilechunking = json.files?.bigfilechunking ?? false
 
             capabilities.userStatusEnabled = json.userstatus?.enabled ?? false
+            capabilities.userStatusSupportsBusy = json.userstatus?.supportsBusy ?? false
+
             capabilities.externalSites = json.external != nil
             capabilities.groupfoldersEnabled = json.groupfolders?.hasGroupFolders ?? false
 
@@ -468,12 +486,17 @@ actor CapabilitiesStore {
     }
 }
 
-/// Singleton container and public API for accessing and caching capabilities.
+///
+/// Singleton container and public API for accessing and caching capabilities for user accounts.
+///
 final public class NKCapabilities: Sendable {
     public static let shared = NKCapabilities()
 
     private let store = CapabilitiesStore()
 
+    ///
+    /// Flattened set of capabilities after parsing the server response.
+    ///
     public class Capabilities: @unchecked Sendable {
         public var serverVersionMajor: Int                          = 0
         public var serverVersion: String                            = ""
@@ -500,10 +523,20 @@ final public class NKCapabilities: Sendable {
         public var activity: [String]                               = []
         public var notification: [String]                           = []
         public var filesUndelete: Bool                              = false
+
+        ///
+        /// Whether different lock types as defined in ``NKLockType`` are supported or not.
+        ///
+        public var filesLockTypes: Bool                             = false
+
+        ///
+        /// The version of the locking API.
+        ///
         public var filesLockVersion: String                         = ""    // NC 24
         public var filesComments: Bool                              = false // NC 20
         public var filesBigfilechunking: Bool                       = false
         public var userStatusEnabled: Bool                          = false
+        public var userStatusSupportsBusy: Bool                     = false
         public var externalSites: Bool                              = false
         public var activityEnabled: Bool                            = false
         public var groupfoldersEnabled: Bool                        = false // NC27
@@ -528,17 +561,37 @@ final public class NKCapabilities: Sendable {
 
     // MARK: - Public API
 
+    ///
+    /// Set or overwrite the existing capabilities in the store.
+    ///
+    /// - Parameters:
+    ///     - account: The account identifier for which the capabilities should be stored for.
+    ///     - capabilities: The actual capabilities which should be stored.
+    ///
     public func setCapabilities(for account: String, capabilities: Capabilities) async {
         await store.set(account, value: capabilities)
     }
 
+    ///
+    /// The capabilities by the given account identifier.
+    ///
+    /// - Parameter account: The account identifier for which the capabilities should be returned.
+    ///
+    /// - Returns: Either the acquired capabilities or a default object.
+    ///
     public func getCapabilities(for account: String?) async -> Capabilities {
         guard let account else {
             return Capabilities()
         }
+
         return await store.get(account) ?? Capabilities()
     }
 
+    ///
+    /// Remove capabilities stored in the in-memory cache.
+    ///
+    /// - Parameter account: The account identifier for which the capabilities should be removed.
+    ///
     public func removeCapabilities(for account: String) async {
         await store.remove(account)
     }
