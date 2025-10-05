@@ -97,6 +97,7 @@ public struct NKCommon: Sendable {
                             completion: @escaping (_ filesChunk: [(fileName: String, size: Int64)], _ error: Error?) -> Void = { _, _ in }) {
         // Return existing chunks immediately
         if !filesChunk.isEmpty {
+            numChunks(filesChunk.count)
             return completion(filesChunk, nil)
         }
 
