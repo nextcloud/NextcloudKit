@@ -101,10 +101,6 @@ public struct NKCommon: Sendable {
             return completion(filesChunk, nil)
         }
 
-        defer {
-            NotificationCenter.default.removeObserver(self, name: notificationCenterChunkedFileStop, object: nil)
-        }
-
         let fileManager = FileManager.default
         var isDirectory: ObjCBool = false
         var reader: FileHandle?
@@ -116,10 +112,6 @@ public struct NKCommon: Sendable {
         var chunkSize = chunkSize
         let bufferSize = 1_000_000
         var stop = false
-
-        NotificationCenter.default.addObserver(forName: notificationCenterChunkedFileStop, object: nil, queue: nil) { _ in
-            stop = true
-        }
 
         // If max chunk count is > 10000 (max count), add + 100 MB to the chunk size to reduce the count. This is an edge case.
         let inputFilePath = inputDirectory + "/" + fileName
@@ -146,6 +138,14 @@ public struct NKCommon: Sendable {
             reader = try .init(forReadingFrom: URL(fileURLWithPath: inputFilePath))
         } catch {
             return completion([], NSError(domain: "chunkedFile", code: -1, userInfo: [NSLocalizedDescriptionKey: "Failed to open the input file for reading."]))
+        }
+
+        let tokenObserver = NotificationCenter.default.addObserver(forName: notificationCenterChunkedFileStop, object: nil, queue: nil) { _ in
+            stop = true
+        }
+
+        defer {
+            NotificationCenter.default.removeObserver(tokenObserver)
         }
 
         outerLoop: repeat {
