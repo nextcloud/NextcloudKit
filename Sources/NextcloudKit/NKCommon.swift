@@ -146,6 +146,9 @@ public struct NKCommon: Sendable {
 
         defer {
             NotificationCenter.default.removeObserver(tokenObserver)
+
+            try? writer?.close()
+            try? reader?.close()
         }
 
         outerLoop: repeat {
@@ -228,9 +231,6 @@ public struct NKCommon: Sendable {
                 break
             }
         } while true
-
-        writer?.closeFile()
-        reader?.closeFile()
 
         // Update incremental chunk sizes
         for i in 0..<filesChunk.count {
