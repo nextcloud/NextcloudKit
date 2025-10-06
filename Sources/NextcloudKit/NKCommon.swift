@@ -97,11 +97,8 @@ public struct NKCommon: Sendable {
                             completion: @escaping (_ filesChunk: [(fileName: String, size: Int64)], _ error: Error?) -> Void = { _, _ in }) {
         // Return existing chunks immediately
         if !filesChunk.isEmpty {
+            numChunks(max(0, filesChunk.count - 1))
             return completion(filesChunk, nil)
-        }
-
-        defer {
-            NotificationCenter.default.removeObserver(self, name: notificationCenterChunkedFileStop, object: nil)
         }
 
         let fileManager = FileManager.default
@@ -115,10 +112,6 @@ public struct NKCommon: Sendable {
         var chunkSize = chunkSize
         let bufferSize = 1_000_000
         var stop = false
-
-        NotificationCenter.default.addObserver(forName: notificationCenterChunkedFileStop, object: nil, queue: nil) { _ in
-            stop = true
-        }
 
         // If max chunk count is > 10000 (max count), add + 100 MB to the chunk size to reduce the count. This is an edge case.
         let inputFilePath = inputDirectory + "/" + fileName
@@ -145,6 +138,17 @@ public struct NKCommon: Sendable {
             reader = try .init(forReadingFrom: URL(fileURLWithPath: inputFilePath))
         } catch {
             return completion([], NSError(domain: "chunkedFile", code: -1, userInfo: [NSLocalizedDescriptionKey: "Failed to open the input file for reading."]))
+        }
+
+        let tokenObserver = NotificationCenter.default.addObserver(forName: notificationCenterChunkedFileStop, object: nil, queue: nil) { _ in
+            stop = true
+        }
+
+        defer {
+            NotificationCenter.default.removeObserver(tokenObserver)
+
+            try? writer?.close()
+            try? reader?.close()
         }
 
         outerLoop: repeat {
@@ -227,9 +231,6 @@ public struct NKCommon: Sendable {
                 break
             }
         } while true
-
-        writer?.closeFile()
-        reader?.closeFile()
 
         // Update incremental chunk sizes
         for i in 0..<filesChunk.count {
