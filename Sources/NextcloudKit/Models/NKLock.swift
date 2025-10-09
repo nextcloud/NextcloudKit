@@ -18,7 +18,7 @@ public struct NKLock: Equatable, Sendable {
     ///
     /// App id of an app owned lock to allow clients to suggest joining the collaborative editing session through the web or direct editing.
     ///
-    public let ownerEditor: String
+    public let ownerEditor: String?
 
     ///
     /// What kind of lock this is.
@@ -53,7 +53,11 @@ public struct NKLock: Equatable, Sendable {
     /// This is intended for creating an instance based on a superset of required properties returned by a `PROPFIND` request to the server about an item.
     ///
     public init?(xml properties: XML.Accessor) {
-        guard let isLocked = properties["nc:lock"].bool else {
+        guard let rawIsLocked = properties["nc:lock"].int else {
+            return nil
+        }
+
+        guard rawIsLocked > 0 else {
             return nil
         }
 
@@ -62,10 +66,6 @@ public struct NKLock: Equatable, Sendable {
         }
 
         guard let ownerDisplayName = properties["nc:lock-owner-displayname"].text else {
-            return nil
-        }
-
-        guard let ownerEditor = properties["nc:lock-owner-editor"].text else {
             return nil
         }
 
@@ -84,7 +84,7 @@ public struct NKLock: Equatable, Sendable {
         let lockToken = properties["nc:lock-token"].text
 
         self.owner = owner
-        self.ownerEditor = ownerEditor
+        self.ownerEditor = properties["nc:lock-owner-editor"].text
         self.ownerType = lockOwnerType
         self.ownerDisplayName = ownerDisplayName
         self.time = Date(timeIntervalSince1970: rawTime)
