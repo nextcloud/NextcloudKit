@@ -50,12 +50,11 @@ public extension NextcloudKit {
             options.queue.async { taskHandler(task) }
         } .downloadProgress { progress in
             options.queue.async { progressHandler(progress) }
-        } .responseData(queue: self.nkCommonInstance.backgroundQueue) { response in
-            switch response.result {
-            case .failure(let error):
+        } .response(queue: self.nkCommonInstance.backgroundQueue) { response in
+            if let error = response.error {
                 let resultError = NKError(error: error, afResponse: response, responseData: nil)
                 options.queue.async { completionHandler(account, nil, nil, 0, response.response?.allHeaderFields, error, resultError) }
-            case .success:
+            } else {
                 var date: Date?
                 var etag: String?
                 var length: Int64 = 0
