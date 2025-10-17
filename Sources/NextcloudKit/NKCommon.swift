@@ -6,7 +6,7 @@
 import Foundation
 import Alamofire
 
-public enum NKTypeReachability: Int {
+public enum NKTypeReachability: Int, Sendable {
     case unknown = 0
     case notReachable = 1
     case reachableEthernetOrWiFi = 2
