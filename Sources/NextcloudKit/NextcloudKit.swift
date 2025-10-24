@@ -10,7 +10,7 @@ import UIKit
 import Alamofire
 import SwiftyJSON
 
-open class NextcloudKit {
+open class NextcloudKit: @unchecked Sendable {
 #if swift(<6.0)
     public static let shared: NextcloudKit = {
         let instance = NextcloudKit()
