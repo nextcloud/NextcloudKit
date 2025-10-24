@@ -1193,7 +1193,7 @@ public extension NextcloudKit {
                            showHiddenFiles: Bool,
                            account: String,
                            options: NKRequestOptions = NKRequestOptions(),
-                           taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in }
+                           taskHandler: @Sendable @escaping (_ task: URLSessionTask) -> Void = { _ in }
     ) async -> (
         account: String,
         items: [NKTrash]?,

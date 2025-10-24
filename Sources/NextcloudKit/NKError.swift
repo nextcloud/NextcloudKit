@@ -32,7 +32,7 @@ extension OCSPath {
     static var ocsXMLMsg: Self { ["d:error", "s:message"] }
 }
 
-public struct NKError: Error, Equatable {
+public struct NKError: Error, Equatable, Sendable {
     static let internalError = -9999
     public let errorCode: Int
     public let errorDescription: String

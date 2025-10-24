@@ -14,7 +14,7 @@ public enum NKTypeReachability: Int, Sendable {
 }
 
 public protocol NextcloudKitDelegate: AnyObject, Sendable {
-    func authenticationChallenge(_ session: URLSession, didReceive challenge: URLAuthenticationChallenge, completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void)
+    func authenticationChallenge(_ session: URLSession, didReceive challenge: URLAuthenticationChallenge, completionHandler: @Sendable @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void)
     func urlSessionDidFinishEvents(forBackgroundURLSession session: URLSession)
 
     func networkReachabilityObserver(_ typeReachability: NKTypeReachability)

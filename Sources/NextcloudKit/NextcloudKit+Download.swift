@@ -26,7 +26,7 @@ public extension NextcloudKit {
                   requestHandler: @escaping (_ request: DownloadRequest) -> Void = { _ in },
                   taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
                   progressHandler: @escaping (_ progress: Progress) -> Void = { _ in },
-                  completionHandler: @escaping (_ account: String, _ etag: String?, _ date: Date?, _ lenght: Int64, _ headers: [AnyHashable: Any]?, _ afError: AFError?, _ nKError: NKError) -> Void) {
+                  completionHandler: @escaping (_ account: String, _ etag: String?, _ date: Date?, _ lenght: Int64, _ headers: [AnyHashable: any Sendable]?, _ afError: AFError?, _ nKError: NKError) -> Void) {
         var convertible: URLConvertible?
         if serverUrlFileName is URL {
             convertible = serverUrlFileName as? URLConvertible
@@ -103,7 +103,7 @@ public extension NextcloudKit {
         etag: String?,
         date: Date?,
         length: Int64,
-        headers: [AnyHashable: Any]?,
+        headers: [AnyHashable: any Sendable]?,
         afError: AFError?,
         nkError: NKError
     ) {
