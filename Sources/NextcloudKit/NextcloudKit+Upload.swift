@@ -167,231 +167,7 @@ public extension NextcloudKit {
         }
     }
 
-    /// Uploads a file in multiple chunks to the Nextcloud server using TUS-like behavior.
-    ///
-    /// - Parameters:
-    ///   - directory: The local directory containing the original file.
-    ///   - fileChunksOutputDirectory: Optional custom output directory for chunks (default is same as `directory`).
-    ///   - fileName: Name of the original file to split and upload.
-    ///   - destinationFileName: Optional custom filename to be used on the server.
-    ///   - date: The modification date to be set on the uploaded file.
-    ///   - creationDate: The creation date to be set on the uploaded file.
-    ///   - serverUrl: The destination server path.
-    ///   - chunkFolder: A temporary folder name (usually a UUID).
-    ///   - filesChunk: List of chunk identifiers and their expected sizes.
-    ///   - chunkSize: Size of each chunk in bytes.
-    ///   - account: The Nextcloud account used for authentication.
-    ///   - options: Request options (headers, queue, etc.).
-    ///   - numChunks: Callback invoked with total number of chunks.
-    ///   - counterChunk: Callback invoked with the index of the chunk being uploaded.
-    ///   - start: Called when chunk upload begins, with the full chunk list.
-    ///   - requestHandler: Handler to inspect the upload request.
-    ///   - taskHandler: Handler to inspect the upload task.
-    ///   - progressHandler: Progress callback with expected bytes, transferred bytes, and fraction completed.
-    ///   - uploaded: Called each time a chunk is successfully uploaded.
-    ///   - completion: Called when all chunks are uploaded and reassembled. Returns:
-    ///     - account: The user account used.
-    ///     - filesChunk: Remaining chunks (if any).
-    ///     - file: The final `NKFile` metadata for the uploaded file.
-    ///     - error: Upload result as `NKError`.
-    func uploadChunk(directory: String,
-                     fileChunksOutputDirectory: String? = nil,
-                     fileName: String,
-                     destinationFileName: String? = nil,
-                     date: Date?,
-                     creationDate: Date?,
-                     serverUrl: String,
-                     chunkFolder: String,
-                     filesChunk: [(fileName: String, size: Int64)],
-                     chunkSize: Int,
-                     account: String,
-                     options: NKRequestOptions = NKRequestOptions(),
-                     numChunks: @escaping (_ num: Int) -> Void = { _ in },
-                     counterChunk: @escaping (_ counter: Int) -> Void = { _ in },
-                     start: @escaping (_ filesChunk: [(fileName: String, size: Int64)]) -> Void = { _ in },
-                     requestHandler: @escaping (_ request: UploadRequest) -> Void = { _ in },
-                     taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-                     progressHandler: @escaping (_ totalBytesExpected: Int64, _ totalBytes: Int64, _ fractionCompleted: Double) -> Void = { _, _, _ in },
-                     uploaded: @escaping (_ fileChunk: (fileName: String, size: Int64)) -> Void = { _ in },
-                     assembling: @escaping () -> Void = { },
-                     completion: @escaping (_ account: String, _ filesChunk: [(fileName: String, size: Int64)]?, _ file: NKFile?, _ error: NKError) -> Void) {
-        guard let nkSession = nkCommonInstance.nksessions.session(forAccount: account) else {
-            return completion(account, nil, nil, .urlError)
-        }
-        let fileNameLocalSize = self.nkCommonInstance.getFileSize(filePath: directory + "/" + fileName)
-        let serverUrlChunkFolder = nkSession.urlBase + "/" + nkSession.dav + "/uploads/" + nkSession.userId + "/" + chunkFolder
-        let serverUrlFileName = nkSession.urlBase + "/" + nkSession.dav + "/files/" + nkSession.userId + self.nkCommonInstance.returnPathfromServerUrl(serverUrl, urlBase: nkSession.urlBase, userId: nkSession.userId) + "/" + (destinationFileName ?? fileName)
-        if options.customHeader == nil {
-            options.customHeader = [:]
-        }
-        options.customHeader?["Destination"] = serverUrlFileName.urlEncoded
-        options.customHeader?["OC-Total-Length"] = String(fileNameLocalSize)
 
-        // Check available disk space
-        #if os(macOS)
-        var fsAttributes: [FileAttributeKey: Any]
-        do {
-            fsAttributes = try FileManager.default.attributesOfFileSystem(forPath: "/")
-        } catch {
-            return completion(account, nil, nil, .errorChunkNoEnoughMemory)
-        }
-        let freeDisk = ((fsAttributes[FileAttributeKey.systemFreeSize] ?? 0) as? Int64) ?? 0
-        #elseif os(visionOS) || os(iOS)
-        var freeDisk: Int64 = 0
-        let outputPath = fileChunksOutputDirectory ?? directory
-        let outputURL = URL(fileURLWithPath: outputPath)
-
-        do {
-            let keys: Set<URLResourceKey> = [
-                .volumeAvailableCapacityForImportantUsageKey,
-                .volumeAvailableCapacityKey
-            ]
-            let values = try outputURL.resourceValues(forKeys: keys)
-
-            if let importantUsage = values.volumeAvailableCapacityForImportantUsage {
-                freeDisk = importantUsage
-            } else if let legacyCapacity = values.volumeAvailableCapacity {
-                freeDisk = Int64(legacyCapacity)
-            }
-        } catch {
-            // fallback zero
-            freeDisk = 0
-        }
-        #endif
-
-        #if os(visionOS) || os(iOS)
-        if freeDisk < fileNameLocalSize * 3 {
-            // It seems there is not enough space to send the file
-            return completion(account, nil, nil, .errorChunkNoEnoughMemory)
-        }
-        #endif
-
-        // Ensure upload chunk folder exists
-        func createFolderIfNeeded(completion: @escaping (_ errorCode: NKError) -> Void) {
-            readFileOrFolder(serverUrlFileName: serverUrlChunkFolder, depth: "0", account: account, options: options) { _, _, _, error in
-                if error == .success {
-                    completion(NKError())
-                } else if error.errorCode == 404 {
-                    self.createFolder(serverUrlFileName: serverUrlChunkFolder, account: account, options: options) { _, _, _, _, error in
-                        completion(error)
-                    }
-                } else {
-                    completion(error)
-                }
-            }
-        }
-
-        createFolderIfNeeded { error in
-            guard error == .success else {
-                return completion(account, nil, nil, .errorChunkCreateFolder)
-            }
-            let outputDirectory = fileChunksOutputDirectory ?? directory
-            var uploadNKError = NKError()
-
-
-            self.nkCommonInstance.chunkedFile(inputDirectory: directory,
-                                              outputDirectory: outputDirectory,
-                                              fileName: fileName,
-                                              chunkSize: chunkSize,
-                                              filesChunk: filesChunk) { num in
-                numChunks(num)
-            } counterChunk: { counter in
-                counterChunk(counter)
-            } completion: { filesChunk, error in
-
-                // Check chunking error
-                if let error {
-                    return completion(account, nil, nil, NKError(error: error))
-                }
-
-                guard !filesChunk.isEmpty else {
-                    return completion(account, nil, nil, NKError(error: NSError(domain: "chunkedFile", code: -5,userInfo: [NSLocalizedDescriptionKey: "Files empty."])))
-                }
-
-                var filesChunkOutput = filesChunk
-                start(filesChunkOutput)
-
-                for fileChunk in filesChunk {
-                    let serverUrlFileName = serverUrlChunkFolder + "/" + fileChunk.fileName
-                    let fileNameLocalPath = outputDirectory + "/" + fileChunk.fileName
-                    let fileSize = self.nkCommonInstance.getFileSize(filePath: fileNameLocalPath)
-
-                    if fileSize == 0 {
-                        // The file could not be sent
-                        return completion(account, nil, nil, NKError(error: NSError(domain: "chunkedFile", code: -6,userInfo: [NSLocalizedDescriptionKey: "File empty."])))
-                    }
-
-                    let semaphore = DispatchSemaphore(value: 0)
-                    self.upload(serverUrlFileName: serverUrlFileName, fileNameLocalPath: fileNameLocalPath, account: account, options: options, requestHandler: { request in
-                        requestHandler(request)
-                    }, taskHandler: { task in
-                        taskHandler(task)
-                    }, progressHandler: { _ in
-                        let totalBytesExpected = fileNameLocalSize
-                        let totalBytes = fileChunk.size
-                        let fractionCompleted = Double(totalBytes) / Double(totalBytesExpected)
-                        progressHandler(totalBytesExpected, totalBytes, fractionCompleted)
-                    }) { _, _, _, _, _, _, error in
-                        if error == .success {
-                            filesChunkOutput.removeFirst()
-                            uploaded(fileChunk)
-                        }
-                        uploadNKError = error
-                        semaphore.signal()
-                    }
-                    semaphore.wait()
-
-                    if uploadNKError != .success {
-                        break
-                    }
-                }
-
-                guard uploadNKError == .success else {
-                    return completion(account, filesChunkOutput, nil, uploadNKError)
-                }
-
-                // Assemble the chunks
-                let serverUrlFileNameSource = serverUrlChunkFolder + "/.file"
-                // Epoch of linux do not permitted negativ value
-                if let creationDate, creationDate.timeIntervalSince1970 > 0 {
-                    options.customHeader?["X-OC-CTime"] = "\(creationDate.timeIntervalSince1970)"
-                }
-                // Epoch of linux do not permitted negativ value
-                if let date, date.timeIntervalSince1970 > 0 {
-                    options.customHeader?["X-OC-MTime"] = "\(date.timeIntervalSince1970)"
-                }
-                // Calculate Assemble Timeout
-                let assembleSizeInGB = Double(fileNameLocalSize) / 1e9
-                let assembleTimePerGB: Double = 3 * 60  // 3  min
-                let assembleTimeMin: Double = 60        // 60 sec
-                let assembleTimeMax: Double = 30 * 60   // 30 min
-                options.timeout = max(assembleTimeMin, min(assembleTimePerGB * assembleSizeInGB, assembleTimeMax))
-
-                assembling()
-
-                self.moveFileOrFolder(serverUrlFileNameSource: serverUrlFileNameSource, serverUrlFileNameDestination: serverUrlFileName, overwrite: true, account: account, options: options) { _, _, error in
-                    guard error == .success else {
-                        return completion(account, filesChunkOutput, nil,.errorChunkMoveFile)
-                    }
-                    self.readFileOrFolder(serverUrlFileName: serverUrlFileName, depth: "0", account: account, options: NKRequestOptions(queue: self.nkCommonInstance.backgroundQueue)) { _, files, _, error in
-                        guard error == .success, let file = files?.first else {
-                            return completion(account, filesChunkOutput, nil, .errorChunkMoveFile)
-                        }
-                        return completion(account, filesChunkOutput, file, error)
-                    }
-                }
-            }
-        }
-    }
-
-    /// Asynchronously uploads a file in chunks and assembles it on the Nextcloud server.
-    ///
-    /// - Parameters: Same as the sync version.
-    /// - Returns: A tuple containing:
-    ///   - account: The user account used.
-    ///   - remainingChunks: Remaining chunks if any failed (or nil if success).
-    ///   - file: The final file metadata object.
-    ///   - error: Upload result as `NKError`.
     func uploadChunkAsync(directory: String,
                           fileChunksOutputDirectory: String? = nil,
                           fileName: String,
@@ -410,32 +186,191 @@ public extension NextcloudKit {
                           requestHandler: @escaping (_ request: UploadRequest) -> Void = { _ in },
                           taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
                           progressHandler: @escaping (_ totalBytesExpected: Int64, _ totalBytes: Int64, _ fractionCompleted: Double) -> Void = { _, _, _ in },
-                          assembling: @escaping () -> Void = { },
-                          uploaded: @escaping (_ fileChunk: (fileName: String, size: Int64)) -> Void = { _ in }
-    ) async -> (account: String, remainingChunks: [(fileName: String, size: Int64)]?, file: NKFile?, error: NKError) {
-        await withCheckedContinuation { continuation in
-            uploadChunk(directory: directory,
-                        fileChunksOutputDirectory: fileChunksOutputDirectory,
-                        fileName: fileName,
-                        destinationFileName: destinationFileName,
-                        date: date,
-                        creationDate: creationDate,
-                        serverUrl: serverUrl,
-                        chunkFolder: chunkFolder,
-                        filesChunk: filesChunk,
-                        chunkSize: chunkSize,
-                        account: account,
-                        options: options,
-                        numChunks: numChunks,
-                        counterChunk: counterChunk,
-                        start: start,
-                        requestHandler: requestHandler,
-                        taskHandler: taskHandler,
-                        progressHandler: progressHandler,
-                        uploaded: uploaded,
-                        assembling: assembling) { account, remaining, file, error in
-                continuation.resume(returning: (account: account, remainingChunks: remaining, file: file, error: error))
-            }
+                          uploaded: @escaping (_ fileChunk: (fileName: String, size: Int64)) -> Void = { _ in },
+                          assembling: @escaping () -> Void = { }
+    ) async throws -> (account: String, remainingChunks: [(fileName: String, size: Int64)]?, file: NKFile?) {
+        // Resolve session
+        guard let nkSession = nkCommonInstance.nksessions.session(forAccount: account) else {
+            throw NKError.urlError
         }
+
+        // Build endpoints and headers
+        let fileNameLocalSize = self.nkCommonInstance.getFileSize(filePath: directory + "/" + fileName)
+        let serverUrlChunkFolder = nkSession.urlBase + "/" + nkSession.dav + "/uploads/" + nkSession.userId + "/" + chunkFolder
+        let serverUrlFileName = nkSession.urlBase + "/" + nkSession.dav + "/files/" + nkSession.userId
+            + self.nkCommonInstance.returnPathfromServerUrl(serverUrl, urlBase: nkSession.urlBase, userId: nkSession.userId)
+            + "/" + (destinationFileName ?? fileName)
+
+        if options.customHeader == nil { options.customHeader = [:] }
+        options.customHeader?["Destination"] = serverUrlFileName.urlEncoded
+        options.customHeader?["OC-Total-Length"] = String(fileNameLocalSize)
+
+        // Disk space preflight (best-effort)
+        #if os(macOS)
+        let fsAttributes = try FileManager.default.attributesOfFileSystem(forPath: "/")
+        let freeDisk = (fsAttributes[.systemFreeSize] as? NSNumber)?.int64Value ?? 0
+        #else
+        let outputPath = fileChunksOutputDirectory ?? directory
+        let outputURL = URL(fileURLWithPath: outputPath)
+        let freeDisk: Int64 = {
+            do {
+                let keys: Set<URLResourceKey> = [.volumeAvailableCapacityForImportantUsageKey, .volumeAvailableCapacityKey]
+                let values = try outputURL.resourceValues(forKeys: keys)
+                if let important = values.volumeAvailableCapacityForImportantUsage { return important }
+                if let legacy = values.volumeAvailableCapacity { return Int64(legacy) }
+            } catch {}
+            return 0
+        }()
+        #endif
+
+        // Need at least ~3x to be safe (chunks + temp + HTTP plumbing)
+        #if os(visionOS) || os(iOS) || os(macOS)
+        if freeDisk < fileNameLocalSize * 3 {
+            throw NKError.errorChunkNoEnoughMemory
+        }
+        #endif
+
+        try Task.checkCancellation()
+
+        // Ensure remote chunk folder exists (read or create)
+        var readErr = await readFileOrFolderAsync(serverUrlFileName: serverUrlChunkFolder,
+                                                  depth: "0",
+                                                  account: account,
+                                                  options: options).error
+        if readErr.errorCode == 404 {
+            readErr = await createFolderAsync(serverUrlFileName: serverUrlChunkFolder,
+                                              account: account,
+                                              options: options).error
+        }
+        guard readErr == .success else {
+            throw NKError.errorChunkCreateFolder
+        }
+
+        let outputDirectory = fileChunksOutputDirectory ?? directory
+
+        // 1) Generate chunks (async, cancellable)
+        let chunkedFiles: [(fileName: String, size: Int64)]
+        do {
+            chunkedFiles = try await self.nkCommonInstance.chunkedFile(
+                inputDirectory: directory,
+                outputDirectory: outputDirectory,
+                fileName: fileName,
+                chunkSize: chunkSize,
+                filesChunk: filesChunk,
+                numChunks: { n in numChunks(n) },
+                counterChunk: { c in counterChunk(c) }
+            )
+        } catch let ns as NSError where ns.domain == "chunkedFile" {
+            // Preserve your original error semantics (propagate as NKError)
+            throw NKError(error: ns)
+        } catch {
+            throw NKError(error: error)
+        }
+
+        try Task.checkCancellation()
+
+        // Sanity check: must have at least one chunk
+        guard !chunkedFiles.isEmpty else {
+            throw NKError(error: NSError(domain: "chunkedFile", code: -5,
+                                         userInfo: [NSLocalizedDescriptionKey: "Files empty."]))
+        }
+
+        // Notify start with the final chunk list
+        start(chunkedFiles)
+
+        // 2) Upload each chunk with cooperative cancellation
+        var lastError: NKError = .success
+        for fileChunk in chunkedFiles {
+            try Task.checkCancellation()
+
+            let serverUrlFileNameChunk = serverUrlChunkFolder + "/" + fileChunk.fileName
+            let fileNameLocalPath = outputDirectory + "/" + fileChunk.fileName
+            let sz = self.nkCommonInstance.getFileSize(filePath: fileNameLocalPath)
+            guard sz > 0 else {
+                throw NKError(error: NSError(domain: "chunkedFile", code: -6,
+                                             userInfo: [NSLocalizedDescriptionKey: "File empty."]))
+            }
+
+            let results = await self.uploadAsync(
+                serverUrlFileName: serverUrlFileNameChunk,
+                fileNameLocalPath: fileNameLocalPath,
+                account: account,
+                options: options,
+                requestHandler: { request in
+                    requestHandler(request)
+                },
+                taskHandler: { task in
+                    taskHandler(task)
+                },
+                progressHandler: { _ in
+                    // Progress is computed from chunk cumulative size vs total
+                    let totalBytesExpected = fileNameLocalSize
+                    let totalBytes = fileChunk.size
+                    let fractionCompleted = Double(totalBytes) / Double(totalBytesExpected)
+                    progressHandler(totalBytesExpected, totalBytes, fractionCompleted)
+                }
+            )
+
+            lastError = results.error
+            if lastError != .success {
+                // Compute remaining chunks from the point of failure
+                if let idx = chunkedFiles.firstIndex(where: { $0.fileName == fileChunk.fileName }) {
+                    let remaining = Array(chunkedFiles.suffix(from: idx))
+                    return (account, remaining, nil)
+                } else {
+                    return (account, chunkedFiles, nil)
+                }
+            }
+
+            // Optional per-chunk callback
+            uploaded(fileChunk)
+        }
+
+        try Task.checkCancellation()
+
+        // 3) Assemble the chunks (MOVE .file -> final path)
+        let serverUrlFileNameSource = serverUrlChunkFolder + "/.file"
+
+        // Attach creation/modification times if valid (Linux epoch must be > 0)
+        if let creationDate, creationDate.timeIntervalSince1970 > 0 {
+            options.customHeader?["X-OC-CTime"] = "\(creationDate.timeIntervalSince1970)"
+        }
+        if let date, date.timeIntervalSince1970 > 0 {
+            options.customHeader?["X-OC-MTime"] = "\(date.timeIntervalSince1970)"
+        }
+
+        // Compute assemble timeout based on size
+        let assembleSizeInGB = Double(fileNameLocalSize) / 1e9
+        let assembleTimePerGB: Double = 3 * 60  // 3 min per GB
+        let assembleTimeMin: Double = 60        // 1 min
+        let assembleTimeMax: Double = 30 * 60   // 30 min
+        options.timeout = max(assembleTimeMin, min(assembleTimePerGB * assembleSizeInGB, assembleTimeMax))
+
+        assembling()
+
+        let moveRes = await moveFileOrFolderAsync(serverUrlFileNameSource: serverUrlFileNameSource,
+                                                  serverUrlFileNameDestination: serverUrlFileName,
+                                                  overwrite: true,
+                                                  account: account,
+                                                  options: options)
+
+        guard moveRes.error == .success else {
+            // Provide remaining chunks so caller could retry assemble after resume
+            throw NKError.errorChunkMoveFile
+        }
+
+        try Task.checkCancellation()
+
+        // 4) Read back the final file to return NKFile
+        let readRes = await readFileOrFolderAsync(serverUrlFileName: serverUrlFileName,
+                                                  depth: "0",
+                                                  account: account,
+                                                  options: options)
+
+        guard readRes.error == .success, let file = readRes.files?.first else {
+            throw NKError.errorChunkMoveFile
+        }
+
+        return (account, nil, file)
     }
 }
