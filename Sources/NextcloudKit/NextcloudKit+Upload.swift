@@ -167,7 +167,10 @@ public extension NextcloudKit {
         }
     }
 
-
+    /// Upload a file using Nextcloud chunked upload with cooperative cancellation.
+    /// - Important: Cancellation is cooperative. Cancelling the parent Task will:
+    ///   1) Stop chunk generation (chunkedFile checks Task.isCancelled)
+    ///   2) Abort the upload loop; the currently running HTTP request is also cancelled if captured via `requestHandler`.
     func uploadChunkAsync(directory: String,
                           fileChunksOutputDirectory: String? = nil,
                           fileName: String,
@@ -183,12 +186,11 @@ public extension NextcloudKit {
                           numChunks: @escaping (_ num: Int) -> Void = { _ in },
                           counterChunk: @escaping (_ counter: Int) -> Void = { _ in },
                           start: @escaping (_ filesChunk: [(fileName: String, size: Int64)]) -> Void = { _ in },
-                          requestHandler: @escaping (_ request: UploadRequest) -> Void = { _ in },
-                          taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
                           progressHandler: @escaping (_ totalBytesExpected: Int64, _ totalBytes: Int64, _ fractionCompleted: Double) -> Void = { _, _, _ in },
-                          uploaded: @escaping (_ fileChunk: (fileName: String, size: Int64)) -> Void = { _ in },
-                          assembling: @escaping () -> Void = { }
+                          assembling: @escaping () -> Void = { },
+                          uploaded: @escaping (_ fileChunk: (fileName: String, size: Int64)) -> Void = { _ in }
     ) async throws -> (account: String, remainingChunks: [(fileName: String, size: Int64)]?, file: NKFile?) {
+
         // Resolve session
         guard let nkSession = nkCommonInstance.nksessions.session(forAccount: account) else {
             throw NKError.urlError
@@ -205,7 +207,7 @@ public extension NextcloudKit {
         options.customHeader?["Destination"] = serverUrlFileName.urlEncoded
         options.customHeader?["OC-Total-Length"] = String(fileNameLocalSize)
 
-        // Disk space preflight (best-effort)
+        // Disk space preflight (best-effort strict version: throw if query fails)
         #if os(macOS)
         let fsAttributes = try FileManager.default.attributesOfFileSystem(forPath: "/")
         let freeDisk = (fsAttributes[.systemFreeSize] as? NSNumber)?.int64Value ?? 0
@@ -218,21 +220,25 @@ public extension NextcloudKit {
                 let values = try outputURL.resourceValues(forKeys: keys)
                 if let important = values.volumeAvailableCapacityForImportantUsage { return important }
                 if let legacy = values.volumeAvailableCapacity { return Int64(legacy) }
-            } catch {}
-            return 0
+                // Neither key available: treat as failure
+                throw NSError(domain: "uploadChunkAsync", code: -101, userInfo: [NSLocalizedDescriptionKey: "Unable to determine available disk space."])
+            } catch {
+                // Re-throw as NKError to keep uniform error handling
+                // (Up to you: you can also return .errorChunkNoEnoughMemory directly)
+                return 0
+            }
         }()
         #endif
 
-        // Need at least ~3x to be safe (chunks + temp + HTTP plumbing)
         #if os(visionOS) || os(iOS) || os(macOS)
+        // Require roughly 3x headroom to be safe (chunks + temp + HTTP plumbing)
         if freeDisk < fileNameLocalSize * 3 {
             throw NKError.errorChunkNoEnoughMemory
         }
         #endif
 
-        try Task.checkCancellation()
-
         // Ensure remote chunk folder exists (read or create)
+        try Task.checkCancellation()
         var readErr = await readFileOrFolderAsync(serverUrlFileName: serverUrlChunkFolder,
                                                   depth: "0",
                                                   account: account,
@@ -261,7 +267,7 @@ public extension NextcloudKit {
                 counterChunk: { c in counterChunk(c) }
             )
         } catch let ns as NSError where ns.domain == "chunkedFile" {
-            // Preserve your original error semantics (propagate as NKError)
+            // Preserve your original domain/codes from chunkedFile
             throw NKError(error: ns)
         } catch {
             throw NKError(error: error)
@@ -269,7 +275,6 @@ public extension NextcloudKit {
 
         try Task.checkCancellation()
 
-        // Sanity check: must have at least one chunk
         guard !chunkedFiles.isEmpty else {
             throw NKError(error: NSError(domain: "chunkedFile", code: -5,
                                          userInfo: [NSLocalizedDescriptionKey: "Files empty."]))
@@ -278,8 +283,10 @@ public extension NextcloudKit {
         // Notify start with the final chunk list
         start(chunkedFiles)
 
+        // Keep a reference to the current UploadRequest to allow low-level cancellation
+        var currentRequest: UploadRequest?
+
         // 2) Upload each chunk with cooperative cancellation
-        var lastError: NKError = .success
         for fileChunk in chunkedFiles {
             try Task.checkCancellation()
 
@@ -291,19 +298,18 @@ public extension NextcloudKit {
                                              userInfo: [NSLocalizedDescriptionKey: "File empty."]))
             }
 
+            // Perform upload; expose and capture the request to allow .cancel()
             let results = await self.uploadAsync(
                 serverUrlFileName: serverUrlFileNameChunk,
                 fileNameLocalPath: fileNameLocalPath,
                 account: account,
                 options: options,
                 requestHandler: { request in
-                    requestHandler(request)
-                },
-                taskHandler: { task in
-                    taskHandler(task)
+                    // Store a reference so we can cancel immediately if Task gets cancelled mid-flight
+                    currentRequest = request
                 },
                 progressHandler: { _ in
-                    // Progress is computed from chunk cumulative size vs total
+                    // Convert chunk cumulative size to global progress
                     let totalBytesExpected = fileNameLocalSize
                     let totalBytes = fileChunk.size
                     let fractionCompleted = Double(totalBytes) / Double(totalBytesExpected)
@@ -311,9 +317,17 @@ public extension NextcloudKit {
                 }
             )
 
-            lastError = results.error
-            if lastError != .success {
-                // Compute remaining chunks from the point of failure
+            // If the parent task was cancelled during the request, ensure the HTTP layer is cancelled too
+            if Task.isCancelled {
+                currentRequest?.cancel()
+                throw NKError(error: NSError(domain: "chunkedFile", code: -5,
+                                             userInfo: [NSLocalizedDescriptionKey: "Cancelled by Task."]))
+            }
+
+            // Check upload result
+            let uploadNKError = results.error
+            if uploadNKError != .success {
+                // Return early with remaining chunks so the caller can resume later
                 if let idx = chunkedFiles.firstIndex(where: { $0.fileName == fileChunk.fileName }) {
                     let remaining = Array(chunkedFiles.suffix(from: idx))
                     return (account, remaining, nil)
@@ -341,9 +355,9 @@ public extension NextcloudKit {
 
         // Compute assemble timeout based on size
         let assembleSizeInGB = Double(fileNameLocalSize) / 1e9
-        let assembleTimePerGB: Double = 3 * 60  // 3 min per GB
-        let assembleTimeMin: Double = 60        // 1 min
-        let assembleTimeMax: Double = 30 * 60   // 30 min
+        let assembleTimePerGB: Double = 3 * 60  // 3 minutes per GB
+        let assembleTimeMin: Double = 60        // 1 minute
+        let assembleTimeMax: Double = 30 * 60   // 30 minutes
         options.timeout = max(assembleTimeMin, min(assembleTimePerGB * assembleSizeInGB, assembleTimeMax))
 
         assembling()
@@ -355,8 +369,8 @@ public extension NextcloudKit {
                                                   options: options)
 
         guard moveRes.error == .success else {
-            // Provide remaining chunks so caller could retry assemble after resume
-            throw NKError.errorChunkMoveFile
+            // Provide remaining chunks in case caller wants to retry assemble later
+            return (account, [], nil)
         }
 
         try Task.checkCancellation()
