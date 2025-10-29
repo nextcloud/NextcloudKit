@@ -381,7 +381,7 @@ public extension NextcloudKit {
     ///   - share: An optional `NKShare` object representing the created share.
     ///   - responseData: The raw `AFDataResponse<Data>` returned by Alamofire.
     ///   - error: An `NKError` representing the result of the operation.
-    private func createShareAsync(
+    public func createShareAsync(
         path: String,
         shareType: Int,
         shareWith: String?,
