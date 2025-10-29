@@ -186,7 +186,7 @@ public extension NextcloudKit {
                           chunkCountHandler: @escaping (_ num: Int) -> Void = { _ in },
                           chunkProgressHandler: @escaping (_ counter: Int) -> Void = { _ in },
                           startUpload: @escaping (_ filesChunk: [(fileName: String, size: Int64)]) -> Void = { _ in },
-                          progressHandler: @escaping (_ totalBytesExpected: Int64, _ totalBytes: Int64, _ fractionCompleted: Double) -> Void = { _, _, _ in },
+                          progressUploadHandler: @escaping (_ totalBytesExpected: Int64, _ totalBytes: Int64, _ fractionCompleted: Double) -> Void = { _, _, _ in },
                           assembling: @escaping () -> Void = { },
                           uploaded: @escaping (_ fileChunk: (fileName: String, size: Int64)) -> Void = { _ in }
     ) async throws -> (account: String, remainingChunks: [(fileName: String, size: Int64)]?, file: NKFile?) {
@@ -317,7 +317,7 @@ public extension NextcloudKit {
                     let totalBytesExpected = fileNameLocalSize
                     let totalBytes = fileChunk.size
                     let fractionCompleted = Double(totalBytes) / Double(totalBytesExpected)
-                    progressHandler(totalBytesExpected, totalBytes, fractionCompleted)
+                    progressUploadHandler(totalBytesExpected, totalBytes, fractionCompleted)
                 }
             )
 
