@@ -183,9 +183,9 @@ public extension NextcloudKit {
                           chunkSize: Int,
                           account: String,
                           options: NKRequestOptions = NKRequestOptions(),
-                          numChunks: @escaping (_ num: Int) -> Void = { _ in },
-                          counterChunk: @escaping (_ counter: Int) -> Void = { _ in },
-                          start: @escaping (_ filesChunk: [(fileName: String, size: Int64)]) -> Void = { _ in },
+                          chunkCountHandler: @escaping (_ num: Int) -> Void = { _ in },
+                          chunkProgressHandler: @escaping (_ counter: Int) -> Void = { _ in },
+                          startUpload: @escaping (_ filesChunk: [(fileName: String, size: Int64)]) -> Void = { _ in },
                           progressHandler: @escaping (_ totalBytesExpected: Int64, _ totalBytes: Int64, _ fractionCompleted: Double) -> Void = { _, _, _ in },
                           assembling: @escaping () -> Void = { },
                           uploaded: @escaping (_ fileChunk: (fileName: String, size: Int64)) -> Void = { _ in }
@@ -263,8 +263,12 @@ public extension NextcloudKit {
                 fileName: fileName,
                 chunkSize: chunkSize,
                 filesChunk: filesChunk,
-                numChunks: { n in numChunks(n) },
-                counterChunk: { c in counterChunk(c) }
+                chunkCountHandler: { num in
+                    chunkCountHandler(num)
+                },
+                chunkProgressHandler: { counter in
+                    chunkProgressHandler(counter)
+                }
             )
         } catch let ns as NSError where ns.domain == "chunkedFile" {
             // Preserve your original domain/codes from chunkedFile
@@ -281,7 +285,7 @@ public extension NextcloudKit {
         }
 
         // Notify start with the final chunk list
-        start(chunkedFiles)
+        startUpload(chunkedFiles)
 
         // Keep a reference to the current UploadRequest to allow low-level cancellation
         var currentRequest: UploadRequest?
