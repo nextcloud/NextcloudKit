@@ -185,8 +185,9 @@ public extension NextcloudKit {
                           options: NKRequestOptions = NKRequestOptions(),
                           chunkCountHandler: @escaping (_ num: Int) -> Void = { _ in },
                           chunkProgressHandler: @escaping (_ counter: Int) -> Void = { _ in },
-                          startUpload: @escaping (_ filesChunk: [(fileName: String, size: Int64)]) -> Void = { _ in },
-                          progressUploadHandler: @escaping (_ totalBytesExpected: Int64, _ totalBytes: Int64, _ fractionCompleted: Double) -> Void = { _, _, _ in },
+                          uploadStart: @escaping (_ filesChunk: [(fileName: String, size: Int64)]) -> Void = { _ in },
+                          uploadTaskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
+                          uploadProgressHandler: @escaping (_ totalBytesExpected: Int64, _ totalBytes: Int64, _ fractionCompleted: Double) -> Void = { _, _, _ in },
                           uploaded: @escaping (_ fileChunk: (fileName: String, size: Int64)) -> Void = { _ in },
                           assembling: @escaping () -> Void = { }
     ) async throws -> (account: String, remainingChunks: [(fileName: String, size: Int64)]?, file: NKFile?) {
@@ -284,8 +285,8 @@ public extension NextcloudKit {
                                          userInfo: [NSLocalizedDescriptionKey: "Files empty."]))
         }
 
-        // Notify start with the final chunk list
-        startUpload(chunkedFiles)
+        // Notify start upload
+        uploadStart(chunkedFiles)
 
         // Keep a reference to the current UploadRequest to allow low-level cancellation
         var currentRequest: UploadRequest?
@@ -312,12 +313,15 @@ public extension NextcloudKit {
                     // Store a reference so we can cancel immediately if Task gets cancelled mid-flight
                     currentRequest = request
                 },
+                taskHandler: { task in
+                    uploadTaskHandler(task)
+                },
                 progressHandler: { _ in
                     // Convert chunk cumulative size to global progress
                     let totalBytesExpected = fileNameLocalSize
                     let totalBytes = fileChunk.size
                     let fractionCompleted = Double(totalBytes) / Double(totalBytesExpected)
-                    progressUploadHandler(totalBytesExpected, totalBytes, fractionCompleted)
+                    uploadProgressHandler(totalBytesExpected, totalBytes, fractionCompleted)
                 }
             )
 
