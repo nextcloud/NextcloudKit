@@ -187,8 +187,8 @@ public extension NextcloudKit {
                           chunkProgressHandler: @escaping (_ counter: Int) -> Void = { _ in },
                           startUpload: @escaping (_ filesChunk: [(fileName: String, size: Int64)]) -> Void = { _ in },
                           progressUploadHandler: @escaping (_ totalBytesExpected: Int64, _ totalBytes: Int64, _ fractionCompleted: Double) -> Void = { _, _, _ in },
-                          assembling: @escaping () -> Void = { },
-                          uploaded: @escaping (_ fileChunk: (fileName: String, size: Int64)) -> Void = { _ in }
+                          uploaded: @escaping (_ fileChunk: (fileName: String, size: Int64)) -> Void = { _ in },
+                          assembling: @escaping () -> Void = { }
     ) async throws -> (account: String, remainingChunks: [(fileName: String, size: Int64)]?, file: NKFile?) {
 
         // Resolve session
