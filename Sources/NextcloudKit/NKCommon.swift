@@ -86,7 +86,7 @@ public struct NKCommon: Sendable {
     // MARK: - Chunked File
 
     /// Async chunking version that mirrors the original callback-based API,
-    /// but returns the result and throws `NSError` with the same domain/codes.
+    /// but returns the result and throws `NKError` with the same domain/codes.
     /// - Error domain: "chunkedFile"
     ///   - -1: Failed to open/read input
     ///   - -2: Failed to create output directory / open chunk file
@@ -141,7 +141,7 @@ public struct NKCommon: Sendable {
             do {
                 try fileManager.createDirectory(atPath: outputDirectory, withIntermediateDirectories: true, attributes: nil)
             } catch {
-                throw NSError(domain: "chunkedFile", code: -2, userInfo: [NSLocalizedDescriptionKey: "Failed to create the output directory for file chunks."])
+                throw NKError(errorCode: -2, errorDescription: "Failed to create the output directory for file chunks.")
             }
         }
 
@@ -149,7 +149,7 @@ public struct NKCommon: Sendable {
         do {
             reader = try .init(forReadingFrom: URL(fileURLWithPath: inputFilePath))
         } catch {
-            throw NSError(domain: "chunkedFile", code: -1, userInfo: [NSLocalizedDescriptionKey: "Failed to open the input file for reading."])
+            throw NKError(errorCode: -1, errorDescription: "Failed to open the input file for reading.")
         }
 
         defer {
@@ -162,7 +162,7 @@ public struct NKCommon: Sendable {
         @inline(__always)
         func checkCancelled() throws {
             if Task.isCancelled {
-                throw NSError(domain: "chunkedFile", code: -5, userInfo: [NSLocalizedDescriptionKey: "Chunking was cancelled."])
+                throw NKError(errorCode: -5, errorDescription: "Chunking was cancelled.")
             }
         }
 
@@ -238,20 +238,20 @@ public struct NKCommon: Sendable {
             })
 
             switch result {
-            case -5:
-                throw NSError(domain: "chunkedFile", code: -5, userInfo: [NSLocalizedDescriptionKey: "Chunking was cancelled."])
-            case -1:
-                throw NSError(domain: "chunkedFile", code: -1, userInfo: [NSLocalizedDescriptionKey: "Failed to read data from the input file."])
-            case -2:
-                throw NSError(domain: "chunkedFile", code: -2, userInfo: [NSLocalizedDescriptionKey: "Failed to open the output chunk file for writing."])
-            case -3:
-                throw NSError(domain: "chunkedFile", code: -3, userInfo: [NSLocalizedDescriptionKey: "There is not enough available disk space to proceed."])
-            case -4:
-                throw NSError(domain: "chunkedFile", code: -4, userInfo: [NSLocalizedDescriptionKey: "Failed to write data to chunk file."])
             case 0:
                 break outerLoop
             case 1:
                 continue
+            case -1:
+                throw NKError(errorCode: -1, errorDescription: "Failed to read data from the input file.")
+            case -2:
+                throw NKError(errorCode: -2, errorDescription: "Failed to open the output chunk file for writing.")
+            case -3:
+                throw NKError(errorCode: -3, errorDescription: "There is not enough available disk space to proceed.")
+            case -4:
+                throw NKError(errorCode: -4, errorDescription: "Failed to write data to chunk file.")
+            case -5:
+                throw NKError(errorCode: -5, errorDescription: "Chunking was cancelled.")
             default:
                 continue
             }

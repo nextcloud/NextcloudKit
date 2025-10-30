@@ -207,7 +207,6 @@ public extension NextcloudKit {
                           uploaded: @escaping (_ fileChunk: (fileName: String, size: Int64)) -> Void = { _ in },
                           assembling: @escaping () -> Void = { }
     ) async throws -> (account: String, remainingChunks: [(fileName: String, size: Int64)]?, file: NKFile?) {
-
         // Resolve session
         guard let nkSession = nkCommonInstance.nksessions.session(forAccount: account) else {
             throw NKError.urlError
@@ -284,11 +283,8 @@ public extension NextcloudKit {
                     chunkProgressHandler(total, counter)
                 }
             )
-        } catch let ns as NSError where ns.domain == "chunkedFile" {
-            // Preserve your original domain/codes from chunkedFile
-            throw NKError(error: ns)
-        } catch {
-            throw NKError(error: error)
+        } catch let error as NKError {
+            throw error
         }
 
         try Task.checkCancellation()
