@@ -188,6 +188,25 @@ public extension NextcloudKit {
     ///   - assembling: Called just before remote assembly (MOVE .file -> destination).
     /// - Returns: (account, remainingChunks, NKFile?) where `remainingChunks == nil` on success.
     /// - Throws: NKError for any failure (including disk preflight and cancellations).
+    actor ActorRequest {
+        private var request: UploadRequest?
+
+        // Set/replace the active request (called from requestHandler)
+        func set(_ req: UploadRequest?) {
+            self.request = req
+        }
+
+        // Cancel if present
+        func cancel() {
+            self.request?.cancel()
+        }
+
+        // Clear to break strong references when done
+        func clear() {
+            self.request = nil
+        }
+    }
+
     func uploadChunkAsync(directory: String,
                           fileChunksOutputDirectory: String? = nil,
                           fileName: String,
@@ -301,8 +320,8 @@ public extension NextcloudKit {
         var uploadedSoFar: Int64 = 0
         uploadProgressHandler(totalFileSize, 0, totalFileSize > 0 ? 0.0 : 1.0)
 
-        // Keep a reference to the current UploadRequest to allow low-level cancellation
-        var currentRequest: UploadRequest?
+        // Clear box before starting this chunk
+        let actorRequest = ActorRequest()
 
         // 2) Upload each chunk with cooperative cancellation
         for fileChunk in chunkedFiles {
@@ -316,45 +335,66 @@ public extension NextcloudKit {
                                              userInfo: [NSLocalizedDescriptionKey: "File empty."]))
             }
 
-            // Perform upload; expose and capture the request to allow .cancel()
-            let results = await self.uploadAsync(
-                serverUrlFileName: serverUrlFileNameChunk,
-                fileNameLocalPath: fileNameLocalPath,
-                account: account,
-                options: options,
-                requestHandler: { request in
-                    currentRequest = request
+            // Clear box before starting this chunk
+            await actorRequest.clear()
+
+            try await withTaskCancellationHandler(
+                operation: {
+                    let results = await self.uploadAsync(
+                        serverUrlFileName: serverUrlFileNameChunk,
+                        fileNameLocalPath: fileNameLocalPath,
+                        account: account,
+                        options: options,
+                        requestHandler: { request in
+                            Task {
+                                await actorRequest.set(request)
+                            }
+                        },
+                        taskHandler: { task in
+                            uploadTaskHandler(task)
+                        },
+                        progressHandler: { progress in
+                            // If the parent Task was cancelled, cancel the HTTP layer immediately
+                            if Task.isCancelled {
+                                Task {
+                                    await actorRequest.cancel()
+                                }
+                                return
+                            }
+                            let completed = Int64(progress.completedUnitCount)
+                            let globalBytes = uploadedSoFar + completed
+                            let fraction = totalFileSize > 0 ? Double(globalBytes) / Double(totalFileSize) : 1.0
+                            uploadProgressHandler(totalFileSize, globalBytes, fraction)
+                        }
+                    )
+
+                    if Task.isCancelled {
+                        await actorRequest.cancel()
+                        throw CancellationError()
+                    }
+
+                    // Check upload result
+                    if results.error != .success {
+                        throw results.error
+                    }
+
+                    // The chunk is fully uploaded; advance the global baseline and notify UI
+                    uploadedSoFar += chunkBytesExpected
+                    let fractionAfter = totalFileSize > 0 ? Double(uploadedSoFar) / Double(totalFileSize) : 1.0
+                    uploadProgressHandler(totalFileSize, uploadedSoFar, fractionAfter)
+
+                    // Optional per-chunk callback
+                    uploaded(fileChunk)
+
+                    // Clear after success to drop the strong ref
+                    await actorRequest.clear()
                 },
-                taskHandler: { task in
-                    uploadTaskHandler(task)
-                },
-                progressHandler: { progress in
-                    let completed = Int64(progress.completedUnitCount)
-                    let globalBytes = uploadedSoFar + completed
-                    let fraction = totalFileSize > 0 ? Double(globalBytes) / Double(totalFileSize) : 1.0
-                    uploadProgressHandler(totalFileSize, globalBytes, fraction)
+                onCancel: {
+                    Task {
+                        await actorRequest.cancel()
+                    }
                 }
             )
-
-            // If the parent task was cancelled during the request, ensure the HTTP layer is cancelled too
-            if Task.isCancelled {
-                currentRequest?.cancel()
-                throw NKError(error: NSError(domain: "chunkedFile", code: -5,
-                                             userInfo: [NSLocalizedDescriptionKey: "Cancelled by Task."]))
-            }
-
-            // Check upload result
-            if results.error != .success {
-                throw results.error
-            }
-
-            // The chunk is fully uploaded; advance the global baseline.
-            uploadedSoFar += chunkBytesExpected
-            let fractionAfter = totalFileSize > 0 ? Double(uploadedSoFar) / Double(totalFileSize) : 1.0
-            uploadProgressHandler(totalFileSize, uploadedSoFar, fractionAfter)
-
-            // Optional per-chunk callback
-            uploaded(fileChunk)
         }
 
         try Task.checkCancellation()
