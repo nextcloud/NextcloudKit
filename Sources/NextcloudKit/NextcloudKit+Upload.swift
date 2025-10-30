@@ -333,15 +333,8 @@ public extension NextcloudKit {
             }
 
             // Check upload result
-            let uploadNKError = results.error
-            if uploadNKError != .success {
-                // Return early with remaining chunks so the caller can resume later
-                if let idx = chunkedFiles.firstIndex(where: { $0.fileName == fileChunk.fileName }) {
-                    let remaining = Array(chunkedFiles.suffix(from: idx))
-                    return (account, remaining, nil)
-                } else {
-                    return (account, chunkedFiles, nil)
-                }
+            if results.error != .success {
+                throw results.error
             }
 
             // Optional per-chunk callback
