@@ -167,10 +167,28 @@ public extension NextcloudKit {
         }
     }
 
-    /// Upload a file using Nextcloud chunked upload with cooperative cancellation.
-    /// - Important: Cancellation is cooperative. Cancelling the parent Task will:
-    ///   1) Stop chunk generation (chunkedFile checks Task.isCancelled)
-    ///   2) Abort the upload loop; the currently running HTTP request is also cancelled if captured via `requestHandler`.
+    /// - Parameters:
+    ///   - directory: Local input directory containing the original file.
+    ///   - fileChunksOutputDirectory: Optional output directory for produced chunks (defaults to `directory`).
+    ///   - fileName: Local file name to upload (input).
+    ///   - destinationFileName: Optional remote file name (defaults to `fileName`).
+    ///   - date: Optional remote mtime (modification time).
+    ///   - creationDate: Optional remote ctime (creation time).
+    ///   - serverUrl: Remote directory URL (WebDAV path without the file name).
+    ///   - chunkFolder: Remote temporary chunk folder name (e.g., UUID).
+    ///   - filesChunk: Optional precomputed chunk descriptors to reuse; if empty, chunks will be generated.
+    ///   - chunkSize: Desired chunk size in bytes.
+    ///   - account: Account identifier.
+    ///   - options: Request options (headers, timeout, etc.).
+    ///   - chunkCountHandler: Reports number of chunks when known.
+    ///   - chunkProgressHandler: Reports per-chunk preparation progress (index/counter).
+    ///   - uploadStart: Called once when upload of chunks begins (with final list of chunks).
+    ///   - uploadTaskHandler: Exposes the low-level URLSessionTask.
+    ///   - uploadProgressHandler: Global progress callback (total file): (totalExpected, totalUploaded, fraction).
+    ///   - uploaded: Called after each chunk completes successfully.
+    ///   - assembling: Called just before remote assembly (MOVE .file -> destination).
+    /// - Returns: (account, remainingChunks, NKFile?) where `remainingChunks == nil` on success.
+    /// - Throws: NKError for any failure (including disk preflight and cancellations).
     func uploadChunkAsync(directory: String,
                           fileChunksOutputDirectory: String? = nil,
                           fileName: String,
@@ -198,7 +216,7 @@ public extension NextcloudKit {
         }
 
         // Build endpoints and headers
-        let fileNameLocalSize = self.nkCommonInstance.getFileSize(filePath: directory + "/" + fileName)
+        let totalFileSize = self.nkCommonInstance.getFileSize(filePath: directory + "/" + fileName)
         let serverUrlChunkFolder = nkSession.urlBase + "/" + nkSession.dav + "/uploads/" + nkSession.userId + "/" + chunkFolder
         let serverUrlFileName = nkSession.urlBase + "/" + nkSession.dav + "/files/" + nkSession.userId
             + self.nkCommonInstance.returnPathfromServerUrl(serverUrl, urlBase: nkSession.urlBase, userId: nkSession.userId)
@@ -206,7 +224,7 @@ public extension NextcloudKit {
 
         if options.customHeader == nil { options.customHeader = [:] }
         options.customHeader?["Destination"] = serverUrlFileName.urlEncoded
-        options.customHeader?["OC-Total-Length"] = String(fileNameLocalSize)
+        options.customHeader?["OC-Total-Length"] = String(totalFileSize)
 
         // Disk space preflight (best-effort strict version: throw if query fails)
         #if os(macOS)
@@ -233,7 +251,7 @@ public extension NextcloudKit {
 
         #if os(visionOS) || os(iOS) || os(macOS)
         // Require roughly 3x headroom to be safe (chunks + temp + HTTP plumbing)
-        if freeDisk < fileNameLocalSize * 3 {
+        if freeDisk < totalFileSize * 3 {
             throw NKError.errorChunkNoEnoughMemory
         }
         #endif
@@ -288,6 +306,10 @@ public extension NextcloudKit {
         // Notify start upload
         uploadStart(chunkedFiles)
 
+        // Global progress baseline (bytes of fully uploaded chunks)
+        var uploadedSoFar: Int64 = 0
+        uploadProgressHandler(totalFileSize, 0, totalFileSize > 0 ? 0.0 : 1.0)
+
         // Keep a reference to the current UploadRequest to allow low-level cancellation
         var currentRequest: UploadRequest?
 
@@ -297,8 +319,8 @@ public extension NextcloudKit {
 
             let serverUrlFileNameChunk = serverUrlChunkFolder + "/" + fileChunk.fileName
             let fileNameLocalPath = outputDirectory + "/" + fileChunk.fileName
-            let sz = self.nkCommonInstance.getFileSize(filePath: fileNameLocalPath)
-            guard sz > 0 else {
+            let chunkBytesExpected = self.nkCommonInstance.getFileSize(filePath: fileNameLocalPath)
+            guard chunkBytesExpected > 0 else {
                 throw NKError(error: NSError(domain: "chunkedFile", code: -6,
                                              userInfo: [NSLocalizedDescriptionKey: "File empty."]))
             }
@@ -316,12 +338,11 @@ public extension NextcloudKit {
                 taskHandler: { task in
                     uploadTaskHandler(task)
                 },
-                progressHandler: { _ in
-                    // Convert chunk cumulative size to global progress
-                    let totalBytesExpected = fileNameLocalSize
-                    let totalBytes = fileChunk.size
-                    let fractionCompleted = Double(totalBytes) / Double(totalBytesExpected)
-                    uploadProgressHandler(totalBytesExpected, totalBytes, fractionCompleted)
+                progressHandler: { progress in
+                    let completed = Int64(progress.completedUnitCount)
+                    let globalBytes = uploadedSoFar + completed
+                    let fraction = totalFileSize > 0 ? Double(globalBytes) / Double(totalFileSize) : 1.0
+                    uploadProgressHandler(totalFileSize, globalBytes, fraction)
                 }
             )
 
@@ -336,6 +357,11 @@ public extension NextcloudKit {
             if results.error != .success {
                 throw results.error
             }
+
+            // The chunk is fully uploaded; advance the global baseline.
+            uploadedSoFar += chunkBytesExpected
+            let fractionAfter = totalFileSize > 0 ? Double(uploadedSoFar) / Double(totalFileSize) : 1.0
+            uploadProgressHandler(totalFileSize, uploadedSoFar, fractionAfter)
 
             // Optional per-chunk callback
             uploaded(fileChunk)
@@ -355,7 +381,7 @@ public extension NextcloudKit {
         }
 
         // Compute assemble timeout based on size
-        let assembleSizeInGB = Double(fileNameLocalSize) / 1e9
+        let assembleSizeInGB = Double(totalFileSize) / 1e9
         let assembleTimePerGB: Double = 3 * 60  // 3 minutes per GB
         let assembleTimeMin: Double = 60        // 1 minute
         let assembleTimeMax: Double = 30 * 60   // 30 minutes
