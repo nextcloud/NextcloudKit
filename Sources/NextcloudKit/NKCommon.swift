@@ -98,8 +98,7 @@ public struct NKCommon: Sendable {
                             fileName: String,
                             chunkSize: Int,
                             filesChunk: [(fileName: String, size: Int64)],
-                            chunkCountHandler: @escaping (_ num: Int) -> Void = { _ in },
-                            chunkProgressHandler: @escaping (_ counter: Int) -> Void = { _ in }) async throws -> [(fileName: String, size: Int64)] {
+                            chunkProgressHandler: @escaping (_ total: Int, _ counter: Int) -> Void = { _, _ in }) async throws -> [(fileName: String, size: Int64)] {
         // If caller already has chunk list, recompute incremental sizes from disk and return.
         if !filesChunk.isEmpty {
             var recomputed: [(fileName: String, size: Int64)] = []
@@ -136,7 +135,6 @@ public struct NKCommon: Sendable {
             dynamicChunkSize += 100_000_000 // add 100 MB to reduce the chunk count in extreme cases
             plannedCount = totalSize > 0 ? Int(totalSize / Int64(dynamicChunkSize)) : 0
         }
-        chunkCountHandler(plannedCount)
 
         // Ensure output directory exists
         if !fileManager.fileExists(atPath: outputDirectory, isDirectory: &isDirectory) {
@@ -189,7 +187,7 @@ public struct NKCommon: Sendable {
                     if writer != nil {
                         writer?.closeFile()
                         writer = nil
-                        chunkProgressHandler(counter)
+                        chunkProgressHandler(plannedCount, counter)
                         counter += 1
                     }
                     return 0
@@ -230,7 +228,7 @@ public struct NKCommon: Sendable {
                         writer?.closeFile()
                         writer = nil
                         chunkWrittenBytes = 0
-                        chunkProgressHandler(counter)
+                        chunkProgressHandler(plannedCount, counter)
                         counter += 1
                     }
                     return 1 // OK

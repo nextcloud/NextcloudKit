@@ -180,7 +180,6 @@ public extension NextcloudKit {
     ///   - chunkSize: Desired chunk size in bytes.
     ///   - account: Account identifier.
     ///   - options: Request options (headers, timeout, etc.).
-    ///   - chunkCountHandler: Reports number of chunks when known.
     ///   - chunkProgressHandler: Reports per-chunk preparation progress (index/counter).
     ///   - uploadStart: Called once when upload of chunks begins (with final list of chunks).
     ///   - uploadTaskHandler: Exposes the low-level URLSessionTask.
@@ -201,8 +200,7 @@ public extension NextcloudKit {
                           chunkSize: Int,
                           account: String,
                           options: NKRequestOptions = NKRequestOptions(),
-                          chunkCountHandler: @escaping (_ num: Int) -> Void = { _ in },
-                          chunkProgressHandler: @escaping (_ counter: Int) -> Void = { _ in },
+                          chunkProgressHandler: @escaping (_ total: Int, _ counter: Int) -> Void = { _, _ in },
                           uploadStart: @escaping (_ filesChunk: [(fileName: String, size: Int64)]) -> Void = { _ in },
                           uploadTaskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
                           uploadProgressHandler: @escaping (_ totalBytesExpected: Int64, _ totalBytes: Int64, _ fractionCompleted: Double) -> Void = { _, _, _ in },
@@ -282,11 +280,8 @@ public extension NextcloudKit {
                 fileName: fileName,
                 chunkSize: chunkSize,
                 filesChunk: filesChunk,
-                chunkCountHandler: { num in
-                    chunkCountHandler(num)
-                },
-                chunkProgressHandler: { counter in
-                    chunkProgressHandler(counter)
+                chunkProgressHandler: { total, counter in
+                    chunkProgressHandler(total, counter)
                 }
             )
         } catch let ns as NSError where ns.domain == "chunkedFile" {
@@ -341,9 +336,6 @@ public extension NextcloudKit {
                     let completed = Int64(progress.completedUnitCount)
                     let globalBytes = uploadedSoFar + completed
                     let fraction = totalFileSize > 0 ? Double(globalBytes) / Double(totalFileSize) : 1.0
-
-                    try? Task.checkCancellation()
-
                     uploadProgressHandler(totalFileSize, globalBytes, fraction)
                 }
             )
