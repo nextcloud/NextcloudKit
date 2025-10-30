@@ -332,7 +332,6 @@ public extension NextcloudKit {
                 account: account,
                 options: options,
                 requestHandler: { request in
-                    // Store a reference so we can cancel immediately if Task gets cancelled mid-flight
                     currentRequest = request
                 },
                 taskHandler: { task in
@@ -342,6 +341,9 @@ public extension NextcloudKit {
                     let completed = Int64(progress.completedUnitCount)
                     let globalBytes = uploadedSoFar + completed
                     let fraction = totalFileSize > 0 ? Double(globalBytes) / Double(totalFileSize) : 1.0
+
+                    try? Task.checkCancellation()
+
                     uploadProgressHandler(totalFileSize, globalBytes, fraction)
                 }
             )
