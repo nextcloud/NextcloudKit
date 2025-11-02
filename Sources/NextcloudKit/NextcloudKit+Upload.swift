@@ -225,7 +225,7 @@ public extension NextcloudKit {
                           uploadProgressHandler: @escaping (_ totalBytesExpected: Int64, _ totalBytes: Int64, _ fractionCompleted: Double) -> Void = { _, _, _ in },
                           uploaded: @escaping (_ fileChunk: (fileName: String, size: Int64)) -> Void = { _ in },
                           assembling: @escaping () -> Void = { }
-    ) async throws -> (account: String, remainingChunks: [(fileName: String, size: Int64)]?, file: NKFile?) {
+    ) async throws -> (account: String, file: NKFile?) {
         // Resolve session
         guard let nkSession = nkCommonInstance.nksessions.session(forAccount: account) else {
             throw NKError.urlError
@@ -289,7 +289,7 @@ public extension NextcloudKit {
 
         let outputDirectory = fileChunksOutputDirectory ?? directory
 
-        // 1) Generate chunks (async, cancellable)
+        // Generate chunks (async, cancellable)
         let chunkedFiles: [(fileName: String, size: Int64)]
         do {
             chunkedFiles = try await self.nkCommonInstance.chunkedFile(
@@ -323,7 +323,7 @@ public extension NextcloudKit {
         // Clear box before starting this chunk
         let actorRequest = ActorRequest()
 
-        // 2) Upload each chunk with cooperative cancellation
+        // Upload each chunk with cooperative cancellation
         for fileChunk in chunkedFiles {
             try Task.checkCancellation()
 
@@ -399,7 +399,7 @@ public extension NextcloudKit {
 
         try Task.checkCancellation()
 
-        // 3) Assemble the chunks (MOVE .file -> final path)
+        // Assemble the chunks (MOVE .file -> final path)
         let serverUrlFileNameSource = serverUrlChunkFolder + "/.file"
 
         // Attach creation/modification times if valid (Linux epoch must be > 0)
@@ -426,13 +426,12 @@ public extension NextcloudKit {
                                                   options: options)
 
         guard moveRes.error == .success else {
-            // Provide remaining chunks in case caller wants to retry assemble later
-            return (account, [], nil)
+            return (account, nil)
         }
 
         try Task.checkCancellation()
 
-        // 4) Read back the final file to return NKFile
+        // Read back the final file to return NKFile
         let readRes = await readFileOrFolderAsync(serverUrlFileName: serverUrlFileName,
                                                   depth: "0",
                                                   account: account,
@@ -442,6 +441,6 @@ public extension NextcloudKit {
             throw NKError.errorChunkMoveFile
         }
 
-        return (account, nil, file)
+        return (account, file)
     }
 }
