@@ -288,6 +288,7 @@ public extension NextcloudKit {
                             let bigfilechunking: Bool?
                             let versiondeletion: Bool?
                             let versionlabeling: Bool?
+                            let windowsCompatibleFilenamesEnabled: Bool?
                             let forbiddenFileNames: [String]?
                             let forbiddenFileNameBasenames: [String]?
                             let forbiddenFileNameCharacters: [String]?
@@ -298,6 +299,7 @@ public extension NextcloudKit {
                                 case undelete, locking, comments, versioning, directEditing, bigfilechunking
                                 case versiondeletion = "version_deletion"
                                 case versionlabeling = "version_labeling"
+                                case windowsCompatibleFilenamesEnabled = "windows_compatible_filenames"
                                 case forbiddenFileNames = "forbidden_filenames"
                                 case forbiddenFileNameBasenames = "forbidden_filename_basenames"
                                 case forbiddenFileNameCharacters = "forbidden_filename_characters"
@@ -419,6 +421,7 @@ public extension NextcloudKit {
 
             capabilities.securityGuardDiagnostics = json.securityguard?.diagnostics ?? false
 
+            capabilities.windowsCompatibleFilenamesEnabled = json.files?.windowsCompatibleFilenamesEnabled ?? false
             capabilities.forbiddenFileNames = json.files?.forbiddenFileNames ?? []
             capabilities.forbiddenFileNameBasenames = json.files?.forbiddenFileNameBasenames ?? []
             capabilities.forbiddenFileNameCharacters = json.files?.forbiddenFileNameCharacters ?? []
@@ -511,6 +514,7 @@ final public class NKCapabilities: Sendable {
         public var assistantEnabled: Bool                           = false // NC28
         public var isLivePhotoServerAvailable: Bool                 = false // NC28
         public var securityGuardDiagnostics                         = false
+        public var windowsCompatibleFilenamesEnabled                = false
         public var forbiddenFileNames: [String]                     = []
         public var forbiddenFileNameBasenames: [String]             = []
         public var forbiddenFileNameCharacters: [String]            = []

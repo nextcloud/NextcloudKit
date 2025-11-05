@@ -4,26 +4,24 @@
 
 import Foundation
 
-//
-//  AutoRenameManager.swift
-//  Nextcloud
-//
-//  Created by Milen Pivchev on 09.10.24.
-//  Copyright © 2024 Marino Faggiana. All rights reserved.
-//
-
 public final class FileAutoRenamer: Sendable {
+    private let capabilities: NKCapabilities.Capabilities
     private let forbiddenFileNameCharacters: [String]
     private let forbiddenFileNameExtensions: [String]
 
     private let replacement = "_"
 
-    public init(forbiddenFileNameCharacters: [String] = [], forbiddenFileNameExtensions: [String] = []) {
+    public init(capabilities: NKCapabilities.Capabilities, forbiddenFileNameCharacters: [String] = [], forbiddenFileNameExtensions: [String] = []) {
+        self.capabilities = capabilities
         self.forbiddenFileNameCharacters = forbiddenFileNameCharacters
         self.forbiddenFileNameExtensions = forbiddenFileNameExtensions.map { $0.lowercased() }
     }
 
     public func rename(filename: String, isFolderPath: Bool = false) -> String {
+        if capabilities.serverVersionMajor >= 32, !capabilities.windowsCompatibleFilenamesEnabled {
+            return filename
+        }
+        
         var pathSegments = filename.split(separator: "/", omittingEmptySubsequences: false).map { String($0) }
         var mutableForbiddenFileNameCharacters = self.forbiddenFileNameCharacters
 
