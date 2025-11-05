@@ -93,6 +93,16 @@ public final class NKShare: NSObject {
         case team = 7
 
         ///
+        /// Shared by a guest.
+        ///
+        case guest = 8
+
+        ///
+        /// A federated group share.
+        ///
+        case federatedGroup = 9
+
+        ///
         /// Shared within a Nextcloud Talk conversation.
         ///
         case talkConversation = 10
