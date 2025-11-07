@@ -18,6 +18,7 @@ public final class FileAutoRenamer: Sendable {
     }
 
     public func rename(filename: String, isFolderPath: Bool = false) -> String {
+        // Only take into account windowsCompatibleFilenamesEnabled if version is >=32. Anything older ignores this flag.
         if capabilities.serverVersionMajor >= 32, !capabilities.windowsCompatibleFilenamesEnabled {
             return filename
         }
