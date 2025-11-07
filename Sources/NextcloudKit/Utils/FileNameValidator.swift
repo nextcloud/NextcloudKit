@@ -9,6 +9,7 @@ public final class FileNameValidator: Sendable {
     private let forbiddenFileNameBasenames: [String]
     private let forbiddenFileNameCharacters: [String]
     private let forbiddenFileNameExtensions: [String]
+    private let capabilities: NKCapabilities.Capabilities
 
     public func fileEmptyNameError() -> NKError {
         NKError(errorCode: NSURLErrorCannotCreateFile, errorDescription: NSLocalizedString("_file_name_empty_", value: "File name cannot be empty.", comment: ""))
@@ -36,14 +37,19 @@ public final class FileNameValidator: Sendable {
         return NKError(errorCode: NSURLErrorCannotCreateFile, errorDescription: errorMessage)
     }
 
-    public init(forbiddenFileNames: [String], forbiddenFileNameBasenames: [String], forbiddenFileNameCharacters: [String], forbiddenFileNameExtensions: [String]) {
+    public init(forbiddenFileNames: [String], forbiddenFileNameBasenames: [String], forbiddenFileNameCharacters: [String], forbiddenFileNameExtensions: [String], capabilities: NKCapabilities.Capabilities) {
         self.forbiddenFileNames = forbiddenFileNames.map { $0.uppercased() }
         self.forbiddenFileNameBasenames = forbiddenFileNameBasenames.map { $0.uppercased() }
         self.forbiddenFileNameCharacters = forbiddenFileNameCharacters
         self.forbiddenFileNameExtensions = forbiddenFileNameExtensions.map { $0.uppercased() }
+        self.capabilities = capabilities
     }
 
     public func checkFileName(_ filename: String) -> NKError? {
+        if !capabilities.shouldEnforceWindowsCompatibleFilenames {
+            return nil
+        }
+
         if filename.trimmingCharacters(in: .whitespaces).isEmpty {
             return fileEmptyNameError()
         }

@@ -5,7 +5,8 @@
 import Testing
 @testable import NextcloudKit
 
-@Suite(.serialized) struct FileAutoRenamerUnitTests {
+@Suite(.serialized)
+struct FileAutoRenamerUnitTests {
     let forbiddenFilenameCharacter = ">"
     let forbiddenFilenameExtension = "."
 
@@ -31,10 +32,10 @@ import Testing
         combinedTuples = zip(characterArrays, extensionArrays).map { ($0, $1) }
     }
 
-    private func makeAutoRenamer(chars: [String], exts: [String], wcfEnabled: Bool = true, versionIs32: Bool = true) -> FileAutoRenamer {
+    private func makeAutoRenamer(chars: [String], exts: [String], wcfEnabled: Bool = true, serverMajor: Int = 32) -> FileAutoRenamer {
         let capabilities = NKCapabilities.Capabilities()
         capabilities.windowsCompatibleFilenamesEnabled = wcfEnabled
-        capabilities.serverVersionMajor = versionIs32 ? 32 : 31
+        capabilities.serverVersionMajor = serverMajor
 
         return FileAutoRenamer(
             capabilities: capabilities,
@@ -241,45 +242,47 @@ import Testing
         }
     }
 
-    /// When WCF is disabled AND version is >=32, the filename should be returned unchanged.
-    @Test func skipAutoRenameWhenWCFDisabled() {
+    @Test("When WCF is disabled AND version is >=32, the filename should be returned unchanged.")
+    func skipAutoRenameWhenWCFDisabled() {
         for (characterArray, extensionArray) in combinedTuples {
-            let fileAutoRenamer = makeAutoRenamer(chars: characterArray, exts: extensionArray, wcfEnabled: false, versionIs32: true)
+            let fileAutoRenamer = makeAutoRenamer(chars: characterArray, exts: extensionArray, wcfEnabled: false, serverMajor: 32)
 
-            // We simulate this by passing a valid folder path and expecting no trimming/renaming when no rules apply.
             let filename = "   readme.txt  "
-            // For parity with the original intent (no auto-rename), we expect the same string back.
-            // If the implementation always trims/renames, adjust this expectation accordingly.
             let result = fileAutoRenamer.rename(filename: filename, isFolderPath: true)
             #expect(result == filename)
         }
     }
 
-    /// When WCF is enabled AND version is >=32, the filename should be returned modified.
-    @Test func doAutoRenameWhenWCFEnabled() {
+    @Test("When WCF is enabled AND version is >=32, the filename should be returned modified.")
+    func doAutoRenameWhenWCFEnabled() {
         for (characterArray, extensionArray) in combinedTuples {
-            let fileAutoRenamer = makeAutoRenamer(chars: characterArray, exts: extensionArray, wcfEnabled: true, versionIs32: true)
+            let fileAutoRenamer = makeAutoRenamer(chars: characterArray, exts: extensionArray, wcfEnabled: true, serverMajor: 32)
 
-            // We simulate this by passing a valid folder path and expecting no trimming/renaming when no rules apply.
             let filename = "   readme.txt  "
-            // For parity with the original intent (no auto-rename), we expect the same string back.
-            // If the implementation always trims/renames, adjust this expectation accordingly.
             let result = fileAutoRenamer.rename(filename: filename, isFolderPath: true)
             #expect(result != filename)
         }
     }
 
-    /// When WCF is disabled BUT version is <= 32, the filename should be returned modified.
-    @Test func doAutoRenameWhenVersionLowerThan32() {
+    @Test("When WCF is disabled BUT version is 31, the filename should be returned modified. Flag is ignored.")
+    func doAutoRenameWhenVersion31() {
         for (characterArray, extensionArray) in combinedTuples {
-            let fileAutoRenamer = makeAutoRenamer(chars: characterArray, exts: extensionArray, wcfEnabled: false, versionIs32: false)
+            let fileAutoRenamer = makeAutoRenamer(chars: characterArray, exts: extensionArray, wcfEnabled: false, serverMajor: 31)
 
-            // We simulate this by passing a valid folder path and expecting no trimming/renaming when no rules apply.
             let filename = "   readme.txt  "
-            // For parity with the original intent (no auto-rename), we expect the same string back.
-            // If the implementation always trims/renames, adjust this expectation accordingly.
             let result = fileAutoRenamer.rename(filename: filename, isFolderPath: true)
             #expect(result != filename)
+        }
+    }
+
+    @Test("When WCF is enabled BUT version is 29, the filename should be returned unchanged. Flag is ignored.")
+    func skipAutoRenameWhenVersion29() {
+        for (characterArray, extensionArray) in combinedTuples {
+            let fileAutoRenamer = makeAutoRenamer(chars: characterArray, exts: extensionArray, wcfEnabled: true, serverMajor: 29)
+
+            let filename = "   readme.txt  "
+            let result = fileAutoRenamer.rename(filename: filename, isFolderPath: true)
+            #expect(result == filename)
         }
     }
 }
