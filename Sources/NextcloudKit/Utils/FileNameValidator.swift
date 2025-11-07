@@ -37,11 +37,11 @@ public final class FileNameValidator: Sendable {
         return NKError(errorCode: NSURLErrorCannotCreateFile, errorDescription: errorMessage)
     }
 
-    public init(forbiddenFileNames: [String], forbiddenFileNameBasenames: [String], forbiddenFileNameCharacters: [String], forbiddenFileNameExtensions: [String], capabilities: NKCapabilities.Capabilities) {
-        self.forbiddenFileNames = forbiddenFileNames.map { $0.uppercased() }
-        self.forbiddenFileNameBasenames = forbiddenFileNameBasenames.map { $0.uppercased() }
-        self.forbiddenFileNameCharacters = forbiddenFileNameCharacters
-        self.forbiddenFileNameExtensions = forbiddenFileNameExtensions.map { $0.uppercased() }
+    public init(capabilities: NKCapabilities.Capabilities) {
+        self.forbiddenFileNames = capabilities.forbiddenFileNames.map { $0.uppercased() }
+        self.forbiddenFileNameBasenames = capabilities.forbiddenFileNameBasenames.map { $0.uppercased() }
+        self.forbiddenFileNameCharacters = capabilities.forbiddenFileNameCharacters
+        self.forbiddenFileNameExtensions = capabilities.forbiddenFileNameExtensions.map { $0.uppercased() }
         self.capabilities = capabilities
     }
 

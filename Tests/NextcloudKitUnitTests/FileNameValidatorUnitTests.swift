@@ -12,16 +12,15 @@ struct FileNameValidatorUnitTests {
         capabilities.windowsCompatibleFilenamesEnabled = wcfEnabled
         capabilities.serverVersionMajor = serverMajor
 
-        return FileNameValidator(
-            forbiddenFileNames: [".htaccess",".htaccess"],
-            forbiddenFileNameBasenames: ["con", "prn", "aux", "nul", "com0", "com1", "com2", "com3", "com4",
-                                         "com5", "com6", "com7", "com8", "com9", "com¹", "com²", "com³",
-                                         "lpt0", "lpt1", "lpt2", "lpt3", "lpt4", "lpt5", "lpt6", "lpt7",
-                                         "lpt8", "lpt9", "lpt¹", "lpt²", "lpt³"],
-            forbiddenFileNameCharacters: ["<", ">", ":", "\\\\", "/", "|", "?", "*", "&"],
-            forbiddenFileNameExtensions: [".filepart",".part", ".", ",", " "],
-            capabilities: capabilities
-        )
+        capabilities.forbiddenFileNames = [".htaccess",".htaccess"]
+        capabilities.forbiddenFileNameBasenames = ["con", "prn", "aux", "nul", "com0", "com1", "com2", "com3", "com4",
+                                                   "com5", "com6", "com7", "com8", "com9", "com¹", "com²", "com³",
+                                                   "lpt0", "lpt1", "lpt2", "lpt3", "lpt4", "lpt5", "lpt6", "lpt7",
+                                                   "lpt8", "lpt9", "lpt¹", "lpt²", "lpt³"]
+        capabilities.forbiddenFileNameCharacters = ["<", ">", ":", "\\\\", "/", "|", "?", "*", "&"]
+        capabilities.forbiddenFileNameExtensions = [".filepart",".part", ".", ",", " "]
+
+        return FileNameValidator(capabilities: capabilities)
     }
 
     @Test("Invalid character is rejected")

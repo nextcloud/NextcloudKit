@@ -37,11 +37,10 @@ struct FileAutoRenamerUnitTests {
         capabilities.windowsCompatibleFilenamesEnabled = wcfEnabled
         capabilities.serverVersionMajor = serverMajor
 
-        return FileAutoRenamer(
-            capabilities: capabilities,
-            forbiddenFileNameCharacters: chars,
-            forbiddenFileNameExtensions: exts
-        )
+        capabilities.forbiddenFileNameCharacters = chars
+        capabilities.forbiddenFileNameExtensions = exts
+
+        return FileAutoRenamer(capabilities: capabilities)
     }
 
     @Test func testInvalidChar() {
