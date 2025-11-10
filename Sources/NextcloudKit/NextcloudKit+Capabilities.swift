@@ -288,6 +288,7 @@ public extension NextcloudKit {
                             let bigfilechunking: Bool?
                             let versiondeletion: Bool?
                             let versionlabeling: Bool?
+                            let windowsCompatibleFilenamesEnabled: Bool?
                             let forbiddenFileNames: [String]?
                             let forbiddenFileNameBasenames: [String]?
                             let forbiddenFileNameCharacters: [String]?
@@ -298,6 +299,7 @@ public extension NextcloudKit {
                                 case undelete, locking, comments, versioning, directEditing, bigfilechunking
                                 case versiondeletion = "version_deletion"
                                 case versionlabeling = "version_labeling"
+                                case windowsCompatibleFilenamesEnabled = "windows_compatible_filenames"
                                 case forbiddenFileNames = "forbidden_filenames"
                                 case forbiddenFileNameBasenames = "forbidden_filename_basenames"
                                 case forbiddenFileNameCharacters = "forbidden_filename_characters"
@@ -419,6 +421,7 @@ public extension NextcloudKit {
 
             capabilities.securityGuardDiagnostics = json.securityguard?.diagnostics ?? false
 
+            capabilities.windowsCompatibleFilenamesEnabled = json.files?.windowsCompatibleFilenamesEnabled ?? false
             capabilities.forbiddenFileNames = json.files?.forbiddenFileNames ?? []
             capabilities.forbiddenFileNameBasenames = json.files?.forbiddenFileNameBasenames ?? []
             capabilities.forbiddenFileNameCharacters = json.files?.forbiddenFileNameCharacters ?? []
@@ -511,6 +514,8 @@ final public class NKCapabilities: Sendable {
         public var assistantEnabled: Bool                           = false // NC28
         public var isLivePhotoServerAvailable: Bool                 = false // NC28
         public var securityGuardDiagnostics                         = false
+        /// Only taken into account for major version >= 32
+        public var windowsCompatibleFilenamesEnabled                = false
         public var forbiddenFileNames: [String]                     = []
         public var forbiddenFileNameBasenames: [String]             = []
         public var forbiddenFileNameCharacters: [String]            = []
@@ -523,6 +528,28 @@ final public class NKCapabilities: Sendable {
         public var directEditingTemplates: [NKEditorTemplate]       = []
 
         public init() {}
+
+        /**
+         Determines whether Windows-compatible filename (WCF) restrictions should be applied
+         for the current server version and configuration.
+
+         Behavior:
+         - For Nextcloud 32 and newer, WCF enforcement depends on the `windowsCompatibleFilenamesEnabled` flag
+           provided by the server capabilities.
+         - For Nextcloud 30 and 31, WCF restrictions are always applied (feature considered enabled).
+         - For versions older than 30, WCF is not supported, and no restrictions are applied.
+
+         - Returns: `true` if WCF restrictions should be enforced based on the server version and configuration; `false` otherwise.
+         */
+        public var shouldEnforceWindowsCompatibleFilenames: Bool {
+            if serverVersionMajor >= 32 {
+                return windowsCompatibleFilenamesEnabled
+            } else if serverVersionMajor >= 30 {
+                return true
+            } else {
+                return false
+            }
+        }
     }
 
     // MARK: - Public API
