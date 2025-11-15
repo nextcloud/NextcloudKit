@@ -111,6 +111,8 @@ public extension NextcloudKit {
 
                     struct Version: Codable {
                         let string: String
+                        let minor: Int
+                        let micro: Int
                         let major: Int
                     }
 
@@ -369,6 +371,8 @@ public extension NextcloudKit {
             // Version info
             capabilities.serverVersion = data.version.string
             capabilities.serverVersionMajor = data.version.major
+            capabilities.serverVersionMinor = data.version.minor
+            capabilities.serverVersionMicro = data.version.micro
 
             // Populate capabilities from decoded JSON
             capabilities.fileSharingApiEnabled = json.filessharing?.apienabled ?? false
@@ -470,6 +474,8 @@ final public class NKCapabilities: Sendable {
     ///
     public class Capabilities: @unchecked Sendable {
         public var serverVersionMajor: Int                          = 0
+        public var serverVersionMinor: Int                          = 0
+        public var serverVersionMicro: Int                          = 0
         public var serverVersion: String                            = ""
         public var fileSharingApiEnabled: Bool                      = false
         public var fileSharingPubPasswdEnforced: Bool               = false
