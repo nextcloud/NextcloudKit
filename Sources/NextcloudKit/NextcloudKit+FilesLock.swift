@@ -93,13 +93,11 @@ public extension NextcloudKit {
             lockUnlockFile(serverUrlFileName: serverUrlFileName, type: type, shouldLock: shouldLock, account: account, options: options, taskHandler: taskHandler) { _, responseData, error in
                 switch error {
                     case .success:
-                        var lock: NKLock?
-
-                        if let data = responseData?.data, let lock = NKLock(data: data) {
+                        if let data = responseData?.data,
+                           let lock = NKLock(data: data) {
                             continuation.resume(returning: lock)
                             return
                         }
-
                         continuation.resume(returning: nil)
                     default:
                         continuation.resume(throwing: error)
