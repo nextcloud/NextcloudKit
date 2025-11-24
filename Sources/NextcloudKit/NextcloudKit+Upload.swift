@@ -259,7 +259,8 @@ public extension NextcloudKit {
         options.customHeader?["Destination"] = serverUrlFileName.urlEncoded
         options.customHeader?["OC-Total-Length"] = String(totalFileSize)
 
-        // Disk space preflight (best-effort strict version: throw if query fails)
+        // Performs a strict disk-space preflight check on the output directory.
+        // Throws if available free space cannot be determined or is insufficient.
         #if os(macOS)
         let fsAttributes = try FileManager.default.attributesOfFileSystem(forPath: "/")
         let freeDisk = (fsAttributes[.systemFreeSize] as? NSNumber)?.int64Value ?? 0
