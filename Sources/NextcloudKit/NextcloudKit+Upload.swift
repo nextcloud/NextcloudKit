@@ -167,20 +167,27 @@ public extension NextcloudKit {
         }
     }
 
+    /// Actor responsible for holding and controlling the lifecycle of a single `UploadRequest`.
+    ///
+    /// This actor serializes access to the currently active request and ensures safe
+    /// cancellation or cleanup from any calling context. Only one request is stored
+    /// at a time; setting a new one replaces the previous reference.
+    ///
+    /// Typical usage:
+    /// - `set(_:)` from the request handler when a new upload task starts.
+    /// - `cancel()` from outside when the upload must be interrupted.
+    /// - `clear()` after completion or failure to release strong references.
     actor ActorRequest {
         private var request: UploadRequest?
 
-        // Set/replace the active request (called from requestHandler)
         func set(_ req: UploadRequest?) {
             self.request = req
         }
 
-        // Cancel if present
         func cancel() {
             self.request?.cancel()
         }
 
-        // Clear to break strong references when done
         func clear() {
             self.request = nil
         }
