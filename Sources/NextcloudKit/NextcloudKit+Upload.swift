@@ -167,27 +167,6 @@ public extension NextcloudKit {
         }
     }
 
-    /// - Parameters:
-    ///   - directory: Local input directory containing the original file.
-    ///   - fileChunksOutputDirectory: Optional output directory for produced chunks (defaults to `directory`).
-    ///   - fileName: Local file name to upload (input).
-    ///   - destinationFileName: Optional remote file name (defaults to `fileName`).
-    ///   - date: Optional remote mtime (modification time).
-    ///   - creationDate: Optional remote ctime (creation time).
-    ///   - serverUrl: Remote directory URL (WebDAV path without the file name).
-    ///   - chunkFolder: Remote temporary chunk folder name (e.g., UUID).
-    ///   - filesChunk: Optional precomputed chunk descriptors to reuse; if empty, chunks will be generated.
-    ///   - chunkSize: Desired chunk size in bytes.
-    ///   - account: Account identifier.
-    ///   - options: Request options (headers, timeout, etc.).
-    ///   - chunkProgressHandler: Reports per-chunk preparation progress (index/counter).
-    ///   - uploadStart: Called once when upload of chunks begins (with final list of chunks).
-    ///   - uploadTaskHandler: Exposes the low-level URLSessionTask.
-    ///   - uploadProgressHandler: Global progress callback (total file): (totalExpected, totalUploaded, fraction).
-    ///   - uploaded: Called after each chunk completes successfully.
-    ///   - assembling: Called just before remote assembly (MOVE .file -> destination).
-    /// - Returns: (account, remainingChunks, NKFile?) where `remainingChunks == nil` on success.
-    /// - Throws: NKError for any failure (including disk preflight and cancellations).
     actor ActorRequest {
         private var request: UploadRequest?
 
@@ -207,6 +186,37 @@ public extension NextcloudKit {
         }
     }
 
+    /// Uploads a local file to a remote WebDAV endpoint using chunked upload.
+    ///
+    /// The function optionally prepares chunk files (if `filesChunk` is empty),
+    /// then uploads each chunk sequentially, reporting both per-chunk and
+    /// global progress. After successful upload of all chunks, it triggers the
+    /// remote assembly (e.g. MOVE of the temporary chunk file/folder to the
+    /// final destination) and returns the final `NKFile` metadata if available.
+    ///
+    /// - Parameters:
+    ///   - directory: Local input directory containing the original file.
+    ///   - fileChunksOutputDirectory: Optional output directory for produced chunks. If `nil`, `directory` is used.
+    ///   - fileName: Local file name to upload (input).
+    ///   - destinationFileName: Optional remote file name. If `nil`, `fileName` is used.
+    ///   - date: Optional remote modification time (mtime).
+    ///   - creationDate: Optional remote creation time (ctime).
+    ///   - serverUrl: Remote directory URL (WebDAV path without the file name).
+    ///   - chunkFolder: Remote temporary chunk folder name (for example, a UUID).
+    ///   - filesChunk: Precomputed chunk descriptors to reuse. Pass an empty array to generate chunks from the source file.
+    ///   - chunkSize: Desired chunk size in bytes.
+    ///   - account: Account identifier.
+    ///   - options: Request options (headers, timeout, etc.).
+    ///   - chunkProgressHandler: Reports per-chunk preparation progress as `(totalChunks, currentIndex)`.
+    ///   - uploadStart: Called once when upload of chunks begins, with the final list of chunks.
+    ///   - uploadTaskHandler: Exposes the low-level `URLSessionTask` for each chunk upload.
+    ///   - uploadProgressHandler: Global progress callback for the whole file: `(totalBytesExpected, totalBytesUploaded, fractionCompleted)`.
+    ///   - uploaded: Called after each chunk completes successfully, passing the corresponding chunk descriptor.
+    ///   - assembling: Called just before remote assembly (e.g. MOVE from temporary to final path).
+    ///
+    /// - Returns: A tuple `(account, file)` where `account` is the account identifier used for the upload and `file` is the final `NKFile` metadata if available, otherwise `nil`.
+    ///
+    /// - Throws: `NKError` for any failure (including disk preflight errors, network errors, server-side failures, or user cancellations).
     func uploadChunkAsync(directory: String,
                           fileChunksOutputDirectory: String? = nil,
                           fileName: String,
