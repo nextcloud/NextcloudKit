@@ -443,7 +443,7 @@ public extension NextcloudKit {
         }
     }
 
-    /// Retrieves the list of predefined user statuses (e.g., "Available", "Away", "Do not disturb") from the Nextcloud server.
+    /// Retrieves the list of predefined user statuses + messages (e.g., "Commuting", "In a meeting", "Be right back") from the Nextcloud server.
     ///
     /// - Parameters:
     ///   - account: The Nextcloud account identifier performing the request.
