@@ -27,7 +27,7 @@ public extension NextcloudKit {
                      params: [String: String]? = nil,
                      options: NKRequestOptions = NKRequestOptions(),
                      taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-                     completion: @escaping (_ token: String?, _ uiResponse: NKDeclarativeUIResponse?, _ responseData: AFDataResponse<Data>?, _ error: NKError) -> Void) {
+                     completion: @escaping (_ token: String?, _ uiResponse: NKClientIntegrationUIResponse?, _ responseData: AFDataResponse<Data>?, _ error: NKError) -> Void) {
 
 //        guard let nkSession = nkCommonInstance.nksessions.session(forAccount: account),
 //              let headers = nkCommonInstance.getStandardHeaders(account: account, options: options) else {
@@ -108,7 +108,7 @@ public extension NextcloudKit {
                           taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in }
     ) async -> (
         account: String,
-        uiResponse: NKDeclarativeUIResponse?,
+        uiResponse: NKClientIntegrationUIResponse?,
         error: NKError
     ) {
         guard let nkSession = nkCommonInstance.nksessions.session(forAccount: account),
@@ -123,9 +123,9 @@ public extension NextcloudKit {
             var qp: [String: Any] = [:]
             for (key, value) in params {
                 switch key {
-                case NKDeclarativeUICapabilities.Params.fileId.rawValue:
+                case NKClientIntegration.Params.fileId.rawValue:
                     qp[key] = fileId
-                case NKDeclarativeUICapabilities.Params.filePath.rawValue:
+                case NKClientIntegration.Params.filePath.rawValue:
                     qp[key] = filePath
                 default:
                     qp[key] = value
@@ -160,7 +160,7 @@ public extension NextcloudKit {
         case .success(let data):
             do {
                 let decoder = JSONDecoder()
-                let ui = try decoder.decode(NKDeclarativeUIResponse.self, from: data)
+                let ui = try decoder.decode(NKClientIntegrationUIResponse.self, from: data)
                 return (account, ui, .success)
             } catch {
                 nkLog(debug: "Declarative UI response decoding failed: \(error)")

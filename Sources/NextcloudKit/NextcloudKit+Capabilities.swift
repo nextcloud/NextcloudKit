@@ -132,7 +132,7 @@ public extension NextcloudKit {
                         let assistant: Assistant?
                         let recommendations: Recommendations?
                         let termsOfService: TermsOfService?
-                        let declarativeUI: NKDeclarativeUICapabilities?
+                        let clientIntegration: NKClientIntegration?
 
                         enum CodingKeys: String, CodingKey {
                             case downloadLimit = "downloadlimit"
@@ -146,7 +146,7 @@ public extension NextcloudKit {
                             case assistant
                             case recommendations
                             case termsOfService = "terms_of_service"
-                            case declarativeUI = "declarativeui"
+                            case clientIntegration = "client_integration"
                         }
 
                         struct DownloadLimit: Codable {
@@ -464,7 +464,7 @@ public extension NextcloudKit {
             capabilities.recommendations = json.recommendations?.enabled ?? false
             capabilities.termsOfService = json.termsOfService?.enabled ?? false
 
-            capabilities.declarativeUI = json.declarativeUI
+            capabilities.clientIntegration = json.clientIntegration
 
             // Persist capabilities in shared store
             await NKCapabilities.shared.setCapabilities(for: account, capabilities: capabilities)
@@ -562,7 +562,7 @@ final public class NKCapabilities: Sendable {
         public var termsOfService: Bool                             = false
 //        public var declarativeUIEnabled: Bool                       = false
 //        public var declarativeUIContextMenu: [ContextMenuItem]                       = []
-        public var declarativeUI: NKDeclarativeUICapabilities?                    = nil
+        public var clientIntegration: NKClientIntegration?                    = nil
         public var directEditingEditors: [NKEditorDetailsEditor]    = []
         public var directEditingCreators: [NKEditorDetailsCreator]  = []
         public var directEditingTemplates: [NKEditorTemplate]       = []

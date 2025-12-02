@@ -1,12 +1,8 @@
-//
-//  NKDeclarativeUIResponse.swift
-//  NextcloudKit
-//
-//  Created by Milen Pivchev on 24.09.25.
-//
+// SPDX-FileCopyrightText: Nextcloud GmbH
+// SPDX-FileCopyrightText: 2025 Milen Pivchev
+// SPDX-License-Identifier: GPL-3.0-or-later
 
-
-public struct NKDeclarativeUIResponse: Codable {
+public struct NKClientIntegrationUIResponse: Codable {
     let version: Double
     let root: RootContainer
 }

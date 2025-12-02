@@ -1,46 +1,11 @@
-//
-//  File.swift
-//  NextcloudKit
-//
-//  Created by Milen Pivchev on 10.07.25.
-//
+// SPDX-FileCopyrightText: Nextcloud GmbH
+// SPDX-FileCopyrightText: 2025 Milen Pivchev
+// SPDX-License-Identifier: GPL-3.0-or-later
 
 import Foundation
 import Alamofire
-//
-//public struct NKDeclarativeUI {
-//    public struct ContextMenu: Codable {
-//        let title: String
-//        let url: String
-//    }
-//}
-//
-//public struct DeclarativeUI: Codable {
-//    public let contextMenu: [ContextMenuItem]
-//
-//    enum CodingKeys: String, CodingKey {
-//        case contextMenu = "context-menu"
-//    }
-//}
-//
-//public struct ContextMenuItem: Codable {
-//    public let title: String
-//    public let endpoint: String
-//
-//    public init(from decoder: Decoder) throws {
-//        var container = try decoder.unkeyedContainer()
-//        title = try container.decode(String.self)
-//        endpoint = try container.decode(String.self)
-//    }
-//
-//    public func encode(to encoder: Encoder) throws {
-//        var container = encoder.unkeyedContainer()
-//        try container.encode(title)
-//        try container.encode(endpoint)
-//    }
-//}
 
-public struct NKDeclarativeUICapabilities: Codable {
+public struct NKClientIntegration: Codable {
     public let apps: [String: AppContext]
 
     public init(from decoder: Decoder) throws {
@@ -75,9 +40,11 @@ public struct NKDeclarativeUICapabilities: Codable {
  }
 
 public struct AppContext: Codable {
+    public let version: Double
     public let contextMenu: [ContextMenuAction]
 
     enum CodingKeys: String, CodingKey {
+        case version
         case contextMenu = "context-menu"
     }
 }
@@ -89,7 +56,6 @@ public struct ContextMenuAction: Codable {
     public let mimetypeFilters: String?
     public let params: [String: String]?
     public let icon: String?
-//    public let filter: String?
 
     enum CodingKeys: String, CodingKey {
         case name, url, method, icon, params
