@@ -429,8 +429,27 @@ public class NKDataFileXML: NSObject {
                 file.richWorkspace = richWorkspace
             }
 
-            if let lock = NKLock(xml: propstat["d:prop"]) {
-                file.lock = lock
+            if let lock = propstat["d:prop", "nc:lock"].int {
+                file.lock = lock > 0
+            }
+
+            if let lockOwner = propstat["d:prop", "nc:lock-owner"].text {
+                file.lockOwner = lockOwner
+            }
+            if let lockOwnerEditor = propstat["d:prop", "nc:lock-owner-editor"].text {
+                file.lockOwnerEditor = lockOwnerEditor
+            }
+            if let lockOwnerType = propstat["d:prop", "nc:lock-owner-type"].int {
+                file.lockOwnerType = lockOwnerType
+            }
+            if let lockOwnerDisplayName = propstat["d:prop", "nc:lock-owner-displayname"].text {
+                file.lockOwnerDisplayName = lockOwnerDisplayName
+            }
+            if let lockTime = propstat["d:prop", "nc:lock-time"].int {
+                file.lockTime = Date(timeIntervalSince1970: TimeInterval(lockTime))
+            }
+            if let lockTimeOut = propstat["d:prop", "nc:lock-timeout"].int {
+                file.lockTimeOut = file.lockTime?.addingTimeInterval(TimeInterval(lockTimeOut))
             }
 
             let tagsElements = propstat["d:prop", "nc:system-tags"]

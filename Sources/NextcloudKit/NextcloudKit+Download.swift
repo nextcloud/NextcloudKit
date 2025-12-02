@@ -26,7 +26,7 @@ public extension NextcloudKit {
                   requestHandler: @escaping (_ request: DownloadRequest) -> Void = { _ in },
                   taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
                   progressHandler: @escaping (_ progress: Progress) -> Void = { _ in },
-                  completionHandler: @escaping (_ account: String, _ etag: String?, _ date: Date?, _ lenght: Int64, _ headers: [AnyHashable: Any]?, _ afError: AFError?, _ nKError: NKError) -> Void) {
+                  completionHandler: @escaping (_ account: String, _ etag: String?, _ date: Date?, _ lenght: Int64, _ headers: [AnyHashable: any Sendable]?, _ afError: AFError?, _ nKError: NKError) -> Void) {
         var convertible: URLConvertible?
         if serverUrlFileName is URL {
             convertible = serverUrlFileName as? URLConvertible
@@ -50,12 +50,11 @@ public extension NextcloudKit {
             options.queue.async { taskHandler(task) }
         } .downloadProgress { progress in
             options.queue.async { progressHandler(progress) }
-        } .responseData(queue: self.nkCommonInstance.backgroundQueue) { response in
-            switch response.result {
-            case .failure(let error):
+        } .response(queue: self.nkCommonInstance.backgroundQueue) { response in
+            if let error = response.error {
                 let resultError = NKError(error: error, afResponse: response, responseData: nil)
                 options.queue.async { completionHandler(account, nil, nil, 0, response.response?.allHeaderFields, error, resultError) }
-            case .success:
+            } else {
                 var date: Date?
                 var etag: String?
                 var length: Int64 = 0
@@ -104,7 +103,7 @@ public extension NextcloudKit {
         etag: String?,
         date: Date?,
         length: Int64,
-        headers: [AnyHashable: Any]?,
+        headers: [AnyHashable: any Sendable]?,
         afError: AFError?,
         nkError: NKError
     ) {

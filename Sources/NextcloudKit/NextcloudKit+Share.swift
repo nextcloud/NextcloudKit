@@ -381,7 +381,7 @@ public extension NextcloudKit {
     ///   - share: An optional `NKShare` object representing the created share.
     ///   - responseData: The raw `AFDataResponse<Data>` returned by Alamofire.
     ///   - error: An `NKError` representing the result of the operation.
-    private func createShareAsync(
+    func createShareAsync(
         path: String,
         shareType: Int,
         shareWith: String?,
@@ -689,44 +689,4 @@ public extension NextcloudKit {
 
         return share
     }
-}
-
-public class NKShare: NSObject {
-    public var account = ""
-    public var canEdit: Bool = false
-    public var canDelete: Bool = false
-    public var date: Date?
-    public var displaynameFileOwner = ""
-    public var displaynameOwner = ""
-    public var expirationDate: NSDate?
-    public var fileParent: Int = 0
-    public var fileSource: Int = 0
-    public var fileTarget = ""
-    public var hideDownload: Bool = false
-    public var idShare: Int = 0
-    public var itemSource: Int = 0
-    public var itemType = ""
-    public var label = ""
-    public var mailSend: Bool = false
-    public var mimeType = ""
-    public var note = ""
-    public var parent = ""
-    public var password = ""
-    public var path = ""
-    public var permissions: Int = 0
-    public var sendPasswordByTalk: Bool = false
-    public var shareType: Int = 0
-    public var shareWith = ""
-    public var shareWithDisplayname = ""
-    public var storage: Int = 0
-    public var storageId = ""
-    public var token = ""
-    public var uidFileOwner = ""
-    public var uidOwner = ""
-    public var url = ""
-    public var userClearAt: Date?
-    public var userIcon = ""
-    public var userMessage = ""
-    public var userStatus = ""
-    public var attributes: String?
 }
