@@ -3,21 +3,37 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 public struct NKClientIntegrationUIResponse: Codable {
-    let version: Double
-    let root: RootContainer
+    public let ocs: OCSContainer
+}
+
+public struct OCSContainer: Codable {
+    public let meta: Meta
+    public let data: ResponseData
+}
+
+public struct Meta: Codable {
+    public let status: String
+    public let statuscode: Int
+    public let message: String
+}
+
+public struct ResponseData: Codable {
+    // TODO: add after
+//    public let version: String 
+    public let tooltip: String?
 }
 
 public struct RootContainer: Codable {
-    let orientation: String
-    let rows: [Row]
+    public let orientation: String
+    public let rows: [Row]
 }
 
 public struct Row: Codable {
-    let children: [Child]
+    public let children: [Child]
 }
 
 public struct Child: Codable {
-    let element: String
-    let text: String?
-    let url: String?
+    public let element: String
+    public let text: String?
+    public let url: String?
 }

@@ -134,13 +134,17 @@ public extension NextcloudKit {
             queryParams = qp
         }
 
-        guard let fullURL = URL(string: nkSession.urlBase + url) else {
+        let fullURLString = nkSession.urlBase + url
+        let finalURLString = fullURLString.replacingOccurrences(of: "{\(NKClientIntegration.Params.fileId.rawValue)}", with: fileId)
+            .replacingOccurrences(of: "{\(NKClientIntegration.Params.filePath.rawValue)}", with: filePath)
+
+        guard let finalURL = URL(string: finalURLString) else {
             return (account, nil, NKError.urlError)
         }
 
         let taskDescription = options.taskDescription
 
-        let request = unauthorizedSession.request(fullURL,
+        let request = unauthorizedSession.request(finalURL,
                                                   method: httpMethod,
                                                   parameters: queryParams,
                                                   encoding: URLEncoding.queryString,
