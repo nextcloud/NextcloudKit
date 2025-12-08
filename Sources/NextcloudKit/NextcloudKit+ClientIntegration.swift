@@ -167,7 +167,7 @@ public extension NextcloudKit {
                 let ui = try decoder.decode(NKClientIntegrationUIResponse.self, from: data)
                 return (account, ui, .success)
             } catch {
-                nkLog(debug: "Declarative UI response decoding failed: \(error)")
+                nkLog(debug: "Client Integration response decoding failed: \(error)")
                 return (account, nil, .invalidData)
             }
         }
