@@ -18,9 +18,9 @@ public struct Meta: Codable {
 }
 
 public struct ResponseData: Codable {
-    // TODO: add after
-//    public let version: String 
+    public let version: Double
     public let tooltip: String?
+    public let root: RootContainer?
 }
 
 public struct RootContainer: Codable {
@@ -34,6 +34,6 @@ public struct Row: Codable {
 
 public struct Child: Codable {
     public let element: String
-    public let text: String?
-    public let url: String?
+    public let text: String
+    public let url: String
 }

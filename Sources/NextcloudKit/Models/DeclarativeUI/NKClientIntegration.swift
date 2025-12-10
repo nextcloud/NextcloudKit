@@ -61,35 +61,5 @@ public struct ContextMenuAction: Codable {
         case name, url, method, icon, params
         case mimetypeFilters = "mimetype_filters"
     }
-
-//    func asRequest(user: String, password: String, userAgent: String? = nil,
-//                   options: NKRequestOptions = NKRequestOptions(),
-//                   taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-//                   completion: @escaping (_ token: String?, _ responseData: AFDataResponse<Data>?, _ error: NKError) -> Void) async {
-//
-//        // Convert string method to Alamofire HTTPMethod
-//        let httpMethod = HTTPMethod(rawValue: method.uppercased())
-//
-//        // Map params/bodyParams arrays into key/value (example: fileId → dummy value)
-//        var queryParams: [String: Any]? = nil
-//        if let params = params {
-//            queryParams = Dictionary(uniqueKeysWithValues: params.map { ($0, "SOME_VALUE") })
-//        }
-//
-//        var body: [String: Any]? = nil
-//        if let bodyParams = bodyParams {
-//            body = Dictionary(uniqueKeysWithValues: bodyParams.map { ($0, "SOME_BODY_VALUE") })
-//        }
-//
-//        await NextcloudKit.shared.sendRequestAsync(fullUrl: url,
-//                                                   method: httpMethod,
-//                                                   user: user,
-//                                                   password: password,
-//                                                   userAgent: userAgent,
-//                                                   params: queryParams,
-//                                                   bodyParams: body,
-//                                                   options: options,
-//                                                   taskHandler: taskHandler)
-//    }
 }
 
