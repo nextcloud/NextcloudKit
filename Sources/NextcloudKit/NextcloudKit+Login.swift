@@ -95,6 +95,92 @@ public extension NextcloudKit {
         }
     }
 
+    /// Retrieves an app password (token) for the given user, server URL and onetime token.
+    ///
+    /// Parameters:
+    /// - url: The base server URL (e.g., https://cloud.example.com).
+    /// - user: The username for authentication.
+    /// - onetimeToken: The onetime token (usually from QR code login).
+    /// - userAgent: Optional user-agent string to include in the request.
+    /// - options: Optional request configuration (headers, queue, etc.).
+    /// - taskHandler: Callback for observing the underlying URLSessionTask.
+    /// - completion: Returns the token string (if any), raw response data, and NKError result.
+    func getAppPasswordOnetime(url: String,
+                        user: String,
+                        onetimeToken: String,
+                        userAgent: String? = nil,
+                        options: NKRequestOptions = NKRequestOptions(),
+                        taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
+                        completion: @escaping (_ token: String?, _ responseData: AFDataResponse<Data>?, _ error: NKError) -> Void) {
+        let endpoint = "ocs/v2.php/core/getapppassword-onetime"
+        guard let url = self.nkCommonInstance.createStandardUrl(serverUrl: url, endpoint: endpoint) else {
+            return options.queue.async { completion(nil, nil, .urlError) }
+        }
+        var headers: HTTPHeaders = [.authorization(username: user, password: onetimeToken)]
+        if let userAgent = userAgent {
+            headers.update(.userAgent(userAgent))
+        }
+        headers.update(name: "OCS-APIRequest", value: "true")
+        var urlRequest: URLRequest
+
+        do {
+            try urlRequest = URLRequest(url: url, method: HTTPMethod(rawValue: "GET"), headers: headers)
+        } catch {
+            return options.queue.async { completion(nil, nil, NKError(error: error)) }
+        }
+
+        unauthorizedSession.request(urlRequest).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
+            task.taskDescription = options.taskDescription
+            taskHandler(task)
+        }.responseData(queue: self.nkCommonInstance.backgroundQueue) { response in
+            switch response.result {
+            case .failure(let error):
+                let error = NKError(error: error, afResponse: response, responseData: response.data)
+                options.queue.async { completion(nil, response, error) }
+            case .success(let data):
+                let apppassword = NKDataFileXML(nkCommonInstance: self.nkCommonInstance).convertDataAppPassword(data: data)
+                options.queue.async { completion(apppassword, response, .success) }
+            }
+        }
+    }
+
+    /// Asynchronously fetches an app password for the provided user and onetime token.
+    ///
+    /// - Parameters:
+    ///   - url: The base URL of the Nextcloud server.
+    ///   - user: The user login name.
+    ///   - onetimeToken: The onetime token (usually from QR code login).
+    ///   - userAgent: Optional custom user agent for the request.
+    ///   - options: Optional request configuration.
+    ///   - taskHandler: Callback to observe the task, if needed.
+    /// - Returns: A tuple containing the token, response data, and error result.
+    func getAppPasswordOnetimeAsync(url: String,
+                                    user: String,
+                                    onetimeToken: String,
+                                    userAgent: String? = nil,
+                                    options: NKRequestOptions = NKRequestOptions(),
+                                    taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in }
+    ) async -> (
+        token: String?,
+        responseData: AFDataResponse<Data>?,
+        error: NKError
+    ) {
+        await withCheckedContinuation { continuation in
+            getAppPasswordOnetime(url: url,
+                                  user: user,
+                                  onetimeToken: onetimeToken,
+                                  userAgent: userAgent,
+                                  options: options,
+                                  taskHandler: taskHandler) { token, responseData, error in
+                continuation.resume(returning: (
+                    token: token,
+                    responseData: responseData,
+                    error: error
+                ))
+            }
+        }
+    }
+
     /// Deletes the app password (token) for a specific account using basic authentication.
     ///
     /// Parameters:
