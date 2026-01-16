@@ -18,7 +18,7 @@ public struct Meta: Codable {
 }
 
 public struct ResponseData: Codable {
-    public let version: Double
+//    public let version: String
     public let tooltip: String?
     public let root: RootContainer?
 }

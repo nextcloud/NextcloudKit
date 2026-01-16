@@ -40,11 +40,11 @@ public struct NKClientIntegration: Codable {
  }
 
 public struct AppContext: Codable {
-    public let version: Double
+//    public let version: Double
     public let contextMenu: [ContextMenuAction]
 
     enum CodingKeys: String, CodingKey {
-        case version
+//        case version
         case contextMenu = "context-menu"
     }
 }
