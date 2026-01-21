@@ -10,7 +10,7 @@ import UIKit
 import Alamofire
 import SwiftyJSON
 
-open class NextcloudKit {
+open class NextcloudKit: @unchecked Sendable {
 #if swift(<6.0)
     public static let shared: NextcloudKit = {
         let instance = NextcloudKit()
@@ -108,35 +108,45 @@ open class NextcloudKit {
         nkCommonInstance.nksessions.append(nkSession)
     }
 
+    /// Updates an existing `NKSession` stored in the synchronized array.
+    ///
+    /// This method looks up the session by its `account` identifier, applies any non-nil
+    /// parameters to mutate the session, and then replaces the stored value using
+    /// `SynchronizedNKSessionArray.replace(account:with:)`.
+    ///
+    /// - Parameters:
+    ///   - account: The account identifier used to locate the session to update.
+    ///   - urlBase: An optional new base URL for the session.
+    ///   - user: An optional new username for the session.
+    ///   - userId: An optional new user identifier for the session.
+    ///   - password: An optional new password or token for the session.
+    ///   - userAgent: An optional new User-Agent string for the session.
     public func updateSession(account: String,
                               urlBase: String? = nil,
                               user: String? = nil,
                               userId: String? = nil,
                               password: String? = nil,
-                              userAgent: String? = nil,
-                              replaceWithAccount: String? = nil) {
-        guard var nkSession = nkCommonInstance.nksessions.session(forAccount: account) else {
+                              userAgent: String? = nil) {
+        guard var newSession = nkCommonInstance.nksessions.session(forAccount: account) else {
             return
         }
 
         if let urlBase {
-            nkSession.urlBase = urlBase
+            newSession.urlBase = urlBase
         }
         if let user {
-            nkSession.user = user
+            newSession.user = user
         }
         if let userId {
-            nkSession.userId = userId
+            newSession.userId = userId
         }
         if let password {
-            nkSession.password = password
+            newSession.password = password
         }
         if let userAgent {
-            nkSession.userAgent = userAgent
+            newSession.userAgent = userAgent
         }
-        if let replaceWithAccount {
-            nkSession.account = replaceWithAccount
-        }
+        nkCommonInstance.nksessions.replace(account: account, with: newSession)
     }
 
     public func deleteCookieStorageForAccount(_ account: String) {

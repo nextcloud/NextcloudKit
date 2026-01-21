@@ -5,7 +5,7 @@
 
 import Foundation
 
-public class NKRequestOptions: NSObject {
+final public class NKRequestOptions: NSObject, Sendable {
     public let endpoint: String?
     public let version: String?
     internal(set) public var customHeader: [String: String]?

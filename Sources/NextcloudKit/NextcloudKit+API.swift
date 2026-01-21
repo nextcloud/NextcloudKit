@@ -238,6 +238,8 @@ public extension NextcloudKit {
         public let extendedSupport: Bool
         public let productName: String
         public let version: String
+        public let instanceid: String
+        public let edition: String
         public let versionMajor: Int
         public let versionMinor: Int
         public let versionMicro: Int
@@ -298,6 +300,8 @@ public extension NextcloudKit {
                                             extendedSupport: json["extendedSupport"].boolValue,
                                             productName: json["productname"].stringValue,
                                             version: json["versionstring"].stringValue,
+                                            instanceid: json["instanceid"].stringValue,
+                                            edition: json["edition"].stringValue,
                                             versionMajor: versionMajor,
                                             versionMinor: versionMinor,
                                             versionMicro: versionMicro,

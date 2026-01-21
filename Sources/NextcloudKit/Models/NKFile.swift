@@ -5,6 +5,9 @@
 
 import Foundation
 
+///
+/// A file or directory on the server.
+///
 public struct NKFile: Sendable {
     public var account: String
     public var classFile: String
