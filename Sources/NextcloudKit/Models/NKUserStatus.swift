@@ -5,7 +5,7 @@
 
 import Foundation
 
-public class NKUserStatus: NSObject {
+public class NKUserStatus: NSObject, Identifiable {
     public var clearAt: Date?
     public var clearAtTime: String?
     public var clearAtType: String?
