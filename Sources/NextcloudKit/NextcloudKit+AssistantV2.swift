@@ -314,6 +314,141 @@ public extension NextcloudKit {
             }
         }
     }
+
+    /// Retrieves all chat sessions. Each session has messages.
+    ///
+    /// Parameters:
+    /// - account: The Nextcloud account performing the request.
+    /// - options: Optional HTTP request configuration.
+    /// - taskHandler: Optional closure to access the underlying URLSessionTask.
+    /// - completion: Completion handler returning the account, list of tasks, raw response, and NKError.
+    func getAssistantChatSessions(account: String,
+                                  options: NKRequestOptions = NKRequestOptions(),
+                                  taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
+                                  completion: @escaping (_ account: String, _ sessions: [AssistantSession]?, _ responseData: AFDataResponse<Data>?, _ error: NKError) -> Void) {
+        let endpoint = "/ocs/v2.php/apps/assistant/chat/sessions"
+        guard let nkSession = nkCommonInstance.nksessions.session(forAccount: account),
+              let url = nkCommonInstance.createStandardUrl(serverUrl: nkSession.urlBase, endpoint: endpoint),
+              let headers = nkCommonInstance.getStandardHeaders(account: account, options: options) else {
+            return options.queue.async { completion(account, nil, nil, .urlError) }
+        }
+
+        nkSession.sessionData.request(url, method: .get, encoding: URLEncoding.default, headers: headers, interceptor: NKInterceptor(nkCommonInstance: nkCommonInstance)).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
+            task.taskDescription = options.taskDescription
+            taskHandler(task)
+        }.responseData(queue: self.nkCommonInstance.backgroundQueue) { response in
+            switch response.result {
+            case .failure(let error):
+                let error = NKError(error: error, afResponse: response, responseData: response.data)
+                options.queue.async { completion(account, nil, response, error) }
+            case .success(let data):
+                let decoder = JSONDecoder()
+                let result = try? decoder.decode([AssistantSession].self, from: data)
+
+                options.queue.async { completion(account, result, response, .success) }
+            }
+        }
+    }
+
+    /// Asynchronously retrieves all chat sessions. Each session has messages.
+    ///
+    /// - Parameters:
+    ///   - account: The account performing the query.
+    ///   - options: Optional configuration.
+    ///   - taskHandler: Callback to access the associated URLSessionTask.
+    /// - Returns: A tuple with named values for account, task list, response, and error.
+    func getAssistantChatSessionsAsync(account: String,
+                                       options: NKRequestOptions = NKRequestOptions(),
+                                       taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in }
+    ) async -> (
+        account: String,
+        sessions: [AssistantSession]?,
+        responseData: AFDataResponse<Data>?,
+        error: NKError
+    ) {
+        await withCheckedContinuation { continuation in
+            getAssistantChatSessions(
+                account: account,
+                options: options,
+                taskHandler: taskHandler) { account, sessions, responseData, error in
+                    continuation.resume(returning: (
+                        account: account,
+                        sessions: sessions,
+                        responseData: responseData,
+                        error: error
+                    ))
+                }
+        }
+    }
+
+    /// Retrieves all messages for a given chat session.
+    ///
+    /// Parameters:
+    /// - sessionId: The chat session from which to fetch all messages.
+    /// - account: The Nextcloud account performing the request.
+    /// - options: Optional HTTP request configuration.
+    /// - taskHandler: Optional closure to access the underlying URLSessionTask.
+    /// - completion: Completion handler returning the account, list of tasks, raw response, and NKError.
+    func getAssistantChatMessages(sessionId: Int,
+                                  account: String,
+                                  options: NKRequestOptions = NKRequestOptions(),
+                                  taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
+                                  completion: @escaping (_ account: String, _ chatMessages: [ChatMessage]?, _ responseData: AFDataResponse<Data>?, _ error: NKError) -> Void) {
+        let endpoint = "/ocs/v2.php/apps/assistant/chat/messages"
+        guard let nkSession = nkCommonInstance.nksessions.session(forAccount: account),
+              let url = nkCommonInstance.createStandardUrl(serverUrl: nkSession.urlBase, endpoint: endpoint),
+              let headers = nkCommonInstance.getStandardHeaders(account: account, options: options) else {
+            return options.queue.async { completion(account, nil, nil, .urlError) }
+        }
+
+        nkSession.sessionData.request(url, method: .get, parameters: ["sessionId": sessionId], encoding: URLEncoding.default, headers: headers, interceptor: NKInterceptor(nkCommonInstance: nkCommonInstance)).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
+            task.taskDescription = options.taskDescription
+            taskHandler(task)
+        }.responseData(queue: self.nkCommonInstance.backgroundQueue) { response in
+            switch response.result {
+            case .failure(let error):
+                let error = NKError(error: error, afResponse: response, responseData: response.data)
+                options.queue.async { completion(account, nil, response, error) }
+            case .success(let data):
+                let decoder = JSONDecoder()
+                let result = try? decoder.decode([ChatMessage].self, from: data)
+
+                options.queue.async { completion(account, result, response, .success) }
+            }
+        }
+    }
+
+    /// Asynchronously retrieves all messages for a given chat session.
+    ///
+    /// - Parameters:
+    ///   - sessionId: The chat session from which to fetch all messages.
+    ///   - account: The account performing the query.
+    ///   - options: Optional configuration.
+    ///   - taskHandler: Callback to access the associated URLSessionTask.
+    /// - Returns: A tuple with named values for account, sessions, response, and error.
+    func getAssistantChatMessagesAsync(sessionId: Int,
+                                       account: String,
+                                       options: NKRequestOptions = NKRequestOptions(),
+                                       taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in }
+    ) async -> (
+        account: String,
+        chatMessage: [ChatMessage]?,
+        responseData: AFDataResponse<Data>?,
+        error: NKError
+    ) {
+        await withCheckedContinuation { continuation in
+            getAssistantChatMessages(sessionId: sessionId,
+                                     account: account,
+                                     options: options,
+                                     taskHandler: taskHandler) { account, chatMessage, responseData, error in
+                continuation.resume(returning: (
+                    account: account,
+                    chatMessage: chatMessage,
+                    responseData: responseData,
+                    error: error
+                ))
+            }
+        }
+    }
+
 }
-
-
