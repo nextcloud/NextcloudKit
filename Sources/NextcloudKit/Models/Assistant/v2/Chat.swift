@@ -30,10 +30,17 @@ public struct ChatMessage: Codable, Identifiable, Equatable {
 // MARK: - ChatMessageRequest
 
 public struct ChatMessageRequest: Encodable {
-    public let sessionId: String
+    public let sessionId: Int
     public let role: String
     public let content: String
     public let timestamp: Int
+
+    public init(sessionId: Int, role: String, content: String, timestamp: Int) {
+        self.sessionId = sessionId
+        self.role = role
+        self.content = content
+        self.timestamp = timestamp
+    }
 
     var bodyMap: [String: Any] {
         return [

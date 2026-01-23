@@ -451,4 +451,74 @@ public extension NextcloudKit {
         }
     }
 
+    /// Creates a new message in a chat session.
+    ///
+    /// Parameters:
+    /// - messageRequest: The message request containing sessionId, role, content, and timestamp.
+    /// - account: The Nextcloud account performing the request.
+    /// - options: Optional HTTP request configuration.
+    /// - taskHandler: Optional closure to access the underlying URLSessionTask.
+    /// - completion: Completion handler returning the account, created message, raw response, and NKError.
+    func createAssistantChatMessage(messageRequest: ChatMessageRequest,
+                                    account: String,
+                                    options: NKRequestOptions = NKRequestOptions(),
+                                    taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
+                                    completion: @escaping (_ account: String, _ chatMessage: ChatMessage?, _ responseData: AFDataResponse<Data>?, _ error: NKError) -> Void) {
+        let endpoint = "/ocs/v2.php/apps/assistant/chat/new_message"
+        guard let nkSession = nkCommonInstance.nksessions.session(forAccount: account),
+              let url = nkCommonInstance.createStandardUrl(serverUrl: nkSession.urlBase, endpoint: endpoint),
+              let headers = nkCommonInstance.getStandardHeaders(account: account, options: options) else {
+            return options.queue.async { completion(account, nil, nil, .urlError) }
+        }
+
+        nkSession.sessionData.request(url, method: .put, parameters: messageRequest.bodyMap, encoding: JSONEncoding.default, headers: headers, interceptor: NKInterceptor(nkCommonInstance: nkCommonInstance)).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
+            task.taskDescription = options.taskDescription
+            taskHandler(task)
+        }.responseData(queue: self.nkCommonInstance.backgroundQueue) { response in
+            switch response.result {
+            case .failure(let error):
+                let error = NKError(error: error, afResponse: response, responseData: response.data)
+                options.queue.async { completion(account, nil, response, error) }
+            case .success(let data):
+                let decoder = JSONDecoder()
+                let result = try? decoder.decode(ChatMessage.self, from: data)
+
+                options.queue.async { completion(account, result, response, .success) }
+            }
+        }
+    }
+
+    /// Asynchronously creates a new message in a chat session.
+    ///
+    /// - Parameters:
+    ///   - messageRequest: The message request containing sessionId, role, content, and timestamp.
+    ///   - account: The account performing the request.
+    ///   - options: Optional configuration.
+    ///   - taskHandler: Callback to access the associated URLSessionTask.
+    /// - Returns: A tuple with named values for account, created message, response, and error.
+    func createAssistantChatMessageAsync(messageRequest: ChatMessageRequest,
+                                         account: String,
+                                         options: NKRequestOptions = NKRequestOptions(),
+                                         taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in }
+    ) async -> (
+        account: String,
+        chatMessage: ChatMessage?,
+        responseData: AFDataResponse<Data>?,
+        error: NKError
+    ) {
+        await withCheckedContinuation { continuation in
+            createAssistantChatMessage(messageRequest: messageRequest,
+                                       account: account,
+                                       options: options,
+                                       taskHandler: taskHandler) { account, chatMessage, responseData, error in
+                continuation.resume(returning: (
+                    account: account,
+                    chatMessage: chatMessage,
+                    responseData: responseData,
+                    error: error
+                ))
+            }
+        }
+    }
+
 }
