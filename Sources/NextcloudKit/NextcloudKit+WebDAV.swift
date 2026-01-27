@@ -770,9 +770,15 @@ public extension NextcloudKit {
         guard let lessDateString, let greaterDateString else {
             return options.queue.async { completion(account, files, nil, .invalidDate) }
         }
-        guard let httpBody = String(format: NKDataFileXML(nkCommonInstance: self.nkCommonInstance).getRequestBodySearchMedia(createProperties: options.createProperties, removeProperties: options.removeProperties), href, elementDate, elementDate, lessDateString, elementDate, greaterDateString, String(limit)).data(using: .utf8) else {
-            return options.queue.async { completion(account, files, nil, .invalidData) }
+
+        let httpBodyString = String(format: NKDataFileXML(nkCommonInstance: self.nkCommonInstance).getRequestBodySearchMedia(createProperties: options.createProperties, removeProperties: options.removeProperties), href, elementDate, elementDate, lessDateString, elementDate, greaterDateString, String(limit))
+
+        guard let httpBody = httpBodyString.data(using: .utf8) else {
+            return options.queue.async {
+                completion(account, files, nil, .invalidData)
+            }
         }
+
 
         search(serverUrl: nkSession.urlBase, httpBody: httpBody, showHiddenFiles: false, includeHiddenFiles: [], account: account, options: options) { task in
             taskHandler(task)
