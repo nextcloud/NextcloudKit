@@ -725,7 +725,7 @@ public extension NextcloudKit {
         }
     }
 
-    /// Performs a private search request with a custom HTTP body on the server.
+    /// Performs a  search request with a custom HTTP body on the server.
     ///
     /// - Parameters:
     ///   - serverUrl: The base URL of the Nextcloud server.
@@ -740,14 +740,14 @@ public extension NextcloudKit {
     ///     - files: Optional array of `NKFile` matching the search.
     ///     - responseData: Raw response data from Alamofire.
     ///     - error: An `NKError` indicating success or failure.
-    private func search(serverUrl: String,
-                        httpBody: Data,
-                        showHiddenFiles: Bool,
-                        includeHiddenFiles: [String],
-                        account: String,
-                        options: NKRequestOptions = NKRequestOptions(),
-                        taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-                        completion: @escaping (_ account: String, _ files: [NKFile]?, _ responseData: AFDataResponse<Data>?, _ error: NKError) -> Void) {
+    func search(serverUrl: String,
+                httpBody: Data,
+                showHiddenFiles: Bool,
+                includeHiddenFiles: [String],
+                account: String,
+                options: NKRequestOptions = NKRequestOptions(),
+                taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
+                completion: @escaping (_ account: String, _ files: [NKFile]?, _ responseData: AFDataResponse<Data>?, _ error: NKError) -> Void) {
         guard let nkSession = nkCommonInstance.nksessions.session(forAccount: account),
               let headers = nkCommonInstance.getStandardHeaders(account: account, options: options, contentType: "application/xml", accept: "application/xml") else {
             return options.queue.async { completion(account, nil, nil, .urlError) }
@@ -802,13 +802,13 @@ public extension NextcloudKit {
     ///   - files: Optional array of `NKFile` results.
     ///   - responseData: Raw response data.
     ///   - error: Resulting `NKError`.
-    private func searchAsync(serverUrl: String,
-                             httpBody: Data,
-                             showHiddenFiles: Bool,
-                             includeHiddenFiles: [String],
-                             account: String,
-                             options: NKRequestOptions = NKRequestOptions(),
-                             taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in }
+    func searchAsync(serverUrl: String,
+                     httpBody: Data,
+                     showHiddenFiles: Bool,
+                     includeHiddenFiles: [String],
+                     account: String,
+                     options: NKRequestOptions = NKRequestOptions(),
+                     taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in }
     ) async -> (
         account: String,
         files: [NKFile]?,
