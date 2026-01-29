@@ -130,7 +130,7 @@ final class NKMonitor: EventMonitor {
                    let code = response.response?.statusCode {
 
                     let responseStatus = (200..<300).contains(code) ? "RESPONSE: SUCCESS" : "RESPONSE: ERROR"
-                    nkLog(network: "\(account) \(code) \(method) \(url) \(responseStatus)")
+                    nkLog(network: "User: \(account) Code: \(code) Method: \(method) Url: \(url) - \(responseStatus)")
                 }
 
             case .verbose:
