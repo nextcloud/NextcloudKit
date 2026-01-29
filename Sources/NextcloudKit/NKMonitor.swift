@@ -64,8 +64,7 @@ final class NKMonitor: EventMonitor {
             // URLRequest not created yet → skip logging
             return
         }
-        let account = request.request?
-            .allHTTPHeaderFields?[self.nkCommonInstance.headerAccount] ?? "unknown"
+        let account = urlRequest.allHTTPHeaderFields?[self.nkCommonInstance.headerAccount] ?? "unknown"
 
         queue.async {
             switch NKLogFileManager.shared.logLevel {
@@ -74,8 +73,8 @@ final class NKMonitor: EventMonitor {
                 nkLog(info: "User: \(account) - Request started: \(request)")
             case .verbose:
                 // Full dump: headers + body
-                let headers = request.request?.allHTTPHeaderFields?.description ?? "None"
-                let body = request.request?.httpBody.flatMap { String(data: $0, encoding: .utf8) } ?? "None"
+                let headers = urlRequest.allHTTPHeaderFields?.description ?? "None"
+                let body = urlRequest.httpBody.flatMap { String(data: $0, encoding: .utf8) } ?? "None"
 
                 nkLog(debug: "User: \(account)")
                 nkLog(debug: "Request started: \(request)")
@@ -129,7 +128,7 @@ final class NKMonitor: EventMonitor {
                    let url = request.request?.url?.absoluteString,
                    let code = response.response?.statusCode {
 
-                    let responseStatus = (200..<300).contains(code) ? "RESPONSE: SUCCESS" : "RESPONSE: ERROR"
+                    let responseStatus = (200..<300).contains(code) ? "Response: SUCCESS" : "Response: ERROR"
                     nkLog(network: "User: \(account) Code: \(code) Method: \(method) Url: \(url) - \(responseStatus)")
                 }
 
