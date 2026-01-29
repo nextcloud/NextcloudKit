@@ -132,6 +132,7 @@ public extension NextcloudKit {
                         let assistant: Assistant?
                         let recommendations: Recommendations?
                         let termsOfService: TermsOfService?
+                        let clientIntegration: NKClientIntegration?
 
                         enum CodingKeys: String, CodingKey {
                             case downloadLimit = "downloadlimit"
@@ -145,6 +146,7 @@ public extension NextcloudKit {
                             case assistant
                             case recommendations
                             case termsOfService = "terms_of_service"
+                            case clientIntegration = "client_integration"
                         }
 
                         struct DownloadLimit: Codable {
@@ -348,6 +350,32 @@ public extension NextcloudKit {
                         struct Recommendations: Codable {
                             let enabled: Bool?
                         }
+
+//                        struct DeclarativeUI: Codable {
+//                            let contextMenu: [[ContextMenuItem]]
+//
+//                            enum CodingKeys: String, CodingKey {
+//                                case contextMenu = "context-menu"
+//                            }
+//                        }
+
+//
+//                        struct DeclarativeUI: Codable {
+//                            let contextMenus: [ContextMenu]
+//
+//                            enum CodingKeys: String, CodingKey {
+//                                case contextMenus = "context-menu"
+//                            }
+//
+//                            struct ContextMenu: Codable {
+//                                let items
+//                            }
+//
+//                            struct ContextMenuItem: Codable {
+//                                let title: String
+//                                let endpoint: String
+//                            }
+//                        }
                     }
                 }
             }
@@ -364,6 +392,8 @@ public extension NextcloudKit {
             let decoded = try JSONDecoder().decode(CapabilityNextcloud.self, from: jsonData)
             let data = decoded.ocs.data
             let json = data.capabilities
+
+            print(json)
 
             // Initialize capabilities
             let capabilities = NKCapabilities.Capabilities()
@@ -433,6 +463,8 @@ public extension NextcloudKit {
 
             capabilities.recommendations = json.recommendations?.enabled ?? false
             capabilities.termsOfService = json.termsOfService?.enabled ?? false
+
+            capabilities.clientIntegration = json.clientIntegration
 
             // Persist capabilities in shared store
             await NKCapabilities.shared.setCapabilities(for: account, capabilities: capabilities)
@@ -528,7 +560,9 @@ final public class NKCapabilities: Sendable {
         public var forbiddenFileNameExtensions: [String]            = []
         public var recommendations: Bool                            = false
         public var termsOfService: Bool                             = false
-
+//        public var declarativeUIEnabled: Bool                       = false
+//        public var declarativeUIContextMenu: [ContextMenuItem]                       = []
+        public var clientIntegration: NKClientIntegration?                    = nil
         public var directEditingEditors: [NKEditorDetailsEditor]    = []
         public var directEditingCreators: [NKEditorDetailsCreator]  = []
         public var directEditingTemplates: [NKEditorTemplate]       = []

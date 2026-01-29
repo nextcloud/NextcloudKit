@@ -725,113 +725,7 @@ public extension NextcloudKit {
         }
     }
 
-    /// Searches media files within a specified date range on the server.
-    ///
-    /// - Parameters:
-    ///   - path: The directory path to search within (default is empty string for root).
-    ///   - lessDate: The upper bound date filter (files older than this).
-    ///   - greaterDate: The lower bound date filter (files newer than this).
-    ///   - elementDate: The file date attribute to filter on (e.g., "created", "modified").
-    ///   - limit: Maximum number of files to return.
-    ///   - account: The Nextcloud account identifier.
-    ///   - options: Optional request options (headers, queue, etc.).
-    ///   - taskHandler: Callback for monitoring the underlying `URLSessionTask`.
-    ///   - completion: Completion handler returning:
-    ///     - account: The account used for the request.
-    ///     - files: Optional array of matching `NKFile` objects.
-    ///     - responseData: Raw Alamofire response data.
-    ///     - error: An `NKError` describing success or failure.
-    func searchMedia(path: String = "",
-                     lessDate: Any,
-                     greaterDate: Any,
-                     elementDate: String,
-                     limit: Int,
-                     account: String,
-                     options: NKRequestOptions = NKRequestOptions(),
-                     taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-                     completion: @escaping (_ account: String, _ files: [NKFile]?, _ responseData: AFDataResponse<Data>?, _ error: NKError) -> Void) {
-        guard let nkSession = nkCommonInstance.nksessions.session(forAccount: account) else {
-            return options.queue.async { completion(account, nil, nil, .urlError) }
-        }
-        let files: [NKFile] = []
-        let elementDate = elementDate + "/"
-        var greaterDateString: String?, lessDateString: String?
-        let href = "/files/" + nkSession.userId + path
-        if let lessDate = lessDate as? Date {
-            lessDateString = lessDate.formatted(using: "yyyy-MM-dd'T'HH:mm:ssZZZZZ")
-        } else if let lessDate = lessDate as? Int {
-            lessDateString = String(lessDate)
-        }
-        if let greaterDate = greaterDate as? Date {
-            greaterDateString = greaterDate.formatted(using: "yyyy-MM-dd'T'HH:mm:ssZZZZZ")
-        } else if let greaterDate = greaterDate as? Int {
-            greaterDateString = String(greaterDate)
-        }
-        guard let lessDateString, let greaterDateString else {
-            return options.queue.async { completion(account, files, nil, .invalidDate) }
-        }
-        guard let httpBody = String(format: NKDataFileXML(nkCommonInstance: self.nkCommonInstance).getRequestBodySearchMedia(createProperties: options.createProperties, removeProperties: options.removeProperties), href, elementDate, elementDate, lessDateString, elementDate, greaterDateString, String(limit)).data(using: .utf8) else {
-            return options.queue.async { completion(account, files, nil, .invalidData) }
-        }
-
-        search(serverUrl: nkSession.urlBase, httpBody: httpBody, showHiddenFiles: false, includeHiddenFiles: [], account: account, options: options) { task in
-            taskHandler(task)
-        } completion: { account, files, responseData, error in
-            options.queue.async { completion(account, files, responseData, error) }
-        }
-    }
-
-    /// Asynchronously searches media files with date filters.
-    ///
-    /// - Parameters:
-    ///   - path: Directory path to search.
-    ///   - lessDate: Upper date bound filter.
-    ///   - greaterDate: Lower date bound filter.
-    ///   - elementDate: File date attribute to filter on.
-    ///   - limit: Maximum number of results.
-    ///   - account: Nextcloud account identifier.
-    ///   - options: Optional request options.
-    ///   - taskHandler: Callback for URLSessionTask monitoring.
-    ///
-    /// - Returns: A tuple containing:
-    ///   - account: Account used for the request.
-    ///   - files: Optional array of `NKFile` matching results.
-    ///   - responseData: Raw server response data.
-    ///   - error: Resulting `NKError`.
-    func searchMediaAsync(path: String = "",
-                          lessDate: Any,
-                          greaterDate: Any,
-                          elementDate: String,
-                          limit: Int,
-                          account: String,
-                          options: NKRequestOptions = NKRequestOptions(),
-                          taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in }
-    ) async -> (
-        account: String,
-        files: [NKFile]?,
-        responseData: AFDataResponse<Data>?,
-        error: NKError
-    ) {
-        await withCheckedContinuation { continuation in
-            searchMedia(path: path,
-                        lessDate: lessDate,
-                        greaterDate: greaterDate,
-                        elementDate: elementDate,
-                        limit: limit,
-                        account: account,
-                        options: options,
-                        taskHandler: taskHandler) { account, files, responseData, error in
-                continuation.resume(returning: (
-                    account: account,
-                    files: files,
-                    responseData: responseData,
-                    error: error
-                ))
-            }
-        }
-    }
-
-    /// Performs a private search request with a custom HTTP body on the server.
+    /// Performs a  search request with a custom HTTP body on the server.
     ///
     /// - Parameters:
     ///   - serverUrl: The base URL of the Nextcloud server.
@@ -846,14 +740,14 @@ public extension NextcloudKit {
     ///     - files: Optional array of `NKFile` matching the search.
     ///     - responseData: Raw response data from Alamofire.
     ///     - error: An `NKError` indicating success or failure.
-    private func search(serverUrl: String,
-                        httpBody: Data,
-                        showHiddenFiles: Bool,
-                        includeHiddenFiles: [String],
-                        account: String,
-                        options: NKRequestOptions = NKRequestOptions(),
-                        taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-                        completion: @escaping (_ account: String, _ files: [NKFile]?, _ responseData: AFDataResponse<Data>?, _ error: NKError) -> Void) {
+    func search(serverUrl: String,
+                httpBody: Data,
+                showHiddenFiles: Bool,
+                includeHiddenFiles: [String],
+                account: String,
+                options: NKRequestOptions = NKRequestOptions(),
+                taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
+                completion: @escaping (_ account: String, _ files: [NKFile]?, _ responseData: AFDataResponse<Data>?, _ error: NKError) -> Void) {
         guard let nkSession = nkCommonInstance.nksessions.session(forAccount: account),
               let headers = nkCommonInstance.getStandardHeaders(account: account, options: options, contentType: "application/xml", accept: "application/xml") else {
             return options.queue.async { completion(account, nil, nil, .urlError) }
@@ -908,13 +802,13 @@ public extension NextcloudKit {
     ///   - files: Optional array of `NKFile` results.
     ///   - responseData: Raw response data.
     ///   - error: Resulting `NKError`.
-    private func searchAsync(serverUrl: String,
-                             httpBody: Data,
-                             showHiddenFiles: Bool,
-                             includeHiddenFiles: [String],
-                             account: String,
-                             options: NKRequestOptions = NKRequestOptions(),
-                             taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in }
+    func searchAsync(serverUrl: String,
+                     httpBody: Data,
+                     showHiddenFiles: Bool,
+                     includeHiddenFiles: [String],
+                     account: String,
+                     options: NKRequestOptions = NKRequestOptions(),
+                     taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in }
     ) async -> (
         account: String,
         files: [NKFile]?,
