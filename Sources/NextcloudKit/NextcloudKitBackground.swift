@@ -230,6 +230,7 @@ public final class NKBackground: NSObject, URLSessionTaskDelegate, URLSessionDel
                             dateModificationFile: Date?,
                             taskDescription: String? = nil,
                             overwrite: Bool = false,
+                            autoMkcol: Bool = false,
                             account: String,
                             automaticResume: Bool = true,
                             sessionIdentifier: String) async -> (
@@ -243,6 +244,7 @@ public final class NKBackground: NSObject, URLSessionTaskDelegate, URLSessionDel
                                        dateModificationFile: dateModificationFile,
                                        taskDescription: taskDescription,
                                        overwrite: overwrite,
+                                       autoMkcol: autoMkcol,
                                        account: account,
                                        automaticResume: automaticResume,
                                        sessionIdentifier: sessionIdentifier)
