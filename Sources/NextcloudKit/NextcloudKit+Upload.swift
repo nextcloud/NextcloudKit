@@ -15,6 +15,7 @@ public extension NextcloudKit {
     ///   - dateCreationFile: Optional creation date to include in headers (X-OC-CTime).
     ///   - dateModificationFile: Optional modification date to include in headers (X-OC-MTime).
     ///   - overwrite: If true, the remote file will be overwritten if it already exists.
+    ///   - autoMkcol: When set to 1, instructs the server to automatically create any missing parent directories when uploading a file.
     ///   - account: The account associated with the upload session.
     ///   - options: Optional configuration for the request (headers, queue, timeout, etc.).
     ///   - requestHandler: Called with the created UploadRequest.
@@ -33,6 +34,7 @@ public extension NextcloudKit {
                 dateCreationFile: Date? = nil,
                 dateModificationFile: Date? = nil,
                 overwrite: Bool = false,
+                autoMkcol: Bool = false,
                 account: String,
                 options: NKRequestOptions = NKRequestOptions(),
                 requestHandler: @escaping (_ request: UploadRequest) -> Void = { _ in },
@@ -64,7 +66,12 @@ public extension NextcloudKit {
         if overwrite {
             headers.update(name: "Overwrite", value: "true")
         }
+        if autoMkcol {
+            headers.update(name: "X-NC-WebDAV-Auto-Mkcol", value: "1")
+        }
         headers.update(.contentType("application/octet-stream"))
+
+        // X-NC-WebDAV-Auto-Mkcol
 
         let request = nkSession.sessionData.upload(fileNameLocalPathUrl, to: url, method: .put, headers: headers, interceptor: NKInterceptor(nkCommonInstance: nkCommonInstance), fileManager: .default).validate(statusCode: 200..<300).onURLSessionTaskCreation(perform: { task in
             task.taskDescription = options.taskDescription
