@@ -65,7 +65,7 @@ public enum NKProperties: String, CaseIterable {
     /// open-cloud-mesh.org
     case sharepermissionscloudmesh = "<share-permissions xmlns=\"http://open-cloud-mesh.org/ns\"/>"
 
-    static func properties(createProperties: [NKProperties]?, removeProperties: [NKProperties] = []) -> String {
+    static public func properties(createProperties: [NKProperties]?, removeProperties: [NKProperties] = []) -> String {
         var properties = allCases.map { $0.rawValue }.joined()
         if let createProperties {
             properties = ""
