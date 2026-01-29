@@ -322,10 +322,10 @@ public extension NextcloudKit {
     /// - options: Optional HTTP request configuration.
     /// - taskHandler: Optional closure to access the underlying URLSessionTask.
     /// - completion: Completion handler returning the account, list of tasks, raw response, and NKError.
-    func getAssistantChatSessions(account: String,
-                                  options: NKRequestOptions = NKRequestOptions(),
-                                  taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-                                  completion: @escaping (_ account: String, _ sessions: [AssistantSession]?, _ responseData: AFDataResponse<Data>?, _ error: NKError) -> Void) {
+    func             getAssistantChatConversations(account: String,
+                                                   options: NKRequestOptions = NKRequestOptions(),
+                                                   taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
+                                                   completion: @escaping (_ account: String, _ sessions: [AssistantSession]?, _ responseData: AFDataResponse<Data>?, _ error: NKError) -> Void) {
         let endpoint = "/ocs/v2.php/apps/assistant/chat/sessions"
         guard let nkSession = nkCommonInstance.nksessions.session(forAccount: account),
               let url = nkCommonInstance.createStandardUrl(serverUrl: nkSession.urlBase, endpoint: endpoint),
@@ -357,9 +357,9 @@ public extension NextcloudKit {
     ///   - options: Optional configuration.
     ///   - taskHandler: Callback to access the associated URLSessionTask.
     /// - Returns: A tuple with named values for account, task list, response, and error.
-    func getAssistantChatSessionsAsync(account: String,
-                                       options: NKRequestOptions = NKRequestOptions(),
-                                       taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in }
+    func getAssistantChatConversationsAsync(account: String,
+                                            options: NKRequestOptions = NKRequestOptions(),
+                                            taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in }
     ) async -> (
         account: String,
         sessions: [AssistantSession]?,
@@ -367,7 +367,7 @@ public extension NextcloudKit {
         error: NKError
     ) {
         await withCheckedContinuation { continuation in
-            getAssistantChatSessions(
+            getAssistantChatConversations(
                 account: account,
                 options: options,
                 taskHandler: taskHandler) { account, sessions, responseData, error in
@@ -511,6 +511,163 @@ public extension NextcloudKit {
                                        account: account,
                                        options: options,
                                        taskHandler: taskHandler) { account, chatMessage, responseData, error in
+                continuation.resume(returning: (
+                    account: account,
+                    chatMessage: chatMessage,
+                    responseData: responseData,
+                    error: error
+                ))
+            }
+        }
+    }
+
+    /// Creates a new chat conversation/session.
+    ///
+    /// Parameters:
+    /// - title: Optional title for the conversation.
+    /// - timestamp: The timestamp for the conversation creation.
+    /// - account: The Nextcloud account performing the request.
+    /// - options: Optional HTTP request configuration.
+    /// - taskHandler: Optional closure to access the underlying URLSessionTask.
+    /// - completion: Completion handler returning the account, created conversation, raw response, and NKError.
+    func createAssistantChatConversation(title: String?,
+                                    timestamp: Int,
+                                    account: String,
+                                    options: NKRequestOptions = NKRequestOptions(),
+                                    taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
+                                    completion: @escaping (_ account: String, _ conversation: CreateConversation?, _ responseData: AFDataResponse<Data>?, _ error: NKError) -> Void) {
+        let endpoint = "/ocs/v2.php/apps/assistant/chat/new_session"
+        guard let nkSession = nkCommonInstance.nksessions.session(forAccount: account),
+              let url = nkCommonInstance.createStandardUrl(serverUrl: nkSession.urlBase, endpoint: endpoint),
+              let headers = nkCommonInstance.getStandardHeaders(account: account, options: options) else {
+            return options.queue.async { completion(account, nil, nil, .urlError) }
+        }
+
+        var parameters: [String: Any] = ["timestamp": timestamp]
+        if let title = title {
+            parameters["title"] = title
+        }
+
+        nkSession.sessionData.request(url, method: .put, parameters: parameters, encoding: JSONEncoding.default, headers: headers, interceptor: NKInterceptor(nkCommonInstance: nkCommonInstance)).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
+            task.taskDescription = options.taskDescription
+            taskHandler(task)
+        }.responseData(queue: self.nkCommonInstance.backgroundQueue) { response in
+            switch response.result {
+            case .failure(let error):
+                let error = NKError(error: error, afResponse: response, responseData: response.data)
+                options.queue.async { completion(account, nil, response, error) }
+            case .success(let data):
+                let decoder = JSONDecoder()
+                let result = try? decoder.decode(CreateConversation.self, from: data)
+
+                options.queue.async { completion(account, result, response, .success) }
+            }
+        }
+    }
+
+    /// Asynchronously creates a new chat conversation/session.
+    ///
+    /// - Parameters:
+    ///   - title: Optional title for the conversation.
+    ///   - timestamp: The timestamp for the conversation creation.
+    ///   - account: The account performing the request.
+    ///   - options: Optional configuration.
+    ///   - taskHandler: Callback to access the associated URLSessionTask.
+    /// - Returns: A tuple with named values for account, created conversation, response, and error.
+    func createAssistantChatConversationAsync(title: String?,
+                                         timestamp: Int,
+                                         account: String,
+                                         options: NKRequestOptions = NKRequestOptions(),
+                                         taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in }
+    ) async -> (
+        account: String,
+        conversation: CreateConversation?,
+        responseData: AFDataResponse<Data>?,
+        error: NKError
+    ) {
+        await withCheckedContinuation { continuation in
+            createAssistantChatConversation(title: title,
+                                       timestamp: timestamp,
+                                       account: account,
+                                       options: options,
+                                       taskHandler: taskHandler) { account, conversation, responseData, error in
+                continuation.resume(returning: (
+                    account: account,
+                    conversation: conversation,
+                    responseData: responseData,
+                    error: error
+                ))
+            }
+        }
+    }
+
+    /// Checks the generation status of a chat message task.
+    ///
+    /// Parameters:
+    /// - taskId: The ID of the generation task to check.
+    /// - sessionId: The chat session ID.
+    /// - account: The Nextcloud account performing the request.
+    /// - options: Optional HTTP request configuration.
+    /// - taskHandler: Optional closure to access the underlying URLSessionTask.
+    /// - completion: Completion handler returning the account, chat message (if ready), raw response, and NKError.
+    func checkAssistantChatGeneration(taskId: String,
+                                      sessionId: Int,
+                                      account: String,
+                                      options: NKRequestOptions = NKRequestOptions(),
+                                      taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
+                                      completion: @escaping (_ account: String, _ chatMessage: ChatMessage?, _ responseData: AFDataResponse<Data>?, _ error: NKError) -> Void) {
+        let endpoint = "/ocs/v2.php/apps/assistant/chat/check_generation"
+        guard let nkSession = nkCommonInstance.nksessions.session(forAccount: account),
+              let url = nkCommonInstance.createStandardUrl(serverUrl: nkSession.urlBase, endpoint: endpoint),
+              let headers = nkCommonInstance.getStandardHeaders(account: account, options: options) else {
+            return options.queue.async { completion(account, nil, nil, .urlError) }
+        }
+
+        let parameters: [String: Any] = ["taskId": taskId, "sessionId": sessionId]
+
+        nkSession.sessionData.request(url, method: .get, parameters: parameters, encoding: URLEncoding.default, headers: headers, interceptor: NKInterceptor(nkCommonInstance: nkCommonInstance)).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
+            task.taskDescription = options.taskDescription
+            taskHandler(task)
+        }.responseData(queue: self.nkCommonInstance.backgroundQueue) { response in
+            switch response.result {
+            case .failure(let error):
+                let error = NKError(error: error, afResponse: response, responseData: response.data)
+                options.queue.async { completion(account, nil, response, error) }
+            case .success(let data):
+                let decoder = JSONDecoder()
+                let result = try? decoder.decode(ChatMessage.self, from: data)
+
+                options.queue.async { completion(account, result, response, .success) }
+            }
+        }
+    }
+
+    /// Asynchronously checks the generation status of a chat message task.
+    ///
+    /// - Parameters:
+    ///   - taskId: The ID of the generation task to check.
+    ///   - sessionId: The chat session ID.
+    ///   - account: The account performing the request.
+    ///   - options: Optional configuration.
+    ///   - taskHandler: Callback to access the associated URLSessionTask.
+    /// - Returns: A tuple with named values for account, chat message (if ready), response, and error.
+    func checkAssistantChatGenerationAsync(taskId: String,
+                                           sessionId: Int,
+                                           account: String,
+                                           options: NKRequestOptions = NKRequestOptions(),
+                                           taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in }
+    ) async -> (
+        account: String,
+        chatMessage: ChatMessage?,
+        responseData: AFDataResponse<Data>?,
+        error: NKError
+    ) {
+        await withCheckedContinuation { continuation in
+            checkAssistantChatGeneration(taskId: taskId,
+                                         sessionId: sessionId,
+                                         account: account,
+                                         options: options,
+                                         taskHandler: taskHandler) { account, chatMessage, responseData, error in
                 continuation.resume(returning: (
                     account: account,
                     chatMessage: chatMessage,

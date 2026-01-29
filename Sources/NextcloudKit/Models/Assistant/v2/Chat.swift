@@ -78,7 +78,7 @@ public struct Conversation: Codable, Identifiable, Equatable {
 public struct AssistantSession: Codable, Equatable {
     public let id: Int
     public let userId: String?
-    public let title: String?
+    private let title: String?
     public let timestamp: Int
 
     enum CodingKeys: String, CodingKey {
@@ -86,6 +86,19 @@ public struct AssistantSession: Codable, Equatable {
         case userId = "user_id"
         case title
         case timestamp
+    }
+
+    public var validTitle: String {
+        return title ?? createTitle()
+
+        func createTitle() -> String {
+            let date = Date(timeIntervalSince1970: TimeInterval(timestamp))
+            let formatter = DateFormatter()
+            formatter.locale = .current
+            formatter.timeZone = .current
+            formatter.dateFormat = "MMM d yyyy, HH:mm"
+            return formatter.string(from: date)
+        }
     }
 }
 
