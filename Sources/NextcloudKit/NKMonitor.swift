@@ -60,8 +60,13 @@ final class NKMonitor: EventMonitor {
     }
 
     func requestDidResume(_ request: Request) {
+        guard let urlRequest = request.request else {
+            // URLRequest not created yet → skip logging
+            return
+        }
         let account = request.request?
             .allHTTPHeaderFields?[self.nkCommonInstance.headerAccount] ?? "unknown"
+
         queue.async {
             switch NKLogFileManager.shared.logLevel {
             case .normal:
