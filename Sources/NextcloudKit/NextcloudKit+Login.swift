@@ -7,7 +7,7 @@ import Alamofire
 import SwiftyJSON
 
 public extension NextcloudKit {
-    // MARK: - App Password
+    // MARK: - App Password / Onetime
 
     /// Retrieves an app password (token) for the given user credentials and server URL.
     ///
@@ -106,12 +106,12 @@ public extension NextcloudKit {
     /// - taskHandler: Callback for observing the underlying URLSessionTask.
     /// - completion: Returns the token string (if any), raw response data, and NKError result.
     func getAppPasswordOnetime(url: String,
-                        user: String,
-                        onetimeToken: String,
-                        userAgent: String? = nil,
-                        options: NKRequestOptions = NKRequestOptions(),
-                        taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-                        completion: @escaping (_ token: String?, _ responseData: AFDataResponse<Data>?, _ error: NKError) -> Void) {
+                               user: String,
+                               onetimeToken: String,
+                               userAgent: String? = nil,
+                               options: NKRequestOptions = NKRequestOptions(),
+                               taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
+                               completion: @escaping (_ token: String?, _ responseData: AFDataResponse<Data>?, _ error: NKError) -> Void) {
         let endpoint = "ocs/v2.php/core/getapppassword-onetime"
         guard let url = self.nkCommonInstance.createStandardUrl(serverUrl: url, endpoint: endpoint) else {
             return options.queue.async { completion(nil, nil, .urlError) }
