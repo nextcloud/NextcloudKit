@@ -124,6 +124,7 @@ public final class NKBackground: NSObject, URLSessionTaskDelegate, URLSessionDel
     ///   - dateModificationFile: Optional modification date metadata for the file.
     ///   - taskDescription: Optional description to set on the URLSession task.
     ///   - overwrite: Boolean indicating whether to overwrite existing files on the server.
+    ///   - autoMkcol: When set to 1, instructs the server to automatically create any missing parent directories when uploading a file.
     ///   - account: The Nextcloud account associated with the upload.
     ///   - sessionIdentifier: A string identifier for the upload session.
     ///
@@ -136,6 +137,7 @@ public final class NKBackground: NSObject, URLSessionTaskDelegate, URLSessionDel
                        dateModificationFile: Date?,
                        taskDescription: String? = nil,
                        overwrite: Bool = false,
+                       autoMkcol: Bool = false,
                        account: String,
                        automaticResume: Bool = true,
                        sessionIdentifier: String) -> (URLSessionUploadTask?, error: NKError) {
@@ -185,6 +187,9 @@ public final class NKBackground: NSObject, URLSessionTaskDelegate, URLSessionDel
         if overwrite {
             request.setValue("true", forHTTPHeaderField: "Overwrite")
         }
+        if autoMkcol {
+            request.setValue("1", forHTTPHeaderField: "X-NC-WebDAV-Auto-Mkcol")
+        }
         // Epoch of linux do not permitted negativ value
         if let dateCreationFile, dateCreationFile.timeIntervalSince1970 > 0 {
             request.setValue("\(dateCreationFile.timeIntervalSince1970)", forHTTPHeaderField: "X-OC-CTime")
@@ -225,6 +230,7 @@ public final class NKBackground: NSObject, URLSessionTaskDelegate, URLSessionDel
                             dateModificationFile: Date?,
                             taskDescription: String? = nil,
                             overwrite: Bool = false,
+                            autoMkcol: Bool = false,
                             account: String,
                             automaticResume: Bool = true,
                             sessionIdentifier: String) async -> (
@@ -238,6 +244,7 @@ public final class NKBackground: NSObject, URLSessionTaskDelegate, URLSessionDel
                                        dateModificationFile: dateModificationFile,
                                        taskDescription: taskDescription,
                                        overwrite: overwrite,
+                                       autoMkcol: autoMkcol,
                                        account: account,
                                        automaticResume: automaticResume,
                                        sessionIdentifier: sessionIdentifier)
