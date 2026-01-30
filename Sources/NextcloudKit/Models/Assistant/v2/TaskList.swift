@@ -2,30 +2,41 @@
 // SPDX-FileCopyrightText: 2025 Milen Pivchev
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-import SwiftyJSON
+import Foundation
+
+// MARK: - OCS Response Wrappers
+
+public struct OCSTaskListResponse: Codable {
+    public let ocs: OCSTaskListOCS
+
+    public struct OCSTaskListOCS: Codable {
+        public let data: OCSTaskListData
+    }
+
+    public struct OCSTaskListData: Codable {
+        public let tasks: [AssistantTask]
+    }
+}
+
+public struct OCSTaskResponse: Codable {
+    public let ocs: OCSTaskOCS
+
+    public struct OCSTaskOCS: Codable {
+        public let data: OCSTaskData
+    }
+
+    public struct OCSTaskData: Codable {
+        public let task: AssistantTask
+    }
+}
+
+// MARK: - Task Models
 
 public struct TaskList: Codable {
     public var tasks: [AssistantTask]
 
-    static func deserialize(from data: JSON) -> TaskList? {
-        let tasks = data.arrayValue.map { taskJson in
-            AssistantTask(
-                id: taskJson["id"].int64Value,
-                type: taskJson["type"].string,
-                status: taskJson["status"].string,
-                userId: taskJson["userId"].string,
-                appId: taskJson["appId"].string,
-                input: TaskInput(input: taskJson["input"]["input"].string),
-                output: TaskOutput(output: taskJson["output"]["output"].string),
-                completionExpectedAt: taskJson["completionExpectedAt"].int,
-                progress: taskJson["progress"].int,
-                lastUpdated: taskJson["lastUpdated"].int,
-                scheduledAt: taskJson["scheduledAt"].int,
-                endedAt: taskJson["endedAt"].int
-            )
-        }
-
-        return TaskList(tasks: tasks)
+    public init(tasks: [AssistantTask]) {
+        self.tasks = tasks
     }
 }
 
@@ -57,25 +68,6 @@ public struct AssistantTask: Codable {
         self.scheduledAt = scheduledAt
         self.endedAt = endedAt
     }
-
-    static func deserialize(from data: JSON) -> AssistantTask? {
-        let task = AssistantTask(
-            id: data["id"].int64Value,
-            type: data["type"].string,
-            status: data["status"].string,
-            userId: data["userId"].string,
-            appId: data["appId"].string,
-            input: TaskInput(input: data["input"]["input"].string),
-            output: TaskOutput(output: data["output"]["output"].string),
-            completionExpectedAt: data["completionExpectedAt"].int,
-            progress: data["progress"].int,
-            lastUpdated: data["lastUpdated"].int,
-            scheduledAt: data["scheduledAt"].int,
-            endedAt: data["endedAt"].int
-        )
-
-        return task
-    }
 }
 
 public struct TaskInput: Codable {
@@ -93,5 +85,3 @@ public struct TaskOutput: Codable {
         self.output = output
     }
 }
-
-

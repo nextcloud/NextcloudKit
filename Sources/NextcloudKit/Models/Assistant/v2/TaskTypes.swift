@@ -2,44 +2,34 @@
 // SPDX-FileCopyrightText: 2025 Milen Pivchev
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-import SwiftyJSON
+import Foundation
+
+// MARK: - OCS Response Wrapper
+
+public struct OCSTaskTypesResponse: Codable {
+    public let ocs: OCSTaskTypesOCS
+
+    public struct OCSTaskTypesOCS: Codable {
+        public let data: OCSTaskTypesData
+    }
+
+    public struct OCSTaskTypesData: Codable {
+        public let types: [String: TaskTypeData]
+    }
+}
+
+// MARK: - Task Type Models
 
 public struct TaskTypes: Codable {
     public let types: [TaskTypeData]
 
-    static func deserialize(from data: JSON) -> TaskTypes? {
-        var taskTypes: [TaskTypeData] = []
-
-        for (key, subJson) in data {
-            let taskTypeData = TaskTypeData(
-                id: key,
-                name: subJson["name"].string,
-                description: subJson["description"].string,
-                inputShape: subJson["inputShape"].dictionary != nil ? TaskInputShape(
-                    input: subJson["inputShape"]["input"].dictionary != nil ? Shape(
-                        name: subJson["inputShape"]["input"]["name"].stringValue,
-                        description: subJson["inputShape"]["input"]["description"].stringValue,
-                        type: subJson["inputShape"]["input"]["type"].stringValue
-                    ) : nil
-                ) : nil,
-                outputShape: subJson["outputShape"].dictionary != nil ? TaskOutputShape(
-                    output: subJson["outputShape"]["output"].dictionary != nil ? Shape(
-                        name: subJson["outputShape"]["output"]["name"].stringValue,
-                        description: subJson["outputShape"]["output"]["description"].stringValue,
-                        type: subJson["outputShape"]["output"]["type"].stringValue
-                    ) : nil
-                ) : nil
-            )
-
-            taskTypes.append(taskTypeData)
-        }
-
-        return TaskTypes(types: taskTypes)
+    public init(types: [TaskTypeData]) {
+        self.types = types
     }
 }
 
 public struct TaskTypeData: Codable {
-    public let id: String?
+    public var id: String?
     public let name: String?
     public let description: String?
     public let inputShape: TaskInputShape?
@@ -81,9 +71,3 @@ public struct Shape: Codable {
         self.type = type
     }
 }
-
-
-
-
-
-

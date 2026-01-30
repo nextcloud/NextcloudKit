@@ -115,9 +115,9 @@ public struct CreateConversation: Codable, Equatable {
 // MARK: - SessionTask
 
 public struct SessionTask: Codable, Equatable {
-    public let taskId: String
+    public let taskId: Int
 
     enum CodingKeys: String, CodingKey {
-        case taskId = "task_id"
+        case taskId
     }
 }

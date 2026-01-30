@@ -4,7 +4,6 @@
 
 import Foundation
 import Alamofire
-import SwiftyJSON
 
 public extension NextcloudKit {
     /// Retrieves the list of supported task types for a specific account and task category.
@@ -36,19 +35,20 @@ public extension NextcloudKit {
             case .failure(let error):
                 let error = NKError(error: error, afResponse: response, responseData: response.data)
                 options.queue.async { completion(account, nil, response, error) }
-            case .success(let jsonData):
-                let json = JSON(jsonData)
-                let data = json["ocs"]["data"]["types"]
-                let statusCode = json["ocs"]["meta"]["statuscode"].int ?? NKError.internalError
-                if 200..<300 ~= statusCode {
-                    let dict = TaskTypes.deserialize(from: data)
-                    let result = dict?.types.map({$0})
-                    let filteredResult = result?
-                        .filter({ $0.inputShape?.input?.type == supportedTaskType && $0.outputShape?.output?.type == supportedTaskType })
-                        .sorted(by: {$0.id! < $1.id!})
-                    options.queue.async { completion(account, filteredResult, response, .success) }
+            case .success(let data):
+                let decoder = JSONDecoder()
+                if let result = try? decoder.decode(OCSTaskTypesResponse.self, from: data) {
+                    var types = result.ocs.data.types.map { (key, value) -> TaskTypeData in
+                        var taskType = value
+                        taskType.id = key
+                        return taskType
+                    }
+                    types = types
+                        .filter { $0.inputShape?.input?.type == supportedTaskType && $0.outputShape?.output?.type == supportedTaskType }
+                        .sorted { ($0.id ?? "") < ($1.id ?? "") }
+                    options.queue.async { completion(account, types, response, .success) }
                 } else {
-                    options.queue.async { completion(account, nil, response, NKError(rootJson: json, fallbackStatusCode: response.response?.statusCode)) }
+                    options.queue.async { completion(account, nil, response, .success) }
                 }
             }
         }
@@ -120,16 +120,11 @@ public extension NextcloudKit {
             case .failure(let error):
                 let error = NKError(error: error, afResponse: response, responseData: response.data)
                 options.queue.async { completion(account, nil, response, error) }
-            case .success(let jsonData):
-                let json = JSON(jsonData)
-                let data = json["ocs"]["data"]["task"]
-                let statusCode = json["ocs"]["meta"]["statuscode"].int ?? NKError.internalError
-                if 200..<300 ~= statusCode {
-                    let result = AssistantTask.deserialize(from: data)
-                    options.queue.async { completion(account, result, response, .success) }
-                } else {
-                    options.queue.async { completion(account, nil, response, NKError(rootJson: json, fallbackStatusCode: response.response?.statusCode)) }
-                }
+            case .success(let data):
+                let decoder = JSONDecoder()
+                let result = try? decoder.decode(OCSTaskResponse.self, from: data)
+
+                options.queue.async { completion(account, result?.ocs.data.task, response, .success) }
             }
         }
     }
@@ -198,16 +193,11 @@ public extension NextcloudKit {
             case .failure(let error):
                 let error = NKError(error: error, afResponse: response, responseData: response.data)
                 options.queue.async { completion(account, nil, response, error) }
-            case .success(let jsonData):
-                let json = JSON(jsonData)
-                let data = json["ocs"]["data"]["tasks"]
-                let statusCode = json["ocs"]["meta"]["statuscode"].int ?? NKError.internalError
-                if 200..<300 ~= statusCode {
-                    let result = TaskList.deserialize(from: data)
-                    options.queue.async { completion(account, result, response, .success) }
-                } else {
-                    options.queue.async { completion(account, nil, response, NKError(rootJson: json, fallbackStatusCode: response.response?.statusCode)) }
-                }
+            case .success(let data):
+                let decoder = JSONDecoder()
+                let result = try? decoder.decode(OCSTaskListResponse.self, from: data)
+
+                options.queue.async { completion(account, result.map { TaskList(tasks: $0.ocs.data.tasks) }, response, .success) }
             }
         }
     }
@@ -273,14 +263,8 @@ public extension NextcloudKit {
             case .failure(let error):
                 let error = NKError(error: error, afResponse: response, responseData: response.data)
                 options.queue.async { completion(account, response, error) }
-            case .success(let jsonData):
-                let json = JSON(jsonData)
-                let statusCode = json["ocs"]["meta"]["statuscode"].int ?? NKError.internalError
-                if 200..<300 ~= statusCode {
-                    options.queue.async { completion(account, response, .success) }
-                } else {
-                    options.queue.async { completion(account, response, NKError(rootJson: json, fallbackStatusCode: response.response?.statusCode)) }
-                }
+            case .success:
+                options.queue.async { completion(account, response, .success) }
             }
         }
     }
@@ -610,7 +594,7 @@ public extension NextcloudKit {
     /// - options: Optional HTTP request configuration.
     /// - taskHandler: Optional closure to access the underlying URLSessionTask.
     /// - completion: Completion handler returning the account, chat message (if ready), raw response, and NKError.
-    func checkAssistantChatGeneration(taskId: String,
+    func checkAssistantChatGeneration(taskId: Int,
                                       sessionId: Int,
                                       account: String,
                                       options: NKRequestOptions = NKRequestOptions(),
@@ -651,7 +635,7 @@ public extension NextcloudKit {
     ///   - options: Optional configuration.
     ///   - taskHandler: Callback to access the associated URLSessionTask.
     /// - Returns: A tuple with named values for account, chat message (if ready), response, and error.
-    func checkAssistantChatGenerationAsync(taskId: String,
+    func checkAssistantChatGenerationAsync(taskId: Int,
                                            sessionId: Int,
                                            account: String,
                                            options: NKRequestOptions = NKRequestOptions(),
