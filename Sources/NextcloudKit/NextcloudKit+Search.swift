@@ -309,6 +309,7 @@ public class NKSearchProvider: NSObject {
     public let id, name: String
     public let order: Int
 
+    // Initialize from JSON
     init?(json: JSON) {
         guard let id = json["id"].string,
               let name = json["name"].string,
@@ -317,6 +318,14 @@ public class NKSearchProvider: NSObject {
         self.id = id
         self.name = name
         self.order = order
+    }
+
+    // Classic initializer
+    public init(id: String, name: String, order: Int) {
+        self.id = id
+        self.name = name
+        self.order = order
+        super.init()
     }
 
     static func factory(jsonArray: JSON) -> [NKSearchProvider]? {
