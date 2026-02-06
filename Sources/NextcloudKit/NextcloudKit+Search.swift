@@ -57,7 +57,7 @@ public extension NextcloudKit {
     /// Performs a search using a specified provider with pagination and timeout support.
     ///
     /// - Parameters:
-    ///   - idProvider: The identifier of the search provider to use.
+    ///   - providerId: The identifier of the search provider to use.
     ///   - term: The search term.
     ///   - limit: Optional maximum number of results to return.
     ///   - cursor: Optional pagination cursor for subsequent requests.
@@ -67,7 +67,7 @@ public extension NextcloudKit {
     ///   - taskHandler: Callback to observe the underlying URLSessionTask.
     ///
     /// - Returns: NKSearchResult, NKError
-    func unifiedSearch(idProvider: String,
+    func unifiedSearch(providerId: String,
                        term: String,
                        limit: Int? = nil,
                        cursor: Int? = nil,
@@ -81,7 +81,7 @@ public extension NextcloudKit {
               let headers = nkCommonInstance.getStandardHeaders(account: account, options: options) else {
             return(nil, .urlError)
         }
-        var endpoint = "ocs/v2.php/search/providers/\(idProvider)/search?term=\(term)"
+        var endpoint = "ocs/v2.php/search/providers/\(providerId)/search?term=\(term)"
         if let limit = limit {
             endpoint += "&limit=\(limit)"
         }
@@ -114,7 +114,7 @@ public extension NextcloudKit {
         case .success(let jsonData):
             let json = JSON(jsonData)
             let searchData = json["ocs"]["data"]
-            let searchResult = NKSearchResult(json: searchData, id: idProvider)
+            let searchResult = NKSearchResult(json: searchData, id: providerId)
 
             return (searchResult, .success)
         case .failure(let error):
