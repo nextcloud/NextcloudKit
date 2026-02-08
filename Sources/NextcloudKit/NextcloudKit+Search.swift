@@ -1,6 +1,5 @@
 // SPDX-FileCopyrightText: Nextcloud GmbH
-// SPDX-FileCopyrightText: 2022 Henrik Storch
-// SPDX-FileCopyrightText: 2023 Marino Faggiana
+// SPDX-FileCopyrightText: 2023/2026 Marino Faggiana
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 import Foundation
