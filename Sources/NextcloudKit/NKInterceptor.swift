@@ -12,7 +12,7 @@ final class NKInterceptor: RequestInterceptor, Sendable {
         self.nkCommonInstance = nkCommonInstance
     }
 
-    func adapt(_ urlRequest: URLRequest, for session: Session, completion: @escaping (Result<URLRequest, Error>) -> Void) {
+    func adapt(_ urlRequest: URLRequest, for session: AssistantSession, completion: @escaping (Result<URLRequest, Error>) -> Void) {
         // Log request URL in verbose mode
         if NKLogFileManager.shared.logLevel == .verbose,
            let url = urlRequest.url?.absoluteString {

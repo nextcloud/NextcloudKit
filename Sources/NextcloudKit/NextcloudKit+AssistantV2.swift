@@ -540,7 +540,7 @@ public extension NextcloudKit {
                                    taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in }
     ) async -> (
         account: String,
-        session: AssistantConversation?,
+        session: AssistantSession?,
         responseData: AFDataResponse<Data>?,
         error: NKError
     ) {
@@ -568,7 +568,7 @@ public extension NextcloudKit {
                     }
                 case .success(let data):
                     let decoder = JSONDecoder()
-                    let result = try? decoder.decode(AssistantConversation.self, from: data)
+                    let result = try? decoder.decode(AssistantSession.self, from: data)
                     options.queue.async {
                         continuation.resume(returning: (account: account, session: result, responseData: response, error: .success))
                     }
@@ -576,5 +576,4 @@ public extension NextcloudKit {
             }
         }
     }
-
 }

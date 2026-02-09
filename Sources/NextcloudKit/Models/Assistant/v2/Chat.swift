@@ -122,6 +122,24 @@ public struct CreateConversation: Codable, Equatable {
     }
 }
 
+// MARK: - Session
+
+public struct AssistantSession: Codable, Equatable {
+    public let messageTaskId: Int?
+    public let titleTaskId: Int?
+    public let sessionTitle: String?
+    public let sessionAgencyPendingActions: String?
+    public let taskId: Int?
+
+    enum CodingKeys: String, CodingKey {
+        case messageTaskId
+        case titleTaskId
+        case sessionTitle
+        case sessionAgencyPendingActions
+        case taskId
+    }
+}
+
 // MARK: - SessionTask
 
 public struct SessionTask: Codable, Equatable {
