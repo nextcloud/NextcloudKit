@@ -309,7 +309,7 @@ public extension NextcloudKit {
     func             getAssistantChatConversations(account: String,
                                                    options: NKRequestOptions = NKRequestOptions(),
                                                    taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-                                                   completion: @escaping (_ account: String, _ sessions: [AssistantSession]?, _ responseData: AFDataResponse<Data>?, _ error: NKError) -> Void) {
+                                                   completion: @escaping (_ account: String, _ sessions: [AssistantConversation]?, _ responseData: AFDataResponse<Data>?, _ error: NKError) -> Void) {
         let endpoint = "/ocs/v2.php/apps/assistant/chat/sessions"
         guard let nkSession = nkCommonInstance.nksessions.session(forAccount: account),
               let url = nkCommonInstance.createStandardUrl(serverUrl: nkSession.urlBase, endpoint: endpoint),
@@ -327,7 +327,7 @@ public extension NextcloudKit {
                 options.queue.async { completion(account, nil, response, error) }
             case .success(let data):
                 let decoder = JSONDecoder()
-                let result = try? decoder.decode([AssistantSession].self, from: data)
+                let result = try? decoder.decode([AssistantConversation].self, from: data)
 
                 options.queue.async { completion(account, result, response, .success) }
             }
@@ -346,7 +346,7 @@ public extension NextcloudKit {
                                             taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in }
     ) async -> (
         account: String,
-        sessions: [AssistantSession]?,
+        sessions: [AssistantConversation]?,
         responseData: AFDataResponse<Data>?,
         error: NKError
     ) {
@@ -727,6 +727,78 @@ public extension NextcloudKit {
                 continuation.resume(returning: (
                     account: account,
                     sessionTask: sessionTask,
+                    responseData: responseData,
+                    error: error
+                ))
+            }
+        }
+    }
+
+    /// Checks if a chat session exists and retrieves its details.
+    ///
+    /// Parameters:
+    /// - sessionId: The ID of the chat session to check.
+    /// - account: The Nextcloud account performing the request.
+    /// - options: Optional HTTP request configuration.
+    /// - taskHandler: Optional closure to access the underlying URLSessionTask.
+    /// - completion: Completion handler returning the account, session (if found), raw response, and NKError.
+    func checkAssistantChatSession(sessionId: Int,
+                                   account: String,
+                                   options: NKRequestOptions = NKRequestOptions(),
+                                   taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
+                                   completion: @escaping (_ account: String, _ session: AssistantConversation?, _ responseData: AFDataResponse<Data>?, _ error: NKError) -> Void) {
+        let endpoint = "/ocs/v2.php/apps/assistant/chat/check_session"
+        guard let nkSession = nkCommonInstance.nksessions.session(forAccount: account),
+              let url = nkCommonInstance.createStandardUrl(serverUrl: nkSession.urlBase, endpoint: endpoint),
+              let headers = nkCommonInstance.getStandardHeaders(account: account, options: options) else {
+            return options.queue.async { completion(account, nil, nil, .urlError) }
+        }
+
+        let parameters: [String: Any] = ["sessionId": sessionId]
+
+        nkSession.sessionData.request(url, method: .get, parameters: parameters, encoding: URLEncoding.default, headers: headers, interceptor: NKInterceptor(nkCommonInstance: nkCommonInstance)).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
+            task.taskDescription = options.taskDescription
+            taskHandler(task)
+        }.responseData(queue: self.nkCommonInstance.backgroundQueue) { response in
+            switch response.result {
+            case .failure(let error):
+                let error = NKError(error: error, afResponse: response, responseData: response.data)
+                options.queue.async { completion(account, nil, response, error) }
+            case .success(let data):
+                let decoder = JSONDecoder()
+                let result = try? decoder.decode(AssistantConversation.self, from: data)
+
+                options.queue.async { completion(account, result, response, .success) }
+            }
+        }
+    }
+
+    /// Asynchronously checks if a chat session exists and retrieves its details.
+    ///
+    /// - Parameters:
+    ///   - sessionId: The ID of the chat session to check.
+    ///   - account: The account performing the request.
+    ///   - options: Optional configuration.
+    ///   - taskHandler: Callback to access the associated URLSessionTask.
+    /// - Returns: A tuple with named values for account, session (if found), response, and error.
+    func checkAssistantChatSessionAsync(sessionId: Int,
+                                        account: String,
+                                        options: NKRequestOptions = NKRequestOptions(),
+                                        taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in }
+    ) async -> (
+        account: String,
+        session: AssistantConversation?,
+        responseData: AFDataResponse<Data>?,
+        error: NKError
+    ) {
+        await withCheckedContinuation { continuation in
+            checkAssistantChatSession(sessionId: sessionId,
+                                      account: account,
+                                      options: options,
+                                      taskHandler: taskHandler) { account, session, responseData, error in
+                continuation.resume(returning: (
+                    account: account,
+                    session: session,
                     responseData: responseData,
                     error: error
                 ))

@@ -3,7 +3,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 import Foundation
-import SwiftyJSON
 
 // MARK: - ChatMessage
 
@@ -16,6 +15,14 @@ public struct ChatMessage: Codable, Identifiable, Equatable {
 
     public var isFromHuman: Bool {
         role == "human"
+    }
+
+    public init(id: Int, sessionId: Int, role: String, content: String, timestamp: Int) {
+        self.id = id
+        self.sessionId = sessionId
+        self.role = role
+        self.content = content
+        self.timestamp = timestamp
     }
 
     enum CodingKeys: String, CodingKey {
@@ -34,12 +41,14 @@ public struct ChatMessageRequest: Encodable {
     public let role: String
     public let content: String
     public let timestamp: Int
+    public let firstHumanMessage: Bool
 
-    public init(sessionId: Int, role: String, content: String, timestamp: Int) {
+    public init(sessionId: Int, role: String, content: String, timestamp: Int, firstHumanMessage: Bool) {
         self.sessionId = sessionId
         self.role = role
         self.content = content
         self.timestamp = timestamp
+        self.firstHumanMessage = firstHumanMessage
     }
 
     var bodyMap: [String: Any] {
@@ -56,6 +65,7 @@ public struct ChatMessageRequest: Encodable {
         case role
         case content
         case timestamp
+        case firstHumanMessage
     }
 }
 
@@ -75,7 +85,7 @@ public struct Conversation: Codable, Identifiable, Equatable {
 
 // MARK: - Session
 
-public struct AssistantSession: Codable, Equatable {
+public struct AssistantConversation: Codable, Equatable, Hashable {
     public let id: Int
     public let userId: String?
     private let title: String?
@@ -105,10 +115,10 @@ public struct AssistantSession: Codable, Equatable {
 // MARK: - CreateConversation
 
 public struct CreateConversation: Codable, Equatable {
-    public let session: AssistantSession
+    public let conversation: AssistantConversation
 
     enum CodingKeys: String, CodingKey {
-        case session
+        case conversation = "session"
     }
 }
 
