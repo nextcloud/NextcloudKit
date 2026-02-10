@@ -7,21 +7,25 @@ import Alamofire
 import SwiftyJSON
 
 public extension NextcloudKit {
+
+
     /// Performs a unified search using multiple providers and returns results asynchronously.
     ///
     /// - Parameters:
     ///   - timeout: The individual request timeout per provider.
     ///   - account: The Nextcloud account performing the search.
     ///   - options: Optional configuration for the request (headers, queue, etc.).
+    ///   - handle: Optional operation handle that receives the underlying DataRequest and URLSessionTask
+    ///             as soon as they are created. Use it to cancel the request while it’s in flight
+    ///             (via handle.cancel()) or to observe the task/request lifecycle.
     ///   - filter: A closure to filter which `NKSearchProvider` are enabled.
-    ///   - taskHandler: Callback triggered when a `URLSessionTask` is created.
     ///
     /// - Returns: NKSearchProvider, NKError
     func unifiedSearchProviders(timeout: TimeInterval = 30,
                                 account: String,
                                 options: NKRequestOptions = NKRequestOptions(),
-                                filter: @escaping (NKSearchProvider) -> Bool = { _ in true },
-                                taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in }
+                                handle: NKOperationHandle? = nil,
+                                filter: @escaping (NKSearchProvider) -> Bool = { _ in true }
     ) async -> (providers: [NKSearchProvider]?, error: NKError) {
         let endpoint = "ocs/v2.php/search/providers"
         guard let nkSession = nkCommonInstance.nksessions.session(forAccount: account),
@@ -32,11 +36,17 @@ public extension NextcloudKit {
 
         let request = nkSession.sessionData
             .request(url, headers: headers, interceptor: NKInterceptor(nkCommonInstance: nkCommonInstance))
-            .validate(statusCode: 200..<300)
             .onURLSessionTaskCreation { task in
                 task.taskDescription = options.taskDescription
-                taskHandler(task)
+                Task {
+                    if let handle {
+                        await handle.set(task: task)
+                    }
+                }
             }
+            .validate(statusCode: 200..<300)
+
+        await handle?.set(request: request)
         let response = await request.serializingData().response
 
         switch response.result {
@@ -63,7 +73,9 @@ public extension NextcloudKit {
     ///   - timeout: The timeout interval for the search request.
     ///   - account: The Nextcloud account performing the search.
     ///   - options: Optional request configuration such as headers and queue.
-    ///   - taskHandler: Callback to observe the underlying URLSessionTask.
+    ///   - handle: Optional operation handle that receives the underlying DataRequest and URLSessionTask
+    ///             as soon as they are created. Use it to cancel the request while it’s in flight
+    ///             (via handle.cancel()) or to observe the task/request lifecycle.
     ///
     /// - Returns: NKSearchResult, NKError
     func unifiedSearch(providerId: String,
@@ -73,7 +85,7 @@ public extension NextcloudKit {
                        timeout: TimeInterval = 60,
                        account: String,
                        options: NKRequestOptions = NKRequestOptions(),
-                       taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in })
+                       handle: NKOperationHandle? = nil)
     async -> (searchResult: NKSearchResult?, error: NKError) {
         guard let term = term.urlEncoded,
               let nkSession = nkCommonInstance.nksessions.session(forAccount: account),
@@ -105,8 +117,14 @@ public extension NextcloudKit {
             .validate(statusCode: 200..<300)
             .onURLSessionTaskCreation { task in
                 task.taskDescription = options.taskDescription
-                taskHandler(task)
+                Task {
+                    if let handle {
+                        await handle.set(task: task)
+                    }
+                }
             }
+
+        await handle?.set(request: request)
         let response = await request.serializingData().response
 
         switch response.result {
@@ -211,3 +229,4 @@ public class NKSearchProvider: NSObject {
         return allProvider.compactMap(NKSearchProvider.init)
     }
 }
+
