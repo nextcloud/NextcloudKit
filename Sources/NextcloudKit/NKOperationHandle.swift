@@ -82,6 +82,12 @@ public actor NKOperationHandle {
         self.task = task
         eventsContinuation?.yield(.didSetTask(task))
     }
+    public func currentRequest() -> DataRequest? {
+        request
+    }
+    public func currentTask() -> URLSessionTask? {
+        task
+    }
 
     public func cancel() {
         if let request = request {
