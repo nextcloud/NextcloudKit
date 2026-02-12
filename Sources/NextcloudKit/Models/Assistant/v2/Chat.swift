@@ -6,7 +6,7 @@ import Foundation
 
 // MARK: - ChatMessage
 
-public struct ChatMessage: Codable, Identifiable, Equatable {
+public struct AssistantChatMessage: Codable, Identifiable, Equatable {
     public let id: Int
     public let sessionId: Int
     public let role: String
@@ -36,7 +36,7 @@ public struct ChatMessage: Codable, Identifiable, Equatable {
 
 // MARK: - ChatMessageRequest
 
-public struct ChatMessageRequest: Encodable {
+public struct AssistantChatMessageRequest: Encodable {
     public let sessionId: Int
     public let role: String
     public let content: String
@@ -66,20 +66,6 @@ public struct ChatMessageRequest: Encodable {
         case content
         case timestamp
         case firstHumanMessage
-    }
-}
-
-// MARK: - Conversation
-
-public struct Conversation: Codable, Identifiable, Equatable {
-    public let id: Int
-    public let title: String?
-    public let timestamp: Int
-
-    enum CodingKeys: String, CodingKey {
-        case id
-        case title
-        case timestamp
     }
 }
 
@@ -114,7 +100,7 @@ public struct AssistantConversation: Codable, Equatable, Hashable {
 
 // MARK: - CreateConversation
 
-public struct CreateConversation: Codable, Equatable {
+public struct AssistantCreatedConversation: Codable, Equatable {
     public let conversation: AssistantConversation
 
     enum CodingKeys: String, CodingKey {
@@ -142,7 +128,7 @@ public struct AssistantSession: Codable, Equatable {
 
 // MARK: - SessionTask
 
-public struct SessionTask: Codable, Equatable {
+public struct AssistantSessionTask: Codable, Equatable {
     public let taskId: Int
 
     enum CodingKeys: String, CodingKey {

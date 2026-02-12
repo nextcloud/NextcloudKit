@@ -282,7 +282,7 @@ public extension NextcloudKit {
                                   taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in }
     ) async -> (
         account: String,
-        chatMessages: [ChatMessage]?,
+        chatMessages: [AssistantChatMessage]?,
         responseData: AFDataResponse<Data>?,
         error: NKError
     ) {
@@ -308,7 +308,7 @@ public extension NextcloudKit {
                     }
                 case .success(let data):
                     let decoder = JSONDecoder()
-                    let result = try? decoder.decode([ChatMessage].self, from: data)
+                    let result = try? decoder.decode([AssistantChatMessage].self, from: data)
                     options.queue.async {
                         continuation.resume(returning: (account: account, chatMessages: result, responseData: response, error: .success))
                     }
@@ -325,13 +325,13 @@ public extension NextcloudKit {
     ///   - options: Optional HTTP request configuration.
     ///   - taskHandler: Optional closure to access the underlying URLSessionTask.
     /// - Returns: A tuple with named values for account, created message, response, and error.
-    func createAssistantChatMessage(messageRequest: ChatMessageRequest,
+    func createAssistantChatMessage(messageRequest: AssistantChatMessageRequest,
                                     account: String,
                                     options: NKRequestOptions = NKRequestOptions(),
                                     taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in }
     ) async -> (
         account: String,
-        chatMessage: ChatMessage?,
+        chatMessage: AssistantChatMessage?,
         responseData: AFDataResponse<Data>?,
         error: NKError
     ) {
@@ -357,7 +357,7 @@ public extension NextcloudKit {
                     }
                 case .success(let data):
                     let decoder = JSONDecoder()
-                    let result = try? decoder.decode(ChatMessage.self, from: data)
+                    let result = try? decoder.decode(AssistantChatMessage.self, from: data)
                     options.queue.async {
                         continuation.resume(returning: (account: account, chatMessage: result, responseData: response, error: .success))
                     }
@@ -382,7 +382,7 @@ public extension NextcloudKit {
                                          taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in }
     ) async -> (
         account: String,
-        conversation: CreateConversation?,
+        conversation: AssistantCreatedConversation?,
         responseData: AFDataResponse<Data>?,
         error: NKError
     ) {
@@ -413,7 +413,7 @@ public extension NextcloudKit {
                     }
                 case .success(let data):
                     let decoder = JSONDecoder()
-                    let result = try? decoder.decode(CreateConversation.self, from: data)
+                    let result = try? decoder.decode(AssistantCreatedConversation.self, from: data)
                     options.queue.async {
                         continuation.resume(returning: (account: account, conversation: result, responseData: response, error: .success))
                     }
@@ -438,7 +438,7 @@ public extension NextcloudKit {
                                       taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in }
     ) async -> (
         account: String,
-        chatMessage: ChatMessage?,
+        chatMessage: AssistantChatMessage?,
         responseData: AFDataResponse<Data>?,
         error: NKError
     ) {
@@ -466,7 +466,7 @@ public extension NextcloudKit {
                     }
                 case .success(let data):
                     let decoder = JSONDecoder()
-                    let result = try? decoder.decode(ChatMessage.self, from: data)
+                    let result = try? decoder.decode(AssistantChatMessage.self, from: data)
                     options.queue.async {
                         continuation.resume(returning: (account: account, chatMessage: result, responseData: response, error: .success))
                     }
@@ -489,7 +489,7 @@ public extension NextcloudKit {
                                       taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in }
     ) async -> (
         account: String,
-        sessionTask: SessionTask?,
+        sessionTask: AssistantSessionTask?,
         responseData: AFDataResponse<Data>?,
         error: NKError
     ) {
@@ -517,7 +517,7 @@ public extension NextcloudKit {
                     }
                 case .success(let data):
                     let decoder = JSONDecoder()
-                    let result = try? decoder.decode(SessionTask.self, from: data)
+                    let result = try? decoder.decode(AssistantSessionTask.self, from: data)
                     options.queue.async {
                         continuation.resume(returning: (account: account, sessionTask: result, responseData: response, error: .success))
                     }
