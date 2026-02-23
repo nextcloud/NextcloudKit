@@ -50,12 +50,11 @@ public extension NextcloudKit {
                     if let result = try? decoder.decode(OCSTaskTypesResponse.self, from: data) {
                         var types = result.ocs.data.types.map { (key, value) -> TaskTypeData in
                             var taskType = value
-                            taskType.id = key
+                            taskType.id = taskType.id ?? key
                             return taskType
                         }
                         types = types
-                            .filter { $0.inputShape?.input?.type == supportedTaskType && $0.outputShape?.output?.type == supportedTaskType }
-                            .sorted { ($0.id ?? "") < ($1.id ?? "") }
+                            .filter { $0.isSingleTextInputOutput(supportedTaskType: supportedTaskType) || $0.isChat() || $0.isTranslate() }
                         options.queue.async {
                             continuation.resume(returning: (account: account, types: types, responseData: response, error: .success))
                         }
