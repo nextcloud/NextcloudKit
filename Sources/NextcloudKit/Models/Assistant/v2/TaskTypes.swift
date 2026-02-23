@@ -29,6 +29,9 @@ public struct TaskTypes: Codable {
 }
 
 public struct TaskTypeData: Codable {
+    public typealias TaskInputShape = [String: Shape]
+    public typealias TaskOutputShape = [String: Shape]
+    
     public var id: String?
     public let name: String?
     public let description: String?
@@ -42,21 +45,21 @@ public struct TaskTypeData: Codable {
         self.inputShape = inputShape
         self.outputShape = outputShape
     }
-}
 
-public struct TaskInputShape: Codable {
-    public let input: Shape?
-
-    public init(input: Shape?) {
-        self.input = input
+    public func isChat() -> Bool {
+        id == "core:text2text:chat"
     }
-}
 
-public struct TaskOutputShape: Codable {
-    public let output: Shape?
+    public func isTranslate() -> Bool {
+        id?.contains("translate") == true
+    }
 
-    public init(output: Shape?) {
-        self.output = output
+    public func isSingleTextInputOutput(supportedTaskType: String = "Text") -> Bool {
+        guard let inputShape, let outputShape else { return false }
+        return inputShape.count == 1 &&
+               outputShape.count == 1 &&
+               inputShape.values.first?.type == supportedTaskType &&
+               outputShape.values.first?.type == supportedTaskType
     }
 }
 
