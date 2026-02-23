@@ -55,6 +55,7 @@ public extension NextcloudKit {
                         }
                         types = types
                             .filter { $0.isSingleTextInputOutput(supportedTaskType: supportedTaskType) || $0.isChat() || $0.isTranslate() }
+                            .sorted { ($0.id ?? "") < ($1.id ?? "") }
                         options.queue.async {
                             continuation.resume(returning: (account: account, types: types, responseData: response, error: .success))
                         }
