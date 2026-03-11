@@ -100,6 +100,8 @@ public struct NKError: Error, Equatable, Sendable {
             return NSLocalizedString("_error_precondition_", value: "The server does not meet one of the preconditions that the requester", comment: "")
         case 413:
             return NSLocalizedString("_request_entity_too_large_", value: "The file is too large", comment: "")
+        case 417:
+            return NSLocalizedString("_expectation_failed_", value: "Expectation failed", comment: "")
         case 423:
             return NSLocalizedString("_webdav_locked_", value: "WebDAV Locked: Trying to access locked resource", comment: "")
         case 500:
