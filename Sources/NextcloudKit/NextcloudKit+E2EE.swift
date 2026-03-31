@@ -238,7 +238,9 @@ public extension NextcloudKit {
                 let statusCode = json["ocs"]["meta"]["statuscode"].int ?? NKError.internalError
                 if 200..<300 ~= statusCode {
                     let e2eMetadata = json["ocs"]["data"]["meta-data"].string
-                    let signature = response.response?.allHeaderFields["X-NC-E2EE-SIGNATURE"] as? String
+                    let signature = response.response?.allHeaderFields.first {
+                        ($0.key as? String)?.caseInsensitiveCompare("X-NC-E2EE-SIGNATURE") == .orderedSame
+                    }?.value as? String
                     options.queue.async { completion(account, e2eMetadata, signature, response, .success) }
                 } else {
                     options.queue.async { completion(account, nil, nil, response, NKError(rootJson: json, fallbackStatusCode: response.response?.statusCode)) }
