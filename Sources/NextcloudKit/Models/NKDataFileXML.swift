@@ -89,6 +89,18 @@ public class NKDataFileXML: NSObject {
     </d:propertyupdate>
     """
 
+    let requestBodySystemTags =
+    """
+    <?xml version=\"1.0\" encoding=\"UTF-8\"?>
+    <d:propfind xmlns:d=\"DAV:\" xmlns:oc=\"http://owncloud.org/ns\" xmlns:nc=\"http://nextcloud.org/ns\">
+        <d:prop>
+            <oc:id />
+            <oc:display-name />
+            <nc:color />
+        </d:prop>
+    </d:propfind>
+    """
+
     func getRequestBodyFileListingFavorites(createProperties: [NKProperties]?, removeProperties: [NKProperties] = []) -> String {
         let request = """
         <?xml version=\"1.0\"?>
