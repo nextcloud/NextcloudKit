@@ -464,11 +464,8 @@ public class NKDataFileXML: NSObject {
                 file.lockTimeOut = file.lockTime?.addingTimeInterval(TimeInterval(lockTimeOut))
             }
 
-            let tagsElements = propstat["d:prop", "nc:system-tags"]
-            for element in tagsElements["nc:system-tag"] {
-                guard let tag = element.text else { continue }
-                file.tags.append(tag)
-            }
+            let tags: [NKTag] = NKTag.parse(systemTagElements: propstat["d:prop", "nc:system-tags", "nc:system-tag"])
+            file.tags.append(contentsOf: tags)
 
             // NC27 -----
             if let latitude = propstat["d:prop", "nc:file-metadata-gps", "latitude"].double {
