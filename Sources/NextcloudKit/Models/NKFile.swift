@@ -56,7 +56,7 @@ public struct NKFile: Sendable {
     public var shareType: [Int]
     public var size: Int64
     public var serverUrl: String
-    public var tags: [String]
+    public var tags: [NKTag]
     public var trashbinFileName: String
     public var trashbinOriginalLocation: String
     public var trashbinDeletionTime: Date
@@ -128,7 +128,7 @@ public struct NKFile: Sendable {
         shareType: [Int] = [],
         size: Int64 = 0,
         serverUrl: String = "",
-        tags: [String] = [],
+        tags: [NKTag] = [],
         trashbinFileName: String = "",
         trashbinOriginalLocation: String = "",
         trashbinDeletionTime: Date = Date(),

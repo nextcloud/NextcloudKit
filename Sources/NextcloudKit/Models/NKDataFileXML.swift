@@ -89,6 +89,30 @@ public class NKDataFileXML: NSObject {
     </d:propertyupdate>
     """
 
+    let requestBodySystemTags =
+    """
+    <?xml version=\"1.0\" encoding=\"UTF-8\"?>
+    <d:propfind xmlns:d=\"DAV:\" xmlns:oc=\"http://owncloud.org/ns\" xmlns:nc=\"http://nextcloud.org/ns\">
+        <d:prop>
+            <oc:id />
+            <oc:display-name />
+            <nc:color />
+        </d:prop>
+    </d:propfind>
+    """
+
+    let requestBodySystemTagSetColor =
+    """
+    <?xml version=\"1.0\" encoding=\"UTF-8\"?>
+    <d:propertyupdate xmlns:d=\"DAV:\" xmlns:oc=\"http://owncloud.org/ns\" xmlns:nc=\"http://nextcloud.org/ns\">
+        <d:set>
+            <d:prop>
+                <nc:color>%@</nc:color>
+            </d:prop>
+        </d:set>
+    </d:propertyupdate>
+    """
+
     func getRequestBodyFileListingFavorites(createProperties: [NKProperties]?, removeProperties: [NKProperties] = []) -> String {
         let request = """
         <?xml version=\"1.0\"?>
@@ -452,11 +476,8 @@ public class NKDataFileXML: NSObject {
                 file.lockTimeOut = file.lockTime?.addingTimeInterval(TimeInterval(lockTimeOut))
             }
 
-            let tagsElements = propstat["d:prop", "nc:system-tags"]
-            for element in tagsElements["nc:system-tag"] {
-                guard let tag = element.text else { continue }
-                file.tags.append(tag)
-            }
+            let tags: [NKTag] = NKTag.parse(systemTagElements: propstat["d:prop", "nc:system-tags", "nc:system-tag"])
+            file.tags.append(contentsOf: tags)
 
             // NC27 -----
             if let latitude = propstat["d:prop", "nc:file-metadata-gps", "latitude"].double {
