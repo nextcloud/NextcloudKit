@@ -21,7 +21,7 @@ public struct NKTrash: Sendable {
     public var iconName: String
     public var size: Int64
     public var classFile: String
-    public var livePhotoFile: String
+    public var livePhoto: Bool
     public var trashbinFileName: String
     public var trashbinOriginalLocation: String
     public var trashbinDeletionTime: Date
@@ -38,7 +38,7 @@ public struct NKTrash: Sendable {
                 iconName: String = "",
                 size: Int64 = 0,
                 classFile: String = "",
-                livePhotoFile: String = "",
+                livePhoto: Bool = false,
                 trashbinFileName: String = "",
                 trashbinOriginalLocation: String = "",
                 trashbinDeletionTime: Date = Date()) {
@@ -54,7 +54,7 @@ public struct NKTrash: Sendable {
         self.iconName = iconName
         self.size = size
         self.classFile = classFile
-        self.livePhotoFile = livePhotoFile
+        self.livePhoto = livePhoto
         self.trashbinFileName = trashbinFileName
         self.trashbinOriginalLocation = trashbinOriginalLocation
         self.trashbinDeletionTime = trashbinDeletionTime
