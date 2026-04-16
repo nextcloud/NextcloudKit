@@ -78,7 +78,14 @@ public enum NKProperties: String, CaseIterable {
     }
 
     static func trashProperties() -> String {
-        let properties: [String] = [displayname.rawValue, getcontenttype.rawValue, resourcetype.rawValue, id.rawValue, fileid.rawValue, size.rawValue, haspreview.rawValue, "<trashbin-filename xmlns=\"http://nextcloud.org/ns\"/>", "<trashbin-original-location xmlns=\"http://nextcloud.org/ns\"/>", "<trashbin-deletion-time xmlns=\"http://nextcloud.org/ns\"/>"]
-        return properties.joined()
+        let base = allCases.map { $0.rawValue }.joined()
+
+        let trashExtras = [
+            "<trashbin-filename xmlns=\"http://nextcloud.org/ns\"/>",
+            "<trashbin-original-location xmlns=\"http://nextcloud.org/ns\"/>",
+            "<trashbin-deletion-time xmlns=\"http://nextcloud.org/ns\"/>"
+        ].joined()
+
+        return base + trashExtras
     }
 }
