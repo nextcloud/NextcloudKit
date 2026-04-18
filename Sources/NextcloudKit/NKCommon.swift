@@ -407,11 +407,6 @@ public struct NKCommon: Sendable {
         return 0
     }
 
-    public func returnPathfromServerUrl(_ serverUrl: String, urlBase: String, userId: String) -> String {
-        let home = urlBase + "/remote.php/dav/files/" + userId
-        return serverUrl.replacingOccurrences(of: home, with: "")
-    }
-
     public func getSessionErrorFromAFError(_ afError: AFError?) -> NSError? {
         if let afError = afError?.asAFError {
             switch afError {

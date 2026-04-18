@@ -250,9 +250,10 @@ public extension NextcloudKit {
         // Build endpoints and headers
         let totalFileSize = self.nkCommonInstance.getFileSize(filePath: directory + "/" + fileName)
         let serverUrlChunkFolder = nkSession.urlBase + "/" + nkSession.dav + "/uploads/" + nkSession.userId + "/" + chunkFolder
-        let serverUrlFileName = nkSession.urlBase + "/" + nkSession.dav + "/files/" + nkSession.userId
-            + self.nkCommonInstance.returnPathfromServerUrl(serverUrl, urlBase: nkSession.urlBase, userId: nkSession.userId)
-            + "/" + (destinationFileName ?? fileName)
+        let serverUrlFileName = NKDav.homeURLString(urlBase: nkSession.urlBase, userId: nkSession.userId)
+            + serverUrl.replacingOccurrences(of: NKDav.homeURLStringNoSlash(urlBase: nkSession.urlBase, userId: nkSession.userId), with: "")
+            + "/"
+            + (destinationFileName ?? fileName)
 
         if options.customHeader == nil { options.customHeader = [:] }
         options.customHeader?["Destination"] = serverUrlFileName.urlEncoded
