@@ -60,13 +60,6 @@ public final class NKFilePropertyResolver {
 
         switch mimeType {
 
-        case "application/vnd.excalidraw+json":
-            fileProperty.classFile = .document
-            fileProperty.iconName = .draw
-            fileProperty.name = "whiteboard"
-            fileProperty.ext = "whiteboard"
-            return fileProperty
-
         case "text/markdown", "text/x-markdown":
             fileProperty.classFile = .document
             fileProperty.iconName = .txt
@@ -102,6 +95,12 @@ public final class NKFilePropertyResolver {
             fileProperty.classFile = .document
             fileProperty.iconName = .txt
             fileProperty.name = "text"
+            return fileProperty
+
+        case "whiteboard":
+            fileProperty.classFile = .document
+            fileProperty.iconName = .draw
+            fileProperty.name = "whiteboard"
             return fileProperty
 
         default:
