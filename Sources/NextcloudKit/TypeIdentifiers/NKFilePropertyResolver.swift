@@ -67,6 +67,12 @@ public final class NKFilePropertyResolver {
             fileProperty.ext = fileExtension.isEmpty ? "md" : fileExtension
             return fileProperty
 
+        case "application/vnd.excalidraw+json":
+            fileProperty.classFile = .document
+            fileProperty.iconName = .draw
+            fileProperty.name = "whiteboard"
+            return fileProperty
+
         default:
             break
         }
