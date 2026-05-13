@@ -53,6 +53,8 @@ public final class NKFilePropertyResolver {
     ) -> NKFileProperty {
 
         let fileProperty = NKFileProperty()
+        let normalizedFileExtension = fileExtension.lowercased()
+        fileProperty.ext = fileExtension
 
         // MARK: - Custom MIME types
 
@@ -63,6 +65,43 @@ public final class NKFilePropertyResolver {
             fileProperty.iconName = .draw
             fileProperty.name = "whiteboard"
             fileProperty.ext = "whiteboard"
+            return fileProperty
+
+        case "text/markdown", "text/x-markdown":
+            fileProperty.classFile = .document
+            fileProperty.iconName = .txt
+            fileProperty.name = "text"
+            fileProperty.ext = fileExtension.isEmpty ? "md" : fileExtension
+            return fileProperty
+
+        default:
+            break
+        }
+
+        // MARK: - Custom file extensions
+
+        switch normalizedFileExtension {
+
+        case "md", "markdown":
+            fileProperty.classFile = .document
+            fileProperty.iconName = .txt
+            fileProperty.name = "text"
+            fileProperty.ext = fileExtension.isEmpty ? "md" : fileExtension
+            return fileProperty
+
+        case "txt", "text", "log", "csv", "tsv":
+            fileProperty.classFile = .document
+            fileProperty.iconName = .txt
+            fileProperty.name = "text"
+            return fileProperty
+
+        case "swift", "m", "mm", "h", "c", "cpp", "hpp",
+             "java", "kt", "js", "ts", "html", "css",
+             "xml", "json", "yaml", "yml", "php", "py",
+             "rb", "go", "rs", "sh", "sql":
+            fileProperty.classFile = .document
+            fileProperty.iconName = .txt
+            fileProperty.name = "text"
             return fileProperty
 
         default:
