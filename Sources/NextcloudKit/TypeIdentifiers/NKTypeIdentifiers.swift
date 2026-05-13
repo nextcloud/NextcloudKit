@@ -5,7 +5,7 @@
 import Foundation
 import UniformTypeIdentifiers
 
-/// Resolved file type metadata, used for cache and classification
+/// Resolved file type metadata, used for cache and classification.
 public struct NKTypeIdentifierCache: Sendable {
     public let mimeType: String
     public let classFile: String
@@ -15,134 +15,254 @@ public struct NKTypeIdentifierCache: Sendable {
     public let ext: String
 }
 
-/// Actor responsible for resolving file type metadata (UTI, MIME type, icon, class file, etc.)
+/// Actor responsible for resolving file type metadata
+/// (UTType, MIME type, icon, class file, etc.).
 public actor NKTypeIdentifiers {
+
     public static let shared = NKTypeIdentifiers()
-    // Cache: extension → resolved type info
+
+    // Cache key:
+    // "<mimeType>|<extension>"
     private var filePropertyCache: [String: NKTypeIdentifierCache] = [:]
+
     // Internal resolver
     private let resolver = NKFilePropertyResolver()
 
     private init() {}
 
-    // Resolves type info from file name and optional MIME type
-    public func getInternalType(fileName: String, mimeType inputMimeType: String, directory: Bool, account: String) async -> NKTypeIdentifierCache {
-        var ext = (fileName as NSString).pathExtension.lowercased()
-        var mimeType = inputMimeType
-        var classFile = ""
-        var iconName = ""
-        var typeIdentifier = ""
-        var fileNameWithoutExt = (fileName as NSString).deletingPathExtension
+    // MARK: - Public
 
-        // Use full name if no extension
-        if ext.isEmpty {
-            fileNameWithoutExt = fileName
+    /// Resolves internal file type information.
+    ///
+    /// MIME type is considered the primary source of truth.
+    ///
+    /// - Parameters:
+    ///   - fileName: Original file name.
+    ///   - inputMimeType: MIME type provided by backend/server.
+    ///   - directory: Indicates whether the item is a directory.
+    ///   - account: Current account identifier.
+    ///
+    /// - Returns: Fully resolved file type metadata.
+    public func getInternalType(
+        fileName: String,
+        mimeType inputMimeType: String,
+        directory: Bool,
+        account: String
+    ) async -> NKTypeIdentifierCache {
+
+        var fileExtension =
+            (fileName as NSString)
+            .pathExtension
+            .lowercased()
+
+        let fileNameWithoutExtension =
+            fileExtension.isEmpty
+            ? fileName
+            : (fileName as NSString).deletingPathExtension
+
+        // MARK: - Directory special case
+
+        if directory {
+
+            return NKTypeIdentifierCache(
+                mimeType: "httpd/unix-directory",
+                classFile: NKTypeClassFile.directory.rawValue,
+                iconName: NKTypeIconFile.directory.rawValue,
+                typeIdentifier: UTType.folder.identifier,
+                fileNameWithoutExt: fileName,
+                ext: ""
+            )
         }
 
-        // Check cache first
-        if let cached = filePropertyCache[ext] {
+        // MARK: - Resolve MIME type
+
+        let resolvedMimeType: String
+
+        if !inputMimeType.isEmpty {
+
+            resolvedMimeType = inputMimeType
+
+        } else if let mime =
+                    UTType(filenameExtension: fileExtension)?
+                    .preferredMIMEType {
+
+            resolvedMimeType = mime
+
+        } else {
+
+            resolvedMimeType = "application/octet-stream"
+        }
+
+        // MARK: - Cache
+
+        let cacheKey = "\(resolvedMimeType)|\(fileExtension)"
+
+        if let cached = filePropertyCache[cacheKey] {
             return cached
         }
 
-        // Resolve UTType
-        let type = UTType(filenameExtension: ext) ?? .data
-        typeIdentifier = type.identifier
+        // MARK: - Resolve UTType
 
-        // Resolve MIME type
-        if mimeType.isEmpty {
-            mimeType = type.preferredMIMEType ?? "application/octet-stream"
+        // Resolve from MIME type first.
+        // Fallback to extension if needed.
+        let resolvedType =
+            UTType(mimeType: resolvedMimeType) ??
+            UTType(filenameExtension: fileExtension) ??
+            .data
+
+        let typeIdentifier = resolvedType.identifier
+
+        // Fill extension if missing
+        if fileExtension.isEmpty {
+            fileExtension =
+                resolvedType.preferredFilenameExtension ??
+                ""
         }
 
-        // Handle folder case
-        if directory {
-            mimeType = "httpd/unix-directory"
-            classFile = NKTypeClassFile.directory.rawValue
-            iconName = NKTypeIconFile.directory.rawValue
-            typeIdentifier = UTType.folder.identifier
-            fileNameWithoutExt = fileName
-            ext = ""
-        } else {
-            let capabilities = await NKCapabilities.shared.getCapabilities(for: account)
-            let props = resolver.resolve(inUTI: typeIdentifier, capabilities: capabilities)
-            classFile = props.classFile.rawValue
-            iconName = props.iconName.rawValue
-        }
+        // MARK: - Resolve properties
 
-        // Construct result
-        let result = NKTypeIdentifierCache(
-            mimeType: mimeType,
-            classFile: classFile,
-            iconName: iconName,
+        let capabilities =
+            await NKCapabilities.shared.getCapabilities(for: account)
+
+        let properties = resolver.resolve(
+            mimeType: resolvedMimeType,
+            fileExtension: fileExtension,
             typeIdentifier: typeIdentifier,
-            fileNameWithoutExt: fileNameWithoutExt,
-            ext: ext
+            capabilities: capabilities
         )
 
-        // Cache it
-        if !ext.isEmpty {
-            filePropertyCache[ext] = result
-        }
+        // MARK: - Result
+
+        let result = NKTypeIdentifierCache(
+            mimeType: resolvedMimeType,
+            classFile: properties.classFile.rawValue,
+            iconName: properties.iconName.rawValue,
+            typeIdentifier: typeIdentifier,
+            fileNameWithoutExt: fileNameWithoutExtension,
+            ext: fileExtension
+        )
+
+        // Cache result
+        filePropertyCache[cacheKey] = result
 
         return result
     }
 
-    // Clears the internal cache (used for testing or reset)
+    // MARK: - Cache
+
+    /// Clears the internal cache.
     public func clearCache() {
         filePropertyCache.removeAll()
     }
 }
 
-/// Helper class to access NKTypeIdentifiers from sync contexts (e.g. in legacy code or libraries).
+/// Helper class used to access NKTypeIdentifiers
+/// from synchronous contexts (legacy code, libraries, etc.).
 public final class NKTypeIdentifiersHelper {
+
     public static let shared = NKTypeIdentifiersHelper()
 
-    // Resolves type info from file name and optional MIME type
-    public func getInternalType(fileName: String, mimeType inputMimeType: String, directory: Bool, capabilities: NKCapabilities.Capabilities) -> NKTypeIdentifierCache {
-        var ext = (fileName as NSString).pathExtension.lowercased()
-        var mimeType = inputMimeType
-        var classFile = ""
-        var iconName = ""
-        var typeIdentifier = ""
-        var fileNameWithoutExt = (fileName as NSString).deletingPathExtension
+    private let resolver = NKFilePropertyResolver()
 
-        // Use full name if no extension
-        if ext.isEmpty {
-            fileNameWithoutExt = fileName
-        }
+    private init() {}
 
-        // Resolve UTType
-        let type = UTType(filenameExtension: ext) ?? .data
-        typeIdentifier = type.identifier
+    // MARK: - Public
 
-        // Resolve MIME type
-        if mimeType.isEmpty {
-            mimeType = type.preferredMIMEType ?? "application/octet-stream"
-        }
+    /// Resolves internal type information synchronously.
+    ///
+    /// MIME type is considered the primary source of truth.
+    ///
+    /// - Parameters:
+    ///   - fileName: Original file name.
+    ///   - inputMimeType: MIME type provided by backend/server.
+    ///   - directory: Indicates whether the item is a directory.
+    ///   - capabilities: Current server capabilities.
+    ///
+    /// - Returns: Fully resolved file type metadata.
+    public func getInternalType(
+        fileName: String,
+        mimeType inputMimeType: String,
+        directory: Bool,
+        capabilities: NKCapabilities.Capabilities
+    ) -> NKTypeIdentifierCache {
 
-        // Handle folder case
+        var fileExtension =
+            (fileName as NSString)
+            .pathExtension
+            .lowercased()
+
+        let fileNameWithoutExtension =
+            fileExtension.isEmpty
+            ? fileName
+            : (fileName as NSString).deletingPathExtension
+
+        // MARK: - Directory special case
+
         if directory {
-            mimeType = "httpd/unix-directory"
-            classFile = NKTypeClassFile.directory.rawValue
-            iconName = NKTypeIconFile.directory.rawValue
-            typeIdentifier = UTType.folder.identifier
-            fileNameWithoutExt = fileName
-            ext = ""
-        } else {
-            let props = NKFilePropertyResolver().resolve(inUTI: typeIdentifier, capabilities: capabilities)
-            classFile = props.classFile.rawValue
-            iconName = props.iconName.rawValue
+
+            return NKTypeIdentifierCache(
+                mimeType: "httpd/unix-directory",
+                classFile: NKTypeClassFile.directory.rawValue,
+                iconName: NKTypeIconFile.directory.rawValue,
+                typeIdentifier: UTType.folder.identifier,
+                fileNameWithoutExt: fileName,
+                ext: ""
+            )
         }
 
-        // Construct result
-        let result = NKTypeIdentifierCache(
-            mimeType: mimeType,
-            classFile: classFile,
-            iconName: iconName,
+        // MARK: - Resolve MIME type
+
+        let resolvedMimeType: String
+
+        if !inputMimeType.isEmpty {
+
+            resolvedMimeType = inputMimeType
+
+        } else if let mime =
+                    UTType(filenameExtension: fileExtension)?
+                    .preferredMIMEType {
+
+            resolvedMimeType = mime
+
+        } else {
+
+            resolvedMimeType = "application/octet-stream"
+        }
+
+        // MARK: - Resolve UTType
+
+        let resolvedType =
+            UTType(mimeType: resolvedMimeType) ??
+            UTType(filenameExtension: fileExtension) ??
+            .data
+
+        let typeIdentifier = resolvedType.identifier
+
+        // Fill extension if missing
+        if fileExtension.isEmpty {
+            fileExtension =
+                resolvedType.preferredFilenameExtension ??
+                ""
+        }
+
+        // MARK: - Resolve properties
+
+        let properties = resolver.resolve(
+            mimeType: resolvedMimeType,
+            fileExtension: fileExtension,
             typeIdentifier: typeIdentifier,
-            fileNameWithoutExt: fileNameWithoutExt,
-            ext: ext
+            capabilities: capabilities
         )
 
-        return result
+        // MARK: - Result
+
+        return NKTypeIdentifierCache(
+            mimeType: resolvedMimeType,
+            classFile: properties.classFile.rawValue,
+            iconName: properties.iconName.rawValue,
+            typeIdentifier: typeIdentifier,
+            fileNameWithoutExt: fileNameWithoutExtension,
+            ext: fileExtension
+        )
     }
 }
