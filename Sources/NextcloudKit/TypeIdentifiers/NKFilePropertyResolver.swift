@@ -54,11 +54,12 @@ public final class NKFilePropertyResolver {
 
         let fileProperty = NKFileProperty()
         let normalizedFileExtension = fileExtension.lowercased()
+        let normalizedMimeType = mimeType.lowercased()
         fileProperty.ext = fileExtension
 
         // MARK: - Custom MIME types
 
-        switch mimeType {
+        switch normalizedMimeType {
 
         case "text/markdown", "text/x-markdown":
             fileProperty.classFile = .document
@@ -71,6 +72,18 @@ public final class NKFilePropertyResolver {
             fileProperty.classFile = .document
             fileProperty.iconName = .draw
             fileProperty.name = "whiteboard"
+            return fileProperty
+
+        case "video/x-matroska", "video/matroska", "video/webm":
+            fileProperty.classFile = .video
+            fileProperty.iconName = .video
+            fileProperty.name = "movie"
+            return fileProperty
+
+        case "audio/x-matroska", "audio/matroska", "audio/webm":
+            fileProperty.classFile = .audio
+            fileProperty.iconName = .audio
+            fileProperty.name = "audio"
             return fileProperty
 
         default:
@@ -109,13 +122,25 @@ public final class NKFilePropertyResolver {
             fileProperty.name = "whiteboard"
             return fileProperty
 
+        case "mkv", "mk3d", "mks", "webm":
+            fileProperty.classFile = .video
+            fileProperty.iconName = .video
+            fileProperty.name = "movie"
+            return fileProperty
+
+        case "mka":
+            fileProperty.classFile = .audio
+            fileProperty.iconName = .audio
+            fileProperty.name = "audio"
+            return fileProperty
+
         default:
             break
         }
 
         // MARK: - Collabora / Office
 
-        if capabilities.richDocumentsMimetypes.contains(mimeType) {
+        if capabilities.richDocumentsMimetypes.contains(mimeType) || capabilities.richDocumentsMimetypes.contains(normalizedMimeType) {
             fileProperty.classFile = .document
             fileProperty.iconName = .document
             fileProperty.name = "document"
