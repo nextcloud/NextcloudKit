@@ -280,6 +280,7 @@ public final class NKBackground: NSObject, URLSessionTaskDelegate, URLSessionDel
 
     public func urlSession(_ session: URLSession, task: URLSessionTask, didCompleteWithError error: Error?) {
         var fileName: String = "", serverUrl: String = "", etag: String?, ocId: String?, date: Date?, dateLastModified: Date?, length: Int64 = 0
+        var ownerId: String?, permissions: String?
         let url = task.currentRequest?.url?.absoluteString.removingPercentEncoding
         if let url {
             fileName = (url as NSString).lastPathComponent
@@ -302,6 +303,8 @@ public final class NKBackground: NSObject, URLSessionTaskDelegate, URLSessionDel
         }
 
         if let header = (task.response as? HTTPURLResponse)?.allHeaderFields {
+            ownerId = self.nkCommonInstance.findHeader("x-nc-ownerid", allHeaderFields: header)
+            permissions = self.nkCommonInstance.findHeader("x-nc-permissions", allHeaderFields: header)
             if self.nkCommonInstance.findHeader("oc-fileid", allHeaderFields: header) != nil {
                 ocId = self.nkCommonInstance.findHeader("oc-fileid", allHeaderFields: header)
             } else if self.nkCommonInstance.findHeader("fileid", allHeaderFields: header) != nil {
@@ -325,7 +328,7 @@ public final class NKBackground: NSObject, URLSessionTaskDelegate, URLSessionDel
         if task is URLSessionDownloadTask {
             self.nkCommonInstance.delegate?.downloadComplete(fileName: fileName, serverUrl: serverUrl, etag: etag, date: date, dateLastModified: dateLastModified, length: length, task: task, error: nkError)
         } else if task is URLSessionUploadTask {
-            self.nkCommonInstance.delegate?.uploadComplete(fileName: fileName, serverUrl: serverUrl, ocId: ocId, etag: etag, date: date, size: task.countOfBytesExpectedToSend, task: task, error: nkError)
+            self.nkCommonInstance.delegate?.uploadComplete(fileName: fileName, serverUrl: serverUrl, ocId: ocId, etag: etag, date: date, size: task.countOfBytesExpectedToSend, ownerId: ownerId, permissions: permissions, task: task, error: nkError)
         }
     }
 
