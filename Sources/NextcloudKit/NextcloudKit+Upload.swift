@@ -128,7 +128,7 @@ public extension NextcloudKit {
     ///   - permissions: The DAV permissions returned by the server.
     ///   - response: The raw upload response.
     ///   - error: The NKError result of the upload.
-    func  (serverUrlFileName: Any,
+    func uploadAsync(serverUrlFileName: Any,
                      fileNameLocalPath: String,
                      dateCreationFile: Date? = nil,
                      dateModificationFile: Date? = nil,
