@@ -16,6 +16,8 @@ public struct UnifiedShareView: View {
     @State private var isSettingsExpanded = true
     @State private var recipients = ""
     @State private var note = ""
+    @State private var addPeopleFieldHeight: CGFloat = 0
+    @Environment(\.colorScheme) private var colorScheme
 
     public init(fileName: String, account: String) {
         self.fileName = fileName
@@ -39,7 +41,7 @@ public struct UnifiedShareView: View {
                         .font(.title)
                     //                .foregroundStyle(.primary)
 
-                    audiencePicker
+                    shareeTypePicker
 
                     //            VStack(spacing: 18) {
                     if shareeType == .invited {
@@ -48,6 +50,26 @@ public struct UnifiedShareView: View {
                             text: $recipients
                         )
                         .textFieldStyle(.roundedBorder)
+                        .onChange(of: recipients) {
+                            model.searchRecipients(query: recipients)
+                        }
+                        // Measure the field so the dropdown can sit just beneath it.
+                        .background {
+                            GeometryReader { proxy in
+                                Color.clear
+                                    .onAppear { addPeopleFieldHeight = proxy.size.height }
+                                    .onChange(of: proxy.size.height) { addPeopleFieldHeight = proxy.size.height }
+                            }
+                        }
+                        // Float the suggestions just below the field, overlaying the
+                        // rest of the form instead of pushing it down.
+                        .overlay(alignment: .topLeading) {
+                            if !model.recipientResults.isEmpty {
+                                recipientDropdown
+                                    .offset(y: addPeopleFieldHeight + 4)
+                            }
+                        }
+                        .zIndex(1)
                     }
 
                     permissionField
@@ -71,9 +93,12 @@ public struct UnifiedShareView: View {
         }
         .padding(.horizontal, 26)
         .padding(.top, 10)
+        .onAppear {
+            model.createShare()
+        }
     }
 
-    private var audiencePicker: some View {
+    private var shareeTypePicker: some View {
         Picker("", selection: $shareeType) {
             Text(String(localized: "Invited"))
                 .tag(ShareeType.invited)
@@ -103,6 +128,69 @@ public struct UnifiedShareView: View {
         } label: {
             Text(String(localized: "Settings"))
         }
+    }
+
+    private var recipientDropdown: some View {
+        ScrollView {
+            VStack(alignment: .leading, spacing: 0) {
+                ForEach(model.recipientResults, id: \.value) { recipient in
+                    Button {
+                        selectRecipient(recipient)
+                    } label: {
+                        HStack(spacing: 10) {
+                            if let icon = recipient.icon {
+                                recipientIcon(icon)
+                            }
+
+                            Text(recipient.displayName)
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                        }
+                        .padding(.horizontal, 12)
+                        .padding(.vertical, 10)
+                        .contentShape(Rectangle())
+                    }
+                    .buttonStyle(.plain)
+
+                    if recipient.value != model.recipientResults.last?.value {
+                        Divider()
+                    }
+                }
+            }
+        }
+        .frame(height: dropdownHeight)
+        .background(.background)
+        .clipShape(RoundedRectangle(cornerRadius: 8))
+        .overlay {
+            RoundedRectangle(cornerRadius: 8)
+                .stroke(.quaternary)
+        }
+        .shadow(radius: 4, y: 2)
+    }
+
+    /// Height of the suggestions dropdown: one row each, capped so it stays a dropdown.
+    private var dropdownHeight: CGFloat {
+        min(CGFloat(model.recipientResults.count) * 44, 220)
+    }
+
+    /// Renders the icon's URL variant (color-scheme aware). Inline SVG isn't natively renderable.
+    @ViewBuilder
+    private func recipientIcon(_ icon: NKUnifiedShareIcon) -> some View {
+        if let urlString = (colorScheme == .dark ? icon.dark : icon.light) ?? icon.light ?? icon.dark,
+           let url = URL(string: urlString) {
+            AsyncImage(url: url) { image in
+                image
+                    .resizable()
+                    .scaledToFit()
+            } placeholder: {
+                ProgressView()
+            }
+            .frame(width: 24, height: 24)
+            .clipShape(Circle())
+        }
+    }
+
+    private func selectRecipient(_ recipient: NKUnifiedShareRecipient) {
+        recipients = ""
     }
 
     private var actionButtons: some View {

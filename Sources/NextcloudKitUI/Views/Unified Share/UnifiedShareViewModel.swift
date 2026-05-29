@@ -8,7 +8,6 @@ import NextcloudKit
 enum UnifiedShareViewState {
     case loading
     case shareUpdated(share: NKUnifiedShare)
-    case recipientsUpdated(recipient: [NKUnifiedShareRecipient])
     case error(Error)
 }
 
@@ -16,6 +15,8 @@ enum UnifiedShareViewState {
 @Observable
 public class UnifiedShareViewModel {
     var state: UnifiedShareViewState = .loading
+    /// Recipient autocomplete results — coexist with a loaded share, so kept out of `state`.
+    var recipientResults: [NKUnifiedShareRecipient] = []
     let account: String
 
     init(account: String) {
@@ -43,14 +44,15 @@ public class UnifiedShareViewModel {
     }
 
     func searchRecipients(query: String) {
+        guard !query.isEmpty else {
+            recipientResults = []
+            return
+        }
+
         Task {
             let result = await NextcloudKit.shared.searchUnifiedShareRecipients(query: query, account: account)
-            guard let share = result.recipients else {
-                state = .error(result.error)
-                return
-            }
 
-            state = .recipientsUpdated(recipient: share)
+            recipientResults = result.recipients ?? []
         }
     }
 }
