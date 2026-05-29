@@ -3,75 +3,80 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 import SwiftUI
+import NextcloudKit
 
 /// View used for Unified Sharing.
 public struct UnifiedShareView: View {
-    @State private var selectedAudience: ShareeType = .invited
+    let fileName: String
+    let account: String
+    @State private var model: UnifiedShareViewModel
+
+    @State private var shareeType: ShareeType = .invited
     @State private var permission: Permission = .canView
     @State private var isSettingsExpanded = true
     @State private var recipients = ""
     @State private var note = ""
 
-    public init() { }
+    public init(fileName: String, account: String) {
+        self.fileName = fileName
+        self.account = account
+        model = UnifiedShareViewModel(account: account)
+    }
+
+    init(fileName: String, model: UnifiedShareViewModel) {
+        self.fileName = fileName
+        self.account = model.account
+        self.model = model
+    }
 
     public var body: some View {
-        ZStack {
-            Color.black.opacity(0.18)
-                .ignoresSafeArea()
-
-            VStack(spacing: 0) {
-                VStack(alignment: .leading, spacing: 24) {
-                    Text(String(localized: "Share Abc.txt"))
-                        .font(.system(size: 48 / 2, weight: .medium))
-                        .foregroundStyle(.primary)
+        VStack(alignment: .leading, spacing: 24) {
+            switch model.state {
+                case .loading:
+                    ProgressView()
+                case .shareUpdated(let share):
+                    Text(String(localized: "Share \(fileName)"))
+                        .font(.title)
+                    //                .foregroundStyle(.primary)
 
                     audiencePicker
 
-                    VStack(spacing: 18) {
+                    //            VStack(spacing: 18) {
+                    if shareeType == .invited {
                         TextField(
                             String(localized: "Add people"),
                             text: $recipients
                         )
                         .textFieldStyle(.roundedBorder)
-
-                        permissionField
-                        settingsRow
-
-                        TextField(
-                            String(localized: "Note to recipients"),
-                            text: $note,
-                            axis: .vertical
-                        )
-                        .textFieldStyle(.roundedBorder)
                     }
 
+                    permissionField
+                    settingsRow
+
+                    TextField(
+                        String(localized: "Note to recipients"),
+                        text: $note,
+                        axis: .vertical
+                    )
+                    .textFieldStyle(.roundedBorder)
+
                     actionButtons
-                }
-                .padding(.horizontal, 26)
-                .padding(.top, 22)
-                .padding(.bottom, 26)
+
+                case .error(let error):
+                    Text("Error")
             }
-            .background(
-                RoundedRectangle(cornerRadius: 28, style: .continuous)
-                    .fill(.background.secondary)
-            )
-            .overlay(
-                RoundedRectangle(cornerRadius: 28, style: .continuous)
-                    .stroke(.separator.opacity(0.2), lineWidth: 0.5)
-            )
-            .shadow(color: .black.opacity(0.12), radius: 24, y: 8)
-            .padding(.horizontal, 18)
-            .padding(.vertical, 10)
+
+            //            }
+
         }
+        .padding(.horizontal, 26)
+        .padding(.top, 10)
     }
 
     private var audiencePicker: some View {
-        Picker(String(localized: ""), selection: $selectedAudience) {
-            Label(
-                String(localized: "Invited"),
-                systemImage: "checkmark"
-            )
-            .tag(ShareeType.invited)
+        Picker("", selection: $shareeType) {
+            Text(String(localized: "Invited"))
+                .tag(ShareeType.invited)
 
             Text(String(localized: "Anyone"))
                 .tag(ShareeType.anyone)
@@ -80,14 +85,13 @@ public struct UnifiedShareView: View {
     }
 
     private var permissionField: some View {
-        LabeledContent(String(localized: "Participants")) {
+        LabeledContent(String(localized: shareeType == .anyone ? "Anyone with the link" : "Participants")) {
             Picker(String(localized: "Participants"), selection: $permission) {
                 ForEach(Permission.allCases) { permission in
                     Text(permission.localizedTitle)
                         .tag(permission)
                 }
             }
-            .labelsHidden()
             .pickerStyle(.menu)
         }
     }
@@ -149,5 +153,8 @@ private extension UnifiedShareView {
 }
 
 #Preview {
-    UnifiedShareView()
+    UnifiedShareView(
+        fileName: "Test.txt",
+        model: UnifiedShareViewModel(account: "", state: .shareUpdated(share: .mock))
+    )
 }
