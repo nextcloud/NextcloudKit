@@ -27,7 +27,9 @@ public extension NextcloudKit {
     ///     - etag: The entity tag for versioning.
     ///     - date: The server date of the operation.
     ///     - size: The total uploaded size in bytes.
-    ///     - headers: The response headers.
+    ///     - ownerId: The owner id returned by the server.
+    ///     - permissions: The DAV permissions returned by the server.
+    ///     - response: The raw upload response.
     ///     - nkError: The result status.
     func upload(serverUrlFileName: Any,
                 fileNameLocalPath: String,
@@ -40,7 +42,7 @@ public extension NextcloudKit {
                 requestHandler: @escaping (_ request: UploadRequest) -> Void = { _ in },
                 taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
                 progressHandler: @escaping (_ progress: Progress) -> Void = { _ in },
-                completionHandler: @escaping (_ account: String, _ ocId: String?, _ etag: String?, _ date: Date?, _ size: Int64, _ response: AFDataResponse<Data>?, _ nkError: NKError) -> Void) {
+                completionHandler: @escaping (_ account: String, _ ocId: String?, _ etag: String?, _ date: Date?, _ size: Int64, _ ownerId: String?, _ permissions: String?, _ response: AFDataResponse<Data>?, _ nkError: NKError) -> Void) {
         var convertible: URLConvertible?
         var uploadedSize: Int64 = 0
 
@@ -52,7 +54,7 @@ public extension NextcloudKit {
         guard let url = convertible,
               let nkSession = nkCommonInstance.nksessions.session(forAccount: account),
               var headers = nkCommonInstance.getStandardHeaders(account: account, options: options) else {
-            return options.queue.async { completionHandler(account, nil, nil, nil, 0, nil, .urlError) }
+            return options.queue.async { completionHandler(account, nil, nil, nil, 0, nil, nil, nil, .urlError) }
         }
         let fileNameLocalPathUrl = URL(fileURLWithPath: fileNameLocalPath)
         // Epoch of linux do not permitted negativ value
@@ -80,27 +82,30 @@ public extension NextcloudKit {
             uploadedSize = progress.totalUnitCount
             options.queue.async { progressHandler(progress) }
         } .responseData(queue: self.nkCommonInstance.backgroundQueue) { response in
-            var ocId: String?, etag: String?, date: Date?
+            var ocId: String?, etag: String?, date: Date?, ownerId: String?, permissions: String?
+            let allHeaderFields = response.response?.allHeaderFields
 
-            if self.nkCommonInstance.findHeader("oc-fileid", allHeaderFields: response.response?.allHeaderFields) != nil {
-                ocId = self.nkCommonInstance.findHeader("oc-fileid", allHeaderFields: response.response?.allHeaderFields)
-            } else if self.nkCommonInstance.findHeader("fileid", allHeaderFields: response.response?.allHeaderFields) != nil {
-                ocId = self.nkCommonInstance.findHeader("fileid", allHeaderFields: response.response?.allHeaderFields)
+            ownerId = self.nkCommonInstance.findHeader("x-nc-ownerid", allHeaderFields: allHeaderFields)
+            permissions = self.nkCommonInstance.findHeader("x-nc-permissions", allHeaderFields: allHeaderFields)
+            if self.nkCommonInstance.findHeader("oc-fileid", allHeaderFields: allHeaderFields) != nil {
+                ocId = self.nkCommonInstance.findHeader("oc-fileid", allHeaderFields: allHeaderFields)
+            } else if self.nkCommonInstance.findHeader("fileid", allHeaderFields: allHeaderFields) != nil {
+                ocId = self.nkCommonInstance.findHeader("fileid", allHeaderFields: allHeaderFields)
             }
-            if self.nkCommonInstance.findHeader("oc-etag", allHeaderFields: response.response?.allHeaderFields) != nil {
-                etag = self.nkCommonInstance.findHeader("oc-etag", allHeaderFields: response.response?.allHeaderFields)
-            } else if self.nkCommonInstance.findHeader("etag", allHeaderFields: response.response?.allHeaderFields) != nil {
-                etag = self.nkCommonInstance.findHeader("etag", allHeaderFields: response.response?.allHeaderFields)
+            if self.nkCommonInstance.findHeader("oc-etag", allHeaderFields: allHeaderFields) != nil {
+                etag = self.nkCommonInstance.findHeader("oc-etag", allHeaderFields: allHeaderFields)
+            } else if self.nkCommonInstance.findHeader("etag", allHeaderFields: allHeaderFields) != nil {
+                etag = self.nkCommonInstance.findHeader("etag", allHeaderFields: allHeaderFields)
             }
             if etag != nil {
                 etag = etag?.replacingOccurrences(of: "\"", with: "")
             }
-            if let dateRaw = self.nkCommonInstance.findHeader("date", allHeaderFields: response.response?.allHeaderFields) {
+            if let dateRaw = self.nkCommonInstance.findHeader("date", allHeaderFields: allHeaderFields) {
                 date = dateRaw.parsedDate(using: "EEE, dd MMM y HH:mm:ss zzz")
             }
 
             options.queue.async {
-                completionHandler(account, ocId, etag, date, uploadedSize, response, self.evaluateResponse(response))
+                completionHandler(account, ocId, etag, date, uploadedSize, ownerId, permissions, response, self.evaluateResponse(response))
             }
         }
 
@@ -119,7 +124,9 @@ public extension NextcloudKit {
     ///   - etag: The file etag returned by the server.
     ///   - date: The server timestamp.
     ///   - size: The size of the uploaded file in bytes.
-    ///   - headers: The raw HTTP response headers.
+    ///   - ownerId: The owner id returned by the server.
+    ///   - permissions: The DAV permissions returned by the server.
+    ///   - response: The raw upload response.
     ///   - error: The NKError result of the upload.
     func uploadAsync(serverUrlFileName: Any,
                      fileNameLocalPath: String,
@@ -138,6 +145,8 @@ public extension NextcloudKit {
         etag: String?,
         date: Date?,
         size: Int64,
+        ownerId: String?,
+        permissions: String?,
         response: AFDataResponse<Data>?,
         error: NKError
     ) {
@@ -152,13 +161,15 @@ public extension NextcloudKit {
                    options: options,
                    requestHandler: requestHandler,
                    taskHandler: taskHandler,
-                   progressHandler: progressHandler) { account, ocId, etag, date, size, response, error in
+                   progressHandler: progressHandler) { account, ocId, etag, date, size, ownerId, permissions, response, error in
                 continuation.resume(returning: (
                     account: account,
                     ocId: ocId,
                     etag: etag,
                     date: date,
                     size: size,
+                    ownerId: ownerId,
+                    permissions: permissions,
                     response: response,
                     error: error
                 ))
