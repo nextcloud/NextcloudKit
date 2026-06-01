@@ -377,6 +377,17 @@ public struct NKCommon: Sendable {
         return nil
     }
 
+    /// Normalizes an HTTP ETag value by removing wrapping quotes when present.
+    /// - Parameter value: The raw ETag header value returned by the HTTP response.
+    /// - Returns: The normalized ETag value without surrounding double quotes.
+    public func normalizedETag(_ value: String?) -> String? {
+        guard let value else {
+            return nil
+        }
+
+        return value.trimmingCharacters(in: CharacterSet(charactersIn: "\""))
+    }
+
     func getHostName(urlString: String) -> String? {
         if let url = URL(string: urlString) {
             guard let hostName = url.host else { return nil }
