@@ -80,30 +80,6 @@ public extension NextcloudKit {
         }) .uploadProgress { progress in
             options.queue.async { progressHandler(progress) }
         } .responseData(queue: self.nkCommonInstance.backgroundQueue) { response in
-            /*
-            var ocId: String?, etag: String?, date: Date?, ownerId: String?, permissions: String?
-            let allHeaderFields = response.response?.allHeaderFields
-
-            ownerId = self.nkCommonInstance.findHeader("x-nc-ownerid", allHeaderFields: allHeaderFields)
-            permissions = self.nkCommonInstance.findHeader("x-nc-permissions", allHeaderFields: allHeaderFields)
-            if self.nkCommonInstance.findHeader("oc-fileid", allHeaderFields: allHeaderFields) != nil {
-                ocId = self.nkCommonInstance.findHeader("oc-fileid", allHeaderFields: allHeaderFields)
-            } else if self.nkCommonInstance.findHeader("fileid", allHeaderFields: allHeaderFields) != nil {
-                ocId = self.nkCommonInstance.findHeader("fileid", allHeaderFields: allHeaderFields)
-            }
-            if self.nkCommonInstance.findHeader("oc-etag", allHeaderFields: allHeaderFields) != nil {
-                etag = self.nkCommonInstance.findHeader("oc-etag", allHeaderFields: allHeaderFields)
-            } else if self.nkCommonInstance.findHeader("etag", allHeaderFields: allHeaderFields) != nil {
-                etag = self.nkCommonInstance.findHeader("etag", allHeaderFields: allHeaderFields)
-            }
-            if etag != nil {
-                etag = etag?.replacingOccurrences(of: "\"", with: "")
-            }
-            if let dateRaw = self.nkCommonInstance.findHeader("date", allHeaderFields: allHeaderFields) {
-                date = dateRaw.parsedDate(using: "EEE, dd MMM y HH:mm:ss zzz")
-            }
-            */
-
             options.queue.async {
                 completionHandler(account, response, self.evaluateResponse(response))
             }

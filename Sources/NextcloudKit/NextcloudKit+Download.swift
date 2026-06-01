@@ -51,32 +51,8 @@ public extension NextcloudKit {
         } .downloadProgress { progress in
             options.queue.async { progressHandler(progress) }
         } .response(queue: self.nkCommonInstance.backgroundQueue) { response in
-            if let error = response.error {
-                let nkError = NKError(error: error, afResponse: response, responseData: nil)
-                options.queue.async { completionHandler(account, response, nkError) }
-            } else {
-                /*
-                var date: Date?
-                var etag: String?
-                var length: Int64 = 0
-
-                if let result = response.response?.allHeaderFields["Content-Length"] as? String {
-                    length = Int64(result) ?? 0
-                }
-                if self.nkCommonInstance.findHeader("oc-etag", allHeaderFields: response.response?.allHeaderFields) != nil {
-                    etag = self.nkCommonInstance.findHeader("oc-etag", allHeaderFields: response.response?.allHeaderFields)
-                } else if self.nkCommonInstance.findHeader("etag", allHeaderFields: response.response?.allHeaderFields) != nil {
-                    etag = self.nkCommonInstance.findHeader("etag", allHeaderFields: response.response?.allHeaderFields)
-                }
-                if etag != nil {
-                    etag = etag?.replacingOccurrences(of: "\"", with: "")
-                }
-                if let dateRaw = self.nkCommonInstance.findHeader("Date", allHeaderFields: response.response?.allHeaderFields) {
-                    date = dateRaw.parsedDate(using: "yyyy-MM-dd HH:mm:ss")
-                }
-                */
-
-                options.queue.async { completionHandler(account, response, .success) }
+            options.queue.async {
+                completionHandler(account, response, self.evaluateDownloadResponse(response))
             }
         }
 
