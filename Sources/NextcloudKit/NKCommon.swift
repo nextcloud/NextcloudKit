@@ -367,7 +367,7 @@ public struct NKCommon: Sendable {
         return serverUrl.asUrl
     }
 
-    func findHeader(_ header: String, allHeaderFields: [AnyHashable: Any]?) -> String? {
+    public func findHeader(_ header: String, allHeaderFields: [AnyHashable: Any]?) -> String? {
         guard let allHeaderFields = allHeaderFields else { return nil }
         let keyValues = allHeaderFields.map { (String(describing: $0.key).lowercased(), String(describing: $0.value)) }
 
