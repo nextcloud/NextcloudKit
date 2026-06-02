@@ -279,8 +279,7 @@ public final class NKBackground: NSObject, URLSessionTaskDelegate, URLSessionDel
     }
 
     public func urlSession(_ session: URLSession, task: URLSessionTask, didCompleteWithError error: Error?) {
-        var fileName: String = "", serverUrl: String = "", etag: String?, ocId: String?, date: Date?, dateLastModified: Date?, length: Int64 = 0
-        var ownerId: String?, permissions: String?
+        var fileName: String = "", serverUrl: String = ""
         let url = task.currentRequest?.url?.absoluteString.removingPercentEncoding
         if let url {
             fileName = (url as NSString).lastPathComponent
@@ -302,6 +301,7 @@ public final class NKBackground: NSObject, URLSessionTaskDelegate, URLSessionDel
             }
         }
 
+        /*
         if let header = (task.response as? HTTPURLResponse)?.allHeaderFields {
             ownerId = self.nkCommonInstance.findHeader("x-nc-ownerid", allHeaderFields: header)
             permissions = self.nkCommonInstance.findHeader("x-nc-permissions", allHeaderFields: header)
@@ -324,6 +324,7 @@ public final class NKBackground: NSObject, URLSessionTaskDelegate, URLSessionDel
             }
             length = header["Content-Length"] as? Int64 ?? 0
         }
+        */
 
         if task is URLSessionDownloadTask {
             self.nkCommonInstance.delegate?.downloadComplete(fileName: fileName, serverUrl: serverUrl, allHeaderFields: (task.response as? HTTPURLResponse)?.allHeaderFields, task: task, error: nkError)
