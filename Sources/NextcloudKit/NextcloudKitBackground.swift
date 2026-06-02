@@ -301,31 +301,6 @@ public final class NKBackground: NSObject, URLSessionTaskDelegate, URLSessionDel
             }
         }
 
-        /*
-        if let header = (task.response as? HTTPURLResponse)?.allHeaderFields {
-            ownerId = self.nkCommonInstance.findHeader("x-nc-ownerid", allHeaderFields: header)
-            permissions = self.nkCommonInstance.findHeader("x-nc-permissions", allHeaderFields: header)
-            if self.nkCommonInstance.findHeader("oc-fileid", allHeaderFields: header) != nil {
-                ocId = self.nkCommonInstance.findHeader("oc-fileid", allHeaderFields: header)
-            } else if self.nkCommonInstance.findHeader("fileid", allHeaderFields: header) != nil {
-                ocId = self.nkCommonInstance.findHeader("fileid", allHeaderFields: header)
-            }
-            if self.nkCommonInstance.findHeader("oc-etag", allHeaderFields: header) != nil {
-                etag = self.nkCommonInstance.findHeader("oc-etag", allHeaderFields: header)
-            } else if self.nkCommonInstance.findHeader("etag", allHeaderFields: header) != nil {
-                etag = self.nkCommonInstance.findHeader("etag", allHeaderFields: header)
-            }
-            if etag != nil { etag = etag?.replacingOccurrences(of: "\"", with: "") }
-            if let dateRaw = self.nkCommonInstance.findHeader("date", allHeaderFields: header) {
-                date = dateRaw.parsedDate(using: "EEE, dd MMM y HH:mm:ss zzz")
-            }
-            if let dateString = header["Last-Modified"] as? String {
-                dateLastModified = dateString.parsedDate(using: "EEE, dd MMM y HH:mm:ss zzz")
-            }
-            length = header["Content-Length"] as? Int64 ?? 0
-        }
-        */
-
         if task is URLSessionDownloadTask {
             self.nkCommonInstance.delegate?.downloadComplete(fileName: fileName, serverUrl: serverUrl, allHeaderFields: (task.response as? HTTPURLResponse)?.allHeaderFields, task: task, error: nkError)
         } else if task is URLSessionUploadTask {
