@@ -220,4 +220,40 @@ open class NextcloudKit: @unchecked Sendable {
             return NKError(error: error, afResponse: response, responseData: response.data)
         }
     }
+
+    /// Evaluates a generic Alamofire download response into NKError with simple HTTP-aware rules.
+    /// - Note:
+    ///   - Explicit cancellations return `.cancelled`.
+    ///   - Any HTTP 2xx is considered success, regardless of downloaded file presence.
+    ///   - If no HTTP status is available, fall back to Alamofire's `Result`.
+    func evaluateDownloadResponse<Data>(_ response: AFDownloadResponse<Data>) -> NKError {
+        // 1) Cancellations take precedence
+        if let afError = response.error?.asAFError,
+           afError.isExplicitlyCancelledError {
+            return .cancelled
+        }
+
+        // 2) Prefer HTTP status code when available
+        if let code = response.response?.statusCode {
+            if (200...299).contains(code) {
+                return .success
+            }
+            // Non-2xx: let the error flow below, even if serializer said "success".
+        }
+
+        // 3) Fall back to Alamofire's result.
+        // This covers transport errors, missing status code, file move errors,
+        // serializer errors, and other download-specific failures.
+        switch response.result {
+        case .success:
+            return .success
+
+        case .failure(let error):
+            return NKError(
+                error: error,
+                afResponse: response,
+                responseData: nil
+            )
+        }
+    }
 }

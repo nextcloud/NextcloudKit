@@ -26,7 +26,7 @@ public extension NextcloudKit {
                   requestHandler: @escaping (_ request: DownloadRequest) -> Void = { _ in },
                   taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
                   progressHandler: @escaping (_ progress: Progress) -> Void = { _ in },
-                  completionHandler: @escaping (_ account: String, _ etag: String?, _ date: Date?, _ lenght: Int64, _ headers: [AnyHashable: any Sendable]?, _ afError: AFError?, _ nKError: NKError) -> Void) {
+                  completionHandler: @escaping (_ account: String, _ response: AFDownloadResponse<URL?>?, _ nKError: NKError) -> Void) {
         var convertible: URLConvertible?
         if serverUrlFileName is URL {
             convertible = serverUrlFileName as? URLConvertible
@@ -36,7 +36,7 @@ public extension NextcloudKit {
         guard let url = convertible,
               let nkSession = nkCommonInstance.nksessions.session(forAccount: account),
               let headers = nkCommonInstance.getStandardHeaders(account: account, options: options) else {
-            return options.queue.async { completionHandler(account, nil, nil, 0, nil, nil, .urlError) }
+            return options.queue.async { completionHandler(account, nil, .urlError) }
         }
         var destination: Alamofire.DownloadRequest.Destination?
         let fileNamePathLocalDestinationURL = NSURL.fileURL(withPath: fileNameLocalPath)
@@ -51,30 +51,8 @@ public extension NextcloudKit {
         } .downloadProgress { progress in
             options.queue.async { progressHandler(progress) }
         } .response(queue: self.nkCommonInstance.backgroundQueue) { response in
-            if let error = response.error {
-                let resultError = NKError(error: error, afResponse: response, responseData: nil)
-                options.queue.async { completionHandler(account, nil, nil, 0, response.response?.allHeaderFields, error, resultError) }
-            } else {
-                var date: Date?
-                var etag: String?
-                var length: Int64 = 0
-
-                if let result = response.response?.allHeaderFields["Content-Length"] as? String {
-                    length = Int64(result) ?? 0
-                }
-                if self.nkCommonInstance.findHeader("oc-etag", allHeaderFields: response.response?.allHeaderFields) != nil {
-                    etag = self.nkCommonInstance.findHeader("oc-etag", allHeaderFields: response.response?.allHeaderFields)
-                } else if self.nkCommonInstance.findHeader("etag", allHeaderFields: response.response?.allHeaderFields) != nil {
-                    etag = self.nkCommonInstance.findHeader("etag", allHeaderFields: response.response?.allHeaderFields)
-                }
-                if etag != nil {
-                    etag = etag?.replacingOccurrences(of: "\"", with: "")
-                }
-                if let dateRaw = self.nkCommonInstance.findHeader("Date", allHeaderFields: response.response?.allHeaderFields) {
-                    date = dateRaw.parsedDate(using: "yyyy-MM-dd HH:mm:ss")
-                }
-
-                options.queue.async { completionHandler(account, etag, date, length, response.response?.allHeaderFields, nil, .success) }
+            options.queue.async {
+                completionHandler(account, response, self.evaluateDownloadResponse(response))
             }
         }
 
@@ -100,11 +78,7 @@ public extension NextcloudKit {
                        progressHandler: @escaping (_ progress: Progress) -> Void = { _ in }
     ) async -> (
         account: String,
-        etag: String?,
-        date: Date?,
-        length: Int64,
-        headers: [AnyHashable: any Sendable]?,
-        afError: AFError?,
+        response: AFDownloadResponse<URL?>?,
         nkError: NKError
     ) {
         await withCheckedContinuation { continuation in
@@ -114,14 +88,10 @@ public extension NextcloudKit {
                      options: options,
                      requestHandler: requestHandler,
                      taskHandler: taskHandler,
-                     progressHandler: progressHandler) { account, etag, date, length, headers, afError, nkError in
+                     progressHandler: progressHandler) { account, response, nkError in
                 continuation.resume(returning: (
                     account: account,
-                    etag: etag,
-                    date: date,
-                    length: length,
-                    headers: headers,
-                    afError: afError,
+                    response: response,
                     nkError: nkError
                 ))
             }
