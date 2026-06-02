@@ -326,9 +326,9 @@ public final class NKBackground: NSObject, URLSessionTaskDelegate, URLSessionDel
         }
 
         if task is URLSessionDownloadTask {
-            self.nkCommonInstance.delegate?.downloadComplete(fileName: fileName, serverUrl: serverUrl, etag: etag, date: date, dateLastModified: dateLastModified, length: length, task: task, error: nkError)
+            self.nkCommonInstance.delegate?.downloadComplete(fileName: fileName, serverUrl: serverUrl, allHeaderFields: (task.response as? HTTPURLResponse)?.allHeaderFields, task: task, error: nkError)
         } else if task is URLSessionUploadTask {
-            self.nkCommonInstance.delegate?.uploadComplete(fileName: fileName, serverUrl: serverUrl, ocId: ocId, etag: etag, date: date, size: task.countOfBytesExpectedToSend, ownerId: ownerId, permissions: permissions, task: task, error: nkError)
+            self.nkCommonInstance.delegate?.uploadComplete(fileName: fileName, serverUrl: serverUrl, allHeaderFields: (task.response as? HTTPURLResponse)?.allHeaderFields, task: task, error: nkError)
         }
     }
 
