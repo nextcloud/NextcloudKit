@@ -363,14 +363,19 @@ public final class NKLogFileManager: @unchecked Sendable {
 
         guard let data = message.data(using: .utf8) else { return }
 
-        if fileManager.fileExists(atPath: logPath.path) {
-            if let handle = FileHandle(forWritingAtPath: logPath.path) {
-                handle.seekToEndOfFile()
-                handle.write(data)
-                handle.closeFile()
+        do {
+            if !fileManager.fileExists(atPath: logPath.path) {
+                fileManager.createFile(atPath: logPath.path, contents: nil)
             }
-        } else {
-            try? data.write(to: logPath)
+
+            let handle = try FileHandle(forWritingTo: logPath)
+
+            defer { try? handle.close() }
+
+            try handle.seekToEnd()
+            try handle.write(contentsOf: data)
+        } catch {
+            // Ignore log write failures to avoid crashes when the device has no free space.
         }
     }
 
