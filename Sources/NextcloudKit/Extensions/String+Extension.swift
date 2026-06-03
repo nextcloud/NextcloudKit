@@ -29,7 +29,8 @@ extension String {
         return String(NSString(string: self).pathExtension)
     }
 
-    public func parsedDate(using format: String) -> Date? {
-        NKLogFileManager.shared.convertDate(self, format: format)
+    public func parsedDate(using format: String?) -> Date? {
+        guard let format else { return nil }
+        return NKLogFileManager.shared.convertDate(self, format: format)
     }
 }
