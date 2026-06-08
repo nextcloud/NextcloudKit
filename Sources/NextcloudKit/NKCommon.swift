@@ -26,8 +26,8 @@ public protocol NextcloudKitDelegate: AnyObject, Sendable {
 
     func downloadingFinish(_ session: URLSession, downloadTask: URLSessionDownloadTask, didFinishDownloadingTo location: URL)
 
-    func downloadComplete(fileName: String, serverUrl: String, etag: String?, date: Date?, dateLastModified: Date?, length: Int64, task: URLSessionTask, error: NKError)
-    func uploadComplete(fileName: String, serverUrl: String, ocId: String?, etag: String?, date: Date?, size: Int64, task: URLSessionTask, error: NKError)
+    func downloadComplete(fileName: String, serverUrl: String, allHeaderFields: [AnyHashable : Any]?, task: URLSessionTask, error: NKError)
+    func uploadComplete(fileName: String, serverUrl: String, allHeaderFields: [AnyHashable : Any]?, task: URLSessionTask, error: NKError)
 }
 
 public extension NextcloudKitDelegate {
@@ -43,8 +43,8 @@ public extension NextcloudKitDelegate {
 
     func downloadingFinish(_ session: URLSession, downloadTask: URLSessionDownloadTask, didFinishDownloadingTo location: URL) { }
 
-    func downloadComplete(fileName: String, serverUrl: String, etag: String?, date: Date?, dateLastModified: Date?, length: Int64, task: URLSessionTask, error: NKError) { }
-    func uploadComplete(fileName: String, serverUrl: String, ocId: String?, etag: String?, date: Date?, size: Int64, task: URLSessionTask, error: NKError) { }
+    func downloadComplete(fileName: String, serverUrl: String, allHeaderFields: [AnyHashable : Any]?, task: URLSessionTask, error: NKError) { }
+    func uploadComplete(fileName: String, serverUrl: String, allHeaderFields: [AnyHashable : Any]?, task: URLSessionTask, error: NKError) { }
 }
 
 public struct NKCommon: Sendable {
@@ -367,7 +367,7 @@ public struct NKCommon: Sendable {
         return serverUrl.asUrl
     }
 
-    func findHeader(_ header: String, allHeaderFields: [AnyHashable: Any]?) -> String? {
+    public func findHeader(_ header: String, allHeaderFields: [AnyHashable: Any]?) -> String? {
         guard let allHeaderFields = allHeaderFields else { return nil }
         let keyValues = allHeaderFields.map { (String(describing: $0.key).lowercased(), String(describing: $0.value)) }
 
@@ -375,6 +375,17 @@ public struct NKCommon: Sendable {
             return headerValue.1
         }
         return nil
+    }
+
+    /// Normalizes an HTTP ETag value by removing wrapping quotes when present.
+    /// - Parameter value: The raw ETag header value returned by the HTTP response.
+    /// - Returns: The normalized ETag value without surrounding double quotes.
+    public func normalizedETag(_ value: String?) -> String? {
+        guard let value else {
+            return nil
+        }
+
+        return value.trimmingCharacters(in: CharacterSet(charactersIn: "\""))
     }
 
     func getHostName(urlString: String) -> String? {
