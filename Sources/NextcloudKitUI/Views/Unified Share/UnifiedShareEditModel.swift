@@ -13,7 +13,7 @@ enum UnifiedShareViewState {
 
 @MainActor
 @Observable
-public class UnifiedShareViewModel {
+public class UnifiedShareEditModel {
     var state: UnifiedShareViewState = .loading
     /// Recipient autocomplete results — coexist with a loaded share, so kept out of `state`.
     var recipientResults: [NKUnifiedShareRecipient] = []
