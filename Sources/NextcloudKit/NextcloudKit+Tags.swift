@@ -17,7 +17,7 @@ public extension NextcloudKit {
     ///   - taskHandler: Callback for the underlying URL session task.
     func getTags(account: String,
                  options: NKRequestOptions = NKRequestOptions(),
-                 taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in }
+                 taskHandler: @escaping @Sendable (_ task: URLSessionTask) -> Void = { _ in }
     ) async -> (
         account: String,
         tags: [NKTag]?,
@@ -108,7 +108,7 @@ public extension NextcloudKit {
     func createTag(name: String,
                    account: String,
                    options: NKRequestOptions = NKRequestOptions(),
-                   taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in }
+                   taskHandler: @escaping @Sendable (_ task: URLSessionTask) -> Void = { _ in }
     ) async -> (
         account: String,
         responseData: AFDataResponse<Data>?,
@@ -168,7 +168,7 @@ public extension NextcloudKit {
                       fileId: String,
                       account: String,
                       options: NKRequestOptions = NKRequestOptions(),
-                      taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in }
+                      taskHandler: @escaping @Sendable (_ task: URLSessionTask) -> Void = { _ in }
     ) async -> (
         account: String,
         responseData: AFDataResponse<Data>?,
@@ -227,7 +227,7 @@ public extension NextcloudKit {
                            fileId: String,
                            account: String,
                            options: NKRequestOptions = NKRequestOptions(),
-                           taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in }
+                           taskHandler: @escaping @Sendable (_ task: URLSessionTask) -> Void = { _ in }
     ) async -> (
         account: String,
         responseData: AFDataResponse<Data>?,
@@ -285,7 +285,7 @@ public extension NextcloudKit {
                         color: String?,
                         account: String,
                         options: NKRequestOptions = NKRequestOptions(),
-                        taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in }
+                        taskHandler: @escaping @Sendable (_ task: URLSessionTask) -> Void = { _ in }
     ) async -> (
         account: String,
         responseData: AFDataResponse<Data>?,

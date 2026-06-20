@@ -21,8 +21,8 @@ public extension NextcloudKit {
                         delete: Bool,
                         account: String,
                         options: NKRequestOptions = NKRequestOptions(),
-                        taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-                        completion: @escaping (_ account: String, _ responseData: AFDataResponse<Data>?, _ error: NKError) -> Void) {
+                        taskHandler: @escaping @Sendable (_ task: URLSessionTask) -> Void = { _ in },
+                        completion: @escaping @Sendable (_ account: String, _ responseData: AFDataResponse<Data>?, _ error: NKError) -> Void) {
         var version = "v1"
         if let optionsVesion = options.version {
             version = optionsVesion
@@ -67,7 +67,7 @@ public extension NextcloudKit {
                              delete: Bool,
                              account: String,
                              options: NKRequestOptions = NKRequestOptions(),
-                             taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in }
+                             taskHandler: @escaping @Sendable (_ task: URLSessionTask) -> Void = { _ in }
     ) async -> (
         account: String,
         responseData: AFDataResponse<Data>?,
@@ -107,8 +107,8 @@ public extension NextcloudKit {
                         method: String,
                         account: String,
                         options: NKRequestOptions = NKRequestOptions(),
-                        taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-                        completion: @escaping (_ account: String, _ e2eToken: String?, _ responseData: AFDataResponse<Data>?, _ error: NKError) -> Void) {
+                        taskHandler: @escaping @Sendable (_ task: URLSessionTask) -> Void = { _ in },
+                        completion: @escaping @Sendable (_ account: String, _ e2eToken: String?, _ responseData: AFDataResponse<Data>?, _ error: NKError) -> Void) {
         var version = "v1"
         if let optionsVesion = options.version {
             version = optionsVesion
@@ -167,7 +167,7 @@ public extension NextcloudKit {
                              method: String,
                              account: String,
                              options: NKRequestOptions = NKRequestOptions(),
-                             taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in }
+                             taskHandler: @escaping @Sendable (_ task: URLSessionTask) -> Void = { _ in }
     ) async -> (
         account: String,
         e2eToken: String?,
@@ -208,8 +208,8 @@ public extension NextcloudKit {
                          e2eToken: String?,
                          account: String,
                          options: NKRequestOptions = NKRequestOptions(),
-                         taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-                         completion: @escaping (_ account: String, _ e2eMetadata: String?, _ signature: String?, _ responseData: AFDataResponse<Data>?, _ error: NKError) -> Void) {
+                         taskHandler: @escaping @Sendable (_ task: URLSessionTask) -> Void = { _ in },
+                         completion: @escaping @Sendable (_ account: String, _ e2eMetadata: String?, _ signature: String?, _ responseData: AFDataResponse<Data>?, _ error: NKError) -> Void) {
         var version = "v1"
         if let optionsVesion = options.version {
             version = optionsVesion
@@ -261,7 +261,7 @@ public extension NextcloudKit {
                               e2eToken: String?,
                               account: String,
                               options: NKRequestOptions = NKRequestOptions(),
-                              taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in }
+                              taskHandler: @escaping @Sendable (_ task: URLSessionTask) -> Void = { _ in }
     ) async -> (
         account: String,
         e2eMetadata: String?,
@@ -307,8 +307,8 @@ public extension NextcloudKit {
                          method: String,
                          account: String,
                          options: NKRequestOptions = NKRequestOptions(),
-                         taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-                         completion: @escaping (_ account: String, _ metadata: String?, _ responseData: AFDataResponse<Data>?, _ error: NKError) -> Void) {
+                         taskHandler: @escaping @Sendable (_ task: URLSessionTask) -> Void = { _ in },
+                         completion: @escaping @Sendable (_ account: String, _ metadata: String?, _ responseData: AFDataResponse<Data>?, _ error: NKError) -> Void) {
         var version = "v1"
         if let optionsVesion = options.version {
             version = optionsVesion
@@ -369,7 +369,7 @@ public extension NextcloudKit {
                               method: String,
                               account: String,
                               options: NKRequestOptions = NKRequestOptions(),
-                              taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in }
+                              taskHandler: @escaping @Sendable (_ task: URLSessionTask) -> Void = { _ in }
     ) async -> (
         account: String,
         metadata: String?,
@@ -410,8 +410,8 @@ public extension NextcloudKit {
     func getE2EECertificate(user: String? = nil,
                             account: String,
                             options: NKRequestOptions = NKRequestOptions(),
-                            taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-                            completion: @escaping (_ account: String, _ certificate: String?, _ certificateUser: String?, _ responseData: AFDataResponse<Data>?, _ error: NKError) -> Void) {
+                            taskHandler: @escaping @Sendable (_ task: URLSessionTask) -> Void = { _ in },
+                            completion: @escaping @Sendable (_ account: String, _ certificate: String?, _ certificateUser: String?, _ responseData: AFDataResponse<Data>?, _ error: NKError) -> Void) {
 
         var version = "v1"
         if let optionsVesion = options.version {
@@ -470,7 +470,7 @@ public extension NextcloudKit {
     func getE2EECertificateAsync(user: String? = nil,
                                  account: String,
                                  options: NKRequestOptions = NKRequestOptions(),
-                                 taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in }
+                                 taskHandler: @escaping @Sendable (_ task: URLSessionTask) -> Void = { _ in }
     ) async -> (
         account: String,
         certificate: String?,
@@ -505,8 +505,8 @@ public extension NextcloudKit {
     ///   - completion: Completion handler returning the account, private key string, raw response, and NKError.
     func getE2EEPrivateKey(account: String,
                            options: NKRequestOptions = NKRequestOptions(),
-                           taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-                           completion: @escaping (_ account: String, _ privateKey: String?, _ responseData: AFDataResponse<Data>?, _ error: NKError) -> Void) {
+                           taskHandler: @escaping @Sendable (_ task: URLSessionTask) -> Void = { _ in },
+                           completion: @escaping @Sendable (_ account: String, _ privateKey: String?, _ responseData: AFDataResponse<Data>?, _ error: NKError) -> Void) {
         var version = "v1"
         if let optionsVesion = options.version {
             version = optionsVesion
@@ -547,7 +547,7 @@ public extension NextcloudKit {
     /// - Returns: A tuple containing the account, the private key string (if available), the response, and the error.
     func getE2EEPrivateKeyAsync(account: String,
                                 options: NKRequestOptions = NKRequestOptions(),
-                                taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in }
+                                taskHandler: @escaping @Sendable (_ task: URLSessionTask) -> Void = { _ in }
     ) async -> (
         account: String,
         privateKey: String?,
@@ -579,8 +579,8 @@ public extension NextcloudKit {
     ///   - completion: Completion handler returning the account, public key string, raw response, and NKError.
     func getE2EEPublicKey(account: String,
                           options: NKRequestOptions = NKRequestOptions(),
-                          taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-                          completion: @escaping (_ account: String, _ publicKey: String?, _ responseData: AFDataResponse<Data>?, _ error: NKError) -> Void) {
+                          taskHandler: @escaping @Sendable (_ task: URLSessionTask) -> Void = { _ in },
+                          completion: @escaping @Sendable (_ account: String, _ publicKey: String?, _ responseData: AFDataResponse<Data>?, _ error: NKError) -> Void) {
         var version = "v1"
         if let optionsVesion = options.version {
             version = optionsVesion
@@ -621,7 +621,7 @@ public extension NextcloudKit {
     /// - Returns: A tuple with account, publicKey string, AFDataResponse, and NKError.
     func getE2EEPublicKeyAsync(account: String,
                                options: NKRequestOptions = NKRequestOptions(),
-                               taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in }
+                               taskHandler: @escaping @Sendable (_ task: URLSessionTask) -> Void = { _ in }
     ) async -> (
         account: String,
         publicKey: String?,
@@ -655,8 +655,8 @@ public extension NextcloudKit {
     func signE2EECertificate(certificate: String,
                              account: String,
                              options: NKRequestOptions = NKRequestOptions(),
-                             taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-                             completion: @escaping (_ account: String, _ certificate: String?, _ responseData: AFDataResponse<Data>?, _ error: NKError) -> Void) {
+                             taskHandler: @escaping @Sendable (_ task: URLSessionTask) -> Void = { _ in },
+                             completion: @escaping @Sendable (_ account: String, _ certificate: String?, _ responseData: AFDataResponse<Data>?, _ error: NKError) -> Void) {
         var version = "v1"
         if let optionsVesion = options.version {
             version = optionsVesion
@@ -701,7 +701,7 @@ public extension NextcloudKit {
     func signE2EECertificateAsync(certificate: String,
                                   account: String,
                                   options: NKRequestOptions = NKRequestOptions(),
-                                  taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in }
+                                  taskHandler: @escaping @Sendable (_ task: URLSessionTask) -> Void = { _ in }
     ) async -> (
         account: String,
         certificate: String?,
@@ -736,8 +736,8 @@ public extension NextcloudKit {
     func storeE2EEPrivateKey(privateKey: String,
                              account: String,
                              options: NKRequestOptions = NKRequestOptions(),
-                             taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-                             completion: @escaping (_ account: String, _ privateKey: String?, _ responseData: AFDataResponse<Data>?, _ error: NKError) -> Void) {
+                             taskHandler: @escaping @Sendable (_ task: URLSessionTask) -> Void = { _ in },
+                             completion: @escaping @Sendable (_ account: String, _ privateKey: String?, _ responseData: AFDataResponse<Data>?, _ error: NKError) -> Void) {
         var version = "v1"
         if let optionsVesion = options.version {
             version = optionsVesion
@@ -781,7 +781,7 @@ public extension NextcloudKit {
     func storeE2EEPrivateKeyAsync(privateKey: String,
                                   account: String,
                                   options: NKRequestOptions = NKRequestOptions(),
-                                  taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in }
+                                  taskHandler: @escaping @Sendable (_ task: URLSessionTask) -> Void = { _ in }
     ) async -> (
         account: String,
         privateKey: String?,
@@ -814,8 +814,8 @@ public extension NextcloudKit {
     ///   - completion: Completion handler returning the account, raw response, and NKError.
     func deleteE2EECertificate(account: String,
                                options: NKRequestOptions = NKRequestOptions(),
-                               taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-                               completion: @escaping (_ account: String, _ responseData: AFDataResponse<Data>?, _ error: NKError) -> Void) {
+                               taskHandler: @escaping @Sendable (_ task: URLSessionTask) -> Void = { _ in },
+                               completion: @escaping @Sendable (_ account: String, _ responseData: AFDataResponse<Data>?, _ error: NKError) -> Void) {
         var version = "v1"
         if let optionsVesion = options.version {
             version = optionsVesion
@@ -848,7 +848,7 @@ public extension NextcloudKit {
     /// - Returns: A tuple containing the account, response data, and error.
     func deleteE2EECertificateAsync(account: String,
                                     options: NKRequestOptions = NKRequestOptions(),
-                                    taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in }
+                                    taskHandler: @escaping @Sendable (_ task: URLSessionTask) -> Void = { _ in }
     ) async -> (
         account: String,
         responseData: AFDataResponse<Data>?,
@@ -878,8 +878,8 @@ public extension NextcloudKit {
     ///   - completion: Completion handler returning the account, raw response, and NKError.
     func deleteE2EEPrivateKey(account: String,
                               options: NKRequestOptions = NKRequestOptions(),
-                              taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-                              completion: @escaping (_ account: String, _ responseData: AFDataResponse<Data>?, _ error: NKError) -> Void) {
+                              taskHandler: @escaping @Sendable (_ task: URLSessionTask) -> Void = { _ in },
+                              completion: @escaping @Sendable (_ account: String, _ responseData: AFDataResponse<Data>?, _ error: NKError) -> Void) {
         var version = "v1"
         if let optionsVesion = options.version {
             version = optionsVesion
@@ -913,7 +913,7 @@ public extension NextcloudKit {
     /// - Returns: A tuple containing the account, response data, and error.
     func deleteE2EEPrivateKeyAsync(account: String,
                                    options: NKRequestOptions = NKRequestOptions(),
-                                   taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in }
+                                   taskHandler: @escaping @Sendable (_ task: URLSessionTask) -> Void = { _ in }
     ) async -> (
         account: String,
         responseData: AFDataResponse<Data>?,

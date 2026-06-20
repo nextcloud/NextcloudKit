@@ -18,7 +18,7 @@ public extension NextcloudKit {
     func textProcessingGetTypesV2(account: String,
                                   supportedTaskType: String = "Text",
                                   options: NKRequestOptions = NKRequestOptions(),
-                                  taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in }
+                                  taskHandler: @escaping @Sendable (_ task: URLSessionTask) -> Void = { _ in }
     ) async -> (
         account: String,
         types: [TaskTypeData]?,
@@ -83,7 +83,7 @@ public extension NextcloudKit {
                                   taskType: TaskTypeData,
                                   account: String,
                                   options: NKRequestOptions = NKRequestOptions(),
-                                  taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in }
+                                  taskHandler: @escaping @Sendable (_ task: URLSessionTask) -> Void = { _ in }
     ) async -> (
         account: String,
         task: AssistantTask?,
@@ -136,7 +136,7 @@ public extension NextcloudKit {
     func textProcessingGetTasksV2(taskType: String,
                                 account: String,
                                 options: NKRequestOptions = NKRequestOptions(),
-                                taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in }
+                                taskHandler: @escaping @Sendable (_ task: URLSessionTask) -> Void = { _ in }
     ) async -> (
         account: String,
         tasks: TaskList?,
@@ -186,7 +186,7 @@ public extension NextcloudKit {
     func textProcessingDeleteTaskV2(taskId: Int64,
                                     account: String,
                                     options: NKRequestOptions = NKRequestOptions(),
-                                    taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in }
+                                    taskHandler: @escaping @Sendable (_ task: URLSessionTask) -> Void = { _ in }
     ) async -> (
         account: String,
         responseData: AFDataResponse<Data>?,
@@ -230,7 +230,7 @@ public extension NextcloudKit {
     /// - Returns: A tuple with named values for account, sessions, response, and error.
     func getAssistantChatConversations(account: String,
                                        options: NKRequestOptions = NKRequestOptions(),
-                                       taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in }
+                                       taskHandler: @escaping @Sendable (_ task: URLSessionTask) -> Void = { _ in }
     ) async -> (
         account: String,
         sessions: [AssistantConversation]?,
@@ -279,7 +279,7 @@ public extension NextcloudKit {
     func getAssistantChatMessages(sessionId: Int,
                                   account: String,
                                   options: NKRequestOptions = NKRequestOptions(),
-                                  taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in }
+                                  taskHandler: @escaping @Sendable (_ task: URLSessionTask) -> Void = { _ in }
     ) async -> (
         account: String,
         chatMessages: [AssistantChatMessage]?,
@@ -328,7 +328,7 @@ public extension NextcloudKit {
     func createAssistantChatMessage(messageRequest: AssistantChatMessageRequest,
                                     account: String,
                                     options: NKRequestOptions = NKRequestOptions(),
-                                    taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in }
+                                    taskHandler: @escaping @Sendable (_ task: URLSessionTask) -> Void = { _ in }
     ) async -> (
         account: String,
         chatMessage: AssistantChatMessage?,
@@ -379,7 +379,7 @@ public extension NextcloudKit {
                                          timestamp: Int,
                                          account: String,
                                          options: NKRequestOptions = NKRequestOptions(),
-                                         taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in }
+                                         taskHandler: @escaping @Sendable (_ task: URLSessionTask) -> Void = { _ in }
     ) async -> (
         account: String,
         conversation: AssistantCreatedConversation?,
@@ -435,7 +435,7 @@ public extension NextcloudKit {
                                       sessionId: Int,
                                       account: String,
                                       options: NKRequestOptions = NKRequestOptions(),
-                                      taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in }
+                                      taskHandler: @escaping @Sendable (_ task: URLSessionTask) -> Void = { _ in }
     ) async -> (
         account: String,
         chatMessage: AssistantChatMessage?,
@@ -486,7 +486,7 @@ public extension NextcloudKit {
     func generateAssistantChatSession(sessionId: Int,
                                       account: String,
                                       options: NKRequestOptions = NKRequestOptions(),
-                                      taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in }
+                                      taskHandler: @escaping @Sendable (_ task: URLSessionTask) -> Void = { _ in }
     ) async -> (
         account: String,
         sessionTask: AssistantSessionTask?,
@@ -537,7 +537,7 @@ public extension NextcloudKit {
     func checkAssistantChatSession(sessionId: Int,
                                    account: String,
                                    options: NKRequestOptions = NKRequestOptions(),
-                                   taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in }
+                                   taskHandler: @escaping @Sendable (_ task: URLSessionTask) -> Void = { _ in }
     ) async -> (
         account: String,
         session: AssistantSession?,

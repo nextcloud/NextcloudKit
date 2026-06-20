@@ -19,8 +19,8 @@ public extension NextcloudKit {
                       livePhotoFile: String,
                       account: String,
                       options: NKRequestOptions = NKRequestOptions(),
-                      taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-                      completion: @escaping (_ account: String, _ responseData: AFDataResponse<Data>?, _ error: NKError) -> Void) {
+                      taskHandler: @escaping @Sendable (_ task: URLSessionTask) -> Void = { _ in },
+                      completion: @escaping @Sendable (_ account: String, _ responseData: AFDataResponse<Data>?, _ error: NKError) -> Void) {
         guard let url = serverUrlfileNamePath.encodedToUrl,
               let nkSession = nkCommonInstance.nksessions.session(forAccount: account) else {
             return options.queue.async { completion(account, nil, .urlError) }
@@ -65,7 +65,7 @@ public extension NextcloudKit {
                            livePhotoFile: String,
                            account: String,
                            options: NKRequestOptions = NKRequestOptions(),
-                           taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in }
+                           taskHandler: @escaping @Sendable (_ task: URLSessionTask) -> Void = { _ in }
     ) async -> (
         account: String,
         responseData: AFDataResponse<Data>?,

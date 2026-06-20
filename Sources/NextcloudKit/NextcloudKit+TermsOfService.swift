@@ -13,9 +13,9 @@ public extension NextcloudKit {
     /// - Returns: Tuple with NKError and optional NKTermsOfService.
     func getTermsOfService(account: String,
                            options: NKRequestOptions = NKRequestOptions(),
-                           request: @escaping (DataRequest?) -> Void = { _ in },
-                           taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-                           completion: @escaping (_ account: String, _ tos: NKTermsOfService?, _ responseData: AFDataResponse<Data>?, _ error: NKError) -> Void) {
+                           request: @escaping @Sendable (DataRequest?) -> Void = { _ in },
+                           taskHandler: @escaping @Sendable (_ task: URLSessionTask) -> Void = { _ in },
+                           completion: @escaping @Sendable (_ account: String, _ tos: NKTermsOfService?, _ responseData: AFDataResponse<Data>?, _ error: NKError) -> Void) {
         let endpoint = "ocs/v2.php/apps/terms_of_service/terms"
         guard let nkSession = nkCommonInstance.nksessions.session(forAccount: account),
               let url = nkCommonInstance.createStandardUrl(serverUrl: nkSession.urlBase, endpoint: endpoint),
@@ -78,8 +78,8 @@ public extension NextcloudKit {
     func signTermsOfService(termId: String,
                             account: String,
                             options: NKRequestOptions = NKRequestOptions(),
-                            taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-                            completion: @escaping (_ account: String, _ responseData: AFDataResponse<Data>?, _ error: NKError) -> Void) {
+                            taskHandler: @escaping @Sendable (_ task: URLSessionTask) -> Void = { _ in },
+                            completion: @escaping @Sendable (_ account: String, _ responseData: AFDataResponse<Data>?, _ error: NKError) -> Void) {
         let endpoint = "ocs/v2.php/apps/terms_of_service/sign"
         var urlRequest: URLRequest
         guard let nkSession = nkCommonInstance.nksessions.session(forAccount: account),

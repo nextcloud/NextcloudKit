@@ -29,8 +29,8 @@ public extension NextcloudKit {
     func getUserStatus(userId: String? = nil,
                        account: String,
                        options: NKRequestOptions = NKRequestOptions(),
-                       taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-                       completion: @escaping (_ account: String, _ clearAt: Date?, _ icon: String?, _ message: String?, _ messageId: String?, _ messageIsPredefined: Bool, _ status: String?, _ statusIsUserDefined: Bool, _ userId: String?, _ responseData: AFDataResponse<Data>?, _ error: NKError) -> Void) {
+                       taskHandler: @escaping @Sendable (_ task: URLSessionTask) -> Void = { _ in },
+                       completion: @escaping @Sendable (_ account: String, _ clearAt: Date?, _ icon: String?, _ message: String?, _ messageId: String?, _ messageIsPredefined: Bool, _ status: String?, _ statusIsUserDefined: Bool, _ userId: String?, _ responseData: AFDataResponse<Data>?, _ error: NKError) -> Void) {
         var endpoint = "ocs/v2.php/apps/user_status/api/v1/user_status"
         if let userId = userId {
             endpoint = "ocs/v2.php/apps/user_status/api/v1/user_status/\(userId)"
@@ -81,7 +81,7 @@ public extension NextcloudKit {
     func getUserStatusAsync(userId: String? = nil,
                             account: String,
                             options: NKRequestOptions = NKRequestOptions(),
-                            taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in }
+                            taskHandler: @escaping @Sendable (_ task: URLSessionTask) -> Void = { _ in }
     ) async -> (
         account: String,
         clearAt: Date?,
@@ -128,8 +128,8 @@ public extension NextcloudKit {
     func setUserStatus(status: String,
                        account: String,
                        options: NKRequestOptions = NKRequestOptions(),
-                       taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-                       completion: @escaping (_ account: String, _ responseData: AFDataResponse<Data>?, _ error: NKError) -> Void) {
+                       taskHandler: @escaping @Sendable (_ task: URLSessionTask) -> Void = { _ in },
+                       completion: @escaping @Sendable (_ account: String, _ responseData: AFDataResponse<Data>?, _ error: NKError) -> Void) {
         let endpoint = "ocs/v2.php/apps/user_status/api/v1/user_status/status"
         guard let nkSession = nkCommonInstance.nksessions.session(forAccount: account),
               let url = nkCommonInstance.createStandardUrl(serverUrl: nkSession.urlBase, endpoint: endpoint),
@@ -167,7 +167,7 @@ public extension NextcloudKit {
     func setUserStatusAsync(status: String,
                             account: String,
                             options: NKRequestOptions = NKRequestOptions(),
-                            taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in }
+                            taskHandler: @escaping @Sendable (_ task: URLSessionTask) -> Void = { _ in }
     ) async -> (
         account: String,
         responseData: AFDataResponse<Data>?,
@@ -203,8 +203,8 @@ public extension NextcloudKit {
                                     clearAt: Double,
                                     account: String,
                                     options: NKRequestOptions = NKRequestOptions(),
-                                    taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-                                    completion: @escaping (_ account: String, _ responseData: AFDataResponse<Data>?, _ error: NKError) -> Void) {
+                                    taskHandler: @escaping @Sendable (_ task: URLSessionTask) -> Void = { _ in },
+                                    completion: @escaping @Sendable (_ account: String, _ responseData: AFDataResponse<Data>?, _ error: NKError) -> Void) {
         let endpoint = "ocs/v2.php/apps/user_status/api/v1/user_status/message/predefined"
         guard let nkSession = nkCommonInstance.nksessions.session(forAccount: account),
               let url = nkCommonInstance.createStandardUrl(serverUrl: nkSession.urlBase, endpoint: endpoint),
@@ -252,7 +252,7 @@ public extension NextcloudKit {
                                          clearAt: Double,
                                          account: String,
                                          options: NKRequestOptions = NKRequestOptions(),
-                                         taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in }
+                                         taskHandler: @escaping @Sendable (_ task: URLSessionTask) -> Void = { _ in }
     ) async -> (
         account: String,
         responseData: AFDataResponse<Data>?,
@@ -291,8 +291,8 @@ public extension NextcloudKit {
                                      clearAt: Double,
                                      account: String,
                                      options: NKRequestOptions = NKRequestOptions(),
-                                     taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-                                     completion: @escaping (_ account: String, _ responseData: AFDataResponse<Data>?, _ error: NKError) -> Void) {
+                                     taskHandler: @escaping @Sendable (_ task: URLSessionTask) -> Void = { _ in },
+                                     completion: @escaping @Sendable (_ account: String, _ responseData: AFDataResponse<Data>?, _ error: NKError) -> Void) {
         let endpoint = "ocs/v2.php/apps/user_status/api/v1/user_status/message/custom"
         guard let nkSession = nkCommonInstance.nksessions.session(forAccount: account),
               let url = nkCommonInstance.createStandardUrl(serverUrl: nkSession.urlBase, endpoint: endpoint),
@@ -346,7 +346,7 @@ public extension NextcloudKit {
                                           clearAt: Double,
                                           account: String,
                                           options: NKRequestOptions = NKRequestOptions(),
-                                          taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in }
+                                          taskHandler: @escaping @Sendable (_ task: URLSessionTask) -> Void = { _ in }
     ) async -> (
         account: String,
         responseData: AFDataResponse<Data>?,
@@ -380,8 +380,8 @@ public extension NextcloudKit {
     ///     - error: An `NKError` representing the result of the operation (success or failure).
     func clearMessage(account: String,
                       options: NKRequestOptions = NKRequestOptions(),
-                      taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-                      completion: @escaping (_ account: String, _ responseData: AFDataResponse<Data>?, _ error: NKError) -> Void) {
+                      taskHandler: @escaping @Sendable (_ task: URLSessionTask) -> Void = { _ in },
+                      completion: @escaping @Sendable (_ account: String, _ responseData: AFDataResponse<Data>?, _ error: NKError) -> Void) {
         let endpoint = "ocs/v2.php/apps/user_status/api/v1/user_status/message"
         guard let nkSession = nkCommonInstance.nksessions.session(forAccount: account),
               let url = nkCommonInstance.createStandardUrl(serverUrl: nkSession.urlBase, endpoint: endpoint),
@@ -423,7 +423,7 @@ public extension NextcloudKit {
     /// - error: The resulting `NKError`, either `.success` or a failure case.
     func clearMessageAsync(account: String,
                            options: NKRequestOptions = NKRequestOptions(),
-                           taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in }
+                           taskHandler: @escaping @Sendable (_ task: URLSessionTask) -> Void = { _ in }
     ) async -> (
         account: String,
         responseData: AFDataResponse<Data>?,
@@ -455,8 +455,8 @@ public extension NextcloudKit {
     ///     - error: Resulting `NKError` describing success or failure.
     func getUserStatusPredefinedStatuses(account: String,
                                          options: NKRequestOptions = NKRequestOptions(),
-                                         taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-                                         completion: @escaping (_ account: String, _ userStatuses: [NKUserStatus]?, _ responseData: AFDataResponse<Data>?, _ error: NKError) -> Void) {
+                                         taskHandler: @escaping @Sendable (_ task: URLSessionTask) -> Void = { _ in },
+                                         completion: @escaping @Sendable (_ account: String, _ userStatuses: [NKUserStatus]?, _ responseData: AFDataResponse<Data>?, _ error: NKError) -> Void) {
         let endpoint = "ocs/v2.php/apps/user_status/api/v1/predefined_statuses"
         guard let nkSession = nkCommonInstance.nksessions.session(forAccount: account),
               let url = nkCommonInstance.createStandardUrl(serverUrl: nkSession.urlBase, endpoint: endpoint),
@@ -556,8 +556,8 @@ public extension NextcloudKit {
                                        offset: Int,
                                        account: String,
                                        options: NKRequestOptions = NKRequestOptions(),
-                                       taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-                                       completion: @escaping (_ account: String, _ userStatuses: [NKUserStatus]?, _ responseData: AFDataResponse<Data>?, _ error: NKError) -> Void) {
+                                       taskHandler: @escaping @Sendable (_ task: URLSessionTask) -> Void = { _ in },
+                                       completion: @escaping @Sendable (_ account: String, _ userStatuses: [NKUserStatus]?, _ responseData: AFDataResponse<Data>?, _ error: NKError) -> Void) {
         let endpoint = "ocs/v2.php/apps/user_status/api/v1/statuses"
         guard let nkSession = nkCommonInstance.nksessions.session(forAccount: account),
               let url = nkCommonInstance.createStandardUrl(serverUrl: nkSession.urlBase, endpoint: endpoint),
@@ -622,7 +622,7 @@ public extension NextcloudKit {
                                             offset: Int,
                                             account: String,
                                             options: NKRequestOptions = NKRequestOptions(),
-                                            taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in }
+                                            taskHandler: @escaping @Sendable (_ task: URLSessionTask) -> Void = { _ in }
     ) async -> (
         account: String,
         userStatuses: [NKUserStatus]?,

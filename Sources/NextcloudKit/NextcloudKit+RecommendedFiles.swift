@@ -18,9 +18,9 @@ public extension NextcloudKit {
     ///               the raw response data, and an NKError result.
     func getRecommendedFiles(account: String,
                              options: NKRequestOptions = NKRequestOptions(),
-                             request: @escaping (DataRequest?) -> Void = { _ in },
-                             taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-                             completion: @escaping (_ account: String, _ recommendations: [NKRecommendation]?, _ responseData: AFDataResponse<Data>?, _ error: NKError) -> Void) {
+                             request: @escaping @Sendable (DataRequest?) -> Void = { _ in },
+                             taskHandler: @escaping @Sendable (_ task: URLSessionTask) -> Void = { _ in },
+                             completion: @escaping @Sendable (_ account: String, _ recommendations: [NKRecommendation]?, _ responseData: AFDataResponse<Data>?, _ error: NKError) -> Void) {
         let endpoint = "ocs/v2.php/apps/recommendations/api/v1/recommendations"
         guard let nkSession = nkCommonInstance.nksessions.session(forAccount: account),
               let url = nkCommonInstance.createStandardUrl(serverUrl: nkSession.urlBase, endpoint: endpoint),
@@ -64,8 +64,8 @@ public extension NextcloudKit {
     /// - Returns: A tuple containing the account, list of recommended files, raw response data, and NKError result.
     func getRecommendedFilesAsync(account: String,
                                   options: NKRequestOptions = NKRequestOptions(),
-                                  request: @escaping (DataRequest?) -> Void = { _ in },
-                                  taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in }
+                                  request: @escaping @Sendable (DataRequest?) -> Void = { _ in },
+                                  taskHandler: @escaping @Sendable (_ task: URLSessionTask) -> Void = { _ in }
     ) async -> (
         account: String,
         recommendations: [NKRecommendation]?,

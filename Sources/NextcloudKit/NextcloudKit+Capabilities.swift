@@ -27,8 +27,8 @@ public extension NextcloudKit {
     ///   
     func getCapabilities(account: String,
                          options: NKRequestOptions = NKRequestOptions(),
-                         taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-                         completion: @escaping (_ account: String, _ capabilities: NKCapabilities.Capabilities?, _ responseData: AFDataResponse<Data>?, _ error: NKError) -> Void) {
+                         taskHandler: @escaping @Sendable (_ task: URLSessionTask) -> Void = { _ in },
+                         completion: @escaping @Sendable (_ account: String, _ capabilities: NKCapabilities.Capabilities?, _ responseData: AFDataResponse<Data>?, _ error: NKError) -> Void) {
         let endpoint = "ocs/v1.php/cloud/capabilities"
         guard let nkSession = nkCommonInstance.nksessions.session(forAccount: account),
               let url = nkCommonInstance.createStandardUrl(serverUrl: nkSession.urlBase, endpoint: endpoint),
@@ -70,10 +70,11 @@ public extension NextcloudKit {
     /// - Returns: A tuple containing account, parsed capabilities, response data, and result error.
     func getCapabilitiesAsync(account: String,
                               options: NKRequestOptions = NKRequestOptions(),
-                              taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in }) async -> (account: String,
-                                                                                                            capabilities: NKCapabilities.Capabilities?,
-                                                                                                            responseData: AFDataResponse<Data>?,
-                                                                                                            error: NKError) {
+                              taskHandler: @escaping @Sendable(_ task: URLSessionTask) -> Void = { _ in }
+    ) async -> (account: String,
+                capabilities: NKCapabilities.Capabilities?,
+                responseData: AFDataResponse<Data>?,
+                error: NKError) {
         await withUnsafeContinuation { continuation in
             getCapabilities(account: account,
                             options: options,
@@ -537,7 +538,7 @@ final public class NKCapabilities: Sendable {
         ///
         /// Whether different lock types as defined in ``NKLockType`` are supported or not.
         ///
-        public var filesLockTypes: Bool                             = false
+        public var filesLockTypes: Bool                              = false
 
         ///
         /// The version of the locking API.

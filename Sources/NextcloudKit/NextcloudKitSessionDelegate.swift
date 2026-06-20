@@ -21,7 +21,7 @@ final class NextcloudKitSessionDelegate: SessionDelegate, @unchecked Sendable {
         super.init(fileManager: fileManager)
     }
 
-    public func urlSession(_ session: URLSession, didReceive challenge: URLAuthenticationChallenge, completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
+    public func urlSession(_ session: URLSession, didReceive challenge: URLAuthenticationChallenge, completionHandler: @escaping @Sendable (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
         if let nkCommon = self.nkCommonInstance,
            let delegate = nkCommon.delegate {
             delegate.authenticationChallenge(session, didReceive: challenge) { authChallengeDisposition, credential in

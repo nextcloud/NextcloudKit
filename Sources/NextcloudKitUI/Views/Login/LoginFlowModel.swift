@@ -21,7 +21,7 @@ final class LoginFlowModel: QRCodeParsing, URLSanitizing {
     private let userAgent: String?
     private let addAccount: AddAccountHandler
 
-    init(userAgent: String?, addAccount: @escaping AddAccountHandler) {
+    init(userAgent: String?, addAccount: @escaping @Sendable AddAccountHandler) {
         self.userAgent = userAgent
         self.addAccount = addAccount
     }

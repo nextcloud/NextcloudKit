@@ -24,8 +24,8 @@ public extension NextcloudKit {
                                      proxyServerUrl: String,
                                      account: String,
                                      options: NKRequestOptions = NKRequestOptions(),
-                                     taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-                                     completion: @escaping (_ account: String, _ deviceIdentifier: String?, _ signature: String?, _ publicKey: String?, _ responseData: AFDataResponse<Data>?, _ error: NKError) -> Void) {
+                                     taskHandler: @escaping @Sendable (_ task: URLSessionTask) -> Void = { _ in },
+                                     completion: @escaping @Sendable (_ account: String, _ deviceIdentifier: String?, _ signature: String?, _ publicKey: String?, _ responseData: AFDataResponse<Data>?, _ error: NKError) -> Void) {
         let endpoint = "ocs/v2.php/apps/notifications/api/v2/push"
         guard let nkSession = nkCommonInstance.nksessions.session(forAccount: account),
               let url = nkCommonInstance.createStandardUrl(serverUrl: nkSession.urlBase, endpoint: endpoint),
@@ -78,7 +78,7 @@ public extension NextcloudKit {
                                           proxyServerUrl: String,
                                           account: String,
                                           options: NKRequestOptions = NKRequestOptions(),
-                                          taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in }
+                                          taskHandler: @escaping @Sendable (_ task: URLSessionTask) -> Void = { _ in }
     ) async -> (
         account: String,
         deviceIdentifier: String?,
@@ -118,8 +118,8 @@ public extension NextcloudKit {
     func unsubscribingPushNotification(serverUrl: String,
                                        account: String,
                                        options: NKRequestOptions = NKRequestOptions(),
-                                       taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-                                       completion: @escaping (_ account: String, _ responseData: AFDataResponse<Data>?, _ error: NKError) -> Void) {
+                                       taskHandler: @escaping @Sendable (_ task: URLSessionTask) -> Void = { _ in },
+                                       completion: @escaping @Sendable (_ account: String, _ responseData: AFDataResponse<Data>?, _ error: NKError) -> Void) {
         let endpoint = "ocs/v2.php/apps/notifications/api/v2/push"
         guard let nkSession = nkCommonInstance.nksessions.session(forAccount: account),
               let url = nkCommonInstance.createStandardUrl(serverUrl: nkSession.urlBase, endpoint: endpoint),
@@ -152,7 +152,7 @@ public extension NextcloudKit {
     func unsubscribingPushNotificationAsync(serverUrl: String,
                                             account: String,
                                             options: NKRequestOptions = NKRequestOptions(),
-                                            taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in }
+                                            taskHandler: @escaping @Sendable (_ task: URLSessionTask) -> Void = { _ in }
     ) async -> (
         account: String,
         responseData: AFDataResponse<Data>?,
@@ -191,8 +191,8 @@ public extension NextcloudKit {
                               publicKey: String,
                               account: String,
                               options: NKRequestOptions = NKRequestOptions(),
-                              taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-                              completion: @escaping (_ account: String, _ responseData: AFDataResponse<Data>?, _ error: NKError) -> Void) {
+                              taskHandler: @escaping @Sendable (_ task: URLSessionTask) -> Void = { _ in },
+                              completion: @escaping @Sendable (_ account: String, _ responseData: AFDataResponse<Data>?, _ error: NKError) -> Void) {
         let endpoint = "devices?format=json"
         guard let nkSession = nkCommonInstance.nksessions.session(forAccount: account),
               let url = self.nkCommonInstance.createStandardUrl(serverUrl: proxyServerUrl, endpoint: endpoint),
@@ -240,7 +240,7 @@ public extension NextcloudKit {
                                    publicKey: String,
                                    account: String,
                                    options: NKRequestOptions = NKRequestOptions(),
-                                   taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in }
+                                   taskHandler: @escaping @Sendable (_ task: URLSessionTask) -> Void = { _ in }
     ) async -> (
         account: String,
         responseData: AFDataResponse<Data>?,
@@ -281,8 +281,8 @@ public extension NextcloudKit {
                                 publicKey: String,
                                 account: String,
                                 options: NKRequestOptions = NKRequestOptions(),
-                                taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-                                completion: @escaping (_ account: String, _ responseData: AFDataResponse<Data>?, _ error: NKError) -> Void) {
+                                taskHandler: @escaping @Sendable (_ task: URLSessionTask) -> Void = { _ in },
+                                completion: @escaping @Sendable (_ account: String, _ responseData: AFDataResponse<Data>?, _ error: NKError) -> Void) {
         let endpoint = "devices"
         guard let nkSession = nkCommonInstance.nksessions.session(forAccount: account),
               let url = self.nkCommonInstance.createStandardUrl(serverUrl: proxyServerUrl, endpoint: endpoint),
@@ -327,7 +327,7 @@ public extension NextcloudKit {
                                      publicKey: String,
                                      account: String,
                                      options: NKRequestOptions = NKRequestOptions(),
-                                     taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in }
+                                     taskHandler: @escaping @Sendable (_ task: URLSessionTask) -> Void = { _ in }
     ) async -> (
         account: String,
         responseData: AFDataResponse<Data>?,

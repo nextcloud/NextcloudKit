@@ -31,7 +31,7 @@ public protocol NextcloudKitDelegate: AnyObject, Sendable {
 }
 
 public extension NextcloudKitDelegate {
-    func authenticationChallenge(_ session: URLSession, didReceive challenge: URLAuthenticationChallenge, completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) { }
+    func authenticationChallenge(_ session: URLSession, didReceive challenge: URLAuthenticationChallenge, completionHandler: @escaping @Sendable (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) { }
     func urlSessionDidFinishEvents(forBackgroundURLSession session: URLSession) { }
 
     func networkReachabilityObserver(_ typeReachability: NKTypeReachability) { }
@@ -43,8 +43,8 @@ public extension NextcloudKitDelegate {
 
     func downloadingFinish(_ session: URLSession, downloadTask: URLSessionDownloadTask, didFinishDownloadingTo location: URL) { }
 
-    func downloadComplete(fileName: String, serverUrl: String, allHeaderFields: [AnyHashable : Any]?, task: URLSessionTask, error: NKError) { }
-    func uploadComplete(fileName: String, serverUrl: String, allHeaderFields: [AnyHashable : Any]?, task: URLSessionTask, error: NKError) { }
+    func downloadComplete(fileName: String, serverUrl: String, allHeaderFields: [AnyHashable: Any]?, task: URLSessionTask, error: NKError) { }
+    func uploadComplete(fileName: String, serverUrl: String, allHeaderFields: [AnyHashable: Any]?, task: URLSessionTask, error: NKError) { }
 }
 
 public struct NKCommon: Sendable {
@@ -98,7 +98,7 @@ public struct NKCommon: Sendable {
                             fileName: String,
                             chunkSize: Int,
                             filesChunk: [(fileName: String, size: Int64)],
-                            chunkProgressHandler: @escaping (_ total: Int, _ counter: Int) -> Void = { _, _ in }) async throws -> [(fileName: String, size: Int64)] {
+                            chunkProgressHandler: @escaping @Sendable (_ total: Int, _ counter: Int) -> Void = { _, _ in }) async throws -> [(fileName: String, size: Int64)] {
         // If caller already has chunk list, recompute incremental sizes from disk and return.
         if !filesChunk.isEmpty {
             var recomputed: [(fileName: String, size: Int64)] = []

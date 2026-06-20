@@ -19,8 +19,8 @@ public extension NextcloudKit {
     func getDashboardWidget(account: String,
                             options: NKRequestOptions = NKRequestOptions(),
                             request: @escaping (DataRequest?) -> Void = { _ in },
-                            taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-                            completion: @escaping (_ account: String, _ dashboardWidgets: [NCCDashboardWidget]?, _ responseData: AFDataResponse<Data>?, _ error: NKError) -> Void) {
+                            taskHandler: @escaping @Sendable (_ task: URLSessionTask) -> Void = { _ in },
+                            completion: @escaping @Sendable (_ account: String, _ dashboardWidgets: [NCCDashboardWidget]?, _ responseData: AFDataResponse<Data>?, _ error: NKError) -> Void) {
         let endpoint = "ocs/v2.php/apps/dashboard/api/v1/widgets"
         guard let nkSession = nkCommonInstance.nksessions.session(forAccount: account),
               let url = nkCommonInstance.createStandardUrl(serverUrl: nkSession.urlBase, endpoint: endpoint),
@@ -60,8 +60,8 @@ public extension NextcloudKit {
     /// - Returns: A tuple with the account, list of widgets, raw response, and NKError.
     func getDashboardWidgetAsync(account: String,
                                  options: NKRequestOptions = NKRequestOptions(),
-                                 request: @escaping (DataRequest?) -> Void = { _ in },
-                                 taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in }
+                                 request: @escaping @Sendable (DataRequest?) -> Void = { _ in },
+                                 taskHandler: @escaping @Sendable (_ task: URLSessionTask) -> Void = { _ in }
     ) async -> (
         account: String,
         dashboardWidgets: [NCCDashboardWidget]?,
@@ -96,9 +96,9 @@ public extension NextcloudKit {
     func getDashboardWidgetsApplication(_ items: String,
                                         account: String,
                                         options: NKRequestOptions = NKRequestOptions(),
-                                        request: @escaping (DataRequest?) -> Void = { _ in },
-                                        taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-                                        completion: @escaping (_ account: String, _ dashboardApplications: [NCCDashboardApplication]?, _ responseData: AFDataResponse<Data>?, _ error: NKError) -> Void) {
+                                        request: @escaping @Sendable (DataRequest?) -> Void = { _ in },
+                                        taskHandler: @escaping @Sendable (_ task: URLSessionTask) -> Void = { _ in },
+                                        completion: @escaping @Sendable (_ account: String, _ dashboardApplications: [NCCDashboardApplication]?, _ responseData: AFDataResponse<Data>?, _ error: NKError) -> Void) {
         let endpoint = "ocs/v2.php/apps/dashboard/api/v1/widget-items?widgets[]=\(items)"
         guard let nkSession = nkCommonInstance.nksessions.session(forAccount: account),
               let url = nkCommonInstance.createStandardUrl(serverUrl: nkSession.urlBase, endpoint: endpoint),
@@ -140,8 +140,8 @@ public extension NextcloudKit {
     func getDashboardWidgetsApplicationAsync(_ items: String,
                                              account: String,
                                              options: NKRequestOptions = NKRequestOptions(),
-                                             request: @escaping (DataRequest?) -> Void = { _ in },
-                                             taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in }
+                                             request: @escaping @Sendable (DataRequest?) -> Void = { _ in },
+                                             taskHandler: @escaping @Sendable (_ task: URLSessionTask) -> Void = { _ in }
     ) async -> (
         account: String,
         dashboardApplications: [NCCDashboardApplication]?,

@@ -105,7 +105,7 @@ public extension NextcloudKit {
                           method: String,
                           params: [String: String]? = nil,
                           options: NKRequestOptions = NKRequestOptions(),
-                          taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in }
+                          taskHandler: @escaping @Sendable (_ task: URLSessionTask) -> Void = { _ in }
     ) async -> (
         account: String,
         uiResponse: NKClientIntegrationUIResponse?,

@@ -27,8 +27,8 @@ public extension NextcloudKit {
                         shouldLock: Bool,
                         account: String,
                         options: NKRequestOptions = NKRequestOptions(),
-                        taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-                        completion: @escaping (_ account: String, _ responseData: AFDataResponse<Data>?, _ error: NKError) -> Void) {
+                        taskHandler: @escaping @Sendable (_ task: URLSessionTask) -> Void = { _ in },
+                        completion: @escaping @Sendable (_ account: String, _ responseData: AFDataResponse<Data>?, _ error: NKError) -> Void) {
         Task {
             guard let url = serverUrlFileName.encodedToUrl else {
                 return options.queue.async {
@@ -88,7 +88,12 @@ public extension NextcloudKit {
     ///
     /// - Returns: A tuple containing the account, the server response, and any error encountered.
     ///
-    func lockUnlockFile(serverUrlFileName: String, type: NKLockType? = nil, shouldLock: Bool, account: String, options: NKRequestOptions = NKRequestOptions(), taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in }) async throws -> NKLock? {
+    func lockUnlockFile(serverUrlFileName: String,
+                        type: NKLockType? = nil,
+                        shouldLock: Bool,
+                        account: String,
+                        options: NKRequestOptions = NKRequestOptions(),
+                        taskHandler: @escaping @Sendable (_ task: URLSessionTask) -> Void = { _ in }) async throws -> NKLock? {
         try await withCheckedThrowingContinuation { continuation in
             lockUnlockFile(serverUrlFileName: serverUrlFileName, type: type, shouldLock: shouldLock, account: account, options: options, taskHandler: taskHandler) { _, responseData, error in
                 switch error {

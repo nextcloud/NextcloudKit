@@ -40,13 +40,13 @@ struct AlternativeLoginMethodsView: View {
     @State var isPresentingSharedAccounts = false
 
     #if os(iOS)
-    init(sharedAccounts: [SharedAccount], scanHandler: @escaping (Result<ScanResult, ScanError>) -> Void, selectionHandler: @escaping (SharedAccount) -> Void) {
+    init(sharedAccounts: [SharedAccount], scanHandler: @escaping @Sendable (Result<ScanResult, ScanError>) -> Void, selectionHandler: @escaping @Sendable (SharedAccount) -> Void) {
         self.sharedAccounts = sharedAccounts
         self.scanHandler = scanHandler
         self.selectionHandler = selectionHandler
     }
     #else
-    init(sharedAccounts: [SharedAccount], selectionHandler: @escaping (SharedAccount) -> Void) {
+    init(sharedAccounts: [SharedAccount], selectionHandler: @escaping @Sendable (SharedAccount) -> Void) {
         self.sharedAccounts = sharedAccounts
         self.selectionHandler = selectionHandler
     }

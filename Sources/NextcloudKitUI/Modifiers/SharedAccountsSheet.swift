@@ -13,7 +13,7 @@ struct SharedAccountsSheet: ViewModifier {
     var sharedAccounts: [SharedAccount]
     let selectionHandler: (SharedAccount) -> Void
 
-    init(isPresented: Binding<Bool>, sharedAccounts: [SharedAccount], selectionHandler: @escaping (SharedAccount) -> Void) {
+    init(isPresented: Binding<Bool>, sharedAccounts: [SharedAccount], selectionHandler: @escaping @Sendable (SharedAccount) -> Void) {
         self._isPresented = isPresented
         self.sharedAccounts = sharedAccounts
         self.selectionHandler = selectionHandler
@@ -34,7 +34,7 @@ extension View {
     ///
     /// See ``SharedAccountsSheet`` for its implementation.
     ///
-    func sharedAccountsSheet(isPresented: Binding<Bool>, sharedAccounts: [SharedAccount], selectionHandler: @escaping (SharedAccount) -> Void) -> some View {
+    func sharedAccountsSheet(isPresented: Binding<Bool>, sharedAccounts: [SharedAccount], selectionHandler: @escaping @Sendable (SharedAccount) -> Void) -> some View {
         modifier(SharedAccountsSheet(isPresented: isPresented, sharedAccounts: sharedAccounts, selectionHandler: selectionHandler))
     }
 }

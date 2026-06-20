@@ -19,7 +19,9 @@ public extension NextcloudKit {
     /// - completion: A closure returning:
     ///   - NKDownloadLimit?: The current download limit information, or `nil` if not available.
     ///   - NKError: An object representing success or error during the request.
-    func getDownloadLimit(account: String, token: String, completion: @escaping (NKDownloadLimit?, NKError) -> Void) {
+    func getDownloadLimit(account: String,
+                          token: String,
+                          completion: @escaping @Sendable (NKDownloadLimit?, NKError) -> Void) {
         let endpoint = makeEndpoint(with: token)
         let options = NKRequestOptions()
 
@@ -114,7 +116,9 @@ public extension NextcloudKit {
     /// - token: The public share token associated with the file or folder.
     /// - completion: A closure returning:
     ///   - NKError: An object representing the success or failure of the request.
-    func removeShareDownloadLimit(account: String, token: String, completion: @escaping (_ error: NKError) -> Void) {
+    func removeShareDownloadLimit(account: String,
+                                  token: String,
+                                  completion: @escaping @Sendable (_ error: NKError) -> Void) {
         let endpoint = makeEndpoint(with: token)
         let options = NKRequestOptions()
 
@@ -169,7 +173,10 @@ public extension NextcloudKit {
     /// - limit: The new download limit to be set.
     /// - completion: A closure returning:
     ///   - error: An NKError representing the success or failure of the operation.
-    func setShareDownloadLimit(account: String, token: String, limit: Int, completion: @escaping (_ error: NKError) -> Void) {
+    func setShareDownloadLimit(account: String,
+                               token: String,
+                               limit: Int,
+                               completion: @escaping @Sendable (_ error: NKError) -> Void) {
         let endpoint = makeEndpoint(with: token)
         let options = NKRequestOptions()
         guard let nkSession = nkCommonInstance.nksessions.session(forAccount: account),

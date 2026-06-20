@@ -14,7 +14,7 @@ struct SharedAccountsView: View {
 
     let selectionHandler: (SharedAccount) -> Void
 
-    init(sharedAccounts: [SharedAccount], selectionHandler: @escaping (SharedAccount) -> Void) {
+    init(sharedAccounts: [SharedAccount], selectionHandler: @escaping @Sendable (SharedAccount) -> Void) {
         self.selectionHandler = selectionHandler
         self.sharedAccounts = sharedAccounts
     }

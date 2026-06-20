@@ -19,8 +19,8 @@ public extension NextcloudKit {
     /// - completion: Completion handler returning the account, list of group folders, response, and any NKError.
     func getGroupfolders(account: String,
                          options: NKRequestOptions = NKRequestOptions(),
-                         taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-                         completion: @escaping (_ account: String, _ results: [NKGroupfolders]?, _ responseData: AFDataResponse<Data>?, _ error: NKError) -> Void) {
+                         taskHandler: @escaping @Sendable (_ task: URLSessionTask) -> Void = { _ in },
+                         completion: @escaping @Sendable (_ account: String, _ results: [NKGroupfolders]?, _ responseData: AFDataResponse<Data>?, _ error: NKError) -> Void) {
         let endpoint = "index.php/apps/groupfolders/folders?applicable=1"
         guard let nkSession = nkCommonInstance.nksessions.session(forAccount: account),
               let url = nkCommonInstance.createStandardUrl(serverUrl: nkSession.urlBase, endpoint: endpoint),
@@ -64,7 +64,7 @@ public extension NextcloudKit {
     /// - Returns: A tuple containing the account, an optional array of `NKGroupfolders`, the response data, and an `NKError`.
     func getGroupfoldersAsync(account: String,
                               options: NKRequestOptions = NKRequestOptions(),
-                              taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in }
+                              taskHandler: @escaping @Sendable (_ task: URLSessionTask) -> Void = { _ in }
     ) async -> (
         account: String,
         results: [NKGroupfolders]?,

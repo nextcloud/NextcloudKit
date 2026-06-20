@@ -24,8 +24,8 @@ public extension NextcloudKit {
                         password: String,
                         userAgent: String? = nil,
                         options: NKRequestOptions = NKRequestOptions(),
-                        taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-                        completion: @escaping (_ token: String?, _ responseData: AFDataResponse<Data>?, _ error: NKError) -> Void) {
+                        taskHandler: @escaping @Sendable (_ task: URLSessionTask) -> Void = { _ in },
+                        completion: @escaping @Sendable (_ token: String?, _ responseData: AFDataResponse<Data>?, _ error: NKError) -> Void) {
         let endpoint = "ocs/v2.php/core/getapppassword"
         guard let url = self.nkCommonInstance.createStandardUrl(serverUrl: url, endpoint: endpoint) else {
             return options.queue.async { completion(nil, nil, .urlError) }
@@ -73,7 +73,7 @@ public extension NextcloudKit {
                              password: String,
                              userAgent: String? = nil,
                              options: NKRequestOptions = NKRequestOptions(),
-                             taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in }
+                             taskHandler: @escaping @Sendable (_ task: URLSessionTask) -> Void = { _ in }
     ) async -> (
         token: String?,
         responseData: AFDataResponse<Data>?,
@@ -110,8 +110,8 @@ public extension NextcloudKit {
                                onetimeToken: String,
                                userAgent: String? = nil,
                                options: NKRequestOptions = NKRequestOptions(),
-                               taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-                               completion: @escaping (_ token: String?, _ responseData: AFDataResponse<Data>?, _ error: NKError) -> Void) {
+                               taskHandler: @escaping @Sendable (_ task: URLSessionTask) -> Void = { _ in },
+                               completion: @escaping @Sendable (_ token: String?, _ responseData: AFDataResponse<Data>?, _ error: NKError) -> Void) {
         let endpoint = "ocs/v2.php/core/getapppassword-onetime"
         guard let url = self.nkCommonInstance.createStandardUrl(serverUrl: url, endpoint: endpoint) else {
             return options.queue.async { completion(nil, nil, .urlError) }
@@ -159,7 +159,7 @@ public extension NextcloudKit {
                                     onetimeToken: String,
                                     userAgent: String? = nil,
                                     options: NKRequestOptions = NKRequestOptions(),
-                                    taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in }
+                                    taskHandler: @escaping @Sendable (_ task: URLSessionTask) -> Void = { _ in }
     ) async -> (
         token: String?,
         responseData: AFDataResponse<Data>?,
@@ -198,8 +198,8 @@ public extension NextcloudKit {
                            userAgent: String? = nil,
                            account: String,
                            options: NKRequestOptions = NKRequestOptions(),
-                           taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-                           completion: @escaping (_ responseData: AFDataResponse<Data>?, _ error: NKError) -> Void) {
+                           taskHandler: @escaping @Sendable (_ task: URLSessionTask) -> Void = { _ in },
+                           completion: @escaping @Sendable (_ responseData: AFDataResponse<Data>?, _ error: NKError) -> Void) {
         let endpoint = "ocs/v2.php/core/apppassword"
         guard let nkSession = nkCommonInstance.nksessions.session(forAccount: account),
               let url = self.nkCommonInstance.createStandardUrl(serverUrl: serverUrl, endpoint: endpoint) else {
@@ -249,7 +249,7 @@ public extension NextcloudKit {
                                 userAgent: String? = nil,
                                 account: String,
                                 options: NKRequestOptions = NKRequestOptions(),
-                                taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in }
+                                taskHandler: @escaping @Sendable (_ task: URLSessionTask) -> Void = { _ in }
     ) async -> (
         responseData: AFDataResponse<Data>?,
         error: NKError
@@ -277,7 +277,9 @@ public extension NextcloudKit {
     ///
     /// - Returns: A tuple consisting of the `endpoint` to poll for the login status with the `token`. Additionally, the `login` to open for the user to log in.
     ///
-    func getLoginFlowV2(serverUrl: String, options: NKRequestOptions = NKRequestOptions(), taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in }) async throws -> (endpoint: URL, login: URL, token: String) {
+    func getLoginFlowV2(serverUrl: String,
+                        options: NKRequestOptions = NKRequestOptions(),
+                        taskHandler: @escaping @Sendable (_ task: URLSessionTask) -> Void = { _ in }) async throws -> (endpoint: URL, login: URL, token: String) {
         try await withCheckedThrowingContinuation { continuation in
             getLoginFlowV2(serverUrl: serverUrl, options: options, taskHandler: taskHandler) { token, endpointString, loginString, _, error in
                 if error != .success {
@@ -320,8 +322,8 @@ public extension NextcloudKit {
     ///   - error: An `NKError` object representing success or failure of the operation.
     func getLoginFlowV2(serverUrl: String,
                         options: NKRequestOptions = NKRequestOptions(),
-                        taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-                        completion: @escaping (_ token: String?, _ endpoint: String?, _ login: String?, _ responseData: AFDataResponse<Data>?, _ error: NKError) -> Void) {
+                        taskHandler: @escaping @Sendable (_ task: URLSessionTask) -> Void = { _ in },
+                        completion: @escaping @Sendable (_ token: String?, _ endpoint: String?, _ login: String?, _ responseData: AFDataResponse<Data>?, _ error: NKError) -> Void) {
         let endpoint = "index.php/login/v2"
         guard let url = nkCommonInstance.createStandardUrl(serverUrl: serverUrl, endpoint: endpoint) else {
             return options.queue.async { completion(nil, nil, nil, nil, .urlError) }
@@ -359,7 +361,7 @@ public extension NextcloudKit {
     /// - Returns: A tuple containing the login token, polling endpoint, login URL, response data, and any encountered error.
     func getLoginFlowV2Async(serverUrl: String,
                              options: NKRequestOptions = NKRequestOptions(),
-                             taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in }
+                             taskHandler: @escaping @Sendable (_ task: URLSessionTask) -> Void = { _ in }
     ) async -> (
         token: String?,
         endpoint: String?,
@@ -393,8 +395,8 @@ public extension NextcloudKit {
     func getLoginFlowV2Poll(token: String,
                             endpoint: String,
                             options: NKRequestOptions = NKRequestOptions(),
-                            taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-                            completion: @escaping (_ server: String?, _ loginName: String?, _ appPassword: String?, _ responseData: AFDataResponse<Data>?, _ error: NKError) -> Void) {
+                            taskHandler: @escaping @Sendable (_ task: URLSessionTask) -> Void = { _ in },
+                            completion: @escaping @Sendable (_ server: String?, _ loginName: String?, _ appPassword: String?, _ responseData: AFDataResponse<Data>?, _ error: NKError) -> Void) {
         let serverUrl = endpoint + "?token=" + token
         guard let url = serverUrl.asUrl else {
             return options.queue.async { completion(nil, nil, nil, nil, .urlError) }
@@ -434,7 +436,7 @@ public extension NextcloudKit {
     func getLoginFlowV2PollAsync(token: String,
                                  endpoint: String,
                                  options: NKRequestOptions = NKRequestOptions(),
-                                 taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in }
+                                 taskHandler: @escaping @Sendable (_ task: URLSessionTask) -> Void = { _ in }
     ) async -> (
         server: String?,
         loginName: String?,

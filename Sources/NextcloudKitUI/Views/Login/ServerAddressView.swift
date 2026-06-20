@@ -30,7 +30,7 @@ public struct ServerAddressView: View {
     ///     - userAgent: An optional user agent string to override the one used by ``WKWebView``.
     ///     - addAccount: see ``AddAccountHandler``.
     ///
-    public init(backgroundColor: Binding<Color>, brandImage: Image, sharedAccounts: [SharedAccount], userAgent: String? = nil, addAccount: @escaping AddAccountHandler) {
+    public init(backgroundColor: Binding<Color>, brandImage: Image, sharedAccounts: [SharedAccount], userAgent: String? = nil, addAccount: @escaping @Sendable AddAccountHandler) {
         self._backgroundColor = backgroundColor
         self.brandImage = brandImage
         self.sharedAccounts = sharedAccounts

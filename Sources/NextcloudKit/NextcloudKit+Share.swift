@@ -59,8 +59,8 @@ public extension NextcloudKit {
     func readShares(parameters: NKShareParameter,
                     account: String,
                     options: NKRequestOptions = NKRequestOptions(),
-                    taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-                    completion: @escaping (_ account: String, _ shares: [NKShare]?, _ responseData: AFDataResponse<Data>?, _ error: NKError) -> Void) {
+                    taskHandler: @escaping @Sendable (_ task: URLSessionTask) -> Void = { _ in },
+                    completion: @escaping @Sendable (_ account: String, _ shares: [NKShare]?, _ responseData: AFDataResponse<Data>?, _ error: NKError) -> Void) {
         guard let nkSession = nkCommonInstance.nksessions.session(forAccount: account),
               let url = nkCommonInstance.createStandardUrl(serverUrl: nkSession.urlBase, endpoint: parameters.endpoint),
               let headers = nkCommonInstance.getStandardHeaders(account: account, options: options) else {
@@ -107,7 +107,7 @@ public extension NextcloudKit {
     func readSharesAsync(parameters: NKShareParameter,
                          account: String,
                          options: NKRequestOptions = NKRequestOptions(),
-                         taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in }) async -> (account: String, shares: [NKShare]?, responseData: AFDataResponse<Data>?, error: NKError) {
+                         taskHandler: @escaping @Sendable (_ task: URLSessionTask) -> Void = { _ in }) async -> (account: String, shares: [NKShare]?, responseData: AFDataResponse<Data>?, error: NKError) {
 
         await withCheckedContinuation { continuation in
             readShares(
@@ -140,8 +140,8 @@ public extension NextcloudKit {
                        lookup: Bool = false,
                        account: String,
                        options: NKRequestOptions = NKRequestOptions(),
-                       taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-                       completion: @escaping (_ account: String, _ sharees: [NKSharee]?, _ responseData: AFDataResponse<Data>?, _ error: NKError) -> Void) {
+                       taskHandler: @escaping @Sendable (_ task: URLSessionTask) -> Void = { _ in },
+                       completion: @escaping @Sendable (_ account: String, _ sharees: [NKSharee]?, _ responseData: AFDataResponse<Data>?, _ error: NKError) -> Void) {
         let endpoint = "ocs/v2.php/apps/files_sharing/api/v1/sharees"
         var lookupString = "false"
         if lookup {
@@ -310,8 +310,8 @@ public extension NextcloudKit {
                      attributes: String? = nil,
                      account: String,
                      options: NKRequestOptions = NKRequestOptions(),
-                     taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-                     completion: @escaping (_ account: String, _ share: NKShare?, _ responseData: AFDataResponse<Data>?, _ error: NKError) -> Void) {
+                     taskHandler: @escaping @Sendable (_ task: URLSessionTask) -> Void = { _ in },
+                     completion: @escaping @Sendable (_ account: String, _ share: NKShare?, _ responseData: AFDataResponse<Data>?, _ error: NKError) -> Void) {
         let endpoint = "ocs/v2.php/apps/files_sharing/api/v1/shares"
         guard let nkSession = nkCommonInstance.nksessions.session(forAccount: account),
               let url = nkCommonInstance.createStandardUrl(serverUrl: nkSession.urlBase, endpoint: endpoint),
@@ -456,8 +456,8 @@ public extension NextcloudKit {
                      attributes: String? = nil,
                      account: String,
                      options: NKRequestOptions = NKRequestOptions(),
-                     taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-                     completion: @escaping (_ account: String, _ share: NKShare?, _ responseData: AFDataResponse<Data>?, _ error: NKError) -> Void) {
+                     taskHandler: @escaping @Sendable (_ task: URLSessionTask) -> Void = { _ in },
+                     completion: @escaping @Sendable (_ account: String, _ share: NKShare?, _ responseData: AFDataResponse<Data>?, _ error: NKError) -> Void) {
         let endpoint = "ocs/v2.php/apps/files_sharing/api/v1/shares/\(idShare)"
         guard let nkSession = nkCommonInstance.nksessions.session(forAccount: account),
               let url = nkCommonInstance.createStandardUrl(serverUrl: nkSession.urlBase, endpoint: endpoint),
@@ -579,8 +579,8 @@ public extension NextcloudKit {
     func deleteShare(idShare: Int,
                      account: String,
                      options: NKRequestOptions = NKRequestOptions(),
-                     taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-                     completion: @escaping (_ account: String, _ responseData: AFDataResponse<Data>?, _ error: NKError) -> Void) {
+                     taskHandler: @escaping @Sendable (_ task: URLSessionTask) -> Void = { _ in },
+                     completion: @escaping @Sendable (_ account: String, _ responseData: AFDataResponse<Data>?, _ error: NKError) -> Void) {
         let endpoint = "ocs/v2.php/apps/files_sharing/api/v1/shares/\(idShare)"
         guard let nkSession = nkCommonInstance.nksessions.session(forAccount: account),
               let url = nkCommonInstance.createStandardUrl(serverUrl: nkSession.urlBase, endpoint: endpoint),

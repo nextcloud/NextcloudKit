@@ -14,7 +14,7 @@ struct WebSheet: ViewModifier {
     @Binding var initialURL: URL?
     @Binding var isPresented: Bool
 
-    init(initialURL: Binding<URL?>, isPresented: Binding<Bool>, userAgent: String?, onDismiss: @escaping () -> Void) {
+    init(initialURL: Binding<URL?>, isPresented: Binding<Bool>, userAgent: String?, onDismiss: @escaping @Sendable () -> Void) {
         self._initialURL = initialURL
         self._isPresented = isPresented
         self.onDismiss = onDismiss
@@ -43,7 +43,7 @@ extension View {
     ///
     /// See ``WebSheet`` for the implementation.
     ///
-    func webSheet(initialURL: Binding<URL?>, isPresented: Binding<Bool>, userAgent: String?, onDismiss: @escaping () -> Void) -> some View {
+    func webSheet(initialURL: Binding<URL?>, isPresented: Binding<Bool>, userAgent: String?, onDismiss: @escaping @Sendable () -> Void) -> some View {
         modifier(WebSheet(initialURL: initialURL, isPresented: isPresented, userAgent: userAgent, onDismiss: onDismiss))
     }
 }

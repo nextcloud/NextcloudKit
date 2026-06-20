@@ -17,7 +17,7 @@ struct CodeScannerSheet: ViewModifier {
     @Binding var isPresentingCodeScanner: Bool
     let completionHandler: (Result<ScanResult, ScanError>) -> Void
 
-    init(isPresented: Binding<Bool>, _ completionHandler: @escaping (Result<ScanResult, ScanError>) -> Void) {
+    init(isPresented: Binding<Bool>, _ completionHandler: @escaping @Sendable (Result<ScanResult, ScanError>) -> Void) {
         self._isPresentingCodeScanner = isPresented
         self.completionHandler = completionHandler
     }
@@ -40,7 +40,7 @@ extension View {
     ///
     /// See ``CodeScannerSheet`` for its implementation.
     ///
-    func codeScannerSheet(isPresented: Binding<Bool>, _ completionHandler: @escaping (Result<ScanResult, ScanError>) -> Void) -> some View {
+    func codeScannerSheet(isPresented: Binding<Bool>, _ completionHandler: @escaping @Sendable (Result<ScanResult, ScanError>) -> Void) -> some View {
         modifier(CodeScannerSheet(isPresented: isPresented, completionHandler))
     }
 }

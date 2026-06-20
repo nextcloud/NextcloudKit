@@ -23,10 +23,10 @@ public extension NextcloudKit {
                   fileNameLocalPath: String,
                   account: String,
                   options: NKRequestOptions = NKRequestOptions(),
-                  requestHandler: @escaping (_ request: DownloadRequest) -> Void = { _ in },
-                  taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-                  progressHandler: @escaping (_ progress: Progress) -> Void = { _ in },
-                  completionHandler: @escaping (_ account: String, _ response: AFDownloadResponse<URL?>?, _ nKError: NKError) -> Void) {
+                  requestHandler: @escaping @Sendable (_ request: DownloadRequest) -> Void = { _ in },
+                  taskHandler: @escaping @Sendable (_ task: URLSessionTask) -> Void = { _ in },
+                  progressHandler: @escaping @Sendable (_ progress: Progress) -> Void = { _ in },
+                  completionHandler: @escaping @Sendable (_ account: String, _ response: AFDownloadResponse<URL?>?, _ nKError: NKError) -> Void) {
         var convertible: URLConvertible?
         if serverUrlFileName is URL {
             convertible = serverUrlFileName as? URLConvertible
@@ -83,9 +83,9 @@ public extension NextcloudKit {
                        fileNameLocalPath: String,
                        account: String,
                        options: NKRequestOptions = NKRequestOptions(),
-                       requestHandler: @escaping (_ request: DownloadRequest) -> Void = { _ in },
-                       taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-                       progressHandler: @escaping (_ progress: Progress) -> Void = { _ in }
+                       requestHandler: @escaping @Sendable (_ request: DownloadRequest) -> Void = { _ in },
+                       taskHandler: @escaping @Sendable (_ task: URLSessionTask) -> Void = { _ in },
+                       progressHandler: @escaping @Sendable (_ progress: Progress) -> Void = { _ in }
     ) async -> (
         account: String,
         response: AFDownloadResponse<URL?>?,

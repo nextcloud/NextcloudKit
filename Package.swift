@@ -30,7 +30,7 @@ let package = Package(
         .package(url: "https://github.com/SwiftyJSON/SwiftyJSON", .upToNextMajor(from: "5.0.2")),
         .package(url: "https://github.com/yahoojapan/SwiftyXMLParser", .upToNextMajor(from: "5.6.0")),
         .package(url: "https://github.com/twostraws/CodeScanner.git", .upToNextMajor(from: "2.5.2")),
-        .package(url: "https://github.com/SimplyDanny/SwiftLintPlugins", from: "0.63.2"),
+        .package(url: "https://github.com/SimplyDanny/SwiftLintPlugins", from: "0.63.3"),
     ],
     targets: [
         .target(

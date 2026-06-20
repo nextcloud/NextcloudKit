@@ -17,8 +17,8 @@ public extension NextcloudKit {
     func getHovercard(for userId: String,
                       account: String,
                       options: NKRequestOptions = NKRequestOptions(),
-                      taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-                      completion: @escaping (_ account: String, _ result: NKHovercard?, _ responseData: AFDataResponse<Data>?, _ error: NKError) -> Void) {
+                      taskHandler: @escaping @Sendable (_ task: URLSessionTask) -> Void = { _ in },
+                      completion: @escaping @Sendable (_ account: String, _ result: NKHovercard?, _ responseData: AFDataResponse<Data>?, _ error: NKError) -> Void) {
         let endpoint = "ocs/v2.php/hovercard/v1/\(userId)"
         guard let nkSession = nkCommonInstance.nksessions.session(forAccount: account),
               let url = nkCommonInstance.createStandardUrl(serverUrl: nkSession.urlBase, endpoint: endpoint),
@@ -59,7 +59,7 @@ public extension NextcloudKit {
     func getHovercardAsync(for userId: String,
                            account: String,
                            options: NKRequestOptions = NKRequestOptions(),
-                           taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in }
+                           taskHandler: @escaping @Sendable (_ task: URLSessionTask) -> Void = { _ in }
     ) async -> (
         account: String,
         result: NKHovercard?,

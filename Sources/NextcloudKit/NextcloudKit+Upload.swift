@@ -39,10 +39,10 @@ public extension NextcloudKit {
                 autoMkcol: Bool = false,
                 account: String,
                 options: NKRequestOptions = NKRequestOptions(),
-                requestHandler: @escaping (_ request: UploadRequest) -> Void = { _ in },
-                taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-                progressHandler: @escaping (_ progress: Progress) -> Void = { _ in },
-                completionHandler: @escaping (_ account: String, _ response: AFDataResponse<Data>?, _ nkError: NKError) -> Void) {
+                requestHandler: @escaping @Sendable (_ request: UploadRequest) -> Void = { _ in },
+                taskHandler: @escaping @Sendable (_ task: URLSessionTask) -> Void = { _ in },
+                progressHandler: @escaping @Sendable (_ progress: Progress) -> Void = { _ in },
+                completionHandler: @escaping @Sendable (_ account: String, _ response: AFDataResponse<Data>?, _ nkError: NKError) -> Void) {
         var convertible: URLConvertible?
 
         if serverUrlFileName is URL {
@@ -112,9 +112,9 @@ public extension NextcloudKit {
                      autoMkcol: Bool = false,
                      account: String,
                      options: NKRequestOptions = NKRequestOptions(),
-                     requestHandler: @escaping (_ request: UploadRequest) -> Void = { _ in },
-                     taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-                     progressHandler: @escaping (_ progress: Progress) -> Void = { _ in }
+                     requestHandler: @escaping @Sendable (_ request: UploadRequest) -> Void = { _ in },
+                     taskHandler: @escaping @Sendable (_ task: URLSessionTask) -> Void = { _ in },
+                     progressHandler: @escaping @Sendable (_ progress: Progress) -> Void = { _ in }
     ) async -> (
         account: String,
         response: AFDataResponse<Data>?,
@@ -210,12 +210,12 @@ public extension NextcloudKit {
                           chunkSize: Int,
                           account: String,
                           options: NKRequestOptions = NKRequestOptions(),
-                          chunkProgressHandler: @escaping (_ total: Int, _ counter: Int) -> Void = { _, _ in },
-                          uploadStart: @escaping (_ filesChunk: [(fileName: String, size: Int64)]) -> Void = { _ in },
-                          uploadTaskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-                          uploadProgressHandler: @escaping (_ totalBytesExpected: Int64, _ totalBytes: Int64, _ fractionCompleted: Double) -> Void = { _, _, _ in },
-                          uploaded: @escaping (_ fileChunk: (fileName: String, size: Int64)) -> Void = { _ in },
-                          assembling: @escaping () -> Void = { }
+                          chunkProgressHandler: @escaping @Sendable (_ total: Int, _ counter: Int) -> Void = { _, _ in },
+                          uploadStart: @escaping @Sendable (_ filesChunk: [(fileName: String, size: Int64)]) -> Void = { _ in },
+                          uploadTaskHandler: @escaping @Sendable (_ task: URLSessionTask) -> Void = { _ in },
+                          uploadProgressHandler: @escaping @Sendable (_ totalBytesExpected: Int64, _ totalBytes: Int64, _ fractionCompleted: Double) -> Void = { _, _, _ in },
+                          uploaded: @escaping @Sendable (_ fileChunk: (fileName: String, size: Int64)) -> Void = { _ in },
+                          assembling: @escaping @Sendable () -> Void = { }
     ) async throws -> (account: String, file: NKFile?) {
         // Resolve session
         guard let nkSession = nkCommonInstance.nksessions.session(forAccount: account) else {
