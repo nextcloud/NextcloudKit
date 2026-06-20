@@ -111,4 +111,3 @@ public actor NKOperationHandle {
         return request != nil || task != nil
     }
 }
-

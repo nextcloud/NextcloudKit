@@ -118,7 +118,7 @@ public extension NextcloudKit {
 
         let httpMethod = HTTPMethod(rawValue: method.uppercased())
 
-        var queryParams: [String: Any]? = nil
+        var queryParams: [String: Any]?
         if let params = params {
             var qp: [String: Any] = [:]
             for (key, value) in params {
@@ -173,4 +173,3 @@ public extension NextcloudKit {
         }
     }
 }
-

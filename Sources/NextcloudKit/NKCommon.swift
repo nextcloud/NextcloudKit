@@ -26,8 +26,8 @@ public protocol NextcloudKitDelegate: AnyObject, Sendable {
 
     func downloadingFinish(_ session: URLSession, downloadTask: URLSessionDownloadTask, didFinishDownloadingTo location: URL)
 
-    func downloadComplete(fileName: String, serverUrl: String, allHeaderFields: [AnyHashable : Any]?, task: URLSessionTask, error: NKError)
-    func uploadComplete(fileName: String, serverUrl: String, allHeaderFields: [AnyHashable : Any]?, task: URLSessionTask, error: NKError)
+    func downloadComplete(fileName: String, serverUrl: String, allHeaderFields: [AnyHashable: Any]?, task: URLSessionTask, error: NKError)
+    func uploadComplete(fileName: String, serverUrl: String, allHeaderFields: [AnyHashable: Any]?, task: URLSessionTask, error: NKError)
 }
 
 public extension NextcloudKitDelegate {
