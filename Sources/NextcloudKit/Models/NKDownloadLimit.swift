@@ -24,10 +24,4 @@ public struct NKDownloadLimit: Sendable {
     /// The token identifying the related share.
     ///
     public let token: String
-
-    init(count: Int, limit: Int, token: String) {
-        self.count = count
-        self.limit = limit
-        self.token = token
-    }
 }
