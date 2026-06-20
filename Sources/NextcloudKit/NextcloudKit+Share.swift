@@ -470,13 +470,13 @@ public extension NextcloudKit {
         ]
 
         parameters["password"] = password != nil ? password : ""
-        
+
         parameters["expireDate"] = expireDate != nil ? expireDate : ""
 
         if let note {
             parameters["note"] = note
         }
-        
+
         if let label {
             parameters["label"] = label
         }

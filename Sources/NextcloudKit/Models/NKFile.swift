@@ -145,7 +145,7 @@ public struct NKFile: Sendable {
         livePhotoFile: String = "",
         isFlaggedAsLivePhotoByServer: Bool = false,
         datePhotosOriginal: Date? = nil,
-        exifPhotos: [[String : String?]] = .init(),
+        exifPhotos: [[String: String?]] = .init(),
         placePhotos: String? = nil,
         typeIdentifier: String = "") {
 

@@ -234,13 +234,13 @@ public extension NextcloudKit {
     ///   - taskHandler: Callback for monitoring the URLSessionTask.
     /// - Returns: A tuple containing the account, response data, and NKError.
     func subscribingPushProxyAsync(proxyServerUrl: String,
-                                    pushToken: String,
-                                    deviceIdentifier: String,
-                                    signature: String,
-                                    publicKey: String,
-                                    account: String,
-                                    options: NKRequestOptions = NKRequestOptions(),
-                                    taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in }
+                                   pushToken: String,
+                                   deviceIdentifier: String,
+                                   signature: String,
+                                   publicKey: String,
+                                   account: String,
+                                   options: NKRequestOptions = NKRequestOptions(),
+                                   taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in }
     ) async -> (
         account: String,
         responseData: AFDataResponse<Data>?,

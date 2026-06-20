@@ -77,7 +77,7 @@ public extension NextcloudKit {
         await withUnsafeContinuation { continuation in
             getCapabilities(account: account,
                             options: options,
-                            taskHandler: taskHandler) { account, capabilities,responseData, error in
+                            taskHandler: taskHandler) { account, capabilities, responseData, error in
                 continuation.resume(returning: (account, capabilities, responseData, error))
             }
         }
@@ -89,7 +89,8 @@ public extension NextcloudKit {
     ///   - data: The raw JSON data returned from the capabilities endpoint.
     /// - Returns: A fully populated `NCCapabilities.Capabilities` object.
     /// - Throws: An error if decoding fails or data is missing.
-    func setCapabilitiesAsync(account: String, data: Data? = nil) async throws -> NKCapabilities.Capabilities {
+    func setCapabilitiesAsync(account: String,
+                              data: Data? = nil) async throws -> NKCapabilities.Capabilities {
         guard let jsonData = data else {
             throw NSError(domain: "SetCapabilities", code: 0, userInfo: [NSLocalizedDescriptionKey: "Missing JSON data"])
         }

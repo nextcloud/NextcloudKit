@@ -220,10 +220,10 @@ public extension NextcloudKit {
     ///   - taskHandler: Optional monitoring of the underlying task.
     /// - Returns: A tuple with account, resulting URL (if successful), raw response, and error result.
     func createRichdocumentsAsync(path: String,
-                                   templateId: String,
-                                   account: String,
-                                   options: NKRequestOptions = NKRequestOptions(),
-                                   taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in }
+                                  templateId: String,
+                                  account: String,
+                                  options: NKRequestOptions = NKRequestOptions(),
+                                  taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in }
     ) async -> (
         account: String,
         url: String?,

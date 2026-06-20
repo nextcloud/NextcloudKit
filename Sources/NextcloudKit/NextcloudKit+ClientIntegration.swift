@@ -20,14 +20,14 @@ public extension NextcloudKit {
     /// - taskHandler: Callback for observing the underlying URLSessionTask.
     /// - completion: Returns the token string (if any), raw response data, and NKError result.
     internal func sendRequest(account: String,
-                     fileId: String,
-                     filePath: String,
-                     url: String,
-                     method: String,
-                     params: [String: String]? = nil,
-                     options: NKRequestOptions = NKRequestOptions(),
-                     taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-                     completion: @escaping (_ token: String?, _ uiResponse: NKClientIntegrationUIResponse?, _ responseData: AFDataResponse<Data>?, _ error: NKError) -> Void) {
+                              fileId: String,
+                              filePath: String,
+                              url: String,
+                              method: String,
+                              params: [String: String]? = nil,
+                              options: NKRequestOptions = NKRequestOptions(),
+                              taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
+                              completion: @escaping (_ token: String?, _ uiResponse: NKClientIntegrationUIResponse?, _ responseData: AFDataResponse<Data>?, _ error: NKError) -> Void) {
 
 //        guard let nkSession = nkCommonInstance.nksessions.session(forAccount: account),
 //              let headers = nkCommonInstance.getStandardHeaders(account: account, options: options) else {

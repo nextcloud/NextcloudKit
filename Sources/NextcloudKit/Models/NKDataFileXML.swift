@@ -277,7 +277,11 @@ public class NKDataFileXML: NSObject {
         return xml["ocs", "data", "apppassword"].text
     }
 
-    func convertDataFile(xmlData: Data, nkSession: NKSession, rootFileName: String, showHiddenFiles: Bool, includeHiddenFiles: [String]) async -> [NKFile] {
+    func convertDataFile(xmlData: Data,
+                         nkSession: NKSession,
+                         rootFileName: String,
+                         showHiddenFiles: Bool,
+                         includeHiddenFiles: [String]) async -> [NKFile] {
         var files: [NKFile] = []
         let rootFiles = "/" + nkSession.dav + "/files/"
         guard let baseUrl = self.nkCommonInstance.getHostName(urlString: nkSession.urlBase) else {
@@ -333,7 +337,7 @@ public class NKDataFileXML: NSObject {
             let propstat = element["d:propstat"][0]
 
             if let getlastmodified = propstat["d:prop", "d:getlastmodified"].text,
-               let date = getlastmodified.parsedDate(using: "EEE, dd MMM y HH:mm:ss zzz") { 
+               let date = getlastmodified.parsedDate(using: "EEE, dd MMM y HH:mm:ss zzz") {
                 file.date = date
             }
 

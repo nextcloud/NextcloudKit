@@ -61,16 +61,16 @@ public extension NextcloudKit {
                 taskHandler(task)
             }.responseData(queue: self.nkCommonInstance.backgroundQueue) { response in
                 switch response.result {
-                    case .failure(let error):
-                        let error = NKError(error: error, afResponse: response, responseData: response.data)
+                case .failure(let error):
+                    let error = NKError(error: error, afResponse: response, responseData: response.data)
 
-                        options.queue.async {
-                            completion(account, response, error)
-                        }
-                    case .success:
-                        options.queue.async {
-                            completion(account, response, .success)
-                        }
+                    options.queue.async {
+                        completion(account, response, error)
+                    }
+                case .success:
+                    options.queue.async {
+                        completion(account, response, .success)
+                    }
                 }
             }
         }
@@ -92,15 +92,15 @@ public extension NextcloudKit {
         try await withCheckedThrowingContinuation { continuation in
             lockUnlockFile(serverUrlFileName: serverUrlFileName, type: type, shouldLock: shouldLock, account: account, options: options, taskHandler: taskHandler) { _, responseData, error in
                 switch error {
-                    case .success:
-                        if let data = responseData?.data,
-                           let lock = NKLock(data: data) {
-                            continuation.resume(returning: lock)
-                            return
-                        }
-                        continuation.resume(returning: nil)
-                    default:
-                        continuation.resume(throwing: error)
+                case .success:
+                    if let data = responseData?.data,
+                        let lock = NKLock(data: data) {
+                        continuation.resume(returning: lock)
+                        return
+                    }
+                    continuation.resume(returning: nil)
+                default:
+                    continuation.resume(throwing: error)
                 }
             }
         }

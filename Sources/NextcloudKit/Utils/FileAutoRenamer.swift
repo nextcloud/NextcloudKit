@@ -21,7 +21,7 @@ public final class FileAutoRenamer: Sendable {
         if !capabilities.shouldEnforceWindowsCompatibleFilenames {
             return filename
         }
-        
+
         var pathSegments = filename.split(separator: "/", omittingEmptySubsequences: false).map { String($0) }
         var mutableForbiddenFileNameCharacters = self.forbiddenFileNameCharacters
 

@@ -8,7 +8,6 @@ import SwiftyJSON
 
 public extension NextcloudKit {
 
-
     /// Performs a unified search using multiple providers and returns results asynchronously.
     ///
     /// - Parameters:
@@ -229,4 +228,3 @@ public class NKSearchProvider: NSObject {
         return allProvider.compactMap(NKSearchProvider.init)
     }
 }
-

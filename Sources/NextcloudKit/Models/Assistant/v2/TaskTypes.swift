@@ -31,7 +31,6 @@ public struct TaskTypes: Codable {
 public struct TaskTypeData: Codable {
     public typealias TaskInputShape = [String: Shape]
     public typealias TaskOutputShape = [String: Shape]
-    
     public var id: String?
     public let name: String?
     public let description: String?

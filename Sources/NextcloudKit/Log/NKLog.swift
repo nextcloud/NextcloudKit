@@ -65,6 +65,6 @@ public func nkLog(cancel message: String, minimumLogLevel: NKLogLevel = .compact
 ///   - minimumLogLevel: set the minimun level for write the message
 ///   - consoleOnly: if true write the messa only in console
 @inlinable
-public func nkLog(tag: String, emoji: NKLogTagEmoji  = .debug, message: String, minimumLogLevel: NKLogLevel = .compact, consoleOnly: Bool = false) {
+public func nkLog(tag: String, emoji: NKLogTagEmoji = .debug, message: String, minimumLogLevel: NKLogLevel = .compact, consoleOnly: Bool = false) {
     NKLogFileManager.shared.writeLog(tag: tag, emoji: emoji, message: message, minimumLogLevel: minimumLogLevel, consoleOnly: consoleOnly)
 }

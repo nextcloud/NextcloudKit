@@ -128,10 +128,10 @@ public extension NextcloudKit {
     ///   - taskHandler: Closure to access the URLSessionTask.
     /// - Returns: A tuple with named values: account, raw response, and error.
     func generalWithEndpointAsync(_ endpoint: String,
-                                   account: String,
-                                   method: String,
-                                   options: NKRequestOptions = NKRequestOptions(),
-                                   taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in }
+                                  account: String,
+                                  method: String,
+                                  options: NKRequestOptions = NKRequestOptions(),
+                                  taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in }
     ) async -> (
         account: String,
         responseData: AFDataResponse<Data>?,
@@ -1134,10 +1134,12 @@ public extension NextcloudKit {
         let endpoint = "index.php/core/wipe/success"
         let parameters: [String: Any] = ["token": token]
         guard let url = nkCommonInstance.createStandardUrl(serverUrl: serverUrl, endpoint: endpoint) else {
-            return options.queue.async { completion(account, nil, .urlError) }
+            return options.queue.async {
+                completion(account, nil, .urlError)
+            }
         }
         var headers: HTTPHeaders = [
-            "Content-Type": "application/json",
+            "Content-Type": "application/json"
         ]
         if let userAgent = options.customUserAgent {
             headers.add(.userAgent(userAgent))

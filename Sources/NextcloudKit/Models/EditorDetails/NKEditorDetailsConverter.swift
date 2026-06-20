@@ -18,7 +18,7 @@ public enum NKEditorDetailsConverter {
         if NKLogFileManager.shared.logLevel == .verbose {
             data.printJson()
         }
-        
+
         return (editors, creators)
     }
 }

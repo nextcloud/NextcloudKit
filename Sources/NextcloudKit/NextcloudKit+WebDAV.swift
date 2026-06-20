@@ -61,9 +61,9 @@ public extension NextcloudKit {
     /// - Parameters: Same as the sync version.
     /// - Returns: A tuple with account, optional ocId, optional date, responseData, and NKError.
     func createFolderAsync(serverUrlFileName: String,
-                          account: String,
-                          options: NKRequestOptions = NKRequestOptions(),
-                          taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in }
+                           account: String,
+                           options: NKRequestOptions = NKRequestOptions(),
+                           taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in }
     ) async -> (
         account: String,
         ocId: String?,

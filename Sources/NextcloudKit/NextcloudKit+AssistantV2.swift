@@ -16,9 +16,9 @@ public extension NextcloudKit {
     ///   - taskHandler: Optional closure to access the URLSessionTask.
     /// - Returns: A tuple with named values for account, supported types, response, and error.
     func textProcessingGetTypesV2(account: String,
-                                supportedTaskType: String = "Text",
-                                options: NKRequestOptions = NKRequestOptions(),
-                                taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in }
+                                  supportedTaskType: String = "Text",
+                                  options: NKRequestOptions = NKRequestOptions(),
+                                  taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in }
     ) async -> (
         account: String,
         types: [TaskTypeData]?,
@@ -80,10 +80,10 @@ public extension NextcloudKit {
     ///   - taskHandler: Optional closure to access the underlying URLSessionTask.
     /// - Returns: A tuple with named values for account, scheduled task, response, and error.
     func textProcessingScheduleV2(input: String,
-                                taskType: TaskTypeData,
-                                account: String,
-                                options: NKRequestOptions = NKRequestOptions(),
-                                taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in }
+                                  taskType: TaskTypeData,
+                                  account: String,
+                                  options: NKRequestOptions = NKRequestOptions(),
+                                  taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in }
     ) async -> (
         account: String,
         task: AssistantTask?,
@@ -184,9 +184,9 @@ public extension NextcloudKit {
     ///   - taskHandler: Optional closure to access the underlying URLSessionTask.
     /// - Returns: A tuple with named values for account, response, and error.
     func textProcessingDeleteTaskV2(taskId: Int64,
-                                  account: String,
-                                  options: NKRequestOptions = NKRequestOptions(),
-                                  taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in }
+                                    account: String,
+                                    options: NKRequestOptions = NKRequestOptions(),
+                                    taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in }
     ) async -> (
         account: String,
         responseData: AFDataResponse<Data>?,

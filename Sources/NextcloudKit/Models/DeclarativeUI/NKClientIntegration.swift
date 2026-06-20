@@ -62,4 +62,3 @@ public struct ContextMenuAction: Codable {
         case mimetypeFilters = "mimetype_filters"
     }
 }
-

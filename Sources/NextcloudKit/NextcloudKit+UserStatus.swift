@@ -117,7 +117,6 @@ public extension NextcloudKit {
         }
     }
 
-
     /// Sets the current user status on the Nextcloud server.
     ///
     /// Parameters:

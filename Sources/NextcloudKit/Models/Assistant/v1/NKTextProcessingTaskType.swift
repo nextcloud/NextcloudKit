@@ -34,5 +34,3 @@ public class NKTextProcessingTaskType {
         return TaskTypes(types: types)
     }
 }
-
-
