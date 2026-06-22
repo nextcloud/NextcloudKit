@@ -34,16 +34,10 @@ let package = Package(
     targets: [
         .target(
             name: "NextcloudKit",
-            dependencies: ["Alamofire", "SwiftyJSON", "SwiftyXMLParser"],
-            swiftSettings: [
-                .enableUpcomingFeature("StrictConcurrency")
-            ]),
+            dependencies: ["Alamofire", "SwiftyJSON", "SwiftyXMLParser"]),
         .target(
             name: "NextcloudKitUI",
-            dependencies: ["NextcloudKit", "CodeScanner"],
-            swiftSettings: [
-                .enableUpcomingFeature("StrictConcurrency")
-            ]),
+            dependencies: ["NextcloudKit", "CodeScanner"]),
         .testTarget(
             name: "NextcloudKitUnitTests",
             dependencies: ["NextcloudKit", "Mocker"],
