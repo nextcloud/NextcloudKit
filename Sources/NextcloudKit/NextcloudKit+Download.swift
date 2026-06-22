@@ -43,6 +43,7 @@ public extension NextcloudKit {
         let destinationFile: DownloadRequest.Destination = { _, _ in
             return (fileNamePathLocalDestinationURL, [.removePreviousFile, .createIntermediateDirectories])
         }
+        let destinationURL = URL(fileURLWithPath: fileNameLocalPath)
         destination = destinationFile
 
         let request = nkSession.sessionData.download(url, method: .get, encoding: URLEncoding.default, headers: headers, interceptor: NKInterceptor(nkCommonInstance: nkCommonInstance), to: destination).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
@@ -51,8 +52,17 @@ public extension NextcloudKit {
         } .downloadProgress { progress in
             options.queue.async { progressHandler(progress) }
         } .response(queue: self.nkCommonInstance.backgroundQueue) { response in
+            let nkError = self.evaluateDownloadResponse(response)
+
+            // A failed HTTP response can still have been downloaded and moved to the final path.
+            // Remove it so XML/HTML/server-error payloads are not cached as valid media files.
+
+            if nkError != .success {
+                try? FileManager.default.removeItem(at: destinationURL)
+            }
+
             options.queue.async {
-                completionHandler(account, response, self.evaluateDownloadResponse(response))
+                completionHandler(account, response, nkError)
             }
         }
 

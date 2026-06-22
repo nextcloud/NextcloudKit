@@ -22,19 +22,24 @@ struct WebSheet: ViewModifier {
     }
 
     func body(content: Content) -> some View {
+        #if os(iOS)
+        content.fullScreenCover(isPresented: $isPresented, onDismiss: onDismiss) {
+            WebView(initialURL: $initialURL, userAgent: userAgent)
+                .ignoresSafeArea()
+        }
+        #else
         content.sheet(isPresented: $isPresented, onDismiss: onDismiss) {
             WebView(initialURL: $initialURL, userAgent: userAgent)
                 .ignoresSafeArea()
-                #if os(macOS)
                 .frame(minWidth: 800, minHeight: 800)
-                #endif
         }
+        #endif
     }
 }
 
 extension View {
     ///
-    /// Present a ``WebView`` in a sheet.
+    /// Present a ``WebView`` full screen (a sheet on macOS, where full screen covers are unavailable).
     ///
     /// See ``WebSheet`` for the implementation.
     ///
