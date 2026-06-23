@@ -32,85 +32,103 @@ public struct UnifiedShareEditView: View {
     }
 
     public var body: some View {
-        VStack(alignment: .leading, spacing: 24) {
+        ZStack {
             switch model.state {
                 case .loading:
                     ProgressView()
                 case .shareUpdated(let share):
-                    Text(String(localized: "Share \(fileName)"))
-                        .font(.title)
-                    //                .foregroundStyle(.primary)
+                    Form {
+//                        VStack(alignment: .leading, spacing: 24) {
+                        Section {
+                            Text(String(localized: "Share \(fileName)"))
+                                .font(.title)
+                            //                .foregroundStyle(.primary)
 
-                    shareeTypePicker
+                        }
 
-                    //            VStack(spacing: 18) {
-                    if shareeType == .invited {
-                        TextField(
-                            String(localized: "Add people"),
-                            text: $recipients
-                        )
-                        .textFieldStyle(.roundedBorder)
-                        .onChange(of: recipients) {
-                            model.searchRecipients(query: recipients)
-                        }
-                        // Measure the field so the dropdown can sit just beneath it.
-                        .background {
-                            GeometryReader { proxy in
-                                Color.clear
-                                    .onAppear { addPeopleFieldHeight = proxy.size.height }
-                                    .onChange(of: proxy.size.height) { addPeopleFieldHeight = proxy.size.height }
+                        Section {
+                            shareeTypePicker
+
+                            //            VStack(spacing: 18) {
+                            if shareeType == .invited && share.recipients.isEmpty {
+                                TextField(
+                                    String(localized: "Add people"),
+                                    text: $recipients
+                                )
+                                .onChange(of: recipients) {
+                                    model.searchRecipients(query: recipients)
+                                }
+                                // Measure the field so the dropdown can sit just beneath it.
+                                .background {
+                                    GeometryReader { proxy in
+                                        Color.clear
+                                            .onAppear { addPeopleFieldHeight = proxy.size.height }
+                                            .onChange(of: proxy.size.height) { addPeopleFieldHeight = proxy.size.height }
+                                    }
+                                }
+                                .overlay(alignment: .topLeading) {
+//                                    if !model.recipientResults.isEmpty {
+                                        recipientDropdown
+                                            .offset(y: 30 + 4)
+
+//                                    }
+                                }
+                                .zIndex(1)
+                            } else if let recipient = share.recipients.first {
+                                Text(recipient.displayName)
                             }
+
+                            permissionField
                         }
-                        // Float the suggestions just below the field, overlaying the
-                        // rest of the form instead of pushing it down.
-                        .overlay(alignment: .topLeading) {
-                            if !model.recipientResults.isEmpty {
-                                recipientDropdown
-                                    .offset(y: addPeopleFieldHeight + 4)
-                            }
-                        }
-                        .zIndex(1)
+                            settingsRow
+
+                            TextField(
+                                String(localized: "Note to recipients"),
+                                text: $note,
+                                axis: .vertical
+                            )
+
+                            actionButtons
+//                        }
+
                     }
-
-                    permissionField
-                    settingsRow
-
-                    TextField(
-                        String(localized: "Note to recipients"),
-                        text: $note,
-                        axis: .vertical
-                    )
-                    .textFieldStyle(.roundedBorder)
-
-                    actionButtons
+////                    .padding(.horizontal, 26)
+//                    .padding(.top, 10)
+                    .onDisappear {
+                        model.deleteShare(share: share)
+                    }
+                    .navigationTitle("Share")
 
                 case .error(let error):
                     Text(error.localizedDescription)
             }
-
+            
             //            }
-
+            
+            
         }
-        .padding(.horizontal, 26)
-        .padding(.top, 10)
         .onAppear {
-            model.createShare()
+//            model.createShare()
         }
-    }
+
+        Spacer()
+}
 
     private var shareeTypePicker: some View {
         Picker("", selection: $shareeType) {
-            Text(String(localized: "Invited"))
+            Text(String(localized: "Invited People"))
                 .tag(ShareeType.invited)
 
             Text(String(localized: "Anyone"))
                 .tag(ShareeType.anyone)
         }
         .pickerStyle(.segmented)
+        .listRowSeparator(.hidden)
+
     }
 
     private var permissionField: some View {
-        LabeledContent(String(localized: shareeType == .anyone ? "Anyone with the link" : "Participants")) {
+//        LabeledContent(String(localized: shareeType == .anyone ? "Anyone with the link" : "Participants")) {
             Picker(String(localized: "Participants"), selection: $permission) {
                 ForEach(Permission.allCases) { permission in
                     Text(permission.localizedTitle)
@@ -118,7 +136,7 @@ public struct UnifiedShareEditView: View {
                 }
             }
             .pickerStyle(.menu)
-        }
+//        }
     }
 
     private var settingsRow: some View {

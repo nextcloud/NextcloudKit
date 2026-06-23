@@ -55,5 +55,23 @@ public class UnifiedShareEditModel {
             recipientResults = result.recipients ?? []
         }
     }
+
+    func deleteShare(share: NKUnifiedShare) {
+        Task {
+            await NextcloudKit.shared.deleteUnifiedShare(id: share.id, account: account)
+        }
+    }
+
+    func updateShare(share: NKUnifiedShare, recipient: NKUnifiedShareRecipient) {
+        Task {
+            let result = await NextcloudKit.shared.addUnifiedShareRecipient(id: share.id, recipientClass: recipient.class, value: recipient.value, account: account)
+            guard let share = result.share else {
+                state = .error(result.error)
+                return
+            }
+
+            state = .shareUpdated(share: share)
+        }
+    }
 }
 

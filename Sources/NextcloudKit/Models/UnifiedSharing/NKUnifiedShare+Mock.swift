@@ -27,13 +27,13 @@ public extension NKUnifiedShare {
                 )
             ],
             recipients: [
-                NKUnifiedShareRecipient(
-                    class: "user",
-                    value: "bob",
-                    instance: nil,
-                    displayName: "Bob",
-                    icon: NKUnifiedShareIcon(svg: "<svg/>", light: nil, dark: nil)
-                )
+//                NKUnifiedShareRecipient(
+//                    class: "user",
+//                    value: "bob",
+//                    instance: nil,
+//                    displayName: "Bob",
+//                    icon: NKUnifiedShareIcon(svg: "<svg/>", light: nil, dark: nil)
+//                )
             ],
             properties: [
                 NKUnifiedSharePropertyDate(
