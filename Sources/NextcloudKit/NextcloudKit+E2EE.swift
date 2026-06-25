@@ -802,7 +802,7 @@ public extension NextcloudKit {
         }
     }
 
-    /// Deletes the currently stored E2EE public certificate from the Nextcloud server.
+    /// Deletes the currently stored E2EE public key from the Nextcloud server.
     /// This is typically used during key revocation or reinitialization of E2EE.
     /// The request targets the `public-key` endpoint with the HTTP DELETE method.
     ///
@@ -811,10 +811,10 @@ public extension NextcloudKit {
     ///   - options: request configuration, including the optional E2EE API version specified by `options.version` v1/v2.
     ///   - taskHandler: Closure to access the URLSessionTask.
     ///   - completion: Completion handler returning the account, raw response, and NKError.
-    func deleteE2EECertificate(account: String,
-                               options: NKRequestOptions = NKRequestOptions(),
-                               taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-                               completion: @escaping (_ account: String, _ responseData: AFDataResponse<Data>?, _ error: NKError) -> Void) {
+    func deleteE2EEPublicKey(account: String,
+                             options: NKRequestOptions = NKRequestOptions(),
+                             taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
+                             completion: @escaping (_ account: String, _ responseData: AFDataResponse<Data>?, _ error: NKError) -> Void) {
         var version = "v2"
         if let optionsVesion = options.version {
             version = optionsVesion
@@ -839,22 +839,22 @@ public extension NextcloudKit {
         }
     }
 
-    /// Asynchronously deletes the E2EE public certificate from the server for the given account.
+    /// Asynchronously deletes the E2EE public key from the server for the given account.
     /// - Parameters:
     ///   - account: The Nextcloud account to remove the certificate from.
     ///   - options: request configuration, including the optional E2EE API version specified by `options.version` v1/v2.
     ///   - taskHandler: Optional monitoring of the URLSessionTask.
     /// - Returns: A tuple containing the account, response data, and error.
-    func deleteE2EECertificateAsync(account: String,
-                                    options: NKRequestOptions = NKRequestOptions(),
-                                    taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in }
+    func deleteE2EEPublicKeyAsync(account: String,
+                                  options: NKRequestOptions = NKRequestOptions(),
+                                  taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in }
     ) async -> (
         account: String,
         responseData: AFDataResponse<Data>?,
         error: NKError
     ) {
         await withCheckedContinuation { continuation in
-            deleteE2EECertificate(account: account,
+            deleteE2EEPublicKey(account: account,
                                   options: options,
                                   taskHandler: taskHandler) { account, responseData, error in
                 continuation.resume(returning: (
