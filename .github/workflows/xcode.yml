@@ -16,7 +16,7 @@ on:
 env:
   DESTINATION_IOS: platform=iOS Simulator,name=iPhone 16,OS=18.5
   DESTINATION_MACOS: platform=macOS,arch=x86_64
-  SCHEME: NextcloudKit
+  SCHEME: NextcloudKit-Package
   SERVER_BRANCH: stable30
   PHP_VERSION: 8.3
 
