@@ -22,3 +22,9 @@ path = [".swiftlint.yml", "Sourcery/bin/sourcery", "Tests/NextcloudKitUnitTests/
 precedence = "aggregate"
 SPDX-FileCopyrightText = "2023 Nextcloud GmbH and Nextcloud contributors"
 SPDX-License-Identifier = "GPL-3.0-or-later"
+
+[[annotations]]
+path = ["Sources/NextcloudKitUI/Documentation.docc/Documentation.md", "Sources/NextcloudKitUI/Documentation.docc/theme-settings.json", "Sources/NextcloudKitUI/Localizable.xcstrings"]
+precedence = "aggregate"
+SPDX-FileCopyrightText = "2026 Nextcloud GmbH and Nextcloud contributors"
+SPDX-License-Identifier = "GPL-3.0-or-later"
