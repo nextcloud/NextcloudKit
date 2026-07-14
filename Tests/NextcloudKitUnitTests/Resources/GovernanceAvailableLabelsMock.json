@@ -1,0 +1,27 @@
+{
+  "ocs": {
+    "meta": {
+      "status": "ok",
+      "statuscode": 200,
+      "message": "OK"
+    },
+    "data": [
+      {
+        "id": "1",
+        "name": "Public",
+        "priority": 0,
+        "description": "Public label",
+        "color": "#00FF00",
+        "scopes": ["FILES", "MAILS"]
+      },
+      {
+        "id": "2",
+        "name": "Restricted",
+        "priority": 10,
+        "description": "Restricted label",
+        "color": "#FF0000",
+        "scopes": ["FILES", "FUTURE_SCOPE"]
+      }
+    ]
+  }
+}
