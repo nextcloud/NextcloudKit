@@ -13,7 +13,7 @@ public extension NextcloudKit {
                                                  options: NKRequestOptions = NKRequestOptions(),
                                                  taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in }
     ) async -> (account: String, labels: [NKGovernanceLabel]?, responseData: AFDataResponse<Data>?, error: NKError) {
-        await getGovernanceAvailableLabels(entityType: entityType, entityId: entityId, labelKind: "sensitivity", account: account, options: options, taskHandler: taskHandler)
+        await fetchAvailableGovernanceLabels(entityType: entityType, entityId: entityId, labelKind: "sensitivity", account: account, options: options, taskHandler: taskHandler)
     }
 
     /// Returns the retention labels the user may apply to an entity.
@@ -23,7 +23,7 @@ public extension NextcloudKit {
                                                options: NKRequestOptions = NKRequestOptions(),
                                                taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in }
     ) async -> (account: String, labels: [NKGovernanceLabel]?, responseData: AFDataResponse<Data>?, error: NKError) {
-        await getGovernanceAvailableLabels(entityType: entityType, entityId: entityId, labelKind: "retention", account: account, options: options, taskHandler: taskHandler)
+        await fetchAvailableGovernanceLabels(entityType: entityType, entityId: entityId, labelKind: "retention", account: account, options: options, taskHandler: taskHandler)
     }
 
     /// Returns the hold labels the user may apply to an entity.
@@ -33,7 +33,49 @@ public extension NextcloudKit {
                                           options: NKRequestOptions = NKRequestOptions(),
                                           taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in }
     ) async -> (account: String, labels: [NKGovernanceLabel]?, responseData: AFDataResponse<Data>?, error: NKError) {
-        await getGovernanceAvailableLabels(entityType: entityType, entityId: entityId, labelKind: "hold", account: account, options: options, taskHandler: taskHandler)
+        await fetchAvailableGovernanceLabels(entityType: entityType, entityId: entityId, labelKind: "hold", account: account, options: options, taskHandler: taskHandler)
+    }
+
+    /// Returns all labels the user may apply to an entity, grouped by type, in a single request.
+    func getGovernanceAvailableLabels(entityType: String = "FILES",
+                                      entityId: String,
+                                      account: String,
+                                      options: NKRequestOptions = NKRequestOptions(),
+                                      taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in }
+    ) async -> (account: String, labels: NKGovernanceAvailableLabels?, responseData: AFDataResponse<Data>?, error: NKError) {
+        await withCheckedContinuation { continuation in
+            let endpoint = governancePath(entityType: entityType, entityId: entityId) + "/available?format=json"
+            guard let nkSession = nkCommonInstance.nksessions.session(forAccount: account),
+                  let url = nkCommonInstance.createStandardUrl(serverUrl: nkSession.urlBase, endpoint: endpoint),
+                  let headers = nkCommonInstance.getStandardHeaders(account: account, options: options) else {
+                return options.queue.async {
+                    continuation.resume(returning: (account, nil, nil, .urlError))
+                }
+            }
+
+            nkSession.sessionData.request(url, method: .get, encoding: URLEncoding.default, headers: headers, interceptor: NKInterceptor(nkCommonInstance: nkCommonInstance)).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
+                task.taskDescription = options.taskDescription
+                taskHandler(task)
+            }.responseData(queue: self.nkCommonInstance.backgroundQueue) { response in
+                switch response.result {
+                case .failure(let error):
+                    let error = NKError(error: error, afResponse: response, responseData: response.data)
+                    options.queue.async {
+                        continuation.resume(returning: (account, nil, response, error))
+                    }
+                case .success(let data):
+                    if let result = try? JSONDecoder().decode(GovernanceOCS<NKGovernanceAvailableLabels>.self, from: data) {
+                        options.queue.async {
+                            continuation.resume(returning: (account, result.ocs.data, response, .success))
+                        }
+                    } else {
+                        options.queue.async {
+                            continuation.resume(returning: (account, nil, response, .invalidData))
+                        }
+                    }
+                }
+            }
+        }
     }
 
     /// Returns all labels applied to an entity, grouped by type and filtered to those visible to the user.
@@ -106,9 +148,9 @@ public extension NextcloudKit {
         "ocs/v2.php/apps/governance/v1/labels/\(entityType)/\(entityId)"
     }
 
-    private func getGovernanceAvailableLabels(entityType: String,
-                                              entityId: String,
-                                              labelKind: String,
+    private func fetchAvailableGovernanceLabels(entityType: String,
+                                                entityId: String,
+                                                labelKind: String,
                                               account: String,
                                               options: NKRequestOptions,
                                               taskHandler: @escaping (_ task: URLSessionTask) -> Void

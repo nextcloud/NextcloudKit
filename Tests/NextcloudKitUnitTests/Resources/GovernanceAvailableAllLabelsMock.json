@@ -6,14 +6,16 @@
       "message": "OK"
     },
     "data": {
-      "sensitivity": {
-        "id": "2",
-        "name": "Restricted",
-        "priority": 10,
-        "description": "Restricted label",
-        "color": "#FF0000",
-        "scopes": ["FILES"]
-      },
+      "sensitivity": [
+        {
+          "id": "1",
+          "name": "Public",
+          "priority": 0,
+          "description": "Public label",
+          "color": "#00FF00",
+          "scopes": ["FILES", "MAILS"]
+        }
+      ],
       "retention": [
         {
           "id": "5",
@@ -30,7 +32,7 @@
           "name": "Legal hold",
           "priority": 2,
           "description": "Legal hold",
-          "color": "#FFAA00",
+          "color": "#FF0000",
           "scopes": ["FILES"]
         }
       ]

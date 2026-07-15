@@ -47,6 +47,7 @@ final class GovernanceUnitTests: XCTestCase {
         XCTAssertEqual(entity.sensitivity?.name, "Restricted")
         XCTAssertEqual(entity.retention.count, 1)
         XCTAssertEqual(entity.retention.first?.id, "5")
+        XCTAssertEqual(entity.hold.map(\.id), ["9"])
     }
 
     func test_decodeEntityLabels_withNullSensitivityAndEmptyRetention_shouldDefaultGracefully() throws {
@@ -55,6 +56,7 @@ final class GovernanceUnitTests: XCTestCase {
 
         XCTAssertNil(entity.sensitivity)
         XCTAssertTrue(entity.retention.isEmpty)
+        XCTAssertTrue(entity.hold.isEmpty)
     }
 
     func test_decodeGenericResponse_shouldParseMessage() throws {
@@ -62,6 +64,16 @@ final class GovernanceUnitTests: XCTestCase {
         let response = try JSONDecoder().decode(OCSEnvelope<GenericResponse>.self, from: data).ocs.data
 
         XCTAssertEqual(response.message, "Label applied")
+    }
+
+    func test_decodeAvailableAllLabels_shouldGroupByType() throws {
+        let data = try fixture("GovernanceAvailableAllLabelsMock")
+        let available = try JSONDecoder().decode(OCSEnvelope<NKGovernanceAvailableLabels>.self, from: data).ocs.data
+
+        XCTAssertEqual(available.sensitivity.map(\.id), ["1"])
+        XCTAssertEqual(available.retention.map(\.id), ["5"])
+        XCTAssertEqual(available.hold.map(\.id), ["9"])
+        XCTAssertEqual(available.sensitivity.first?.scopes, [.files, .mails])
     }
 
     func test_labelType_rawValues_shouldMatchApiPathSegments() {
