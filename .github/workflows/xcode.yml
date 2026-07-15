@@ -16,7 +16,7 @@ on:
 env:
   DESTINATION_IOS: platform=iOS Simulator,name=iPhone 16,OS=18.5
   DESTINATION_MACOS: platform=macOS,arch=x86_64
-  SCHEME: NextcloudKit
+  SCHEME: NextcloudKit-Package
   SERVER_BRANCH: stable30
   PHP_VERSION: 8.3
 
@@ -56,8 +56,6 @@ jobs:
         ./server/occ config:system:set hashing_default_password --value=true --type=boolean
         ./server/occ config:system:set auth.bruteforce.protection.enabled --value false --type bool
         ./server/occ config:system:set ratelimit.protection.enabled --value false --type bool
-        ./server/occ config:system:set memcache.local --value="\\OC\\Memcache\\APCu"
-        ./server/occ config:system:set memcache.distributed --value="\\OC\\Memcache\\APCu"
         ./server/occ background:cron
         PHP_CLI_SERVER_WORKERS=5 php -S localhost:8080 -t server/ &
 

@@ -115,7 +115,7 @@ public final class NKLogFileManager: @unchecked Sendable {
     private var blacklist: [String] = []
     private var whitelist: [String] = []
     private var currentLogDate: String
-    private let logQueue = DispatchQueue(label: "com.nextcloud.LogWriterQueue", attributes: .concurrent)
+    private let logQueue = DispatchQueue(label: "com.nextcloud.LogWriterQueue")
     private let rotationQueue = DispatchQueue(label: "com.nextcloud.LogRotationQueue")
     private let fileManager = FileManager.default
 
