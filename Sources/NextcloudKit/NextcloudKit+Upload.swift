@@ -188,6 +188,7 @@ public extension NextcloudKit {
     ///   - chunkSize: Desired chunk size in bytes.
     ///   - account: Account identifier.
     ///   - options: Request options (headers, timeout, etc.).
+    ///   - ifMatch: Optional ETag precondition applied **only** to the final assembly `MOVE` (not the chunk uploads). When set, the server rejects the assembly with `412 Precondition Failed` if the destination changed since this ETag, enabling optimistic-concurrency conflict detection for chunked uploads.
     ///   - chunkProgressHandler: Reports per-chunk preparation progress as `(totalChunks, currentIndex)`.
     ///   - uploadStart: Called once when upload of chunks begins, with the final list of chunks.
     ///   - uploadTaskHandler: Exposes the low-level `URLSessionTask` for each chunk upload.
@@ -210,6 +211,7 @@ public extension NextcloudKit {
                           chunkSize: Int,
                           account: String,
                           options: NKRequestOptions = NKRequestOptions(),
+                          ifMatch: String? = nil,
                           chunkProgressHandler: @escaping (_ total: Int, _ counter: Int) -> Void = { _, _ in },
                           uploadStart: @escaping (_ filesChunk: [(fileName: String, size: Int64)]) -> Void = { _ in },
                           uploadTaskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
@@ -410,6 +412,14 @@ public extension NextcloudKit {
         let assembleTimeMax: Double = 30 * 60   // 30 minutes
         options.timeout = max(assembleTimeMin, min(assembleTimePerGB * assembleSizeInGB, assembleTimeMax))
 
+        // Optimistic concurrency: guard the assembly against a concurrent change to
+        // the destination. The precondition must ride ONLY on the MOVE that
+        // materializes the final file — never on the chunk PUTs above, which target
+        // brand-new chunk resources and would spuriously fail with 412.
+        if let ifMatch {
+            options.customHeader?["If-Match"] = ifMatch
+        }
+
         assembling()
 
         let moveRes = await moveFileOrFolderAsync(serverUrlFileNameSource: serverUrlFileNameSource,
@@ -417,6 +427,11 @@ public extension NextcloudKit {
                                                   overwrite: true,
                                                   account: account,
                                                   options: options)
+
+        // Don't let the precondition leak onto the post-assembly PROPFIND readback:
+        // after a successful MOVE the destination carries a fresh etag, which would
+        // fail an If-Match against the pre-assembly value.
+        options.customHeader?["If-Match"] = nil
 
         guard moveRes.error == .success else {
             return (account, nil)
