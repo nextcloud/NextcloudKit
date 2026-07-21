@@ -59,7 +59,7 @@ The following details are important when working on the library.
 ### Requirements
 
 - Latest stable Xcode available is required to be installed in the development environment.
-- The library targets iOS 17, macOS 11, tvOS 14, watchOS 7 and visionOS 1 (see `Package.swift`).
+- The supported platforms and minimum deployment targets are defined in `./Package.swift`
 
 ### Code Style
 
