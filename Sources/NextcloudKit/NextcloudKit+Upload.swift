@@ -188,6 +188,7 @@ public extension NextcloudKit {
     ///   - chunkSize: Desired chunk size in bytes.
     ///   - account: Account identifier.
     ///   - options: Request options (headers, timeout, etc.).
+    ///   - ifMatch: Optional ETag precondition applied **only** to the final assembly `MOVE` (not the chunk uploads). When set, the server rejects the assembly with `412 Precondition Failed` if the destination changed since this ETag, enabling optimistic-concurrency conflict detection for chunked uploads.
     ///   - chunkProgressHandler: Reports per-chunk preparation progress as `(totalChunks, currentIndex)`.
     ///   - uploadStart: Called once when upload of chunks begins, with the final list of chunks.
     ///   - uploadTaskHandler: Exposes the low-level `URLSessionTask` for each chunk upload.
@@ -210,6 +211,7 @@ public extension NextcloudKit {
                           chunkSize: Int,
                           account: String,
                           options: NKRequestOptions = NKRequestOptions(),
+                          ifMatch: String? = nil,
                           chunkProgressHandler: @escaping (_ total: Int, _ counter: Int) -> Void = { _, _ in },
                           uploadStart: @escaping (_ filesChunk: [(fileName: String, size: Int64)]) -> Void = { _ in },
                           uploadTaskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
@@ -410,6 +412,14 @@ public extension NextcloudKit {
         let assembleTimeMax: Double = 30 * 60   // 30 minutes
         options.timeout = max(assembleTimeMin, min(assembleTimePerGB * assembleSizeInGB, assembleTimeMax))
 
+        // Optimistic concurrency: guard the assembly against a concurrent change to
+        // the destination. The precondition must ride ONLY on the MOVE that
+        // materializes the final file — never on the chunk PUTs above, which target
+        // brand-new chunk resources and would spuriously fail with 412.
+        if let ifMatch {
+            options.customHeader?["If-Match"] = ifMatch
+        }
+
         assembling()
 
         let moveRes = await moveFileOrFolderAsync(serverUrlFileNameSource: serverUrlFileNameSource,
@@ -418,22 +428,97 @@ public extension NextcloudKit {
                                                   account: account,
                                                   options: options)
 
+        // Don't let the precondition leak onto the post-assembly PROPFIND readback:
+        // after a successful MOVE the destination carries a fresh etag, which would
+        // fail an If-Match against the pre-assembly value.
+        options.customHeader?["If-Match"] = nil
+
         guard moveRes.error == .success else {
             return (account, nil)
         }
 
         try Task.checkCancellation()
 
-        // Read back the final file to return NKFile
-        let readRes = await readFileOrFolderAsync(serverUrlFileName: serverUrlFileName,
-                                                  depth: "0",
-                                                  account: account,
-                                                  options: options)
-
-        guard readRes.error == .success, let file = readRes.files?.first else {
-            throw NKError.errorChunkMoveFile
+        // Prefer the assembled file's identity straight from the MOVE response headers.
+        // On a successful chunk-assembly MOVE the server returns OC-FileID (and OC-ETag),
+        // exactly as it does on MKCOL/PUT — the reference desktop client reads these off the
+        // same reply and treats them as required. Using them here avoids a second, fragile
+        // PROPFIND read-back whose failure (server-side finalization lag, a proxy 5xx, or a
+        // short timeout) would otherwise throw errorChunkMoveFile even though the file
+        // assembled correctly, losing the ocId and failing an upload whose bytes already landed.
+        if let file = assembledFile(fromMoveResponseHeaders: moveRes.responseData?.response?.allHeaderFields,
+                                    account: account,
+                                    fileName: destinationFileName ?? fileName,
+                                    serverUrl: serverUrl,
+                                    size: totalFileSize,
+                                    fallbackDate: date) {
+            return (account, file)
         }
 
-        return (account, file)
+        // Fallback: the MOVE reply carried no OC-FileID (an older server, a proxy that strips
+        // it, or a 202 async assembly still finishing). Read the assembled file back — but with
+        // its OWN timeout and a bounded retry, so a transient PROPFIND failure or brief
+        // post-assembly visibility lag no longer fails an upload that already succeeded. Only
+        // after the retries are exhausted do we surface errorChunkMoveFile.
+        let readbackOptions = NKRequestOptions(timeout: 120, queue: options.queue)
+        let readbackBackoff: [UInt64] = [0, 1_000_000_000, 3_000_000_000] // attempt after 0s, 1s, 3s
+
+        for backoff in readbackBackoff {
+            if backoff > 0 {
+                try? await Task.sleep(nanoseconds: backoff)
+            }
+            try Task.checkCancellation()
+
+            let readRes = await readFileOrFolderAsync(serverUrlFileName: serverUrlFileName,
+                                                      depth: "0",
+                                                      account: account,
+                                                      options: readbackOptions)
+            if readRes.error == .success, let file = readRes.files?.first {
+                return (account, file)
+            }
+        }
+
+        throw NKError.errorChunkMoveFile
+    }
+
+    /// Builds the assembled file's `NKFile` from a chunk-assembly MOVE response's headers.
+    ///
+    /// A Nextcloud server returns `OC-FileID` (and `OC-ETag`) on a successful assembly MOVE,
+    /// mirroring what it returns on MKCOL/PUT — the reference desktop client reads these off the
+    /// same reply. Returns `nil` when no `OC-FileID` is present (an older server, a proxy that
+    /// strips it, or a `202` async assembly still in progress), signalling the caller to fall
+    /// back to a PROPFIND read-back.
+    ///
+    /// - Parameters:
+    ///   - headers: The MOVE response's `allHeaderFields`, if any.
+    ///   - account: The account identifier to stamp onto the returned file.
+    ///   - fileName: The assembled file's name (the MOVE destination's leaf).
+    ///   - serverUrl: The server URL of the assembled file's parent directory.
+    ///   - size: The assembled file's size in bytes (the known local total).
+    ///   - fallbackDate: Date to use when the response carries no usable `Date` header.
+    /// - Returns: An `NKFile` populated from the headers, or `nil` if `OC-FileID` is absent.
+    func assembledFile(fromMoveResponseHeaders headers: [AnyHashable: Any]?,
+                       account: String,
+                       fileName: String,
+                       serverUrl: String,
+                       size: Int64,
+                       fallbackDate: Date?) -> NKFile? {
+        guard let ocId = nkCommonInstance.findHeader("oc-fileid", allHeaderFields: headers) else {
+            return nil
+        }
+        let etag = nkCommonInstance.normalizedETag(nkCommonInstance.findHeader("oc-etag", allHeaderFields: headers)
+            ?? nkCommonInstance.findHeader("etag", allHeaderFields: headers)) ?? ""
+        var date = fallbackDate ?? Date()
+        if let dateString = nkCommonInstance.findHeader("date", allHeaderFields: headers),
+           let headerDate = dateString.parsedDate(using: "EEE, dd MMM y HH:mm:ss zzz") {
+            date = headerDate
+        }
+        return NKFile(account: account,
+                      date: date,
+                      etag: etag,
+                      fileName: fileName,
+                      ocId: ocId,
+                      size: size,
+                      serverUrl: serverUrl)
     }
 }
