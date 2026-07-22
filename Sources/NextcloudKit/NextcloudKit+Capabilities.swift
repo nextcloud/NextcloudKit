@@ -151,7 +151,6 @@ public extension NextcloudKit {
                             case governance
                         }
 
-                        // Presence of this object indicates the governance app is enabled.
                         struct Governance: Codable {}
 
                         struct DownloadLimit: Codable {
@@ -355,32 +354,6 @@ public extension NextcloudKit {
                         struct Recommendations: Codable {
                             let enabled: Bool?
                         }
-
-//                        struct DeclarativeUI: Codable {
-//                            let contextMenu: [[ContextMenuItem]]
-//
-//                            enum CodingKeys: String, CodingKey {
-//                                case contextMenu = "context-menu"
-//                            }
-//                        }
-
-//
-//                        struct DeclarativeUI: Codable {
-//                            let contextMenus: [ContextMenu]
-//
-//                            enum CodingKeys: String, CodingKey {
-//                                case contextMenus = "context-menu"
-//                            }
-//
-//                            struct ContextMenu: Codable {
-//                                let items
-//                            }
-//
-//                            struct ContextMenuItem: Codable {
-//                                let title: String
-//                                let endpoint: String
-//                            }
-//                        }
                     }
                 }
             }
