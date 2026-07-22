@@ -10,30 +10,31 @@ public struct NKGovernanceLabel: Codable, Sendable, Equatable, Hashable {
     public let priority: Int
     public let description: String
     public let color: String
-    public let scopes: [NKGovernanceLabelScope]
+    public let isAssigned: Bool
 
-    public init(id: String, name: String, priority: Int, description: String, color: String, scopes: [NKGovernanceLabelScope]) {
+    public init(id: String, name: String, priority: Int, description: String, color: String, isAssigned: Bool) {
         self.id = id
         self.name = name
         self.priority = priority
         self.description = description
         self.color = color
-        self.scopes = scopes
+        self.isAssigned = isAssigned
     }
 
     enum CodingKeys: String, CodingKey {
-        case id, name, priority, description, color, scopes
+        case id, name, priority, description, color, isAssigned
     }
 
     public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         id = try container.decode(String.self, forKey: .id)
         name = try container.decode(String.self, forKey: .name)
-        priority = try container.decode(Int.self, forKey: .priority)
-        description = try container.decode(String.self, forKey: .description)
-        color = try container.decode(String.self, forKey: .color)
-        // Tolerate unknown scope values rather than failing the whole decode.
-        let rawScopes = try container.decodeIfPresent([String].self, forKey: .scopes) ?? []
-        scopes = rawScopes.compactMap(NKGovernanceLabelScope.init(rawValue:))
+        priority = try container.decodeIfPresent(Int.self, forKey: .priority) ?? 0
+        description = try container.decodeIfPresent(String.self, forKey: .description) ?? ""
+
+        let rawColor = try container.decodeIfPresent(String.self, forKey: .color) ?? ""
+        color = rawColor.isEmpty || rawColor.hasPrefix("#") ? rawColor : "#\(rawColor)"
+
+        isAssigned = try container.decodeIfPresent(Bool.self, forKey: .isAssigned) ?? false
     }
 }

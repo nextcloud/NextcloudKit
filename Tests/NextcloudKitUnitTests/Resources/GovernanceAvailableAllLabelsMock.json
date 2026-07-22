@@ -8,32 +8,46 @@
     "data": {
       "sensitivity": [
         {
-          "id": "1",
+          "id": "101463106843779073",
           "name": "Public",
           "priority": 0,
-          "description": "Public label",
-          "color": "#00FF00",
-          "scopes": ["FILES", "MAILS"]
+          "description": "Information intended for public release with no access restrictions.",
+          "color": "2E7D32",
+          "canAssign": "yes",
+          "canRemove": "yes",
+          "isAssigned": false
+        },
+        {
+          "id": "101464175724404737",
+          "name": "Confidential",
+          "priority": 2,
+          "description": "Sensitive business information such as contracts, financials, or strategy documents.",
+          "color": "EF6C00",
+          "canAssign": "yes",
+          "canRemove": "yes",
+          "isAssigned": true
         }
       ],
       "retention": [
         {
-          "id": "5",
-          "name": "Keep 1 year",
-          "priority": 1,
-          "description": "Retain for one year",
-          "color": "#0000FF",
-          "scopes": ["FILES"]
-        }
-      ],
-      "hold": [
-        {
-          "id": "9",
-          "name": "Legal hold",
+          "id": "101921038681186305",
+          "name": "Employee Records (HR)",
           "priority": 2,
-          "description": "Legal hold",
-          "color": "#FF0000",
-          "scopes": ["FILES"]
+          "description": "Personnel files, payroll records, and employment contracts.",
+          "color": "6A1B9A",
+          "canAssign": "yes",
+          "canRemove": "yes",
+          "isAssigned": true
+        },
+        {
+          "id": "101921039478104065",
+          "name": "Customer Personal Data (GDPR)",
+          "priority": 3,
+          "description": "Customer personal data collected for support, sales, or marketing purposes.",
+          "color": "AD1457",
+          "canAssign": "yes",
+          "canRemove": "yes",
+          "isAssigned": false
         }
       ]
     }

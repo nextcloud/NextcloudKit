@@ -133,6 +133,7 @@ public extension NextcloudKit {
                         let recommendations: Recommendations?
                         let termsOfService: TermsOfService?
                         let clientIntegration: NKClientIntegration?
+                        let governance: Governance?
 
                         enum CodingKeys: String, CodingKey {
                             case downloadLimit = "downloadlimit"
@@ -147,7 +148,11 @@ public extension NextcloudKit {
                             case recommendations
                             case termsOfService = "terms_of_service"
                             case clientIntegration = "client_integration"
+                            case governance
                         }
+
+                        // Presence of this object indicates the governance app is enabled.
+                        struct Governance: Codable {}
 
                         struct DownloadLimit: Codable {
                             let enabled: Bool?
@@ -435,6 +440,8 @@ public extension NextcloudKit {
             capabilities.activityEnabled = json.activity != nil
             capabilities.activity = json.activity?.apiv2 ?? []
 
+            capabilities.governanceEnabled = json.governance != nil
+
             capabilities.notification = json.notifications?.ocsendpoints ?? []
 
             capabilities.filesUndelete = json.files?.undelete ?? false
@@ -548,6 +555,7 @@ final public class NKCapabilities: Sendable {
         public var userStatusSupportsBusy: Bool                     = false
         public var externalSites: Bool                              = false
         public var activityEnabled: Bool                            = false
+        public var governanceEnabled: Bool                          = false
         public var groupfoldersEnabled: Bool                        = false // NC27
         public var assistantEnabled: Bool                           = false // NC28
         public var isLivePhotoServerAvailable: Bool                 = false // NC28
