@@ -16,7 +16,6 @@ public struct UnifiedShareEditView: View {
     @State private var isSettingsExpanded = true
     @State private var recipients = ""
     @State private var note = ""
-    @State private var addPeopleFieldHeight: CGFloat = 0
     @Environment(\.colorScheme) private var colorScheme
 
     public init(fileName: String, account: String) {
@@ -37,6 +36,7 @@ public struct UnifiedShareEditView: View {
                 case .loading:
                     ProgressView()
                 case .shareUpdated(let share):
+
                     Form {
 //                        VStack(alignment: .leading, spacing: 24) {
                         Section {
@@ -58,37 +58,24 @@ public struct UnifiedShareEditView: View {
                                 .onChange(of: recipients) {
                                     model.searchRecipients(query: recipients)
                                 }
-                                // Measure the field so the dropdown can sit just beneath it.
-                                .background {
-                                    GeometryReader { proxy in
-                                        Color.clear
-                                            .onAppear { addPeopleFieldHeight = proxy.size.height }
-                                            .onChange(of: proxy.size.height) { addPeopleFieldHeight = proxy.size.height }
-                                    }
-                                }
-                                .overlay(alignment: .topLeading) {
-//                                    if !model.recipientResults.isEmpty {
-                                        recipientDropdown
-                                            .offset(y: 30 + 4)
+                                // Publish the field's frame so the dropdown can be drawn outside the Form.
+                                .anchorPreference(key: AddPeopleFieldAnchorKey.self, value: .bounds) { $0 }
 
-//                                    }
-                                }
-                                .zIndex(1)
                             } else if let recipient = share.recipients.first {
                                 Text(recipient.displayName)
                             }
 
                             permissionField
                         }
-                            settingsRow
+                        settingsRow
 
-                            TextField(
-                                String(localized: "Note to recipients"),
-                                text: $note,
-                                axis: .vertical
-                            )
+                        TextField(
+                            String(localized: "Note to recipients"),
+                            text: $note,
+                            axis: .vertical
+                        )
 
-                            actionButtons
+                        actionButtons
 //                        }
 
                     }
@@ -98,6 +85,19 @@ public struct UnifiedShareEditView: View {
                         model.deleteShare(share: share)
                     }
                     .navigationTitle("Share")
+                    // Draw the dropdown above the Form, anchored just beneath the field, so the
+                    // Form's row clipping can't cut it off.
+                    .overlayPreferenceValue(AddPeopleFieldAnchorKey.self) { anchor in
+                        GeometryReader { proxy in
+                            if let anchor, !model.recipientResults.isEmpty {
+                                let frame = proxy[anchor]
+
+                                recipientDropdown(share: share)
+                                    .frame(width: frame.width)
+                                    .offset(x: frame.minX, y: frame.maxY + 4)
+                            }
+                        }
+                    }
 
                 case .error(let error):
                     Text(error.localizedDescription)
@@ -107,8 +107,8 @@ public struct UnifiedShareEditView: View {
             
             
         }
-        .onAppear {
-//            model.createShare()
+        .task {
+            model.createShare()
         }
 
         Spacer()
@@ -148,12 +148,12 @@ public struct UnifiedShareEditView: View {
         }
     }
 
-    private var recipientDropdown: some View {
+    private func recipientDropdown(share: NKUnifiedShare) -> some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 0) {
                 ForEach(model.recipientResults, id: \.value) { recipient in
                     Button {
-                        selectRecipient(recipient)
+                        model.addRecipient(share: share, recipient: recipient)
                     } label: {
                         HStack(spacing: 10) {
                             if let icon = recipient.icon {
@@ -207,9 +207,9 @@ public struct UnifiedShareEditView: View {
         }
     }
 
-    private func selectRecipient(_ recipient: NKUnifiedShareRecipient) {
-        recipients = ""
-    }
+//    private func selectRecipient(_ recipient: NKUnifiedShareRecipient) {
+//        recipients = ""
+//    }
 
     private var actionButtons: some View {
         HStack(spacing: 16) {
@@ -224,6 +224,15 @@ public struct UnifiedShareEditView: View {
             .frame(maxWidth: .infinity)
         }
         .padding(.top, 18)
+    }
+}
+
+/// Carries the "Add people" field's frame up to the ZStack so the dropdown can sit beneath it.
+private struct AddPeopleFieldAnchorKey: PreferenceKey {
+    static let defaultValue: Anchor<CGRect>? = nil
+
+    static func reduce(value: inout Anchor<CGRect>?, nextValue: () -> Anchor<CGRect>?) {
+        value = value ?? nextValue()
     }
 }
 
@@ -261,6 +270,6 @@ private extension UnifiedShareEditView {
 #Preview {
     UnifiedShareEditView(
         fileName: "Test.txt",
-        model: UnifiedShareEditModel(account: "", state: .shareUpdated(share: .mock))
+        model: UnifiedShareEditModel(account: "", state: .shareUpdated(share: .mock), recipientResults: .mocks)
     )
 }

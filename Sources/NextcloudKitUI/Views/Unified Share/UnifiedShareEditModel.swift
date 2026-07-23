@@ -25,9 +25,10 @@ public class UnifiedShareEditModel {
 
 #if DEBUG
     /// Preview-only initializer that starts in a given state.
-    init(account: String, state: UnifiedShareViewState) {
+    init(account: String, state: UnifiedShareViewState, recipientResults: [NKUnifiedShareRecipient] = []) {
         self.account = account
         self.state = state
+        self.recipientResults = recipientResults
     }
 #endif
 
@@ -62,7 +63,7 @@ public class UnifiedShareEditModel {
         }
     }
 
-    func updateShare(share: NKUnifiedShare, recipient: NKUnifiedShareRecipient) {
+    func addRecipient(share: NKUnifiedShare, recipient: NKUnifiedShareRecipient) {
         Task {
             let result = await NextcloudKit.shared.addUnifiedShareRecipient(id: share.id, recipientClass: recipient.class, value: recipient.value, account: account)
             guard let share = result.share else {
