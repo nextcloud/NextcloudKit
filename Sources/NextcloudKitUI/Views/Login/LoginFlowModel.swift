@@ -113,6 +113,12 @@ final class LoginFlowModel: QRCodeParsing, URLSanitizing {
                     return
                 }
 
+                // HTTP 404 means the flow is still pending; any other failure is terminal.
+                if poll.error != .success, poll.responseData?.response?.statusCode != 404 {
+                    self.endLogin(poll.error)
+                    return
+                }
+
                 try? await Task.sleep(for: .seconds(1))
             }
         }
