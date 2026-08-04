@@ -18,13 +18,13 @@ public struct UnifiedShareEditView: View {
     @State private var permissionSelection: PermissionSelection = .unset
     @State private var isSettingsExpanded = true
     @State private var recipients = ""
-    @State private var note = ""
     @Environment(\.colorScheme) private var colorScheme
+    @Environment(\.dismiss) private var dismiss
 
-    public init(fileName: String, account: String) {
+    public init(fileName: String, account: String, sourceId: String? = nil) {
         self.fileName = fileName
         self.account = account
-        model = UnifiedShareEditModel(account: account)
+        model = UnifiedShareEditModel(account: account, sourceId: sourceId)
     }
 
     init(fileName: String, model: UnifiedShareEditModel) {
@@ -50,7 +50,7 @@ public struct UnifiedShareEditView: View {
                         }
 
                         Section {
-                            shareeTypePicker
+                            shareeTypePicker(share: share)
 
                             //            VStack(spacing: 18) {
                             if shareeType == .invited {
@@ -74,16 +74,12 @@ public struct UnifiedShareEditView: View {
                             permissionField(share: share)
 
                             ForEach(basicProperties(share), id: \.class) { property in
-                                propertyRow(property)
+                                PropertyRow(property: property, error: model.propertyErrors[property.class]) { value in
+                                    model.setProperty(share: share, propertyClass: property.class, value: value)
+                                }
                             }
                         }
                         settingsRow(share: share)
-
-                        TextField(
-                            String(localized: "Note to recipients"),
-                            text: $note,
-                            axis: .vertical
-                        )
 
                         actionButtons(share: share)
 //                        }
@@ -92,7 +88,12 @@ public struct UnifiedShareEditView: View {
 ////                    .padding(.horizontal, 26)
 //                    .padding(.top, 10)
                     .onDisappear {
-                        model.deleteShare(share: share)
+                        model.discardDraftIfNeeded(share: share)
+                    }
+                    .onChange(of: model.didActivate) {
+                        if model.didActivate {
+                            dismiss()
+                        }
                     }
                     .navigationTitle("Share")
                     // Draw the dropdown above the Form, anchored just beneath the field, so the
@@ -118,14 +119,19 @@ public struct UnifiedShareEditView: View {
             
         }
         .task {
-            model.createShare()
-            model.loadCapabilities()
+            if case .loading = model.state {
+                model.createShare()
+            }
+
+            if model.permissionPresets.isEmpty {
+                model.loadCapabilities()
+            }
         }
 
         Spacer()
 }
 
-    private var shareeTypePicker: some View {
+    private func shareeTypePicker(share: NKUnifiedShare) -> some View {
         Picker("", selection: $shareeType) {
             Text(String(localized: "Invited People"))
                 .tag(ShareeType.invited)
@@ -135,7 +141,9 @@ public struct UnifiedShareEditView: View {
         }
         .pickerStyle(.segmented)
         .listRowSeparator(.hidden)
-
+        .onChange(of: shareeType) {
+            model.setShareeType(share: share, anyone: shareeType == .anyone)
+        }
     }
 
     @ViewBuilder
@@ -167,6 +175,9 @@ public struct UnifiedShareEditView: View {
                 PermissionToggleRow(permission: permission) { enabled in
                     model.setPermission(share: share, permissionClass: permission.class, enabled: enabled)
                 }
+                // Re-seed the toggle whenever the server's enabled value changes (e.g. after a
+                // preset like "Can edit" recomputes the permissions), not just on first render.
+                .id(permission.enabled)
             }
         }
     }
@@ -198,30 +209,39 @@ public struct UnifiedShareEditView: View {
         return !applicablePresets(share).contains { $0.class == presetClass }
     }
 
-    /// Advanced properties live behind the disclosure; basic ones are shown inline in the form.
+    /// Advanced properties + editable link tokens live behind the disclosure; basic properties inline.
     private func settingsRow(share: NKUnifiedShare) -> some View {
         DisclosureGroup(isExpanded: $isSettingsExpanded) {
             ForEach(advancedProperties(share), id: \.class) { property in
-                propertyRow(property)
+                PropertyRow(property: property, error: model.propertyErrors[property.class]) { value in
+                    model.setProperty(share: share, propertyClass: property.class, value: value)
+                }
+            }
+
+            ForEach(customLinkRecipients(share), id: \.value) { recipient in
+                CustomLinkRow(
+                    recipient: recipient,
+                    onCommit: { token in model.updateRecipientSecret(share: share, recipient: recipient, secret: token) },
+                    onRegenerate: { model.regenerateRecipientSecret(share: share, recipient: recipient) }
+                )
             }
         } label: {
             Text(String(localized: "Settings"))
         }
     }
 
+    // Properties are ordered by the server-provided `priority` (ascending), matching Android.
     private func basicProperties(_ share: NKUnifiedShare) -> [NKUnifiedShareProperty] {
-        share.properties.filter { !$0.advanced }
+        share.properties.filter { !$0.advanced }.sorted { $0.priority < $1.priority }
     }
 
     private func advancedProperties(_ share: NKUnifiedShare) -> [NKUnifiedShareProperty] {
-        share.properties.filter { $0.advanced }
+        share.properties.filter { $0.advanced }.sorted { $0.priority < $1.priority }
     }
 
-    private func propertyRow(_ property: NKUnifiedShareProperty) -> some View {
-        LabeledContent(property.displayName) {
-            Text(property.value ?? property.hint ?? "")
-                .foregroundStyle(.secondary)
-        }
+    /// Recipients whose secret can be edited — i.e. custom/private links.
+    private func customLinkRecipients(_ share: NKUnifiedShare) -> [NKUnifiedShareRecipient] {
+        share.recipients.filter { $0.secret.updatable }
     }
 
     private func recipientDropdown(share: NKUnifiedShare) -> some View {
@@ -333,32 +353,42 @@ public struct UnifiedShareEditView: View {
     private func actionButtons(share: NKUnifiedShare) -> some View {
         HStack(spacing: 16) {
             Button(String(localized: "Copy link")) {
-                copyLink(share)
+                Task {
+                    if let link = await model.prepareLinkForCopy(share: share) {
+                        copyToPasteboard(link)
+                    }
+                }
             }
             .buttonStyle(.bordered)
             .frame(maxWidth: .infinity)
-            .disabled(linkURL(share) == nil)
 
-            Button(String(localized: "Send")) {
+            Button(sendLabel) {
+                model.activate(share: share)
             }
             .buttonStyle(.borderedProminent)
             .frame(maxWidth: .infinity)
+            .disabled(!canSend(share))
         }
         .padding(.top, 18)
     }
 
-    /// The share's public link, taken from the first recipient that carries one.
-    private func linkURL(_ share: NKUnifiedShare) -> String? {
-        share.recipients.compactMap { $0.secret.url }.first
+    private var sendLabel: String {
+        shareeType == .anyone ? String(localized: "Share") : String(localized: "Send")
     }
 
-    private func copyLink(_ share: NKUnifiedShare) {
-        guard let link = linkURL(share) else {
-            return
-        }
+    /// Mirrors Android's Share.canSend: a source, a recipient, an enabled permission, no missing
+    /// required property, and no pending property error.
+    private func canSend(_ share: NKUnifiedShare) -> Bool {
+        !share.sources.isEmpty
+            && !share.recipients.isEmpty
+            && share.permissions.contains { $0.enabled }
+            && !share.properties.contains { $0.required && ($0.value ?? "").isEmpty }
+            && model.propertyErrors.isEmpty
+    }
 
+    private func copyToPasteboard(_ string: String) {
         #if canImport(UIKit)
-        UIPasteboard.general.string = link
+        UIPasteboard.general.string = string
         #endif
     }
 }
@@ -455,6 +485,231 @@ private struct PermissionToggleRow: View {
             .onChange(of: isOn) {
                 onChange(isOn)
             }
+    }
+}
+
+/// Renders the right editor for a property's concrete type, with a hint/error caption.
+private struct PropertyRow: View {
+    let property: NKUnifiedShareProperty
+    let error: String?
+    let onCommit: (String?) -> Void
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 4) {
+            editor
+
+            if let caption {
+                Text(caption)
+                    .font(.caption)
+                    .foregroundStyle(error != nil ? Color.red : Color.secondary)
+            }
+        }
+    }
+
+    private var caption: String? {
+        if let error, !error.isEmpty {
+            return error
+        }
+
+        if let hint = property.hint, !hint.isEmpty {
+            return hint
+        }
+
+        return nil
+    }
+
+    @ViewBuilder
+    private var editor: some View {
+        switch property {
+        case let property as NKUnifiedSharePropertyBoolean:
+            BooleanPropertyEditor(property: property, onCommit: onCommit)
+        case let property as NKUnifiedSharePropertyEnum:
+            EnumPropertyEditor(property: property, onCommit: onCommit)
+        case let property as NKUnifiedSharePropertyDate:
+            DatePropertyEditor(property: property, onCommit: onCommit)
+        case let property as NKUnifiedSharePropertyPassword:
+            TextPropertyEditor(property: property, secure: true, onCommit: onCommit)
+        case let property as NKUnifiedSharePropertyString:
+            TextPropertyEditor(property: property, secure: false, onCommit: onCommit)
+        default:
+            LabeledContent(property.displayName) {
+                Text(property.value ?? "").foregroundStyle(.secondary)
+            }
+        }
+    }
+}
+
+private struct BooleanPropertyEditor: View {
+    let property: NKUnifiedSharePropertyBoolean
+    let onCommit: (String?) -> Void
+    @State private var isOn: Bool
+
+    init(property: NKUnifiedSharePropertyBoolean, onCommit: @escaping (String?) -> Void) {
+        self.property = property
+        self.onCommit = onCommit
+        _isOn = State(initialValue: property.value == "true")
+    }
+
+    var body: some View {
+        Toggle(property.displayName, isOn: $isOn)
+            .onChange(of: isOn) {
+                onCommit(isOn ? "true" : "false")
+            }
+    }
+}
+
+private struct EnumPropertyEditor: View {
+    let property: NKUnifiedSharePropertyEnum
+    let onCommit: (String?) -> Void
+    @State private var selection: String
+
+    init(property: NKUnifiedSharePropertyEnum, onCommit: @escaping (String?) -> Void) {
+        self.property = property
+        self.onCommit = onCommit
+        _selection = State(initialValue: property.value ?? property.validValues.first ?? "")
+    }
+
+    var body: some View {
+        Picker(property.displayName, selection: $selection) {
+            ForEach(property.validValues, id: \.self) { value in
+                Text(value).tag(value)
+            }
+        }
+        .pickerStyle(.menu)
+        .onChange(of: selection) {
+            onCommit(selection)
+        }
+    }
+}
+
+private struct DatePropertyEditor: View {
+    let property: NKUnifiedSharePropertyDate
+    let onCommit: (String?) -> Void
+    @State private var date: Date
+
+    init(property: NKUnifiedSharePropertyDate, onCommit: @escaping (String?) -> Void) {
+        self.property = property
+        self.onCommit = onCommit
+        _date = State(initialValue: Self.parse(property.value) ?? Date())
+    }
+
+    var body: some View {
+        DatePicker(property.displayName, selection: $date, in: lowerBound, displayedComponents: .date)
+            .onChange(of: date) {
+                onCommit(Self.format(date))
+            }
+    }
+
+    private var lowerBound: PartialRangeFrom<Date> {
+        (Self.parse(property.minDate) ?? Date())...
+    }
+
+    private static let formatter: ISO8601DateFormatter = {
+        let formatter = ISO8601DateFormatter()
+        formatter.formatOptions = [.withInternetDateTime, .withColonSeparatorInTimeZone]
+        formatter.timeZone = .current
+        return formatter
+    }()
+
+    static func parse(_ string: String?) -> Date? {
+        guard let string, !string.isEmpty else {
+            return nil
+        }
+
+        return formatter.date(from: string) ?? ISO8601DateFormatter().date(from: string)
+    }
+
+    static func format(_ date: Date) -> String {
+        formatter.string(from: Calendar.current.startOfDay(for: date))
+    }
+}
+
+/// Text / password field that commits on blur (focus lost) or return, only when the value changed.
+private struct TextPropertyEditor: View {
+    let property: NKUnifiedShareProperty
+    let secure: Bool
+    let onCommit: (String?) -> Void
+    @State private var text: String
+    @State private var committed: String
+    @FocusState private var focused: Bool
+
+    init(property: NKUnifiedShareProperty, secure: Bool, onCommit: @escaping (String?) -> Void) {
+        self.property = property
+        self.secure = secure
+        self.onCommit = onCommit
+        let initial = property.value ?? ""
+        _text = State(initialValue: initial)
+        _committed = State(initialValue: initial)
+    }
+
+    var body: some View {
+        field
+            .focused($focused)
+            .onChange(of: focused) {
+                if !focused {
+                    commit()
+                }
+            }
+            .onSubmit {
+                commit()
+            }
+    }
+
+    @ViewBuilder
+    private var field: some View {
+        if secure {
+            SecureField(property.displayName, text: $text)
+        } else {
+            TextField(property.displayName, text: $text)
+        }
+    }
+
+    private func commit() {
+        guard text != committed else {
+            return
+        }
+
+        committed = text
+        onCommit(text)
+    }
+}
+
+/// Editable token for a custom/private link recipient, with a regenerate button.
+private struct CustomLinkRow: View {
+    let recipient: NKUnifiedShareRecipient
+    let onCommit: (String) -> Void
+    let onRegenerate: () -> Void
+    @State private var token: String
+    @State private var committed: String
+    @FocusState private var focused: Bool
+
+    init(recipient: NKUnifiedShareRecipient, onCommit: @escaping (String) -> Void, onRegenerate: @escaping () -> Void) {
+        self.recipient = recipient
+        self.onCommit = onCommit
+        self.onRegenerate = onRegenerate
+        let initial = recipient.secret.value ?? ""
+        _token = State(initialValue: initial)
+        _committed = State(initialValue: initial)
+    }
+
+    var body: some View {
+        HStack {
+            TextField(String(localized: "Link token"), text: $token)
+                .focused($focused)
+                .onChange(of: focused) {
+                    if !focused, token != committed, !token.isEmpty {
+                        committed = token
+                        onCommit(token)
+                    }
+                }
+
+            Button {
+                onRegenerate()
+            } label: {
+                Image(systemName: "arrow.clockwise")
+            }
+            .buttonStyle(.plain)
+        }
     }
 }
 

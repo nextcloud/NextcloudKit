@@ -14,15 +14,27 @@ enum UnifiedShareViewState {
 @MainActor
 @Observable
 public class UnifiedShareEditModel {
+    /// Server class for a file/folder share source.
+    static let nodeSourceClass = "OCA\\Files\\Sharing\\Source\\NodeShareSourceType"
+    /// Server class for a public-link (token) recipient.
+    static let tokenRecipientClass = "OC\\Core\\Sharing\\Recipient\\TokenShareRecipientType"
+
     var state: UnifiedShareViewState = .loading
     /// Recipient autocomplete results — coexist with a loaded share, so kept out of `state`.
     var recipientResults: [NKUnifiedShareRecipient] = []
     /// Selectable permission presets advertised by the server's sharing capability.
     var permissionPresets: [NKUnifiedSharePermissionPreset] = []
+    /// Last property-update error text, keyed by property class (shown under the field).
+    var propertyErrors: [String: String] = [:]
+    /// Set once the draft has been activated (sent), so the sheet can dismiss.
+    var didActivate = false
     let account: String
+    /// Globally-unique id of the file/folder being shared (attached as the share source).
+    let sourceId: String?
 
-    init(account: String) {
+    init(account: String, sourceId: String? = nil) {
         self.account = account
+        self.sourceId = sourceId
     }
 
 #if DEBUG
@@ -32,6 +44,7 @@ public class UnifiedShareEditModel {
          recipientResults: [NKUnifiedShareRecipient] = [],
          permissionPresets: [NKUnifiedSharePermissionPreset] = []) {
         self.account = account
+        self.sourceId = nil
         self.state = state
         self.recipientResults = recipientResults
         self.permissionPresets = permissionPresets
@@ -72,13 +85,68 @@ public class UnifiedShareEditModel {
     func createShare() {
         Task {
             let result = await NextcloudKit.shared.createUnifiedShare(account: account)
-            guard let share = result.share else {
+            guard var share = result.share else {
                 state = .error(result.error)
                 return
             }
 
+            // Point the draft at the actual file/folder being shared.
+            if let sourceId, !sourceId.isEmpty {
+                let sourceResult = await NextcloudKit.shared.addUnifiedShareSource(id: share.id, sourceClass: Self.nodeSourceClass, value: sourceId, account: account)
+                if let updated = sourceResult.share {
+                    share = updated
+                }
+            }
+
             state = .shareUpdated(share: share)
         }
+    }
+
+    /// Switch between an invited-people share and a public-link (token) share.
+    func setShareeType(share: NKUnifiedShare, anyone: Bool) {
+        Task {
+            var current = share
+
+            if anyone {
+                for recipient in current.recipients where recipient.class != Self.tokenRecipientClass {
+                    current = await removingRecipient(from: current, recipient: recipient) ?? current
+                }
+
+                if !current.recipients.contains(where: { $0.class == Self.tokenRecipientClass }) {
+                    let result = await NextcloudKit.shared.addUnifiedShareRecipient(id: current.id, recipientClass: Self.tokenRecipientClass, value: UUID().uuidString, account: account)
+                    if let updated = result.share {
+                        current = updated
+                    }
+                }
+            } else {
+                for recipient in current.recipients where recipient.class == Self.tokenRecipientClass {
+                    current = await removingRecipient(from: current, recipient: recipient) ?? current
+                }
+            }
+
+            state = .shareUpdated(share: current)
+        }
+    }
+
+    private func removingRecipient(from share: NKUnifiedShare, recipient: NKUnifiedShareRecipient) async -> NKUnifiedShare? {
+        let result = await NextcloudKit.shared.removeUnifiedShareRecipient(id: share.id, recipientClass: recipient.class, value: recipient.value, instance: recipient.instance, account: account)
+        return result.share
+    }
+
+    /// Return the public link, activating the share first to mint it if needed.
+    func prepareLinkForCopy(share: NKUnifiedShare) async -> String? {
+        if let url = share.recipients.compactMap({ $0.secret.url }).first {
+            return url
+        }
+
+        let result = await NextcloudKit.shared.setUnifiedShareState(id: share.id, state: .active, account: account)
+        guard let updated = result.share else {
+            state = .error(result.error)
+            return nil
+        }
+
+        state = .shareUpdated(share: updated)
+        return updated.recipients.compactMap { $0.secret.url }.first
     }
 
     func searchRecipients(query: String) {
@@ -121,6 +189,68 @@ public class UnifiedShareEditModel {
             }
 
             state = .shareUpdated(share: share)
+        }
+    }
+
+    func setProperty(share: NKUnifiedShare, propertyClass: String, value: String?) {
+        Task {
+            let result = await NextcloudKit.shared.setUnifiedShareProperty(id: share.id, propertyClass: propertyClass, value: value, account: account)
+            guard let share = result.share else {
+                propertyErrors[propertyClass] = result.error.errorDescription
+                return
+            }
+
+            propertyErrors[propertyClass] = nil
+            state = .shareUpdated(share: share)
+        }
+    }
+
+    /// Activate the draft (draft → active). This is what persists the share and, for invited
+    /// recipients, triggers the server-side notification/email.
+    func activate(share: NKUnifiedShare) {
+        Task {
+            let result = await NextcloudKit.shared.setUnifiedShareState(id: share.id, state: .active, account: account)
+            guard let share = result.share else {
+                state = .error(result.error)
+                return
+            }
+
+            didActivate = true
+            state = .shareUpdated(share: share)
+        }
+    }
+
+    /// Discard on dismiss only while still a draft (an activated/link share is kept).
+    func discardDraftIfNeeded(share: NKUnifiedShare) {
+        guard share.state == .draft else {
+            return
+        }
+
+        deleteShare(share: share)
+    }
+
+    func updateRecipientSecret(share: NKUnifiedShare, recipient: NKUnifiedShareRecipient, secret: String) {
+        Task {
+            let result = await NextcloudKit.shared.setUnifiedShareRecipientSecret(id: share.id, recipientClass: recipient.class, value: recipient.value, secret: secret, instance: recipient.instance, account: account)
+            guard let share = result.share else {
+                state = .error(result.error)
+                return
+            }
+
+            state = .shareUpdated(share: share)
+        }
+    }
+
+    /// Mint a fresh server secret and apply it to the recipient (the "regenerate link" action).
+    func regenerateRecipientSecret(share: NKUnifiedShare, recipient: NKUnifiedShareRecipient) {
+        Task {
+            let generated = await NextcloudKit.shared.generateUnifiedShareSecret(account: account)
+            guard let secret = generated.secret else {
+                state = .error(generated.error)
+                return
+            }
+
+            updateRecipientSecret(share: share, recipient: recipient, secret: secret)
         }
     }
 }
