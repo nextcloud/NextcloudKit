@@ -15,6 +15,8 @@ public final class NKUnifiedShare: Codable {
     public let recipients: [NKUnifiedShareRecipient]
     public let properties: [NKUnifiedShareProperty]
     public let permissions: [NKUnifiedSharePermission]
+    /// Currently-applied permission preset class, if any.
+    public let permissionPreset: String?
 
     enum CodingKeys: String, CodingKey {
         case id
@@ -25,6 +27,7 @@ public final class NKUnifiedShare: Codable {
         case recipients
         case properties
         case permissions
+        case permissionPreset = "permission_preset"
     }
 
     public init(id: String,
@@ -34,7 +37,8 @@ public final class NKUnifiedShare: Codable {
                 sources: [NKUnifiedShareSource],
                 recipients: [NKUnifiedShareRecipient],
                 properties: [NKUnifiedShareProperty],
-                permissions: [NKUnifiedSharePermission]) {
+                permissions: [NKUnifiedSharePermission],
+                permissionPreset: String? = nil) {
         self.id = id
         self.owner = owner
         self.lastUpdated = lastUpdated
@@ -43,6 +47,7 @@ public final class NKUnifiedShare: Codable {
         self.recipients = recipients
         self.properties = properties
         self.permissions = permissions
+        self.permissionPreset = permissionPreset
     }
 
     public init(from decoder: Decoder) throws {
@@ -54,6 +59,7 @@ public final class NKUnifiedShare: Codable {
         self.sources = try c.decode([NKUnifiedShareSource].self, forKey: .sources)
         self.recipients = try c.decode([NKUnifiedShareRecipient].self, forKey: .recipients)
         self.permissions = try c.decode([NKUnifiedSharePermission].self, forKey: .permissions)
+        self.permissionPreset = try c.decodeIfPresent(String.self, forKey: .permissionPreset)
         self.properties = try Self.decodeProperties(from: c)
     }
 
@@ -67,6 +73,7 @@ public final class NKUnifiedShare: Codable {
         try c.encode(recipients, forKey: .recipients)
         try c.encode(permissions, forKey: .permissions)
         try c.encode(properties, forKey: .properties)
+        try c.encodeIfPresent(permissionPreset, forKey: .permissionPreset)
     }
 
     /// Dispatch each `properties` element to the correct subclass based on its `type` discriminator.

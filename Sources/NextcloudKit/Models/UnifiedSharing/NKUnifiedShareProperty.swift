@@ -23,6 +23,7 @@ public class NKUnifiedShareProperty: Codable {
     public let hint: String?
     public let priority: Int
     public let required: Bool
+    public let advanced: Bool
     public let value: String?
     public let type: NKUnifiedSharePropertyType
 
@@ -32,16 +33,18 @@ public class NKUnifiedShareProperty: Codable {
         case hint
         case priority
         case required
+        case advanced
         case value
         case type
     }
 
-    public init(class: String, displayName: String, hint: String?, priority: Int, required: Bool, value: String?, type: NKUnifiedSharePropertyType) {
+    public init(class: String, displayName: String, hint: String?, priority: Int, required: Bool, advanced: Bool, value: String?, type: NKUnifiedSharePropertyType) {
         self.class = `class`
         self.displayName = displayName
         self.hint = hint
         self.priority = priority
         self.required = required
+        self.advanced = advanced
         self.value = value
         self.type = type
     }
@@ -53,6 +56,7 @@ public class NKUnifiedShareProperty: Codable {
         self.hint = try c.decodeIfPresent(String.self, forKey: .hint)
         self.priority = try c.decode(Int.self, forKey: .priority)
         self.required = try c.decode(Bool.self, forKey: .required)
+        self.advanced = try c.decode(Bool.self, forKey: .advanced)
         self.value = try c.decodeIfPresent(String.self, forKey: .value)
         self.type = try c.decode(NKUnifiedSharePropertyType.self, forKey: .type)
     }
@@ -64,6 +68,7 @@ public class NKUnifiedShareProperty: Codable {
         try c.encodeIfPresent(hint, forKey: .hint)
         try c.encode(priority, forKey: .priority)
         try c.encode(required, forKey: .required)
+        try c.encode(advanced, forKey: .advanced)
         try c.encodeIfPresent(value, forKey: .value)
         try c.encode(type, forKey: .type)
     }
@@ -79,10 +84,10 @@ public final class NKUnifiedSharePropertyDate: NKUnifiedShareProperty {
         case maxDate = "max_date"
     }
 
-    public init(class: String, displayName: String, hint: String? = nil, priority: Int, required: Bool, value: String? = nil, minDate: String? = nil, maxDate: String? = nil) {
+    public init(class: String, displayName: String, hint: String? = nil, priority: Int, required: Bool, advanced: Bool = false, value: String? = nil, minDate: String? = nil, maxDate: String? = nil) {
         self.minDate = minDate
         self.maxDate = maxDate
-        super.init(class: `class`, displayName: displayName, hint: hint, priority: priority, required: required, value: value, type: .date)
+        super.init(class: `class`, displayName: displayName, hint: hint, priority: priority, required: required, advanced: advanced, value: value, type: .date)
     }
 
     public required init(from decoder: Decoder) throws {
@@ -108,9 +113,9 @@ public final class NKUnifiedSharePropertyEnum: NKUnifiedShareProperty {
         case validValues = "valid_values"
     }
 
-    public init(class: String, displayName: String, hint: String? = nil, priority: Int, required: Bool, value: String? = nil, validValues: [String]) {
+    public init(class: String, displayName: String, hint: String? = nil, priority: Int, required: Bool, advanced: Bool = false, value: String? = nil, validValues: [String]) {
         self.validValues = validValues
-        super.init(class: `class`, displayName: displayName, hint: hint, priority: priority, required: required, value: value, type: .enumeration)
+        super.init(class: `class`, displayName: displayName, hint: hint, priority: priority, required: required, advanced: advanced, value: value, type: .enumeration)
     }
 
     public required init(from decoder: Decoder) throws {
@@ -128,8 +133,8 @@ public final class NKUnifiedSharePropertyEnum: NKUnifiedShareProperty {
 
 /// Boolean-typed property; no additional fields.
 public final class NKUnifiedSharePropertyBoolean: NKUnifiedShareProperty {
-    public init(class: String, displayName: String, hint: String? = nil, priority: Int, required: Bool, value: String? = nil) {
-        super.init(class: `class`, displayName: displayName, hint: hint, priority: priority, required: required, value: value, type: .boolean)
+    public init(class: String, displayName: String, hint: String? = nil, priority: Int, required: Bool, advanced: Bool = false, value: String? = nil) {
+        super.init(class: `class`, displayName: displayName, hint: hint, priority: priority, required: required, advanced: advanced, value: value, type: .boolean)
     }
 
     public required init(from decoder: Decoder) throws {
@@ -139,8 +144,8 @@ public final class NKUnifiedSharePropertyBoolean: NKUnifiedShareProperty {
 
 /// Password-typed property; no additional fields.
 public final class NKUnifiedSharePropertyPassword: NKUnifiedShareProperty {
-    public init(class: String, displayName: String, hint: String? = nil, priority: Int, required: Bool, value: String? = nil) {
-        super.init(class: `class`, displayName: displayName, hint: hint, priority: priority, required: required, value: value, type: .password)
+    public init(class: String, displayName: String, hint: String? = nil, priority: Int, required: Bool, advanced: Bool = false, value: String? = nil) {
+        super.init(class: `class`, displayName: displayName, hint: hint, priority: priority, required: required, advanced: advanced, value: value, type: .password)
     }
 
     public required init(from decoder: Decoder) throws {
@@ -158,10 +163,10 @@ public final class NKUnifiedSharePropertyString: NKUnifiedShareProperty {
         case maxLength = "max_length"
     }
 
-    public init(class: String, displayName: String, hint: String? = nil, priority: Int, required: Bool, value: String? = nil, minLength: Int? = nil, maxLength: Int? = nil) {
+    public init(class: String, displayName: String, hint: String? = nil, priority: Int, required: Bool, advanced: Bool = false, value: String? = nil, minLength: Int? = nil, maxLength: Int? = nil) {
         self.minLength = minLength
         self.maxLength = maxLength
-        super.init(class: `class`, displayName: displayName, hint: hint, priority: priority, required: required, value: value, type: .string)
+        super.init(class: `class`, displayName: displayName, hint: hint, priority: priority, required: required, advanced: advanced, value: value, type: .string)
     }
 
     public required init(from decoder: Decoder) throws {

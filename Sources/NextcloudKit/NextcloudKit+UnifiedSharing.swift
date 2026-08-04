@@ -10,7 +10,8 @@ public extension NextcloudKit {
     // MARK: - List & search
 
     /// `GET /shares` — paginated list of shares the current user can see.
-    func listUnifiedShares(sourceClass: String? = nil,
+    func listUnifiedShares(filterSourceTypeClass: String? = nil,
+                           filterSourceTypeValue: String? = nil,
                            lastShareID: String? = nil,
                            limit: Int? = nil,
                            account: String,
@@ -25,7 +26,8 @@ public extension NextcloudKit {
         }
 
         var parameters: [String: String] = [:]
-        if let sourceClass { parameters["sourceClass"] = sourceClass }
+        if let filterSourceTypeClass { parameters["filterSourceTypeClass"] = filterSourceTypeClass }
+        if let filterSourceTypeValue { parameters["filterSourceTypeValue"] = filterSourceTypeValue }
         if let lastShareID { parameters["lastShareID"] = lastShareID }
         if let limit { parameters["limit"] = String(limit) }
 
@@ -45,7 +47,7 @@ public extension NextcloudKit {
 
     /// `GET /recipients` — search recipients (users, groups, federated …) by free-text query.
     func searchUnifiedShareRecipients(query: String,
-                                      recipientTypeClass: String? = nil,
+                                      recipientTypeClasses: [String]? = nil,
                                       limit: Int? = nil,
                                       offset: Int? = nil,
                                       account: String,
@@ -59,14 +61,25 @@ public extension NextcloudKit {
             return (account, nil, nil, .urlError)
         }
 
-        var parameters: [String: String] = ["query": query]
-        if let recipientTypeClass { parameters["recipientTypeClass"] = recipientTypeClass }
-        if let limit { parameters["limit"] = String(limit) }
-        if let offset { parameters["offset"] = String(offset) }
+        // Build the query manually so `recipientTypeClasses[]` can repeat once per element
+        // (a plain [String: String] can't hold an array, and [String: Any] isn't Sendable).
+        guard let baseURL = try? url.asURL(),
+              var components = URLComponents(url: baseURL, resolvingAgainstBaseURL: false) else {
+            return (account, nil, nil, .urlError)
+        }
+
+        var queryItems: [URLQueryItem] = [URLQueryItem(name: "query", value: query)]
+        recipientTypeClasses?.forEach { queryItems.append(URLQueryItem(name: "recipientTypeClasses[]", value: $0)) }
+        if let limit { queryItems.append(URLQueryItem(name: "limit", value: String(limit))) }
+        if let offset { queryItems.append(URLQueryItem(name: "offset", value: String(offset))) }
+        components.queryItems = queryItems
+
+        guard let requestURL = components.url else {
+            return (account, nil, nil, .urlError)
+        }
 
         let response = await nkSession.sessionData
-            .request(url, method: .get, parameters: parameters, encoding: URLEncoding.default,
-                     headers: headers, interceptor: NKInterceptor(nkCommonInstance: nkCommonInstance))
+            .request(requestURL, method: .get, headers: headers, interceptor: NKInterceptor(nkCommonInstance: nkCommonInstance))
             .validate(statusCode: 200..<300)
             .onURLSessionTaskCreation { task in
                 task.taskDescription = options.taskDescription
@@ -85,6 +98,85 @@ public extension NextcloudKit {
                     return (account, nil, response, NKError(statusCode: wrap.ocs.meta.statuscode, fallbackDescription: wrap.ocs.meta.message ?? "", responseData: data))
                 }
                 return (account, wrap.ocs.data, response, .success)
+            } catch {
+                return (account, nil, response, NKError(error: error, responseData: data))
+            }
+        }
+    }
+
+    /// `GET /secret` — generate a new server-side secret (returns the secret string).
+    func generateUnifiedShareSecret(account: String,
+                                    options: NKRequestOptions = NKRequestOptions(),
+                                    taskHandler: @Sendable @escaping (_ task: URLSessionTask) -> Void = { _ in }
+    ) async -> (account: String, secret: String?, responseData: AFDataResponse<Data>?, error: NKError) {
+        let endpoint = "ocs/v2.php/apps/sharing/api/v1/secret"
+        guard let nkSession = nkCommonInstance.nksessions.session(forAccount: account),
+              let url = nkCommonInstance.createStandardUrl(serverUrl: nkSession.urlBase, endpoint: endpoint),
+              let headers = nkCommonInstance.getStandardHeaders(account: account, options: options) else {
+            return (account, nil, nil, .urlError)
+        }
+
+        let response = await nkSession.sessionData
+            .request(url, method: .get, headers: headers, interceptor: NKInterceptor(nkCommonInstance: nkCommonInstance))
+            .validate(statusCode: 200..<300)
+            .onURLSessionTaskCreation { task in
+                task.taskDescription = options.taskDescription
+                taskHandler(task)
+            }
+            .serializingData()
+            .response
+
+        switch response.result {
+        case .failure(let error):
+            return (account, nil, response, NKError(error: error, afResponse: response, responseData: response.data))
+        case .success(let data):
+            do {
+                let wrap = try JSONDecoder().decode(NKOCSWrapper<String>.self, from: data)
+                guard 200..<300 ~= wrap.ocs.meta.statuscode else {
+                    return (account, nil, response, NKError(statusCode: wrap.ocs.meta.statuscode, fallbackDescription: wrap.ocs.meta.message ?? "", responseData: data))
+                }
+                return (account, wrap.ocs.data, response, .success)
+            } catch {
+                return (account, nil, response, NKError(error: error, responseData: data))
+            }
+        }
+    }
+
+    // MARK: - Capabilities
+
+    /// `GET /cloud/capabilities` — the unified-sharing capability block, or `nil` if the server
+    /// doesn't advertise it.
+    func getUnifiedSharingCapabilities(account: String,
+                                       options: NKRequestOptions = NKRequestOptions(),
+                                       taskHandler: @Sendable @escaping (_ task: URLSessionTask) -> Void = { _ in }
+    ) async -> (account: String, capabilities: NKUnifiedSharingCapabilities?, responseData: AFDataResponse<Data>?, error: NKError) {
+        let endpoint = "ocs/v2.php/cloud/capabilities"
+        guard let nkSession = nkCommonInstance.nksessions.session(forAccount: account),
+              let url = nkCommonInstance.createStandardUrl(serverUrl: nkSession.urlBase, endpoint: endpoint),
+              let headers = nkCommonInstance.getStandardHeaders(account: account, options: options) else {
+            return (account, nil, nil, .urlError)
+        }
+
+        let response = await nkSession.sessionData
+            .request(url, method: .get, headers: headers, interceptor: NKInterceptor(nkCommonInstance: nkCommonInstance))
+            .validate(statusCode: 200..<300)
+            .onURLSessionTaskCreation { task in
+                task.taskDescription = options.taskDescription
+                taskHandler(task)
+            }
+            .serializingData()
+            .response
+
+        switch response.result {
+        case .failure(let error):
+            return (account, nil, response, NKError(error: error, afResponse: response, responseData: response.data))
+        case .success(let data):
+            do {
+                let wrap = try JSONDecoder().decode(NKOCSWrapper<CapabilitiesEnvelope>.self, from: data)
+                guard 200..<300 ~= wrap.ocs.meta.statuscode else {
+                    return (account, nil, response, NKError(statusCode: wrap.ocs.meta.statuscode, fallbackDescription: wrap.ocs.meta.message ?? "", responseData: data))
+                }
+                return (account, wrap.ocs.data.capabilities.sharing, response, .success)
             } catch {
                 return (account, nil, response, NKError(error: error, responseData: data))
             }
@@ -203,18 +295,34 @@ public extension NextcloudKit {
 
     // MARK: - Share mutations (return the updated share)
 
-    /// `PUT /share/{id}/enabled` — toggle a permission.
-    func setUnifiedSharePermissionEnabled(id: String,
-                                          permissionClass: String,
-                                          enabled: Bool,
-                                          account: String,
-                                          options: NKRequestOptions = NKRequestOptions(),
-                                          taskHandler: @Sendable @escaping (_ task: URLSessionTask) -> Void = { _ in }
+    /// `PUT /share/{id}/permission` — toggle a permission.
+    func setUnifiedSharePermission(id: String,
+                                   permissionClass: String,
+                                   enabled: Bool,
+                                   account: String,
+                                   options: NKRequestOptions = NKRequestOptions(),
+                                   taskHandler: @Sendable @escaping (_ task: URLSessionTask) -> Void = { _ in }
     ) async -> (account: String, share: NKUnifiedShare?, responseData: AFDataResponse<Data>?, error: NKError) {
         await mutateUnifiedShare(method: .put,
-                                 subpath: "enabled",
+                                 subpath: "permission",
                                  id: id,
                                  body: ["class": permissionClass, "enabled": enabled],
+                                 account: account,
+                                 options: options,
+                                 taskHandler: taskHandler)
+    }
+
+    /// `PUT /share/{id}/permission/preset` — apply a permission preset.
+    func setUnifiedSharePermissionPreset(id: String,
+                                         permissionPresetClass: String,
+                                         account: String,
+                                         options: NKRequestOptions = NKRequestOptions(),
+                                         taskHandler: @Sendable @escaping (_ task: URLSessionTask) -> Void = { _ in }
+    ) async -> (account: String, share: NKUnifiedShare?, responseData: AFDataResponse<Data>?, error: NKError) {
+        await mutateUnifiedShare(method: .put,
+                                 subpath: "permission/preset",
+                                 id: id,
+                                 body: ["permissionPresetClass": permissionPresetClass],
                                  account: account,
                                  options: options,
                                  taskHandler: taskHandler)
@@ -293,6 +401,27 @@ public extension NextcloudKit {
                                                  account: account,
                                                  options: options,
                                                  taskHandler: taskHandler)
+    }
+
+    /// `PUT /share/{id}/recipient/secret` — set/rotate a recipient's secret.
+    func setUnifiedShareRecipientSecret(id: String,
+                                        recipientClass: String,
+                                        value: String,
+                                        secret: String,
+                                        instance: String? = nil,
+                                        account: String,
+                                        options: NKRequestOptions = NKRequestOptions(),
+                                        taskHandler: @Sendable @escaping (_ task: URLSessionTask) -> Void = { _ in }
+    ) async -> (account: String, share: NKUnifiedShare?, responseData: AFDataResponse<Data>?, error: NKError) {
+        var body: [String: Any] = ["class": recipientClass, "value": value, "secret": secret]
+        if let instance { body["instance"] = instance }
+        return await mutateUnifiedShare(method: .put,
+                                        subpath: "recipient/secret",
+                                        id: id,
+                                        body: body,
+                                        account: account,
+                                        options: options,
+                                        taskHandler: taskHandler)
     }
 
     /// `POST /share/{id}/source` — add a source.
@@ -443,6 +572,15 @@ public extension NextcloudKit {
             } catch {
                 return (account, nil, response, NKError(error: error, responseData: data))
             }
+        }
+    }
+
+    /// `ocs.data` shape of `/cloud/capabilities`, narrowed to the unified-sharing block.
+    private struct CapabilitiesEnvelope: Decodable {
+        let capabilities: Capabilities
+
+        struct Capabilities: Decodable {
+            let sharing: NKUnifiedSharingCapabilities?
         }
     }
 }

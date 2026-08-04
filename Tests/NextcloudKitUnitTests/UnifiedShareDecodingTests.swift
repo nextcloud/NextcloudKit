@@ -42,6 +42,7 @@ struct UnifiedShareDecodingTests {
                   "hint": null,
                   "priority": 10,
                   "required": false,
+                  "advanced": false,
                   "value": null,
                   "type": "date",
                   "min_date": "2026-01-01",
@@ -53,6 +54,7 @@ struct UnifiedShareDecodingTests {
                   "hint": null,
                   "priority": 20,
                   "required": true,
+                  "advanced": true,
                   "value": "editor",
                   "type": "enum",
                   "valid_values": ["viewer", "editor"]
@@ -63,6 +65,7 @@ struct UnifiedShareDecodingTests {
                   "hint": null,
                   "priority": 30,
                   "required": false,
+                  "advanced": false,
                   "value": "true",
                   "type": "boolean"
                 },
@@ -72,6 +75,7 @@ struct UnifiedShareDecodingTests {
                   "hint": "Min 8 chars",
                   "priority": 40,
                   "required": false,
+                  "advanced": true,
                   "value": null,
                   "type": "password"
                 },
@@ -81,6 +85,7 @@ struct UnifiedShareDecodingTests {
                   "hint": null,
                   "priority": 50,
                   "required": false,
+                  "advanced": false,
                   "value": "hi",
                   "type": "string",
                   "min_length": 0,
@@ -101,11 +106,13 @@ struct UnifiedShareDecodingTests {
 
         let p0 = try #require(share.properties[0] as? NKUnifiedSharePropertyDate)
         #expect(p0.type == .date)
+        #expect(p0.advanced == false)
         #expect(p0.minDate == "2026-01-01")
         #expect(p0.maxDate == nil)
 
         let p1 = try #require(share.properties[1] as? NKUnifiedSharePropertyEnum)
         #expect(p1.type == .enumeration)
+        #expect(p1.advanced == true)
         #expect(p1.validValues == ["viewer", "editor"])
 
         let p2 = try #require(share.properties[2] as? NKUnifiedSharePropertyBoolean)
@@ -178,5 +185,80 @@ struct UnifiedShareDecodingTests {
         #expect(wrap.ocs.meta.statuscode == 200)
         #expect(wrap.ocs.meta.message == "OK")
         #expect(wrap.ocs.data.isEmpty)
+    }
+
+    @Test("Decodes permission, recipient secret/initiator and share permission_preset")
+    func decodesPermissionRecipientAndPreset() throws {
+        let json = """
+        {
+          "ocs": {
+            "meta": { "status": "ok", "statuscode": 200 },
+            "data": {
+              "id": "s3",
+              "owner": { "user_id": "alice", "instance": null, "display_name": "Alice", "icon": { "svg": "<svg/>" } },
+              "last_updated": 0,
+              "state": "active",
+              "sources": [],
+              "recipients": [
+                {
+                  "class": "link",
+                  "value": "token",
+                  "instance": null,
+                  "display_name": "Public link",
+                  "icon": null,
+                  "secret": { "updatable": true, "url": "https://x/s/abc" },
+                  "initiator": { "user_id": "alice", "instance": null, "display_name": "Alice", "icon": { "svg": "<svg/>" } }
+                }
+              ],
+              "permissions": [
+                {
+                  "class": "download",
+                  "source_class": null,
+                  "display_name": "Allow download",
+                  "hint": null,
+                  "priority": 30,
+                  "presets": ["viewer", "editor"],
+                  "enabled": true
+                }
+              ],
+              "properties": [],
+              "permission_preset": "editor"
+            }
+          }
+        }
+        """
+
+        let share = try decodeShare(json: json)
+
+        #expect(share.permissionPreset == "editor")
+
+        let permission = try #require(share.permissions.first)
+        #expect(permission.sourceClass == nil)
+        #expect(permission.priority == 30)
+        #expect(permission.presets == ["viewer", "editor"])
+        #expect(permission.enabled == true)
+
+        let recipient = try #require(share.recipients.first)
+        #expect(recipient.secret.updatable == true)
+        #expect(recipient.secret.url == "https://x/s/abc")
+        #expect(recipient.secret.value == nil)
+        #expect(recipient.initiator?.userId == "alice")
+    }
+
+    @Test("Decodes the sharing capabilities block")
+    func decodesSharingCapabilities() throws {
+        let json = """
+        {
+          "api_versions": ["v1"],
+          "source_types": [ { "class": "file" } ],
+          "permission_presets": [ { "class": "viewer", "display_name": "Viewer", "hint": null } ]
+        }
+        """
+        let caps = try JSONDecoder().decode(NKUnifiedSharingCapabilities.self, from: Data(json.utf8))
+
+        #expect(caps.apiVersions == ["v1"])
+        #expect(caps.sourceTypes.first?.class == "file")
+        #expect(caps.permissionPresets.first?.class == "viewer")
+        #expect(caps.permissionPresets.first?.displayName == "Viewer")
     }
 }

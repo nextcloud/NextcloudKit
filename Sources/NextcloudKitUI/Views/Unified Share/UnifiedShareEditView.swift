@@ -4,6 +4,9 @@
 
 import SwiftUI
 import NextcloudKit
+#if canImport(UIKit)
+import UIKit
+#endif
 
 /// View used for Unified Sharing.
 public struct UnifiedShareEditView: View {
@@ -12,7 +15,7 @@ public struct UnifiedShareEditView: View {
     @State private var model: UnifiedShareEditModel
 
     @State private var shareeType: ShareeType = .invited
-    @State private var permission: Permission = .canView
+    @State private var permissionSelection: PermissionSelection = .unset
     @State private var isSettingsExpanded = true
     @State private var recipients = ""
     @State private var note = ""
@@ -50,7 +53,11 @@ public struct UnifiedShareEditView: View {
                             shareeTypePicker
 
                             //            VStack(spacing: 18) {
-                            if shareeType == .invited && share.recipients.isEmpty {
+                            if shareeType == .invited {
+                                if !share.recipients.isEmpty {
+                                    recipientPills(share: share)
+                                }
+
                                 TextField(
                                     String(localized: "Add people"),
                                     text: $recipients
@@ -60,14 +67,17 @@ public struct UnifiedShareEditView: View {
                                 }
                                 // Publish the field's frame so the dropdown can be drawn outside the Form.
                                 .anchorPreference(key: AddPeopleFieldAnchorKey.self, value: .bounds) { $0 }
-
-                            } else if let recipient = share.recipients.first {
-                                Text(recipient.displayName)
+                            } else {
+                                recipientPills(share: share)
                             }
 
-                            permissionField
+                            permissionField(share: share)
+
+                            ForEach(basicProperties(share), id: \.class) { property in
+                                propertyRow(property)
+                            }
                         }
-                        settingsRow
+                        settingsRow(share: share)
 
                         TextField(
                             String(localized: "Note to recipients"),
@@ -75,7 +85,7 @@ public struct UnifiedShareEditView: View {
                             axis: .vertical
                         )
 
-                        actionButtons
+                        actionButtons(share: share)
 //                        }
 
                     }
@@ -109,6 +119,7 @@ public struct UnifiedShareEditView: View {
         }
         .task {
             model.createShare()
+            model.loadCapabilities()
         }
 
         Spacer()
@@ -127,24 +138,89 @@ public struct UnifiedShareEditView: View {
 
     }
 
-    private var permissionField: some View {
-//        LabeledContent(String(localized: shareeType == .anyone ? "Anyone with the link" : "Participants")) {
-            Picker(String(localized: "Participants"), selection: $permission) {
-                ForEach(Permission.allCases) { permission in
-                    Text(permission.localizedTitle)
-                        .tag(permission)
+    @ViewBuilder
+    private func permissionField(share: NKUnifiedShare) -> some View {
+        Picker(String(localized: "Participants"), selection: Binding(
+            get: { isCustomSelected(share) ? Self.customTag : (selectedPresetClass(share) ?? Self.customTag) },
+            set: { tag in
+                if tag == Self.customTag {
+                    permissionSelection = .custom
+                } else {
+                    permissionSelection = .preset(tag)
+                    model.setPermissionPreset(share: share, presetClass: tag)
                 }
             }
-            .pickerStyle(.menu)
-//        }
+        )) {
+            ForEach(applicablePresets(share), id: \.class) { preset in
+                Text(preset.displayName)
+                    .tag(preset.class)
+            }
+
+            // Custom: reveals the per-permission toggles below. Client-side only, no request.
+            Text(String(localized: "Can…"))
+                .tag(Self.customTag)
+        }
+        .pickerStyle(.menu)
+
+        if isCustomSelected(share) {
+            ForEach(share.permissions, id: \.class) { permission in
+                PermissionToggleRow(permission: permission) { enabled in
+                    model.setPermission(share: share, permissionClass: permission.class, enabled: enabled)
+                }
+            }
+        }
     }
 
-    private var settingsRow: some View {
+    /// Sentinel tag for the synthesized "Custom" option (distinct from any real preset class).
+    private static let customTag = "__nk_custom_permissions__"
+
+    /// Presets from the capability, narrowed to those the share's permissions reference.
+    private func applicablePresets(_ share: NKUnifiedShare) -> [NKUnifiedSharePermissionPreset] {
+        let applicable = Set(share.permissions.flatMap { $0.presets })
+        return model.permissionPresets.filter { applicable.contains($0.class) }
+    }
+
+    /// The effective preset class: the user's pick, else the share's server-side preset.
+    private func selectedPresetClass(_ share: NKUnifiedShare) -> String? {
+        switch permissionSelection {
+        case .unset: return share.permissionPreset
+        case .custom: return nil
+        case .preset(let presetClass): return presetClass
+        }
+    }
+
+    /// Custom mode (toggles shown) when there's no preset, or the preset isn't a known one.
+    private func isCustomSelected(_ share: NKUnifiedShare) -> Bool {
+        guard let presetClass = selectedPresetClass(share) else {
+            return true
+        }
+
+        return !applicablePresets(share).contains { $0.class == presetClass }
+    }
+
+    /// Advanced properties live behind the disclosure; basic ones are shown inline in the form.
+    private func settingsRow(share: NKUnifiedShare) -> some View {
         DisclosureGroup(isExpanded: $isSettingsExpanded) {
-            Text("Test")
-            Text("Test")
+            ForEach(advancedProperties(share), id: \.class) { property in
+                propertyRow(property)
+            }
         } label: {
             Text(String(localized: "Settings"))
+        }
+    }
+
+    private func basicProperties(_ share: NKUnifiedShare) -> [NKUnifiedShareProperty] {
+        share.properties.filter { !$0.advanced }
+    }
+
+    private func advancedProperties(_ share: NKUnifiedShare) -> [NKUnifiedShareProperty] {
+        share.properties.filter { $0.advanced }
+    }
+
+    private func propertyRow(_ property: NKUnifiedShareProperty) -> some View {
+        LabeledContent(property.displayName) {
+            Text(property.value ?? property.hint ?? "")
+                .foregroundStyle(.secondary)
         }
     }
 
@@ -154,6 +230,7 @@ public struct UnifiedShareEditView: View {
                 ForEach(model.recipientResults, id: \.value) { recipient in
                     Button {
                         model.addRecipient(share: share, recipient: recipient)
+                        recipients = ""
                     } label: {
                         HStack(spacing: 10) {
                             if let icon = recipient.icon {
@@ -207,16 +284,60 @@ public struct UnifiedShareEditView: View {
         }
     }
 
-//    private func selectRecipient(_ recipient: NKUnifiedShareRecipient) {
-//        recipients = ""
-//    }
+    private func recipientPills(share: NKUnifiedShare) -> some View {
+        FlowLayout(spacing: 8) {
+            ForEach(share.recipients, id: \.value) { recipient in
+                recipientPill(recipient, share: share)
+            }
+        }
+    }
 
-    private var actionButtons: some View {
+    private func recipientPill(_ recipient: NKUnifiedShareRecipient, share: NKUnifiedShare) -> some View {
+        HStack(spacing: 6) {
+            recipientAvatar(recipient)
+
+            Text(recipient.displayName)
+                .lineLimit(1)
+
+            Button {
+                model.removeRecipient(share: share, recipient: recipient)
+            } label: {
+                Image(systemName: "xmark")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+            .buttonStyle(.plain)
+        }
+        .padding(.horizontal, 12)
+        .padding(.vertical, 6)
+        .background(Capsule().fill(.quaternary))
+        .overlay(Capsule().stroke(.tertiary, lineWidth: 0.5))
+    }
+
+    /// The recipient's URL avatar when available, otherwise a circle with its initial.
+    @ViewBuilder
+    private func recipientAvatar(_ recipient: NKUnifiedShareRecipient) -> some View {
+        if let icon = recipient.icon, icon.light != nil || icon.dark != nil {
+            recipientIcon(icon)
+        } else {
+            Circle()
+                .fill(.quaternary)
+                .frame(width: 24, height: 24)
+                .overlay {
+                    Text(recipient.displayName.prefix(1).uppercased())
+                        .font(.caption)
+                }
+        }
+    }
+
+    private func actionButtons(share: NKUnifiedShare) -> some View {
         HStack(spacing: 16) {
             Button(String(localized: "Copy link")) {
+                copyLink(share)
             }
             .buttonStyle(.bordered)
             .frame(maxWidth: .infinity)
+            .disabled(linkURL(share) == nil)
 
             Button(String(localized: "Send")) {
             }
@@ -224,6 +345,72 @@ public struct UnifiedShareEditView: View {
             .frame(maxWidth: .infinity)
         }
         .padding(.top, 18)
+    }
+
+    /// The share's public link, taken from the first recipient that carries one.
+    private func linkURL(_ share: NKUnifiedShare) -> String? {
+        share.recipients.compactMap { $0.secret.url }.first
+    }
+
+    private func copyLink(_ share: NKUnifiedShare) {
+        guard let link = linkURL(share) else {
+            return
+        }
+
+        #if canImport(UIKit)
+        UIPasteboard.general.string = link
+        #endif
+    }
+}
+
+/// A simple left-to-right layout that wraps its subviews onto new rows when they overflow.
+private struct FlowLayout: Layout {
+    var spacing: CGFloat = 8
+
+    func sizeThatFits(proposal: ProposedViewSize, subviews: Subviews, cache: inout Void) -> CGSize {
+        let maxWidth = proposal.width ?? .infinity
+        var rowWidth: CGFloat = 0
+        var rowHeight: CGFloat = 0
+        var totalWidth: CGFloat = 0
+        var totalHeight: CGFloat = 0
+
+        for subview in subviews {
+            let size = subview.sizeThatFits(.unspecified)
+
+            if rowWidth > 0, rowWidth + spacing + size.width > maxWidth {
+                totalWidth = max(totalWidth, rowWidth)
+                totalHeight += rowHeight + spacing
+                rowWidth = size.width
+                rowHeight = size.height
+            } else {
+                rowWidth += (rowWidth > 0 ? spacing : 0) + size.width
+                rowHeight = max(rowHeight, size.height)
+            }
+        }
+
+        totalWidth = max(totalWidth, rowWidth)
+        totalHeight += rowHeight
+        return CGSize(width: min(totalWidth, maxWidth), height: totalHeight)
+    }
+
+    func placeSubviews(in bounds: CGRect, proposal: ProposedViewSize, subviews: Subviews, cache: inout Void) {
+        var x = bounds.minX
+        var y = bounds.minY
+        var rowHeight: CGFloat = 0
+
+        for subview in subviews {
+            let size = subview.sizeThatFits(.unspecified)
+
+            if x > bounds.minX, x + size.width > bounds.maxX {
+                x = bounds.minX
+                y += rowHeight + spacing
+                rowHeight = 0
+            }
+
+            subview.place(at: CGPoint(x: x, y: y), anchor: .topLeading, proposal: ProposedViewSize(size))
+            x += size.width + spacing
+            rowHeight = max(rowHeight, size.height)
+        }
     }
 }
 
@@ -242,34 +429,46 @@ private extension UnifiedShareEditView {
         case anyone
     }
 
-    enum Permission: CaseIterable, Identifiable {
-        case canView
-        case canEdit
-        case fileDrop
-        case customPermissions
+    /// The participants dropdown state: follow the share's server preset, a chosen preset, or Custom.
+    enum PermissionSelection: Equatable {
+        case unset
+        case custom
+        case preset(String)
+    }
+}
 
-        var id: Self {
-            self
-        }
+/// A single permission toggle. Keeps local state for immediate feedback, then reports the change.
+private struct PermissionToggleRow: View {
+    let permission: NKUnifiedSharePermission
+    let onChange: (Bool) -> Void
 
-        var localizedTitle: String {
-            switch self {
-                case .canView:
-                    String(localized: "Can view")
-                case .canEdit:
-                    String(localized: "Can edit")
-                case .fileDrop:
-                    String(localized: "File drop")
-                case .customPermissions:
-                    String(localized: "Custom permissions")
+    @State private var isOn: Bool
+
+    init(permission: NKUnifiedSharePermission, onChange: @escaping (Bool) -> Void) {
+        self.permission = permission
+        self.onChange = onChange
+        _isOn = State(initialValue: permission.enabled)
+    }
+
+    var body: some View {
+        Toggle(permission.displayName, isOn: $isOn)
+            .onChange(of: isOn) {
+                onChange(isOn)
             }
-        }
     }
 }
 
 #Preview {
     UnifiedShareEditView(
         fileName: "Test.txt",
-        model: UnifiedShareEditModel(account: "", state: .shareUpdated(share: .mock), recipientResults: .mocks)
+        model: UnifiedShareEditModel(
+            account: "",
+            state: .shareUpdated(share: .mock),
+            recipientResults: .mocks,
+            permissionPresets: [
+                NKUnifiedSharePermissionPreset(class: "viewer", displayName: "Can view"),
+                NKUnifiedSharePermissionPreset(class: "editor", displayName: "Can edit")
+            ]
+        )
     )
 }

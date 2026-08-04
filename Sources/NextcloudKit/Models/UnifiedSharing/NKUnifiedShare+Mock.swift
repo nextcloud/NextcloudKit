@@ -26,15 +26,7 @@ public extension NKUnifiedShare {
                     icon: NKUnifiedShareIcon(svg: nil, light: "https://example.com/light.png", dark: "https://example.com/dark.png")
                 )
             ],
-            recipients: [
-//                NKUnifiedShareRecipient(
-//                    class: "user",
-//                    value: "bob",
-//                    instance: nil,
-//                    displayName: "Bob",
-//                    icon: NKUnifiedShareIcon(svg: "<svg/>", light: nil, dark: nil)
-//                )
-            ],
+            recipients: .mocks,
             properties: [
                 NKUnifiedSharePropertyDate(
                     class: "expiration",
@@ -76,14 +68,12 @@ public extension NKUnifiedShare {
                 )
             ],
             permissions: [
-                NKUnifiedSharePermission(
-                    class: "download",
-                    displayName: "Allow download",
-                    hint: nil,
-                    category: nil,
-                    enabled: true
-                )
-            ]
+                NKUnifiedSharePermission(class: "read", sourceClass: nil, displayName: "View files", hint: nil, priority: 1, presets: ["viewer", "editor"], enabled: true),
+                NKUnifiedSharePermission(class: "update", sourceClass: nil, displayName: "Edit files", hint: nil, priority: 2, presets: ["editor"], enabled: false),
+                NKUnifiedSharePermission(class: "share", sourceClass: nil, displayName: "Share with others", hint: nil, priority: 3, presets: ["editor"], enabled: false),
+                NKUnifiedSharePermission(class: "download", sourceClass: nil, displayName: "Download files", hint: nil, priority: 4, presets: ["viewer", "editor"], enabled: true)
+            ],
+            permissionPreset: nil
         )
     }
 }
