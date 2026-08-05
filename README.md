@@ -23,11 +23,11 @@ dependencies: [
 
 ### Manual
 
-To vendor **NextcloudKit** instead of resolving it from GitHub, clone this repo somewhere inside your project folder and add it as a local package.
+To add **NextcloudKit** to your app, clone this repo and place it somewhere in your project folder. 
 
 In an Xcode project, drag the cloned folder into the Project navigator — Xcode picks it up as a local Swift package. Then select your app target and add the `NextcloudKit` library (and `NextcloudKitUI`, if you need the UI components) under `General ▸ Frameworks, Libraries, and Embedded Content`.
 
-In another Swift package, reference it by path instead:
+If used in another Swift package, reference it by path instead:
 
 ```swift
 dependencies: [
