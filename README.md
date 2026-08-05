@@ -11,16 +11,6 @@
 
 ## Installation
 
-### Carthage
-
-[Carthage](https://github.com/Carthage/Carthage) is a decentralized dependency manager that builds your dependencies and provides you with binary frameworks. To integrate **NextcloudKit** into your Xcode project using Carthage, specify it in your `Cartfile`:
-
-```
-github "nextcloud/NextcloudKit" "main"
-```
-
-Run `carthage update` to build the framework and drag the built `NextcloudKit.framework` into your Xcode project.
-
 ### Swift Package Manager
 
 [Swift Package Manager](https://swift.org/package-manager/) is a tool for automating the distribution of Swift code and is integrated into the `swift` compiler. Once you have your Swift package set up, adding NextcloudKit as a dependency is as easy as adding it to the `dependencies` value of your `Package.swift`.
@@ -33,8 +23,17 @@ dependencies: [
 
 ### Manual
 
-To add **NextcloudKit** to your app without Carthage, clone this repo and place it somewhere in your project folder. 
-Then, add `NextcloudKit.xcodeproj` to your project, select your app target and add the NextcloudKit framework as an embedded binary under `General` and as a target dependency under `Build Phases`.
+To vendor **NextcloudKit** instead of resolving it from GitHub, clone this repo somewhere inside your project folder and add it as a local package.
+
+In an Xcode project, drag the cloned folder into the Project navigator — Xcode picks it up as a local Swift package. Then select your app target and add the `NextcloudKit` library (and `NextcloudKitUI`, if you need the UI components) under `General ▸ Frameworks, Libraries, and Embedded Content`.
+
+In another Swift package, reference it by path instead:
+
+```swift
+dependencies: [
+    .package(path: "../NextcloudKit")
+]
+```
 
 ## Testing
 
