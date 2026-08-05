@@ -5,7 +5,7 @@
 import Foundation
 
 /// A unified share returned by `ocs/v2.php/apps/sharing/api/v1/...`.
-public final class NKUnifiedShare: Codable {
+public final class NKUnifiedShare: Codable, Identifiable {
     public let id: String
     public let owner: NKUnifiedShareOwner
     /// Unix time in milliseconds.

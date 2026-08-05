@@ -336,8 +336,8 @@ public extension NextcloudKit {
                                  options: NKRequestOptions = NKRequestOptions(),
                                  taskHandler: @Sendable @escaping (_ task: URLSessionTask) -> Void = { _ in }
     ) async -> (account: String, share: NKUnifiedShare?, responseData: AFDataResponse<Data>?, error: NKError) {
-        var body: [String: Any] = ["class": propertyClass]
-        if let value { body["value"] = value }
+        // Send an explicit null value to clear a property (e.g. removing an expiration date).
+        let body: [String: Any] = ["class": propertyClass, "value": value ?? NSNull()]
         return await mutateUnifiedShare(method: .put,
                                         subpath: "property",
                                         id: id,

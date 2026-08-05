@@ -37,6 +37,13 @@ public class UnifiedShareEditModel {
         self.sourceId = sourceId
     }
 
+    /// Edit an already-existing share (from the list) rather than creating a new draft.
+    init(account: String, existingShare: NKUnifiedShare) {
+        self.account = account
+        self.sourceId = nil
+        self.state = .shareUpdated(share: existingShare)
+    }
+
 #if DEBUG
     /// Preview-only initializer that starts in a given state.
     init(account: String,
@@ -217,6 +224,7 @@ public class UnifiedShareEditModel {
 
             didActivate = true
             state = .shareUpdated(share: share)
+            NotificationCenter.default.post(name: .unifiedShareDidChange, object: nil)
         }
     }
 

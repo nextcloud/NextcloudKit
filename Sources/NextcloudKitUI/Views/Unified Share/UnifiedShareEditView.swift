@@ -12,6 +12,8 @@ import UIKit
 public struct UnifiedShareEditView: View {
     let fileName: String
     let account: String
+    /// Editing an existing share (vs composing a new draft): the audience is fixed.
+    let isEditingExisting: Bool
     @State private var model: UnifiedShareEditModel
 
     @State private var shareeType: ShareeType = .invited
@@ -24,12 +26,23 @@ public struct UnifiedShareEditView: View {
     public init(fileName: String, account: String, sourceId: String? = nil) {
         self.fileName = fileName
         self.account = account
+        self.isEditingExisting = false
         model = UnifiedShareEditModel(account: account, sourceId: sourceId)
+    }
+
+    /// Open the editor on an existing share (from the list).
+    public init(fileName: String, account: String, share: NKUnifiedShare) {
+        self.fileName = fileName
+        self.account = account
+        self.isEditingExisting = true
+        model = UnifiedShareEditModel(account: account, existingShare: share)
+        _shareeType = State(initialValue: share.recipients.contains { $0.class == UnifiedShareEditModel.tokenRecipientClass } ? .anyone : .invited)
     }
 
     init(fileName: String, model: UnifiedShareEditModel) {
         self.fileName = fileName
         self.account = model.account
+        self.isEditingExisting = false
         self.model = model
     }
 
@@ -41,21 +54,16 @@ public struct UnifiedShareEditView: View {
                 case .shareUpdated(let share):
 
                     Form {
-//                        VStack(alignment: .leading, spacing: 24) {
                         Section {
-                            Text(String(localized: "Share \(fileName)"))
-                                .font(.title)
-                            //                .foregroundStyle(.primary)
+                            // The audience is only selectable for a new draft; an existing share's is fixed.
+                            if !isEditingExisting {
+                                shareeTypePicker(share: share)
+                            }
 
-                        }
-
-                        Section {
-                            shareeTypePicker(share: share)
-
-                            //            VStack(spacing: 18) {
                             if shareeType == .invited {
-                                if !share.recipients.isEmpty {
+                                if !peopleRecipients(share).isEmpty {
                                     recipientPills(share: share)
+                                        .listRowSeparator(.hidden)
                                 }
 
                                 TextField(
@@ -81,12 +89,10 @@ public struct UnifiedShareEditView: View {
                         }
                         settingsRow(share: share)
 
-                        actionButtons(share: share)
-//                        }
+                        customLinkSection(share: share)
 
+                        actionButtons(share: share)
                     }
-////                    .padding(.horizontal, 26)
-//                    .padding(.top, 10)
                     .onDisappear {
                         model.discardDraftIfNeeded(share: share)
                     }
@@ -95,7 +101,18 @@ public struct UnifiedShareEditView: View {
                             dismiss()
                         }
                     }
-                    .navigationTitle("Share")
+                    .navigationTitle(isEditingExisting ? String(localized: "Edit share") : String(localized: "Create a new share"))
+                    .navigationBarTitleDisplayMode(.inline)
+                    .interactiveDismissDisabled()
+                    .toolbar {
+                        ToolbarItem(placement: .topBarTrailing) {
+                            Button {
+                                dismiss()
+                            } label: {
+                                Image(systemName: "xmark")
+                            }
+                        }
+                    }
                     // Draw the dropdown above the Form, anchored just beneath the field, so the
                     // Form's row clipping can't cut it off.
                     .overlayPreferenceValue(AddPeopleFieldAnchorKey.self) { anchor in
@@ -113,18 +130,14 @@ public struct UnifiedShareEditView: View {
                 case .error(let error):
                     Text(error.localizedDescription)
             }
-            
-            //            }
-            
-            
         }
         .task {
             if case .loading = model.state {
-                model.createShare()
+//                model.createShare()
             }
 
             if model.permissionPresets.isEmpty {
-                model.loadCapabilities()
+//                model.loadCapabilities()
             }
         }
 
@@ -182,7 +195,6 @@ public struct UnifiedShareEditView: View {
         }
     }
 
-    /// Sentinel tag for the synthesized "Custom" option (distinct from any real preset class).
     private static let customTag = "__nk_custom_permissions__"
 
     /// Presets from the capability, narrowed to those the share's permissions reference.
@@ -217,16 +229,25 @@ public struct UnifiedShareEditView: View {
                     model.setProperty(share: share, propertyClass: property.class, value: value)
                 }
             }
-
-            ForEach(customLinkRecipients(share), id: \.value) { recipient in
-                CustomLinkRow(
-                    recipient: recipient,
-                    onCommit: { token in model.updateRecipientSecret(share: share, recipient: recipient, secret: token) },
-                    onRegenerate: { model.regenerateRecipientSecret(share: share, recipient: recipient) }
-                )
-            }
         } label: {
             Text(String(localized: "Settings"))
+        }
+    }
+
+    @ViewBuilder
+    private func customLinkSection(share: NKUnifiedShare) -> some View {
+        if !customLinkRecipients(share).isEmpty {
+            Section {
+                ForEach(customLinkRecipients(share), id: \.value) { recipient in
+                    CustomLinkRow(
+                        recipient: recipient,
+                        onCommit: { token in model.updateRecipientSecret(share: share, recipient: recipient, secret: token) },
+                        onRegenerate: { model.regenerateRecipientSecret(share: share, recipient: recipient) }
+                    )
+                }
+            } footer: {
+                Text(String(localized: "The link can be changed to be easy to remember, but do not set it to something that is easy to guess."))
+            }
         }
     }
 
@@ -287,7 +308,6 @@ public struct UnifiedShareEditView: View {
         min(CGFloat(model.recipientResults.count) * 44, 220)
     }
 
-    /// Renders the icon's URL variant (color-scheme aware). Inline SVG isn't natively renderable.
     @ViewBuilder
     private func recipientIcon(_ icon: NKUnifiedShareIcon) -> some View {
         if let urlString = (colorScheme == .dark ? icon.dark : icon.light) ?? icon.light ?? icon.dark,
@@ -306,10 +326,14 @@ public struct UnifiedShareEditView: View {
 
     private func recipientPills(share: NKUnifiedShare) -> some View {
         FlowLayout(spacing: 8) {
-            ForEach(share.recipients, id: \.value) { recipient in
+            ForEach(peopleRecipients(share), id: \.value) { recipient in
                 recipientPill(recipient, share: share)
             }
         }
+    }
+
+    private func peopleRecipients(_ share: NKUnifiedShare) -> [NKUnifiedShareRecipient] {
+        share.recipients.filter { !$0.secret.updatable }
     }
 
     private func recipientPill(_ recipient: NKUnifiedShareRecipient, share: NKUnifiedShare) -> some View {
@@ -352,7 +376,7 @@ public struct UnifiedShareEditView: View {
 
     private func actionButtons(share: NKUnifiedShare) -> some View {
         HStack(spacing: 16) {
-            Button(String(localized: "Copy link")) {
+            Button(String(localized: "Copy public link")) {
                 Task {
                     if let link = await model.prepareLinkForCopy(share: share) {
                         copyToPasteboard(link)
@@ -373,7 +397,7 @@ public struct UnifiedShareEditView: View {
     }
 
     private var sendLabel: String {
-        shareeType == .anyone ? String(localized: "Share") : String(localized: "Send")
+        shareeType == .anyone ? String(localized: "Share public link") : String(localized: "Send")
     }
 
     /// Mirrors Android's Share.canSend: a source, a recipient, an enabled permission, no missing
@@ -459,7 +483,6 @@ private extension UnifiedShareEditView {
         case anyone
     }
 
-    /// The participants dropdown state: follow the share's server preset, a chosen preset, or Custom.
     enum PermissionSelection: Equatable {
         case unset
         case custom
@@ -467,7 +490,6 @@ private extension UnifiedShareEditView {
     }
 }
 
-/// A single permission toggle. Keeps local state for immediate feedback, then reports the change.
 private struct PermissionToggleRow: View {
     let permission: NKUnifiedSharePermission
     let onChange: (Bool) -> Void
@@ -586,18 +608,50 @@ private struct DatePropertyEditor: View {
     let property: NKUnifiedSharePropertyDate
     let onCommit: (String?) -> Void
     @State private var date: Date
+    @State private var hasDate: Bool
 
     init(property: NKUnifiedSharePropertyDate, onCommit: @escaping (String?) -> Void) {
         self.property = property
         self.onCommit = onCommit
-        _date = State(initialValue: Self.parse(property.value) ?? Date())
+        let parsed = Self.parse(property.value)
+        _date = State(initialValue: parsed ?? Date())
+        _hasDate = State(initialValue: parsed != nil)
     }
 
     var body: some View {
-        DatePicker(property.displayName, selection: $date, in: lowerBound, displayedComponents: .date)
-            .onChange(of: date) {
-                onCommit(Self.format(date))
+        if hasDate {
+            HStack(spacing: 12) {
+                DatePicker(property.displayName, selection: $date, in: lowerBound, displayedComponents: .date)
+                    .onChange(of: date) {
+                        onCommit(Self.format(date))
+                    }
+
+                Button {
+                    hasDate = false
+                    onCommit(nil)
+                } label: {
+                    Image(systemName: "xmark.circle.fill")
+                        .foregroundStyle(.secondary)
+                }
+                .buttonStyle(.plain)
+                .padding(.leading, 4)
             }
+        } else {
+            Button {
+                hasDate = true
+                onCommit(Self.format(date))
+            } label: {
+                HStack {
+                    Text(property.displayName)
+                        .foregroundStyle(.primary)
+                    Spacer()
+                    Image(systemName: "calendar.badge.plus")
+                        .foregroundStyle(.secondary)
+                }
+                .contentShape(Rectangle())
+            }
+            .buttonStyle(.plain)
+        }
     }
 
     private var lowerBound: PartialRangeFrom<Date> {
@@ -624,7 +678,6 @@ private struct DatePropertyEditor: View {
     }
 }
 
-/// Text / password field that commits on blur (focus lost) or return, only when the value changed.
 private struct TextPropertyEditor: View {
     let property: NKUnifiedShareProperty
     let secure: Bool
@@ -674,14 +727,16 @@ private struct TextPropertyEditor: View {
     }
 }
 
-/// Editable token for a custom/private link recipient, with a regenerate button.
 private struct CustomLinkRow: View {
     let recipient: NKUnifiedShareRecipient
     let onCommit: (String) -> Void
     let onRegenerate: () -> Void
+    private let prefix: String
     @State private var token: String
     @State private var committed: String
     @FocusState private var focused: Bool
+
+    private static let maxTokenLength = 32
 
     init(recipient: NKUnifiedShareRecipient, onCommit: @escaping (String) -> Void, onRegenerate: @escaping () -> Void) {
         self.recipient = recipient
@@ -690,26 +745,52 @@ private struct CustomLinkRow: View {
         let initial = recipient.secret.value ?? ""
         _token = State(initialValue: initial)
         _committed = State(initialValue: initial)
+
+        // The prefix is the link URL with the token suffix stripped (e.g. ".../index.php/s/").
+        let url = recipient.secret.url ?? ""
+        if !initial.isEmpty, url.hasSuffix(initial) {
+            self.prefix = String(url.dropLast(initial.count))
+        } else {
+            self.prefix = url
+        }
     }
 
     var body: some View {
-        HStack {
-            TextField(String(localized: "Link token"), text: $token)
-                .focused($focused)
-                .onChange(of: focused) {
-                    if !focused, token != committed, !token.isEmpty {
-                        committed = token
-                        onCommit(token)
-                    }
-                }
+        VStack(alignment: .leading, spacing: 4) {
+            Text(String(localized: "Custom link"))
+                .font(.headline)
 
-            Button {
-                onRegenerate()
-            } label: {
-                Image(systemName: "arrow.clockwise")
+            if !prefix.isEmpty {
+                Text(prefix)
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
             }
-            .buttonStyle(.plain)
+
+            HStack {
+                TextField(String(localized: "Link token"), text: $token)
+                    .focused($focused)
+                    .onChange(of: token) {
+                        if token.count > Self.maxTokenLength {
+                            token = String(token.prefix(Self.maxTokenLength))
+                        }
+                    }
+                    .onChange(of: focused) {
+                        if !focused, token != committed, !token.isEmpty {
+                            committed = token
+                            onCommit(token)
+                        }
+                    }
+
+                Button {
+                    onRegenerate()
+                } label: {
+                    Image(systemName: "arrow.clockwise")
+                }
+                .buttonStyle(.plain)
+                .accessibilityLabel(String(localized: "Refresh link"))
+            }
         }
+        .padding(.vertical, 4)
     }
 }
 
