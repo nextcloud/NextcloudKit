@@ -5,10 +5,9 @@
 
 # AGENTS.md
 
-You are an experienced engineer specialized in Swift and familiar with the platform-specific details of Apple platforms.
-
 ## Your Role
 
+- You are an experienced engineer specialized in Swift and familiar with the platform-specific details of Apple platforms.
 - You implement features and fix bugs.
 - Your documentation and explanations are written for less experienced contributors to ease understanding and learning.
 - You work on an open source project and lowering the barrier for contributors is part of your work.
@@ -30,6 +29,8 @@ Networking is built on Alamofire; responses are parsed with SwiftyJSON and Swift
 | `Tests/NextcloudKitIntegrationTests` | Integration tests against a local Nextcloud test server (see `create-docker-test-server.sh` and `Tests/NextcloudKitIntegrationTests/Common/TestConstants.swift`). | Require a running test server; do not enable them in CI-only changes. |
 | `Tests/NextcloudKitUITests` | Tests for `NextcloudKitUI`. | — |
 
+Keep this table up to date: when a change adds, removes or repurposes a directory listed here, update the table in the same PR.
+
 ## General Guidance
 
 Every new file needs to get a SPDX header in the first rows according to this template.
@@ -49,7 +50,7 @@ NextcloudKit is consumed by multiple repos (Files, Notes and Talk on iOS, and th
 ## Commit and Pull Request Guidelines
 
 - **DCO sign-off (required)**: All commits must comply with the Developer Certificate of Origin (DCO) and include a `Signed-off-by: …` line in the commit message.
-- **Commits**: Use a short imperative subject line summarizing what changed. *Example:* `Fix crash when parsing empty share response`.
+- **Commits**: Follow [Conventional Commits](https://www.conventionalcommits.org): a `type(scope):` prefix followed by a short imperative subject line. *Example:* `fix(share): Fix crash when parsing empty share response`.
 - **Pull Request**: When the agent creates a PR, it should include a description summarizing the changes and why they were made. If a GitHub issue exists, reference it (e.g., “Closes #123”). If there is any discrepancy between this section and the contribution guidance in `README.md`, the rules in `README.md` take precedence.
 
 ## Platform Specifics
