@@ -38,8 +38,8 @@ public extension NextcloudKit {
                     do {
                         let (editors, creators) = try NKEditorDetailsConverter.from(data: responseData)
                         let capabilities = await NKCapabilities.shared.getCapabilities(for: account)
-                        capabilities.directEditingEditors = editors
-                        capabilities.directEditingCreators = creators
+                        capabilities.editorEditors = editors
+                        capabilities.editorCreators = creators
                         await NKCapabilities.shared.setCapabilities(for: account, capabilities: capabilities)
 
                         options.queue.async {
@@ -207,7 +207,7 @@ public extension NextcloudKit {
                         let templates = decoded.ocs.data.editors
                         // Update capabilities
                         let capabilities = await NKCapabilities.shared.getCapabilities(for: account)
-                        capabilities.directEditingTemplates = templates
+                        capabilities.editorTemplates = templates
                         await NKCapabilities.shared.setCapabilities(for: account, capabilities: capabilities)
 
                         options.queue.async { completion(account, templates, response, .success) }
