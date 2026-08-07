@@ -133,6 +133,7 @@ public extension NextcloudKit {
                         let recommendations: Recommendations?
                         let termsOfService: TermsOfService?
                         let clientIntegration: NKClientIntegration?
+                        let governance: Governance?
 
                         enum CodingKeys: String, CodingKey {
                             case downloadLimit = "downloadlimit"
@@ -147,7 +148,10 @@ public extension NextcloudKit {
                             case recommendations
                             case termsOfService = "terms_of_service"
                             case clientIntegration = "client_integration"
+                            case governance
                         }
+
+                        struct Governance: Codable {}
 
                         struct DownloadLimit: Codable {
                             let enabled: Bool?
@@ -350,32 +354,6 @@ public extension NextcloudKit {
                         struct Recommendations: Codable {
                             let enabled: Bool?
                         }
-
-//                        struct DeclarativeUI: Codable {
-//                            let contextMenu: [[ContextMenuItem]]
-//
-//                            enum CodingKeys: String, CodingKey {
-//                                case contextMenu = "context-menu"
-//                            }
-//                        }
-
-//
-//                        struct DeclarativeUI: Codable {
-//                            let contextMenus: [ContextMenu]
-//
-//                            enum CodingKeys: String, CodingKey {
-//                                case contextMenus = "context-menu"
-//                            }
-//
-//                            struct ContextMenu: Codable {
-//                                let items
-//                            }
-//
-//                            struct ContextMenuItem: Codable {
-//                                let title: String
-//                                let endpoint: String
-//                            }
-//                        }
                     }
                 }
             }
@@ -434,6 +412,8 @@ public extension NextcloudKit {
 
             capabilities.activityEnabled = json.activity != nil
             capabilities.activity = json.activity?.apiv2 ?? []
+
+            capabilities.governanceEnabled = json.governance != nil
 
             capabilities.notification = json.notifications?.ocsendpoints ?? []
 
@@ -548,6 +528,7 @@ final public class NKCapabilities: Sendable {
         public var userStatusSupportsBusy: Bool                     = false
         public var externalSites: Bool                              = false
         public var activityEnabled: Bool                            = false
+        public var governanceEnabled: Bool                          = false
         public var groupfoldersEnabled: Bool                        = false // NC27
         public var assistantEnabled: Bool                           = false // NC28
         public var isLivePhotoServerAvailable: Bool                 = false // NC28
