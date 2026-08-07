@@ -12,7 +12,7 @@ SPDX-FileCopyrightText = "2024 Nextcloud GmbH"
 SPDX-License-Identifier = "LicenseRef-NextcloudTrademarks"
 
 [[annotations]]
-path = ["Cartfile", "Gemfile", "Package.resolved"]
+path = ["Gemfile", "Package.resolved"]
 precedence = "aggregate"
 SPDX-FileCopyrightText = "2022 Nextcloud GmbH and Nextcloud contributors"
 SPDX-License-Identifier = "GPL-3.0-or-later"

@@ -34,9 +34,6 @@ DerivedData
 *.hmap
 *.xccheckout
 
-## Package
-Carthage/
-
 ### SwiftPackageManager ###
 .swiftpm
 Package.resolved
