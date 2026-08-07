@@ -544,9 +544,9 @@ final public class NKCapabilities: Sendable {
 //        public var declarativeUIEnabled: Bool                       = false
 //        public var declarativeUIContextMenu: [ContextMenuItem]                       = []
         public var clientIntegration: NKClientIntegration?                    = nil
-        public var directEditingEditors: [NKEditorDetailsEditor]    = []
-        public var directEditingCreators: [NKEditorDetailsCreator]  = []
-        public var directEditingTemplates: [NKEditorTemplate]       = []
+        public var editorEditors: [NKEditorDetailsEditor]    = []
+        public var editorCreators: [NKEditorDetailsCreator]  = []
+        public var editorTemplates: [NKEditorTemplate]       = []
 
         public init() {}
 
