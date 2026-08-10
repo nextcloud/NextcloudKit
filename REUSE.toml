@@ -18,7 +18,7 @@ SPDX-FileCopyrightText = "2022 Nextcloud GmbH and Nextcloud contributors"
 SPDX-License-Identifier = "GPL-3.0-or-later"
 
 [[annotations]]
-path = [".swiftlint.yml", "Sourcery/bin/sourcery", "Tests/NextcloudKitUnitTests/Resources/PollMock.json"]
+path = [".swiftlint.yml", "Tests/NextcloudKitUnitTests/Resources/PollMock.json"]
 precedence = "aggregate"
 SPDX-FileCopyrightText = "2023 Nextcloud GmbH and Nextcloud contributors"
 SPDX-License-Identifier = "GPL-3.0-or-later"
