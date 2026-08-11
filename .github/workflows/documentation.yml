@@ -52,7 +52,7 @@ jobs:
           </html>
           EOF
       - name: Upload static files as artifact
-        uses: actions/upload-pages-artifact@v3
+        uses: actions/upload-pages-artifact@v5
         with:
           path: ./docs
   deploy-docs: # See: https://github.com/actions/deploy-pages
