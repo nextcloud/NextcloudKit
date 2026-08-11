@@ -20,7 +20,7 @@ jobs:
       - uses: maxim-lobanov/setup-xcode@v1
         with:
           xcode-version: latest-stable
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - name: Build documentation
         run: |
           xcodebuild docbuild \
