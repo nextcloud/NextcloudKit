@@ -12,8 +12,8 @@ public enum NKDirectEditingCapabilitiesConverter {
     /// - Throws: Decoding error if parsing fails.
     public static func from(data: Data) throws -> (editors: [NKDirectEditingEditor], creators: [NKDirectEditingCreator]) {
         let decoded = try JSONDecoder().decode(NKDirectEditingCapabilitiesResponse.self, from: data)
-        let editors = decoded.ocs.data.editorsArray()
-        let creators = decoded.ocs.data.creatorsArray()
+        let editors = Array(decoded.ocs.data.editors.values)
+        let creators = Array(decoded.ocs.data.creators.values)
 
         if NKLogFileManager.shared.logLevel == .verbose {
             data.printJson()
