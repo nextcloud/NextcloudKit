@@ -24,8 +24,38 @@ public struct NKDirectEditingTemplateResponse: Codable, Sendable {
         public let data: DataClass
 
         public struct DataClass: Codable, Sendable {
-            public let editors: [NKDirectEditingTemplate]
+            public let templates: [String: NKDirectEditingTemplate]
         }
+    }
+}
+
+public struct NKDirectEditingTemplate: Codable, Sendable {
+    public let ext: String
+    public let identifier: String
+    public let mimetype: String
+    public let name: String
+    public let preview: String?
+
+    enum CodingKeys: String, CodingKey {
+        case ext = "extension"
+        case identifier = "id"
+        case mimetype
+        case name = "title"
+        case preview
+    }
+
+    public init(
+        ext: String = "",
+        identifier: String = "",
+        mimetype: String = "",
+        name: String = "",
+        preview: String? = nil
+    ) {
+        self.ext = ext
+        self.identifier = identifier
+        self.mimetype = mimetype
+        self.name = name
+        self.preview = preview
     }
 }
 
@@ -60,26 +90,5 @@ public struct NKDirectEditingCreator: Codable, Sendable {
         case name
         case editor
         case ext = "extension"
-    }
-}
-
-public struct NKDirectEditingTemplate: Codable, Sendable {
-    public var ext: String
-    public var identifier: String
-    public var name: String
-    public var preview: String
-
-    enum CodingKeys: String, CodingKey {
-        case ext = "extension"
-        case identifier = "id"
-        case name
-        case preview
-    }
-
-    public init(ext: String = "", identifier: String = "", name: String = "", preview: String = "") {
-        self.ext = ext
-        self.identifier = identifier
-        self.name = name
-        self.preview = preview
     }
 }

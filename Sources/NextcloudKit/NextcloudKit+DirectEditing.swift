@@ -94,7 +94,7 @@ public extension NextcloudKit {
     /// Parameters:
     /// - fileNamePath: The path of the file to open on the server.
     /// - fileId: Optional file identifier used to reference the file more precisely.
-    /// - editor: The identifier of the text editor to use.
+    /// - editorId: The identifier of the text editor to use.
     /// - account: The account initiating the file open request.
     /// - options: Optional configuration for the request (headers, API version, etc.).
     /// - taskHandler: Callback triggered with the underlying URLSessionTask.
@@ -140,7 +140,7 @@ public extension NextcloudKit {
     /// - Parameters:
     ///   - fileNamePath: Path of the file on the server.
     ///   - fileId: Optional file ID to assist in uniquely identifying the file.
-    ///   - editor: Identifier of the text editor to be used.
+    ///   - editorId: Identifier of the editor to be used.
     ///   - account: Account performing the operation.
     ///   - options: Configuration options for the request.
     ///   - taskHandler: Optional monitoring for the underlying URLSessionTask.
@@ -178,6 +178,8 @@ public extension NextcloudKit {
     ///
     /// Parameters:
     /// - account: The account requesting the list of templates.
+    /// - editorId: Identifier of the editor to be used.
+    /// - creatorId: The identifier of the creator (e.g., "document", "spreadsheet").
     /// - options: Optional request configuration such as headers, queue, or API version.
     /// - taskHandler: Callback triggered with the underlying URLSessionTask.
     /// - completion: Returns the account, an optional array of NKDirectEditingTemplate, the raw response, and an NKError.
@@ -206,16 +208,19 @@ public extension NextcloudKit {
                 Task {
                     do {
                         let decoded = try JSONDecoder().decode(NKDirectEditingTemplateResponse.self, from: data)
-                        let templates = decoded.ocs.data.editors
-                        // Update capabilities
+                        let templates = Array(decoded.ocs.data.templates.values)
                         let capabilities = await NKCapabilities.shared.getCapabilities(for: account)
                         capabilities.directEditingTemplates = templates
                         await NKCapabilities.shared.setCapabilities(for: account, capabilities: capabilities)
 
-                        options.queue.async { completion(account, templates, response, .success) }
+                        options.queue.async {
+                            completion(account, templates, response, .success)
+                        }
                     } catch {
                         nkLog(error: "Failed to decode template list: \(error)")
-                        options.queue.async { completion(account, nil, response, .invalidData) }
+                        options.queue.async {
+                            completion(account, nil, response, .invalidData)
+                        }
                     }
                 }
             }
@@ -227,6 +232,8 @@ public extension NextcloudKit {
     /// - Parameters:
     ///   - account: The account requesting the templates.
     ///   - options: Request configuration options (queue, headers, etc.).
+    ///   - editorId: Identifier of the editor to be used.
+    ///   - creatorId: The identifier of the creator (e.g., "document", "spreadsheet").
     ///   - taskHandler: Optional callback to monitor the underlying URLSessionTask.
     /// - Returns: A tuple containing the account, list of templates (if any), raw response, and error information.
     func getDirectEditingTemplatesAsync(account: String,
@@ -311,7 +318,7 @@ public extension NextcloudKit {
     /// - Parameters:
     ///   - fileNamePath: Destination path where the new file will be saved.
     ///   - editorId: The editor's unique identifier (e.g., "richdocuments").
-    ///   - creatorId: The creator's identifier (e.g., "document").
+    ///   - creatorId: The identifier of the creator (e.g., "document", "spreadsheet").
     ///   - templateId: The template to use for the new file.
     ///   - account: The Nextcloud account used for the operation.
     ///   - options: Optional request settings (e.g., headers, queue, etc.).
