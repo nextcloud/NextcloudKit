@@ -521,32 +521,30 @@ final public class NKCapabilities: Sendable {
         ///
         /// The version of the locking API.
         ///
-        public var filesLockVersion: String                         = ""    // NC 24
-        public var filesComments: Bool                              = false // NC 20
-        public var filesBigfilechunking: Bool                       = false
-        public var userStatusEnabled: Bool                          = false
-        public var userStatusSupportsBusy: Bool                     = false
-        public var externalSites: Bool                              = false
-        public var activityEnabled: Bool                            = false
-        public var governanceEnabled: Bool                          = false
-        public var groupfoldersEnabled: Bool                        = false // NC27
-        public var assistantEnabled: Bool                           = false // NC28
-        public var isLivePhotoServerAvailable: Bool                 = false // NC28
-        public var securityGuardDiagnostics                         = false
+        public var filesLockVersion: String                             = ""    // NC 24
+        public var filesComments: Bool                                  = false // NC 20
+        public var filesBigfilechunking: Bool                           = false
+        public var userStatusEnabled: Bool                              = false
+        public var userStatusSupportsBusy: Bool                         = false
+        public var externalSites: Bool                                  = false
+        public var activityEnabled: Bool                                = false
+        public var governanceEnabled: Bool                              = false
+        public var groupfoldersEnabled: Bool                            = false // NC27
+        public var assistantEnabled: Bool                               = false // NC28
+        public var isLivePhotoServerAvailable: Bool                     = false // NC28
+        public var securityGuardDiagnostics                             = false
         /// Only taken into account for major version >= 32
-        public var windowsCompatibleFilenamesEnabled                = false
-        public var forbiddenFileNames: [String]                     = []
-        public var forbiddenFileNameBasenames: [String]             = []
-        public var forbiddenFileNameCharacters: [String]            = []
-        public var forbiddenFileNameExtensions: [String]            = []
-        public var recommendations: Bool                            = false
-        public var termsOfService: Bool                             = false
-//        public var declarativeUIEnabled: Bool                       = false
-//        public var declarativeUIContextMenu: [ContextMenuItem]                       = []
-        public var clientIntegration: NKClientIntegration?                    = nil
-        public var editorEditors: [NKEditorDetailsEditor]    = []
-        public var editorCreators: [NKEditorDetailsCreator]  = []
-        public var editorTemplates: [NKEditorTemplate]       = []
+        public var windowsCompatibleFilenamesEnabled                    = false
+        public var forbiddenFileNames: [String]                         = []
+        public var forbiddenFileNameBasenames: [String]                 = []
+        public var forbiddenFileNameCharacters: [String]                = []
+        public var forbiddenFileNameExtensions: [String]                = []
+        public var recommendations: Bool                                = false
+        public var termsOfService: Bool                                 = false
+        public var clientIntegration: NKClientIntegration?              = nil
+        public var directEditingEditors: [NKDirectEditingEditor]        = []
+        public var directEditingCreators: [NKDirectEditingCreator]      = []
+        public var directEditingTemplates: [NKDirectEditingTemplate]    = []
 
         public init() {}
 
