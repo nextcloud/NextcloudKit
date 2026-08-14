@@ -4,12 +4,12 @@
 
 import Foundation
 
-public extension NKEditorDetailsResponse.OCS.DataClass {
-    func editorsArray() -> [NKEditorDetailsEditor] {
+public extension NKDirectEditingCapabilitiesResponse.OCS.DataClass {
+    func editorsArray() -> [NKDirectEditingEditor] {
         Array(editors.values)
     }
 
-    func creatorsArray() -> [NKEditorDetailsCreator] {
+    func creatorsArray() -> [NKDirectEditingCreator] {
         Array(creators.values)
     }
 }

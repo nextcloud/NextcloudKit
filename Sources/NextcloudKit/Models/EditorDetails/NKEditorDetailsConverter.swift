@@ -4,14 +4,14 @@
 
 import Foundation
 
-public enum NKEditorDetailsConverter {
+public enum NKDirectEditingCapabilitiesConverter {
 
-    /// Parses and converts raw JSON `Data` into `[NKEditorDetailsEditors]` and `[NKEditorDetailsCreators]`.
+    /// Parses and converts raw JSON `Data` into `[NKDirectEditingEditor]` and `[NKDirectEditingCreator]`.
     /// - Parameter data: Raw JSON `Data` from the editors/creators endpoint.
     /// - Returns: A tuple with editors and creators.
     /// - Throws: Decoding error if parsing fails.
-    public static func from(data: Data) throws -> (editors: [NKEditorDetailsEditor], creators: [NKEditorDetailsCreator]) {
-        let decoded = try JSONDecoder().decode(NKEditorDetailsResponse.self, from: data)
+    public static func from(data: Data) throws -> (editors: [NKDirectEditingEditor], creators: [NKDirectEditingCreator]) {
+        let decoded = try JSONDecoder().decode(NKDirectEditingCapabilitiesResponse.self, from: data)
         let editors = decoded.ocs.data.editorsArray()
         let creators = decoded.ocs.data.creatorsArray()
 
