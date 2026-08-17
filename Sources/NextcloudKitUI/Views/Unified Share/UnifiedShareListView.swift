@@ -11,15 +11,18 @@ public struct UnifiedShareListView: View {
     let account: String
     /// Brand/accent color (the app passes NCBrandColor); used for the chip and ⋯ button.
     let tint: Color
+    /// The file's in-server link, forwarded to the editor for invited-people shares.
+    let internalLink: String?
     @State private var model: UnifiedShareListModel
     @State private var editing: ShareEditor?
     @State private var shareToDelete: NKUnifiedShare?
     @Environment(\.colorScheme) private var colorScheme
 
-    public init(fileName: String, account: String, sourceId: String? = nil, tint: Color = .accentColor) {
+    public init(fileName: String, account: String, sourceId: String? = nil, internalLink: String? = nil, tint: Color = .accentColor) {
         self.fileName = fileName
         self.account = account
         self.tint = tint
+        self.internalLink = internalLink
         model = UnifiedShareListModel(account: account, sourceId: sourceId)
     }
 
@@ -34,7 +37,7 @@ public struct UnifiedShareListView: View {
                 Task { await model.refresh() }
             }) { editor in
                 NavigationStack {
-                    UnifiedShareEditView(fileName: fileName, account: account, share: editor.share, expandSettings: editor.expandSettings)
+                    UnifiedShareEditView(fileName: fileName, account: account, share: editor.share, internalLink: internalLink, expandSettings: editor.expandSettings)
                 }
             }
             // A share created/activated from the "+" modal (outside this view) refreshes the list.

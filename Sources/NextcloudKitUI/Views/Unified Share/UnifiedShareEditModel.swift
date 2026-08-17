@@ -26,6 +26,10 @@ public class UnifiedShareEditModel {
     var permissionPresets: [NKUnifiedSharePermissionPreset] = []
     /// Last property-update error text, keyed by property class (shown under the field).
     var propertyErrors: [String: String] = [:]
+    /// Transient mutation failure, shown as an alert while the form stays usable.
+    var mutationError: NKError?
+    /// A copy-link activation is in flight.
+    var isPreparingLink = false
     /// Set once the draft has been activated (sent), so the sheet can dismiss.
     var didActivate = false
     let account: String
@@ -69,7 +73,7 @@ public class UnifiedShareEditModel {
         Task {
             let result = await NextcloudKit.shared.setUnifiedSharePermissionPreset(id: share.id, permissionPresetClass: presetClass, account: account)
             guard let share = result.share else {
-                state = .error(result.error)
+                mutationError = result.error
                 return
             }
 
@@ -81,7 +85,7 @@ public class UnifiedShareEditModel {
         Task {
             let result = await NextcloudKit.shared.setUnifiedSharePermission(id: share.id, permissionClass: permissionClass, enabled: enabled, account: account)
             guard let share = result.share else {
-                state = .error(result.error)
+                mutationError = result.error
                 return
             }
 
@@ -115,19 +119,32 @@ public class UnifiedShareEditModel {
             var current = share
 
             if anyone {
+                var removalFailed = false
+
                 for recipient in current.recipients where recipient.class != Self.tokenRecipientClass {
-                    current = await removingRecipient(from: current, recipient: recipient) ?? current
+                    guard let updated = await removingRecipient(from: current, recipient: recipient) else {
+                        removalFailed = true
+                        break
+                    }
+
+                    current = updated
                 }
 
-                if !current.recipients.contains(where: { $0.class == Self.tokenRecipientClass }) {
+                if !removalFailed, !current.recipients.contains(where: { $0.class == Self.tokenRecipientClass }) {
                     let result = await NextcloudKit.shared.addUnifiedShareRecipient(id: current.id, recipientClass: Self.tokenRecipientClass, value: UUID().uuidString, account: account)
                     if let updated = result.share {
                         current = updated
+                    } else {
+                        mutationError = result.error
                     }
                 }
             } else {
                 for recipient in current.recipients where recipient.class == Self.tokenRecipientClass {
-                    current = await removingRecipient(from: current, recipient: recipient) ?? current
+                    guard let updated = await removingRecipient(from: current, recipient: recipient) else {
+                        break
+                    }
+
+                    current = updated
                 }
             }
 
@@ -137,6 +154,11 @@ public class UnifiedShareEditModel {
 
     private func removingRecipient(from share: NKUnifiedShare, recipient: NKUnifiedShareRecipient) async -> NKUnifiedShare? {
         let result = await NextcloudKit.shared.removeUnifiedShareRecipient(id: share.id, recipientClass: recipient.class, value: recipient.value, instance: recipient.instance, account: account)
+
+        if result.share == nil {
+            mutationError = result.error
+        }
+
         return result.share
     }
 
@@ -146,13 +168,21 @@ public class UnifiedShareEditModel {
             return url
         }
 
+        guard !isPreparingLink else {
+            return nil
+        }
+
+        isPreparingLink = true
+        defer { isPreparingLink = false }
+
         let result = await NextcloudKit.shared.setUnifiedShareState(id: share.id, state: .active, account: account)
         guard let updated = result.share else {
-            state = .error(result.error)
+            mutationError = result.error
             return nil
         }
 
         state = .shareUpdated(share: updated)
+        NotificationCenter.default.post(name: .unifiedShareDidChange, object: nil)
         return updated.recipients.compactMap { $0.secret.url }.first
     }
 
@@ -179,7 +209,7 @@ public class UnifiedShareEditModel {
         Task {
             let result = await NextcloudKit.shared.addUnifiedShareRecipient(id: share.id, recipientClass: recipient.class, value: recipient.value, account: account)
             guard let share = result.share else {
-                state = .error(result.error)
+                mutationError = result.error
                 return
             }
 
@@ -191,7 +221,7 @@ public class UnifiedShareEditModel {
         Task {
             let result = await NextcloudKit.shared.removeUnifiedShareRecipient(id: share.id, recipientClass: recipient.class, value: recipient.value, instance: recipient.instance, account: account)
             guard let share = result.share else {
-                state = .error(result.error)
+                mutationError = result.error
                 return
             }
 
@@ -218,7 +248,7 @@ public class UnifiedShareEditModel {
         Task {
             let result = await NextcloudKit.shared.setUnifiedShareState(id: share.id, state: .active, account: account)
             guard let share = result.share else {
-                state = .error(result.error)
+                mutationError = result.error
                 return
             }
 
@@ -241,7 +271,7 @@ public class UnifiedShareEditModel {
         Task {
             let result = await NextcloudKit.shared.setUnifiedShareRecipientSecret(id: share.id, recipientClass: recipient.class, value: recipient.value, secret: secret, instance: recipient.instance, account: account)
             guard let share = result.share else {
-                state = .error(result.error)
+                mutationError = result.error
                 return
             }
 
@@ -254,7 +284,7 @@ public class UnifiedShareEditModel {
         Task {
             let generated = await NextcloudKit.shared.generateUnifiedShareSecret(account: account)
             guard let secret = generated.secret else {
-                state = .error(generated.error)
+                mutationError = generated.error
                 return
             }
 

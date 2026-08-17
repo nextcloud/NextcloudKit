@@ -14,6 +14,8 @@ public struct UnifiedShareEditView: View {
     let account: String
     /// Editing an existing share (vs composing a new draft): the audience is fixed.
     let isEditingExisting: Bool
+    /// The file's in-server link, copied for invited-people shares.
+    let internalLink: String?
     @State private var model: UnifiedShareEditModel
 
     @State private var shareeType: ShareeType = .invited
@@ -23,18 +25,20 @@ public struct UnifiedShareEditView: View {
     @Environment(\.colorScheme) private var colorScheme
     @Environment(\.dismiss) private var dismiss
 
-    public init(fileName: String, account: String, sourceId: String? = nil) {
+    public init(fileName: String, account: String, sourceId: String? = nil, internalLink: String? = nil) {
         self.fileName = fileName
         self.account = account
         self.isEditingExisting = false
+        self.internalLink = internalLink
         model = UnifiedShareEditModel(account: account, sourceId: sourceId)
     }
 
     /// Open the editor on an existing share (from the list).
-    public init(fileName: String, account: String, share: NKUnifiedShare, expandSettings: Bool = false) {
+    public init(fileName: String, account: String, share: NKUnifiedShare, internalLink: String? = nil, expandSettings: Bool = false) {
         self.fileName = fileName
         self.account = account
         self.isEditingExisting = true
+        self.internalLink = internalLink
         model = UnifiedShareEditModel(account: account, existingShare: share)
         _shareeType = State(initialValue: share.recipients.contains { $0.class == UnifiedShareEditModel.tokenRecipientClass } ? .anyone : .invited)
         _isSettingsExpanded = State(initialValue: expandSettings)
@@ -44,6 +48,7 @@ public struct UnifiedShareEditView: View {
         self.fileName = fileName
         self.account = model.account
         self.isEditingExisting = false
+        self.internalLink = nil
         self.model = model
     }
 
@@ -102,18 +107,6 @@ public struct UnifiedShareEditView: View {
                             dismiss()
                         }
                     }
-                    .navigationTitle(isEditingExisting ? String(localized: "Edit share") : String(localized: "Create a new share"))
-                    .navigationBarTitleDisplayMode(.inline)
-                    .interactiveDismissDisabled()
-                    .toolbar {
-                        ToolbarItem(placement: .topBarTrailing) {
-                            Button {
-                                dismiss()
-                            } label: {
-                                Image(systemName: "xmark")
-                            }
-                        }
-                    }
                     // Draw the dropdown above the Form, anchored just beneath the field, so the
                     // Form's row clipping can't cut it off.
                     .overlayPreferenceValue(AddPeopleFieldAnchorKey.self) { anchor in
@@ -130,6 +123,31 @@ public struct UnifiedShareEditView: View {
 
                 case .error(let error):
                     Text(error.localizedDescription)
+            }
+        }
+        .navigationTitle(isEditingExisting ? String(localized: "Edit share") : String(localized: "Create a new share"))
+        .navigationBarTitleDisplayMode(.inline)
+        .interactiveDismissDisabled()
+        .toolbar {
+            ToolbarItem(placement: .topBarTrailing) {
+                Button {
+                    dismiss()
+                } label: {
+                    Image(systemName: "xmark")
+                }
+            }
+        }
+        .alert(
+            String(localized: "Failed to update share."),
+            isPresented: Binding(
+                get: { model.mutationError != nil },
+                set: { if !$0 { model.mutationError = nil } }
+            )
+        ) {
+            Button(String(localized: "OK"), role: .cancel) {}
+        } message: {
+            if let error = model.mutationError {
+                Text(error.errorDescription)
             }
         }
         .task {
@@ -384,15 +402,7 @@ public struct UnifiedShareEditView: View {
 
     private func actionButtons(share: NKUnifiedShare) -> some View {
         HStack(spacing: 16) {
-            Button(String(localized: "Copy public link")) {
-                Task {
-                    if let link = await model.prepareLinkForCopy(share: share) {
-                        copyToPasteboard(link)
-                    }
-                }
-            }
-            .buttonStyle(.bordered)
-            .frame(maxWidth: .infinity)
+            copyButton(share: share)
 
             Button(sendLabel) {
                 model.activate(share: share)
@@ -402,6 +412,39 @@ public struct UnifiedShareEditView: View {
             .disabled(!canSend(share))
         }
         .padding(.top, 18)
+    }
+
+    /// Anyone: copy the public link, activating the draft to mint it if needed.
+    /// Invited: copy the internal link — never activates (that would send the share).
+    @ViewBuilder
+    private func copyButton(share: NKUnifiedShare) -> some View {
+        if shareeType == .anyone {
+            Button {
+                Task {
+                    if let link = await model.prepareLinkForCopy(share: share) {
+                        copyToPasteboard(link)
+                    }
+                }
+            } label: {
+                if model.isPreparingLink {
+                    ProgressView()
+                } else {
+                    Text(String(localized: "Copy public link"))
+                }
+            }
+            .buttonStyle(.bordered)
+            .frame(maxWidth: .infinity)
+            .disabled(model.isPreparingLink || !canSend(share))
+        } else {
+            Button(String(localized: "Copy private link")) {
+                if let internalLink {
+                    copyToPasteboard(internalLink)
+                }
+            }
+            .buttonStyle(.bordered)
+            .frame(maxWidth: .infinity)
+            .disabled(internalLink == nil)
+        }
     }
 
     private var sendLabel: String {
