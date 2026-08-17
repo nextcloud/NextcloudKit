@@ -18,12 +18,12 @@ public struct UnifiedShareListView: View {
     @State private var shareToDelete: NKUnifiedShare?
     @Environment(\.colorScheme) private var colorScheme
 
-    public init(fileName: String, account: String, sourceId: String? = nil, internalLink: String? = nil, tint: Color = .accentColor) {
+    public init(fileName: String, account: String, sourceId: String? = nil, internalLink: String? = nil, tint: Color = .accentColor, onError: ((NKError) -> Void)? = nil) {
         self.fileName = fileName
         self.account = account
         self.tint = tint
         self.internalLink = internalLink
-        model = UnifiedShareListModel(account: account, sourceId: sourceId)
+        model = UnifiedShareListModel(account: account, sourceId: sourceId, onError: onError)
     }
 
     public var body: some View {
