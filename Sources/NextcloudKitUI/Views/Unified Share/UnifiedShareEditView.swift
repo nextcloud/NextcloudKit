@@ -18,7 +18,7 @@ public struct UnifiedShareEditView: View {
 
     @State private var shareeType: ShareeType = .invited
     @State private var permissionSelection: PermissionSelection = .unset
-    @State private var isSettingsExpanded = true
+    @State private var isSettingsExpanded = false
     @State private var recipients = ""
     @Environment(\.colorScheme) private var colorScheme
     @Environment(\.dismiss) private var dismiss
@@ -31,12 +31,13 @@ public struct UnifiedShareEditView: View {
     }
 
     /// Open the editor on an existing share (from the list).
-    public init(fileName: String, account: String, share: NKUnifiedShare) {
+    public init(fileName: String, account: String, share: NKUnifiedShare, expandSettings: Bool = false) {
         self.fileName = fileName
         self.account = account
         self.isEditingExisting = true
         model = UnifiedShareEditModel(account: account, existingShare: share)
         _shareeType = State(initialValue: share.recipients.contains { $0.class == UnifiedShareEditModel.tokenRecipientClass } ? .anyone : .invited)
+        _isSettingsExpanded = State(initialValue: expandSettings)
     }
 
     init(fileName: String, model: UnifiedShareEditModel) {
@@ -132,17 +133,25 @@ public struct UnifiedShareEditView: View {
             }
         }
         .task {
+            guard !isPreview else {
+                return
+            }
+
             if case .loading = model.state {
-//                model.createShare()
+                model.createShare()
             }
 
             if model.permissionPresets.isEmpty {
-//                model.loadCapabilities()
+                model.loadCapabilities()
             }
         }
 
         Spacer()
 }
+
+    private var isPreview: Bool {
+        ProcessInfo.processInfo.environment["XCODE_RUNNING_FOR_PREVIEWS"] == "1"
+    }
 
     private func shareeTypePicker(share: NKUnifiedShare) -> some View {
         Picker("", selection: $shareeType) {
@@ -251,7 +260,6 @@ public struct UnifiedShareEditView: View {
         }
     }
 
-    // Properties are ordered by the server-provided `priority` (ascending), matching Android.
     private func basicProperties(_ share: NKUnifiedShare) -> [NKUnifiedShareProperty] {
         share.properties.filter { !$0.advanced }.sorted { $0.priority < $1.priority }
     }
@@ -400,8 +408,6 @@ public struct UnifiedShareEditView: View {
         shareeType == .anyone ? String(localized: "Share public link") : String(localized: "Send")
     }
 
-    /// Mirrors Android's Share.canSend: a source, a recipient, an enabled permission, no missing
-    /// required property, and no pending property error.
     private func canSend(_ share: NKUnifiedShare) -> Bool {
         !share.sources.isEmpty
             && !share.recipients.isEmpty

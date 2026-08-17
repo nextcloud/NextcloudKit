@@ -12,7 +12,7 @@ public struct UnifiedShareListView: View {
     /// Brand/accent color (the app passes NCBrandColor); used for the chip and ⋯ button.
     let tint: Color
     @State private var model: UnifiedShareListModel
-    @State private var editingShare: NKUnifiedShare?
+    @State private var editing: ShareEditor?
     @State private var shareToDelete: NKUnifiedShare?
     @Environment(\.colorScheme) private var colorScheme
 
@@ -30,33 +30,16 @@ public struct UnifiedShareListView: View {
                     model.load()
                 }
             }
-            .sheet(item: $editingShare, onDismiss: {
+            .sheet(item: $editing, onDismiss: {
                 Task { await model.refresh() }
-            }) { share in
+            }) { editor in
                 NavigationStack {
-                    UnifiedShareEditView(fileName: fileName, account: account, share: share)
+                    UnifiedShareEditView(fileName: fileName, account: account, share: editor.share, expandSettings: editor.expandSettings)
                 }
             }
             // A share created/activated from the "+" modal (outside this view) refreshes the list.
             .onReceive(NotificationCenter.default.publisher(for: .unifiedShareDidChange)) { _ in
                 Task { await model.refresh() }
-            }
-            .confirmationDialog(
-                String(localized: "Delete share?"),
-                isPresented: Binding(get: { shareToDelete != nil }, set: { if !$0 { shareToDelete = nil } }),
-                titleVisibility: .visible,
-                presenting: shareToDelete
-            ) { share in
-                Button(String(localized: "Delete"), role: .destructive) {
-                    model.delete(share: share)
-                    shareToDelete = nil
-                }
-
-                Button(String(localized: "Cancel"), role: .cancel) {
-                    shareToDelete = nil
-                }
-            } message: { _ in
-                Text(String(localized: "This share will be permanently removed."))
             }
     }
 
@@ -108,7 +91,6 @@ public struct UnifiedShareListView: View {
         }
     }
 
-    // Row body isn't tappable (matching Android): use the chip for permissions, the ⋯ menu to edit.
     private func shareRow(_ share: NKUnifiedShare, allShares: [NKUnifiedShare]) -> some View {
         HStack(spacing: 12) {
             shareIcon(share)
@@ -125,6 +107,25 @@ public struct UnifiedShareListView: View {
             Spacer()
 
             overflowMenu(share)
+                .confirmationDialog(
+                    String(localized: "Delete share?"),
+                    isPresented: Binding(
+                        get: { shareToDelete?.id == share.id },
+                        set: { if !$0 { shareToDelete = nil } }
+                    ),
+                    titleVisibility: .visible
+                ) {
+                    Button(String(localized: "Delete"), role: .destructive) {
+                        model.delete(share: share)
+                        shareToDelete = nil
+                    }
+
+                    Button(String(localized: "Cancel"), role: .cancel) {
+                        shareToDelete = nil
+                    }
+                } message: {
+                    Text(String(localized: "This share will be permanently removed."))
+                }
         }
     }
 
@@ -194,7 +195,7 @@ public struct UnifiedShareListView: View {
             Divider()
 
             Button(String(localized: "Can…")) {
-                editingShare = share
+                editing = ShareEditor(share: share)
             }
         } label: {
             HStack(spacing: 2) {
@@ -215,9 +216,15 @@ public struct UnifiedShareListView: View {
     private func overflowMenu(_ share: NKUnifiedShare) -> some View {
         Menu {
             Button {
-                editingShare = share
+                editing = ShareEditor(share: share)
             } label: {
                 Label(String(localized: "Edit"), systemImage: "pencil")
+            }
+
+            Button {
+                editing = ShareEditor(share: share, expandSettings: true)
+            } label: {
+                Label(String(localized: "Send email"), systemImage: "envelope")
             }
 
             Button(role: .destructive) {
@@ -225,12 +232,14 @@ public struct UnifiedShareListView: View {
             } label: {
                 Label(String(localized: "Delete"), systemImage: "trash")
             }
+            .tint(.red)
         } label: {
             Image(systemName: "ellipsis")
-                .foregroundStyle(tint)
+                .foregroundStyle(.primary)
                 .frame(width: 32, height: 32)
                 .contentShape(Rectangle())
         }
+        .tint(.primary)
     }
 
     private func presetLabel(_ share: NKUnifiedShare) -> String {
@@ -244,7 +253,6 @@ public struct UnifiedShareListView: View {
 
     // MARK: - Helpers
 
-    /// Matches Android's `belongsAnyoneTab`: the share carries an editable-secret (link) recipient.
     private func isLink(_ share: NKUnifiedShare) -> Bool {
         share.recipients.contains { $0.secret.updatable }
     }
@@ -266,4 +274,10 @@ public struct UnifiedShareListView: View {
     private func iconURL(_ icon: NKUnifiedShareIcon) -> String? {
         (colorScheme == .dark ? icon.dark : icon.light) ?? icon.light ?? icon.dark
     }
+}
+
+private struct ShareEditor: Identifiable {
+    let share: NKUnifiedShare
+    var expandSettings = false
+    var id: String { share.id }
 }

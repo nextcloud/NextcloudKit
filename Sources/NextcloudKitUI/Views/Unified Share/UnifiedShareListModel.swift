@@ -20,10 +20,8 @@ enum UnifiedShareListState {
 @Observable
 public class UnifiedShareListModel {
     var state: UnifiedShareListState = .loading
-    /// Permission presets (for the per-row permission chip label).
     var permissionPresets: [NKUnifiedSharePermissionPreset] = []
     let account: String
-    /// The file/folder whose shares are listed (nil lists everything).
     let sourceId: String?
 
     init(account: String, sourceId: String?) {
@@ -58,7 +56,6 @@ public class UnifiedShareListModel {
         state = .loaded(shares.filter { $0.state == .active })
     }
 
-    /// Presets applicable to a share (those its permissions reference), for the quick chip.
     func applicablePresets(_ share: NKUnifiedShare) -> [NKUnifiedSharePermissionPreset] {
         let applicable = Set(share.permissions.flatMap { $0.presets })
         return permissionPresets.filter { applicable.contains($0.class) }
