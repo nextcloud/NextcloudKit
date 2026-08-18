@@ -61,42 +61,41 @@ public struct UnifiedShareEditView: View {
                 case .shareUpdated(let share):
 
                     Form {
-                        Section {
-                            // The audience is only selectable for a new draft; an existing share's is fixed.
-                            if !isEditingExisting {
-                                shareeTypePicker(share: share)
-                            }
+                        // The audience is only selectable for a new draft; an existing share's is fixed.
+                        if !isEditingExisting {
+                            shareeTypePicker(share: share)
+                        }
 
-                            if shareeType == .invited {
-                                if !peopleRecipients(share).isEmpty {
-                                    recipientPills(share: share)
-                                        .listRowSeparator(.hidden)
-                                }
-
-                                TextField(
-                                    String(localized: "Add people"),
-                                    text: $recipients
-                                )
-                                .onChange(of: recipients) {
-                                    model.searchRecipients(query: recipients)
-                                }
-                                // Publish the field's frame so the dropdown can be drawn outside the Form.
-                                .anchorPreference(key: AddPeopleFieldAnchorKey.self, value: .bounds) { $0 }
-                            } else {
+                        if shareeType == .invited {
+                            if !peopleRecipients(share).isEmpty {
                                 recipientPills(share: share)
+                                    .listRowSeparator(.hidden)
                             }
 
-                            permissionField(share: share)
+                            TextField(
+                                String(localized: "Add people"),
+                                text: $recipients
+                            )
+                            .onChange(of: recipients) {
+                                model.searchRecipients(query: recipients)
+                            }
+                            // Publish the field's frame so the dropdown can be drawn outside the Form.
+                            .anchorPreference(key: AddPeopleFieldAnchorKey.self, value: .bounds) { $0 }
+                        } else {
+                            recipientPills(share: share)
+                        }
 
-                            ForEach(basicProperties(share), id: \.class) { property in
-                                PropertyRow(property: property, error: model.propertyErrors[property.class]) { value in
-                                    model.setProperty(share: share, propertyClass: property.class, value: value)
-                                }
+                        permissionField(share: share)
+
+                        ForEach(basicProperties(share), id: \.class) { property in
+                            PropertyRow(property: property, error: model.propertyErrors[property.class]) { value in
+                                model.setProperty(share: share, propertyClass: property.class, value: value)
                             }
                         }
+
                         settingsRow(share: share)
 
-                        customLinkSection(share: share)
+                        customLinkRows(share: share)
 
                         actionButtons(share: share)
                     }
@@ -263,19 +262,20 @@ public struct UnifiedShareEditView: View {
     }
 
     @ViewBuilder
-    private func customLinkSection(share: NKUnifiedShare) -> some View {
+    private func customLinkRows(share: NKUnifiedShare) -> some View {
         if !customLinkRecipients(share).isEmpty {
-            Section {
-                ForEach(customLinkRecipients(share), id: \.value) { recipient in
-                    CustomLinkRow(
-                        recipient: recipient,
-                        onCommit: { token in model.updateRecipientSecret(share: share, recipient: recipient, secret: token) },
-                        onRegenerate: { model.regenerateRecipientSecret(share: share, recipient: recipient) }
-                    )
-                }
-            } footer: {
-                Text(String(localized: "The link can be changed to be easy to remember, but do not set it to something that is easy to guess."))
+            ForEach(customLinkRecipients(share), id: \.value) { recipient in
+                CustomLinkRow(
+                    recipient: recipient,
+                    onCommit: { token in model.updateRecipientSecret(share: share, recipient: recipient, secret: token) },
+                    onRegenerate: { model.regenerateRecipientSecret(share: share, recipient: recipient) }
+                )
             }
+
+            Text(String(localized: "The link can be changed to be easy to remember, but do not set it to something that is easy to guess."))
+                .font(.footnote)
+                .foregroundStyle(.secondary)
+                .listRowSeparator(.hidden)
         }
     }
 
