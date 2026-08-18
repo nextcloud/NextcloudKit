@@ -34,7 +34,7 @@ public struct UnifiedShareEditView: View {
     }
 
     /// Open the editor on an existing share (from the list).
-    public init(fileName: String, account: String, share: NKUnifiedShare, internalLink: String? = nil, expandSettings: Bool = false) {
+    public init(fileName: String, account: String, share: NKUnifiedShare, internalLink: String? = nil, expandSettings: Bool = false, forceCustomPermissions: Bool = false) {
         self.fileName = fileName
         self.account = account
         self.isEditingExisting = true
@@ -42,6 +42,7 @@ public struct UnifiedShareEditView: View {
         model = UnifiedShareEditModel(account: account, existingShare: share)
         _shareeType = State(initialValue: share.recipients.contains { $0.class == UnifiedShareEditModel.tokenRecipientClass } ? .anyone : .invited)
         _isSettingsExpanded = State(initialValue: expandSettings)
+        _permissionSelection = State(initialValue: forceCustomPermissions ? .custom : .unset)
     }
 
     init(fileName: String, model: UnifiedShareEditModel) {
@@ -670,14 +671,18 @@ private struct DatePropertyEditor: View {
     var body: some View {
         if hasDate {
             HStack(spacing: 12) {
-                DatePicker(property.displayName, selection: $date, in: lowerBound, displayedComponents: .date)
+                DatePicker(property.displayName, selection: $date, in: dateRange, displayedComponents: .date)
                     .onChange(of: date) {
                         onCommit(Self.format(date))
                     }
 
                 Button {
                     hasDate = false
-                    onCommit(nil)
+
+                    // Nothing to clear server-side while the picker was only revealed.
+                    if let value = property.value, !value.isEmpty {
+                        onCommit("")
+                    }
                 } label: {
                     Image(systemName: "xmark.circle.fill")
                         .foregroundStyle(.secondary)
@@ -686,9 +691,9 @@ private struct DatePropertyEditor: View {
                 .padding(.leading, 4)
             }
         } else {
+            // Revealing the picker commits nothing; the first user-chosen date does.
             Button {
                 hasDate = true
-                onCommit(Self.format(date))
             } label: {
                 HStack {
                     Text(property.displayName)
@@ -703,8 +708,12 @@ private struct DatePropertyEditor: View {
         }
     }
 
-    private var lowerBound: PartialRangeFrom<Date> {
-        (Self.parse(property.minDate) ?? Date())...
+    private var dateRange: ClosedRange<Date> {
+        let today = Calendar.current.startOfDay(for: Date())
+        let lower = max(Self.parse(property.minDate) ?? today, today)
+        let upper = Self.parse(property.maxDate) ?? .distantFuture
+
+        return lower...max(lower, upper)
     }
 
     private static let formatter: ISO8601DateFormatter = {

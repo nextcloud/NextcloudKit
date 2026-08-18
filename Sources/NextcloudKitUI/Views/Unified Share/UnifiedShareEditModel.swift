@@ -19,6 +19,9 @@ public class UnifiedShareEditModel {
     /// Server class for a public-link (token) recipient.
     static let tokenRecipientClass = "OC\\Core\\Sharing\\Recipient\\TokenShareRecipientType"
 
+    private static let searchDebounce: Duration = .milliseconds(300)
+    private static let searchLimit = 10
+
     var state: UnifiedShareViewState = .loading
     /// Recipient autocomplete results — coexist with a loaded share, so kept out of `state`.
     var recipientResults: [NKUnifiedShareRecipient] = []
@@ -32,6 +35,7 @@ public class UnifiedShareEditModel {
     var isPreparingLink = false
     /// Set once the draft has been activated (sent), so the sheet can dismiss.
     var didActivate = false
+    @ObservationIgnored private var searchTask: Task<Void, Never>?
     let account: String
     /// Globally-unique id of the file/folder being shared (attached as the share source).
     let sourceId: String?
@@ -106,6 +110,8 @@ public class UnifiedShareEditModel {
                 let sourceResult = await NextcloudKit.shared.addUnifiedShareSource(id: share.id, sourceClass: Self.nodeSourceClass, value: sourceId, account: account)
                 if let updated = sourceResult.share {
                     share = updated
+                } else {
+                    mutationError = sourceResult.error
                 }
             }
 
@@ -186,14 +192,24 @@ public class UnifiedShareEditModel {
         return updated.recipients.compactMap { $0.secret.url }.first
     }
 
+    /// Debounced, latest-wins: a new keystroke cancels the pending search so a slow
+    /// stale response can't overwrite fresher results.
     func searchRecipients(query: String) {
+        searchTask?.cancel()
+
         guard !query.isEmpty else {
             recipientResults = []
             return
         }
 
-        Task {
-            let result = await NextcloudKit.shared.searchUnifiedShareRecipients(query: query, account: account)
+        searchTask = Task {
+            try? await Task.sleep(for: Self.searchDebounce)
+
+            guard !Task.isCancelled else { return }
+
+            let result = await NextcloudKit.shared.searchUnifiedShareRecipients(query: query, limit: Self.searchLimit, account: account)
+
+            guard !Task.isCancelled else { return }
 
             recipientResults = result.recipients ?? []
         }

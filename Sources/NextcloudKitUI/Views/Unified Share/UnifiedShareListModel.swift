@@ -94,6 +94,7 @@ public class UnifiedShareListModel {
         Task {
             let result = await NextcloudKit.shared.setUnifiedSharePermissionPreset(id: share.id, permissionPresetClass: presetClass, account: account)
             guard let updated = result.share else {
+                onError?(result.error)
                 return
             }
 
@@ -108,12 +109,17 @@ public class UnifiedShareListModel {
     }
 
     func delete(share: NKUnifiedShare) {
-        if case .loaded(let shares) = state {
-            state = .loaded(shares.filter { $0.id != share.id })
-        }
-
         Task {
-            await NextcloudKit.shared.deleteUnifiedShare(id: share.id, account: account)
+            let result = await NextcloudKit.shared.deleteUnifiedShare(id: share.id, account: account)
+
+            guard result.error == .success else {
+                onError?(result.error)
+                return
+            }
+
+            if case .loaded(let shares) = state {
+                state = .loaded(shares.filter { $0.id != share.id })
+            }
         }
     }
 }

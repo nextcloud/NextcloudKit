@@ -37,7 +37,14 @@ public struct UnifiedShareListView: View {
                 Task { await model.refresh() }
             }) { editor in
                 NavigationStack {
-                    UnifiedShareEditView(fileName: fileName, account: account, share: editor.share, internalLink: internalLink, expandSettings: editor.expandSettings)
+                    UnifiedShareEditView(
+                        fileName: fileName,
+                        account: account,
+                        share: editor.share,
+                        internalLink: internalLink,
+                        expandSettings: editor.expandSettings,
+                        forceCustomPermissions: editor.forceCustomPermissions
+                    )
                 }
             }
             // A share created/activated from the "+" modal (outside this view) refreshes the list.
@@ -130,6 +137,10 @@ public struct UnifiedShareListView: View {
                     Text(String(localized: "This share will be permanently removed."))
                 }
         }
+        .contentShape(Rectangle())
+        .onTapGesture {
+            editing = ShareEditor(share: share)
+        }
     }
 
     // MARK: - Row content
@@ -198,7 +209,7 @@ public struct UnifiedShareListView: View {
             Divider()
 
             Button(String(localized: "Can…")) {
-                editing = ShareEditor(share: share)
+                editing = ShareEditor(share: share, forceCustomPermissions: true)
             }
         } label: {
             HStack(spacing: 2) {
@@ -282,5 +293,6 @@ public struct UnifiedShareListView: View {
 private struct ShareEditor: Identifiable {
     let share: NKUnifiedShare
     var expandSettings = false
+    var forceCustomPermissions = false
     var id: String { share.id }
 }
