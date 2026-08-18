@@ -81,8 +81,6 @@ public struct UnifiedShareEditView: View {
                             }
                             // Publish the field's frame so the dropdown can be drawn outside the Form.
                             .anchorPreference(key: AddPeopleFieldAnchorKey.self, value: .bounds) { $0 }
-                        } else {
-                            recipientPills(share: share)
                         }
 
                         permissionField(share: share)
