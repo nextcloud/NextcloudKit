@@ -35,7 +35,10 @@ public class UnifiedShareEditModel {
     var isPreparingLink = false
     /// Set once the draft has been activated (sent), so the sheet can dismiss.
     var didActivate = false
+    /// Property classes with an update in flight; Send stays disabled until empty.
+    var pendingProperties: Set<String> = []
     @ObservationIgnored private var searchTask: Task<Void, Never>?
+    @ObservationIgnored private var propertyTasks: [String: Task<Void, Never>] = [:]
     let account: String
     /// Globally-unique id of the file/folder being shared (attached as the share source).
     let sourceId: String?
@@ -245,11 +248,32 @@ public class UnifiedShareEditModel {
         }
     }
 
+    /// Latest-wins per property: a new commit cancels the pending one for the same class.
     func setProperty(share: NKUnifiedShare, propertyClass: String, value: String?) {
-        Task {
+        propertyTasks[propertyClass]?.cancel()
+
+        let isClearing = value?.isEmpty ?? true
+
+        if isClearing {
+            propertyErrors[propertyClass] = nil
+        }
+
+        pendingProperties.insert(propertyClass)
+
+        propertyTasks[propertyClass] = Task {
             let result = await NextcloudKit.shared.setUnifiedShareProperty(id: share.id, propertyClass: propertyClass, value: value, account: account)
+
+            // A newer commit for this class superseded us; it owns the pending entry.
+            guard !Task.isCancelled else { return }
+
+            pendingProperties.remove(propertyClass)
+
             guard let share = result.share else {
-                propertyErrors[propertyClass] = result.error.errorDescription
+                if !isClearing {
+                    let description = result.error.errorDescription
+                    propertyErrors[propertyClass] = description.isEmpty ? String(localized: "Failed to update share.") : description
+                }
+
                 return
             }
 

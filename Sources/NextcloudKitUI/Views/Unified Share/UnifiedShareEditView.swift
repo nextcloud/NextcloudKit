@@ -85,9 +85,9 @@ public struct UnifiedShareEditView: View {
 
                         settingsRow(share: share)
 
-                        customLinkRows(share: share)
-
-                        actionButtons(share: share)
+                        if structuralCanSend(share) {
+                            actionButtons(share: share)
+                        }
                     }
                     .onDisappear {
                         model.discardDraftIfNeeded(share: share)
@@ -237,15 +237,20 @@ public struct UnifiedShareEditView: View {
     }
 
     /// Advanced properties + editable link tokens live behind the disclosure; basic properties inline.
+    @ViewBuilder
     private func settingsRow(share: NKUnifiedShare) -> some View {
-        DisclosureGroup(isExpanded: $isSettingsExpanded) {
-            ForEach(advancedProperties(share), id: \.class) { property in
-                PropertyRow(property: property, error: model.propertyErrors[property.class]) { value in
-                    model.setProperty(share: share, propertyClass: property.class, value: value)
+        if !advancedProperties(share).isEmpty || !customLinkRecipients(share).isEmpty {
+            DisclosureGroup(isExpanded: $isSettingsExpanded) {
+                ForEach(advancedProperties(share), id: \.class) { property in
+                    PropertyRow(property: property, error: model.propertyErrors[property.class]) { value in
+                        model.setProperty(share: share, propertyClass: property.class, value: value)
+                    }
                 }
+
+                customLinkRows(share: share)
+            } label: {
+                Text(String(localized: "Settings"))
             }
-        } label: {
-            Text(String(localized: "Settings"))
         }
     }
 
@@ -371,6 +376,10 @@ public struct UnifiedShareEditView: View {
         .padding(.vertical, 6)
         .background(Capsule().fill(.quaternary))
         .overlay(Capsule().stroke(.tertiary, lineWidth: 0.5))
+        .contentShape(Capsule())
+        .onTapGesture {
+            model.removeRecipient(share: share, recipient: recipient)
+        }
     }
 
     /// The recipient's URL avatar when available, otherwise a circle with its initial.
@@ -440,12 +449,18 @@ public struct UnifiedShareEditView: View {
         shareeType == .anyone ? String(localized: "Share public link") : String(localized: "Send")
     }
 
-    private func canSend(_ share: NKUnifiedShare) -> Bool {
+    /// Structural sendability — gates whether the action buttons render at all.
+    private func structuralCanSend(_ share: NKUnifiedShare) -> Bool {
         !share.sources.isEmpty
             && !share.recipients.isEmpty
             && share.permissions.contains { $0.enabled }
             && !share.properties.contains { $0.required && ($0.value ?? "").isEmpty }
+    }
+
+    private func canSend(_ share: NKUnifiedShare) -> Bool {
+        structuralCanSend(share)
             && model.propertyErrors.isEmpty
+            && model.pendingProperties.isEmpty
     }
 
     private func copyToPasteboard(_ string: String) {
@@ -621,23 +636,28 @@ private struct BooleanPropertyEditor: View {
 private struct EnumPropertyEditor: View {
     let property: NKUnifiedSharePropertyEnum
     let onCommit: (String?) -> Void
-    @State private var selection: String
+    /// nil while the property is unset — the picker shows no value until the user picks one.
+    @State private var selection: String?
 
     init(property: NKUnifiedSharePropertyEnum, onCommit: @escaping (String?) -> Void) {
         self.property = property
         self.onCommit = onCommit
-        _selection = State(initialValue: property.value ?? property.validValues.first ?? "")
+
+        let value = property.value
+        _selection = State(initialValue: (value?.isEmpty ?? true) ? nil : value)
     }
 
     var body: some View {
         Picker(property.displayName, selection: $selection) {
             ForEach(property.validValues, id: \.self) { value in
-                Text(value).tag(value)
+                Text(value).tag(String?.some(value))
             }
         }
         .pickerStyle(.menu)
         .onChange(of: selection) {
-            onCommit(selection)
+            if let selection {
+                onCommit(selection)
+            }
         }
     }
 }

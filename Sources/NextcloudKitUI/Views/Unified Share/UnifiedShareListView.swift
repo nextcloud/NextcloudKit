@@ -152,35 +152,26 @@ public struct UnifiedShareListView: View {
             AsyncImage(url: url) { image in
                 image.resizable().scaledToFill()
             } placeholder: {
-                letterAvatar(share)
+                Circle().fill(.quaternary)
             }
         } else {
-            letterAvatar(share)
+            linkIcon
         }
     }
 
-    /// Colored circle with the recipient's initial — the native stand-in for the server avatar.
-    private func letterAvatar(_ share: NKUnifiedShare) -> some View {
-        let name = share.recipients.first?.displayName ?? ""
-        let initial = name.first.map { String($0).uppercased() } ?? "?"
-
-        return Circle()
-            .fill(avatarColor(for: name.isEmpty ? initial : name))
+    private var linkIcon: some View {
+        Circle()
+            .fill(.quaternary)
             .overlay {
-                Text(initial)
+                Image(systemName: "link")
                     .font(.system(size: 14, weight: .semibold))
-                    .foregroundStyle(.white)
+                    .foregroundStyle(.secondary)
             }
-    }
-
-    private func avatarColor(for string: String) -> Color {
-        let hash = string.unicodeScalars.reduce(0) { $0 &+ Int($1.value) }
-        return Color(hue: Double(hash % 360) / 360.0, saturation: 0.55, brightness: 0.55)
     }
 
     private func headline(_ share: NKUnifiedShare, in shares: [NKUnifiedShare]) -> String {
         guard isLink(share) else {
-            return peopleRecipients(share).first?.displayName ?? String(localized: "Share")
+            return peopleRecipients(share).first?.displayName ?? ""
         }
 
         if let label = label(share) {
