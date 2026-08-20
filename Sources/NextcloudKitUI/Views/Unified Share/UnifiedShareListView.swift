@@ -38,7 +38,6 @@ public struct UnifiedShareListView: View {
             }) { editor in
                 NavigationStack {
                     UnifiedShareEditView(
-                        fileName: fileName,
                         account: account,
                         share: editor.share,
                         internalLink: internalLink,

@@ -10,8 +10,6 @@ import UIKit
 
 /// View used for Unified Sharing.
 public struct UnifiedShareEditView: View {
-    let fileName: String
-    let account: String
     /// Editing an existing share (vs composing a new draft): the audience is fixed.
     let isEditingExisting: Bool
     /// The file's in-server link, copied for invited-people shares.
@@ -25,18 +23,14 @@ public struct UnifiedShareEditView: View {
     @Environment(\.colorScheme) private var colorScheme
     @Environment(\.dismiss) private var dismiss
 
-    public init(fileName: String, account: String, sourceId: String? = nil, internalLink: String? = nil) {
-        self.fileName = fileName
-        self.account = account
+    public init(account: String, sourceId: String? = nil, internalLink: String? = nil) {
         self.isEditingExisting = false
         self.internalLink = internalLink
         model = UnifiedShareEditModel(account: account, sourceId: sourceId)
     }
 
     /// Open the editor on an existing share (from the list).
-    public init(fileName: String, account: String, share: NKUnifiedShare, internalLink: String? = nil, expandSettings: Bool = false, forceCustomPermissions: Bool = false) {
-        self.fileName = fileName
-        self.account = account
+    public init(account: String, share: NKUnifiedShare, internalLink: String? = nil, expandSettings: Bool = false, forceCustomPermissions: Bool = false) {
         self.isEditingExisting = true
         self.internalLink = internalLink
         model = UnifiedShareEditModel(account: account, existingShare: share)
@@ -45,9 +39,7 @@ public struct UnifiedShareEditView: View {
         _permissionSelection = State(initialValue: forceCustomPermissions ? .custom : .unset)
     }
 
-    init(fileName: String, model: UnifiedShareEditModel) {
-        self.fileName = fileName
-        self.account = model.account
+    init(model: UnifiedShareEditModel) {
         self.isEditingExisting = false
         self.internalLink = nil
         self.model = model
@@ -161,9 +153,7 @@ public struct UnifiedShareEditView: View {
                 model.loadCapabilities()
             }
         }
-
-        Spacer()
-}
+    }
 
     private var isPreview: Bool {
         ProcessInfo.processInfo.environment["XCODE_RUNNING_FOR_PREVIEWS"] == "1"
@@ -852,7 +842,6 @@ private struct CustomLinkRow: View {
 
 #Preview {
     UnifiedShareEditView(
-        fileName: "Test.txt",
         model: UnifiedShareEditModel(
             account: "",
             state: .shareUpdated(share: .mock),
