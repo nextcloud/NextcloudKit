@@ -808,12 +808,12 @@ public extension NextcloudKit {
     ///
     /// - Parameters:
     ///   - account: The Nextcloud account requesting the deletion of the certificate.
-    ///   - password: the account password
+    ///   - password: the account password if requested
     ///   - options: request configuration, including the optional E2EE API version specified by `options.version` v1/v2.
     ///   - taskHandler: Closure to access the URLSessionTask.
     ///   - completion: Completion handler returning the account, raw response, and NKError.
     func deleteE2EEPublicKey(account: String,
-                             password: String,
+                             password: String?,
                              options: NKRequestOptions = NKRequestOptions(),
                              taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
                              completion: @escaping (_ account: String, _ responseData: AFDataResponse<Data>?, _ error: NKError) -> Void) {
@@ -844,12 +844,12 @@ public extension NextcloudKit {
     /// Asynchronously deletes the E2EE public key from the server for the given account.
     /// - Parameters:
     ///   - account: The Nextcloud account to remove the certificate from.
-    ///   - password: the account password
+    ///   - password: the account password if requested
     ///   - options: request configuration, including the optional E2EE API version specified by `options.version` v1/v2.
     ///   - taskHandler: Optional monitoring of the URLSessionTask.
     /// - Returns: A tuple containing the account, response data, and error.
     func deleteE2EEPublicKeyAsync(account: String,
-                                  password: String,
+                                  password: String?,
                                   options: NKRequestOptions = NKRequestOptions(),
                                   taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in }
     ) async -> (
@@ -877,12 +877,12 @@ public extension NextcloudKit {
     ///
     /// - Parameters:
     ///   - account: The Nextcloud account requesting the deletion of its private key.
-    ///   - password: the account password
+    ///   - password: the account password if requested
     ///   - options: request configuration, including the optional E2EE API version specified by `options.version` v1/v2.
     ///   - taskHandler: Closure to access the URLSessionTask.
     ///   - completion: Completion handler returning the account, raw response, and NKError.
     func deleteE2EEPrivateKey(account: String,
-                              password: String,
+                              password: String?,
                               options: NKRequestOptions = NKRequestOptions(),
                               taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
                               completion: @escaping (_ account: String, _ responseData: AFDataResponse<Data>?, _ error: NKError) -> Void) {
@@ -914,12 +914,12 @@ public extension NextcloudKit {
     /// Asynchronously deletes the E2EE private key from the server for the specified account.
     /// - Parameters:
     ///   - account: The Nextcloud account for which the private key will be deleted.
-    ///   - password: the account password
+    ///   - password: the account password if requested
     ///   - options: request configuration, including the optional E2EE API version specified by `options.version` v1/v2.
     ///   - taskHandler: Optional monitoring of the URLSessionTask.
     /// - Returns: A tuple containing the account, response data, and error.
     func deleteE2EEPrivateKeyAsync(account: String,
-                                   password: String,
+                                   password: String?,
                                    options: NKRequestOptions = NKRequestOptions(),
                                    taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in }
     ) async -> (
@@ -945,12 +945,12 @@ public extension NextcloudKit {
     ///
     /// - Parameters:
     ///   - account: The Nextcloud account identifier.
-    ///   - password: the account password
+    ///   - password: the account password if requested
     ///   - options: request configuration, including the optional E2EE API version specified by `options.version` v1/v2.
     ///   - taskHandler: Closure invoked when the underlying URLSession task is created.
     /// - Returns: A tuple containing the account identifier, the Alamofire response data, and the resulting NKError.
     func deleteE2EEKeysAsync(account: String,
-                             password: String,
+                             password: String?,
                              options: NKRequestOptions = NKRequestOptions(),
                              taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in }) async -> (account: String, responseData: AFDataResponse<Data>?, error: NKError) {
         let version = options.version ?? "v2"
