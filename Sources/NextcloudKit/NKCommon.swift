@@ -314,13 +314,22 @@ public struct NKCommon: Sendable {
     public func getStandardHeaders(account: String,
                                    options: NKRequestOptions? = nil,
                                    contentType: String? = nil,
-                                   accept: String? = nil) -> HTTPHeaders? {
+                                   accept: String? = nil,
+                                   password: String? = nil) -> HTTPHeaders? {
         guard let session = nksessions.session(forAccount: account) else {
             return nil
         }
         var headers: HTTPHeaders = []
+        let authPassword: String
 
-        headers.update(.authorization(username: session.user, password: session.password))
+        if let password, !password.isEmpty {
+            authPassword = password
+        } else {
+            authPassword = session.password
+        }
+
+        headers.update(.authorization(username: session.user, password: authPassword))
+
         headers.update(.userAgent(session.userAgent))
         if let customUserAgent = options?.customUserAgent {
             headers.update(.userAgent(customUserAgent))
