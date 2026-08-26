@@ -1382,17 +1382,6 @@
         }
       }
     },
-    "Create a new share" : {
-      "comment" : "Navigation title when creating a share.",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Create a new share"
-          }
-        }
-      }
-    },
     "Custom link" : {
       "comment" : "Heading of the editable public-link token row.",
       "localizations" : {
@@ -1431,17 +1420,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Edit"
-          }
-        }
-      }
-    },
-    "Edit share" : {
-      "comment" : "Navigation title when editing an existing share.",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Edit share"
           }
         }
       }
@@ -4163,6 +4141,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Settings"
+          }
+        }
+      }
+    },
+    "Share \"%@\"" : {
+      "comment" : "Share editor title; placeholder is the shared file or folder name.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Share \"%@\""
           }
         }
       }

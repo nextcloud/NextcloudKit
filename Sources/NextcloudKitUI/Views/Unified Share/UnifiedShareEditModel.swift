@@ -171,10 +171,10 @@ public class UnifiedShareEditModel {
         return result.share
     }
 
-    /// Return the public link, activating the share first to mint it if needed.
+    /// Return the public link, activating the share first so the copied link is live.
     func prepareLinkForCopy(share: NKUnifiedShare) async -> String? {
-        if let url = share.recipients.compactMap({ $0.secret.url }).first {
-            return url
+        if share.state == .active {
+            return share.recipients.compactMap({ $0.secret.url }).first
         }
 
         guard !isPreparingLink else {
@@ -195,9 +195,7 @@ public class UnifiedShareEditModel {
         return updated.recipients.compactMap { $0.secret.url }.first
     }
 
-    /// Debounced, latest-wins: a new keystroke cancels the pending search so a slow
-    /// stale response can't overwrite fresher results.
-    func searchRecipients(query: String) {
+    func searchRecipients(query: String, share: NKUnifiedShare) {
         searchTask?.cancel()
 
         guard !query.isEmpty else {
@@ -214,7 +212,11 @@ public class UnifiedShareEditModel {
 
             guard !Task.isCancelled else { return }
 
-            recipientResults = result.recipients ?? []
+            recipientResults = (result.recipients ?? []).filter { candidate in
+                !share.recipients.contains {
+                    $0.class == candidate.class && $0.value == candidate.value && $0.instance == candidate.instance
+                }
+            }
         }
     }
 
@@ -248,7 +250,6 @@ public class UnifiedShareEditModel {
         }
     }
 
-    /// Latest-wins per property: a new commit cancels the pending one for the same class.
     func setProperty(share: NKUnifiedShare, propertyClass: String, value: String?) {
         propertyTasks[propertyClass]?.cancel()
 
@@ -263,7 +264,6 @@ public class UnifiedShareEditModel {
         propertyTasks[propertyClass] = Task {
             let result = await NextcloudKit.shared.setUnifiedShareProperty(id: share.id, propertyClass: propertyClass, value: value, account: account)
 
-            // A newer commit for this class superseded us; it owns the pending entry.
             guard !Task.isCancelled else { return }
 
             pendingProperties.remove(propertyClass)

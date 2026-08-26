@@ -109,6 +109,7 @@ public struct UnifiedShareListView: View {
             VStack(alignment: .leading, spacing: 4) {
                 Text(headline(share, in: allShares))
                     .foregroundStyle(.primary)
+                    .lineLimit(1)
 
                 presetChip(share)
             }
@@ -213,7 +214,7 @@ public struct UnifiedShareListView: View {
             .padding(.vertical, 2)
             .background(tint.opacity(0.12), in: Capsule())
         }
-        .menuStyle(.borderlessButton)
+        .buttonStyle(.plain)
         .fixedSize()
     }
 

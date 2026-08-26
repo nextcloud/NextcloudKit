@@ -69,7 +69,7 @@ public struct UnifiedShareEditView: View {
                                 text: $recipients
                             )
                             .onChange(of: recipients) {
-                                model.searchRecipients(query: recipients)
+                                model.searchRecipients(query: recipients, share: share)
                             }
                             // Publish the field's frame so the dropdown can be drawn outside the Form.
                             .anchorPreference(key: AddPeopleFieldAnchorKey.self, value: .bounds) { $0 }
@@ -115,10 +115,16 @@ public struct UnifiedShareEditView: View {
                     Text(error.localizedDescription)
             }
         }
-        .navigationTitle(isEditingExisting ? String(localized: "Edit share") : String(localized: "Create a new share"))
         .navigationBarTitleDisplayMode(.inline)
         .interactiveDismissDisabled()
         .toolbar {
+            ToolbarItem(placement: .principal) {
+                Text(navigationTitle)
+                    .font(.headline)
+                    .lineLimit(1)
+                    .truncationMode(.middle)
+            }
+
             ToolbarItem(placement: .topBarTrailing) {
                 Button {
                     dismiss()
@@ -157,6 +163,15 @@ public struct UnifiedShareEditView: View {
 
     private var isPreview: Bool {
         ProcessInfo.processInfo.environment["XCODE_RUNNING_FOR_PREVIEWS"] == "1"
+    }
+
+    private var navigationTitle: String {
+        guard case .shareUpdated(let share) = model.state else {
+            return ""
+        }
+
+        let name = share.sources.first?.displayName ?? "..."
+        return String(localized: "Share \"\(name)\"")
     }
 
     private func shareeTypePicker(share: NKUnifiedShare) -> some View {
@@ -263,6 +278,8 @@ public struct UnifiedShareEditView: View {
                     onCommit: { token in model.updateRecipientSecret(share: share, recipient: recipient, secret: token) },
                     onRegenerate: { model.regenerateRecipientSecret(share: share, recipient: recipient) }
                 )
+                // Re-seed the row's local token whenever the server-side secret changes.
+                .id(recipient.secret.value)
             }
 
             Text(String(localized: "The link can be changed to be easy to remember, but do not set it to something that is easy to guess."))
@@ -636,7 +653,6 @@ private struct BooleanPropertyEditor: View {
 private struct EnumPropertyEditor: View {
     let property: NKUnifiedSharePropertyEnum
     let onCommit: (String?) -> Void
-    /// nil while the property is unset — the picker shows no value until the user picks one.
     @State private var selection: String?
 
     init(property: NKUnifiedSharePropertyEnum, onCommit: @escaping (String?) -> Void) {
@@ -667,6 +683,7 @@ private struct DatePropertyEditor: View {
     let onCommit: (String?) -> Void
     @State private var date: Date
     @State private var hasDate: Bool
+    @State private var showsPicker = false
 
     init(property: NKUnifiedSharePropertyDate, onCommit: @escaping (String?) -> Void) {
         self.property = property
@@ -677,17 +694,19 @@ private struct DatePropertyEditor: View {
     }
 
     var body: some View {
-        if hasDate {
-            HStack(spacing: 12) {
-                DatePicker(property.displayName, selection: $date, in: dateRange, displayedComponents: .date)
-                    .onChange(of: date) {
-                        onCommit(Self.format(date))
-                    }
+        HStack(spacing: 12) {
+            Text(property.displayName)
+                .foregroundStyle(.primary)
+
+            Spacer()
+
+            if hasDate {
+                Text(date, format: Date.FormatStyle(date: .abbreviated))
+                    .foregroundStyle(.secondary)
 
                 Button {
                     hasDate = false
 
-                    // Nothing to clear server-side while the picker was only revealed.
                     if let value = property.value, !value.isEmpty {
                         onCommit("")
                     }
@@ -697,22 +716,34 @@ private struct DatePropertyEditor: View {
                 }
                 .buttonStyle(.plain)
                 .padding(.leading, 4)
+            } else {
+                Image(systemName: "calendar.badge.plus")
+                    .foregroundStyle(.secondary)
             }
-        } else {
-            // Revealing the picker commits nothing; the first user-chosen date does.
-            Button {
-                hasDate = true
-            } label: {
-                HStack {
-                    Text(property.displayName)
-                        .foregroundStyle(.primary)
-                    Spacer()
-                    Image(systemName: "calendar.badge.plus")
-                        .foregroundStyle(.secondary)
-                }
-                .contentShape(Rectangle())
-            }
-            .buttonStyle(.plain)
+        }
+        .contentShape(Rectangle())
+        .onTapGesture {
+            showsPicker = true
+        }
+        .popover(isPresented: $showsPicker) {
+            DatePicker(
+                "",
+                selection: Binding(
+                    get: { date },
+                    set: { picked in
+                        date = picked
+                        hasDate = true
+                        onCommit(Self.format(picked))
+                    }
+                ),
+                in: dateRange,
+                displayedComponents: .date
+            )
+            .datePickerStyle(.graphical)
+            .labelsHidden()
+            .frame(width: 320)
+            .padding(8)
+            .presentationCompactAdaptation(.popover)
         }
     }
 
@@ -774,10 +805,21 @@ private struct TextPropertyEditor: View {
             }
     }
 
+    private var isMultiline: Bool {
+        guard let maxLength = (property as? NKUnifiedSharePropertyString)?.maxLength else {
+            return property is NKUnifiedSharePropertyString
+        }
+
+        return maxLength > 255
+    }
+
     @ViewBuilder
     private var field: some View {
         if secure {
             SecureField(property.displayName, text: $text)
+        } else if isMultiline {
+            TextField(property.displayName, text: $text, axis: .vertical)
+                .lineLimit(1...3)
         } else {
             TextField(property.displayName, text: $text)
         }
@@ -824,7 +866,6 @@ private struct CustomLinkRow: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 4) {
             Text(String(localized: "Custom link"))
-                .font(.headline)
 
             if !prefix.isEmpty {
                 Text(prefix)
@@ -834,6 +875,8 @@ private struct CustomLinkRow: View {
 
             HStack {
                 TextField(String(localized: "Link token"), text: $token)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.5)
                     .focused($focused)
                     .onChange(of: token) {
                         if token.count > Self.maxTokenLength {
