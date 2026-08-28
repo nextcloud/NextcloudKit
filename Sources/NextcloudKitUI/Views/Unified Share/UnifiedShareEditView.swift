@@ -20,6 +20,8 @@ public struct UnifiedShareEditView: View {
     @State private var permissionSelection: PermissionSelection = .unset
     @State private var isSettingsExpanded = false
     @State private var recipients = ""
+    @State private var showsCopied = false
+    @State private var copiedTask: Task<Void, Never>?
     @Environment(\.colorScheme) private var colorScheme
     @Environment(\.dismiss) private var dismiss
 
@@ -112,8 +114,9 @@ public struct UnifiedShareEditView: View {
                         }
                     }
 
-                case .error(let error):
-                    Text(error.localizedDescription)
+                case .error:
+                    Text(String(localized: "Could not create share, try again later"))
+                        .foregroundStyle(.secondary)
             }
         }
         .navigationBarTitleDisplayMode(.inline)
@@ -439,27 +442,44 @@ public struct UnifiedShareEditView: View {
                 Task {
                     if let link = await model.prepareLinkForCopy(share: share) {
                         copyToPasteboard(link)
+                        flashCopied()
                     }
                 }
             } label: {
                 if model.isPreparingLink {
                     ProgressView()
                 } else {
-                    Text(String(localized: "Copy public link"))
+                    Text(showsCopied ? String(localized: "Copied") : String(localized: "Copy public link"))
                 }
             }
             .buttonStyle(.bordered)
             .frame(maxWidth: .infinity)
             .disabled(model.isPreparingLink || !canSend(share))
         } else {
-            Button(String(localized: "Copy private link")) {
+            Button {
                 if let internalLink {
                     copyToPasteboard(internalLink)
+                    flashCopied()
                 }
+            } label: {
+                Text(showsCopied ? String(localized: "Copied") : String(localized: "Copy private link"))
             }
             .buttonStyle(.bordered)
             .frame(maxWidth: .infinity)
             .disabled(internalLink == nil)
+        }
+    }
+
+    private func flashCopied() {
+        copiedTask?.cancel()
+        showsCopied = true
+
+        copiedTask = Task {
+            try? await Task.sleep(for: .seconds(1))
+
+            guard !Task.isCancelled else { return }
+
+            showsCopied = false
         }
     }
 

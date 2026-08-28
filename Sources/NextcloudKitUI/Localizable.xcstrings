@@ -555,12 +555,6 @@
             "value" : ""
           }
         },
-        "sr@latin" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : ""
-          }
-        },
         "sv" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1208,12 +1202,6 @@
             "value" : ""
           }
         },
-        "sr@latin" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : ""
-          }
-        },
         "sv" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1349,6 +1337,16 @@
         }
       }
     },
+    "Copied" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copied"
+          }
+        }
+      }
+    },
     "Copy private link" : {
       "comment" : "Copies the in-server link of the file for invited people.",
       "localizations" : {
@@ -1367,6 +1365,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Copy public link"
+          }
+        }
+      }
+    },
+    "Could not create share, try again later" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Could not create share, try again later"
           }
         }
       }
@@ -2012,12 +2020,6 @@
             "value" : ""
           }
         },
-        "sr@latin" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : ""
-          }
-        },
         "sv" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2110,13 +2112,12 @@
         }
       }
     },
-    "No shares yet" : {
-      "comment" : "Empty state title of the share list.",
+    "Not Shared Yet" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "No shares yet"
+            "value" : "Not Shared Yet"
           }
         }
       }
@@ -2671,12 +2672,6 @@
           }
         },
         "sr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : ""
-          }
-        },
-        "sr@latin" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : ""
@@ -3361,12 +3356,6 @@
             "value" : ""
           }
         },
-        "sr@latin" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : ""
-          }
-        },
         "sv" : {
           "stringUnit" : {
             "state" : "translated",
@@ -4036,12 +4025,6 @@
             "value" : ""
           }
         },
-        "sr@latin" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : ""
-          }
-        },
         "sv" : {
           "stringUnit" : {
             "state" : "translated",
@@ -4152,6 +4135,26 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Share \"%@\""
+          }
+        }
+      }
+    },
+    "Share File" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Share File"
+          }
+        }
+      }
+    },
+    "Share Folder" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Share Folder"
           }
         }
       }
@@ -4739,12 +4742,6 @@
           }
         },
         "sr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : ""
-          }
-        },
-        "sr@latin" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : ""
@@ -5397,12 +5394,6 @@
             "value" : ""
           }
         },
-        "sr@latin" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : ""
-          }
-        },
         "sv" : {
           "stringUnit" : {
             "state" : "translated",
@@ -5512,17 +5503,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "This share will be permanently removed."
-          }
-        }
-      }
-    },
-    "Use the + button to share %@." : {
-      "comment" : "Empty state description; placeholder is the file name.",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Use the + button to share %@."
           }
         }
       }

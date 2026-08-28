@@ -7,22 +7,22 @@ import NextcloudKit
 
 /// Lists the existing unified shares for a file, with tap-to-edit and swipe-to-delete.
 public struct UnifiedShareListView: View {
-    let fileName: String
     let account: String
-    /// Brand/accent color (the app passes NCBrandColor); used for the chip and ⋯ button.
     let tint: Color
     /// The file's in-server link, forwarded to the editor for invited-people shares.
     let internalLink: String?
+    let isDirectory: Bool
     @State private var model: UnifiedShareListModel
     @State private var editing: ShareEditor?
     @State private var shareToDelete: NKUnifiedShare?
+    @State private var isCreating = false
     @Environment(\.colorScheme) private var colorScheme
 
-    public init(fileName: String, account: String, sourceId: String? = nil, internalLink: String? = nil, tint: Color = .accentColor, onError: ((NKError) -> Void)? = nil) {
-        self.fileName = fileName
+    public init(account: String, sourceId: String? = nil, internalLink: String? = nil, isDirectory: Bool = false, tint: Color = .accentColor, onError: ((NKError) -> Void)? = nil) {
         self.account = account
         self.tint = tint
         self.internalLink = internalLink
+        self.isDirectory = isDirectory
         model = UnifiedShareListModel(account: account, sourceId: sourceId, onError: onError)
     }
 
@@ -44,6 +44,13 @@ public struct UnifiedShareListView: View {
                         expandSettings: editor.expandSettings,
                         forceCustomPermissions: editor.forceCustomPermissions
                     )
+                }
+            }
+            .sheet(isPresented: $isCreating, onDismiss: {
+                Task { await model.refresh() }
+            }) {
+                NavigationStack {
+                    UnifiedShareEditView(account: account, sourceId: model.sourceId, internalLink: internalLink)
                 }
             }
             // A share created/activated from the "+" modal (outside this view) refreshes the list.
@@ -90,11 +97,13 @@ public struct UnifiedShareListView: View {
             }
             .overlay {
                 if shares.isEmpty {
-                    ContentUnavailableView(
-                        String(localized: "No shares yet"),
-                        systemImage: "person.2.slash",
-                        description: Text(String(localized: "Use the + button to share \(fileName)."))
-                    )
+                    ContentUnavailableView {
+                        Label("Not Shared Yet", systemImage: "person.badge.plus.fill")
+                    } actions: {
+                        Button(isDirectory ? String(localized: "Share Folder") : String(localized: "Share File")) {
+                            isCreating = true
+                        }
+                    }
                 }
             }
         }

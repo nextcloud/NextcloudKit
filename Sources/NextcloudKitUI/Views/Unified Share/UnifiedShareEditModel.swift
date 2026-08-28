@@ -104,6 +104,7 @@ public class UnifiedShareEditModel {
         Task {
             let result = await NextcloudKit.shared.createUnifiedShare(account: account)
             guard var share = result.share else {
+                nkLog(error: "Could not create share: \(result.error.errorCode) \(result.error.errorDescription)")
                 state = .error(result.error)
                 return
             }
@@ -125,6 +126,11 @@ public class UnifiedShareEditModel {
     /// Switch between an invited-people share and a public-link (token) share.
     func setShareeType(share: NKUnifiedShare, anyone: Bool) {
         Task {
+            #if DEBUG
+            // TEMP: artificial switch latency for testing. Remove.
+            try? await Task.sleep(for: .seconds(3))
+            #endif
+
             var current = share
 
             if anyone {
