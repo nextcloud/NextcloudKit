@@ -8,8 +8,8 @@ import Foundation
 public final class NKUnifiedShare: Codable, Identifiable {
     public let id: String
     public let owner: NKUnifiedShareOwner
-    /// Unix time in milliseconds.
-    public let lastUpdated: Int64
+    /// Unix time in milliseconds, as a numeric string.
+    public let lastUpdated: String
     public let state: NKUnifiedShareState
     public let sources: [NKUnifiedShareSource]
     public let recipients: [NKUnifiedShareRecipient]
@@ -32,7 +32,7 @@ public final class NKUnifiedShare: Codable, Identifiable {
 
     public init(id: String,
                 owner: NKUnifiedShareOwner,
-                lastUpdated: Int64,
+                lastUpdated: String,
                 state: NKUnifiedShareState,
                 sources: [NKUnifiedShareSource],
                 recipients: [NKUnifiedShareRecipient],
@@ -54,7 +54,7 @@ public final class NKUnifiedShare: Codable, Identifiable {
         let c = try decoder.container(keyedBy: CodingKeys.self)
         self.id = try c.decode(String.self, forKey: .id)
         self.owner = try c.decode(NKUnifiedShareOwner.self, forKey: .owner)
-        self.lastUpdated = try c.decode(Int64.self, forKey: .lastUpdated)
+        self.lastUpdated = try c.decode(String.self, forKey: .lastUpdated)
         self.state = try c.decode(NKUnifiedShareState.self, forKey: .state)
         self.sources = try c.decode([NKUnifiedShareSource].self, forKey: .sources)
         self.recipients = try c.decode([NKUnifiedShareRecipient].self, forKey: .recipients)

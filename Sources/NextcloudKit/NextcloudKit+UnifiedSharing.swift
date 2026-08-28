@@ -12,6 +12,7 @@ public extension NextcloudKit {
     /// `GET /shares` — paginated list of shares the current user can see.
     func listUnifiedShares(filterSourceTypeClass: String? = nil,
                            filterSourceTypeValue: String? = nil,
+                           filterState: NKUnifiedShareState? = nil,
                            lastShareID: String? = nil,
                            limit: Int? = nil,
                            account: String,
@@ -28,6 +29,7 @@ public extension NextcloudKit {
         var parameters: [String: String] = [:]
         if let filterSourceTypeClass { parameters["filterSourceTypeClass"] = filterSourceTypeClass }
         if let filterSourceTypeValue { parameters["filterSourceTypeValue"] = filterSourceTypeValue }
+        if let filterState { parameters["filterState"] = filterState.rawValue }
         if let lastShareID { parameters["lastShareID"] = lastShareID }
         if let limit { parameters["limit"] = String(limit) }
 

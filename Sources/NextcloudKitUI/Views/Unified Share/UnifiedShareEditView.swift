@@ -89,7 +89,7 @@ public struct UnifiedShareEditView: View {
                             actionButtons(share: share)
                         }
                     }
-                    .scrollDismissesKeyboard(.interactively)
+                    .scrollDismissesKeyboard(.immediately)
                     .onDisappear {
                         model.discardDraftIfNeeded(share: share)
                     }

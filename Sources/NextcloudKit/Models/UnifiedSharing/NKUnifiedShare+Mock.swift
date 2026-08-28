@@ -16,7 +16,7 @@ public extension NKUnifiedShare {
                 displayName: "Alice",
                 icon: NKUnifiedShareIcon(svg: "<svg/>", light: nil, dark: nil)
             ),
-            lastUpdated: 1_730_000_000_000,
+            lastUpdated: "1730000000000",
             state: .draft,
             sources: [
                 NKUnifiedShareSource(
