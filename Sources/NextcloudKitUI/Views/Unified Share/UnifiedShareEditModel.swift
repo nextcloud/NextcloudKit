@@ -214,15 +214,11 @@ public class UnifiedShareEditModel {
 
             guard !Task.isCancelled else { return }
 
-            let result = await NextcloudKit.shared.searchUnifiedShareRecipients(query: query, limit: Self.searchLimit, account: account)
+            let result = await NextcloudKit.shared.searchUnifiedShareRecipients(query: query, limit: Self.searchLimit, excludingRecipientsOfShareID: share.id, account: account)
 
             guard !Task.isCancelled else { return }
 
-            recipientResults = (result.recipients ?? []).filter { candidate in
-                !share.recipients.contains {
-                    $0.class == candidate.class && $0.value == candidate.value && $0.instance == candidate.instance
-                }
-            }
+            recipientResults = result.recipients ?? []
         }
     }
 

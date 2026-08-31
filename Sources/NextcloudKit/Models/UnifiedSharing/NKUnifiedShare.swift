@@ -11,6 +11,8 @@ public final class NKUnifiedShare: Codable, Identifiable {
     /// Unix time in milliseconds, as a numeric string.
     public let lastUpdated: String
     public let state: NKUnifiedShareState
+    /// The current user's standing on a received share.
+    public let userStatus: NKUnifiedShareUserStatus?
     public let sources: [NKUnifiedShareSource]
     public let recipients: [NKUnifiedShareRecipient]
     public let properties: [NKUnifiedShareProperty]
@@ -23,6 +25,7 @@ public final class NKUnifiedShare: Codable, Identifiable {
         case owner
         case lastUpdated = "last_updated"
         case state
+        case userStatus = "user_status"
         case sources
         case recipients
         case properties
@@ -34,6 +37,7 @@ public final class NKUnifiedShare: Codable, Identifiable {
                 owner: NKUnifiedShareOwner,
                 lastUpdated: String,
                 state: NKUnifiedShareState,
+                userStatus: NKUnifiedShareUserStatus? = nil,
                 sources: [NKUnifiedShareSource],
                 recipients: [NKUnifiedShareRecipient],
                 properties: [NKUnifiedShareProperty],
@@ -43,6 +47,7 @@ public final class NKUnifiedShare: Codable, Identifiable {
         self.owner = owner
         self.lastUpdated = lastUpdated
         self.state = state
+        self.userStatus = userStatus
         self.sources = sources
         self.recipients = recipients
         self.properties = properties
@@ -56,6 +61,7 @@ public final class NKUnifiedShare: Codable, Identifiable {
         self.owner = try c.decode(NKUnifiedShareOwner.self, forKey: .owner)
         self.lastUpdated = try c.decode(String.self, forKey: .lastUpdated)
         self.state = try c.decode(NKUnifiedShareState.self, forKey: .state)
+        self.userStatus = try c.decodeIfPresent(NKUnifiedShareUserStatus.self, forKey: .userStatus)
         self.sources = try c.decode([NKUnifiedShareSource].self, forKey: .sources)
         self.recipients = try c.decode([NKUnifiedShareRecipient].self, forKey: .recipients)
         self.permissions = try c.decode([NKUnifiedSharePermission].self, forKey: .permissions)
@@ -69,6 +75,7 @@ public final class NKUnifiedShare: Codable, Identifiable {
         try c.encode(owner, forKey: .owner)
         try c.encode(lastUpdated, forKey: .lastUpdated)
         try c.encode(state, forKey: .state)
+        try c.encodeIfPresent(userStatus, forKey: .userStatus)
         try c.encode(sources, forKey: .sources)
         try c.encode(recipients, forKey: .recipients)
         try c.encode(permissions, forKey: .permissions)

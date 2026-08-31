@@ -92,6 +92,8 @@ public struct UnifiedShareListView: View {
                 }
             }
             .listStyle(.insetGrouped)
+            .scrollContentBackground(.hidden)
+            .background(.background)
             .refreshable {
                 await model.refresh()
             }
