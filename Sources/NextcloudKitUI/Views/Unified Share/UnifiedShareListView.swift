@@ -5,6 +5,13 @@
 import SwiftUI
 import NextcloudKit
 
+@Observable
+public final class CreateUnifiedShareTrigger {
+    public var isPresenting = false
+
+    public init() {}
+}
+
 /// Lists the existing unified shares for a file, with tap-to-edit and swipe-to-delete.
 public struct UnifiedShareListView: View {
     let account: String
@@ -15,18 +22,21 @@ public struct UnifiedShareListView: View {
     @State private var model: UnifiedShareListModel
     @State private var editing: ShareEditor?
     @State private var shareToDelete: NKUnifiedShare?
-    @State private var isCreating = false
+    let createTrigger: CreateUnifiedShareTrigger
     @Environment(\.colorScheme) private var colorScheme
 
-    public init(account: String, sourceId: String? = nil, internalLink: String? = nil, isDirectory: Bool = false, tint: Color = .accentColor, onError: ((NKError) -> Void)? = nil) {
+    public init(account: String, sourceId: String? = nil, internalLink: String? = nil, isDirectory: Bool = false, tint: Color = .accentColor, createTrigger: CreateUnifiedShareTrigger = CreateUnifiedShareTrigger(), onError: ((NKError) -> Void)? = nil) {
         self.account = account
         self.tint = tint
         self.internalLink = internalLink
         self.isDirectory = isDirectory
+        self.createTrigger = createTrigger
         model = UnifiedShareListModel(account: account, sourceId: sourceId, onError: onError)
     }
 
     public var body: some View {
+        @Bindable var createTrigger = createTrigger
+
         content
             .task {
                 if case .loading = model.state {
@@ -46,16 +56,12 @@ public struct UnifiedShareListView: View {
                     )
                 }
             }
-            .sheet(isPresented: $isCreating, onDismiss: {
+            .sheet(isPresented: $createTrigger.isPresenting, onDismiss: {
                 Task { await model.refresh() }
             }) {
                 NavigationStack {
                     UnifiedShareEditView(account: account, sourceId: model.sourceId, internalLink: internalLink)
                 }
-            }
-            // A share created/activated from the "+" modal (outside this view) refreshes the list.
-            .onReceive(NotificationCenter.default.publisher(for: .unifiedShareDidChange)) { _ in
-                Task { await model.refresh() }
             }
     }
 
@@ -103,7 +109,7 @@ public struct UnifiedShareListView: View {
                         Label("Not Shared Yet", systemImage: "person.badge.plus.fill")
                     } actions: {
                         Button(isDirectory ? String(localized: "Share Folder") : String(localized: "Share File")) {
-                            isCreating = true
+                            createTrigger.isPresenting = true
                         }
                     }
                 }

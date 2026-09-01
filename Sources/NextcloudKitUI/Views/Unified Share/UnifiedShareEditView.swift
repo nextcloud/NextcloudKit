@@ -20,6 +20,8 @@ public struct UnifiedShareEditView: View {
     @State private var permissionSelection: PermissionSelection = .unset
     @State private var isSettingsExpanded = false
     @State private var recipients = ""
+    /// Hides the audience-dependent rows while a switch is running.
+    @State private var showsRows = true
     @State private var showsCopied = false
     @State private var copiedTask: Task<Void, Never>?
     @Environment(\.colorScheme) private var colorScheme
@@ -58,9 +60,10 @@ public struct UnifiedShareEditView: View {
                         // The audience is only selectable for a new draft; an existing share's is fixed.
                         if !isEditingExisting {
                             shareeTypePicker(share: share)
+                                .disabled(model.isSwitchingAudience)
                         }
 
-                        if shareeType == .invited {
+                        if showsRows, shareeType == .invited {
                             if !peopleRecipients(share).isEmpty {
                                 recipientPills(share: share)
                                     .listRowSeparator(.hidden)
@@ -77,21 +80,33 @@ public struct UnifiedShareEditView: View {
                             .anchorPreference(key: AddPeopleFieldAnchorKey.self, value: .bounds) { $0 }
                         }
 
-                        permissionField(share: share)
+                        if showsRows {
+                            permissionField(share: share)
 
-                        ForEach(basicProperties(share), id: \.class) { property in
-                            PropertyRow(property: property, error: model.propertyErrors[property.class]) { value in
-                                model.setProperty(share: share, propertyClass: property.class, value: value)
+                            ForEach(basicProperties(share), id: \.class) { property in
+                                PropertyRow(property: property, error: model.propertyErrors[property.class]) { value in
+                                    model.setProperty(share: share, propertyClass: property.class, value: value)
+                                }
                             }
+
+                            settingsRow(share: share)
                         }
 
-                        settingsRow(share: share)
-
-                        if structuralCanSend(share) {
+                        if !model.isSwitchingAudience, structuralCanSend(share) {
                             actionButtons(share: share)
                         }
                     }
                     .scrollDismissesKeyboard(.immediately)
+                    .onChange(of: model.isSwitchingAudience) {
+                        showsRows = !model.isSwitchingAudience
+                    }
+                    // An overlay, not a Form row: conditional row insertion driven by the
+                    // observable flag stops rendering after the first cycle.
+                    .overlay {
+                        if model.showsSwitchSpinner {
+                            ProgressView()
+                        }
+                    }
                     .onDisappear {
                         model.discardDraftIfNeeded(share: share)
                     }

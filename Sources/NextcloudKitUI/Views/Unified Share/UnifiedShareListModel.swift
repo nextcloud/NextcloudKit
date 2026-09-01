@@ -5,11 +5,6 @@
 import Foundation
 import NextcloudKit
 
-extension Notification.Name {
-    /// Posted when a share is created/activated elsewhere, so any visible list can refresh.
-    static let unifiedShareDidChange = Notification.Name("unifiedShareDidChange")
-}
-
 enum UnifiedShareListState {
     case loading
     case loaded([NKUnifiedShare])

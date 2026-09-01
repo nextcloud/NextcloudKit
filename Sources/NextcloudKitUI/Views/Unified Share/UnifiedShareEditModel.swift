@@ -31,14 +31,19 @@ public class UnifiedShareEditModel {
     var propertyErrors: [String: String] = [:]
     /// Transient mutation failure, shown as an alert while the form stays usable.
     var mutationError: NKError?
-    /// A copy-link activation is in flight.
+    /// A copy-link activation is in progress.
     var isPreparingLink = false
     /// Set once the draft has been activated (sent), so the sheet can dismiss.
     var didActivate = false
-    /// Property classes with an update in flight; Send stays disabled until empty.
+    /// Property classes with an update in progress; Send stays disabled until empty.
     var pendingProperties: Set<String> = []
+    var isSwitchingAudience = false
+    /// The audience switch outlasted its grace period, so the spinner is visible.
+    var showsSwitchSpinner = false
+
     @ObservationIgnored private var searchTask: Task<Void, Never>?
     @ObservationIgnored private var propertyTasks: [String: Task<Void, Never>] = [:]
+
     let account: String
     /// Globally-unique id of the file/folder being shared (attached as the share source).
     let sourceId: String?
@@ -109,7 +114,6 @@ public class UnifiedShareEditModel {
                 return
             }
 
-            // Point the draft at the actual file/folder being shared.
             if let sourceId, !sourceId.isEmpty {
                 let sourceResult = await NextcloudKit.shared.addUnifiedShareSource(id: share.id, sourceClass: Self.nodeSourceClass, value: sourceId, account: account)
                 if let updated = sourceResult.share {
@@ -126,6 +130,22 @@ public class UnifiedShareEditModel {
     /// Switch between an invited-people share and a public-link (token) share.
     func setShareeType(share: NKUnifiedShare, anyone: Bool) {
         Task {
+            isSwitchingAudience = true
+
+            let graceTask = Task { @MainActor in
+                try? await Task.sleep(for: .seconds(1))
+
+                guard !Task.isCancelled else { return }
+
+                showsSwitchSpinner = true
+            }
+
+            defer {
+                graceTask.cancel()
+                isSwitchingAudience = false
+                showsSwitchSpinner = false
+            }
+
             #if DEBUG
             // TEMP: artificial switch latency for testing. Remove.
             try? await Task.sleep(for: .seconds(3))
@@ -197,7 +217,6 @@ public class UnifiedShareEditModel {
         }
 
         state = .shareUpdated(share: updated)
-        NotificationCenter.default.post(name: .unifiedShareDidChange, object: nil)
         return updated.recipients.compactMap { $0.secret.url }.first
     }
 
@@ -296,7 +315,6 @@ public class UnifiedShareEditModel {
 
             didActivate = true
             state = .shareUpdated(share: share)
-            NotificationCenter.default.post(name: .unifiedShareDidChange, object: nil)
         }
     }
 
