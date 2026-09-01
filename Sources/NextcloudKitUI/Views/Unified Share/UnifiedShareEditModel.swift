@@ -8,7 +8,7 @@ import NextcloudKit
 enum UnifiedShareViewState {
     case loading
     case shareUpdated(share: NKUnifiedShare)
-    case error(Error)
+    case error
 }
 
 @MainActor
@@ -110,7 +110,7 @@ public class UnifiedShareEditModel {
             let result = await NextcloudKit.shared.createUnifiedShare(account: account)
             guard var share = result.share else {
                 nkLog(error: "Could not create share: \(result.error.errorCode) \(result.error.errorDescription)")
-                state = .error(result.error)
+                state = .error
                 return
             }
 
