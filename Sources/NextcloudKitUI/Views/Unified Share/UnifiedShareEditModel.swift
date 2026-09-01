@@ -146,11 +146,6 @@ public class UnifiedShareEditModel {
                 showsSwitchSpinner = false
             }
 
-            #if DEBUG
-            // TEMP: artificial switch latency for testing. Remove.
-            try? await Task.sleep(for: .seconds(3))
-            #endif
-
             var current = share
 
             if anyone {
@@ -339,7 +334,7 @@ public class UnifiedShareEditModel {
         }
     }
 
-    /// Mint a fresh server secret and apply it to the recipient (the "regenerate link" action).
+    /// Generate a fresh server secret and apply it to the recipient (the "regenerate link" action).
     func regenerateRecipientSecret(share: NKUnifiedShare, recipient: NKUnifiedShareRecipient) {
         Task {
             let generated = await NextcloudKit.shared.generateUnifiedShareSecret(account: account)
