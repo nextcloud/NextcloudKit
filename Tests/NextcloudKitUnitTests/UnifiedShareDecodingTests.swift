@@ -101,7 +101,7 @@ struct UnifiedShareDecodingTests {
 
         #expect(share.id == "s1")
         #expect(share.state == .active)
-        #expect(share.lastUpdated == 1_730_000_000_000)
+        #expect(share.lastUpdated == "1_730_000_000_000")
         #expect(share.properties.count == 5)
 
         let p0 = try #require(share.properties[0] as? NKUnifiedSharePropertyDate)
