@@ -12,6 +12,8 @@ public extension NextcloudKit {
     /// `GET /shares` — paginated list of shares the current user can see.
     func listUnifiedShares(filterSourceTypeClass: String? = nil,
                            filterSourceTypeValue: String? = nil,
+                           filterState: NKUnifiedShareState? = nil,
+                           filterUserStatus: NKUnifiedShareUserStatus? = nil,
                            lastShareID: String? = nil,
                            limit: Int? = nil,
                            account: String,
@@ -28,6 +30,8 @@ public extension NextcloudKit {
         var parameters: [String: String] = [:]
         if let filterSourceTypeClass { parameters["filterSourceTypeClass"] = filterSourceTypeClass }
         if let filterSourceTypeValue { parameters["filterSourceTypeValue"] = filterSourceTypeValue }
+        if let filterState { parameters["filterState"] = filterState.rawValue }
+        if let filterUserStatus { parameters["filterUserStatus"] = filterUserStatus.rawValue }
         if let lastShareID { parameters["lastShareID"] = lastShareID }
         if let limit { parameters["limit"] = String(limit) }
 
@@ -50,6 +54,7 @@ public extension NextcloudKit {
                                       recipientTypeClasses: [String]? = nil,
                                       limit: Int? = nil,
                                       offset: Int? = nil,
+                                      excludingRecipientsOfShareID: String? = nil,
                                       account: String,
                                       options: NKRequestOptions = NKRequestOptions(),
                                       taskHandler: @Sendable @escaping (_ task: URLSessionTask) -> Void = { _ in }
@@ -72,6 +77,7 @@ public extension NextcloudKit {
         recipientTypeClasses?.forEach { queryItems.append(URLQueryItem(name: "recipientTypeClasses[]", value: $0)) }
         if let limit { queryItems.append(URLQueryItem(name: "limit", value: String(limit))) }
         if let offset { queryItems.append(URLQueryItem(name: "offset", value: String(offset))) }
+        if let excludingRecipientsOfShareID { queryItems.append(URLQueryItem(name: "id", value: excludingRecipientsOfShareID)) }
         components.queryItems = queryItems
 
         guard let requestURL = components.url else {
@@ -90,7 +96,7 @@ public extension NextcloudKit {
 
         switch response.result {
         case .failure(let error):
-            return (account, nil, response, NKError(error: error, afResponse: response, responseData: response.data))
+            return (account, nil, response, unifiedShareError(from: response, error: error))
         case .success(let data):
             do {
                 let wrap = try JSONDecoder().decode(NKOCSWrapper<[NKUnifiedShareRecipient]>.self, from: data)
@@ -128,7 +134,7 @@ public extension NextcloudKit {
 
         switch response.result {
         case .failure(let error):
-            return (account, nil, response, NKError(error: error, afResponse: response, responseData: response.data))
+            return (account, nil, response, unifiedShareError(from: response, error: error))
         case .success(let data):
             do {
                 let wrap = try JSONDecoder().decode(NKOCSWrapper<String>.self, from: data)
@@ -169,7 +175,7 @@ public extension NextcloudKit {
 
         switch response.result {
         case .failure(let error):
-            return (account, nil, response, NKError(error: error, afResponse: response, responseData: response.data))
+            return (account, nil, response, unifiedShareError(from: response, error: error))
         case .success(let data):
             do {
                 let wrap = try JSONDecoder().decode(NKOCSWrapper<CapabilitiesEnvelope>.self, from: data)
@@ -287,7 +293,7 @@ public extension NextcloudKit {
 
         switch response.result {
         case .failure(let error):
-            return (account, response, NKError(error: error, afResponse: response, responseData: response.data))
+            return (account, response, unifiedShareError(from: response, error: error))
         case .success:
             return (account, response, .success)
         }
@@ -358,6 +364,22 @@ public extension NextcloudKit {
                                  subpath: "state",
                                  id: id,
                                  body: ["state": state.rawValue],
+                                 account: account,
+                                 options: options,
+                                 taskHandler: taskHandler)
+    }
+
+    /// `PUT /share/{id}/user-status` — accept or reject a received share.
+    func setUnifiedShareUserStatus(id: String,
+                                   userStatus: NKUnifiedShareUserStatus,
+                                   account: String,
+                                   options: NKRequestOptions = NKRequestOptions(),
+                                   taskHandler: @Sendable @escaping (_ task: URLSessionTask) -> Void = { _ in }
+    ) async -> (account: String, share: NKUnifiedShare?, responseData: AFDataResponse<Data>?, error: NKError) {
+        await mutateUnifiedShare(method: .put,
+                                 subpath: "user-status",
+                                 id: id,
+                                 body: ["userStatus": userStatus.rawValue],
                                  account: account,
                                  options: options,
                                  taskHandler: taskHandler)
@@ -541,7 +563,7 @@ public extension NextcloudKit {
     ) -> (account: String, share: NKUnifiedShare?, responseData: AFDataResponse<Data>?, error: NKError) {
         switch response.result {
         case .failure(let error):
-            return (account, nil, response, NKError(error: error, afResponse: response, responseData: response.data))
+            return (account, nil, response, unifiedShareError(from: response, error: error))
         case .success(let data):
             do {
                 let wrap = try JSONDecoder().decode(NKOCSWrapper<NKUnifiedShare>.self, from: data)
@@ -555,13 +577,24 @@ public extension NextcloudKit {
         }
     }
 
+    /// Unified-sharing error bodies carry the message as the whole `ocs.data` string.
+    private func unifiedShareError(from response: AFDataResponse<Data>, error: AFError) -> NKError {
+        if let data = response.data,
+           let wrap = try? JSONDecoder().decode(NKOCSWrapper<String>.self, from: data),
+           !wrap.ocs.data.isEmpty {
+            return NKError(errorCode: wrap.ocs.meta.statuscode, errorDescription: wrap.ocs.data, responseData: data)
+        }
+
+        return NKError(error: error, afResponse: response, responseData: response.data)
+    }
+
     /// Decode an OCS response containing an array of `Share`.
     private func decodeUnifiedShareList(response: AFDataResponse<Data>,
                                         account: String
     ) -> (account: String, shares: [NKUnifiedShare]?, responseData: AFDataResponse<Data>?, error: NKError) {
         switch response.result {
         case .failure(let error):
-            return (account, nil, response, NKError(error: error, afResponse: response, responseData: response.data))
+            return (account, nil, response, unifiedShareError(from: response, error: error))
         case .success(let data):
             do {
                 let wrap = try JSONDecoder().decode(NKOCSWrapper<[NKUnifiedShare]>.self, from: data)

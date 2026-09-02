@@ -5,11 +5,6 @@
 import Foundation
 import NextcloudKit
 
-extension Notification.Name {
-    /// Posted when a share is created/activated elsewhere, so any visible list can refresh.
-    static let unifiedShareDidChange = Notification.Name("unifiedShareDidChange")
-}
-
 enum UnifiedShareListState {
     case loading
     case loaded([NKUnifiedShare])
@@ -19,9 +14,6 @@ enum UnifiedShareListState {
 @MainActor
 @Observable
 public class UnifiedShareListModel {
-    private static let pageSize = 100
-    private static let maxPages = 20
-
     var state: UnifiedShareListState = .loading
     var permissionPresets: [NKUnifiedSharePermissionPreset] = []
     /// Handler for failures that shouldn't replace visible content (the app shows a banner).
@@ -47,42 +39,25 @@ public class UnifiedShareListModel {
     }
 
     func refresh() async {
-        var all: [NKUnifiedShare] = []
-        var lastShareID: String?
+        let result = await NextcloudKit.shared.listUnifiedShares(
+            filterSourceTypeClass: UnifiedShareEditModel.nodeSourceClass,
+            filterSourceTypeValue: sourceId,
+            filterState: .active,
+            account: account
+        )
 
-        // The server pages drafts and active shares together, so fetch every page
-        // before filtering — otherwise actives past page one would be missed.
-        for _ in 0..<Self.maxPages {
-            let result = await NextcloudKit.shared.listUnifiedShares(
-                filterSourceTypeClass: UnifiedShareEditModel.nodeSourceClass,
-                filterSourceTypeValue: sourceId,
-                lastShareID: lastShareID,
-                limit: Self.pageSize,
-                account: account
-            )
-
-            guard let page = result.shares else {
-                // A visible list is kept; only the first load takes the full-page error.
-                if case .loaded = state {
-                    onError?(result.error)
-                } else {
-                    state = .error(result.error)
-                }
-
-                return
+        guard let shares = result.shares else {
+            // A visible list is kept; only the first load takes the full-page error.
+            if case .loaded = state {
+                onError?(result.error)
+            } else {
+                state = .error(result.error)
             }
 
-            all.append(contentsOf: page)
-
-            if page.count < Self.pageSize {
-                break
-            }
-
-            lastShareID = page.last?.id
+            return
         }
 
-        // Only active shares are shown; drafts are in-progress and deleted ones are gone.
-        state = .loaded(all.filter { $0.state == .active })
+        state = .loaded(shares)
     }
 
     func applicablePresets(_ share: NKUnifiedShare) -> [NKUnifiedSharePermissionPreset] {

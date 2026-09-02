@@ -8,7 +8,7 @@ import NextcloudKit
 enum UnifiedShareViewState {
     case loading
     case shareUpdated(share: NKUnifiedShare)
-    case error(Error)
+    case error
 }
 
 @MainActor
@@ -31,14 +31,19 @@ public class UnifiedShareEditModel {
     var propertyErrors: [String: String] = [:]
     /// Transient mutation failure, shown as an alert while the form stays usable.
     var mutationError: NKError?
-    /// A copy-link activation is in flight.
+    /// A copy-link activation is in progress.
     var isPreparingLink = false
     /// Set once the draft has been activated (sent), so the sheet can dismiss.
     var didActivate = false
-    /// Property classes with an update in flight; Send stays disabled until empty.
+    /// Property classes with an update in progress; Send stays disabled until empty.
     var pendingProperties: Set<String> = []
+    var isSwitchingAudience = false
+    /// The audience switch outlasted its grace period, so the spinner is visible.
+    var showsSwitchSpinner = false
+
     @ObservationIgnored private var searchTask: Task<Void, Never>?
     @ObservationIgnored private var propertyTasks: [String: Task<Void, Never>] = [:]
+
     let account: String
     /// Globally-unique id of the file/folder being shared (attached as the share source).
     let sourceId: String?
@@ -104,11 +109,11 @@ public class UnifiedShareEditModel {
         Task {
             let result = await NextcloudKit.shared.createUnifiedShare(account: account)
             guard var share = result.share else {
-                state = .error(result.error)
+                nkLog(error: "Could not create share: \(result.error.errorCode) \(result.error.errorDescription)")
+                state = .error
                 return
             }
 
-            // Point the draft at the actual file/folder being shared.
             if let sourceId, !sourceId.isEmpty {
                 let sourceResult = await NextcloudKit.shared.addUnifiedShareSource(id: share.id, sourceClass: Self.nodeSourceClass, value: sourceId, account: account)
                 if let updated = sourceResult.share {
@@ -125,6 +130,22 @@ public class UnifiedShareEditModel {
     /// Switch between an invited-people share and a public-link (token) share.
     func setShareeType(share: NKUnifiedShare, anyone: Bool) {
         Task {
+            isSwitchingAudience = true
+
+            let graceTask = Task { @MainActor in
+                try? await Task.sleep(for: .seconds(1))
+
+                guard !Task.isCancelled else { return }
+
+                showsSwitchSpinner = true
+            }
+
+            defer {
+                graceTask.cancel()
+                isSwitchingAudience = false
+                showsSwitchSpinner = false
+            }
+
             var current = share
 
             if anyone {
@@ -171,10 +192,10 @@ public class UnifiedShareEditModel {
         return result.share
     }
 
-    /// Return the public link, activating the share first to mint it if needed.
+    /// Return the public link, activating the share first so the copied link is live.
     func prepareLinkForCopy(share: NKUnifiedShare) async -> String? {
-        if let url = share.recipients.compactMap({ $0.secret.url }).first {
-            return url
+        if share.state == .active {
+            return share.recipients.compactMap({ $0.secret.url }).first
         }
 
         guard !isPreparingLink else {
@@ -191,13 +212,10 @@ public class UnifiedShareEditModel {
         }
 
         state = .shareUpdated(share: updated)
-        NotificationCenter.default.post(name: .unifiedShareDidChange, object: nil)
         return updated.recipients.compactMap { $0.secret.url }.first
     }
 
-    /// Debounced, latest-wins: a new keystroke cancels the pending search so a slow
-    /// stale response can't overwrite fresher results.
-    func searchRecipients(query: String) {
+    func searchRecipients(query: String, share: NKUnifiedShare) {
         searchTask?.cancel()
 
         guard !query.isEmpty else {
@@ -210,7 +228,7 @@ public class UnifiedShareEditModel {
 
             guard !Task.isCancelled else { return }
 
-            let result = await NextcloudKit.shared.searchUnifiedShareRecipients(query: query, limit: Self.searchLimit, account: account)
+            let result = await NextcloudKit.shared.searchUnifiedShareRecipients(query: query, limit: Self.searchLimit, excludingRecipientsOfShareID: share.id, account: account)
 
             guard !Task.isCancelled else { return }
 
@@ -248,7 +266,6 @@ public class UnifiedShareEditModel {
         }
     }
 
-    /// Latest-wins per property: a new commit cancels the pending one for the same class.
     func setProperty(share: NKUnifiedShare, propertyClass: String, value: String?) {
         propertyTasks[propertyClass]?.cancel()
 
@@ -263,7 +280,6 @@ public class UnifiedShareEditModel {
         propertyTasks[propertyClass] = Task {
             let result = await NextcloudKit.shared.setUnifiedShareProperty(id: share.id, propertyClass: propertyClass, value: value, account: account)
 
-            // A newer commit for this class superseded us; it owns the pending entry.
             guard !Task.isCancelled else { return }
 
             pendingProperties.remove(propertyClass)
@@ -294,7 +310,6 @@ public class UnifiedShareEditModel {
 
             didActivate = true
             state = .shareUpdated(share: share)
-            NotificationCenter.default.post(name: .unifiedShareDidChange, object: nil)
         }
     }
 
@@ -319,7 +334,7 @@ public class UnifiedShareEditModel {
         }
     }
 
-    /// Mint a fresh server secret and apply it to the recipient (the "regenerate link" action).
+    /// Generate a fresh server secret and apply it to the recipient (the "regenerate link" action).
     func regenerateRecipientSecret(share: NKUnifiedShare, recipient: NKUnifiedShareRecipient) {
         Task {
             let generated = await NextcloudKit.shared.generateUnifiedShareSecret(account: account)

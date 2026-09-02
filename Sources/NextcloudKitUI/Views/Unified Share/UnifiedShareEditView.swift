@@ -20,6 +20,10 @@ public struct UnifiedShareEditView: View {
     @State private var permissionSelection: PermissionSelection = .unset
     @State private var isSettingsExpanded = false
     @State private var recipients = ""
+    /// Hides the audience-dependent rows while a switch is running.
+    @State private var showsRows = true
+    @State private var showsCopied = false
+    @State private var copiedTask: Task<Void, Never>?
     @Environment(\.colorScheme) private var colorScheme
     @Environment(\.dismiss) private var dismiss
 
@@ -56,9 +60,10 @@ public struct UnifiedShareEditView: View {
                         // The audience is only selectable for a new draft; an existing share's is fixed.
                         if !isEditingExisting {
                             shareeTypePicker(share: share)
+                                .disabled(model.isSwitchingAudience)
                         }
 
-                        if shareeType == .invited {
+                        if showsRows, shareeType == .invited {
                             if !peopleRecipients(share).isEmpty {
                                 recipientPills(share: share)
                                     .listRowSeparator(.hidden)
@@ -69,24 +74,37 @@ public struct UnifiedShareEditView: View {
                                 text: $recipients
                             )
                             .onChange(of: recipients) {
-                                model.searchRecipients(query: recipients)
+                                model.searchRecipients(query: recipients, share: share)
                             }
                             // Publish the field's frame so the dropdown can be drawn outside the Form.
                             .anchorPreference(key: AddPeopleFieldAnchorKey.self, value: .bounds) { $0 }
                         }
 
-                        permissionField(share: share)
+                        if showsRows {
+                            permissionField(share: share)
 
-                        ForEach(basicProperties(share), id: \.class) { property in
-                            PropertyRow(property: property, error: model.propertyErrors[property.class]) { value in
-                                model.setProperty(share: share, propertyClass: property.class, value: value)
+                            ForEach(basicProperties(share), id: \.class) { property in
+                                PropertyRow(property: property, error: model.propertyErrors[property.class]) { value in
+                                    model.setProperty(share: share, propertyClass: property.class, value: value)
+                                }
                             }
+
+                            settingsRow(share: share)
                         }
 
-                        settingsRow(share: share)
-
-                        if structuralCanSend(share) {
+                        if !model.isSwitchingAudience, structuralCanSend(share) {
                             actionButtons(share: share)
+                        }
+                    }
+                    .scrollDismissesKeyboard(.immediately)
+                    .onChange(of: model.isSwitchingAudience) {
+                        showsRows = !model.isSwitchingAudience
+                    }
+                    // An overlay, not a Form row: conditional row insertion driven by the
+                    // observable flag stops rendering after the first cycle.
+                    .overlay {
+                        if model.showsSwitchSpinner {
+                            ProgressView()
                         }
                     }
                     .onDisappear {
@@ -111,14 +129,21 @@ public struct UnifiedShareEditView: View {
                         }
                     }
 
-                case .error(let error):
-                    Text(error.localizedDescription)
+                case .error:
+                    Text(String(localized: "Could not create share, try again later"))
+                        .foregroundStyle(.secondary)
             }
         }
-        .navigationTitle(isEditingExisting ? String(localized: "Edit share") : String(localized: "Create a new share"))
         .navigationBarTitleDisplayMode(.inline)
         .interactiveDismissDisabled()
         .toolbar {
+            ToolbarItem(placement: .principal) {
+                Text(navigationTitle)
+                    .font(.headline)
+                    .lineLimit(1)
+                    .truncationMode(.middle)
+            }
+
             ToolbarItem(placement: .topBarTrailing) {
                 Button {
                     dismiss()
@@ -157,6 +182,15 @@ public struct UnifiedShareEditView: View {
 
     private var isPreview: Bool {
         ProcessInfo.processInfo.environment["XCODE_RUNNING_FOR_PREVIEWS"] == "1"
+    }
+
+    private var navigationTitle: String {
+        guard case .shareUpdated(let share) = model.state else {
+            return ""
+        }
+
+        let name = share.sources.first?.displayName ?? "..."
+        return String(localized: "Share \"\(name)\"")
     }
 
     private func shareeTypePicker(share: NKUnifiedShare) -> some View {
@@ -263,6 +297,8 @@ public struct UnifiedShareEditView: View {
                     onCommit: { token in model.updateRecipientSecret(share: share, recipient: recipient, secret: token) },
                     onRegenerate: { model.regenerateRecipientSecret(share: share, recipient: recipient) }
                 )
+                // Re-seed the row's local token whenever the server-side secret changes.
+                .id(recipient.secret.value)
             }
 
             Text(String(localized: "The link can be changed to be easy to remember, but do not set it to something that is easy to guess."))
@@ -421,27 +457,44 @@ public struct UnifiedShareEditView: View {
                 Task {
                     if let link = await model.prepareLinkForCopy(share: share) {
                         copyToPasteboard(link)
+                        flashCopied()
                     }
                 }
             } label: {
                 if model.isPreparingLink {
                     ProgressView()
                 } else {
-                    Text(String(localized: "Copy public link"))
+                    Text(showsCopied ? String(localized: "Copied") : String(localized: "Copy public link"))
                 }
             }
             .buttonStyle(.bordered)
             .frame(maxWidth: .infinity)
             .disabled(model.isPreparingLink || !canSend(share))
         } else {
-            Button(String(localized: "Copy private link")) {
+            Button {
                 if let internalLink {
                     copyToPasteboard(internalLink)
+                    flashCopied()
                 }
+            } label: {
+                Text(showsCopied ? String(localized: "Copied") : String(localized: "Copy private link"))
             }
             .buttonStyle(.bordered)
             .frame(maxWidth: .infinity)
             .disabled(internalLink == nil)
+        }
+    }
+
+    private func flashCopied() {
+        copiedTask?.cancel()
+        showsCopied = true
+
+        copiedTask = Task {
+            try? await Task.sleep(for: .seconds(1))
+
+            guard !Task.isCancelled else { return }
+
+            showsCopied = false
         }
     }
 
@@ -636,7 +689,6 @@ private struct BooleanPropertyEditor: View {
 private struct EnumPropertyEditor: View {
     let property: NKUnifiedSharePropertyEnum
     let onCommit: (String?) -> Void
-    /// nil while the property is unset — the picker shows no value until the user picks one.
     @State private var selection: String?
 
     init(property: NKUnifiedSharePropertyEnum, onCommit: @escaping (String?) -> Void) {
@@ -667,6 +719,7 @@ private struct DatePropertyEditor: View {
     let onCommit: (String?) -> Void
     @State private var date: Date
     @State private var hasDate: Bool
+    @State private var showsPicker = false
 
     init(property: NKUnifiedSharePropertyDate, onCommit: @escaping (String?) -> Void) {
         self.property = property
@@ -677,17 +730,19 @@ private struct DatePropertyEditor: View {
     }
 
     var body: some View {
-        if hasDate {
-            HStack(spacing: 12) {
-                DatePicker(property.displayName, selection: $date, in: dateRange, displayedComponents: .date)
-                    .onChange(of: date) {
-                        onCommit(Self.format(date))
-                    }
+        HStack(spacing: 12) {
+            Text(property.displayName)
+                .foregroundStyle(.primary)
+
+            Spacer()
+
+            if hasDate {
+                Text(date, format: Date.FormatStyle(date: .abbreviated))
+                    .foregroundStyle(.secondary)
 
                 Button {
                     hasDate = false
 
-                    // Nothing to clear server-side while the picker was only revealed.
                     if let value = property.value, !value.isEmpty {
                         onCommit("")
                     }
@@ -697,22 +752,34 @@ private struct DatePropertyEditor: View {
                 }
                 .buttonStyle(.plain)
                 .padding(.leading, 4)
+            } else {
+                Image(systemName: "calendar.badge.plus")
+                    .foregroundStyle(.secondary)
             }
-        } else {
-            // Revealing the picker commits nothing; the first user-chosen date does.
-            Button {
-                hasDate = true
-            } label: {
-                HStack {
-                    Text(property.displayName)
-                        .foregroundStyle(.primary)
-                    Spacer()
-                    Image(systemName: "calendar.badge.plus")
-                        .foregroundStyle(.secondary)
-                }
-                .contentShape(Rectangle())
-            }
-            .buttonStyle(.plain)
+        }
+        .contentShape(Rectangle())
+        .onTapGesture {
+            showsPicker = true
+        }
+        .popover(isPresented: $showsPicker) {
+            DatePicker(
+                "",
+                selection: Binding(
+                    get: { date },
+                    set: { picked in
+                        date = picked
+                        hasDate = true
+                        onCommit(Self.format(picked))
+                    }
+                ),
+                in: dateRange,
+                displayedComponents: .date
+            )
+            .datePickerStyle(.graphical)
+            .labelsHidden()
+            .frame(width: 320)
+            .padding(8)
+            .presentationCompactAdaptation(.popover)
         }
     }
 
@@ -774,10 +841,21 @@ private struct TextPropertyEditor: View {
             }
     }
 
+    private var isMultiline: Bool {
+        guard let maxLength = (property as? NKUnifiedSharePropertyString)?.maxLength else {
+            return property is NKUnifiedSharePropertyString
+        }
+
+        return maxLength > 255
+    }
+
     @ViewBuilder
     private var field: some View {
         if secure {
             SecureField(property.displayName, text: $text)
+        } else if isMultiline {
+            TextField(property.displayName, text: $text, axis: .vertical)
+                .lineLimit(1...3)
         } else {
             TextField(property.displayName, text: $text)
         }
@@ -824,7 +902,6 @@ private struct CustomLinkRow: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 4) {
             Text(String(localized: "Custom link"))
-                .font(.headline)
 
             if !prefix.isEmpty {
                 Text(prefix)
@@ -834,6 +911,8 @@ private struct CustomLinkRow: View {
 
             HStack {
                 TextField(String(localized: "Link token"), text: $token)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.5)
                     .focused($focused)
                     .onChange(of: token) {
                         if token.count > Self.maxTokenLength {
