@@ -1,5 +1,6 @@
 // SPDX-FileCopyrightText: Nextcloud GmbH
 // SPDX-FileCopyrightText: 2026 Milen Pivchev
+// SPDX-FileCopyrightText: 2026 Marino Faggiana
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 import Foundation
@@ -316,6 +317,33 @@ public extension NextcloudKit {
                                  account: account,
                                  options: options,
                                  taskHandler: taskHandler)
+    }
+
+    /// `PUT /share/{id}/recipient/permission` — toggle a permission for one recipient.
+    func setUnifiedShareRecipientPermission(id: String,
+                                            recipientClass: String,
+                                            recipientValue: String,
+                                            recipientInstance: String? = nil,
+                                            permissionClass: String,
+                                            enabled: Bool,
+                                            account: String,
+                                            options: NKRequestOptions = NKRequestOptions(),
+                                            taskHandler: @Sendable @escaping (_ task: URLSessionTask) -> Void = { _ in }
+    ) async -> (account: String, share: NKUnifiedShare?, responseData: AFDataResponse<Data>?, error: NKError) {
+        var body: [String: Any] = [
+            "recipientClass": recipientClass,
+            "recipientValue": recipientValue,
+            "permissionClass": permissionClass,
+            "enabled": enabled
+        ]
+        if let recipientInstance { body["recipientInstance"] = recipientInstance }
+        return await mutateUnifiedShare(method: .put,
+                                        subpath: "recipient/permission",
+                                        id: id,
+                                        body: body,
+                                        account: account,
+                                        options: options,
+                                        taskHandler: taskHandler)
     }
 
     /// `PUT /share/{id}/permission/preset` — apply a permission preset.

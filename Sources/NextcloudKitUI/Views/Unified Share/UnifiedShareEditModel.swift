@@ -1,5 +1,6 @@
 // SPDX-FileCopyrightText: Nextcloud GmbH
 // SPDX-FileCopyrightText: 2026 Milen Pivchev
+// SPDX-FileCopyrightText: 2026 Marino Faggiana
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 import Foundation
@@ -96,6 +97,29 @@ public class UnifiedShareEditModel {
     func setPermission(share: NKUnifiedShare, permissionClass: String, enabled: Bool) {
         Task {
             let result = await NextcloudKit.shared.setUnifiedSharePermission(id: share.id, permissionClass: permissionClass, enabled: enabled, account: account)
+            guard let share = result.share else {
+                mutationError = result.error
+                return
+            }
+
+            state = .shareUpdated(share: share)
+        }
+    }
+
+    func setRecipientPermission(share: NKUnifiedShare,
+                                recipient: NKUnifiedShareRecipient,
+                                permissionClass: String,
+                                enabled: Bool) {
+        Task {
+            let result = await NextcloudKit.shared.setUnifiedShareRecipientPermission(
+                id: share.id,
+                recipientClass: recipient.class,
+                recipientValue: recipient.value,
+                recipientInstance: recipient.instance,
+                permissionClass: permissionClass,
+                enabled: enabled,
+                account: account
+            )
             guard let share = result.share else {
                 mutationError = result.error
                 return
@@ -347,4 +371,3 @@ public class UnifiedShareEditModel {
         }
     }
 }
-

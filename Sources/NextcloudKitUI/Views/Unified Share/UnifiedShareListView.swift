@@ -1,5 +1,6 @@
 // SPDX-FileCopyrightText: Nextcloud GmbH
 // SPDX-FileCopyrightText: 2026 Milen Pivchev
+// SPDX-FileCopyrightText: 2026 Marino Faggiana
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 import SwiftUI
@@ -59,13 +60,17 @@ public struct UnifiedShareListView: View {
                 Task { await model.refresh() }
             }) { editor in
                 NavigationStack {
-                    UnifiedShareEditView(
-                        account: account,
-                        share: editor.share,
-                        internalLink: internalLink,
-                        expandSettings: editor.expandSettings,
-                        forceCustomPermissions: editor.forceCustomPermissions
-                    )
+                    if let recipient = editor.recipient {
+                        UnifiedShareEditView(account: account, share: editor.share, recipient: recipient)
+                    } else {
+                        UnifiedShareEditView(
+                            account: account,
+                            share: editor.share,
+                            internalLink: internalLink,
+                            expandSettings: editor.expandSettings,
+                            forceCustomPermissions: editor.forceCustomPermissions
+                        )
+                    }
                 }
             }
             .sheet(isPresented: $createTrigger.isPresenting, onDismiss: {
@@ -185,7 +190,7 @@ public struct UnifiedShareListView: View {
                 shareRow(share)
                     .contentShape(Rectangle())
                     .onTapGesture {
-                        editing = ShareEditor(share: share)
+                        editing = ShareEditor(share: share, recipient: share.recipients.first)
                     }
 
                 shareMenu(share)
@@ -200,11 +205,13 @@ public struct UnifiedShareListView: View {
             }
 
             VStack(alignment: .leading, spacing: 4) {
-                Text(recipientSummary(share.recipients))
+                Text(share.recipients.count == 1 ? (share.recipients.first?.displayName ?? "") : recipientSummary(share.recipients))
                     .foregroundStyle(.primary)
                     .lineLimit(1)
 
-                // Permission presets are edited in the share editor, not from the summary row.
+                if let recipient = share.recipients.first, share.recipients.count == 1 {
+                    recipientPresetChip(recipient, in: share)
+                }
             }
 
             Spacer()
@@ -268,23 +275,52 @@ public struct UnifiedShareListView: View {
             }
     }
 
-    /// The preset chip — a menu of the applicable presets plus "Custom permissions" (opens the editor).
-    private func presetChip(_ share: NKUnifiedShare) -> some View {
+    private func recipientRow(_ recipient: NKUnifiedShareRecipient, in share: NKUnifiedShare) -> some View {
+        HStack(spacing: 12) {
+            recipientAvatar(recipient)
+                .frame(width: 28, height: 28)
+                .clipShape(Circle())
+
+            VStack(alignment: .leading, spacing: 2) {
+                Text(recipient.displayName)
+                    .foregroundStyle(.primary)
+                    .lineLimit(1)
+
+                recipientPresetChip(recipient, in: share)
+            }
+
+            Spacer()
+
+            recipientMenu(recipient, in: share)
+        }
+        .background {
+            Button {
+                editing = ShareEditor(share: share, recipient: recipient)
+            } label: {
+                Color.clear
+                    .contentShape(Rectangle())
+            }
+            .buttonStyle(.plain)
+            .accessibilityLabel(recipient.displayName)
+        }
+    }
+
+    private func recipientPresetChip(_ recipient: NKUnifiedShareRecipient, in share: NKUnifiedShare) -> some View {
         Menu {
-            ForEach(model.applicablePresets(share), id: \.class) { preset in
+            ForEach(model.applicablePresets(recipient), id: \.class) { preset in
                 Button(preset.displayName) {
-                    model.setPermissionPreset(share: share, presetClass: preset.class)
+                    model.setPermissionPreset(share: share, recipient: recipient, presetClass: preset.class)
                 }
             }
 
             Divider()
 
             Button(String(localized: "Can…")) {
-                editing = ShareEditor(share: share, forceCustomPermissions: true)
+                editing = ShareEditor(share: share, recipient: recipient)
             }
         } label: {
             HStack(spacing: 2) {
-                Text(presetLabel(share))
+                Text(recipientPresetLabel(recipient))
                 Image(systemName: "chevron.down")
                     .font(.caption2)
             }
@@ -298,36 +334,12 @@ public struct UnifiedShareListView: View {
         .fixedSize()
     }
 
-    private func recipientRow(_ recipient: NKUnifiedShareRecipient, in share: NKUnifiedShare) -> some View {
-        HStack(spacing: 12) {
-            Button {
-                editing = ShareEditor(share: share)
-            } label: {
-                HStack(spacing: 12) {
-                    recipientAvatar(recipient)
-                        .frame(width: 28, height: 28)
-                        .clipShape(Circle())
-
-                    Text(recipient.displayName)
-                        .foregroundStyle(.primary)
-                        .lineLimit(1)
-
-                    Spacer()
-                }
-                .contentShape(Rectangle())
-            }
-            .buttonStyle(.plain)
-
-            recipientMenu(recipient, in: share)
-        }
-    }
-
     private func recipientMenu(_ recipient: NKUnifiedShareRecipient, in share: NKUnifiedShare) -> some View {
         let deletion = RecipientDeletion(share: share, recipient: recipient)
 
         return Menu {
             Button {
-                editing = ShareEditor(share: share)
+                editing = ShareEditor(share: share, recipient: recipient)
             } label: {
                 Label(String(localized: "Edit"), systemImage: "pencil")
             }
@@ -433,9 +445,16 @@ public struct UnifiedShareListView: View {
         return components.isEmpty ? String(localized: "No recipients") : components.joined(separator: ", ")
     }
 
-    private func presetLabel(_ share: NKUnifiedShare) -> String {
-        if let presetClass = share.permissionPreset,
-           let preset = model.permissionPresets.first(where: { $0.class == presetClass }) {
+    private func recipientPresetLabel(_ recipient: NKUnifiedShareRecipient) -> String {
+        guard !recipient.permissions.isEmpty else {
+            return String(localized: "Can…")
+        }
+
+        if let preset = model.applicablePresets(recipient).first(where: { preset in
+            recipient.permissions.allSatisfy { permission in
+                permission.enabled == permission.presets.contains(preset.class)
+            }
+        }) {
             return preset.displayName
         }
 
@@ -459,9 +478,20 @@ public struct UnifiedShareListView: View {
 
 private struct ShareEditor: Identifiable {
     let share: NKUnifiedShare
+    var recipient: NKUnifiedShareRecipient?
     var expandSettings = false
     var forceCustomPermissions = false
     var id: String { share.id }
+
+    init(share: NKUnifiedShare,
+         recipient: NKUnifiedShareRecipient? = nil,
+         expandSettings: Bool = false,
+         forceCustomPermissions: Bool = false) {
+        self.share = share
+        self.recipient = recipient
+        self.expandSettings = expandSettings
+        self.forceCustomPermissions = forceCustomPermissions
+    }
 }
 
 private struct RecipientDeletion: Identifiable {

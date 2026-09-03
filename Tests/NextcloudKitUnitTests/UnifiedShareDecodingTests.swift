@@ -207,7 +207,18 @@ struct UnifiedShareDecodingTests {
                   "display_name": "Public link",
                   "icon": null,
                   "secret": { "updatable": true, "url": "https://x/s/abc" },
-                  "initiator": { "user_id": "alice", "instance": null, "display_name": "Alice", "icon": { "svg": "<svg/>" } }
+                  "initiator": { "user_id": "alice", "instance": null, "display_name": "Alice", "icon": { "svg": "<svg/>" } },
+                  "permissions": [
+                    {
+                      "class": "download",
+                      "source_class": null,
+                      "display_name": "Allow download",
+                      "hint": null,
+                      "priority": 30,
+                      "presets": ["viewer", "editor"],
+                      "enabled": false
+                    }
+                  ]
                 }
               ],
               "permissions": [
@@ -243,6 +254,8 @@ struct UnifiedShareDecodingTests {
         #expect(recipient.secret.url == "https://x/s/abc")
         #expect(recipient.secret.value == nil)
         #expect(recipient.initiator?.userId == "alice")
+        #expect(recipient.permissions.first?.class == "download")
+        #expect(recipient.permissions.first?.enabled == false)
     }
 
     @Test("Decodes the sharing capabilities block")

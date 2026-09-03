@@ -1,5 +1,6 @@
 // SPDX-FileCopyrightText: Nextcloud GmbH
 // SPDX-FileCopyrightText: 2026 Milen Pivchev
+// SPDX-FileCopyrightText: 2026 Marino Faggiana
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 import SwiftUI
@@ -12,6 +13,8 @@ import UIKit
 public struct UnifiedShareEditView: View {
     /// Editing an existing share (vs composing a new draft): the audience is fixed.
     let isEditingExisting: Bool
+    /// When set, the editor changes permissions only for this recipient.
+    let selectedRecipient: NKUnifiedShareRecipient?
     /// The file's in-server link, copied for invited-people shares.
     let internalLink: String?
     @State private var model: UnifiedShareEditModel
@@ -29,6 +32,7 @@ public struct UnifiedShareEditView: View {
 
     public init(account: String, sourceId: String? = nil, internalLink: String? = nil) {
         self.isEditingExisting = false
+        self.selectedRecipient = nil
         self.internalLink = internalLink
         model = UnifiedShareEditModel(account: account, sourceId: sourceId)
     }
@@ -36,6 +40,7 @@ public struct UnifiedShareEditView: View {
     /// Open the editor on an existing share (from the list).
     public init(account: String, share: NKUnifiedShare, internalLink: String? = nil, expandSettings: Bool = false, forceCustomPermissions: Bool = false) {
         self.isEditingExisting = true
+        self.selectedRecipient = nil
         self.internalLink = internalLink
         model = UnifiedShareEditModel(account: account, existingShare: share)
         _shareeType = State(initialValue: share.recipients.contains { $0.class == UnifiedShareEditModel.tokenRecipientClass } ? .anyone : .invited)
@@ -43,8 +48,18 @@ public struct UnifiedShareEditView: View {
         _permissionSelection = State(initialValue: forceCustomPermissions ? .custom : .unset)
     }
 
+    /// Open the permissions editor for one recipient of an existing share.
+    public init(account: String, share: NKUnifiedShare, recipient: NKUnifiedShareRecipient) {
+        self.isEditingExisting = true
+        self.selectedRecipient = recipient
+        self.internalLink = nil
+        model = UnifiedShareEditModel(account: account, existingShare: share)
+        _shareeType = State(initialValue: .invited)
+    }
+
     init(model: UnifiedShareEditModel) {
         self.isEditingExisting = false
+        self.selectedRecipient = nil
         self.internalLink = nil
         self.model = model
     }
@@ -52,18 +67,18 @@ public struct UnifiedShareEditView: View {
     public var body: some View {
         ZStack {
             switch model.state {
-                case .loading:
-                    ProgressView()
-                case .shareUpdated(let share):
+            case .loading:
+                ProgressView()
+            case .shareUpdated(let share):
 
                     Form {
                         // The audience is only selectable for a new draft; an existing share's is fixed.
-                        if !isEditingExisting {
+                        if !isEditingExisting, selectedRecipient == nil {
                             shareeTypePicker(share: share)
                                 .disabled(model.isSwitchingAudience)
                         }
 
-                        if showsRows, shareeType == .invited {
+                        if selectedRecipient == nil, showsRows, shareeType == .invited {
                             if !peopleRecipients(share).isEmpty {
                                 recipientPills(share: share)
                                     .listRowSeparator(.hidden)
@@ -81,18 +96,22 @@ public struct UnifiedShareEditView: View {
                         }
 
                         if showsRows {
-                            permissionField(share: share)
+                            if let recipient = currentSelectedRecipient(in: share) {
+                                recipientPermissionFields(share: share, recipient: recipient)
+                            } else if selectedRecipient == nil {
+                                permissionField(share: share)
 
-                            ForEach(basicProperties(share), id: \.class) { property in
-                                PropertyRow(property: property, error: model.propertyErrors[property.class]) { value in
-                                    model.setProperty(share: share, propertyClass: property.class, value: value)
+                                ForEach(basicProperties(share), id: \.class) { property in
+                                    PropertyRow(property: property, error: model.propertyErrors[property.class]) { value in
+                                        model.setProperty(share: share, propertyClass: property.class, value: value)
+                                    }
                                 }
-                            }
 
-                            settingsRow(share: share)
+                                settingsRow(share: share)
+                            }
                         }
 
-                        if !model.isSwitchingAudience, structuralCanSend(share) {
+                        if selectedRecipient == nil, !model.isSwitchingAudience, structuralCanSend(share) {
                             actionButtons(share: share)
                         }
                     }
@@ -129,9 +148,9 @@ public struct UnifiedShareEditView: View {
                         }
                     }
 
-                case .error:
-                    Text(String(localized: "Could not create share, try again later"))
-                        .foregroundStyle(.secondary)
+            case .error:
+                Text(String(localized: "Could not create share, try again later"))
+                    .foregroundStyle(.secondary)
             }
         }
         .navigationBarTitleDisplayMode(.inline)
@@ -174,7 +193,7 @@ public struct UnifiedShareEditView: View {
                 model.createShare()
             }
 
-            if model.permissionPresets.isEmpty {
+            if selectedRecipient == nil, model.permissionPresets.isEmpty {
                 model.loadCapabilities()
             }
         }
@@ -185,12 +204,43 @@ public struct UnifiedShareEditView: View {
     }
 
     private var navigationTitle: String {
+        if let selectedRecipient {
+            return selectedRecipient.displayName
+        }
+
         guard case .shareUpdated(let share) = model.state else {
             return ""
         }
 
         let name = share.sources.first?.displayName ?? "..."
         return String(localized: "Share \"\(name)\"")
+    }
+
+    @ViewBuilder
+    private func recipientPermissionFields(share: NKUnifiedShare, recipient: NKUnifiedShareRecipient) -> some View {
+        ForEach(recipient.permissions, id: \.class) { permission in
+            PermissionToggleRow(permission: permission) { enabled in
+                model.setRecipientPermission(
+                    share: share,
+                    recipient: recipient,
+                    permissionClass: permission.class,
+                    enabled: enabled
+                )
+            }
+            .id(permission.enabled)
+        }
+    }
+
+    private func currentSelectedRecipient(in share: NKUnifiedShare) -> NKUnifiedShareRecipient? {
+        guard let selectedRecipient else {
+            return nil
+        }
+
+        return share.recipients.first {
+            $0.class == selectedRecipient.class
+                && $0.value == selectedRecipient.value
+                && $0.instance == selectedRecipient.instance
+        }
     }
 
     private func shareeTypePicker(share: NKUnifiedShare) -> some View {

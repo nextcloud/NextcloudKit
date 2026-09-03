@@ -1,5 +1,6 @@
 // SPDX-FileCopyrightText: Nextcloud GmbH
 // SPDX-FileCopyrightText: 2026 Milen Pivchev
+// SPDX-FileCopyrightText: 2026 Marino Faggiana
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 import Foundation
@@ -74,20 +75,42 @@ public class UnifiedShareListModel {
         state = .loaded(shares)
     }
 
-    func applicablePresets(_ share: NKUnifiedShare) -> [NKUnifiedSharePermissionPreset] {
-        let applicable = Set(share.permissions.flatMap { $0.presets })
+    func applicablePresets(_ recipient: NKUnifiedShareRecipient) -> [NKUnifiedSharePermissionPreset] {
+        let applicable = Set(recipient.permissions.flatMap { $0.presets })
         return permissionPresets.filter { applicable.contains($0.class) }
     }
 
-    func setPermissionPreset(share: NKUnifiedShare, presetClass: String) {
+    func setPermissionPreset(share: NKUnifiedShare,
+                             recipient: NKUnifiedShareRecipient,
+                             presetClass: String) {
         Task {
-            let result = await NextcloudKit.shared.setUnifiedSharePermissionPreset(id: share.id, permissionPresetClass: presetClass, account: account)
-            guard let updated = result.share else {
-                onError?(result.error)
-                return
+            var currentShare = share
+
+            for permission in recipient.permissions {
+                let enabled = permission.presets.contains(presetClass)
+                guard permission.enabled != enabled else {
+                    continue
+                }
+
+                let result = await NextcloudKit.shared.setUnifiedShareRecipientPermission(
+                    id: currentShare.id,
+                    recipientClass: recipient.class,
+                    recipientValue: recipient.value,
+                    recipientInstance: recipient.instance,
+                    permissionClass: permission.class,
+                    enabled: enabled,
+                    account: account
+                )
+                guard let updated = result.share else {
+                    replace(currentShare)
+                    onError?(result.error)
+                    return
+                }
+
+                currentShare = updated
             }
 
-            replace(updated)
+            replace(currentShare)
         }
     }
 
