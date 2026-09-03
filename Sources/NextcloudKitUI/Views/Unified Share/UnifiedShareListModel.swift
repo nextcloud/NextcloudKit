@@ -27,6 +27,20 @@ public class UnifiedShareListModel {
         self.onError = onError
     }
 
+#if DEBUG
+    /// Preview-only initializer that starts with preloaded shares and capabilities.
+    init(account: String,
+         sourceId: String? = nil,
+         state: UnifiedShareListState,
+         permissionPresets: [NKUnifiedSharePermissionPreset] = []) {
+        self.account = account
+        self.sourceId = sourceId
+        self.onError = nil
+        self.state = state
+        self.permissionPresets = permissionPresets
+    }
+#endif
+
     func load() {
         Task {
             if permissionPresets.isEmpty {

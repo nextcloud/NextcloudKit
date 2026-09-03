@@ -34,6 +34,15 @@ public struct UnifiedShareListView: View {
         model = UnifiedShareListModel(account: account, sourceId: sourceId, onError: onError)
     }
 
+    init(model: UnifiedShareListModel, isDirectory: Bool = false, tint: Color = .accentColor) {
+        self.account = model.account
+        self.tint = tint
+        self.internalLink = nil
+        self.isDirectory = isDirectory
+        self.createTrigger = CreateUnifiedShareTrigger()
+        self.model = model
+    }
+
     public var body: some View {
         @Bindable var createTrigger = createTrigger
 
@@ -304,3 +313,23 @@ private struct ShareEditor: Identifiable {
     var forceCustomPermissions = false
     var id: String { share.id }
 }
+
+#if DEBUG
+
+#Preview {
+    NavigationStack {
+        UnifiedShareListView(
+            model: UnifiedShareListModel(
+                account: "",
+                state: .loaded([.mock]),
+                permissionPresets: [
+                    NKUnifiedSharePermissionPreset(class: "viewer", displayName: "Can view"),
+                    NKUnifiedSharePermissionPreset(class: "editor", displayName: "Can edit")
+                ]
+            )
+        )
+        .navigationTitle("Shares")
+    }
+}
+
+#endif
