@@ -30,7 +30,7 @@ struct UnifiedShareDecodingTests {
                 "display_name": "Alice",
                 "icon": { "svg": "<svg/>" }
               },
-              "last_updated": 1730000000000,
+              "last_updated": "1730000000000",
               "state": "active",
               "sources": [],
               "recipients": [],
@@ -101,7 +101,7 @@ struct UnifiedShareDecodingTests {
 
         #expect(share.id == "s1")
         #expect(share.state == .active)
-        #expect(share.lastUpdated == "1_730_000_000_000")
+        #expect(share.lastUpdated == "1730000000000")
         #expect(share.properties.count == 5)
 
         let p0 = try #require(share.properties[0] as? NKUnifiedSharePropertyDate)
@@ -143,7 +143,7 @@ struct UnifiedShareDecodingTests {
                 "display_name": "Bob",
                 "icon": { "svg": "<svg/>" }
               },
-              "last_updated": 0,
+              "last_updated": "0",
               "state": "draft",
               "sources": [
                 {
@@ -196,7 +196,7 @@ struct UnifiedShareDecodingTests {
             "data": {
               "id": "s3",
               "owner": { "user_id": "alice", "instance": null, "display_name": "Alice", "icon": { "svg": "<svg/>" } },
-              "last_updated": 0,
+              "last_updated": "0",
               "state": "active",
               "sources": [],
               "recipients": [
