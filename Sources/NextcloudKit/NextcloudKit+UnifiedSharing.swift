@@ -66,7 +66,7 @@ public extension NextcloudKit {
             return (account, nil, nil, .urlError)
         }
 
-        // Build the query manually so `recipientTypeClasses[]` can repeat once per element
+        // Build the query manually so `filterRecipientTypeClasses[]` can repeat once per element
         // (a plain [String: String] can't hold an array, and [String: Any] isn't Sendable).
         guard let baseURL = try? url.asURL(),
               var components = URLComponents(url: baseURL, resolvingAgainstBaseURL: false) else {
@@ -74,7 +74,7 @@ public extension NextcloudKit {
         }
 
         var queryItems: [URLQueryItem] = [URLQueryItem(name: "query", value: query)]
-        recipientTypeClasses?.forEach { queryItems.append(URLQueryItem(name: "recipientTypeClasses[]", value: $0)) }
+        recipientTypeClasses?.forEach { queryItems.append(URLQueryItem(name: "filterRecipientTypeClasses[]", value: $0)) }
         if let limit { queryItems.append(URLQueryItem(name: "limit", value: String(limit))) }
         if let offset { queryItems.append(URLQueryItem(name: "offset", value: String(offset))) }
         if let excludingRecipientsOfShareID { queryItems.append(URLQueryItem(name: "id", value: excludingRecipientsOfShareID)) }
