@@ -91,6 +91,24 @@ public class UnifiedShareListModel {
         }
     }
 
+    func remove(recipient: NKUnifiedShareRecipient, from share: NKUnifiedShare) {
+        Task {
+            let result = await NextcloudKit.shared.removeUnifiedShareRecipient(
+                id: share.id,
+                recipientClass: recipient.class,
+                value: recipient.value,
+                instance: recipient.instance,
+                account: account
+            )
+            guard let updated = result.share else {
+                onError?(result.error)
+                return
+            }
+
+            replace(updated)
+        }
+    }
+
     private func replace(_ updated: NKUnifiedShare) {
         if case .loaded(let shares) = state {
             state = .loaded(shares.map { $0.id == updated.id ? updated : $0 })

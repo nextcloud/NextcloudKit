@@ -21,12 +21,13 @@ public extension NKUnifiedShareRecipient {
 }
 
 public extension Array where Element == NKUnifiedShareRecipient {
-    /// A few sample recipients, e.g. for autocomplete results.
+    /// Sample recipients, e.g. for autocomplete results and list previews.
     static var mocks: [NKUnifiedShareRecipient] {
         [
-            NKUnifiedShareRecipient(class: "", value: "bob", instance: nil, displayName: "Bob", icon: NKUnifiedShareIcon(svg: "<svg/>", light: nil, dark: nil), secret: .init(updatable: false), initiator: nil),
-            NKUnifiedShareRecipient(class: "", value: "team", instance: nil, displayName: "Team", icon: NKUnifiedShareIcon(svg: "<svg/>", light: nil, dark: nil), secret: .init(updatable: false), initiator: nil),
-            NKUnifiedShareRecipient(class: "", value: "carol@example.com", instance: "example.com", displayName: "Carol (example.com)", icon: nil, secret: .init(updatable: true, url: "https://example.com/s/abc"), initiator: nil)
+            NKUnifiedShareRecipient(class: "user", value: "bob", instance: nil, displayName: "Bob", icon: NKUnifiedShareIcon(svg: "<svg/>", light: nil, dark: nil), secret: .init(updatable: false), initiator: nil),
+            NKUnifiedShareRecipient(class: "group", value: "team", instance: nil, displayName: "Team", icon: NKUnifiedShareIcon(svg: "<svg/>", light: nil, dark: nil), secret: .init(updatable: false), initiator: nil),
+            NKUnifiedShareRecipient(class: "federated_user", value: "carol@example.com", instance: "example.com", displayName: "Carol (example.com)", icon: nil, secret: .init(updatable: false), initiator: nil),
+            NKUnifiedShareRecipient(class: "user", value: "dave", instance: nil, displayName: "Dave", icon: nil, secret: .init(updatable: false), initiator: nil)
         ]
     }
 }

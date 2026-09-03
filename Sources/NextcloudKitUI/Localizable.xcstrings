@@ -1,6 +1,72 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "%lld groups" : {
+      "comment" : "Recipient summary for multiple groups.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld groups"
+          }
+        }
+      }
+    },
+    "%lld links" : {
+      "comment" : "Recipient summary for multiple public links.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld links"
+          }
+        }
+      }
+    },
+    "%lld people" : {
+      "comment" : "Recipient summary for multiple people.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld people"
+          }
+        }
+      }
+    },
+    "1 group" : {
+      "comment" : "Recipient summary for one group.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "1 group"
+          }
+        }
+      }
+    },
+    "1 link" : {
+      "comment" : "Recipient summary for one public link.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "1 link"
+          }
+        }
+      }
+    },
+    "1 person" : {
+      "comment" : "Recipient summary for one person.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "1 person"
+          }
+        }
+      }
+    },
     "Accounts" : {
       "localizations" : {
         "af" : {
@@ -1411,6 +1477,17 @@
         }
       }
     },
+    "Delete recipient?" : {
+      "comment" : "Title of the recipient removal confirmation dialog.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Delete recipient?"
+          }
+        }
+      }
+    },
     "Delete share?" : {
       "comment" : "Title of the delete confirmation dialog.",
       "localizations" : {
@@ -1439,6 +1516,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Failed to update share."
+          }
+        }
+      }
+    },
+    "Hide recipients" : {
+      "comment" : "Accessibility label for collapsing a share's recipient list.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hide recipients"
           }
         }
       }
@@ -2108,6 +2196,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : ""
+          }
+        }
+      }
+    },
+    "No recipients" : {
+      "comment" : "Recipient summary when a share has no recipients.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No recipients"
           }
         }
       }
@@ -4192,6 +4291,17 @@
         }
       }
     },
+    "Show recipients" : {
+      "comment" : "Accessibility label for expanding a share's recipient list.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Show recipients"
+          }
+        }
+      }
+    },
     "The address of your Nextcloud web interface when you open it in your browser." : {
       "comment" : "Label below the server address field in the login view.",
       "localizations" : {
@@ -5492,6 +5602,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "The link can be changed to be easy to remember, but do not set it to something that is easy to guess."
+          }
+        }
+      }
+    },
+    "This recipient will be removed from the share." : {
+      "comment" : "Message of the recipient removal confirmation dialog.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This recipient will be removed from the share."
           }
         }
       }
