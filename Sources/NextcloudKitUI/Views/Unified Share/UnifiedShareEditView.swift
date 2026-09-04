@@ -23,6 +23,9 @@ public struct UnifiedShareEditView: View {
     @State private var permissionSelection: PermissionSelection = .unset
     @State private var isSettingsExpanded = false
     @State private var recipients = ""
+    @State private var showsDeleteConfirmation = false
+    @State private var hasPermissionChanges = false
+    @State private var isNewlyAddedRecipient = false
     /// Hides the audience-dependent rows while a switch is running.
     @State private var showsRows = true
     @State private var showsCopied = false
@@ -227,6 +230,7 @@ public struct UnifiedShareEditView: View {
                     permissionSelection = .custom
                 } else {
                     permissionSelection = .preset(tag)
+                    hasPermissionChanges = true
                     model.setRecipientPermissionPreset(share: share, recipient: recipient, presetClass: tag)
                 }
             }
@@ -244,6 +248,7 @@ public struct UnifiedShareEditView: View {
         if isRecipientCustomSelected(recipient) {
             ForEach(recipient.permissions, id: \.class) { permission in
                 PermissionToggleRow(permission: permission) { enabled in
+                    hasPermissionChanges = true
                     model.setRecipientPermission(
                         share: share,
                         recipient: recipient,
@@ -292,6 +297,7 @@ public struct UnifiedShareEditView: View {
                     permissionSelection = .custom
                 } else {
                     permissionSelection = .preset(tag)
+                    hasPermissionChanges = true
                     model.setPermissionPreset(share: share, presetClass: tag)
                 }
             }
@@ -310,6 +316,7 @@ public struct UnifiedShareEditView: View {
         if isCustomSelected(share) {
             ForEach(share.permissions, id: \.class) { permission in
                 PermissionToggleRow(permission: permission) { enabled in
+                    hasPermissionChanges = true
                     model.setPermission(share: share, permissionClass: permission.class, enabled: enabled)
                 }
                 // Re-seed the toggle whenever the server's enabled value changes (e.g. after a
@@ -391,6 +398,44 @@ public struct UnifiedShareEditView: View {
         }
     }
 
+    private func deleteAction(share: NKUnifiedShare) -> some View {
+        let recipient = currentSelectedRecipient(in: share)
+
+        return Button(role: .destructive) {
+            showsDeleteConfirmation = true
+        } label: {
+            Text(recipient == nil ? String(localized: "Delete share") : String(localized: "Delete recipient"))
+        }
+        .buttonStyle(.bordered)
+        .tint(.red)
+        .disabled(selectedRecipient != nil && recipient == nil)
+        .confirmationDialog(
+            recipient == nil ? String(localized: "Delete share?") : String(localized: "Delete recipient?"),
+            isPresented: $showsDeleteConfirmation,
+            titleVisibility: .visible
+        ) {
+            Button(String(localized: "Delete"), role: .destructive) {
+                if let recipient {
+                    model.removeRecipient(share: share, recipient: recipient) {
+                        dismiss()
+                    }
+                } else {
+                    model.deleteShare(share: share) {
+                        dismiss()
+                    }
+                }
+            }
+
+            Button(String(localized: "Cancel"), role: .cancel) {}
+        } message: {
+            if recipient == nil {
+                Text(String(localized: "This share will be permanently removed."))
+            } else {
+                Text(String(localized: "This recipient will be removed from the share."))
+            }
+        }
+    }
+
     @ViewBuilder
     private func customLinkRows(share: NKUnifiedShare) -> some View {
         if !customLinkRecipients(share).isEmpty {
@@ -433,6 +478,7 @@ public struct UnifiedShareEditView: View {
                         model.addRecipient(share: share, recipient: recipient) { addedRecipient in
                             selectedRecipient = addedRecipient
                             permissionSelection = .unset
+                            isNewlyAddedRecipient = true
                         }
                     } label: {
                         HStack(spacing: 10) {
@@ -552,6 +598,10 @@ public struct UnifiedShareEditView: View {
         HStack(spacing: 16) {
             copyButton(share: share)
 
+            if isEditingExisting {
+                deleteAction(share: share)
+            }
+
             Button(sendLabel) {
                 model.activate(share: share)
             }
@@ -613,7 +663,19 @@ public struct UnifiedShareEditView: View {
     }
 
     private var sendLabel: String {
-        shareeType == .anyone ? String(localized: "Share public link") : String(localized: "Send")
+        if shareeType == .anyone {
+            return String(localized: "Share public link")
+        }
+
+        if selectedRecipient != nil {
+            return isNewlyAddedRecipient ? String(localized: "Save share") : String(localized: "Update share")
+        }
+
+        if isEditingExisting, hasPermissionChanges {
+            return String(localized: "Update share")
+        }
+
+        return String(localized: "Save share")
     }
 
     /// Structural sendability — gates whether the action buttons render at all.

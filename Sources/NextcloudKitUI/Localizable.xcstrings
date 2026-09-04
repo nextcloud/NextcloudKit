@@ -1477,6 +1477,17 @@
         }
       }
     },
+    "Delete recipient" : {
+      "comment" : "Button that removes one recipient from a unified share.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Delete recipient"
+          }
+        }
+      }
+    },
     "Delete recipient?" : {
       "comment" : "Title of the recipient removal confirmation dialog.",
       "localizations" : {
@@ -1484,6 +1495,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Delete recipient?"
+          }
+        }
+      }
+    },
+    "Delete share" : {
+      "comment" : "Button that deletes a unified share.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Delete share"
           }
         }
       }
@@ -4227,6 +4249,17 @@
         }
       }
     },
+    "Save share" : {
+      "comment" : "Button that saves a unified share without pending permission changes.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Save share"
+          }
+        }
+      }
+    },
     "Share \"%@\"" : {
       "comment" : "Share editor title; placeholder is the shared file or folder name.",
       "localizations" : {
@@ -5624,6 +5657,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "This share will be permanently removed."
+          }
+        }
+      }
+    },
+    "Update share" : {
+      "comment" : "Button that finishes editing a unified share after its permissions changed.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Update share"
           }
         }
       }

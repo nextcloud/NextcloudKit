@@ -13,7 +13,7 @@ public final class CreateUnifiedShareTrigger {
     public init() {}
 }
 
-/// Lists the existing unified shares for a file, with expandable recipients and swipe-to-delete.
+/// Lists the existing unified shares for a file, with expandable recipients.
 public struct UnifiedShareListView: View {
     let account: String
     let tint: Color
@@ -22,8 +22,6 @@ public struct UnifiedShareListView: View {
     let isDirectory: Bool
     @State private var model: UnifiedShareListModel
     @State private var editing: ShareEditor?
-    @State private var shareToDelete: NKUnifiedShare?
-    @State private var recipientToDelete: RecipientDeletion?
     @State private var expandedShareIDs: Set<String> = []
     let createTrigger: CreateUnifiedShareTrigger
     @Environment(\.colorScheme) private var colorScheme
@@ -104,34 +102,6 @@ public struct UnifiedShareListView: View {
             List {
                 ForEach(shares) { share in
                     shareContainer(share)
-                        .swipeActions(edge: .trailing) {
-                            Button(role: .destructive) {
-                                shareToDelete = share
-                            } label: {
-                                Label(String(localized: "Delete"), systemImage: "trash")
-                            }
-                            .tint(.red)
-                        }
-                        .confirmationDialog(
-                            String(localized: "Delete share?"),
-                            isPresented: Binding(
-                                get: { shareToDelete?.id == share.id },
-                                set: { if !$0 { shareToDelete = nil } }
-                            ),
-                            titleVisibility: .visible
-                        ) {
-                            Button(String(localized: "Delete"), role: .destructive) {
-                                expandedShareIDs.remove(share.id)
-                                model.delete(share: share)
-                                shareToDelete = nil
-                            }
-
-                            Button(String(localized: "Cancel"), role: .cancel) {
-                                shareToDelete = nil
-                            }
-                        } message: {
-                            Text(String(localized: "This share will be permanently removed."))
-                        }
                 }
             }
             .listStyle(.insetGrouped)
@@ -184,8 +154,6 @@ public struct UnifiedShareListView: View {
                     }
                     .buttonStyle(.plain)
                     .accessibilityLabel(isExpanded.wrappedValue ? String(localized: "Hide recipients") : String(localized: "Show recipients"))
-
-                    shareMenu(share)
                 }
             }
             .disclosureGroupStyle(ShareDisclosureGroupStyle())
@@ -196,8 +164,6 @@ public struct UnifiedShareListView: View {
                     .onTapGesture {
                         editing = ShareEditor(share: share, recipient: share.recipients.first)
                     }
-
-                shareMenu(share)
             }
         }
     }
@@ -294,8 +260,6 @@ public struct UnifiedShareListView: View {
             }
 
             Spacer()
-
-            recipientMenu(recipient, in: share)
         }
         .background {
             Button {
@@ -336,77 +300,6 @@ public struct UnifiedShareListView: View {
         }
         .buttonStyle(.plain)
         .fixedSize()
-    }
-
-    private func recipientMenu(_ recipient: NKUnifiedShareRecipient, in share: NKUnifiedShare) -> some View {
-        let deletion = RecipientDeletion(share: share, recipient: recipient)
-
-        return Menu {
-            Button {
-                editing = ShareEditor(share: share, recipient: recipient)
-            } label: {
-                Label(String(localized: "Edit"), systemImage: "pencil")
-            }
-
-            // Sending email is intentionally omitted until a recipient-specific flow is available.
-
-            Button(role: .destructive) {
-                recipientToDelete = deletion
-            } label: {
-                Label(String(localized: "Delete"), systemImage: "trash")
-            }
-            .tint(.red)
-        } label: {
-            Image(systemName: "ellipsis")
-                .foregroundStyle(.primary)
-                .frame(width: 44, height: 44)
-                .contentShape(Rectangle())
-        }
-        .tint(.primary)
-        .confirmationDialog(
-            String(localized: "Delete recipient?"),
-            isPresented: Binding(
-                get: { recipientToDelete?.id == deletion.id },
-                set: { if !$0 { recipientToDelete = nil } }
-            ),
-            titleVisibility: .visible
-        ) {
-            Button(String(localized: "Delete"), role: .destructive) {
-                model.remove(recipient: recipient, from: share)
-                recipientToDelete = nil
-            }
-
-            Button(String(localized: "Cancel"), role: .cancel) {
-                recipientToDelete = nil
-            }
-        } message: {
-            Text(String(localized: "This recipient will be removed from the share."))
-        }
-    }
-
-    private func shareMenu(_ share: NKUnifiedShare) -> some View {
-        Menu {
-            Button {
-                editing = ShareEditor(share: share)
-            } label: {
-                Label(String(localized: "Edit"), systemImage: "pencil")
-            }
-
-            // Sending email is intentionally omitted until the correct flow is available.
-
-            Button(role: .destructive) {
-                shareToDelete = share
-            } label: {
-                Label(String(localized: "Delete"), systemImage: "trash")
-            }
-            .tint(.red)
-        } label: {
-            Image(systemName: "ellipsis")
-                .foregroundStyle(.primary)
-                .frame(width: 44, height: 44)
-                .contentShape(Rectangle())
-        }
-        .tint(.primary)
     }
 
     private func expansionBinding(for share: NKUnifiedShare) -> Binding<Bool> {
@@ -495,15 +388,6 @@ private struct ShareEditor: Identifiable {
         self.recipient = recipient
         self.expandSettings = expandSettings
         self.forceCustomPermissions = forceCustomPermissions
-    }
-}
-
-private struct RecipientDeletion: Identifiable {
-    let share: NKUnifiedShare
-    let recipient: NKUnifiedShareRecipient
-
-    var id: String {
-        [share.id, recipient.class, recipient.value, recipient.instance ?? ""].joined(separator: "|")
     }
 }
 

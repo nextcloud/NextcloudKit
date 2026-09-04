@@ -294,9 +294,15 @@ public class UnifiedShareEditModel {
         }
     }
 
-    func deleteShare(share: NKUnifiedShare) {
+    func deleteShare(share: NKUnifiedShare, completion: @escaping () -> Void = {}) {
         Task {
-            await NextcloudKit.shared.deleteUnifiedShare(id: share.id, account: account)
+            let result = await NextcloudKit.shared.deleteUnifiedShare(id: share.id, account: account)
+            guard result.error == .success else {
+                mutationError = result.error
+                return
+            }
+
+            completion()
         }
     }
 
@@ -323,7 +329,9 @@ public class UnifiedShareEditModel {
         }
     }
 
-    func removeRecipient(share: NKUnifiedShare, recipient: NKUnifiedShareRecipient) {
+    func removeRecipient(share: NKUnifiedShare,
+                         recipient: NKUnifiedShareRecipient,
+                         completion: @escaping () -> Void = {}) {
         Task {
             let result = await NextcloudKit.shared.removeUnifiedShareRecipient(id: share.id, recipientClass: recipient.class, value: recipient.value, instance: recipient.instance, account: account)
             guard let share = result.share else {
@@ -332,6 +340,7 @@ public class UnifiedShareEditModel {
             }
 
             state = .shareUpdated(share: share)
+            completion()
         }
     }
 
