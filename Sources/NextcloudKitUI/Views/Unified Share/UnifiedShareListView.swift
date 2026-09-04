@@ -169,7 +169,7 @@ public struct UnifiedShareListView: View {
                 shareRow(share)
                     .background {
                         Button {
-                            editing = ShareEditor(share: share, recipient: share.recipients.first)
+                            editing = ShareEditor(share: share, recipient: editableRecipient(share.recipients.first))
                         } label: {
                             Color.clear
                                 .contentShape(Rectangle())
@@ -276,7 +276,7 @@ public struct UnifiedShareListView: View {
         }
         .background {
             Button {
-                editing = ShareEditor(share: share, recipient: recipient)
+                editing = ShareEditor(share: share, recipient: editableRecipient(recipient))
             } label: {
                 Color.clear
                     .contentShape(Rectangle())
@@ -288,7 +288,7 @@ public struct UnifiedShareListView: View {
 
     private func recipientPresetChip(_ recipient: NKUnifiedShareRecipient, in share: NKUnifiedShare) -> some View {
         Menu {
-            ForEach(model.applicablePresets(recipient), id: \.class) { preset in
+            ForEach(model.applicablePresets(recipient, in: share), id: \.class) { preset in
                 Button(preset.displayName) {
                     model.setPermissionPreset(share: share, recipient: recipient, presetClass: preset.class)
                 }
@@ -297,7 +297,7 @@ public struct UnifiedShareListView: View {
             Divider()
 
             Button(String(localized: "Can…")) {
-                editing = ShareEditor(share: share, recipient: recipient)
+                editing = ShareEditor(share: share, recipient: editableRecipient(recipient))
             }
         } label: {
             HStack(spacing: 2) {
@@ -357,17 +357,19 @@ public struct UnifiedShareListView: View {
     }
 
     private func recipientPresetLabel(_ recipient: NKUnifiedShareRecipient, in share: NKUnifiedShare) -> String {
-        if let preset = model.applicablePresets(recipient).first(where: { preset in
+        let applicablePresets = model.applicablePresets(recipient, in: share)
+
+        if recipient.permissions.isEmpty,
+           let presetClass = share.permissionPreset,
+           let preset = applicablePresets.first(where: { $0.class == presetClass }) {
+            return preset.displayName
+        }
+
+        if let preset = applicablePresets.first(where: { preset in
             recipient.permissions.allSatisfy { permission in
                 permission.enabled == permission.presets.contains(preset.class)
             }
         }) {
-            return preset.displayName
-        }
-
-        if share.recipients.count == 1,
-           let presetClass = share.permissionPreset,
-           let preset = model.permissionPresets.first(where: { $0.class == presetClass }) {
             return preset.displayName
         }
 
@@ -382,6 +384,11 @@ public struct UnifiedShareListView: View {
 
     private func isLink(_ recipient: NKUnifiedShareRecipient) -> Bool {
         recipient.secret.updatable
+    }
+
+    private func editableRecipient(_ recipient: NKUnifiedShareRecipient?) -> NKUnifiedShareRecipient? {
+        guard let recipient, !recipient.permissions.isEmpty else { return nil }
+        return recipient
     }
 
     private func iconURL(_ icon: NKUnifiedShareIcon) -> String? {
