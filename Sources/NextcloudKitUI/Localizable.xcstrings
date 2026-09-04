@@ -68,6 +68,7 @@
       }
     },
     "Accounts" : {
+      "comment" : "Navigation title for the list of configured Nextcloud accounts.",
       "localizations" : {
         "af" : {
           "stringUnit" : {
@@ -1361,7 +1362,7 @@
       }
     },
     "Add people" : {
-      "comment" : "Prompt to add recipients in the unified share view.",
+      "comment" : "Placeholder for searching and adding people or groups to a unified share.",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -1372,7 +1373,7 @@
       }
     },
     "Anyone" : {
-      "comment" : "Audience option for anyone with link.",
+      "comment" : "Audience option that makes a unified share accessible to anyone with its public link.",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -1383,6 +1384,7 @@
       }
     },
     "Cancel" : {
+      "comment" : "Button that dismisses a confirmation dialog without making changes.",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -1404,6 +1406,7 @@
       }
     },
     "Copied" : {
+      "comment" : "Temporary button label confirming that a share link was copied.",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -1436,6 +1439,7 @@
       }
     },
     "Could not create share, try again later" : {
+      "comment" : "Error message shown when a unified share cannot be created.",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -1468,6 +1472,7 @@
       }
     },
     "Delete" : {
+      "comment" : "Destructive confirmation button for deleting a share or removing a recipient.",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -1478,7 +1483,7 @@
       }
     },
     "Delete recipient" : {
-      "comment" : "Button that removes one recipient from a unified share.",
+      "comment" : "Button that removes only the selected recipient from a unified share.",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -1500,7 +1505,7 @@
       }
     },
     "Delete share" : {
-      "comment" : "Button that deletes a unified share.",
+      "comment" : "Button that deletes the entire unified share and all its recipients.",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -1522,6 +1527,7 @@
       }
     },
     "Edit" : {
+      "comment" : "Action that opens the unified share editor.",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -2234,6 +2240,7 @@
       }
     },
     "Not Shared Yet" : {
+      "comment" : "Empty-state title shown when a file or folder has no unified shares.",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -2244,7 +2251,7 @@
       }
     },
     "OK" : {
-      "comment" : "Button label for error alert dismissal.",
+      "comment" : "Button that dismisses an error alert.",
       "localizations" : {
         "af" : {
           "stringUnit" : {
@@ -2913,6 +2920,7 @@
       }
     },
     "Retry" : {
+      "comment" : "Button that retries loading the unified share list after an error.",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -3581,7 +3589,7 @@
       }
     },
     "Send email" : {
-      "comment" : "Menu option that opens the share editor to notify recipients.",
+      "comment" : "Legacy action for notifying unified-share recipients by email; currently not displayed.",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -4250,7 +4258,7 @@
       }
     },
     "Save share" : {
-      "comment" : "Button that saves a unified share without pending permission changes.",
+      "comment" : "Primary button that activates a new unified share for invited recipients.",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -4272,6 +4280,7 @@
       }
     },
     "Share File" : {
+      "comment" : "Empty-state button that starts sharing a file.",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -4282,6 +4291,7 @@
       }
     },
     "Share Folder" : {
+      "comment" : "Empty-state button that starts sharing a folder.",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -5630,6 +5640,7 @@
       }
     },
     "The link can be changed to be easy to remember, but do not set it to something that is easy to guess." : {
+      "comment" : "Help text below the editable token of a custom public link.",
       "localizations" : {
         "en" : {
           "stringUnit" : {
