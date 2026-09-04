@@ -301,7 +301,7 @@ public struct UnifiedShareListView: View {
             }
         } label: {
             HStack(spacing: 2) {
-                Text(recipientPresetLabel(recipient))
+                Text(recipientPresetLabel(recipient, in: share))
                 Image(systemName: "chevron.down")
                     .font(.caption2)
             }
@@ -356,16 +356,18 @@ public struct UnifiedShareListView: View {
         return components.isEmpty ? String(localized: "No recipients") : components.joined(separator: ", ")
     }
 
-    private func recipientPresetLabel(_ recipient: NKUnifiedShareRecipient) -> String {
-        guard !recipient.permissions.isEmpty else {
-            return String(localized: "Can…")
-        }
-
+    private func recipientPresetLabel(_ recipient: NKUnifiedShareRecipient, in share: NKUnifiedShare) -> String {
         if let preset = model.applicablePresets(recipient).first(where: { preset in
             recipient.permissions.allSatisfy { permission in
                 permission.enabled == permission.presets.contains(preset.class)
             }
         }) {
+            return preset.displayName
+        }
+
+        if share.recipients.count == 1,
+           let presetClass = share.permissionPreset,
+           let preset = model.permissionPresets.first(where: { $0.class == presetClass }) {
             return preset.displayName
         }
 
