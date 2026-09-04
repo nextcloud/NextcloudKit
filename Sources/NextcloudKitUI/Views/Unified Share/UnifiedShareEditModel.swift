@@ -168,7 +168,7 @@ public class UnifiedShareEditModel {
             defer { isUpdatingPermissions = false }
 
             var currentShare = share
-            let permissions = recipient.permissions.isEmpty ? share.permissions : recipient.permissions
+            let permissions = recipient.effectivePermissions(in: share)
 
             for permission in permissions {
                 let enabled = permission.presets.contains(presetClass)

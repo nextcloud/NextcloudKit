@@ -77,8 +77,7 @@ public class UnifiedShareListModel {
     }
 
     func applicablePresets(_ recipient: NKUnifiedShareRecipient, in share: NKUnifiedShare) -> [NKUnifiedSharePermissionPreset] {
-        let permissions = recipient.permissions.isEmpty ? share.permissions : recipient.permissions
-        let applicable = Set(permissions.flatMap { $0.presets })
+        let applicable = Set(recipient.effectivePermissions(in: share).flatMap { $0.presets })
         return permissionPresets.filter { applicable.contains($0.class) }
     }
 
@@ -92,7 +91,7 @@ public class UnifiedShareListModel {
             defer { recipientsUpdatingPermissions.remove(recipientID) }
 
             var currentShare = share
-            let permissions = recipient.permissions.isEmpty ? share.permissions : recipient.permissions
+            let permissions = recipient.effectivePermissions(in: share)
 
             for permission in permissions {
                 let enabled = permission.presets.contains(presetClass)

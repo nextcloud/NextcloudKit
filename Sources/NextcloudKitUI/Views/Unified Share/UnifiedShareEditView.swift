@@ -284,7 +284,7 @@ public struct UnifiedShareEditView: View {
         .disabled(model.isUpdatingPermissions)
 
         if isRecipientCustomSelected(recipient, in: share) {
-            ForEach(effectivePermissions(recipient, in: share), id: \.class) { permission in
+            ForEach(recipient.effectivePermissions(in: share), id: \.class) { permission in
                 PermissionToggleRow(permission: permission) { enabled in
                     model.setRecipientPermission(
                         share: share,
@@ -371,12 +371,8 @@ public struct UnifiedShareEditView: View {
         return model.permissionPresets.filter { applicable.contains($0.class) }
     }
 
-    private func effectivePermissions(_ recipient: NKUnifiedShareRecipient, in share: NKUnifiedShare) -> [NKUnifiedSharePermission] {
-        recipient.permissions.isEmpty ? share.permissions : recipient.permissions
-    }
-
     private func applicablePresets(_ recipient: NKUnifiedShareRecipient, in share: NKUnifiedShare) -> [NKUnifiedSharePermissionPreset] {
-        let applicable = Set(effectivePermissions(recipient, in: share).flatMap { $0.presets })
+        let applicable = Set(recipient.effectivePermissions(in: share).flatMap { $0.presets })
         return model.permissionPresets.filter { applicable.contains($0.class) }
     }
 
@@ -402,7 +398,7 @@ public struct UnifiedShareEditView: View {
         switch permissionSelection {
         case .unset:
             return applicablePresets(recipient, in: share).first { preset in
-                effectivePermissions(recipient, in: share).allSatisfy { permission in
+                recipient.effectivePermissions(in: share).allSatisfy { permission in
                     permission.enabled == permission.presets.contains(preset.class)
                 }
             }?.class

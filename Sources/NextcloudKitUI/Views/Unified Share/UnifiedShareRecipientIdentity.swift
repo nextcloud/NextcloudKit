@@ -23,4 +23,10 @@ extension NKUnifiedShareRecipient {
     var unifiedShareIdentity: UnifiedShareRecipientIdentity {
         UnifiedShareRecipientIdentity(recipient: self)
     }
+
+    func effectivePermissions(in share: NKUnifiedShare) -> [NKUnifiedSharePermission] {
+        let overrides = Dictionary(permissions.map { ($0.class, $0) }, uniquingKeysWith: { _, latest in latest })
+        let inheritedClasses = Set(share.permissions.map(\.class))
+        return share.permissions.map { overrides[$0.class] ?? $0 } + permissions.filter { !inheritedClasses.contains($0.class) }
+    }
 }
