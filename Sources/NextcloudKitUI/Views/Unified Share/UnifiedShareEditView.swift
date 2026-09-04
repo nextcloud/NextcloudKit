@@ -14,7 +14,7 @@ public struct UnifiedShareEditView: View {
     /// Editing an existing share (vs composing a new draft): the audience is fixed.
     let isEditingExisting: Bool
     /// When set, the editor changes permissions only for this recipient.
-    let selectedRecipient: NKUnifiedShareRecipient?
+    @State private var selectedRecipient: NKUnifiedShareRecipient?
     /// The file's in-server link, copied for invited-people shares.
     let internalLink: String?
     @State private var model: UnifiedShareEditModel
@@ -32,17 +32,17 @@ public struct UnifiedShareEditView: View {
 
     public init(account: String, sourceId: String? = nil, internalLink: String? = nil) {
         self.isEditingExisting = false
-        self.selectedRecipient = nil
         self.internalLink = internalLink
         model = UnifiedShareEditModel(account: account, sourceId: sourceId)
+        _selectedRecipient = State(initialValue: nil)
     }
 
     /// Open the editor on an existing share (from the list).
     public init(account: String, share: NKUnifiedShare, internalLink: String? = nil, expandSettings: Bool = false, forceCustomPermissions: Bool = false) {
         self.isEditingExisting = true
-        self.selectedRecipient = nil
         self.internalLink = internalLink
         model = UnifiedShareEditModel(account: account, existingShare: share)
+        _selectedRecipient = State(initialValue: nil)
         _shareeType = State(initialValue: share.recipients.contains { $0.class == UnifiedShareEditModel.tokenRecipientClass } ? .anyone : .invited)
         _isSettingsExpanded = State(initialValue: expandSettings)
         _permissionSelection = State(initialValue: forceCustomPermissions ? .custom : .unset)
@@ -51,17 +51,17 @@ public struct UnifiedShareEditView: View {
     /// Open the permissions editor for one recipient of an existing share.
     public init(account: String, share: NKUnifiedShare, recipient: NKUnifiedShareRecipient) {
         self.isEditingExisting = true
-        self.selectedRecipient = recipient
         self.internalLink = nil
         model = UnifiedShareEditModel(account: account, existingShare: share)
+        _selectedRecipient = State(initialValue: recipient)
         _shareeType = State(initialValue: .invited)
     }
 
     init(model: UnifiedShareEditModel) {
         self.isEditingExisting = false
-        self.selectedRecipient = nil
         self.internalLink = nil
         self.model = model
+        _selectedRecipient = State(initialValue: nil)
     }
 
     public var body: some View {
@@ -84,15 +84,17 @@ public struct UnifiedShareEditView: View {
                                     .listRowSeparator(.hidden)
                             }
 
-                            TextField(
-                                String(localized: "Add people"),
-                                text: $recipients
-                            )
-                            .onChange(of: recipients) {
-                                model.searchRecipients(query: recipients, share: share)
+                            if selectedRecipient == nil {
+                                TextField(
+                                    String(localized: "Add people"),
+                                    text: $recipients
+                                )
+                                .onChange(of: recipients) {
+                                    model.searchRecipients(query: recipients, share: share)
+                                }
+                                // Publish the field's frame so the dropdown can be drawn outside the Form.
+                                .anchorPreference(key: AddPeopleFieldAnchorKey.self, value: .bounds) { $0 }
                             }
-                            // Publish the field's frame so the dropdown can be drawn outside the Form.
-                            .anchorPreference(key: AddPeopleFieldAnchorKey.self, value: .bounds) { $0 }
                         }
 
                         if showsRows {
@@ -427,8 +429,11 @@ public struct UnifiedShareEditView: View {
             VStack(alignment: .leading, spacing: 0) {
                 ForEach(model.recipientResults, id: \.value) { recipient in
                     Button {
-                        model.addRecipient(share: share, recipient: recipient)
                         recipients = ""
+                        model.addRecipient(share: share, recipient: recipient) { addedRecipient in
+                            selectedRecipient = addedRecipient
+                            permissionSelection = .unset
+                        }
                     } label: {
                         HStack(spacing: 10) {
                             if let icon = recipient.icon {

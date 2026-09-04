@@ -300,7 +300,9 @@ public class UnifiedShareEditModel {
         }
     }
 
-    func addRecipient(share: NKUnifiedShare, recipient: NKUnifiedShareRecipient) {
+    func addRecipient(share: NKUnifiedShare,
+                      recipient: NKUnifiedShareRecipient,
+                      completion: @escaping (NKUnifiedShareRecipient) -> Void) {
         Task {
             let result = await NextcloudKit.shared.addUnifiedShareRecipient(id: share.id, recipientClass: recipient.class, value: recipient.value, account: account)
             guard let share = result.share else {
@@ -309,6 +311,15 @@ public class UnifiedShareEditModel {
             }
 
             state = .shareUpdated(share: share)
+            recipientResults = []
+
+            if let addedRecipient = share.recipients.first(where: {
+                $0.class == recipient.class
+                    && $0.value == recipient.value
+                    && $0.instance == recipient.instance
+            }) {
+                completion(addedRecipient)
+            }
         }
     }
 
