@@ -363,6 +363,7 @@ public struct UnifiedShareEditView: View {
     }
 
     private static let customTag = "__nk_custom_permissions__"
+    private static let rolePropertyClass = "role"
 
     /// Presets from the capability, narrowed to those the share's permissions reference.
     private func applicablePresets(_ share: NKUnifiedShare) -> [NKUnifiedSharePermissionPreset] {
@@ -507,11 +508,17 @@ public struct UnifiedShareEditView: View {
     }
 
     private func basicProperties(_ share: NKUnifiedShare) -> [NKUnifiedShareProperty] {
-        share.properties.filter { !$0.advanced }.sorted { $0.priority < $1.priority }
+        share.properties
+            // "role" is a share-wide property and would be misleading in the recipient editor.
+            // Recipient access is edited through the dedicated permission controls above.
+            .filter { !$0.advanced && $0.class != Self.rolePropertyClass }
+            .sorted { $0.priority < $1.priority }
     }
 
     private func advancedProperties(_ share: NKUnifiedShare) -> [NKUnifiedShareProperty] {
-        share.properties.filter { $0.advanced }.sorted { $0.priority < $1.priority }
+        share.properties
+            .filter { $0.advanced && $0.class != Self.rolePropertyClass }
+            .sorted { $0.priority < $1.priority }
     }
 
     /// Recipients whose secret can be edited — i.e. custom/private links.
