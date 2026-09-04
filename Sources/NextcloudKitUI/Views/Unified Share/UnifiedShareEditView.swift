@@ -23,7 +23,11 @@ public struct UnifiedShareEditView: View {
     @State private var permissionSelection: PermissionSelection = .unset
     @State private var isSettingsExpanded = false
     @State private var recipients = ""
-    @State private var showsDeleteConfirmation = false
+    /// The exact server object selected when the destructive action is tapped.
+    /// Keeping it stable prevents an asynchronous refresh from changing a recipient deletion
+    /// into a whole-share deletion while the confirmation dialog is open.
+    @State private var deletionTarget: EditorDeletionTarget?
+    @State private var recipientToDelete: NKUnifiedShareRecipient?
     /// Hides the audience-dependent rows while a switch is running.
     @State private var showsRows = true
     @State private var showsCopied = false
@@ -49,6 +53,23 @@ public struct UnifiedShareEditView: View {
         _permissionSelection = State(initialValue: forceCustomPermissions ? .custom : .unset)
     }
 
+    init(account: String,
+         share: NKUnifiedShare,
+         internalLink: String?,
+         expandSettings: Bool,
+         forceCustomPermissions: Bool,
+         permissionPresets: [NKUnifiedSharePermissionPreset]) {
+        self.isEditingExisting = true
+        self.internalLink = internalLink
+        model = UnifiedShareEditModel(account: account, existingShare: share, permissionPresets: permissionPresets)
+        _selectedRecipient = State(initialValue: nil)
+        _shareeType = State(initialValue: share.recipients.contains {
+            $0.class == UnifiedShareEditModel.tokenRecipientClass
+        } ? .anyone : .invited)
+        _isSettingsExpanded = State(initialValue: expandSettings)
+        _permissionSelection = State(initialValue: forceCustomPermissions ? .custom : .unset)
+    }
+
     /// Open the permissions editor for one recipient of an existing share.
     public init(account: String,
                 share: NKUnifiedShare,
@@ -57,6 +78,18 @@ public struct UnifiedShareEditView: View {
         self.isEditingExisting = true
         self.internalLink = internalLink
         model = UnifiedShareEditModel(account: account, existingShare: share)
+        _selectedRecipient = State(initialValue: recipient)
+        _shareeType = State(initialValue: .invited)
+    }
+
+    init(account: String,
+         share: NKUnifiedShare,
+         recipient: NKUnifiedShareRecipient,
+         internalLink: String?,
+         permissionPresets: [NKUnifiedSharePermissionPreset]) {
+        self.isEditingExisting = true
+        self.internalLink = internalLink
+        model = UnifiedShareEditModel(account: account, existingShare: share, permissionPresets: permissionPresets)
         _selectedRecipient = State(initialValue: recipient)
         _shareeType = State(initialValue: .invited)
     }
@@ -248,6 +281,7 @@ public struct UnifiedShareEditView: View {
                 .tag(Self.customTag)
         }
         .pickerStyle(.menu)
+        .disabled(model.isUpdatingPermissions)
 
         if isRecipientCustomSelected(recipient) {
             ForEach(recipient.permissions, id: \.class) { permission in
@@ -260,6 +294,7 @@ public struct UnifiedShareEditView: View {
                     )
                 }
                 .id("\(permission.class)|\(permission.enabled)|\(model.permissionResetRevision)")
+                .disabled(model.isUpdatingPermissions)
             }
         }
     }
@@ -270,9 +305,7 @@ public struct UnifiedShareEditView: View {
         }
 
         return share.recipients.first {
-            $0.class == selectedRecipient.class
-                && $0.value == selectedRecipient.value
-                && $0.instance == selectedRecipient.instance
+            $0.unifiedShareIdentity == selectedRecipient.unifiedShareIdentity
         }
     }
 
@@ -314,6 +347,7 @@ public struct UnifiedShareEditView: View {
                 .tag(Self.customTag)
         }
         .pickerStyle(.menu)
+        .disabled(model.isUpdatingPermissions)
 
         if isCustomSelected(share) {
             ForEach(share.permissions, id: \.class) { permission in
@@ -323,6 +357,7 @@ public struct UnifiedShareEditView: View {
                 // Re-seed the toggle whenever the server's enabled value changes (e.g. after a
                 // preset like "Can edit" recomputes the permissions), not just on first render.
                 .id("\(permission.class)|\(permission.enabled)|\(model.permissionResetRevision)")
+                .disabled(model.isUpdatingPermissions)
             }
         }
     }
@@ -404,7 +439,11 @@ public struct UnifiedShareEditView: View {
         let recipient = currentSelectedRecipient(in: share)
 
         return Button(role: .destructive) {
-            showsDeleteConfirmation = true
+            if let recipient {
+                deletionTarget = .recipient(shareID: share.id, recipient: recipient)
+            } else {
+                deletionTarget = .share(id: share.id)
+            }
         } label: {
             Text(recipient == nil ? String(localized: "Delete share") : String(localized: "Delete recipient"))
         }
@@ -412,28 +451,37 @@ public struct UnifiedShareEditView: View {
         .tint(.red)
         .disabled(selectedRecipient != nil && recipient == nil)
         .confirmationDialog(
-            recipient == nil ? String(localized: "Delete share?") : String(localized: "Delete recipient?"),
-            isPresented: $showsDeleteConfirmation,
+            deletionTarget?.isRecipient == true ? String(localized: "Delete recipient?") : String(localized: "Delete share?"),
+            isPresented: Binding(
+                get: { deletionTarget != nil },
+                set: { if !$0 { deletionTarget = nil } }
+            ),
             titleVisibility: .visible
         ) {
             Button(String(localized: "Delete"), role: .destructive) {
-                if let recipient {
+                switch deletionTarget {
+                case .recipient(let shareID, let recipient) where share.id == shareID:
                     model.removeRecipient(share: share, recipient: recipient) {
                         dismiss()
                     }
-                } else {
+                case .share(let shareID) where share.id == shareID:
                     model.deleteShare(share: share) {
                         dismiss()
                     }
+                default:
+                    // The share changed while the dialog was open: do not delete anything.
+                    break
                 }
+
+                deletionTarget = nil
             }
 
             Button(String(localized: "Cancel"), role: .cancel) {}
         } message: {
-            if recipient == nil {
-                Text(String(localized: "This share will be permanently removed."))
-            } else {
+            if deletionTarget?.isRecipient == true {
                 Text(String(localized: "This recipient will be removed from the share."))
+            } else {
+                Text(String(localized: "This share will be permanently removed."))
             }
         }
     }
@@ -441,14 +489,14 @@ public struct UnifiedShareEditView: View {
     @ViewBuilder
     private func customLinkRows(share: NKUnifiedShare) -> some View {
         if !customLinkRecipients(share).isEmpty {
-            ForEach(customLinkRecipients(share), id: \.value) { recipient in
+            ForEach(customLinkRecipients(share), id: \.unifiedShareIdentity) { recipient in
                 CustomLinkRow(
                     recipient: recipient,
                     onCommit: { token in model.updateRecipientSecret(share: share, recipient: recipient, secret: token) },
                     onRegenerate: { model.regenerateRecipientSecret(share: share, recipient: recipient) }
                 )
                 // Re-seed the row's local token whenever the server-side secret changes.
-                .id(recipient.secret.value)
+                .id("\(recipient.secret.value ?? "")|\(model.recipientSecretResetRevision(share: share, recipient: recipient))")
             }
 
             Text(String(localized: "The link can be changed to be easy to remember, but do not set it to something that is easy to guess."))
@@ -474,7 +522,7 @@ public struct UnifiedShareEditView: View {
     private func recipientDropdown(share: NKUnifiedShare) -> some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 0) {
-                ForEach(model.recipientResults, id: \.value) { recipient in
+                ForEach(Array(model.recipientResults.enumerated()), id: \.element.unifiedShareIdentity) { index, recipient in
                     Button {
                         recipients = ""
                         model.addRecipient(share: share, recipient: recipient) { addedRecipient in
@@ -496,7 +544,7 @@ public struct UnifiedShareEditView: View {
                     }
                     .buttonStyle(.plain)
 
-                    if recipient.value != model.recipientResults.last?.value {
+                    if index < model.recipientResults.count - 1 {
                         Divider()
                     }
                 }
@@ -535,7 +583,7 @@ public struct UnifiedShareEditView: View {
 
     private func recipientPills(share: NKUnifiedShare) -> some View {
         FlowLayout(spacing: 8) {
-            ForEach(peopleRecipients(share), id: \.value) { recipient in
+            ForEach(peopleRecipients(share), id: \.unifiedShareIdentity) { recipient in
                 recipientPill(recipient, share: share)
             }
         }
@@ -553,22 +601,45 @@ public struct UnifiedShareEditView: View {
                 .lineLimit(1)
 
             Button {
-                model.removeRecipient(share: share, recipient: recipient)
+                recipientToDelete = recipient
             } label: {
                 Image(systemName: "xmark")
                     .font(.caption)
                     .foregroundStyle(.secondary)
             }
             .buttonStyle(.plain)
+            .accessibilityLabel(String(localized: "Delete recipient"))
+            .confirmationDialog(
+                String(localized: "Delete recipient?"),
+                isPresented: Binding(
+                    get: {
+                        guard let recipientToDelete else { return false }
+                        return sameRecipient(recipientToDelete, recipient)
+                    },
+                    set: { if !$0 { recipientToDelete = nil } }
+                ),
+                titleVisibility: .visible
+            ) {
+                Button(String(localized: "Delete"), role: .destructive) {
+                    model.removeRecipient(share: share, recipient: recipient)
+                    recipientToDelete = nil
+                }
+
+                Button(String(localized: "Cancel"), role: .cancel) {
+                    recipientToDelete = nil
+                }
+            } message: {
+                Text(String(localized: "This recipient will be removed from the share."))
+            }
         }
         .padding(.horizontal, 12)
         .padding(.vertical, 6)
         .background(Capsule().fill(.quaternary))
         .overlay(Capsule().stroke(.tertiary, lineWidth: 0.5))
-        .contentShape(Capsule())
-        .onTapGesture {
-            model.removeRecipient(share: share, recipient: recipient)
-        }
+    }
+
+    private func sameRecipient(_ lhs: NKUnifiedShareRecipient, _ rhs: NKUnifiedShareRecipient) -> Bool {
+        lhs.unifiedShareIdentity == rhs.unifiedShareIdentity
     }
 
     /// The recipient's URL avatar when available, otherwise a circle with its initial.
@@ -592,16 +663,20 @@ public struct UnifiedShareEditView: View {
             copyButton(share: share)
 
             if isEditingExisting {
+                Spacer()
+
                 deleteAction(share: share)
             } else {
+                Spacer()
+
                 Button(sendLabel) {
                     model.activate(share: share)
                 }
                 .buttonStyle(.borderedProminent)
-                .frame(maxWidth: .infinity)
                 .disabled(!canSend(share))
             }
         }
+        .frame(maxWidth: .infinity)
         .padding(.top, 18)
     }
 
@@ -625,7 +700,6 @@ public struct UnifiedShareEditView: View {
                 }
             }
             .buttonStyle(.bordered)
-            .frame(maxWidth: .infinity)
             .disabled(model.isPreparingLink || !canSend(share))
         } else {
             Button {
@@ -637,7 +711,6 @@ public struct UnifiedShareEditView: View {
                 Text(showsCopied ? String(localized: "Copied") : String(localized: "Copy private link"))
             }
             .buttonStyle(.bordered)
-            .frame(maxWidth: .infinity)
             .disabled(internalLink == nil)
         }
     }
@@ -754,6 +827,19 @@ private extension UnifiedShareEditView {
         case unset
         case custom
         case preset(String)
+    }
+
+    enum EditorDeletionTarget {
+        case share(id: String)
+        case recipient(shareID: String, recipient: NKUnifiedShareRecipient)
+
+        var isRecipient: Bool {
+            if case .recipient = self {
+                return true
+            }
+
+            return false
+        }
     }
 }
 

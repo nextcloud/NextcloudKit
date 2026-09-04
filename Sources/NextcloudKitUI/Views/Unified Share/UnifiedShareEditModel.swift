@@ -36,6 +36,10 @@ public class UnifiedShareEditModel {
     var permissionResetRevision = 0
     /// Per-property revisions used to restore editors after a rejected mutation.
     var propertyResetRevisions: [String: Int] = [:]
+    /// Per-recipient revisions used to restore custom-link tokens after a rejected mutation.
+    var recipientSecretResetRevisions: [UnifiedShareRecipientIdentity: Int] = [:]
+    /// Prevents overlapping permission mutations from applying responses out of order.
+    var isUpdatingPermissions = false
     /// A copy-link activation is in progress.
     var isPreparingLink = false
     /// Set once the draft has been activated (sent), so the sheet can dismiss.
@@ -59,10 +63,13 @@ public class UnifiedShareEditModel {
     }
 
     /// Edit an already-existing share (from the list) rather than creating a new draft.
-    init(account: String, existingShare: NKUnifiedShare) {
+    init(account: String,
+         existingShare: NKUnifiedShare,
+         permissionPresets: [NKUnifiedSharePermissionPreset] = []) {
         self.account = account
         self.sourceId = nil
         self.state = .shareUpdated(share: existingShare)
+        self.permissionPresets = permissionPresets
     }
 
 #if DEBUG
@@ -87,7 +94,12 @@ public class UnifiedShareEditModel {
     }
 
     func setPermissionPreset(share: NKUnifiedShare, presetClass: String) {
+        guard !isUpdatingPermissions else { return }
+        isUpdatingPermissions = true
+
         Task {
+            defer { isUpdatingPermissions = false }
+
             let result = await NextcloudKit.shared.setUnifiedSharePermissionPreset(id: share.id, permissionPresetClass: presetClass, account: account)
             guard let share = result.share else {
                 permissionResetRevision += 1
@@ -100,7 +112,12 @@ public class UnifiedShareEditModel {
     }
 
     func setPermission(share: NKUnifiedShare, permissionClass: String, enabled: Bool) {
+        guard !isUpdatingPermissions else { return }
+        isUpdatingPermissions = true
+
         Task {
+            defer { isUpdatingPermissions = false }
+
             let result = await NextcloudKit.shared.setUnifiedSharePermission(id: share.id, permissionClass: permissionClass, enabled: enabled, account: account)
             guard let share = result.share else {
                 permissionResetRevision += 1
@@ -116,7 +133,12 @@ public class UnifiedShareEditModel {
                                 recipient: NKUnifiedShareRecipient,
                                 permissionClass: String,
                                 enabled: Bool) {
+        guard !isUpdatingPermissions else { return }
+        isUpdatingPermissions = true
+
         Task {
+            defer { isUpdatingPermissions = false }
+
             let result = await NextcloudKit.shared.setUnifiedShareRecipientPermission(
                 id: share.id,
                 recipientClass: recipient.class,
@@ -139,7 +161,12 @@ public class UnifiedShareEditModel {
     func setRecipientPermissionPreset(share: NKUnifiedShare,
                                       recipient: NKUnifiedShareRecipient,
                                       presetClass: String) {
+        guard !isUpdatingPermissions else { return }
+        isUpdatingPermissions = true
+
         Task {
+            defer { isUpdatingPermissions = false }
+
             var currentShare = share
 
             for permission in recipient.permissions {
@@ -318,7 +345,13 @@ public class UnifiedShareEditModel {
                       recipient: NKUnifiedShareRecipient,
                       completion: @escaping (NKUnifiedShareRecipient) -> Void) {
         Task {
-            let result = await NextcloudKit.shared.addUnifiedShareRecipient(id: share.id, recipientClass: recipient.class, value: recipient.value, account: account)
+            let result = await NextcloudKit.shared.addUnifiedShareRecipient(
+                id: share.id,
+                recipientClass: recipient.class,
+                value: recipient.value,
+                instance: recipient.instance,
+                account: account
+            )
             guard let share = result.share else {
                 mutationError = result.error
                 return
@@ -328,9 +361,7 @@ public class UnifiedShareEditModel {
             recipientResults = []
 
             if let addedRecipient = share.recipients.first(where: {
-                $0.class == recipient.class
-                    && $0.value == recipient.value
-                    && $0.instance == recipient.instance
+                $0.unifiedShareIdentity == recipient.unifiedShareIdentity
             }) {
                 completion(addedRecipient)
             }
@@ -411,6 +442,7 @@ public class UnifiedShareEditModel {
         Task {
             let result = await NextcloudKit.shared.setUnifiedShareRecipientSecret(id: share.id, recipientClass: recipient.class, value: recipient.value, secret: secret, instance: recipient.instance, account: account)
             guard let share = result.share else {
+                recipientSecretResetRevisions[recipientIdentity(share: share, recipient: recipient), default: 0] += 1
                 mutationError = result.error
                 return
             }
@@ -430,5 +462,14 @@ public class UnifiedShareEditModel {
 
             updateRecipientSecret(share: share, recipient: recipient, secret: secret)
         }
+    }
+
+    func recipientSecretResetRevision(share: NKUnifiedShare, recipient: NKUnifiedShareRecipient) -> Int {
+        recipientSecretResetRevisions[recipientIdentity(share: share, recipient: recipient)] ?? 0
+    }
+
+    private func recipientIdentity(share: NKUnifiedShare,
+                                   recipient: NKUnifiedShareRecipient) -> UnifiedShareRecipientIdentity {
+        UnifiedShareRecipientIdentity(shareID: share.id, recipient: recipient)
     }
 }

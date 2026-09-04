@@ -17,6 +17,7 @@ enum UnifiedShareListState {
 public class UnifiedShareListModel {
     var state: UnifiedShareListState = .loading
     var permissionPresets: [NKUnifiedSharePermissionPreset] = []
+    var recipientsUpdatingPermissions: Set<UnifiedShareRecipientIdentity> = []
     /// Handler for failures that shouldn't replace visible content (the app shows a banner).
     let onError: ((NKError) -> Void)?
     let account: String
@@ -83,7 +84,12 @@ public class UnifiedShareListModel {
     func setPermissionPreset(share: NKUnifiedShare,
                              recipient: NKUnifiedShareRecipient,
                              presetClass: String) {
+        let recipientID = permissionUpdateIdentity(share: share, recipient: recipient)
+        guard recipientsUpdatingPermissions.insert(recipientID).inserted else { return }
+
         Task {
+            defer { recipientsUpdatingPermissions.remove(recipientID) }
+
             var currentShare = share
 
             for permission in recipient.permissions {
@@ -112,6 +118,15 @@ public class UnifiedShareListModel {
 
             replace(currentShare)
         }
+    }
+
+    func isUpdatingPermissions(for recipient: NKUnifiedShareRecipient, in share: NKUnifiedShare) -> Bool {
+        recipientsUpdatingPermissions.contains(permissionUpdateIdentity(share: share, recipient: recipient))
+    }
+
+    private func permissionUpdateIdentity(share: NKUnifiedShare,
+                                          recipient: NKUnifiedShareRecipient) -> UnifiedShareRecipientIdentity {
+        UnifiedShareRecipientIdentity(shareID: share.id, recipient: recipient)
     }
 
     private func replace(_ updated: NKUnifiedShare) {

@@ -63,7 +63,8 @@ public struct UnifiedShareListView: View {
                             account: account,
                             share: editor.share,
                             recipient: recipient,
-                            internalLink: internalLink
+                            internalLink: internalLink,
+                            permissionPresets: model.permissionPresets
                         )
                     } else {
                         UnifiedShareEditView(
@@ -71,7 +72,8 @@ public struct UnifiedShareListView: View {
                             share: editor.share,
                             internalLink: internalLink,
                             expandSettings: editor.expandSettings,
-                            forceCustomPermissions: editor.forceCustomPermissions
+                            forceCustomPermissions: editor.forceCustomPermissions,
+                            permissionPresets: model.permissionPresets
                         )
                     }
                 }
@@ -135,7 +137,7 @@ public struct UnifiedShareListView: View {
             let isExpanded = expansionBinding(for: share)
 
             DisclosureGroup(isExpanded: isExpanded) {
-                ForEach(Array(share.recipients.enumerated()), id: \.offset) { _, recipient in
+                ForEach(share.recipients, id: \.unifiedShareIdentity) { recipient in
                     recipientRow(recipient, in: share)
                 }
             } label: {
@@ -165,9 +167,15 @@ public struct UnifiedShareListView: View {
         } else {
             HStack(spacing: 8) {
                 shareRow(share)
-                    .contentShape(Rectangle())
-                    .onTapGesture {
-                        editing = ShareEditor(share: share, recipient: share.recipients.first)
+                    .background {
+                        Button {
+                            editing = ShareEditor(share: share, recipient: share.recipients.first)
+                        } label: {
+                            Color.clear
+                                .contentShape(Rectangle())
+                        }
+                        .buttonStyle(.plain)
+                        .accessibilityLabel(share.recipients.first?.displayName ?? "")
                     }
             }
         }
@@ -227,7 +235,7 @@ public struct UnifiedShareListView: View {
                 .frame(width: 32, height: 32)
         } else {
             HStack(spacing: -10) {
-                ForEach(Array(visibleRecipients.enumerated()), id: \.offset) { index, recipient in
+                ForEach(Array(visibleRecipients.enumerated()), id: \.element.unifiedShareIdentity) { index, recipient in
                     recipientAvatar(recipient)
                         .frame(width: 32, height: 32)
                         .clipShape(Circle())
@@ -305,6 +313,7 @@ public struct UnifiedShareListView: View {
         }
         .buttonStyle(.plain)
         .fixedSize()
+        .disabled(model.isUpdatingPermissions(for: recipient, in: share))
     }
 
     private func expansionBinding(for share: NKUnifiedShare) -> Binding<Bool> {
