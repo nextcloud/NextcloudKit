@@ -169,7 +169,7 @@ public struct UnifiedShareListView: View {
                 shareRow(share)
                     .background {
                         Button {
-                            editing = ShareEditor(share: share, recipient: editableRecipient(share.recipients.first))
+                            editing = ShareEditor(share: share, recipient: share.recipients.first)
                         } label: {
                             Color.clear
                                 .contentShape(Rectangle())
@@ -276,7 +276,7 @@ public struct UnifiedShareListView: View {
         }
         .background {
             Button {
-                editing = ShareEditor(share: share, recipient: editableRecipient(recipient))
+                editing = ShareEditor(share: share, recipient: recipient)
             } label: {
                 Color.clear
                     .contentShape(Rectangle())
@@ -297,7 +297,7 @@ public struct UnifiedShareListView: View {
             Divider()
 
             Button(String(localized: "Can…")) {
-                editing = ShareEditor(share: share, recipient: editableRecipient(recipient))
+                editing = ShareEditor(share: share, recipient: recipient)
             }
         } label: {
             HStack(spacing: 2) {
@@ -384,11 +384,6 @@ public struct UnifiedShareListView: View {
 
     private func isLink(_ recipient: NKUnifiedShareRecipient) -> Bool {
         recipient.secret.updatable
-    }
-
-    private func editableRecipient(_ recipient: NKUnifiedShareRecipient?) -> NKUnifiedShareRecipient? {
-        guard let recipient, !recipient.permissions.isEmpty else { return nil }
-        return recipient
     }
 
     private func iconURL(_ icon: NKUnifiedShareIcon) -> String? {

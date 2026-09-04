@@ -91,20 +91,10 @@ public class UnifiedShareListModel {
         Task {
             defer { recipientsUpdatingPermissions.remove(recipientID) }
 
-            if recipient.permissions.isEmpty {
-                let result = await NextcloudKit.shared.setUnifiedSharePermissionPreset(id: share.id, permissionPresetClass: presetClass, account: account)
-                guard let updated = result.share else {
-                    onError?(result.error)
-                    return
-                }
-
-                replace(updated)
-                return
-            }
-
             var currentShare = share
+            let permissions = recipient.permissions.isEmpty ? share.permissions : recipient.permissions
 
-            for permission in recipient.permissions {
+            for permission in permissions {
                 let enabled = permission.presets.contains(presetClass)
                 guard permission.enabled != enabled else {
                     continue

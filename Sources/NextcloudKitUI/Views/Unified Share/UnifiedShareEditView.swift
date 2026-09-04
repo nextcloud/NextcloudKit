@@ -259,9 +259,9 @@ public struct UnifiedShareEditView: View {
     private func recipientPermissionField(share: NKUnifiedShare, recipient: NKUnifiedShareRecipient) -> some View {
         Picker(recipient.displayName, selection: Binding(
             get: {
-                isRecipientCustomSelected(recipient)
+                isRecipientCustomSelected(recipient, in: share)
                     ? Self.customTag
-                    : (selectedRecipientPresetClass(recipient) ?? Self.customTag)
+                    : (selectedRecipientPresetClass(recipient, in: share) ?? Self.customTag)
             },
             set: { tag in
                 if tag == Self.customTag {
@@ -272,7 +272,7 @@ public struct UnifiedShareEditView: View {
                 }
             }
         )) {
-            ForEach(applicablePresets(recipient), id: \.class) { preset in
+            ForEach(applicablePresets(recipient, in: share), id: \.class) { preset in
                 Text(preset.displayName)
                     .tag(preset.class)
             }
@@ -283,8 +283,8 @@ public struct UnifiedShareEditView: View {
         .pickerStyle(.menu)
         .disabled(model.isUpdatingPermissions)
 
-        if isRecipientCustomSelected(recipient) {
-            ForEach(recipient.permissions, id: \.class) { permission in
+        if isRecipientCustomSelected(recipient, in: share) {
+            ForEach(effectivePermissions(recipient, in: share), id: \.class) { permission in
                 PermissionToggleRow(permission: permission) { enabled in
                     model.setRecipientPermission(
                         share: share,
@@ -304,13 +304,9 @@ public struct UnifiedShareEditView: View {
             return nil
         }
 
-        guard let recipient = share.recipients.first(where: {
+        return share.recipients.first(where: {
             $0.unifiedShareIdentity == selectedRecipient.unifiedShareIdentity
-        }), !recipient.permissions.isEmpty else {
-            return nil
-        }
-
-        return recipient
+        })
     }
 
     private func shareeTypePicker(share: NKUnifiedShare) -> some View {
@@ -375,8 +371,12 @@ public struct UnifiedShareEditView: View {
         return model.permissionPresets.filter { applicable.contains($0.class) }
     }
 
-    private func applicablePresets(_ recipient: NKUnifiedShareRecipient) -> [NKUnifiedSharePermissionPreset] {
-        let applicable = Set(recipient.permissions.flatMap { $0.presets })
+    private func effectivePermissions(_ recipient: NKUnifiedShareRecipient, in share: NKUnifiedShare) -> [NKUnifiedSharePermission] {
+        recipient.permissions.isEmpty ? share.permissions : recipient.permissions
+    }
+
+    private func applicablePresets(_ recipient: NKUnifiedShareRecipient, in share: NKUnifiedShare) -> [NKUnifiedSharePermissionPreset] {
+        let applicable = Set(effectivePermissions(recipient, in: share).flatMap { $0.presets })
         return model.permissionPresets.filter { applicable.contains($0.class) }
     }
 
@@ -398,11 +398,11 @@ public struct UnifiedShareEditView: View {
         return !applicablePresets(share).contains { $0.class == presetClass }
     }
 
-    private func selectedRecipientPresetClass(_ recipient: NKUnifiedShareRecipient) -> String? {
+    private func selectedRecipientPresetClass(_ recipient: NKUnifiedShareRecipient, in share: NKUnifiedShare) -> String? {
         switch permissionSelection {
         case .unset:
-            return applicablePresets(recipient).first { preset in
-                recipient.permissions.allSatisfy { permission in
+            return applicablePresets(recipient, in: share).first { preset in
+                effectivePermissions(recipient, in: share).allSatisfy { permission in
                     permission.enabled == permission.presets.contains(preset.class)
                 }
             }?.class
@@ -413,12 +413,12 @@ public struct UnifiedShareEditView: View {
         }
     }
 
-    private func isRecipientCustomSelected(_ recipient: NKUnifiedShareRecipient) -> Bool {
-        guard let presetClass = selectedRecipientPresetClass(recipient) else {
+    private func isRecipientCustomSelected(_ recipient: NKUnifiedShareRecipient, in share: NKUnifiedShare) -> Bool {
+        guard let presetClass = selectedRecipientPresetClass(recipient, in: share) else {
             return true
         }
 
-        return !applicablePresets(recipient).contains { $0.class == presetClass }
+        return !applicablePresets(recipient, in: share).contains { $0.class == presetClass }
     }
 
     /// Advanced properties + editable link tokens live behind the disclosure; basic properties inline.
@@ -537,7 +537,7 @@ public struct UnifiedShareEditView: View {
                     Button {
                         recipients = ""
                         model.addRecipient(share: share, recipient: recipient) { addedRecipient in
-                            selectedRecipient = addedRecipient.permissions.isEmpty ? nil : addedRecipient
+                            selectedRecipient = addedRecipient
                             permissionSelection = .unset
                         }
                     } label: {
