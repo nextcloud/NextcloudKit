@@ -5660,17 +5660,6 @@
           }
         }
       }
-    },
-    "Update share" : {
-      "comment" : "Button that finishes editing a unified share after its permissions changed.",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Update share"
-          }
-        }
-      }
     }
   },
   "version" : "1.0"

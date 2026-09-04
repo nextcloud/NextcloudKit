@@ -32,6 +32,10 @@ public class UnifiedShareEditModel {
     var propertyErrors: [String: String] = [:]
     /// Transient mutation failure, shown as an alert while the form stays usable.
     var mutationError: NKError?
+    /// Changes on a failed permission mutation so controls are recreated from server values.
+    var permissionResetRevision = 0
+    /// Per-property revisions used to restore editors after a rejected mutation.
+    var propertyResetRevisions: [String: Int] = [:]
     /// A copy-link activation is in progress.
     var isPreparingLink = false
     /// Set once the draft has been activated (sent), so the sheet can dismiss.
@@ -86,6 +90,7 @@ public class UnifiedShareEditModel {
         Task {
             let result = await NextcloudKit.shared.setUnifiedSharePermissionPreset(id: share.id, permissionPresetClass: presetClass, account: account)
             guard let share = result.share else {
+                permissionResetRevision += 1
                 mutationError = result.error
                 return
             }
@@ -98,6 +103,7 @@ public class UnifiedShareEditModel {
         Task {
             let result = await NextcloudKit.shared.setUnifiedSharePermission(id: share.id, permissionClass: permissionClass, enabled: enabled, account: account)
             guard let share = result.share else {
+                permissionResetRevision += 1
                 mutationError = result.error
                 return
             }
@@ -121,6 +127,7 @@ public class UnifiedShareEditModel {
                 account: account
             )
             guard let share = result.share else {
+                permissionResetRevision += 1
                 mutationError = result.error
                 return
             }
@@ -152,6 +159,7 @@ public class UnifiedShareEditModel {
                 )
                 guard let updatedShare = result.share else {
                     state = .shareUpdated(share: currentShare)
+                    permissionResetRevision += 1
                     mutationError = result.error
                     return
                 }
@@ -363,10 +371,9 @@ public class UnifiedShareEditModel {
             pendingProperties.remove(propertyClass)
 
             guard let share = result.share else {
-                if !isClearing {
-                    let description = result.error.errorDescription
-                    propertyErrors[propertyClass] = description.isEmpty ? String(localized: "Failed to update share.") : description
-                }
+                let description = result.error.errorDescription
+                propertyErrors[propertyClass] = description.isEmpty ? String(localized: "Failed to update share.") : description
+                propertyResetRevisions[propertyClass, default: 0] += 1
 
                 return
             }

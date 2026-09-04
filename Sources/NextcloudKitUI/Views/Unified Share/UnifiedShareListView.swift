@@ -59,7 +59,12 @@ public struct UnifiedShareListView: View {
             }) { editor in
                 NavigationStack {
                     if let recipient = editor.recipient {
-                        UnifiedShareEditView(account: account, share: editor.share, recipient: recipient)
+                        UnifiedShareEditView(
+                            account: account,
+                            share: editor.share,
+                            recipient: recipient,
+                            internalLink: internalLink
+                        )
                     } else {
                         UnifiedShareEditView(
                             account: account,

@@ -24,8 +24,6 @@ public struct UnifiedShareEditView: View {
     @State private var isSettingsExpanded = false
     @State private var recipients = ""
     @State private var showsDeleteConfirmation = false
-    @State private var hasPermissionChanges = false
-    @State private var isNewlyAddedRecipient = false
     /// Hides the audience-dependent rows while a switch is running.
     @State private var showsRows = true
     @State private var showsCopied = false
@@ -52,9 +50,12 @@ public struct UnifiedShareEditView: View {
     }
 
     /// Open the permissions editor for one recipient of an existing share.
-    public init(account: String, share: NKUnifiedShare, recipient: NKUnifiedShareRecipient) {
+    public init(account: String,
+                share: NKUnifiedShare,
+                recipient: NKUnifiedShareRecipient,
+                internalLink: String? = nil) {
         self.isEditingExisting = true
-        self.internalLink = nil
+        self.internalLink = internalLink
         model = UnifiedShareEditModel(account: account, existingShare: share)
         _selectedRecipient = State(initialValue: recipient)
         _shareeType = State(initialValue: .invited)
@@ -82,7 +83,7 @@ public struct UnifiedShareEditView: View {
                         }
 
                         if showsRows, shareeType == .invited {
-                            if !peopleRecipients(share).isEmpty {
+                            if selectedRecipient == nil, !peopleRecipients(share).isEmpty {
                                 recipientPills(share: share)
                                     .listRowSeparator(.hidden)
                             }
@@ -111,18 +112,22 @@ public struct UnifiedShareEditView: View {
                                 PropertyRow(property: property, error: model.propertyErrors[property.class]) { value in
                                     model.setProperty(share: share, propertyClass: property.class, value: value)
                                 }
+                                .id("\(property.class)|\(model.propertyResetRevisions[property.class] ?? 0)")
                             }
 
                             settingsRow(share: share)
                         }
 
-                        if !model.isSwitchingAudience, structuralCanSend(share) {
+                        if !model.isSwitchingAudience, isEditingExisting || structuralCanSend(share) {
                             actionButtons(share: share)
                         }
                     }
                     .scrollDismissesKeyboard(.immediately)
                     .onChange(of: model.isSwitchingAudience) {
                         showsRows = !model.isSwitchingAudience
+                    }
+                    .onChange(of: model.permissionResetRevision) {
+                        permissionSelection = .unset
                     }
                     // An overlay, not a Form row: conditional row insertion driven by the
                     // observable flag stops rendering after the first cycle.
@@ -230,7 +235,6 @@ public struct UnifiedShareEditView: View {
                     permissionSelection = .custom
                 } else {
                     permissionSelection = .preset(tag)
-                    hasPermissionChanges = true
                     model.setRecipientPermissionPreset(share: share, recipient: recipient, presetClass: tag)
                 }
             }
@@ -248,7 +252,6 @@ public struct UnifiedShareEditView: View {
         if isRecipientCustomSelected(recipient) {
             ForEach(recipient.permissions, id: \.class) { permission in
                 PermissionToggleRow(permission: permission) { enabled in
-                    hasPermissionChanges = true
                     model.setRecipientPermission(
                         share: share,
                         recipient: recipient,
@@ -256,7 +259,7 @@ public struct UnifiedShareEditView: View {
                         enabled: enabled
                     )
                 }
-                .id(permission.enabled)
+                .id("\(permission.class)|\(permission.enabled)|\(model.permissionResetRevision)")
             }
         }
     }
@@ -297,7 +300,6 @@ public struct UnifiedShareEditView: View {
                     permissionSelection = .custom
                 } else {
                     permissionSelection = .preset(tag)
-                    hasPermissionChanges = true
                     model.setPermissionPreset(share: share, presetClass: tag)
                 }
             }
@@ -316,12 +318,11 @@ public struct UnifiedShareEditView: View {
         if isCustomSelected(share) {
             ForEach(share.permissions, id: \.class) { permission in
                 PermissionToggleRow(permission: permission) { enabled in
-                    hasPermissionChanges = true
                     model.setPermission(share: share, permissionClass: permission.class, enabled: enabled)
                 }
                 // Re-seed the toggle whenever the server's enabled value changes (e.g. after a
                 // preset like "Can edit" recomputes the permissions), not just on first render.
-                .id(permission.enabled)
+                .id("\(permission.class)|\(permission.enabled)|\(model.permissionResetRevision)")
             }
         }
     }
@@ -389,6 +390,7 @@ public struct UnifiedShareEditView: View {
                     PropertyRow(property: property, error: model.propertyErrors[property.class]) { value in
                         model.setProperty(share: share, propertyClass: property.class, value: value)
                     }
+                    .id("\(property.class)|\(model.propertyResetRevisions[property.class] ?? 0)")
                 }
 
                 customLinkRows(share: share)
@@ -478,7 +480,6 @@ public struct UnifiedShareEditView: View {
                         model.addRecipient(share: share, recipient: recipient) { addedRecipient in
                             selectedRecipient = addedRecipient
                             permissionSelection = .unset
-                            isNewlyAddedRecipient = true
                         }
                     } label: {
                         HStack(spacing: 10) {
@@ -534,18 +535,10 @@ public struct UnifiedShareEditView: View {
 
     private func recipientPills(share: NKUnifiedShare) -> some View {
         FlowLayout(spacing: 8) {
-            ForEach(visiblePeopleRecipients(share), id: \.value) { recipient in
+            ForEach(peopleRecipients(share), id: \.value) { recipient in
                 recipientPill(recipient, share: share)
             }
         }
-    }
-
-    private func visiblePeopleRecipients(_ share: NKUnifiedShare) -> [NKUnifiedShareRecipient] {
-        if let recipient = currentSelectedRecipient(in: share) {
-            return [recipient]
-        }
-
-        return peopleRecipients(share)
     }
 
     private func peopleRecipients(_ share: NKUnifiedShare) -> [NKUnifiedShareRecipient] {
@@ -600,14 +593,14 @@ public struct UnifiedShareEditView: View {
 
             if isEditingExisting {
                 deleteAction(share: share)
+            } else {
+                Button(sendLabel) {
+                    model.activate(share: share)
+                }
+                .buttonStyle(.borderedProminent)
+                .frame(maxWidth: .infinity)
+                .disabled(!canSend(share))
             }
-
-            Button(sendLabel) {
-                model.activate(share: share)
-            }
-            .buttonStyle(.borderedProminent)
-            .frame(maxWidth: .infinity)
-            .disabled(!canSend(share))
         }
         .padding(.top, 18)
     }
@@ -665,14 +658,6 @@ public struct UnifiedShareEditView: View {
     private var sendLabel: String {
         if shareeType == .anyone {
             return String(localized: "Share public link")
-        }
-
-        if selectedRecipient != nil {
-            return isNewlyAddedRecipient ? String(localized: "Save share") : String(localized: "Update share")
-        }
-
-        if isEditingExisting, hasPermissionChanges {
-            return String(localized: "Update share")
         }
 
         return String(localized: "Save share")
