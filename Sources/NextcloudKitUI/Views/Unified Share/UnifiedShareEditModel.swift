@@ -129,6 +129,40 @@ public class UnifiedShareEditModel {
         }
     }
 
+    func setRecipientPermissionPreset(share: NKUnifiedShare,
+                                      recipient: NKUnifiedShareRecipient,
+                                      presetClass: String) {
+        Task {
+            var currentShare = share
+
+            for permission in recipient.permissions {
+                let enabled = permission.presets.contains(presetClass)
+                guard permission.enabled != enabled else {
+                    continue
+                }
+
+                let result = await NextcloudKit.shared.setUnifiedShareRecipientPermission(
+                    id: currentShare.id,
+                    recipientClass: recipient.class,
+                    recipientValue: recipient.value,
+                    recipientInstance: recipient.instance,
+                    permissionClass: permission.class,
+                    enabled: enabled,
+                    account: account
+                )
+                guard let updatedShare = result.share else {
+                    state = .shareUpdated(share: currentShare)
+                    mutationError = result.error
+                    return
+                }
+
+                currentShare = updatedShare
+            }
+
+            state = .shareUpdated(share: currentShare)
+        }
+    }
+
     func createShare() {
         Task {
             let result = await NextcloudKit.shared.createUnifiedShare(account: account)

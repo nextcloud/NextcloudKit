@@ -73,12 +73,12 @@ public struct UnifiedShareEditView: View {
 
                     Form {
                         // The audience is only selectable for a new draft; an existing share's is fixed.
-                        if !isEditingExisting, selectedRecipient == nil {
+                        if !isEditingExisting {
                             shareeTypePicker(share: share)
                                 .disabled(model.isSwitchingAudience)
                         }
 
-                        if selectedRecipient == nil, showsRows, shareeType == .invited {
+                        if showsRows, shareeType == .invited {
                             if !peopleRecipients(share).isEmpty {
                                 recipientPills(share: share)
                                     .listRowSeparator(.hidden)
@@ -97,21 +97,21 @@ public struct UnifiedShareEditView: View {
 
                         if showsRows {
                             if let recipient = currentSelectedRecipient(in: share) {
-                                recipientPermissionFields(share: share, recipient: recipient)
-                            } else if selectedRecipient == nil {
+                                recipientPermissionField(share: share, recipient: recipient)
+                            } else {
                                 permissionField(share: share)
-
-                                ForEach(basicProperties(share), id: \.class) { property in
-                                    PropertyRow(property: property, error: model.propertyErrors[property.class]) { value in
-                                        model.setProperty(share: share, propertyClass: property.class, value: value)
-                                    }
-                                }
-
-                                settingsRow(share: share)
                             }
+
+                            ForEach(basicProperties(share), id: \.class) { property in
+                                PropertyRow(property: property, error: model.propertyErrors[property.class]) { value in
+                                    model.setProperty(share: share, propertyClass: property.class, value: value)
+                                }
+                            }
+
+                            settingsRow(share: share)
                         }
 
-                        if selectedRecipient == nil, !model.isSwitchingAudience, structuralCanSend(share) {
+                        if !model.isSwitchingAudience, structuralCanSend(share) {
                             actionButtons(share: share)
                         }
                     }
@@ -193,7 +193,7 @@ public struct UnifiedShareEditView: View {
                 model.createShare()
             }
 
-            if selectedRecipient == nil, model.permissionPresets.isEmpty {
+            if model.permissionPresets.isEmpty {
                 model.loadCapabilities()
             }
         }
@@ -204,10 +204,6 @@ public struct UnifiedShareEditView: View {
     }
 
     private var navigationTitle: String {
-        if let selectedRecipient {
-            return selectedRecipient.displayName
-        }
-
         guard case .shareUpdated(let share) = model.state else {
             return ""
         }
@@ -217,17 +213,44 @@ public struct UnifiedShareEditView: View {
     }
 
     @ViewBuilder
-    private func recipientPermissionFields(share: NKUnifiedShare, recipient: NKUnifiedShareRecipient) -> some View {
-        ForEach(recipient.permissions, id: \.class) { permission in
-            PermissionToggleRow(permission: permission) { enabled in
-                model.setRecipientPermission(
-                    share: share,
-                    recipient: recipient,
-                    permissionClass: permission.class,
-                    enabled: enabled
-                )
+    private func recipientPermissionField(share: NKUnifiedShare, recipient: NKUnifiedShareRecipient) -> some View {
+        Picker(recipient.displayName, selection: Binding(
+            get: {
+                isRecipientCustomSelected(recipient)
+                    ? Self.customTag
+                    : (selectedRecipientPresetClass(recipient) ?? Self.customTag)
+            },
+            set: { tag in
+                if tag == Self.customTag {
+                    permissionSelection = .custom
+                } else {
+                    permissionSelection = .preset(tag)
+                    model.setRecipientPermissionPreset(share: share, recipient: recipient, presetClass: tag)
+                }
             }
-            .id(permission.enabled)
+        )) {
+            ForEach(applicablePresets(recipient), id: \.class) { preset in
+                Text(preset.displayName)
+                    .tag(preset.class)
+            }
+
+            Text(String(localized: "Can…"))
+                .tag(Self.customTag)
+        }
+        .pickerStyle(.menu)
+
+        if isRecipientCustomSelected(recipient) {
+            ForEach(recipient.permissions, id: \.class) { permission in
+                PermissionToggleRow(permission: permission) { enabled in
+                    model.setRecipientPermission(
+                        share: share,
+                        recipient: recipient,
+                        permissionClass: permission.class,
+                        enabled: enabled
+                    )
+                }
+                .id(permission.enabled)
+            }
         }
     }
 
@@ -302,6 +325,11 @@ public struct UnifiedShareEditView: View {
         return model.permissionPresets.filter { applicable.contains($0.class) }
     }
 
+    private func applicablePresets(_ recipient: NKUnifiedShareRecipient) -> [NKUnifiedSharePermissionPreset] {
+        let applicable = Set(recipient.permissions.flatMap { $0.presets })
+        return model.permissionPresets.filter { applicable.contains($0.class) }
+    }
+
     /// The effective preset class: the user's pick, else the share's server-side preset.
     private func selectedPresetClass(_ share: NKUnifiedShare) -> String? {
         switch permissionSelection {
@@ -318,6 +346,29 @@ public struct UnifiedShareEditView: View {
         }
 
         return !applicablePresets(share).contains { $0.class == presetClass }
+    }
+
+    private func selectedRecipientPresetClass(_ recipient: NKUnifiedShareRecipient) -> String? {
+        switch permissionSelection {
+        case .unset:
+            return applicablePresets(recipient).first { preset in
+                recipient.permissions.allSatisfy { permission in
+                    permission.enabled == permission.presets.contains(preset.class)
+                }
+            }?.class
+        case .custom:
+            return nil
+        case .preset(let presetClass):
+            return presetClass
+        }
+    }
+
+    private func isRecipientCustomSelected(_ recipient: NKUnifiedShareRecipient) -> Bool {
+        guard let presetClass = selectedRecipientPresetClass(recipient) else {
+            return true
+        }
+
+        return !applicablePresets(recipient).contains { $0.class == presetClass }
     }
 
     /// Advanced properties + editable link tokens live behind the disclosure; basic properties inline.
@@ -432,10 +483,18 @@ public struct UnifiedShareEditView: View {
 
     private func recipientPills(share: NKUnifiedShare) -> some View {
         FlowLayout(spacing: 8) {
-            ForEach(peopleRecipients(share), id: \.value) { recipient in
+            ForEach(visiblePeopleRecipients(share), id: \.value) { recipient in
                 recipientPill(recipient, share: share)
             }
         }
+    }
+
+    private func visiblePeopleRecipients(_ share: NKUnifiedShare) -> [NKUnifiedShareRecipient] {
+        if let recipient = currentSelectedRecipient(in: share) {
+            return [recipient]
+        }
+
+        return peopleRecipients(share)
     }
 
     private func peopleRecipients(_ share: NKUnifiedShare) -> [NKUnifiedShareRecipient] {

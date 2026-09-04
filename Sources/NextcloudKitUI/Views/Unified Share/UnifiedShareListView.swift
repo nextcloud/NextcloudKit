@@ -166,6 +166,10 @@ public struct UnifiedShareListView: View {
             } label: {
                 HStack(spacing: 8) {
                     shareRow(share, showsAvatars: !isExpanded.wrappedValue)
+                        .contentShape(Rectangle())
+                        .onTapGesture {
+                            editing = ShareEditor(share: share)
+                        }
 
                     Button {
                         withAnimation {
