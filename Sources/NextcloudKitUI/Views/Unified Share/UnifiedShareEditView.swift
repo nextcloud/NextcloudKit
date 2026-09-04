@@ -304,9 +304,13 @@ public struct UnifiedShareEditView: View {
             return nil
         }
 
-        return share.recipients.first {
+        guard let recipient = share.recipients.first(where: {
             $0.unifiedShareIdentity == selectedRecipient.unifiedShareIdentity
+        }), !recipient.permissions.isEmpty else {
+            return nil
         }
+
+        return recipient
     }
 
     private func shareeTypePicker(share: NKUnifiedShare) -> some View {
@@ -533,7 +537,7 @@ public struct UnifiedShareEditView: View {
                     Button {
                         recipients = ""
                         model.addRecipient(share: share, recipient: recipient) { addedRecipient in
-                            selectedRecipient = addedRecipient
+                            selectedRecipient = addedRecipient.permissions.isEmpty ? nil : addedRecipient
                             permissionSelection = .unset
                         }
                     } label: {
