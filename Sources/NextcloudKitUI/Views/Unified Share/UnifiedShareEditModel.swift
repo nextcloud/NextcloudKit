@@ -107,7 +107,12 @@ public class UnifiedShareEditModel {
                 return
             }
 
-            state = .shareUpdated(share: share)
+            let propagation = await propagateTopPermissions(from: share)
+            state = .shareUpdated(share: propagation.share)
+
+            if !propagation.succeeded {
+                permissionResetRevision += 1
+            }
         }
     }
 
@@ -125,8 +130,51 @@ public class UnifiedShareEditModel {
                 return
             }
 
-            state = .shareUpdated(share: share)
+            let propagation = await propagateTopPermissions(from: share, permissionClasses: [permissionClass])
+            state = .shareUpdated(share: propagation.share)
+
+            if !propagation.succeeded {
+                permissionResetRevision += 1
+            }
         }
+    }
+
+    /// Applies changed top-level permissions to every recipient, overriding recipient-specific values.
+    private func propagateTopPermissions(from share: NKUnifiedShare,
+                                         permissionClasses: Set<String>? = nil) async -> (share: NKUnifiedShare, succeeded: Bool) {
+        var currentShare = share
+        let targetPermissions = share.permissions.filter { permissionClasses?.contains($0.class) ?? true }
+
+        for originalRecipient in share.recipients {
+            let identity = originalRecipient.unifiedShareIdentity
+
+            for targetPermission in targetPermissions {
+                guard let recipient = currentShare.recipients.first(where: { $0.unifiedShareIdentity == identity }),
+                      let effectivePermission = recipient.effectivePermissions(in: currentShare).first(where: { $0.class == targetPermission.class }),
+                      effectivePermission.enabled != targetPermission.enabled else {
+                    continue
+                }
+
+                let result = await NextcloudKit.shared.setUnifiedShareRecipientPermission(
+                    id: currentShare.id,
+                    recipientClass: recipient.class,
+                    recipientValue: recipient.value,
+                    recipientInstance: recipient.instance,
+                    permissionClass: targetPermission.class,
+                    enabled: targetPermission.enabled,
+                    account: account
+                )
+
+                guard let updatedShare = result.share else {
+                    mutationError = result.error
+                    return (currentShare, false)
+                }
+
+                currentShare = updatedShare
+            }
+        }
+
+        return (currentShare, true)
     }
 
     func setRecipientPermission(share: NKUnifiedShare,
