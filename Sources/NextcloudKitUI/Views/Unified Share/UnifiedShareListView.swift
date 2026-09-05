@@ -274,6 +274,7 @@ public struct UnifiedShareListView: View {
 
             Spacer()
         }
+        .padding(.vertical, 4)
         .background {
             Button {
                 editing = ShareEditor(share: share, recipient: recipient)
