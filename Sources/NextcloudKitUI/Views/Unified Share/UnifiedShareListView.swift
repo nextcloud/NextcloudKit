@@ -169,7 +169,7 @@ public struct UnifiedShareListView: View {
                 shareRow(share)
                     .background {
                         Button {
-                            editing = ShareEditor(share: share, recipient: share.recipients.first)
+                            editing = ShareEditor(share: share)
                         } label: {
                             Color.clear
                                 .contentShape(Rectangle())
