@@ -1070,6 +1070,7 @@ private struct TextPropertyEditor: View {
     let onCommit: (String?) -> Void
     @State private var text: String
     @State private var committed: String
+    @State private var isPasswordVisible = false
     @FocusState private var focused: Bool
 
     init(property: NKUnifiedShareProperty, secure: Bool, onCommit: @escaping (String?) -> Void) {
@@ -1082,16 +1083,29 @@ private struct TextPropertyEditor: View {
     }
 
     var body: some View {
-        field
-            .focused($focused)
-            .onChange(of: focused) {
-                if !focused {
-                    commit()
+        HStack {
+            field
+                .focused($focused)
+
+            if secure {
+                Button {
+                    isPasswordVisible.toggle()
+                } label: {
+                    Image(systemName: isPasswordVisible ? "eye.slash" : "eye")
+                        .foregroundStyle(.secondary)
                 }
+                .buttonStyle(.plain)
+                .accessibilityLabel(isPasswordVisible ? String(localized: "Hide password") : String(localized: "Show password"))
             }
-            .onSubmit {
+        }
+        .onChange(of: focused) {
+            if !focused {
                 commit()
             }
+        }
+        .onSubmit {
+            commit()
+        }
     }
 
     private var isMultiline: Bool {
@@ -1104,7 +1118,7 @@ private struct TextPropertyEditor: View {
 
     @ViewBuilder
     private var field: some View {
-        if secure {
+        if secure && !isPasswordVisible {
             SecureField(property.displayName, text: $text)
         } else if isMultiline {
             TextField(property.displayName, text: $text, axis: .vertical)
