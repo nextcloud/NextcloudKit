@@ -532,8 +532,7 @@ public struct UnifiedShareEditView: View {
                 ForEach(Array(model.recipientResults.enumerated()), id: \.element.unifiedShareIdentity) { index, recipient in
                     Button {
                         recipients = ""
-                        model.addRecipient(share: share, recipient: recipient) { addedRecipient in
-                            selectedRecipient = addedRecipient
+                        model.addRecipient(share: share, recipient: recipient) { _ in
                             permissionSelection = .unset
                         }
                     } label: {
