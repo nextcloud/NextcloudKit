@@ -287,34 +287,49 @@ public struct UnifiedShareListView: View {
         }
     }
 
+    @ViewBuilder
     private func recipientPresetChip(_ recipient: NKUnifiedShareRecipient, in share: NKUnifiedShare) -> some View {
-        Menu {
-            ForEach(model.applicablePresets(recipient, in: share), id: \.class) { preset in
-                Button(preset.displayName) {
-                    model.setPermissionPreset(share: share, recipient: recipient, presetClass: preset.class)
+        if isLink(recipient) {
+            Button {
+                editing = ShareEditor(share: share)
+            } label: {
+                recipientPresetChipLabel(recipient, in: share)
+            }
+            .buttonStyle(.plain)
+            .fixedSize()
+        } else {
+            Menu {
+                ForEach(model.applicablePresets(recipient, in: share), id: \.class) { preset in
+                    Button(preset.displayName) {
+                        model.setPermissionPreset(share: share, recipient: recipient, presetClass: preset.class)
+                    }
                 }
-            }
 
-            Divider()
+                Divider()
 
-            Button(String(localized: "Can…")) {
-                editing = ShareEditor(share: share, recipient: recipient)
+                Button(String(localized: "Can…")) {
+                    editing = ShareEditor(share: share, recipient: recipient)
+                }
+            } label: {
+                recipientPresetChipLabel(recipient, in: share)
             }
-        } label: {
-            HStack(spacing: 2) {
-                Text(recipientPresetLabel(recipient, in: share))
-                Image(systemName: "chevron.down")
-                    .font(.caption2)
-            }
-            .font(.subheadline)
-            .foregroundStyle(tint)
-            .padding(.horizontal, 10)
-            .padding(.vertical, 2)
-            .background(tint.opacity(0.12), in: Capsule())
+            .buttonStyle(.plain)
+            .fixedSize()
+            .disabled(model.isUpdatingPermissions(for: recipient, in: share))
         }
-        .buttonStyle(.plain)
-        .fixedSize()
-        .disabled(model.isUpdatingPermissions(for: recipient, in: share))
+    }
+
+    private func recipientPresetChipLabel(_ recipient: NKUnifiedShareRecipient, in share: NKUnifiedShare) -> some View {
+        HStack(spacing: 2) {
+            Text(recipientPresetLabel(recipient, in: share))
+            Image(systemName: "chevron.down")
+                .font(.caption2)
+        }
+        .font(.subheadline)
+        .foregroundStyle(tint)
+        .padding(.horizontal, 10)
+        .padding(.vertical, 2)
+        .background(tint.opacity(0.12), in: Capsule())
     }
 
     private func expansionBinding(for share: NKUnifiedShare) -> Binding<Bool> {

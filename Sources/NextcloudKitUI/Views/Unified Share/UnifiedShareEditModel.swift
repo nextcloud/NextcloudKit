@@ -145,7 +145,7 @@ public class UnifiedShareEditModel {
         var currentShare = share
         let targetPermissions = share.permissions.filter { permissionClasses?.contains($0.class) ?? true }
 
-        for originalRecipient in share.recipients {
+        for originalRecipient in share.recipients where originalRecipient.class != Self.tokenRecipientClass {
             let identity = originalRecipient.unifiedShareIdentity
 
             for targetPermission in targetPermissions {
