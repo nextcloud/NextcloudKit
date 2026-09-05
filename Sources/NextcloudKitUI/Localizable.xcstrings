@@ -4279,6 +4279,17 @@
         }
       }
     },
+    "Save password" : {
+      "comment" : "Accessibility label for saving a changed public-share password.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Save password"
+          }
+        }
+      }
+    },
     "Save share" : {
       "comment" : "Primary button that activates a new unified share for invited recipients.",
       "localizations" : {

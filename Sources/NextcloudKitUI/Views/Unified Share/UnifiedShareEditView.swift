@@ -1088,8 +1088,23 @@ private struct TextPropertyEditor: View {
         HStack {
             field
                 .focused($focused)
+                .onSubmit {
+                    focused = false
+                    commit()
+                }
 
             if secure {
+                if text != committed {
+                    Button {
+                        focused = false
+                        commit()
+                    } label: {
+                        Image(systemName: "checkmark.circle.fill")
+                    }
+                    .buttonStyle(.plain)
+                    .accessibilityLabel(String(localized: "Save password"))
+                }
+
                 Button {
                     isPasswordVisible.toggle()
                 } label: {
@@ -1105,9 +1120,6 @@ private struct TextPropertyEditor: View {
                 commit()
             }
         }
-        .onSubmit {
-            commit()
-        }
     }
 
     private var isMultiline: Bool {
@@ -1120,8 +1132,16 @@ private struct TextPropertyEditor: View {
 
     @ViewBuilder
     private var field: some View {
-        if secure && !isPasswordVisible {
-            SecureField(placeholder, text: $text)
+        if secure {
+            if isPasswordVisible {
+                TextField(placeholder, text: $text)
+                    .textInputAutocapitalization(.never)
+                    .autocorrectionDisabled()
+            } else {
+                SecureField(placeholder, text: $text)
+                    .textInputAutocapitalization(.never)
+                    .autocorrectionDisabled()
+            }
         } else if isMultiline {
             TextField(placeholder, text: $text, axis: .vertical)
                 .lineLimit(1...3)
