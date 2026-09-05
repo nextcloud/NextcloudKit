@@ -359,14 +359,16 @@ public struct UnifiedShareListView: View {
     private func recipientPresetLabel(_ recipient: NKUnifiedShareRecipient, in share: NKUnifiedShare) -> String {
         let applicablePresets = model.applicablePresets(recipient, in: share)
 
-        if recipient.permissions.isEmpty,
-           let presetClass = share.permissionPreset,
-           let preset = applicablePresets.first(where: { $0.class == presetClass }) {
+        if recipient.permissions.isEmpty {
+            guard let presetClass = share.permissionPreset,
+                  let preset = applicablePresets.first(where: { $0.class == presetClass }) else {
+                return String(localized: "Can…")
+            }
             return preset.displayName
         }
 
         if let preset = applicablePresets.first(where: { preset in
-            recipient.permissions.allSatisfy { permission in
+            recipient.effectivePermissions(in: share).allSatisfy { permission in
                 permission.enabled == permission.presets.contains(preset.class)
             }
         }) {
