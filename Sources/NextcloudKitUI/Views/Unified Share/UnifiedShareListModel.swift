@@ -81,6 +81,30 @@ public class UnifiedShareListModel {
         return permissionPresets.filter { applicable.contains($0.class) }
     }
 
+    func applicablePresets(in share: NKUnifiedShare) -> [NKUnifiedSharePermissionPreset] {
+        let applicable = Set(share.permissions.flatMap { $0.presets })
+        return permissionPresets.filter { applicable.contains($0.class) }
+    }
+
+    func setSharePermissionPreset(share: NKUnifiedShare,
+                                  recipient: NKUnifiedShareRecipient,
+                                  presetClass: String) {
+        let recipientID = permissionUpdateIdentity(share: share, recipient: recipient)
+        guard recipientsUpdatingPermissions.insert(recipientID).inserted else { return }
+
+        Task {
+            defer { recipientsUpdatingPermissions.remove(recipientID) }
+
+            let result = await NextcloudKit.shared.setUnifiedSharePermissionPreset(id: share.id, permissionPresetClass: presetClass, account: account)
+            guard let updatedShare = result.share else {
+                onError?(result.error)
+                return
+            }
+
+            replace(updatedShare)
+        }
+    }
+
     func setPermissionPreset(share: NKUnifiedShare,
                              recipient: NKUnifiedShareRecipient,
                              presetClass: String) {

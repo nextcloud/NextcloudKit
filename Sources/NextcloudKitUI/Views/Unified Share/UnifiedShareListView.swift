@@ -290,13 +290,24 @@ public struct UnifiedShareListView: View {
     @ViewBuilder
     private func recipientPresetChip(_ recipient: NKUnifiedShareRecipient, in share: NKUnifiedShare) -> some View {
         if isLink(recipient) {
-            Button {
-                editing = ShareEditor(share: share)
+            Menu {
+                ForEach(model.applicablePresets(in: share), id: \.class) { preset in
+                    Button(preset.displayName) {
+                        model.setSharePermissionPreset(share: share, recipient: recipient, presetClass: preset.class)
+                    }
+                }
+
+                Divider()
+
+                Button(String(localized: "Can…")) {
+                    editing = ShareEditor(share: share, forceCustomPermissions: true)
+                }
             } label: {
                 recipientPresetChipLabel(recipient, in: share)
             }
             .buttonStyle(.plain)
             .fixedSize()
+            .disabled(model.isUpdatingPermissions(for: recipient, in: share))
         } else {
             Menu {
                 ForEach(model.applicablePresets(recipient, in: share), id: \.class) { preset in
@@ -373,9 +384,9 @@ public struct UnifiedShareListView: View {
     }
 
     private func recipientPresetLabel(_ recipient: NKUnifiedShareRecipient, in share: NKUnifiedShare) -> String {
-        let applicablePresets = model.applicablePresets(recipient, in: share)
+        let applicablePresets = isLink(recipient) ? model.applicablePresets(in: share) : model.applicablePresets(recipient, in: share)
 
-        if recipient.permissions.isEmpty {
+        if recipient.permissions.isEmpty || isLink(recipient) {
             guard let presetClass = share.permissionPreset,
                   let preset = applicablePresets.first(where: { $0.class == presetClass }) else {
                 return String(localized: "Can…")
