@@ -1065,6 +1065,8 @@ private struct DatePropertyEditor: View {
 }
 
 private struct TextPropertyEditor: View {
+    private static let labelPropertyClass = "OC\\Core\\Sharing\\Property\\LabelSharePropertyType"
+
     let property: NKUnifiedShareProperty
     let secure: Bool
     let onCommit: (String?) -> Void
@@ -1119,13 +1121,17 @@ private struct TextPropertyEditor: View {
     @ViewBuilder
     private var field: some View {
         if secure && !isPasswordVisible {
-            SecureField(property.displayName, text: $text)
+            SecureField(placeholder, text: $text)
         } else if isMultiline {
-            TextField(property.displayName, text: $text, axis: .vertical)
+            TextField(placeholder, text: $text, axis: .vertical)
                 .lineLimit(1...3)
         } else {
-            TextField(property.displayName, text: $text)
+            TextField(placeholder, text: $text)
         }
+    }
+
+    private var placeholder: String {
+        property.class == Self.labelPropertyClass ? String(localized: "Add a label") : property.displayName
     }
 
     private func commit() {

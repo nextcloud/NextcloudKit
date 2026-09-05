@@ -1361,6 +1361,17 @@
         }
       }
     },
+    "Add a label" : {
+      "comment" : "Placeholder for the optional label of a public share.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add a label"
+          }
+        }
+      }
+    },
     "Add people" : {
       "comment" : "Placeholder for searching and adding people or groups to a unified share.",
       "localizations" : {
@@ -1544,6 +1555,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Failed to update share."
+          }
+        }
+      }
+    },
+    "Hide password" : {
+      "comment" : "Accessibility label for hiding the password field contents.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hide password"
           }
         }
       }
@@ -4330,6 +4352,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Share public link"
+          }
+        }
+      }
+    },
+    "Show password" : {
+      "comment" : "Accessibility label for revealing the password field contents.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Show password"
           }
         }
       }
