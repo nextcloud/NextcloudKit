@@ -4279,13 +4279,13 @@
         }
       }
     },
-    "Save password" : {
-      "comment" : "Accessibility label for saving a changed public-share password.",
+    "Save" : {
+      "comment" : "Button that confirms a text property change.",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Save password"
+            "value" : "Save"
           }
         }
       }
