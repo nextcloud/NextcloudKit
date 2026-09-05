@@ -73,7 +73,7 @@ public class UnifiedShareListModel {
             return
         }
 
-        state = .loaded(shares)
+        state = .loaded(sortedShares(shares))
     }
 
     func applicablePresets(_ recipient: NKUnifiedShareRecipient, in share: NKUnifiedShare) -> [NKUnifiedSharePermissionPreset] {
@@ -158,5 +158,25 @@ public class UnifiedShareListModel {
         if case .loaded(let shares) = state {
             state = .loaded(shares.map { $0.id == updated.id ? updated : $0 })
         }
+    }
+
+    /// Keeps invited shares before public-link shares. Change the category values to alter this order.
+    /// Shares in the same category are ordered by their server-assigned share ID for stable refreshes.
+    private func sortedShares(_ shares: [NKUnifiedShare]) -> [NKUnifiedShare] {
+        shares.sorted { lhs, rhs in
+            let lhsCategory = shareSortCategory(lhs)
+            let rhsCategory = shareSortCategory(rhs)
+
+            if lhsCategory != rhsCategory {
+                return lhsCategory < rhsCategory
+            }
+
+            return lhs.id.localizedStandardCompare(rhs.id) == .orderedAscending
+        }
+    }
+
+    /// Category 0: invited people and groups. Category 1: public links.
+    private func shareSortCategory(_ share: NKUnifiedShare) -> Int {
+        share.recipients.contains { $0.class == UnifiedShareEditModel.tokenRecipientClass } ? 1 : 0
     }
 }
