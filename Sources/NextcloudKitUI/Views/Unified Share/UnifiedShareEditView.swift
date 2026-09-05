@@ -997,7 +997,7 @@ private struct DatePropertyEditor: View {
                     hasDate = false
 
                     if let value = property.value, !value.isEmpty {
-                        onCommit("")
+                        onCommit(nil)
                     }
                 } label: {
                     Image(systemName: "xmark.circle.fill")
