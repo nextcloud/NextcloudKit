@@ -205,16 +205,16 @@ public struct UnifiedShareListView: View {
 
     @ViewBuilder
     private func recipientAvatar(_ recipient: NKUnifiedShareRecipient) -> some View {
-        if let icon = recipient.icon,
-           let urlString = iconURL(icon),
-           let url = URL(string: urlString) {
+        if isLink(recipient) {
+            linkIcon
+        } else if let icon = recipient.icon,
+                  let urlString = iconURL(icon),
+                  let url = URL(string: urlString) {
             AsyncImage(url: url) { image in
                 image.resizable().scaledToFill()
             } placeholder: {
                 Circle().fill(.quaternary)
             }
-        } else if isLink(recipient) {
-            linkIcon
         } else {
             Circle()
                 .fill(.quaternary)
