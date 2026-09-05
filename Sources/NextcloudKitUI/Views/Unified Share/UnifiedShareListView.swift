@@ -175,7 +175,7 @@ public struct UnifiedShareListView: View {
                                 .contentShape(Rectangle())
                         }
                         .buttonStyle(.plain)
-                        .accessibilityLabel(share.recipients.first?.displayName ?? "")
+                        .accessibilityLabel(share.recipients.first.map(recipientDisplayName) ?? "")
                     }
             }
         }
@@ -188,7 +188,7 @@ public struct UnifiedShareListView: View {
             }
 
             VStack(alignment: .leading, spacing: 4) {
-                Text(share.recipients.count == 1 ? (share.recipients.first?.displayName ?? "") : recipientSummary(share.recipients))
+                Text(share.recipients.count == 1 ? (share.recipients.first.map(recipientDisplayName) ?? "") : recipientSummary(share.recipients))
                     .foregroundStyle(.primary)
                     .lineLimit(1)
 
@@ -213,7 +213,7 @@ public struct UnifiedShareListView: View {
             } placeholder: {
                 Circle().fill(.quaternary)
             }
-        } else if recipient.secret.updatable {
+        } else if isLink(recipient) {
             linkIcon
         } else {
             Circle()
@@ -265,7 +265,7 @@ public struct UnifiedShareListView: View {
                 .clipShape(Circle())
 
             VStack(alignment: .leading, spacing: 2) {
-                Text(recipient.displayName)
+                Text(recipientDisplayName(recipient))
                     .foregroundStyle(.primary)
                     .lineLimit(1)
 
@@ -283,7 +283,7 @@ public struct UnifiedShareListView: View {
                     .contentShape(Rectangle())
             }
             .buttonStyle(.plain)
-            .accessibilityLabel(recipient.displayName)
+            .accessibilityLabel(recipientDisplayName(recipient))
         }
     }
 
@@ -386,7 +386,11 @@ public struct UnifiedShareListView: View {
     }
 
     private func isLink(_ recipient: NKUnifiedShareRecipient) -> Bool {
-        recipient.secret.updatable
+        recipient.class == UnifiedShareEditModel.tokenRecipientClass || recipient.secret.updatable
+    }
+
+    private func recipientDisplayName(_ recipient: NKUnifiedShareRecipient) -> String {
+        isLink(recipient) ? String(localized: "Anyone") : recipient.displayName
     }
 
     private func iconURL(_ icon: NKUnifiedShareIcon) -> String? {
