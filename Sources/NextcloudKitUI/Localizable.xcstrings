@@ -1,7 +1,74 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "%lld groups" : {
+      "comment" : "Recipient summary for multiple groups.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld groups"
+          }
+        }
+      }
+    },
+    "%lld links" : {
+      "comment" : "Recipient summary for multiple public links.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld links"
+          }
+        }
+      }
+    },
+    "%lld people" : {
+      "comment" : "Recipient summary for multiple people.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld people"
+          }
+        }
+      }
+    },
+    "1 group" : {
+      "comment" : "Recipient summary for one group.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "1 group"
+          }
+        }
+      }
+    },
+    "1 link" : {
+      "comment" : "Recipient summary for one public link.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "1 link"
+          }
+        }
+      }
+    },
+    "1 person" : {
+      "comment" : "Recipient summary for one person.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "1 person"
+          }
+        }
+      }
+    },
     "Accounts" : {
+      "comment" : "Navigation title for the list of configured Nextcloud accounts.",
       "localizations" : {
         "af" : {
           "stringUnit" : {
@@ -550,12 +617,6 @@
           }
         },
         "sr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : ""
-          }
-        },
-        "sr@latin" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : ""
@@ -1208,12 +1269,6 @@
             "value" : ""
           }
         },
-        "sr@latin" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : ""
-          }
-        },
         "sv" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1302,6 +1357,248 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : ""
+          }
+        }
+      }
+    },
+    "Add a label" : {
+      "comment" : "Placeholder for the optional label of a public share.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add a label"
+          }
+        }
+      }
+    },
+    "Add people" : {
+      "comment" : "Placeholder for searching and adding people or groups to a unified share.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add people"
+          }
+        }
+      }
+    },
+    "Anyone" : {
+      "comment" : "Audience option that makes a unified share accessible to anyone with its public link.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Anyone"
+          }
+        }
+      }
+    },
+    "Cancel" : {
+      "comment" : "Button that dismisses a confirmation dialog without making changes.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cancel"
+          }
+        }
+      }
+    },
+    "Can…" : {
+      "comment" : "Menu option that reveals per-permission toggles for custom permissions.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Can…"
+          }
+        }
+      }
+    },
+    "Copied" : {
+      "comment" : "Temporary button label confirming that a share link was copied.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copied"
+          }
+        }
+      }
+    },
+    "Copy private link" : {
+      "comment" : "Copies the in-server link of the file for invited people.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copy private link"
+          }
+        }
+      }
+    },
+    "Copy public link" : {
+      "comment" : "Copies the public link of an Anyone share.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copy public link"
+          }
+        }
+      }
+    },
+    "Could not create share, try again later" : {
+      "comment" : "Error message shown when a unified share cannot be created.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Could not create share, try again later"
+          }
+        }
+      }
+    },
+    "Couldn't load shares" : {
+      "comment" : "Full-screen error title when the share list fails to load.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Couldn't load shares"
+          }
+        }
+      }
+    },
+    "Custom link" : {
+      "comment" : "Heading of the editable public-link token row.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Custom link"
+          }
+        }
+      }
+    },
+    "Delete" : {
+      "comment" : "Destructive confirmation button for deleting a share or removing a recipient.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Delete"
+          }
+        }
+      }
+    },
+    "Delete recipient" : {
+      "comment" : "Button that removes only the selected recipient from a unified share.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Delete recipient"
+          }
+        }
+      }
+    },
+    "Delete recipient?" : {
+      "comment" : "Title of the recipient removal confirmation dialog.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Delete recipient?"
+          }
+        }
+      }
+    },
+    "Delete share" : {
+      "comment" : "Button that deletes the entire unified share and all its recipients.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Delete share"
+          }
+        }
+      }
+    },
+    "Delete share?" : {
+      "comment" : "Title of the delete confirmation dialog.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Delete share?"
+          }
+        }
+      }
+    },
+    "Edit" : {
+      "comment" : "Action that opens the unified share editor.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Edit"
+          }
+        }
+      }
+    },
+    "Failed to update share." : {
+      "comment" : "Shown when a share modification fails.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Failed to update share."
+          }
+        }
+      }
+    },
+    "Hide password" : {
+      "comment" : "Accessibility label for hiding the password field contents.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hide password"
+          }
+        }
+      }
+    },
+    "Hide recipients" : {
+      "comment" : "Accessibility label for collapsing a share's recipient list.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hide recipients"
+          }
+        }
+      }
+    },
+    "Invited People" : {
+      "comment" : "Audience option for specific recipients.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Invited People"
+          }
+        }
+      }
+    },
+    "Link token" : {
+      "comment" : "Placeholder of the editable public-link token field.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Link token"
           }
         }
       }
@@ -1861,12 +2158,6 @@
             "value" : ""
           }
         },
-        "sr@latin" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : ""
-          }
-        },
         "sv" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1959,8 +2250,30 @@
         }
       }
     },
+    "No recipients" : {
+      "comment" : "Recipient summary when a share has no recipients.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No recipients"
+          }
+        }
+      }
+    },
+    "Not Shared Yet" : {
+      "comment" : "Empty-state title shown when a file or folder has no unified shares.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Not Shared Yet"
+          }
+        }
+      }
+    },
     "OK" : {
-      "comment" : "Button label for error alert dismissal.",
+      "comment" : "Button that dismisses an error alert.",
       "localizations" : {
         "af" : {
           "stringUnit" : {
@@ -2514,12 +2827,6 @@
             "value" : ""
           }
         },
-        "sr@latin" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : ""
-          }
-        },
         "sv" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2608,6 +2915,39 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : ""
+          }
+        }
+      }
+    },
+    "Participants" : {
+      "comment" : "Label above the permission selector in the unified share view.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Participants"
+          }
+        }
+      }
+    },
+    "Refresh link" : {
+      "comment" : "Accessibility label for regenerating the public-link token.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Refresh link"
+          }
+        }
+      }
+    },
+    "Retry" : {
+      "comment" : "Button that retries loading the unified share list after an error.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Retry"
           }
         }
       }
@@ -3167,12 +3507,6 @@
             "value" : ""
           }
         },
-        "sr@latin" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : ""
-          }
-        },
         "sv" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3261,6 +3595,28 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : ""
+          }
+        }
+      }
+    },
+    "Send" : {
+      "comment" : "Primary action button title in the unified share view.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Send"
+          }
+        }
+      }
+    },
+    "Send email" : {
+      "comment" : "Legacy action for notifying unified-share recipients by email; currently not displayed.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Send email"
           }
         }
       }
@@ -3820,12 +4176,6 @@
             "value" : ""
           }
         },
-        "sr@latin" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : ""
-          }
-        },
         "sv" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3914,6 +4264,127 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : ""
+          }
+        }
+      }
+    },
+    "Settings" : {
+      "comment" : "Settings section title in the unified share view.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Settings"
+          }
+        }
+      }
+    },
+    "Save" : {
+      "comment" : "Button that confirms a text property change.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Save"
+          }
+        }
+      }
+    },
+    "Save share" : {
+      "comment" : "Primary button that activates a new unified share for invited recipients.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Save share"
+          }
+        }
+      }
+    },
+    "Share \"%@\"" : {
+      "comment" : "Share editor title; placeholder is the shared file or folder name.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Share \"%@\""
+          }
+        }
+      }
+    },
+    "Share File" : {
+      "comment" : "Empty-state button that starts sharing a file.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Share File"
+          }
+        }
+      }
+    },
+    "Share Folder" : {
+      "comment" : "Empty-state button that starts sharing a folder.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Share Folder"
+          }
+        }
+      }
+    },
+    "Share link" : {
+      "comment" : "Row title for a public link share.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Share link"
+          }
+        }
+      }
+    },
+    "Share link (%lld)" : {
+      "comment" : "Row title for the nth public link share of a file.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Share link (%lld)"
+          }
+        }
+      }
+    },
+    "Share public link" : {
+      "comment" : "Primary action activating an Anyone share.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Share public link"
+          }
+        }
+      }
+    },
+    "Show password" : {
+      "comment" : "Accessibility label for revealing the password field contents.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Show password"
+          }
+        }
+      }
+    },
+    "Show recipients" : {
+      "comment" : "Accessibility label for expanding a share's recipient list.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Show recipients"
           }
         }
       }
@@ -4468,12 +4939,6 @@
           }
         },
         "sr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : ""
-          }
-        },
-        "sr@latin" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : ""
@@ -5126,12 +5591,6 @@
             "value" : ""
           }
         },
-        "sr@latin" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : ""
-          }
-        },
         "sv" : {
           "stringUnit" : {
             "state" : "translated",
@@ -5220,6 +5679,39 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : ""
+          }
+        }
+      }
+    },
+    "The link can be changed to be easy to remember, but do not set it to something that is easy to guess." : {
+      "comment" : "Help text below the editable token of a custom public link.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The link can be changed to be easy to remember, but do not set it to something that is easy to guess."
+          }
+        }
+      }
+    },
+    "This recipient will be removed from the share." : {
+      "comment" : "Message of the recipient removal confirmation dialog.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This recipient will be removed from the share."
+          }
+        }
+      }
+    },
+    "This share will be permanently removed." : {
+      "comment" : "Message of the delete confirmation dialog.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This share will be permanently removed."
           }
         }
       }
