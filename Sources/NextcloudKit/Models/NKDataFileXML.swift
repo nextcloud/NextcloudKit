@@ -472,7 +472,7 @@ public class NKDataFileXML: NSObject {
             if let lockTime = propstat["d:prop", "nc:lock-time"].int {
                 file.lockTime = Date(timeIntervalSince1970: TimeInterval(lockTime))
             }
-            if let lockTimeOut = propstat["d:prop", "nc:lock-timeout"].int {
+            if let lockTimeOut = propstat["d:prop", "nc:lock-timeout"].int, lockTimeOut > 0 {
                 file.lockTimeOut = file.lockTime?.addingTimeInterval(TimeInterval(lockTimeOut))
             }
 
