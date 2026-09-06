@@ -1383,6 +1383,28 @@
         }
       }
     },
+    "Apply permissions to all recipients?" : {
+      "comment" : "Confirmation title shown before replacing every recipient's individual permissions.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Apply permissions to all recipients?"
+          }
+        }
+      }
+    },
+    "Apply to all" : {
+      "comment" : "Button that confirms applying top-level permissions to every recipient.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Apply to all"
+          }
+        }
+      }
+    },
     "Anyone" : {
       "comment" : "Audience option that makes a unified share accessible to anyone with its public link.",
       "localizations" : {
@@ -4385,6 +4407,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Show recipients"
+          }
+        }
+      }
+    },
+    "This change will replace the individual permission settings of all recipients in this share." : {
+      "comment" : "Explanation shown before propagating top-level permission changes to every recipient.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This change will replace the individual permission settings of all recipients in this share."
           }
         }
       }

@@ -32,6 +32,7 @@ public struct UnifiedShareEditView: View {
     @State private var showsRows = true
     @State private var showsCopied = false
     @State private var copiedTask: Task<Void, Never>?
+    @State private var pendingTopPermissionChange: TopPermissionChange?
     @Environment(\.colorScheme) private var colorScheme
     @Environment(\.dismiss) private var dismiss
 
@@ -228,6 +229,26 @@ public struct UnifiedShareEditView: View {
                 Text(error.errorDescription)
             }
         }
+        .confirmationDialog(
+            String(localized: "Apply permissions to all recipients?"),
+            isPresented: Binding(
+                get: { pendingTopPermissionChange != nil },
+                set: { if !$0 { pendingTopPermissionChange = nil } }
+            ),
+            titleVisibility: .visible
+        ) {
+            if let change = pendingTopPermissionChange {
+                Button(String(localized: "Apply to all")) {
+                    applyTopPermissionChange(change)
+                }
+
+                Button(String(localized: "Cancel"), role: .cancel) {
+                    cancelTopPermissionChange(change)
+                }
+            }
+        } message: {
+            Text(String(localized: "This change will replace the individual permission settings of all recipients in this share."))
+        }
         .task {
             guard !isPreview else {
                 return
@@ -333,8 +354,7 @@ public struct UnifiedShareEditView: View {
                 if tag == Self.customTag {
                     permissionSelection = .custom
                 } else {
-                    permissionSelection = .preset(tag)
-                    model.setPermissionPreset(share: share, presetClass: tag)
+                    requestTopPermissionChange(.preset(share: share, presetClass: tag))
                 }
             }
         )) {
@@ -353,13 +373,42 @@ public struct UnifiedShareEditView: View {
         if isCustomSelected(share) {
             ForEach(share.permissions, id: \.class) { permission in
                 PermissionToggleRow(permission: permission) { enabled in
-                    model.setPermission(share: share, permissionClass: permission.class, enabled: enabled)
+                    requestTopPermissionChange(.permission(share: share, permissionClass: permission.class, enabled: enabled))
                 }
                 // Re-seed the toggle whenever the server's enabled value changes (e.g. after a
                 // preset like "Can edit" recomputes the permissions), not just on first render.
                 .id("\(permission.class)|\(permission.enabled)|\(model.permissionResetRevision)")
                 .disabled(model.isUpdatingPermissions)
             }
+        }
+    }
+
+    private func requestTopPermissionChange(_ change: TopPermissionChange) {
+        guard change.share.recipients.contains(where: { $0.class != UnifiedShareEditModel.tokenRecipientClass }) else {
+            applyTopPermissionChange(change)
+            return
+        }
+
+        pendingTopPermissionChange = change
+    }
+
+    private func applyTopPermissionChange(_ change: TopPermissionChange) {
+        pendingTopPermissionChange = nil
+
+        switch change {
+        case .preset(let share, let presetClass):
+            permissionSelection = .preset(presetClass)
+            model.setPermissionPreset(share: share, presetClass: presetClass)
+        case .permission(let share, let permissionClass, let enabled):
+            model.setPermission(share: share, permissionClass: permissionClass, enabled: enabled)
+        }
+    }
+
+    private func cancelTopPermissionChange(_ change: TopPermissionChange) {
+        pendingTopPermissionChange = nil
+
+        if case .permission = change {
+            model.permissionResetRevision += 1
         }
     }
 
@@ -774,6 +823,18 @@ private extension UnifiedShareEditView {
         case unset
         case custom
         case preset(String)
+    }
+
+    enum TopPermissionChange {
+        case preset(share: NKUnifiedShare, presetClass: String)
+        case permission(share: NKUnifiedShare, permissionClass: String, enabled: Bool)
+
+        var share: NKUnifiedShare {
+            switch self {
+            case .preset(let share, _), .permission(let share, _, _):
+                return share
+            }
+        }
     }
 
     enum EditorDeletionTarget {
