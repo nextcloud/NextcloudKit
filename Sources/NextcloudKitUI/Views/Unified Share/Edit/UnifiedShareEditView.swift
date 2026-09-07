@@ -851,6 +851,7 @@ private extension UnifiedShareEditView {
     }
 }
 
+#if DEBUG
 #Preview {
     UnifiedShareEditView(
         model: UnifiedShareEditModel(
@@ -864,3 +865,4 @@ private extension UnifiedShareEditView {
         )
     )
 }
+#endif
