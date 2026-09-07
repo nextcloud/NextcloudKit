@@ -1581,17 +1581,6 @@
         }
       }
     },
-    "Hide password" : {
-      "comment" : "Accessibility label for hiding the password field contents.",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Hide password"
-          }
-        }
-      }
-    },
     "Hide recipients" : {
       "comment" : "Accessibility label for collapsing a share's recipient list.",
       "localizations" : {
@@ -4385,17 +4374,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Share public link"
-          }
-        }
-      }
-    },
-    "Show password" : {
-      "comment" : "Accessibility label for revealing the password field contents.",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Show password"
           }
         }
       }

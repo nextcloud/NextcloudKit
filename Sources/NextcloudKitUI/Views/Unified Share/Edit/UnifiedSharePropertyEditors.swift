@@ -210,7 +210,6 @@ private struct TextPropertyEditor: View {
     @State private var isPresented = false
     @State private var draft: String
     @State private var committed: String
-    @State private var isPasswordVisible = false
 
     init(property: NKUnifiedShareProperty, secure: Bool, onCommit: @escaping (String?) -> Void) {
         self.property = property
@@ -224,7 +223,8 @@ private struct TextPropertyEditor: View {
     var body: some View {
         HStack {
             Button {
-                draft = committed
+                // Password values returned by the API are placeholders, never reusable clear text.
+                draft = secure ? "" : committed
                 isPresented = true
             } label: {
                 Text(displayValue)
@@ -237,17 +237,6 @@ private struct TextPropertyEditor: View {
                     .foregroundStyle(.secondary)
             }
             .buttonStyle(.plain)
-
-            if secure {
-                Button {
-                    isPasswordVisible.toggle()
-                } label: {
-                    Image(systemName: isPasswordVisible ? "eye.slash" : "eye")
-                        .foregroundStyle(.secondary)
-                }
-                .buttonStyle(.plain)
-                .accessibilityLabel(isPasswordVisible ? String(localized: "Hide password") : String(localized: "Show password"))
-            }
         }
         .alert(property.displayName, isPresented: $isPresented) {
             if secure {
@@ -263,6 +252,10 @@ private struct TextPropertyEditor: View {
             }
 
             Button(String(localized: "Save")) {
+                guard !secure || !draft.isEmpty else {
+                    return
+                }
+
                 guard draft != committed else {
                     return
                 }
@@ -270,6 +263,7 @@ private struct TextPropertyEditor: View {
                 committed = draft
                 onCommit(draft.isEmpty ? nil : draft)
             }
+            .disabled(secure && draft.isEmpty)
         }
     }
 
@@ -282,6 +276,6 @@ private struct TextPropertyEditor: View {
             return placeholder
         }
 
-        return secure && !isPasswordVisible ? String(repeating: "•", count: min(committed.count, 12)) : committed
+        return secure ? String(repeating: "•", count: 8) : committed
     }
 }
