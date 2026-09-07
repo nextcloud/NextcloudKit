@@ -1592,6 +1592,28 @@
         }
       }
     },
+    "For people who already have access" : {
+      "comment" : "Subtitle explaining that an internal link works only for people who already have access.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "For people who already have access"
+          }
+        }
+      }
+    },
+    "Internal link" : {
+      "comment" : "Title for a link that works only for people who already have access.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Internal link"
+          }
+        }
+      }
+    },
     "Invited People" : {
       "comment" : "Audience option for specific recipients.",
       "localizations" : {

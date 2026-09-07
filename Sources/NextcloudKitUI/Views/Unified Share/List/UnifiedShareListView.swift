@@ -193,6 +193,12 @@ public struct UnifiedShareListView: View {
                     .lineLimit(1)
 
                 if let recipient = share.recipients.first, share.recipients.count == 1 {
+                    if isLink(recipient) {
+                        Text(String(localized: "For people who already have access"))
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
+
                     recipientPresetChip(recipient, in: share)
                 }
             }
@@ -268,6 +274,12 @@ public struct UnifiedShareListView: View {
                 Text(recipientDisplayName(recipient))
                     .foregroundStyle(.primary)
                     .lineLimit(1)
+
+                if isLink(recipient) {
+                    Text(String(localized: "For people who already have access"))
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
 
                 recipientPresetChip(recipient, in: share)
             }
@@ -416,7 +428,7 @@ public struct UnifiedShareListView: View {
     }
 
     private func recipientDisplayName(_ recipient: NKUnifiedShareRecipient) -> String {
-        isLink(recipient) ? String(localized: "Anyone") : recipient.displayName
+        isLink(recipient) ? String(localized: "Internal link") : recipient.displayName
     }
 
     private func iconURL(_ icon: NKUnifiedShareIcon) -> String? {
