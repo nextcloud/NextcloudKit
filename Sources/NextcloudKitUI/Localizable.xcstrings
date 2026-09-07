@@ -4290,6 +4290,17 @@
         }
       }
     },
+    "Remove password" : {
+      "comment" : "Destructive action that removes the password from a share.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Remove password"
+          }
+        }
+      }
+    },
     "Save" : {
       "comment" : "Button that confirms a text property change.",
       "localizations" : {

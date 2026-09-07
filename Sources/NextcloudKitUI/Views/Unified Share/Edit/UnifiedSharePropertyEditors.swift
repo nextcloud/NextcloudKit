@@ -251,6 +251,14 @@ private struct TextPropertyEditor: View {
                 draft = committed
             }
 
+            if secure && !committed.isEmpty {
+                Button(String(localized: "Remove password"), role: .destructive) {
+                    draft = ""
+                    committed = ""
+                    onCommit(nil)
+                }
+            }
+
             Button(String(localized: "Save")) {
                 guard !secure || !draft.isEmpty else {
                     return
