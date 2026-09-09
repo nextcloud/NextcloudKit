@@ -54,7 +54,7 @@ public class UnifiedShareEditModel {
     @ObservationIgnored private var propertyTasks: [String: Task<Void, Never>] = [:]
 
     let account: String
-    /// Globally-unique id of the file/folder being shared (attached as the share source).
+    /// Numeric server file ID of the file or folder attached as the share source.
     let sourceId: String?
 
     init(account: String, sourceId: String? = nil) {
