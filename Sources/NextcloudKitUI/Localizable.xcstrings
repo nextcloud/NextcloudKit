@@ -5716,6 +5716,17 @@
         }
       }
     },
+    "This share is limited to \"%@\". You can only grant the same or fewer permissions." : {
+      "comment" : "Explains that recipient permissions cannot exceed the share-wide preset; the placeholder is the preset name.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This share is limited to \"%1$@\". You can only grant the same or fewer permissions."
+          }
+        }
+      }
+    },
     "This recipient will be removed from the share." : {
       "comment" : "Message of the recipient removal confirmation dialog.",
       "localizations" : {

@@ -19,10 +19,36 @@ struct PermissionToggleRow: View {
     }
 
     var body: some View {
-        Toggle(permission.displayName, isOn: $isOn)
+        Toggle(isOn: $isOn) {
+            VStack(alignment: .leading, spacing: 2) {
+                Text(permission.displayName)
+
+                if let hint = permission.hint, !hint.isEmpty {
+                    Text(hint)
+                        .font(.footnote)
+                        .foregroundStyle(.secondary)
+                }
+            }
+        }
             .onChange(of: isOn) {
                 onChange(isOn)
             }
+    }
+}
+
+struct PermissionLimitNotice: View {
+    let text: String
+
+    var body: some View {
+        HStack(alignment: .top, spacing: 12) {
+            Image(systemName: "info.circle.fill")
+                .foregroundStyle(.blue)
+
+            Text(text)
+                .frame(maxWidth: .infinity, alignment: .leading)
+        }
+        .padding(12)
+        .background(.blue.opacity(0.12), in: RoundedRectangle(cornerRadius: 8))
     }
 }
 

@@ -279,6 +279,8 @@ public struct UnifiedShareEditView: View {
 
     @ViewBuilder
     private func recipientPermissionField(share: NKUnifiedShare, recipient: NKUnifiedShareRecipient) -> some View {
+        PermissionLimitNotice(text: recipientPermissionLimitDescription(share))
+
         Picker(recipient.displayName, selection: Binding(
             get: {
                 isRecipientCustomSelected(recipient, in: share)
@@ -316,9 +318,17 @@ public struct UnifiedShareEditView: View {
                     )
                 }
                 .id("\(permission.class)|\(permission.enabled)|\(model.permissionResetRevision)")
-                .disabled(model.isUpdatingPermissions)
+                .disabled(model.isUpdatingPermissions || !share.allowsRecipientPermission(permission.class))
             }
         }
+    }
+
+    private func recipientPermissionLimitDescription(_ share: NKUnifiedShare) -> String {
+        let presetName = share.permissionPreset.flatMap { presetClass in
+            model.permissionPresets.first(where: { $0.class == presetClass })?.displayName
+        } ?? String(localized: "Custom permissions")
+        let format = String(localized: "This share is limited to \"%@\". You can only grant the same or fewer permissions.")
+        return String(format: format, locale: .current, presetName)
     }
 
     private func currentSelectedRecipient(in share: NKUnifiedShare) -> NKUnifiedShareRecipient? {
@@ -424,7 +434,7 @@ public struct UnifiedShareEditView: View {
 
     private func applicablePresets(_ recipient: NKUnifiedShareRecipient, in share: NKUnifiedShare) -> [NKUnifiedSharePermissionPreset] {
         let applicable = Set(recipient.effectivePermissions(in: share).flatMap { $0.presets })
-        return model.permissionPresets.filter { applicable.contains($0.class) }
+        return model.permissionPresets.filter { applicable.contains($0.class) && share.allowsRecipientPreset($0.class) }
     }
 
     /// The effective preset class: the user's pick, else the share's server-side preset.

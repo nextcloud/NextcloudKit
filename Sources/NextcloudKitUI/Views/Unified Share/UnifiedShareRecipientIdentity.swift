@@ -30,3 +30,13 @@ extension NKUnifiedShareRecipient {
         return share.permissions.map { overrides[$0.class] ?? $0 } + permissions.filter { !inheritedClasses.contains($0.class) }
     }
 }
+
+extension NKUnifiedShare {
+    func allowsRecipientPermission(_ permissionClass: String) -> Bool {
+        permissions.first(where: { $0.class == permissionClass })?.enabled == true
+    }
+
+    func allowsRecipientPreset(_ presetClass: String) -> Bool {
+        permissions.allSatisfy { !$0.presets.contains(presetClass) || $0.enabled }
+    }
+}

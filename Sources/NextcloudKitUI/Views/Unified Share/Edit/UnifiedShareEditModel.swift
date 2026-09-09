@@ -181,7 +181,7 @@ public class UnifiedShareEditModel {
                                 recipient: NKUnifiedShareRecipient,
                                 permissionClass: String,
                                 enabled: Bool) {
-        guard !isUpdatingPermissions else { return }
+        guard !isUpdatingPermissions, !enabled || share.allowsRecipientPermission(permissionClass) else { return }
         isUpdatingPermissions = true
 
         Task {
@@ -209,7 +209,7 @@ public class UnifiedShareEditModel {
     func setRecipientPermissionPreset(share: NKUnifiedShare,
                                       recipient: NKUnifiedShareRecipient,
                                       presetClass: String) {
-        guard !isUpdatingPermissions else { return }
+        guard !isUpdatingPermissions, share.allowsRecipientPreset(presetClass) else { return }
         isUpdatingPermissions = true
 
         Task {
