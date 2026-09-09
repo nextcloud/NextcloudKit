@@ -656,6 +656,7 @@ public struct UnifiedShareEditView: View {
 
             Text(recipient.displayName)
                 .lineLimit(1)
+                .truncationMode(.tail)
 
             Button {
                 recipientToDelete = recipient
@@ -665,6 +666,7 @@ public struct UnifiedShareEditView: View {
                     .foregroundStyle(.secondary)
             }
             .buttonStyle(.plain)
+            .fixedSize()
             .accessibilityLabel(String(localized: "Delete recipient"))
             .confirmationDialog(
                 String(localized: "Delete recipient?"),

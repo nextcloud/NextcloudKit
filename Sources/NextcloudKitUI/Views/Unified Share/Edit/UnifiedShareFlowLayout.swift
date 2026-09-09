@@ -11,13 +11,14 @@ struct FlowLayout: Layout {
 
     func sizeThatFits(proposal: ProposedViewSize, subviews: Subviews, cache: inout Void) -> CGSize {
         let maxWidth = proposal.width ?? .infinity
+        let subviewProposal = proposal.width.map { ProposedViewSize(width: $0, height: nil) } ?? .unspecified
         var rowWidth: CGFloat = 0
         var rowHeight: CGFloat = 0
         var totalWidth: CGFloat = 0
         var totalHeight: CGFloat = 0
 
         for subview in subviews {
-            let size = subview.sizeThatFits(.unspecified)
+            let size = subview.sizeThatFits(subviewProposal)
 
             if rowWidth > 0, rowWidth + spacing + size.width > maxWidth {
                 totalWidth = max(totalWidth, rowWidth)
@@ -41,7 +42,7 @@ struct FlowLayout: Layout {
         var rowHeight: CGFloat = 0
 
         for subview in subviews {
-            let size = subview.sizeThatFits(.unspecified)
+            let size = subview.sizeThatFits(ProposedViewSize(width: bounds.width, height: nil))
 
             if x > bounds.minX, x + size.width > bounds.maxX {
                 x = bounds.minX
