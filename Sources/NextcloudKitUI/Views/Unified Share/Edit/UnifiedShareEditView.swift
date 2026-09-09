@@ -728,8 +728,10 @@ public struct UnifiedShareEditView: View {
             } else {
                 Spacer()
 
-                Button(String(localized: "Send")) {
+                Button {
                     model.activate(share: share)
+                } label: {
+                    Label(String(localized: "Send"), systemImage: "paperplane.fill")
                 }
                 .buttonStyle(.borderedProminent)
                 .disabled(!canSend(share))
