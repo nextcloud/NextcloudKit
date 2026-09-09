@@ -384,7 +384,8 @@ public struct UnifiedShareEditView: View {
     }
 
     private func requestTopPermissionChange(_ change: TopPermissionChange) {
-        guard change.share.recipients.contains(where: { $0.class != UnifiedShareEditModel.tokenRecipientClass }) else {
+        guard isEditingExisting,
+              change.share.recipients.contains(where: { $0.class != UnifiedShareEditModel.tokenRecipientClass }) else {
             applyTopPermissionChange(change)
             return
         }
