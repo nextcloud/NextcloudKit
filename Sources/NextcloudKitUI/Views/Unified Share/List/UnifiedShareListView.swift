@@ -311,7 +311,7 @@ public struct UnifiedShareListView: View {
 
                 Divider()
 
-                Button(String(localized: "Can…")) {
+                Button(String(localized: "Custom permissions")) {
                     editing = ShareEditor(share: share, forceCustomPermissions: true)
                 }
             } label: {
@@ -330,7 +330,7 @@ public struct UnifiedShareListView: View {
 
                 Divider()
 
-                Button(String(localized: "Can…")) {
+                Button(String(localized: "Custom permissions")) {
                     editing = ShareEditor(share: share, recipient: recipient)
                 }
             } label: {
@@ -401,7 +401,7 @@ public struct UnifiedShareListView: View {
         if recipient.permissions.isEmpty || isLink(recipient) {
             guard let presetClass = share.permissionPreset,
                   let preset = applicablePresets.first(where: { $0.class == presetClass }) else {
-                return String(localized: "Can…")
+                return String(localized: "Custom permissions")
             }
             return preset.displayName
         }
@@ -414,7 +414,7 @@ public struct UnifiedShareListView: View {
             return preset.displayName
         }
 
-        return String(localized: "Can…")
+        return String(localized: "Custom permissions")
     }
 
     // MARK: - Helpers

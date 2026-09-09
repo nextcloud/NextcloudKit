@@ -1427,13 +1427,13 @@
         }
       }
     },
-    "Can…" : {
+    "Custom permissions" : {
       "comment" : "Menu option that reveals per-permission toggles for custom permissions.",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Can…"
+            "value" : "Custom permissions"
           }
         }
       }
@@ -4334,17 +4334,6 @@
         }
       }
     },
-    "Save share" : {
-      "comment" : "Primary button that activates a new unified share for invited recipients.",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Save share"
-          }
-        }
-      }
-    },
     "Share \"%@\"" : {
       "comment" : "Share editor title; placeholder is the shared file or folder name.",
       "localizations" : {
@@ -4396,17 +4385,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Share link (%lld)"
-          }
-        }
-      }
-    },
-    "Share public link" : {
-      "comment" : "Primary action activating an Anyone share.",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Share public link"
           }
         }
       }

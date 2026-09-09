@@ -299,7 +299,7 @@ public struct UnifiedShareEditView: View {
                     .tag(preset.class)
             }
 
-            Text(String(localized: "Can…"))
+            Text(String(localized: "Custom permissions"))
                 .tag(Self.customTag)
         }
         .pickerStyle(.menu)
@@ -364,7 +364,7 @@ public struct UnifiedShareEditView: View {
             }
 
             // Custom: reveals the per-permission toggles below. Client-side only, no request.
-            Text(String(localized: "Can…"))
+            Text(String(localized: "Custom permissions"))
                 .tag(Self.customTag)
         }
         .pickerStyle(.menu)
@@ -728,7 +728,7 @@ public struct UnifiedShareEditView: View {
             } else {
                 Spacer()
 
-                Button(sendLabel) {
+                Button(String(localized: "Send")) {
                     model.activate(share: share)
                 }
                 .buttonStyle(.borderedProminent)
@@ -785,14 +785,6 @@ public struct UnifiedShareEditView: View {
 
             showsCopied = false
         }
-    }
-
-    private var sendLabel: String {
-        if shareeType == .anyone {
-            return String(localized: "Share public link")
-        }
-
-        return String(localized: "Save share")
     }
 
     /// Structural sendability — gates whether the action buttons render at all.
