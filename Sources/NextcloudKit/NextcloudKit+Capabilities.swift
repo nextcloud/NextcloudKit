@@ -119,6 +119,7 @@ public extension NextcloudKit {
                     struct Capabilities: Codable {
                         let downloadLimit: DownloadLimit?
                         let filessharing: FilesSharing?
+                        let sharing: Sharing?
                         let theming: Theming?
                         let endtoendencryption: EndToEndEncryption?
                         let richdocuments: RichDocuments?
@@ -138,6 +139,7 @@ public extension NextcloudKit {
                         enum CodingKeys: String, CodingKey {
                             case downloadLimit = "downloadlimit"
                             case filessharing = "files_sharing"
+                            case sharing
                             case theming
                             case endtoendencryption = "end-to-end-encryption"
                             case richdocuments, activity, notifications, files
@@ -152,6 +154,8 @@ public extension NextcloudKit {
                         }
 
                         struct Governance: Codable {}
+
+                        struct Sharing: Codable {}
 
                         struct DownloadLimit: Codable {
                             let enabled: Bool?
@@ -395,6 +399,8 @@ public extension NextcloudKit {
             capabilities.fileSharingDownloadLimit = json.downloadLimit?.enabled ?? false
             capabilities.fileSharingDownloadLimitDefaultLimit = json.downloadLimit?.defaultLimit ?? 1
 
+            capabilities.unifiedSharingEnabled = json.sharing != nil
+
             capabilities.themingColor = json.theming?.color ?? ""
             capabilities.themingColorElement = json.theming?.colorelement ?? ""
             capabilities.themingColorText = json.theming?.colortext ?? ""
@@ -500,6 +506,7 @@ final public class NKCapabilities: Sendable {
         public var fileSharingDefaultPermission: Int                = 0
         public var fileSharingDownloadLimit: Bool                   = false
         public var fileSharingDownloadLimitDefaultLimit: Int        = 1
+        public var unifiedSharingEnabled: Bool                      = false
         public var themingColor: String                             = ""
         public var themingColorElement: String                      = ""
         public var themingColorText: String                         = ""
