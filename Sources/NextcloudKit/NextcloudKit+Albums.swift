@@ -13,8 +13,7 @@ public extension NextcloudKit {
         for account: String,
         options: NKRequestOptions = NKRequestOptions(),
         taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-        completion: @escaping (Result<[NKAlbumDTO], Error>) -> Void
-    ) {
+        completion: @escaping (Result<[NKPhotoAlbum], Error>) -> Void) {
         guard let nkSession = nkCommonInstance.nksessions.session(forAccount: account),
               let url = nkCommonInstance.createStandardUrl(
                 serverUrl: nkSession.urlBase,
@@ -23,7 +22,6 @@ public extension NextcloudKit {
               let headers = nkCommonInstance.getStandardHeaders(account: account, options: options) else {
             return completion(.failure(NKError.urlError))
         }
-        let method = HTTPMethod(rawValue: "PROPFIND")
         let propfindXML = """
         <?xml version="1.0"?>
         <d:propfind xmlns:d="DAV:" xmlns:oc="http://owncloud.org/ns" xmlns:nc="http://nextcloud.org/ns" xmlns:ocs="http://open-collaboration-services.org/ns">
@@ -36,10 +34,10 @@ public extension NextcloudKit {
             </d:prop>
         </d:propfind>
         """
-
         var urlRequest: URLRequest
+
         do {
-            try urlRequest = URLRequest(url: url, method: method, headers: headers)
+            try urlRequest = URLRequest(url: url, method: HTTPMethod(rawValue: "PROPFIND"), headers: headers)
             urlRequest.httpBody = propfindXML.data(using: .utf8)
             urlRequest.timeoutInterval = options.timeout
         } catch {
@@ -50,11 +48,6 @@ public extension NextcloudKit {
             task.taskDescription = options.taskDescription
             taskHandler(task)
         }.responseData(queue: self.nkCommonInstance.backgroundQueue) { response in
-            // Explicit 404 check
-            if response.response?.statusCode == 404 {
-                return completion(.success([]))
-            }
-
             switch response.result {
             case .failure(let error):
                 let error = NKError(error: error, afResponse: response, responseData: response.data)
@@ -65,7 +58,7 @@ public extension NextcloudKit {
                     return completion(.failure(NKError.invalidData))
                 }
 
-                let albums = self.parseAlbumsXML(data: data)
+                let albums = self.parseAlbumsXML(account: account, data: data)
                 completion(.success(albums))
             }
         }
@@ -76,8 +69,7 @@ public extension NextcloudKit {
         albumName: String,
         options: NKRequestOptions = NKRequestOptions(),
         taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-        completion: @escaping (Result<Bool, NKError>) -> Void
-    ) {
+        completion: @escaping (Result<String, NKError>) -> Void) {
         guard let nkSession = nkCommonInstance.nksessions.session(forAccount: account),
               let url = nkCommonInstance.createStandardUrl(
                 serverUrl: nkSession.urlBase,
@@ -86,11 +78,10 @@ public extension NextcloudKit {
               let headers = nkCommonInstance.getStandardHeaders(account: account, options: options) else {
             return completion(.failure(NKError.urlError))
         }
-        let method = HTTPMethod(rawValue: "MKCOL")
-
         var urlRequest: URLRequest
+
         do {
-            try urlRequest = URLRequest(url: url, method: method, headers: headers)
+            try urlRequest = URLRequest(url: url, method: HTTPMethod(rawValue: "MKCOL"), headers: headers)
             urlRequest.timeoutInterval = options.timeout
         } catch {
             return completion(.failure(NKError(error: error)))
@@ -100,22 +91,13 @@ public extension NextcloudKit {
             task.taskDescription = options.taskDescription
             taskHandler(task)
         }.responseData(queue: self.nkCommonInstance.backgroundQueue) { response in
-            // Explicit 405 check -> treat as conflict (album already exists)
-            if let statusCode = response.response?.statusCode, statusCode == 405 {
-                // Resolve localized message so UI using `localizedDescription` shows the proper text
-                let message = NSLocalizedString("_album_already_exists_", comment: "Album already exists")
-                // Build an NSError carrying the localized description
-                let nsError = NSError(domain: "NextcloudKit", code: statusCode, userInfo: [NSLocalizedDescriptionKey: message])
-                return completion(.failure(NKError(error: nsError)))
-            }
-
             switch response.result {
             case .failure(let error):
                 let error = NKError(error: error, afResponse: response, responseData: response.data)
                 completion(.failure(error))
 
             case .success:
-                completion(.success(true))
+                completion(.success(account))
             }
         }
     }
@@ -125,43 +107,21 @@ public extension NextcloudKit {
         account: String,
         options: NKRequestOptions = NKRequestOptions(),
         taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-        completion: @escaping (Result<[NKAlbumPhotoDTO], Error>) -> Void
+        completion: @escaping (Result<[NKFile], Error>) -> Void
     ) {
         guard let nkSession = nkCommonInstance.nksessions.session(forAccount: account),
               let url = nkCommonInstance.createStandardUrl(
                 serverUrl: nkSession.urlBase,
                 endpoint: nkSession.urlBase + "/remote.php/dav/photos/" + nkSession.userId + "/albums/" + album + "/"
               ),
-              let headers = nkCommonInstance.getStandardHeaders(account: account, options: options) else {
+              let headers = nkCommonInstance.getStandardHeaders(account: account, options: options, contentType: "application/xml", accept: "application/xml") else {
             return completion(.failure(NKError.urlError))
         }
-        let method = HTTPMethod(rawValue: "PROPFIND")
-
-        let propfindXML = """
-        <d:propfind xmlns:d="DAV:" xmlns:oc="http://owncloud.org/ns"
-        xmlns:nc="http://nextcloud.org/ns" xmlns:ocs="http://open-collaborationservices.org/ns">
-         <d:prop>
-         <d:getcontentlength />
-         <d:getcontenttype />
-         <d:getetag />
-         <d:getlastmodified />
-         <d:resourcetype />
-         <nc:metadata-photos-size />
-         <nc:metadata-photos-original_date_time />
-         <nc:metadata-files-live-photo />
-         <nc:has-preview />
-         <nc:hidden />
-         <oc:favorite />
-         <oc:fileid />
-         <oc:permissions />
-         </d:prop>
-        </d:propfind>
-        """
-
         var urlRequest: URLRequest
+
         do {
-            try urlRequest = URLRequest(url: url, method: method, headers: headers)
-            urlRequest.httpBody = propfindXML.data(using: .utf8)
+            try urlRequest = URLRequest(url: url, method: HTTPMethod(rawValue: "PROPFIND"), headers: headers)
+            urlRequest.httpBody = NKDataFileXML(nkCommonInstance: self.nkCommonInstance).getRequestBodyFile(createProperties: options.createProperties, removeProperties: options.removeProperties).data(using: .utf8)
             urlRequest.timeoutInterval = options.timeout
         } catch {
             return completion(.failure(NKError(error: error)))
@@ -171,11 +131,6 @@ public extension NextcloudKit {
             task.taskDescription = options.taskDescription
             taskHandler(task)
         }.responseData(queue: self.nkCommonInstance.backgroundQueue) { response in
-            // Explicit 404 check
-            if response.response?.statusCode == 404 {
-                return completion(.success([]))
-            }
-
             switch response.result {
             case .failure(let error):
                 let error = NKError(error: error, afResponse: response, responseData: response.data)
@@ -187,10 +142,9 @@ public extension NextcloudKit {
                         completion(.failure(NKError.invalidData))
                     }
                 }
-
-                let photos = self.parseAlbumPhotosXML(data: data)
-                options.queue.async {
-                    completion(.success(photos))
+                Task {
+                    let files = await NKDataFileXML(nkCommonInstance: self.nkCommonInstance).convertDataFile(xmlData: data, nkSession: nkSession, rootFileName: self.nkCommonInstance.rootFileName, showHiddenFiles: true, includeHiddenFiles: [])
+                    completion(.success(files))
                 }
             }
         }
@@ -202,8 +156,7 @@ public extension NextcloudKit {
             fileName: String,
             options: NKRequestOptions = NKRequestOptions(),
             taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-            completion: @escaping (Result<Void, Error>) -> Void
-        ) {
+            completion: @escaping (Result<String, Error>) -> Void) {
             guard let nkSession = nkCommonInstance.nksessions.session(forAccount: account),
                   var headers = nkCommonInstance.getStandardHeaders(account: account, options: options) else {
                 return completion(.failure(NKError.urlError))
@@ -230,36 +183,138 @@ public extension NextcloudKit {
                 try urlRequest = URLRequest(url: sourceUrl, method: .init(rawValue: "COPY"), headers: headers)
                 urlRequest.timeoutInterval = options.timeout
             } catch {
-                return options.queue.async { completion(.failure(NKError(error: error))) }
+                return completion(.failure(NKError(error: error)))
             }
 
             nkSession.sessionData.request(urlRequest, interceptor: NKInterceptor(nkCommonInstance: nkCommonInstance)).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
                 task.taskDescription = options.taskDescription
                 taskHandler(task)
             }.responseData(queue: self.nkCommonInstance.backgroundQueue) { response in
-                let statusCode = response.response?.statusCode
-                // Explicit 404 check
-                if statusCode == 404 || statusCode == 403 {
-                    return completion(.success(()))
-                }
-
                 switch response.result {
                 case .failure(let error):
                     let error = NKError(error: error, afResponse: response, responseData: response.data)
                     completion(.failure(error))
 
                 case .success:
-                    completion(.success(()))
+                    completion(.success((account)))
                 }
+            }
+        }
+    }
+
+    func deletePhotoFromAlbum(albumName: String,
+                              fileName: String,
+                              account: String,
+                              options: NKRequestOptions = NKRequestOptions(),
+                              taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
+                              completion: @escaping (Result<String, Error>) -> Void) {
+        guard let nkSession = nkCommonInstance.nksessions.session(forAccount: account),
+              let url = nkCommonInstance.createStandardUrl(
+                serverUrl: nkSession.urlBase,
+                endpoint: nkSession.urlBase + "/remote.php/dav/photos/" + nkSession.userId + "/albums/" + albumName + "/" + fileName
+              ),
+              let headers = nkCommonInstance.getStandardHeaders(account: account, options: options) else {
+            return completion(.failure(NKError.urlError))
+        }
+
+        var urlRequest: URLRequest
+        do {
+            try urlRequest = URLRequest(url: url, method: .delete, headers: headers)
+            urlRequest.timeoutInterval = options.timeout
+        } catch {
+            return completion(.failure(NKError(error: error)))
+        }
+
+        nkSession.sessionData.request(urlRequest, interceptor: NKInterceptor(nkCommonInstance: nkCommonInstance)).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
+            task.taskDescription = options.taskDescription
+            taskHandler(task)
+        }.responseData(queue: self.nkCommonInstance.backgroundQueue) { response in
+            switch response.result {
+            case .failure(let error):
+                let error = NKError(error: error, afResponse: response, responseData: response.data)
+                completion(.failure(error))
+
+            case .success:
+                completion(.success((account)))
+            }
+        }
+    }
+
+    func deletePhotoFromAlbumAsync(
+        albumName: String,
+        fileName: String,
+        account: String,
+        options: NKRequestOptions = NKRequestOptions(),
+        taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in }
+    ) async throws -> String {
+        try await withCheckedThrowingContinuation { continuation in
+            deletePhotoFromAlbum(
+                albumName: albumName,
+                fileName: fileName,
+                account: account,
+                options: options,
+                taskHandler: taskHandler
+            ) { result in
+                continuation.resume(with: result)
+            }
+        }
+    }
+
+    func renameAlbum(
+        account: String,
+        from name: String,
+        to newName: String,
+        options: NKRequestOptions = NKRequestOptions(),
+        taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
+        completion: @escaping (Result<String, Error>) -> Void) {
+        guard let nkSession = nkCommonInstance.nksessions.session(forAccount: account),
+              let url = nkCommonInstance.createStandardUrl(
+                serverUrl: nkSession.urlBase,
+                endpoint: nkSession.urlBase + "/remote.php/dav/photos/" + nkSession.userId + "/albums/" + name + "/"
+              ),
+              var headers = nkCommonInstance.getStandardHeaders(account: account, options: options) else {
+            return completion(.failure(NKError.urlError))
+        }
+        let destinationHeader = "/remote.php/dav/photos/" + nkSession.userId + "/albums/" + newName + "/"
+
+        // Add the required MOVE header
+        headers.add(
+            name: "Destination",
+            value: destinationHeader.addingPercentEncoding(
+                withAllowedCharacters: CharacterSet.urlQueryAllowed.subtracting(["+", "?", "&"])
+            ) ?? destinationHeader
+        )
+        // Disallow overwriting an existing destination to avoid silent data loss
+        headers.add(name: "Overwrite", value: "F")
+
+        var urlRequest: URLRequest
+        do {
+            try urlRequest = URLRequest(url: url, method: .init(rawValue: "MOVE"), headers: headers)
+            urlRequest.timeoutInterval = options.timeout
+        } catch {
+            return completion(.failure(NKError(error: error)))
+        }
+
+        nkSession.sessionData.request(urlRequest, interceptor: NKInterceptor(nkCommonInstance: nkCommonInstance)).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
+            task.taskDescription = options.taskDescription
+            taskHandler(task)
+        }.responseData(queue: self.nkCommonInstance.backgroundQueue) { response in
+            switch response.result {
+            case .failure(let error):
+                let error = NKError(error: error, afResponse: response, responseData: response.data)
+                completion(.failure(error))
+
+            case .success:
+                completion(.success((account)))
             }
         }
     }
 
     // MARK: - Helper
 
-    private func parseAlbumsXML(data: Data) -> [NKAlbumDTO] {
+    private func parseAlbumsXML(account: String, data: Data) -> [NKPhotoAlbum] {
         let xml = XML.parse(data)
-        var albums: [NKAlbumDTO] = []
+        var albums: [NKPhotoAlbum] = []
         let elements = xml["d:multistatus", "d:response"]
 
         for element in elements {
@@ -274,7 +329,8 @@ public extension NextcloudKit {
             // Optionally skip entries with 404 status
             let status = element["d:propstat"]["d:status"].element?.text ?? ""
             if status.contains("200") {
-                let album = NKAlbumDTO(
+                let album = NKPhotoAlbum(
+                    account: account,
                     href: href,
                     lastPhotoId: lastPhoto,
                     itemCount: nbItems,
@@ -287,68 +343,5 @@ public extension NextcloudKit {
         }
 
         return albums
-    }
-
-    private func parseAlbumPhotosXML(data: Data) -> [NKAlbumPhotoDTO] {
-        let xml = XML.parse(data)
-        var photos: [NKAlbumPhotoDTO] = []
-        let elements = xml["d:multistatus", "d:response"]
-
-        let formatter = DateFormatter()
-        formatter.locale = Locale(identifier: "en_US_POSIX")
-        formatter.dateFormat = "EEE, dd MMM yyyy HH:mm:ss zzz"
-
-        for element in elements {
-            let href = element["d:href"].element?.text ?? ""
-            let fileName = URL(string: href)?.lastPathComponent ?? href
-            let propstats: [XML.Element] = element["d:propstat"].all ?? []
-
-            for propstat in propstats {
-                let ps = XML.Accessor(propstat)
-                let status = ps["d:status"].element?.text ?? ""
-                guard status.contains("200") else { continue }
-                let prop = ps["d:prop"]
-
-                guard let fileId = prop["oc:fileid"].element?.text else { continue }
-
-                let contentType = prop["d:getcontenttype"].element?.text ?? ""
-                let contentLength = prop["d:getcontentlength"].element?.text.flatMap { Int($0) } ?? 0
-                let lastModified = prop["d:getlastmodified"].element?.text.flatMap {
-                    formatter.date(from: $0)
-                } ?? Date()
-
-                let hasPreview = prop["nc:has-preview"].element?.text == "true"
-                let isHidden = prop["nc:hidden"].element?.text == "true"
-                let isFavorite = prop["oc:favorite"].element?.text == "1"
-                let permissions = prop["oc:permissions"].element?.text ?? ""
-
-                let originalDateTime = prop["nc:metadata-photos-original_date_time"]
-                    .element?.text.flatMap { Double($0) }
-                    .flatMap { Date(timeIntervalSince1970: $0) }
-
-                let sizeNode = prop["nc:metadata-photos-size"]
-                let width = sizeNode["width"].element?.text.flatMap { Int($0) }
-                let height = sizeNode["height"].element?.text.flatMap { Int($0) }
-
-                let photo = NKAlbumPhotoDTO(
-                    fileId: fileId,
-                    fileName: fileName,
-                    contentType: contentType,
-                    contentLength: contentLength,
-                    lastModified: lastModified,
-                    hasPreview: hasPreview,
-                    isHidden: isHidden,
-                    isFavorite: isFavorite,
-                    permissions: permissions,
-                    originalDateTime: originalDateTime,
-                    width: width,
-                    height: height
-                )
-
-                photos.append(photo)
-            }
-        }
-
-        return photos
     }
 }
