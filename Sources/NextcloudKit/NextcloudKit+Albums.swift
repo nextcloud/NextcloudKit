@@ -9,6 +9,9 @@ import SwiftyJSON
 import SwiftyXMLParser
 
 public extension NextcloudKit {
+
+    // MARK: - Album
+
     func fetchAllAlbums(
         for account: String,
         options: NKRequestOptions = NKRequestOptions(),
@@ -103,6 +106,98 @@ public extension NextcloudKit {
             }
         }
     }
+
+    func renameAlbum(
+        account: String,
+        from name: String,
+        to newName: String,
+        options: NKRequestOptions = NKRequestOptions(),
+        taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
+        completion: @escaping (Result<String, Error>) -> Void) {
+        guard let nkSession = nkCommonInstance.nksessions.session(forAccount: account),
+              let endpoint = albumEndpoint(userId: nkSession.userId, albumName: name),
+              let url = nkCommonInstance.createStandardUrl(
+                serverUrl: nkSession.urlBase,
+                endpoint: endpoint
+              ),
+              var headers = nkCommonInstance.getStandardHeaders(account: account, options: options) else {
+            return options.queue.async { completion(.failure(NKError.urlError)) }
+        }
+        guard let destinationEndpoint = albumEndpoint(userId: nkSession.userId, albumName: newName),
+              let destinationUrl = nkCommonInstance.createStandardUrl(serverUrl: nkSession.urlBase, endpoint: destinationEndpoint),
+              let destination = try? destinationUrl.asURL() else {
+            return options.queue.async { completion(.failure(NKError.urlError)) }
+        }
+
+        // Add the required MOVE header
+        headers.add(name: "Destination", value: destination.absoluteString)
+        // Disallow overwriting an existing destination to avoid silent data loss
+        headers.add(name: "Overwrite", value: "F")
+
+        var urlRequest: URLRequest
+        do {
+            try urlRequest = URLRequest(url: url, method: .init(rawValue: "MOVE"), headers: headers)
+            urlRequest.timeoutInterval = options.timeout
+        } catch {
+            return options.queue.async { completion(.failure(NKError(error: error))) }
+        }
+
+        nkSession.sessionData.request(urlRequest, interceptor: NKInterceptor(nkCommonInstance: nkCommonInstance)).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
+            task.taskDescription = options.taskDescription
+            taskHandler(task)
+        }.responseData(queue: self.nkCommonInstance.backgroundQueue) { response in
+            switch response.result {
+            case .failure(let error):
+                let error = NKError(error: error, afResponse: response, responseData: response.data)
+                options.queue.async { completion(.failure(error)) }
+
+            case .success:
+                options.queue.async { completion(.success((account))) }
+            }
+        }
+    }
+
+    func deleteAlbum(
+        albumName: String,
+        account: String,
+        options: NKRequestOptions = NKRequestOptions(),
+        taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
+        completion: @escaping (Result<String, Error>) -> Void) {
+
+        guard let nkSession = nkCommonInstance.nksessions.session(forAccount: account),
+              let endpoint = albumEndpoint(userId: nkSession.userId, albumName: albumName),
+              let url = nkCommonInstance.createStandardUrl(
+                serverUrl: nkSession.urlBase,
+                endpoint: endpoint
+              ),
+              let headers = nkCommonInstance.getStandardHeaders(account: account, options: options) else {
+            return options.queue.async { completion(.failure(NKError.urlError)) }
+        }
+
+        var urlRequest: URLRequest
+        do {
+            try urlRequest = URLRequest(url: url, method: .delete, headers: headers)
+            urlRequest.timeoutInterval = options.timeout
+        } catch {
+            return options.queue.async { completion(.failure(NKError(error: error))) }
+        }
+
+        nkSession.sessionData.request(urlRequest, interceptor: NKInterceptor(nkCommonInstance: nkCommonInstance)).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
+            task.taskDescription = options.taskDescription
+            taskHandler(task)
+        }.responseData(queue: self.nkCommonInstance.backgroundQueue) { response in
+            switch response.result {
+            case .failure(let error):
+                let error = NKError(error: error, afResponse: response, responseData: response.data)
+                options.queue.async { completion(.failure(error)) }
+
+            case .success:
+                options.queue.async { completion(.success((account))) }
+            }
+        }
+    }
+
+    // MARK: - Album Photo
 
     func fetchAlbumPhotos(
         for album: String,
@@ -261,56 +356,6 @@ public extension NextcloudKit {
                 taskHandler: taskHandler
             ) { result in
                 continuation.resume(with: result)
-            }
-        }
-    }
-
-    func renameAlbum(
-        account: String,
-        from name: String,
-        to newName: String,
-        options: NKRequestOptions = NKRequestOptions(),
-        taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-        completion: @escaping (Result<String, Error>) -> Void) {
-        guard let nkSession = nkCommonInstance.nksessions.session(forAccount: account),
-              let endpoint = albumEndpoint(userId: nkSession.userId, albumName: name),
-              let url = nkCommonInstance.createStandardUrl(
-                serverUrl: nkSession.urlBase,
-                endpoint: endpoint
-              ),
-              var headers = nkCommonInstance.getStandardHeaders(account: account, options: options) else {
-            return options.queue.async { completion(.failure(NKError.urlError)) }
-        }
-        guard let destinationEndpoint = albumEndpoint(userId: nkSession.userId, albumName: newName),
-              let destinationUrl = nkCommonInstance.createStandardUrl(serverUrl: nkSession.urlBase, endpoint: destinationEndpoint),
-              let destination = try? destinationUrl.asURL() else {
-            return options.queue.async { completion(.failure(NKError.urlError)) }
-        }
-
-        // Add the required MOVE header
-        headers.add(name: "Destination", value: destination.absoluteString)
-        // Disallow overwriting an existing destination to avoid silent data loss
-        headers.add(name: "Overwrite", value: "F")
-
-        var urlRequest: URLRequest
-        do {
-            try urlRequest = URLRequest(url: url, method: .init(rawValue: "MOVE"), headers: headers)
-            urlRequest.timeoutInterval = options.timeout
-        } catch {
-            return options.queue.async { completion(.failure(NKError(error: error))) }
-        }
-
-        nkSession.sessionData.request(urlRequest, interceptor: NKInterceptor(nkCommonInstance: nkCommonInstance)).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
-            task.taskDescription = options.taskDescription
-            taskHandler(task)
-        }.responseData(queue: self.nkCommonInstance.backgroundQueue) { response in
-            switch response.result {
-            case .failure(let error):
-                let error = NKError(error: error, afResponse: response, responseData: response.data)
-                options.queue.async { completion(.failure(error)) }
-
-            case .success:
-                options.queue.async { completion(.success((account))) }
             }
         }
     }
