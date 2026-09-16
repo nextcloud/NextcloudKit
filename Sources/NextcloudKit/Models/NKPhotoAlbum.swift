@@ -5,11 +5,11 @@
 import Foundation
 
 public struct NKPhotoAlbum {
-    let account: String
-    let href: String
-    let lastPhotoId: String?
-    let itemCount: Int?
-    let location: String?
-    let dateRange: String?
-    let collaborators: String?
+    public let account: String
+    public let href: String
+    public let lastPhotoId: String?
+    public let itemCount: Int?
+    public let location: String?
+    public let dateRange: String?
+    public let collaborators: String?
 }
