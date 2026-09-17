@@ -289,7 +289,7 @@ public extension NextcloudKit {
         nkSession.sessionData.request(urlRequest, interceptor: NKInterceptor(nkCommonInstance: nkCommonInstance)).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
             task.taskDescription = options.taskDescription
             taskHandler(task)
-        }.responseData(queue: self.nkCommonInstance.backgroundQueue) { response in
+        }.response(queue: self.nkCommonInstance.backgroundQueue) { response in
             if let error = response.error {
                 let error = NKError(error: error, afResponse: response, responseData: response.data)
                 options.queue.async { completion(.failure(error)) }
