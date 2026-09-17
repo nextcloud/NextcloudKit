@@ -141,12 +141,13 @@ public extension NextcloudKit {
         nkSession.sessionData.request(urlRequest, interceptor: NKInterceptor(nkCommonInstance: nkCommonInstance)).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
             task.taskDescription = options.taskDescription
             taskHandler(task)
-        }.response(queue: self.nkCommonInstance.backgroundQueue) { response in
-            if let error = response.error {
+        }.responseData(queue: self.nkCommonInstance.backgroundQueue) { response in
+            switch response.result {
+            case .failure(let error):
                 let error = NKError(error: error, afResponse: response, responseData: response.data)
                 options.queue.async { completion(.failure(error)) }
-            } else {
-                options.queue.async { completion(.success(account)) }
+            case .success:
+                options.queue.async { completion(.success((account))) }
             }
         }
     }
