@@ -16,7 +16,7 @@ public extension NextcloudKit {
         for account: String,
         options: NKRequestOptions = NKRequestOptions(),
         taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-        completion: @escaping (Result<[NKPhotoAlbum], Error>) -> Void) {
+        completion: @escaping (Result<[NKPhotoAlbum], NKError>) -> Void) {
         guard let nkSession = nkCommonInstance.nksessions.session(forAccount: account),
               let endpoint = albumEndpoint(userId: nkSession.userId),
               let url = nkCommonInstance.createStandardUrl(
@@ -113,7 +113,7 @@ public extension NextcloudKit {
         to newName: String,
         options: NKRequestOptions = NKRequestOptions(),
         taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-        completion: @escaping (Result<String, Error>) -> Void) {
+        completion: @escaping (Result<String, NKError>) -> Void) {
         guard let nkSession = nkCommonInstance.nksessions.session(forAccount: account),
               let endpoint = albumEndpoint(userId: nkSession.userId, albumName: name),
               let url = nkCommonInstance.createStandardUrl(
@@ -162,7 +162,7 @@ public extension NextcloudKit {
         account: String,
         options: NKRequestOptions = NKRequestOptions(),
         taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-        completion: @escaping (Result<String, Error>) -> Void) {
+        completion: @escaping (Result<String, NKError>) -> Void) {
 
         guard let nkSession = nkCommonInstance.nksessions.session(forAccount: account),
               let endpoint = albumEndpoint(userId: nkSession.userId, albumName: albumName),
@@ -204,7 +204,7 @@ public extension NextcloudKit {
         account: String,
         options: NKRequestOptions = NKRequestOptions(),
         taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-        completion: @escaping (Result<[NKFile], Error>) -> Void) {
+        completion: @escaping (Result<[NKFile], NKError>) -> Void) {
         guard let nkSession = nkCommonInstance.nksessions.session(forAccount: account),
               let endpoint = albumEndpoint(userId: nkSession.userId, albumName: album),
               let url = nkCommonInstance.createStandardUrl(
@@ -252,7 +252,7 @@ public extension NextcloudKit {
         fileName: String,
         options: NKRequestOptions = NKRequestOptions(),
         taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-        completion: @escaping (Result<String, Error>) -> Void) {
+        completion: @escaping (Result<String, NKError>) -> Void) {
         guard let nkSession = nkCommonInstance.nksessions.session(forAccount: account),
               var headers = nkCommonInstance.getStandardHeaders(account: account, options: options) else {
             return options.queue.async { completion(.failure(NKError.urlError)) }
@@ -306,7 +306,7 @@ public extension NextcloudKit {
                               account: String,
                               options: NKRequestOptions = NKRequestOptions(),
                               taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-                              completion: @escaping (Result<String, Error>) -> Void) {
+                              completion: @escaping (Result<String, NKError>) -> Void) {
         guard let nkSession = nkCommonInstance.nksessions.session(forAccount: account),
               let endpoint = albumEndpoint(userId: nkSession.userId, albumName: albumName, fileName: fileName),
               let url = nkCommonInstance.createStandardUrl(
