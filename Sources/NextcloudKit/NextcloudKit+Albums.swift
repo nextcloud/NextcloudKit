@@ -56,12 +56,10 @@ public extension NextcloudKit {
             case .failure(let error):
                 let error = NKError(error: error, afResponse: response, responseData: response.data)
                 options.queue.async { completion(.failure(error)) }
-
             case .success:
                 guard let data = response.data else {
                     return options.queue.async { completion(.failure(NKError.invalidData)) }
                 }
-
                 let albums = self.parseAlbumsXML(account: account, data: data)
                 options.queue.async { completion(.success(albums)) }
             }
@@ -143,14 +141,12 @@ public extension NextcloudKit {
         nkSession.sessionData.request(urlRequest, interceptor: NKInterceptor(nkCommonInstance: nkCommonInstance)).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
             task.taskDescription = options.taskDescription
             taskHandler(task)
-        }.responseData(queue: self.nkCommonInstance.backgroundQueue) { response in
-            switch response.result {
-            case .failure(let error):
+        }.response(queue: self.nkCommonInstance.backgroundQueue) { response in
+            if let error = response.error {
                 let error = NKError(error: error, afResponse: response, responseData: response.data)
                 options.queue.async { completion(.failure(error)) }
-
-            case .success:
-                options.queue.async { completion(.success((account))) }
+            } else {
+                options.queue.async { completion(.success(account)) }
             }
         }
     }
@@ -183,14 +179,12 @@ public extension NextcloudKit {
         nkSession.sessionData.request(urlRequest, interceptor: NKInterceptor(nkCommonInstance: nkCommonInstance)).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
             task.taskDescription = options.taskDescription
             taskHandler(task)
-        }.responseData(queue: self.nkCommonInstance.backgroundQueue) { response in
-            switch response.result {
-            case .failure(let error):
+        }.response(queue: self.nkCommonInstance.backgroundQueue) { response in
+            if let error = response.error {
                 let error = NKError(error: error, afResponse: response, responseData: response.data)
                 options.queue.async { completion(.failure(error)) }
-
-            case .success:
-                options.queue.async { completion(.success((account))) }
+            } else {
+                options.queue.async { completion(.success(account)) }
             }
         }
     }
