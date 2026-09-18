@@ -79,7 +79,8 @@ public extension NextcloudKit {
             options.queue.async { taskHandler(task) }
         }) .uploadProgress { progress in
             options.queue.async { progressHandler(progress) }
-        } .responseData(queue: self.nkCommonInstance.backgroundQueue) { response in
+        } .response(queue: self.nkCommonInstance.backgroundQueue) { response in
+            let response = response.map { $0 ?? Data() }
             options.queue.async {
                 completionHandler(account, response, self.evaluateResponse(response))
             }
