@@ -334,7 +334,7 @@ public extension NextcloudKit {
         account: String,
         options: NKRequestOptions = NKRequestOptions(),
         taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in }
-    ) async throws -> String {
+    ) async throws {
         try await withCheckedThrowingContinuation { continuation in
             deletePhotoFromAlbum(
                 albumName: albumName,
@@ -343,7 +343,13 @@ public extension NextcloudKit {
                 options: options,
                 taskHandler: taskHandler
             ) { result in
-                continuation.resume(with: result)
+                switch result {
+                case .success:
+                    continuation.resume()
+
+                case .failure(let error):
+                    continuation.resume(throwing: error)
+                }
             }
         }
     }
