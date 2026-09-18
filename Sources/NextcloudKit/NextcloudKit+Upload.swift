@@ -311,9 +311,12 @@ public extension NextcloudKit {
         // Notify start upload
         uploadStart(chunkedFiles)
 
-        // Global progress baseline (bytes of fully uploaded chunks)
-        var uploadedSoFar: Int64 = 0
-        uploadProgressHandler(totalFileSize, 0, totalFileSize > 0 ? 0.0 : 1.0)
+        // Remaining chunks have cumulative sizes, recomputed from disk by chunkedFile.
+        // Include completed chunks when resuming; the interrupted chunk is sent again.
+        let remainingBytes = chunkedFiles.last?.size ?? 0
+        var uploadedSoFar = max(0, totalFileSize - remainingBytes)
+        let initialFraction = totalFileSize > 0 ? Double(uploadedSoFar) / Double(totalFileSize) : 1.0
+        uploadProgressHandler(totalFileSize, uploadedSoFar, initialFraction)
 
         // Clear box before starting this chunk
         let actorRequest = ActorRequest()
