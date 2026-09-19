@@ -23,6 +23,7 @@ public extension NextcloudKit {
                 serverUrl: nkSession.urlBase,
                 endpoint: endpoint
               ),
+              let collectionURL = try? url.asURL(),
               let headers = nkCommonInstance.getStandardHeaders(account: account, options: options) else {
             return options.queue.async { completion(.failure(NKError.urlError)) }
         }
@@ -60,7 +61,7 @@ public extension NextcloudKit {
                 guard let data = response.data else {
                     return options.queue.async { completion(.failure(NKError.invalidData)) }
                 }
-                let albums = self.parseAlbumsXML(account: account, data: data)
+                let albums = self.parseAlbumsXML(account: account, data: data, collectionURL: collectionURL)
                 options.queue.async { completion(.success(albums)) }
             }
         }
@@ -254,14 +255,7 @@ public extension NextcloudKit {
               let destination = try? destinationUrl.asURL() else {
             return options.queue.async { completion(.failure(NKError.urlError)) }
         }
-        let sourceUrlString: String = {
-            if sourcePath.lowercased().hasPrefix("http") {
-                return sourcePath
-            } else {
-                return nkSession.urlBase + sourcePath
-            }
-        }()
-        guard let sourceUrl = sourceUrlString.encodedToUrl else {
+        guard let sourceUrl = albumPhotoSourceURL(sourcePath: sourcePath, serverUrl: nkSession.urlBase) else {
             return options.queue.async { completion(.failure(NKError.urlError)) }
         }
 
@@ -297,6 +291,11 @@ public extension NextcloudKit {
                               options: NKRequestOptions = NKRequestOptions(),
                               taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
                               completion: @escaping (Result<String, NKError>) -> Void) {
+        // An empty file name would target the album itself with DELETE.
+        guard !fileName.isEmpty else {
+            return options.queue.async { completion(.failure(NKError.invalidData)) }
+        }
+
         guard let nkSession = nkCommonInstance.nksessions.session(forAccount: account),
               let endpoint = albumEndpoint(userId: nkSession.userId, albumName: albumName, fileName: fileName),
               let url = nkCommonInstance.createStandardUrl(
@@ -371,13 +370,32 @@ public extension NextcloudKit {
         return encodedComponents.joined(separator: "/") + (fileName == nil ? "/" : "")
     }
 
-    private func parseAlbumsXML(account: String, data: Data) -> [NKPhotoAlbum] {
+    // Resolve root-relative DAV paths against the origin, and relative paths against the installation.
+    internal func albumPhotoSourceURL(sourcePath: String, serverUrl: String) -> URL? {
+        guard let encodedSource = sourcePath.urlEncoded,
+              let encodedBase = serverUrl.urlEncoded,
+              let baseURL = URL(string: encodedBase.hasSuffix("/") ? encodedBase : encodedBase + "/"),
+              let sourceURL = URL(string: encodedSource, relativeTo: baseURL)?.absoluteURL,
+              let scheme = sourceURL.scheme?.lowercased(),
+              scheme == "http" || scheme == "https" else {
+            return nil
+        }
+        return sourceURL
+    }
+
+    internal func parseAlbumsXML(account: String, data: Data, collectionURL: URL) -> [NKPhotoAlbum] {
         let xml = XML.parse(data)
         var albums: [NKPhotoAlbum] = []
         let elements = xml["d:multistatus", "d:response"]
 
         for element in elements {
             let href = element["d:href"].element?.text ?? ""
+            // PROPFIND also returns the requested collection, which is not an album.
+            guard !href.isEmpty,
+                  let resourceURL = URL(string: href, relativeTo: collectionURL),
+                  resourceURL.pathComponents != collectionURL.pathComponents else {
+                continue
+            }
             let prop = element["d:propstat"]["d:prop"]
             let lastPhoto = prop["nc:last-photo"].element?.text
             let nbItems = prop["nc:nbItems"].element?.text.flatMap { Int($0) }
