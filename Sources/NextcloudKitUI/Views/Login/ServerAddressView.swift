@@ -70,7 +70,7 @@ public struct ServerAddressView: View {
                     .resizable()
                     .aspectRatio(contentMode: .fit)
                     .foregroundStyle(backgroundColor.readable)
-                    .frame(minHeight: 100)
+                    .frame(width: 240, height: 120)
                     .padding(.vertical, 40)
 
                 // Some space between brand logo and server address field.
