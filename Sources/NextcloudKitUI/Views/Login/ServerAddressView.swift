@@ -54,122 +54,189 @@ public struct ServerAddressView: View {
     ///
     @State private var model: LoginFlowModel
 
+    #if os(iOS)
+    ///
+    /// State toggle for presenting the QR code scanner sheet.
+    ///
+    @State private var isPresentingCodeScanner = false
+    #endif
+
+    ///
+    /// State toggle whether the shared accounts have been suggested once during lifetime of this view.
+    ///
+    @State private var hasSuggestedSharedAccounts = false
+
+    ///
+    /// State toggle for presenting the sheet to select accounts shared among apps of the same group.
+    ///
+    @State private var isPresentingSharedAccounts = false
+
     // MARK: - Implementation
 
     public var body: some View {
         @Bindable var model = model
 
-        return ZStack {
-            backgroundColor
+        return NavigationStack {
+            ZStack {
+                backgroundColor
 
-            VStack {
-                Spacer(minLength: 40)
+                VStack {
+                    Spacer(minLength: 40)
 
-                // Brand image binding or fallback symbol.
-                brandImage
-                    .resizable()
-                    .aspectRatio(contentMode: .fit)
-                    .foregroundStyle(backgroundColor.readable)
-                    .frame(width: 240, height: 120)
-                    .padding(.vertical, 40)
+                    // Brand image binding or fallback symbol.
+                    brandImage
+                        .resizable()
+                        .aspectRatio(contentMode: .fit)
+                        .foregroundStyle(backgroundColor.readable)
+                        .frame(width: 240, height: 120)
+                        .padding(.vertical, 40)
 
-                // Some space between brand logo and server address field.
-                if verticalSizeClass == .regular {
-                    Spacer()
-                        .frame(height: 50)
-                }
-
-                // Container to add horizontal spacers for regular size classes.
-                HStack {
-                    if horizontalSizeClass == .regular {
-                        Spacer(minLength: 100)
+                    // Some space between brand logo and server address field.
+                    if verticalSizeClass == .regular {
+                        Spacer()
+                            .frame(height: 50)
                     }
 
-                    // Container for the server address input and button.
+                    // Container to add horizontal spacers for regular size classes.
                     HStack {
-                        TextField(
-                            text: $model.enteredServerAddress,
-                            prompt: Text(verbatim: "https://example.org/").foregroundColor(backgroundColor.readable.opacity(0.5))
-                        ) {
-                            Text("Server Address", comment: "Label for text field.")
-                        }
-                        .textContentType(.URL)
-                        .autocorrectionDisabled()
-                        #if os(iOS)
-                        .foregroundStyle(backgroundColor.readable)
-                        .keyboardType(.URL)
-                        .textInputAutocapitalization(.never)
-                        .submitLabel(.done)
-                        #endif
-                        .onSubmit {
-                            model.logIn()
+                        if horizontalSizeClass == .regular {
+                            Spacer(minLength: 100)
                         }
 
-                        if model.isActive {
-                            ProgressView()
-                                .progressViewStyle(.circular)
-                                .tint(backgroundColor.readable)
-                        } else {
-                            Button {
+                        // Container for the server address input and button.
+                        HStack {
+                            TextField(
+                                text: $model.enteredServerAddress,
+                                prompt: Text(verbatim: "https://example.org/").foregroundColor(backgroundColor.readable.opacity(0.5))
+                            ) {
+                                Text("Server Address", comment: "Label for text field.")
+                            }
+                            .textContentType(.URL)
+                            .autocorrectionDisabled()
+                            #if os(iOS)
+                            .foregroundStyle(backgroundColor.readable)
+                            .keyboardType(.URL)
+                            .textInputAutocapitalization(.never)
+                            .submitLabel(.done)
+                            #endif
+                            .onSubmit {
                                 model.logIn()
-                            } label: {
-                                #if !os(macOS)
-                                Image(systemName: "arrow.right")
-                                #else
-                                Image(systemName: "arrow.right.circle")
-                                    .font(.title)
-                                    .foregroundStyle(.white)
+                            }
+
+                            if model.isActive {
+                                ProgressView()
+                                    .progressViewStyle(.circular)
+                                    .tint(backgroundColor.readable)
+                            } else {
+                                Button {
+                                    model.logIn()
+                                } label: {
+                                    #if !os(macOS)
+                                    Image(systemName: "arrow.right")
+                                    #else
+                                    Image(systemName: "arrow.right.circle")
+                                        .font(.title)
+                                        .foregroundStyle(.white)
+                                    #endif
+                                }
+                                #if os(macOS)
+                                .buttonStyle(.plain)
                                 #endif
                             }
-                            #if os(macOS)
-                            .buttonStyle(.plain)
-                            #endif
+                        }
+                        #if !os(macOS)
+                        .padding(EdgeInsets(top: 8, leading: 10, bottom: 8, trailing: 10))
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 8)
+                                .stroke(backgroundColor.readable, lineWidth: 1)
+                        )
+                        #endif
+
+                        if horizontalSizeClass == .regular {
+                            Spacer(minLength: 100)
                         }
                     }
-                    #if !os(macOS)
-                    .padding(EdgeInsets(top: 8, leading: 10, bottom: 8, trailing: 10))
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 8)
-                            .stroke(backgroundColor.readable, lineWidth: 1)
-                    )
+
+                    Text("The address of your Nextcloud web interface when you open it in your browser.", comment: "Label below the server address field in the login view.")
+                        .foregroundStyle(backgroundColor.readable)
+                        .font(.footnote)
+                        .padding(4)
+
+                    Spacer()
+
+                    #if os(iOS) // Camera usually is available on iOS devices only.
+                    Button {
+                        isPresentingCodeScanner = true
+                    } label: {
+                        Image(systemName: "qrcode.viewfinder")
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 32, height: 32)
+
+                        Text(String(localized: "Scan QR Code", comment: "Button label"))
+                    }
+                    .padding()
+                    .codeScannerSheet(isPresented: $isPresentingCodeScanner) {
+                        model.handleQRCodeScan($0)
+                    }
                     #endif
 
-                    if horizontalSizeClass == .regular {
-                        Spacer(minLength: 100)
+                    Spacer()
+                }
+                .disabled(model.isActive)
+                .tint(backgroundColor.readable)
+                .padding()
+                .safeAreaPadding(.all)
+            }
+            .ignoresSafeArea()
+            .toolbar {
+                if sharedAccounts.isEmpty == false {
+                    if #available(iOS 26.0, macOS 26.0, *) {
+                        sharedAccountsToolbarItem
+                            .sharedBackgroundVisibility(.hidden)
+                    } else {
+                        sharedAccountsToolbarItem
                     }
                 }
-
-                Text("The address of your Nextcloud web interface when you open it in your browser.", comment: "Label below the server address field in the login view.")
-                    .foregroundStyle(backgroundColor.readable)
-                    .font(.footnote)
-                    .padding(4)
-
-                Spacer()
-
-                // Buttons for QR code and shared accounts.
-                #if os(iOS)
-                AlternativeLoginMethodsView(sharedAccounts: sharedAccounts, scanHandler: { model.handleQRCodeScan($0) }, selectionHandler: { model.selectSharedAccount($0) })
-                #else
-                AlternativeLoginMethodsView(sharedAccounts: sharedAccounts, selectionHandler: { model.selectSharedAccount($0) })
-                #endif
-
-                Spacer()
             }
-            .disabled(model.isActive)
-            .tint(backgroundColor.readable)
-            .padding()
-            .safeAreaPadding(.all)
+            #if os(iOS)
+            .toolbarBackground(.hidden, for: .navigationBar)
+            #endif
+            .sharedAccountsSheet(isPresented: $isPresentingSharedAccounts, sharedAccounts: sharedAccounts, selectionHandler: { model.selectSharedAccount($0) })
+            .onAppear {
+                if sharedAccounts.isEmpty == false && hasSuggestedSharedAccounts == false {
+                    isPresentingSharedAccounts = true
+                    hasSuggestedSharedAccounts = true
+                }
+            }
+            .webSheet(initialURL: $model.loginAddress, isPresented: $model.isPresentingWebView, userAgent: userAgent, onDismiss: { model.cancel() })
+            .alert(String(localized: "Login Failed", comment: "Alert title"), isPresented: $model.isPresentingAlert) {
+                Button(role: .cancel) {
+                    model.errorMessage = nil
+                } label: {
+                    Text("OK", comment: "Button label for error alert dismissal.")
+                }
+            } message: {
+                Text(model.errorMessage ?? "?")
+            }
         }
-        .ignoresSafeArea()
-        .webSheet(initialURL: $model.loginAddress, isPresented: $model.isPresentingWebView, userAgent: userAgent, onDismiss: { model.cancel() })
-        .alert(String(localized: "Login Failed", comment: "Alert title"), isPresented: $model.isPresentingAlert) {
-            Button(role: .cancel) {
-                model.errorMessage = nil
+    }
+
+    ///
+    /// The toolbar entry point for accounts from other apps, as in the login view of the Files app.
+    ///
+    private var sharedAccountsToolbarItem: some ToolbarContent {
+        ToolbarItem(placement: .primaryAction) {
+            Button {
+                isPresentingSharedAccounts = true
             } label: {
-                Text("OK", comment: "Button label for error alert dismissal.")
+                Label {
+                    Text("Accounts from other Apps", comment: "Button label")
+                } icon: {
+                    Image(systemName: "person.badge.plus")
+                }
             }
-        } message: {
-            Text(model.errorMessage ?? "?")
+            .tint(backgroundColor.readable)
         }
     }
 }
