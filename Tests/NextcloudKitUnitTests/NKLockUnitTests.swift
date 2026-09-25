@@ -26,6 +26,18 @@ struct NKLockUnitTests {
         return Data(xml.utf8)
     }
 
+    private func makeUnlockData(etagElement: String = "") -> Data {
+        let xml = """
+        <?xml version="1.0"?>
+        <d:prop xmlns:d="DAV:" xmlns:nc="http://nextcloud.org/ns">
+            <nc:lock>0</nc:lock>
+            \(etagElement)
+        </d:prop>
+        """
+
+        return Data(xml.utf8)
+    }
+
     @Test("Parses quoted ETag from LOCK response")
     func parsesQuotedETag() {
         let lock = NKLock(data: makeLockData(etagElement: "<d:getetag>\"etag-after-lock\"</d:getetag>"))
@@ -49,5 +61,45 @@ struct NKLockUnitTests {
 
         #expect(lock != nil)
         #expect(lock?.etag == "etag-after-lock")
+    }
+
+    @Test("LOCK result includes the lock and ETag")
+    func lockResultIncludesLockAndETag() {
+        let result = NKLockOperationResult(data: makeLockData(etagElement: "<d:getetag>etag-b</d:getetag>"))
+
+        #expect(result.lock != nil)
+        #expect(result.etag == "etag-b")
+        #expect(result.lock?.etag == result.etag)
+    }
+
+    @Test("UNLOCK result retains ETag without a lock")
+    func unlockResultRetainsETag() {
+        let result = NKLockOperationResult(data: makeUnlockData(etagElement: "<d:getetag>etag-c</d:getetag>"))
+
+        #expect(result.lock == nil)
+        #expect(result.etag == "etag-c")
+    }
+
+    @Test("Unlocked response without ETag has no result values")
+    func unlockResultWithoutETagHasNoValues() {
+        let result = NKLockOperationResult(data: makeUnlockData())
+
+        #expect(result.lock == nil)
+        #expect(result.etag == nil)
+    }
+
+    @Test("Empty response result has no values")
+    func emptyResponseResultHasNoValues() {
+        let result = NKLockOperationResult()
+
+        #expect(result.lock == nil)
+        #expect(result.etag == nil)
+    }
+
+    @Test("Result normalizes quoted ETags")
+    func resultNormalizesQuotedETag() {
+        let result = NKLockOperationResult(data: makeUnlockData(etagElement: "<d:getetag>\"etag-c\"</d:getetag>"))
+
+        #expect(result.etag == "etag-c")
     }
 }

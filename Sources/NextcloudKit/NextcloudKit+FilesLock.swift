@@ -11,7 +11,7 @@ public extension NextcloudKit {
     /// Sends a WebDAV `LOCK` or `UNLOCK` request for a file on the server, depending on the `shouldLock` flag.
     /// This is used to prevent or release concurrent edits on a file.
     ///
-    /// > Structured Concurrency: Use ``lockUnlockFile(serverUrlFileName:type:shouldLock:account:options:taskHandler:)`` for an `async` implementation which `throws`.
+    /// > Structured Concurrency: Use ``lockUnlockFileResult(serverUrlFileName:type:shouldLock:account:options:taskHandler:)`` for an `async` implementation which `throws`.
     ///
     /// Parameters:
     ///     - serverUrlFileName: Fully qualified and encoded URL of the file to lock/unlock.
@@ -86,23 +86,43 @@ public extension NextcloudKit {
     ///     - options: Optional request configuration (headers, queue, etc.).
     ///     - taskHandler: Optional monitoring of the `URLSessionTask`.
     ///
-    /// - Returns: A tuple containing the account, the server response, and any error encountered.
+    /// - Returns: The operation result, including the resource ETag even when unlocking.
     ///
-    func lockUnlockFile(serverUrlFileName: String, type: NKLockType? = nil, shouldLock: Bool, account: String, options: NKRequestOptions = NKRequestOptions(), taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in }) async throws -> NKLock? {
+    func lockUnlockFileResult(serverUrlFileName: String, type: NKLockType? = nil, shouldLock: Bool, account: String, options: NKRequestOptions = NKRequestOptions(), taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in }) async throws -> NKLockOperationResult {
         try await withCheckedThrowingContinuation { continuation in
             lockUnlockFile(serverUrlFileName: serverUrlFileName, type: type, shouldLock: shouldLock, account: account, options: options, taskHandler: taskHandler) { _, responseData, error in
                 switch error {
                     case .success:
-                        if let data = responseData?.data,
-                           let lock = NKLock(data: data) {
-                            continuation.resume(returning: lock)
+                        guard let data = responseData?.data, !data.isEmpty else {
+                            continuation.resume(returning: NKLockOperationResult())
                             return
                         }
-                        continuation.resume(returning: nil)
+                        continuation.resume(returning: NKLockOperationResult(data: data))
                     default:
                         continuation.resume(throwing: error)
-                }
+                    }
             }
         }
+    }
+
+    ///
+    /// Asynchronously locks or unlocks a file on the server via WebDAV.
+    ///
+    /// - Parameters:
+    ///   - serverUrlFileName: The server-side full URL of the file to lock or unlock.
+    ///   - shouldLock: `true` to lock the file, `false` to unlock it.
+    ///   - account: The Nextcloud account performing the action.
+    ///   - options: Optional request configuration (headers, queue, etc.).
+    ///   - taskHandler: Optional monitoring of the `URLSessionTask`.
+    ///
+    /// - Returns: The created lock, or `nil` when the resource was unlocked.
+    ///
+    func lockUnlockFile(serverUrlFileName: String, type: NKLockType? = nil, shouldLock: Bool, account: String, options: NKRequestOptions = NKRequestOptions(), taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in }) async throws -> NKLock? {
+        try await lockUnlockFileResult(serverUrlFileName: serverUrlFileName,
+                                       type: type,
+                                       shouldLock: shouldLock,
+                                       account: account,
+                                       options: options,
+                                       taskHandler: taskHandler).lock
     }
 }
