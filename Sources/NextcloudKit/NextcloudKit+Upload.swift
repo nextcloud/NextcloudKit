@@ -190,6 +190,7 @@ public extension NextcloudKit {
     ///   - account: Account identifier.
     ///   - options: Request options (headers, timeout, etc.).
     ///   - ifMatch: Optional ETag precondition applied **only** to the final assembly `MOVE` (not the chunk uploads). When set, the server rejects the assembly with `412 Precondition Failed` if the destination changed since this ETag, enabling optimistic-concurrency conflict detection for chunked uploads.
+    ///   - overwrite: Whether the final assembly may replace an existing destination. Defaults to true for existing callers.
     ///   - chunkProgressHandler: Reports per-chunk preparation progress as `(totalChunks, currentIndex)`.
     ///   - uploadStart: Called once when upload of chunks begins, with the final list of chunks.
     ///   - uploadTaskHandler: Exposes the low-level `URLSessionTask` for each chunk upload.
@@ -213,6 +214,7 @@ public extension NextcloudKit {
                           account: String,
                           options: NKRequestOptions = NKRequestOptions(),
                           ifMatch: String? = nil,
+                          overwrite: Bool = true,
                           chunkProgressHandler: @escaping (_ total: Int, _ counter: Int) -> Void = { _, _ in },
                           uploadStart: @escaping (_ filesChunk: [(fileName: String, size: Int64)]) -> Void = { _ in },
                           uploadTaskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
@@ -428,7 +430,7 @@ public extension NextcloudKit {
 
         let moveRes = await moveFileOrFolderAsync(serverUrlFileNameSource: serverUrlFileNameSource,
                                                   serverUrlFileNameDestination: serverUrlFileName,
-                                                  overwrite: true,
+                                                  overwrite: overwrite,
                                                   account: account,
                                                   options: options)
 
