@@ -438,7 +438,7 @@ public extension NextcloudKit {
         options.customHeader?["If-Match"] = nil
 
         guard moveRes.error == .success else {
-            return (account, nil)
+            throw moveRes.error
         }
 
         try Task.checkCancellation()

@@ -2,11 +2,10 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 import XCTest
+import Alamofire
 @testable import NextcloudKit
 
-/// Unit tests for deriving the assembled file's `NKFile` from a chunk-assembly MOVE response's
-/// headers — the primary path that lets `uploadChunkAsync` skip the fragile PROPFIND read-back
-/// (whose failure otherwise surfaced as `errorChunkMoveFile`, code -9997).
+/// Unit tests for chunk-assembly MOVE failures and deriving the assembled file from response headers.
 final class ChunkedUploadAssemblyTests: XCTestCase {
     private func makeKit() -> NextcloudKit {
         #if swift(<6.0)
@@ -14,6 +13,64 @@ final class ChunkedUploadAssemblyTests: XCTestCase {
         #else
         return NextcloudKit()
         #endif
+    }
+
+    private func uploadThroughMockedAssembly(moveStatus: Int) async throws -> (error: NKError?, file: NKFile?) {
+        let kit = makeKit()
+        let account = UUID().uuidString
+        let urlBase = "https://assembly-\(moveStatus).test"
+        let configuration = URLSessionConfiguration.af.default
+        configuration.protocolClasses = [ChunkedUploadURLProtocol.self]
+        let session = NKSession(nkCommonInstance: kit.nkCommonInstance,
+                                urlBase: urlBase,
+                                user: "user",
+                                userId: "user",
+                                password: "password",
+                                account: account,
+                                userAgent: "NextcloudKitTests",
+                                groupIdentifier: "",
+                                httpMaximumConnectionsPerHost: 1,
+                                httpMaximumConnectionsPerHostInDownload: 1,
+                                httpMaximumConnectionsPerHostInUpload: 1,
+                                sessionDataOverride: Alamofire.Session(configuration: configuration))
+        kit.nkCommonInstance.nksessions.append(session)
+        defer { kit.nkCommonInstance.nksessions.remove(account: account) }
+
+        let directory = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
+        defer { try? FileManager.default.removeItem(at: directory) }
+        try Data("chunk".utf8).write(to: directory.appendingPathComponent("source.txt"))
+        try Data("chunk".utf8).write(to: directory.appendingPathComponent("00001"))
+
+        do {
+            let result = try await kit.uploadChunkAsync(directory: directory.path,
+                                                        fileName: "source.txt",
+                                                        date: nil, creationDate: nil,
+                                                        serverUrl: urlBase + "/remote.php/dav/files/user",
+                                                        chunkFolder: "chunks",
+                                                        filesChunk: [(fileName: "00001", size: 5)],
+                                                        chunkSize: 5,
+                                                        account: account)
+            return (nil, result.file)
+        } catch let error as NKError {
+            return (error, nil)
+        }
+    }
+
+    func test_failedAssemblyMove_throwsServerError() async throws {
+        let result = try await uploadThroughMockedAssembly(moveStatus: 507)
+        XCTAssertEqual(result.error?.errorCode, 507)
+    }
+
+    func test_failedAssemblyMove_throwsPreconditionError() async throws {
+        let result = try await uploadThroughMockedAssembly(moveStatus: 412)
+        XCTAssertEqual(result.error?.errorCode, 412)
+    }
+
+    func test_successfulAssemblyMove_returnsFile() async throws {
+        let result = try await uploadThroughMockedAssembly(moveStatus: 201)
+        XCTAssertNil(result.error)
+        XCTAssertEqual(result.file?.ocId, "assembled-file-id")
     }
 
     func test_assembledFile_withOCFileId_derivesNKFileFromHeaders() {
