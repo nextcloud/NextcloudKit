@@ -4,32 +4,62 @@
 
 import Foundation
 
-public struct NKEditorDetailsResponse: Codable, Sendable {
+public struct NKDirectEditingCapabilitiesResponse: Codable, Sendable {
     public let ocs: OCS
 
     public struct OCS: Codable, Sendable {
         public let data: DataClass
 
         public struct DataClass: Codable, Sendable {
-            public let editors: [String: NKEditorDetailsEditor]
-            public let creators: [String: NKEditorDetailsCreator]
+            public let editors: [String: NKDirectEditingEditor]
+            public let creators: [String: NKDirectEditingCreator]
         }
     }
 }
 
-public struct NKEditorTemplateResponse: Codable, Sendable {
+public struct NKDirectEditingTemplateResponse: Codable, Sendable {
     public let ocs: OCS
 
     public struct OCS: Codable, Sendable {
         public let data: DataClass
 
         public struct DataClass: Codable, Sendable {
-            public let editors: [NKEditorTemplate]
+            public let templates: [String: NKDirectEditingTemplate]
         }
     }
 }
 
-public struct NKEditorDetailsEditor: Codable, Sendable {
+public struct NKDirectEditingTemplate: Codable, Sendable {
+    public let ext: String
+    public let identifier: String
+    public let mimetype: String
+    public let name: String
+    public let preview: String?
+
+    enum CodingKeys: String, CodingKey {
+        case ext = "extension"
+        case identifier = "id"
+        case mimetype
+        case name = "title"
+        case preview
+    }
+
+    public init(
+        ext: String = "",
+        identifier: String = "",
+        mimetype: String = "",
+        name: String = "",
+        preview: String? = nil
+    ) {
+        self.ext = ext
+        self.identifier = identifier
+        self.mimetype = mimetype
+        self.name = name
+        self.preview = preview
+    }
+}
+
+public struct NKDirectEditingEditor: Codable, Sendable {
     public let identifier: String
     public let mimetypes: [String]
     public let name: String
@@ -45,7 +75,7 @@ public struct NKEditorDetailsEditor: Codable, Sendable {
     }
 }
 
-public struct NKEditorDetailsCreator: Codable, Sendable {
+public struct NKDirectEditingCreator: Codable, Sendable {
     public let identifier: String
     public let templates: Bool
     public let mimetype: String
@@ -60,26 +90,5 @@ public struct NKEditorDetailsCreator: Codable, Sendable {
         case name
         case editor
         case ext = "extension"
-    }
-}
-
-public struct NKEditorTemplate: Codable, Sendable {
-    public var ext: String
-    public var identifier: String
-    public var name: String
-    public var preview: String
-
-    enum CodingKeys: String, CodingKey {
-        case ext = "extension"
-        case identifier = "id"
-        case name
-        case preview
-    }
-
-    public init(ext: String = "", identifier: String = "", name: String = "", preview: String = "") {
-        self.ext = ext
-        self.identifier = identifier
-        self.name = name
-        self.preview = preview
     }
 }

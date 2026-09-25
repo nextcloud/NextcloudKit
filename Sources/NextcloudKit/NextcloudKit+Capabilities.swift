@@ -119,6 +119,7 @@ public extension NextcloudKit {
                     struct Capabilities: Codable {
                         let downloadLimit: DownloadLimit?
                         let filessharing: FilesSharing?
+                        let sharing: Sharing?
                         let theming: Theming?
                         let endtoendencryption: EndToEndEncryption?
                         let richdocuments: RichDocuments?
@@ -133,10 +134,12 @@ public extension NextcloudKit {
                         let recommendations: Recommendations?
                         let termsOfService: TermsOfService?
                         let clientIntegration: NKClientIntegration?
+                        let governance: Governance?
 
                         enum CodingKeys: String, CodingKey {
                             case downloadLimit = "downloadlimit"
                             case filessharing = "files_sharing"
+                            case sharing
                             case theming
                             case endtoendencryption = "end-to-end-encryption"
                             case richdocuments, activity, notifications, files
@@ -147,7 +150,12 @@ public extension NextcloudKit {
                             case recommendations
                             case termsOfService = "terms_of_service"
                             case clientIntegration = "client_integration"
+                            case governance
                         }
+
+                        struct Governance: Codable {}
+
+                        struct Sharing: Codable {}
 
                         struct DownloadLimit: Codable {
                             let enabled: Bool?
@@ -350,32 +358,6 @@ public extension NextcloudKit {
                         struct Recommendations: Codable {
                             let enabled: Bool?
                         }
-
-//                        struct DeclarativeUI: Codable {
-//                            let contextMenu: [[ContextMenuItem]]
-//
-//                            enum CodingKeys: String, CodingKey {
-//                                case contextMenu = "context-menu"
-//                            }
-//                        }
-
-//
-//                        struct DeclarativeUI: Codable {
-//                            let contextMenus: [ContextMenu]
-//
-//                            enum CodingKeys: String, CodingKey {
-//                                case contextMenus = "context-menu"
-//                            }
-//
-//                            struct ContextMenu: Codable {
-//                                let items
-//                            }
-//
-//                            struct ContextMenuItem: Codable {
-//                                let title: String
-//                                let endpoint: String
-//                            }
-//                        }
                     }
                 }
             }
@@ -417,6 +399,8 @@ public extension NextcloudKit {
             capabilities.fileSharingDownloadLimit = json.downloadLimit?.enabled ?? false
             capabilities.fileSharingDownloadLimitDefaultLimit = json.downloadLimit?.defaultLimit ?? 1
 
+            capabilities.unifiedSharingEnabled = json.sharing != nil
+
             capabilities.themingColor = json.theming?.color ?? ""
             capabilities.themingColorElement = json.theming?.colorelement ?? ""
             capabilities.themingColorText = json.theming?.colortext ?? ""
@@ -434,6 +418,8 @@ public extension NextcloudKit {
 
             capabilities.activityEnabled = json.activity != nil
             capabilities.activity = json.activity?.apiv2 ?? []
+
+            capabilities.governanceEnabled = json.governance != nil
 
             capabilities.notification = json.notifications?.ocsendpoints ?? []
 
@@ -520,6 +506,7 @@ final public class NKCapabilities: Sendable {
         public var fileSharingDefaultPermission: Int                = 0
         public var fileSharingDownloadLimit: Bool                   = false
         public var fileSharingDownloadLimitDefaultLimit: Int        = 1
+        public var unifiedSharingEnabled: Bool                      = false
         public var themingColor: String                             = ""
         public var themingColorElement: String                      = ""
         public var themingColorText: String                         = ""
@@ -541,31 +528,30 @@ final public class NKCapabilities: Sendable {
         ///
         /// The version of the locking API.
         ///
-        public var filesLockVersion: String                         = ""    // NC 24
-        public var filesComments: Bool                              = false // NC 20
-        public var filesBigfilechunking: Bool                       = false
-        public var userStatusEnabled: Bool                          = false
-        public var userStatusSupportsBusy: Bool                     = false
-        public var externalSites: Bool                              = false
-        public var activityEnabled: Bool                            = false
-        public var groupfoldersEnabled: Bool                        = false // NC27
-        public var assistantEnabled: Bool                           = false // NC28
-        public var isLivePhotoServerAvailable: Bool                 = false // NC28
-        public var securityGuardDiagnostics                         = false
+        public var filesLockVersion: String                             = ""    // NC 24
+        public var filesComments: Bool                                  = false // NC 20
+        public var filesBigfilechunking: Bool                           = false
+        public var userStatusEnabled: Bool                              = false
+        public var userStatusSupportsBusy: Bool                         = false
+        public var externalSites: Bool                                  = false
+        public var activityEnabled: Bool                                = false
+        public var governanceEnabled: Bool                              = false
+        public var groupfoldersEnabled: Bool                            = false // NC27
+        public var assistantEnabled: Bool                               = false // NC28
+        public var isLivePhotoServerAvailable: Bool                     = false // NC28
+        public var securityGuardDiagnostics                             = false
         /// Only taken into account for major version >= 32
-        public var windowsCompatibleFilenamesEnabled                = false
-        public var forbiddenFileNames: [String]                     = []
-        public var forbiddenFileNameBasenames: [String]             = []
-        public var forbiddenFileNameCharacters: [String]            = []
-        public var forbiddenFileNameExtensions: [String]            = []
-        public var recommendations: Bool                            = false
-        public var termsOfService: Bool                             = false
-//        public var declarativeUIEnabled: Bool                       = false
-//        public var declarativeUIContextMenu: [ContextMenuItem]                       = []
-        public var clientIntegration: NKClientIntegration?                    = nil
-        public var directEditingEditors: [NKEditorDetailsEditor]    = []
-        public var directEditingCreators: [NKEditorDetailsCreator]  = []
-        public var directEditingTemplates: [NKEditorTemplate]       = []
+        public var windowsCompatibleFilenamesEnabled                    = false
+        public var forbiddenFileNames: [String]                         = []
+        public var forbiddenFileNameBasenames: [String]                 = []
+        public var forbiddenFileNameCharacters: [String]                = []
+        public var forbiddenFileNameExtensions: [String]                = []
+        public var recommendations: Bool                                = false
+        public var termsOfService: Bool                                 = false
+        public var clientIntegration: NKClientIntegration?              = nil
+        public var directEditingEditors: [NKDirectEditingEditor]        = []
+        public var directEditingCreators: [NKDirectEditingCreator]      = []
+        public var directEditingTemplates: [NKDirectEditingTemplate]    = []
 
         public init() {}
 

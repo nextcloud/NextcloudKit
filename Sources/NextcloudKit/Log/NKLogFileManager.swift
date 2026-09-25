@@ -115,7 +115,7 @@ public final class NKLogFileManager: @unchecked Sendable {
     private var blacklist: [String] = []
     private var whitelist: [String] = []
     private var currentLogDate: String
-    private let logQueue = DispatchQueue(label: "com.nextcloud.LogWriterQueue", attributes: .concurrent)
+    private let logQueue = DispatchQueue(label: "com.nextcloud.LogWriterQueue")
     private let rotationQueue = DispatchQueue(label: "com.nextcloud.LogRotationQueue")
     private let fileManager = FileManager.default
 
@@ -363,14 +363,19 @@ public final class NKLogFileManager: @unchecked Sendable {
 
         guard let data = message.data(using: .utf8) else { return }
 
-        if fileManager.fileExists(atPath: logPath.path) {
-            if let handle = FileHandle(forWritingAtPath: logPath.path) {
-                handle.seekToEndOfFile()
-                handle.write(data)
-                handle.closeFile()
+        do {
+            if !fileManager.fileExists(atPath: logPath.path) {
+                fileManager.createFile(atPath: logPath.path, contents: nil)
             }
-        } else {
-            try? data.write(to: logPath)
+
+            let handle = try FileHandle(forWritingTo: logPath)
+
+            defer { try? handle.close() }
+
+            try handle.seekToEnd()
+            try handle.write(contentsOf: data)
+        } catch {
+            // Ignore log write failures to avoid crashes when the device has no free space.
         }
     }
 

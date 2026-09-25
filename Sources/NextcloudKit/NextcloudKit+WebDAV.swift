@@ -119,7 +119,8 @@ public extension NextcloudKit {
         nkSession.sessionData.request(urlRequest, interceptor: NKInterceptor(nkCommonInstance: nkCommonInstance)).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
             task.taskDescription = options.taskDescription
             taskHandler(task)
-        }.responseData(queue: self.nkCommonInstance.backgroundQueue) { response in
+        }.response(queue: self.nkCommonInstance.backgroundQueue) { response in
+            let response = response.map { $0 ?? Data() }
             let result = self.evaluateResponse(response)
 
             options.queue.async {
@@ -206,7 +207,8 @@ public extension NextcloudKit {
         nkSession.sessionData.request(urlRequest, interceptor: NKInterceptor(nkCommonInstance: nkCommonInstance)).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
             task.taskDescription = options.taskDescription
             taskHandler(task)
-        }.responseData(queue: self.nkCommonInstance.backgroundQueue) { response in
+        }.response(queue: self.nkCommonInstance.backgroundQueue) { response in
+            let response = response.map { $0 ?? Data() }
             let result = self.evaluateResponse(response)
 
             options.queue.async {
@@ -392,9 +394,13 @@ public extension NextcloudKit {
 
         do {
             try urlRequest = URLRequest(url: url, method: method, headers: headers)
+            // Apply the caller's timeout on every path, not only when a custom requestBody is
+            // supplied. The default-body PROPFIND (requestBody == nil) previously fell back to
+            // the URLSession default timeout, silently ignoring options.timeout — every other
+            // WebDAV method here sets timeoutInterval unconditionally.
+            urlRequest.timeoutInterval = options.timeout
             if let requestBody {
                 urlRequest.httpBody = requestBody
-                urlRequest.timeoutInterval = options.timeout
             } else {
                 urlRequest.httpBody = NKDataFileXML(nkCommonInstance: self.nkCommonInstance).getRequestBodyFile(createProperties: options.createProperties, removeProperties: options.removeProperties).data(using: .utf8)
             }

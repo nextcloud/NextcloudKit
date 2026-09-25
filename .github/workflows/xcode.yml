@@ -16,7 +16,7 @@ on:
 env:
   DESTINATION_IOS: platform=iOS Simulator,name=iPhone 16,OS=18.5
   DESTINATION_MACOS: platform=macOS,arch=x86_64
-  SCHEME: NextcloudKit
+  SCHEME: NextcloudKit-Package
   SERVER_BRANCH: stable30
   PHP_VERSION: 8.3
 
@@ -28,10 +28,10 @@ jobs:
     steps:
     - name: Set env var
       run: echo "DEVELOPER_DIR=$(xcode-select --print-path)" >> $GITHUB_ENV
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v7
 
     - name: Set up php ${{ env.PHP_VERSION }}
-      uses: shivammathur/setup-php@8872c784b04a1420e81191df5d64fbd59d3d3033 # v2.30.0
+      uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # v2.30.0
       with:
         php-version: ${{ env.PHP_VERSION }}
         # https://docs.nextcloud.com/server/stable/admin_manual/installation/source_installation.html#prerequisites-for-manual-installation
@@ -42,7 +42,7 @@ jobs:
         ini-values: apc.enable_cli=on, disable_functions=
 
     - name: Checkout server
-      uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
+      uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       with:
         submodules: true
         repository: nextcloud/server
@@ -56,8 +56,6 @@ jobs:
         ./server/occ config:system:set hashing_default_password --value=true --type=boolean
         ./server/occ config:system:set auth.bruteforce.protection.enabled --value false --type bool
         ./server/occ config:system:set ratelimit.protection.enabled --value false --type bool
-        ./server/occ config:system:set memcache.local --value="\\OC\\Memcache\\APCu"
-        ./server/occ config:system:set memcache.distributed --value="\\OC\\Memcache\\APCu"
         ./server/occ background:cron
         PHP_CLI_SERVER_WORKERS=5 php -S localhost:8080 -t server/ &
 

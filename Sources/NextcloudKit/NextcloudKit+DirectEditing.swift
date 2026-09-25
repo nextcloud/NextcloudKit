@@ -14,10 +14,10 @@ public extension NextcloudKit {
     /// - options: Optional request configuration such as headers, queue, or API version.
     /// - taskHandler: Callback to track the underlying URLSessionTask.
     /// - completion: Returns the account, array of editors, array of creators, the raw response data, and NKError.
-    func textObtainEditorDetails(account: String,
-                                 options: NKRequestOptions = NKRequestOptions(),
-                                 taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-                                 completion: @escaping (_ account: String, _  editors: [NKEditorDetailsEditor]?, _ creators: [NKEditorDetailsCreator]?, _ responseData: AFDataResponse<Data>?, _ error: NKError) -> Void) {
+    func getDirectEditingCapabilities(account: String,
+                                      options: NKRequestOptions = NKRequestOptions(),
+                                      taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
+                                      completion: @escaping (_ account: String, _  editors: [NKDirectEditingEditor]?, _ creators: [NKDirectEditingCreator]?, _ responseData: AFDataResponse<Data>?, _ error: NKError) -> Void) {
         let endpoint = "ocs/v2.php/apps/files/api/v1/directEditing"
         guard let nkSession = nkCommonInstance.nksessions.session(forAccount: account),
               let url = nkCommonInstance.createStandardUrl(serverUrl: nkSession.urlBase, endpoint: endpoint),
@@ -36,7 +36,7 @@ public extension NextcloudKit {
             case .success(let responseData):
                 Task {
                     do {
-                        let (editors, creators) = try NKEditorDetailsConverter.from(data: responseData)
+                        let (editors, creators) = try NKDirectEditingCapabilitiesConverter.from(data: responseData)
                         let capabilities = await NKCapabilities.shared.getCapabilities(for: account)
                         capabilities.directEditingEditors = editors
                         capabilities.directEditingCreators = creators
@@ -47,7 +47,7 @@ public extension NextcloudKit {
                         }
 
                     } catch {
-                        nkLog(error: "Parsing error in NKEditorDetailsConverter: \(error)")
+                        nkLog(error: "Parsing error in NKDirectEditingCapabilitiesConverter: \(error)")
                         options.queue.async {
                             completion(account, nil, nil, response, .invalidData)
                         }
@@ -64,20 +64,20 @@ public extension NextcloudKit {
     ///   - options: Configuration for the request, including headers and execution queue.
     ///   - taskHandler: Optional callback to monitor the underlying network task.
     /// - Returns: A tuple containing the account, list of editors, list of creators, raw response, and NKError.
-    func textObtainEditorDetailsAsync(account: String,
-                                      options: NKRequestOptions = NKRequestOptions(),
-                                      taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in }
+    func getDirectEditingCapabilitiesAsync(account: String,
+                                           options: NKRequestOptions = NKRequestOptions(),
+                                           taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in }
     ) async -> (
         account: String,
-        editors: [NKEditorDetailsEditor]?,
-        creators: [NKEditorDetailsCreator]?,
+        editors: [NKDirectEditingEditor]?,
+        creators: [NKDirectEditingCreator]?,
         responseData: AFDataResponse<Data>?,
         error: NKError
     ) {
         await withCheckedContinuation { continuation in
-            textObtainEditorDetails(account: account,
-                                    options: options,
-                                    taskHandler: taskHandler) { account, editors, creators, responseData, error in
+            getDirectEditingCapabilities(account: account,
+                                         options: options,
+                                         taskHandler: taskHandler) { account, editors, creators, responseData, error in
                 continuation.resume(returning: (
                     account: account,
                     editors: editors,
@@ -94,24 +94,24 @@ public extension NextcloudKit {
     /// Parameters:
     /// - fileNamePath: The path of the file to open on the server.
     /// - fileId: Optional file identifier used to reference the file more precisely.
-    /// - editor: The identifier of the text editor to use.
+    /// - editorId: The identifier of the text editor to use.
     /// - account: The account initiating the file open request.
     /// - options: Optional configuration for the request (headers, API version, etc.).
     /// - taskHandler: Callback triggered with the underlying URLSessionTask.
     /// - completion: Returns the account, the resulting file editor URL, raw response data, and an NKError.
-    func textOpenFile(fileNamePath: String,
-                      fileId: String? = nil,
-                      editor: String,
-                      account: String,
-                      options: NKRequestOptions = NKRequestOptions(),
-                      taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-                      completion: @escaping (_ account: String, _  url: String?, _ responseData: AFDataResponse<Data>?, _ error: NKError) -> Void) {
+    func openFileForDirectEditing(fileNamePath: String,
+                                  fileId: String? = nil,
+                                  editorId: String,
+                                  account: String,
+                                  options: NKRequestOptions = NKRequestOptions(),
+                                  taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
+                                  completion: @escaping (_ account: String, _  url: String?, _ responseData: AFDataResponse<Data>?, _ error: NKError) -> Void) {
         guard let fileNamePath = fileNamePath.urlEncoded else {
             return options.queue.async { completion(account, nil, nil, .urlError) }
         }
-        var endpoint = "ocs/v2.php/apps/files/api/v1/directEditing/open?path=/\(fileNamePath)&editorId=\(editor)"
+        var endpoint = "ocs/v2.php/apps/files/api/v1/directEditing/open?path=/\(fileNamePath)&editorId=\(editorId)"
         if let fileId = fileId {
-            endpoint = "ocs/v2.php/apps/files/api/v1/directEditing/open?path=/\(fileNamePath)&fileId=\(fileId)&editorId=\(editor)"
+            endpoint = "ocs/v2.php/apps/files/api/v1/directEditing/open?path=/\(fileNamePath)&fileId=\(fileId)&editorId=\(editorId)"
         }
         guard let nkSession = nkCommonInstance.nksessions.session(forAccount: account),
               let url = nkCommonInstance.createStandardUrl(serverUrl: nkSession.urlBase, endpoint: endpoint),
@@ -140,17 +140,17 @@ public extension NextcloudKit {
     /// - Parameters:
     ///   - fileNamePath: Path of the file on the server.
     ///   - fileId: Optional file ID to assist in uniquely identifying the file.
-    ///   - editor: Identifier of the text editor to be used.
+    ///   - editorId: Identifier of the editor to be used.
     ///   - account: Account performing the operation.
     ///   - options: Configuration options for the request.
     ///   - taskHandler: Optional monitoring for the underlying URLSessionTask.
     /// - Returns: A tuple containing the account, resulting URL, raw response data, and NKError.
-    func textOpenFileAsync(fileNamePath: String,
-                           fileId: String? = nil,
-                           editor: String,
-                           account: String,
-                           options: NKRequestOptions = NKRequestOptions(),
-                           taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in }
+    func openFileForDirectEditingAsync(fileNamePath: String,
+                                       fileId: String? = nil,
+                                       editorId: String,
+                                       account: String,
+                                       options: NKRequestOptions = NKRequestOptions(),
+                                       taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in }
     ) async -> (
         account: String,
         url: String?,
@@ -158,12 +158,12 @@ public extension NextcloudKit {
         error: NKError
     ) {
         await withCheckedContinuation { continuation in
-            textOpenFile(fileNamePath: fileNamePath,
-                         fileId: fileId,
-                         editor: editor,
-                         account: account,
-                         options: options,
-                         taskHandler: taskHandler) { account, url, responseData, error in
+            openFileForDirectEditing(fileNamePath: fileNamePath,
+                                     fileId: fileId,
+                                     editorId: editorId,
+                                     account: account,
+                                     options: options,
+                                     taskHandler: taskHandler) { account, url, responseData, error in
                 continuation.resume(returning: (
                     account: account,
                     url: url,
@@ -178,14 +178,18 @@ public extension NextcloudKit {
     ///
     /// Parameters:
     /// - account: The account requesting the list of templates.
+    /// - editorId: Identifier of the editor to be used.
+    /// - creatorId: The identifier of the creator (e.g., "document", "spreadsheet").
     /// - options: Optional request configuration such as headers, queue, or API version.
     /// - taskHandler: Callback triggered with the underlying URLSessionTask.
-    /// - completion: Returns the account, an optional array of NKEditorTemplate, the raw response, and an NKError.
-    func textGetListOfTemplates(account: String,
-                                options: NKRequestOptions = NKRequestOptions(),
-                                taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-                                completion: @escaping (_ account: String, _ templates: [NKEditorTemplate]?, _ responseData: AFDataResponse<Data>?, _ error: NKError) -> Void) {
-        let endpoint = "ocs/v2.php/apps/files/api/v1/directEditing/templates/text/textdocumenttemplate"
+    /// - completion: Returns the account, an optional array of NKDirectEditingTemplate, the raw response, and an NKError.
+    func getDirectEditingTemplates(account: String,
+                                   editorId: String,
+                                   creatorId: String,
+                                   options: NKRequestOptions = NKRequestOptions(),
+                                   taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
+                                   completion: @escaping (_ account: String, _ templates: [NKDirectEditingTemplate]?, _ responseData: AFDataResponse<Data>?, _ error: NKError) -> Void) {
+        let endpoint = "ocs/v2.php/apps/files/api/v1/directEditing/templates/\(editorId)/\(creatorId)"
         guard let nkSession = nkCommonInstance.nksessions.session(forAccount: account),
               let url = nkCommonInstance.createStandardUrl(serverUrl: nkSession.urlBase, endpoint: endpoint),
               let headers = nkCommonInstance.getStandardHeaders(account: account, options: options) else {
@@ -203,17 +207,20 @@ public extension NextcloudKit {
             case .success(let data):
                 Task {
                     do {
-                        let decoded = try JSONDecoder().decode(NKEditorTemplateResponse.self, from: data)
-                        let templates = decoded.ocs.data.editors
-                        // Update capabilities
+                        let decoded = try JSONDecoder().decode(NKDirectEditingTemplateResponse.self, from: data)
+                        let templates = Array(decoded.ocs.data.templates.values)
                         let capabilities = await NKCapabilities.shared.getCapabilities(for: account)
                         capabilities.directEditingTemplates = templates
                         await NKCapabilities.shared.setCapabilities(for: account, capabilities: capabilities)
 
-                        options.queue.async { completion(account, templates, response, .success) }
+                        options.queue.async {
+                            completion(account, templates, response, .success)
+                        }
                     } catch {
                         nkLog(error: "Failed to decode template list: \(error)")
-                        options.queue.async { completion(account, nil, response, .invalidData) }
+                        options.queue.async {
+                            completion(account, nil, response, .invalidData)
+                        }
                     }
                 }
             }
@@ -225,21 +232,27 @@ public extension NextcloudKit {
     /// - Parameters:
     ///   - account: The account requesting the templates.
     ///   - options: Request configuration options (queue, headers, etc.).
+    ///   - editorId: Identifier of the editor to be used.
+    ///   - creatorId: The identifier of the creator (e.g., "document", "spreadsheet").
     ///   - taskHandler: Optional callback to monitor the underlying URLSessionTask.
     /// - Returns: A tuple containing the account, list of templates (if any), raw response, and error information.
-    func textGetListOfTemplatesAsync(account: String,
-                                     options: NKRequestOptions = NKRequestOptions(),
-                                     taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in }
+    func getDirectEditingTemplatesAsync(account: String,
+                                        editorId: String,
+                                        creatorId: String,
+                                        options: NKRequestOptions = NKRequestOptions(),
+                                        taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in }
     ) async -> (
         account: String,
-        templates: [NKEditorTemplate]?,
+        templates: [NKDirectEditingTemplate]?,
         responseData: AFDataResponse<Data>?,
         error: NKError
     ) {
         await withCheckedContinuation { continuation in
-            textGetListOfTemplates(account: account,
-                                   options: options,
-                                   taskHandler: taskHandler) { account, templates, responseData, error in
+            getDirectEditingTemplates(account: account,
+                                      editorId: editorId,
+                                      creatorId: creatorId,
+                                      options: options,
+                                      taskHandler: taskHandler) { account, templates, responseData, error in
                 continuation.resume(returning: (
                     account: account,
                     templates: templates,
@@ -261,14 +274,14 @@ public extension NextcloudKit {
     /// - options: Optional request configuration (headers, queue, version, etc.).
     /// - taskHandler: Callback to monitor the underlying URLSessionTask.
     /// - completion: Returns the account, the resulting file URL (if any), the raw response, and NKError.
-    func textCreateFile(fileNamePath: String,
-                        editorId: String,
-                        creatorId: String,
-                        templateId: String,
-                        account: String,
-                        options: NKRequestOptions = NKRequestOptions(),
-                        taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-                        completion: @escaping (_ account: String, _ url: String?, _ responseData: AFDataResponse<Data>?, _ error: NKError) -> Void) {
+    func createFileForDirectEditing(fileNamePath: String,
+                                    editorId: String,
+                                    creatorId: String,
+                                    templateId: String,
+                                    account: String,
+                                    options: NKRequestOptions = NKRequestOptions(),
+                                    taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
+                                    completion: @escaping (_ account: String, _ url: String?, _ responseData: AFDataResponse<Data>?, _ error: NKError) -> Void) {
         guard let fileNamePath = fileNamePath.urlEncoded else {
             return options.queue.async { completion(account, nil, nil, .urlError) }
         }
@@ -305,19 +318,19 @@ public extension NextcloudKit {
     /// - Parameters:
     ///   - fileNamePath: Destination path where the new file will be saved.
     ///   - editorId: The editor's unique identifier (e.g., "richdocuments").
-    ///   - creatorId: The creator's identifier (e.g., "document").
+    ///   - creatorId: The identifier of the creator (e.g., "document", "spreadsheet").
     ///   - templateId: The template to use for the new file.
     ///   - account: The Nextcloud account used for the operation.
     ///   - options: Optional request settings (e.g., headers, queue, etc.).
     ///   - taskHandler: Optional callback to observe the URLSessionTask.
     /// - Returns: A tuple containing the account, the resulting file URL, raw response data, and NKError.
-    func textCreateFileAsync(fileNamePath: String,
-                             editorId: String,
-                             creatorId: String,
-                             templateId: String,
-                             account: String,
-                             options: NKRequestOptions = NKRequestOptions(),
-                             taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in }
+    func createFileForDirectEditingAsync(fileNamePath: String,
+                                         editorId: String,
+                                         creatorId: String,
+                                         templateId: String,
+                                         account: String,
+                                         options: NKRequestOptions = NKRequestOptions(),
+                                         taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in }
     ) async -> (
         account: String,
         url: String?,
@@ -325,13 +338,13 @@ public extension NextcloudKit {
         error: NKError
     ) {
         await withCheckedContinuation { continuation in
-            textCreateFile(fileNamePath: fileNamePath,
-                           editorId: editorId,
-                           creatorId: creatorId,
-                           templateId: templateId,
-                           account: account,
-                           options: options,
-                           taskHandler: taskHandler) { account, url, responseData, error in
+            createFileForDirectEditing(fileNamePath: fileNamePath,
+                                       editorId: editorId,
+                                       creatorId: creatorId,
+                                       templateId: templateId,
+                                       account: account,
+                                       options: options,
+                                       taskHandler: taskHandler) { account, url, responseData, error in
                 continuation.resume(returning: (
                     account: account,
                     url: url,

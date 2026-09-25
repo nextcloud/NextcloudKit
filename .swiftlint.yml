@@ -42,7 +42,6 @@ disabled_rules:
   - compiler_protocol_init
   
 excluded:
-  - Carthage
   - Pods
   - Package.swift
   - Tests

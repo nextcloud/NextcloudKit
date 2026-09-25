@@ -5,7 +5,10 @@
 import Foundation
 
 public class NKTermsOfService: NSObject {
-    public var meta: Meta?
+    /// Source-compat alias for callers that still reference `NKTermsOfService.Meta`.
+    public typealias Meta = NKOCSMeta
+
+    public var meta: NKOCSMeta?
     public var data: OCSData?
 
     public override init() {
@@ -14,9 +17,9 @@ public class NKTermsOfService: NSObject {
 
     public func loadFromJSON(_ jsonData: Data) -> Bool {
         do {
-            let decodedResponse = try JSONDecoder().decode(OCSResponse.self, from: jsonData)
-            self.meta = decodedResponse.ocs.meta
-            self.data = decodedResponse.ocs.data
+            let decoded = try JSONDecoder().decode(NKOCSWrapper<OCSData>.self, from: jsonData)
+            self.meta = decoded.ocs.meta
+            self.data = decoded.ocs.data
             return true
         } catch {
             debugPrint("[DEBUG] decode error:", error)
@@ -36,24 +39,8 @@ public class NKTermsOfService: NSObject {
         return data?.hasSigned ?? false
     }
 
-    public func getMeta() -> Meta? {
+    public func getMeta() -> NKOCSMeta? {
         return meta
-    }
-
-    // MARK: - Codable
-    private class OCSResponse: Codable {
-        let ocs: OCS
-    }
-
-    private class OCS: Codable {
-        let meta: Meta
-        let data: OCSData
-    }
-
-    public class Meta: Codable {
-        public let status: String
-        public let statuscode: Int
-        public let message: String
     }
 
     public class OCSData: Codable {

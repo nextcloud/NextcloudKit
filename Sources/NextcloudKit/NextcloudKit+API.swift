@@ -1351,25 +1351,68 @@ public extension NextcloudKit {
 
     // MARK: -
 
-    /// Retrieves all notifications associated with the current account.
+    private func parseNotification(_ subJson: JSON) -> NKNotifications {
+        let notification = NKNotifications()
+
+        if subJson["actions"].exists() {
+            do {
+                notification.actions = try subJson["actions"].rawData()
+            } catch {}
+        }
+        notification.app = subJson["app"].stringValue
+        if let datetime = subJson["datetime"].string,
+           let date = datetime.parsedDate(using: "yyyy-MM-dd'T'HH:mm:ssZZZZZ") {
+            notification.date = date
+        }
+        notification.icon = subJson["icon"].string
+        notification.idNotification = subJson["notification_id"].intValue
+        notification.link = subJson["link"].stringValue
+        notification.message = subJson["message"].stringValue
+        notification.messageRich = subJson["messageRich"].stringValue
+        if subJson["messageRichParameters"].exists() {
+            do {
+                notification.messageRichParameters = try subJson["messageRichParameters"].rawData()
+            } catch {}
+        }
+        notification.objectId = subJson["object_id"].stringValue
+        notification.objectType = subJson["object_type"].stringValue
+        notification.subject = subJson["subject"].stringValue
+        notification.subjectRich = subJson["subjectRich"].stringValue
+        if subJson["subjectRichParameters"].exists() {
+            do {
+                notification.subjectRichParameters = try subJson["subjectRichParameters"].rawData()
+            } catch {}
+        }
+        notification.user = subJson["user"].stringValue
+
+        return notification
+    }
+
+    /// Retrieves notifications associated with the current account — all of them, or a single one when `idNotification` is set.
     ///
     /// Parameters:
+    /// - idNotification: Optional ID of a single notification to retrieve.
     /// - account: The Nextcloud account from which to retrieve notifications.
     /// - options: Optional request configuration (headers, queue, version, etc.).
     /// - taskHandler: Callback for the underlying URLSessionTask.
     /// - completion: Returns the account, list of NKNotifications, raw response data, and NKError.
-    func getNotifications(account: String,
+    func getNotifications(idNotification: Int? = nil,
+                          account: String,
                           options: NKRequestOptions = NKRequestOptions(),
                           taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
                           completion: @escaping (_ account: String, _ notifications: [NKNotifications]?, _ responseData: AFDataResponse<Data>?, _ error: NKError) -> Void) {
-        let endpoint = "ocs/v2.php/apps/notifications/api/v2/notifications"
+        var endpoint = "ocs/v2.php/apps/notifications/api/v2/notifications"
+        if let idNotification {
+            endpoint += "/\(idNotification)"
+        }
+
         guard let nkSession = nkCommonInstance.nksessions.session(forAccount: account),
               let url = nkCommonInstance.createStandardUrl(serverUrl: nkSession.urlBase, endpoint: endpoint),
               let headers = nkCommonInstance.getStandardHeaders(account: account, options: options) else {
             return options.queue.async { completion(account, nil, nil, .urlError) }
         }
 
-        nkSession.sessionData.request(url, method: .get, encoding: URLEncoding.default, headers: headers, interceptor: NKInterceptor(nkCommonInstance: nkCommonInstance)).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
+        nkSession.sessionData.request(url, method: .get, encoding: URLEncoding.default, headers: headers, interceptor: NKInterceptor(nkCommonInstance: nkCommonInstance), requestModifier: { $0.timeoutInterval = options.timeout }).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
             task.taskDescription = options.taskDescription
             taskHandler(task)
         }.responseData(queue: self.nkCommonInstance.backgroundQueue) { response in
@@ -1382,41 +1425,16 @@ public extension NextcloudKit {
                 if json["ocs"]["meta"]["statuscode"].int == 200 {
                     let ocsdata = json["ocs"]["data"]
                     var notifications: [NKNotifications] = []
-                    for (_, subJson): (String, JSON) in ocsdata {
-                        let notification = NKNotifications()
 
-                        if subJson["actions"].exists() {
-                            do {
-                                notification.actions = try subJson["actions"].rawData()
-                            } catch {}
+                    // The single-notification endpoint returns `ocs.data` as one object, the list endpoint as an array.
+                    if idNotification != nil {
+                        notifications.append(self.parseNotification(ocsdata))
+                    } else {
+                        for (_, subJson): (String, JSON) in ocsdata {
+                            notifications.append(self.parseNotification(subJson))
                         }
-                        notification.app = subJson["app"].stringValue
-                        if let datetime = subJson["datetime"].string,
-                           let date = datetime.parsedDate(using: "yyyy-MM-dd'T'HH:mm:ssZZZZZ") {
-                            notification.date = date
-                        }
-                        notification.icon = subJson["icon"].string
-                        notification.idNotification = subJson["notification_id"].intValue
-                        notification.link = subJson["link"].stringValue
-                        notification.message = subJson["message"].stringValue
-                        notification.messageRich = subJson["messageRich"].stringValue
-                        if subJson["messageRichParameters"].exists() {
-                            do {
-                                notification.messageRichParameters = try subJson["messageRichParameters"].rawData()
-                            } catch {}
-                        }
-                        notification.objectId = subJson["object_id"].stringValue
-                        notification.objectType = subJson["object_type"].stringValue
-                        notification.subject = subJson["subject"].stringValue
-                        notification.subjectRich = subJson["subjectRich"].stringValue
-                        if subJson["subjectRichParameters"].exists() {
-                            do {
-                                notification.subjectRichParameters = try subJson["subjectRichParameters"].rawData()
-                            } catch {}
-                        }
-                        notification.user = subJson["user"].stringValue
-                        notifications.append(notification)
                     }
+
                     options.queue.async { completion(account, notifications, response, .success) }
                 } else {
                     options.queue.async { completion(account, nil, response, NKError(rootJson: json, fallbackStatusCode: response.response?.statusCode)) }
@@ -1425,14 +1443,16 @@ public extension NextcloudKit {
         }
     }
 
-    /// Asynchronously fetches notifications for the given account.
+    /// Asynchronously fetches notifications for the given account — all of them, or a single one when `idNotification` is set.
     ///
     /// - Parameters:
+    ///   - idNotification: Optional ID of a single notification to retrieve.
     ///   - account: The Nextcloud account used to authenticate the request.
     ///   - options: Request configuration including queue and headers.
     ///   - taskHandler: Optional callback to monitor the URLSessionTask.
     /// - Returns: A tuple containing the account, notifications array (optional), response data (optional), and the resulting NKError.
-    func getNotificationsAsync(account: String,
+    func getNotificationsAsync(idNotification: Int? = nil,
+                               account: String,
                                options: NKRequestOptions = NKRequestOptions(),
                                taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in }
     ) async -> (
@@ -1442,7 +1462,8 @@ public extension NextcloudKit {
         error: NKError
     ) {
         await withCheckedContinuation { continuation in
-            getNotifications(account: account,
+            getNotifications(idNotification: idNotification,
+                             account: account,
                              options: options,
                              taskHandler: taskHandler) { account, notifications, responseData, error in
                 continuation.resume(returning: (

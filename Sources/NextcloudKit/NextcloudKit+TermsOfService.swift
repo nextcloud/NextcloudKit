@@ -34,7 +34,7 @@ public extension NextcloudKit {
                     if meta.statuscode == 200 {
                         options.queue.async { completion(account, tos, response, .success) }
                     } else {
-                        options.queue.async { completion(account, tos, response, NKError(errorCode: meta.statuscode, errorDescription: meta.message, responseData: jsonData)) }
+                        options.queue.async { completion(account, tos, response, NKError(errorCode: meta.statuscode, errorDescription: meta.message ?? "", responseData: jsonData)) }
                     }
                 } else {
                     options.queue.async { completion(account, nil, response, .invalidData) }

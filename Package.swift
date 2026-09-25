@@ -10,7 +10,7 @@ import PackageDescription
 let package = Package(
     name: "NextcloudKit",
     platforms: [
-        .iOS(.v14),
+        .iOS(.v17),
         .macOS(.v11),
         .tvOS(.v14),
         .watchOS(.v7),
@@ -20,17 +20,24 @@ let package = Package(
         .library(
             name: "NextcloudKit",
             targets: ["NextcloudKit"]),
+        .library(
+            name: "NextcloudKitUI",
+            targets: ["NextcloudKitUI"])
     ],
     dependencies: [
         .package(url: "https://github.com/WeTransfer/Mocker.git", .upToNextMajor(from: "3.0.2")),
         .package(url: "https://github.com/Alamofire/Alamofire", .upToNextMajor(from: "5.10.2")),
         .package(url: "https://github.com/SwiftyJSON/SwiftyJSON", .upToNextMajor(from: "5.0.2")),
         .package(url: "https://github.com/yahoojapan/SwiftyXMLParser", .upToNextMajor(from: "5.6.0")),
+        .package(url: "https://github.com/twostraws/CodeScanner.git", .upToNextMajor(from: "2.5.2")),
     ],
     targets: [
         .target(
             name: "NextcloudKit",
             dependencies: ["Alamofire", "SwiftyJSON", "SwiftyXMLParser"]),
+        .target(
+            name: "NextcloudKitUI",
+            dependencies: ["NextcloudKit", "CodeScanner"]),
         .testTarget(
             name: "NextcloudKitUnitTests",
             dependencies: ["NextcloudKit", "Mocker"],
@@ -39,6 +46,9 @@ let package = Package(
             ]),
         .testTarget(
             name: "NextcloudKitIntegrationTests",
-            dependencies: ["NextcloudKit", "Mocker"])
+            dependencies: ["NextcloudKit", "Mocker"]),
+        .testTarget(
+            name: "NextcloudKitUITests",
+            dependencies: ["NextcloudKit", "NextcloudKitUI", "Mocker"]),
     ]
 )

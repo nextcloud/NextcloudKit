@@ -48,6 +48,11 @@ public struct NKLock: Equatable, Sendable {
     public let token: String?
 
     ///
+    /// Normalized resource ETag returned by the LOCK response.
+    ///
+    public let etag: String?
+
+    ///
     /// Initialize from a SwiftyXML accessor.
     ///
     /// This is intended for creating an instance based on a superset of required properties returned by a `PROPFIND` request to the server about an item.
@@ -90,6 +95,8 @@ public struct NKLock: Equatable, Sendable {
         self.time = Date(timeIntervalSince1970: rawTime)
         self.timeOut = Date(timeIntervalSince1970: rawTime + rawTimeOut)
         self.token = lockToken
+        self.etag = properties["d:getetag"].text?
+            .trimmingCharacters(in: CharacterSet(charactersIn: "\""))
     }
 
     ///
@@ -103,7 +110,7 @@ public struct NKLock: Equatable, Sendable {
     ///
     /// Initialize from raw values.
     ///
-    public init(owner: String, ownerEditor: String, ownerType: NKLockType, ownerDisplayName: String, time: Date?, timeOut: Date?, token: String?) {
+    public init(owner: String, ownerEditor: String, ownerType: NKLockType, ownerDisplayName: String, time: Date?, timeOut: Date?, token: String?, etag: String? = nil) {
         self.owner = owner
         self.ownerEditor = ownerEditor
         self.ownerType = ownerType
@@ -111,5 +118,6 @@ public struct NKLock: Equatable, Sendable {
         self.time = time
         self.timeOut = timeOut
         self.token = token
+        self.etag = etag
     }
 }
