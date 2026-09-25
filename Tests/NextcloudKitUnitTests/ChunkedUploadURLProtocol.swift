@@ -27,7 +27,17 @@ final class ChunkedUploadURLProtocol: URLProtocol {
         case "MKCOL", "PUT":
             statusCode = 201
         case "MOVE":
-            statusCode = Int(url.host?.split(separator: "-").last?.split(separator: ".").first ?? "") ?? 500
+            let requestedStatus = Int(url.host?.split(separator: "-").last?.split(separator: ".").first ?? "") ?? 500
+            if requestedStatus == 412 {
+                // Simulate an occupied destination: the MOVE succeeds only when overwriting is allowed.
+                switch request.value(forHTTPHeaderField: "Overwrite") {
+                case "F": statusCode = 412
+                case "T": statusCode = 201
+                default: statusCode = 400
+                }
+            } else {
+                statusCode = requestedStatus
+            }
             if statusCode == 201 {
                 headers = ["OC-FileID": "assembled-file-id", "OC-ETag": "assembled-etag"]
             }

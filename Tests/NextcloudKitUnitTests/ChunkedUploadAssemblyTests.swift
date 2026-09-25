@@ -15,7 +15,7 @@ final class ChunkedUploadAssemblyTests: XCTestCase {
         #endif
     }
 
-    private func uploadThroughMockedAssembly(moveStatus: Int) async throws -> (error: NKError?, file: NKFile?) {
+    private func uploadThroughMockedAssembly(moveStatus: Int, overwrite: Bool = true) async throws -> (error: NKError?, file: NKFile?) {
         let kit = makeKit()
         let account = UUID().uuidString
         let urlBase = "https://assembly-\(moveStatus).test"
@@ -50,7 +50,8 @@ final class ChunkedUploadAssemblyTests: XCTestCase {
                                                         chunkFolder: "chunks",
                                                         filesChunk: [(fileName: "00001", size: 5)],
                                                         chunkSize: 5,
-                                                        account: account)
+                                                        account: account,
+                                                        overwrite: overwrite)
             return (nil, result.file)
         } catch let error as NKError {
             return (error, nil)
@@ -62,9 +63,16 @@ final class ChunkedUploadAssemblyTests: XCTestCase {
         XCTAssertEqual(result.error?.errorCode, 507)
     }
 
-    func test_failedAssemblyMove_throwsPreconditionError() async throws {
-        let result = try await uploadThroughMockedAssembly(moveStatus: 412)
+    func test_assemblyMove_withoutOverwriteThrowsCollisionError() async throws {
+        let result = try await uploadThroughMockedAssembly(moveStatus: 412, overwrite: false)
         XCTAssertEqual(result.error?.errorCode, 412)
+        XCTAssertNil(result.file)
+    }
+
+    func test_assemblyMove_withOverwriteReplacesExistingDestination() async throws {
+        let result = try await uploadThroughMockedAssembly(moveStatus: 412)
+        XCTAssertNil(result.error)
+        XCTAssertEqual(result.file?.ocId, "assembled-file-id")
     }
 
     func test_successfulAssemblyMove_returnsFile() async throws {
