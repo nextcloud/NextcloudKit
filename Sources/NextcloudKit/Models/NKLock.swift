@@ -95,8 +95,7 @@ public struct NKLock: Equatable, Sendable {
         self.time = Date(timeIntervalSince1970: rawTime)
         self.timeOut = Date(timeIntervalSince1970: rawTime + rawTimeOut)
         self.token = lockToken
-        self.etag = properties["d:getetag"].text?
-            .trimmingCharacters(in: CharacterSet(charactersIn: "\""))
+        self.etag = NKLockOperationResult.normalizedETag(properties["d:getetag"].text)
     }
 
     ///

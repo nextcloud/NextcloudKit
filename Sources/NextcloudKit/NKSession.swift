@@ -65,7 +65,8 @@ public struct NKSession: Sendable {
          groupIdentifier: String,
          httpMaximumConnectionsPerHost: Int,
          httpMaximumConnectionsPerHostInDownload: Int,
-         httpMaximumConnectionsPerHostInUpload: Int) {
+         httpMaximumConnectionsPerHostInUpload: Int,
+         sessionDataOverride: Alamofire.Session? = nil) {
         self.urlBase = urlBase
         self.user = user
         self.userId = userId
@@ -91,12 +92,12 @@ public struct NKSession: Sendable {
         #endif
 
         configurationSessionData.httpCookieStorage = HTTPCookieStorage.sharedCookieStorage(forGroupContainerIdentifier: sharedCookieStorage)
-        sessionData = Alamofire.Session(configuration: configurationSessionData,
-                                        delegate: NextcloudKitSessionDelegate(nkCommonInstance: nkCommonInstance),
-                                        rootQueue: nkCommonInstance.rootQueue,
-                                        requestQueue: nkCommonInstance.requestQueue,
-                                        serializationQueue: nkCommonInstance.serializationQueue,
-                                        eventMonitors: [NKMonitor(nkCommonInstance: nkCommonInstance)])
+        sessionData = sessionDataOverride ?? Alamofire.Session(configuration: configurationSessionData,
+                                                               delegate: NextcloudKitSessionDelegate(nkCommonInstance: nkCommonInstance),
+                                                               rootQueue: nkCommonInstance.rootQueue,
+                                                               requestQueue: nkCommonInstance.requestQueue,
+                                                               serializationQueue: nkCommonInstance.serializationQueue,
+                                                               eventMonitors: [NKMonitor(nkCommonInstance: nkCommonInstance)])
 
         // SessionDataNoCache Alamofire
         let configurationSessionDataNoCache = URLSessionConfiguration.af.default
