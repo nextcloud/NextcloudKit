@@ -14,7 +14,8 @@ public struct NKLockOperationResult: Sendable {
     public let etag: String?
 
     ///
-    /// The created lock, or `nil` when the resource was unlocked.
+    /// Lock metadata parsed from the response, or `nil` when absent or unparseable.
+    /// A `nil` value alone does not confirm that the resource is unlocked.
     ///
     public let lock: NKLock?
 

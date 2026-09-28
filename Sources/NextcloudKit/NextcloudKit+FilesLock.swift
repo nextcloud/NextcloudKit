@@ -115,7 +115,8 @@ public extension NextcloudKit {
     ///   - options: Optional request configuration (headers, queue, etc.).
     ///   - taskHandler: Optional monitoring of the `URLSessionTask`.
     ///
-    /// - Returns: The created lock, or `nil` when the resource was unlocked.
+    /// - Returns: Lock metadata parsed from the response, or `nil` when absent or unparseable.
+    ///   A `nil` value alone does not confirm that the resource is unlocked.
     ///
     func lockUnlockFile(serverUrlFileName: String, type: NKLockType? = nil, shouldLock: Bool, account: String, options: NKRequestOptions = NKRequestOptions(), taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in }) async throws -> NKLock? {
         try await lockUnlockFileResult(serverUrlFileName: serverUrlFileName,
