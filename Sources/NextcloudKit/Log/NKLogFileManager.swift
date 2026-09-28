@@ -122,7 +122,6 @@ public final class NKLogFileManager: @unchecked Sendable {
     public var logLevel: NKLogLevel
     private var blacklist: [String] = []
     private var whitelist: [String] = []
-    private var currentLogDate: String
     private let logQueue = DispatchQueue(label: "com.nextcloud.LogWriterQueue")
     private let rotationQueue = DispatchQueue(label: "com.nextcloud.LogRotationQueue")
     private let fileManager = FileManager.default
@@ -147,7 +146,6 @@ public final class NKLogFileManager: @unchecked Sendable {
             try? FileManager.default.createDirectory(at: logsFolder, withIntermediateDirectories: true)
         }
         self.logDirectory = logsFolder
-        self.currentLogDate = Self.currentDateString()
     }
 
     /// Creates the configured log directory if it does not already exist.
@@ -157,8 +155,6 @@ public final class NKLogFileManager: @unchecked Sendable {
     /// - Otherwise uses the "Logs" subdirectory of `.documentDirectory`.
     /// - Checks if the folder already exists.
     /// - If not, it creates the folder, including any intermediate directories.
-    /// - Initializes the current log date after ensuring the directory exists.
-    ///
     /// If folder creation fails, the method silently ignores the error.
     ///
     /// - Note: The `logDirectory` property will point to the created `Logs` folder.
@@ -168,7 +164,6 @@ public final class NKLogFileManager: @unchecked Sendable {
         if !FileManager.default.fileExists(atPath: logsFolder.path) {
             try? FileManager.default.createDirectory(at: logsFolder, withIntermediateDirectories: true)
         }
-        self.currentLogDate = Self.currentDateString()
     }
 
     /// Sets configuration parameters for the logger.
@@ -341,11 +336,17 @@ public final class NKLogFileManager: @unchecked Sendable {
     // MARK: - Log Rotation
 
     private func checkForRotation() {
+        let currentPath = logDirectory.appendingPathComponent(logFileName)
         let today = Self.currentDateString()
-        guard today != currentLogDate else { return }
+        guard let attributes = try? fileManager.attributesOfItem(atPath: currentPath.path),
+              let modificationDate = attributes[.modificationDate] as? Date else {
+            return
+        }
 
-        rotateLog(for: currentLogDate)
-        currentLogDate = today
+        let logDate = Self.currentDateString(from: modificationDate)
+        guard today != logDate else { return }
+
+        rotateLog(for: logDate)
     }
 
     private func rotateLog(for date: String) {
@@ -484,7 +485,12 @@ public final class NKLogFileManager: @unchecked Sendable {
 
     /// Returns today's date string in "yyyy-MM-dd" format using a cached formatter.
     private static func currentDateString() -> String {
-        return cachedCurrentDateFormatter.string(from: Date())
+        return currentDateString(from: Date())
+    }
+
+    /// Returns the supplied date as a string in "yyyy-MM-dd" format.
+    private static func currentDateString(from date: Date) -> String {
+        return cachedCurrentDateFormatter.string(from: date)
     }
 
     /// Returns a stable timestamp string in "yyyy-MM-dd HH:mm:ss" format using a cached formatter.
