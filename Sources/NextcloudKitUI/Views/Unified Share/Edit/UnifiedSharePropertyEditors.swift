@@ -247,19 +247,19 @@ private struct TextPropertyEditor: View {
                 TextField(placeholder, text: $draft)
             }
 
-            Button(String(localized: "Cancel"), role: .cancel) {
+            Button(String(localized: "Cancel", bundle: .module), role: .cancel) {
                 draft = committed
             }
 
             if secure && !committed.isEmpty {
-                Button(String(localized: "Remove password"), role: .destructive) {
+                Button(String(localized: "Remove password", bundle: .module), role: .destructive) {
                     draft = ""
                     committed = ""
                     onCommit(nil)
                 }
             }
 
-            Button(String(localized: "Save")) {
+            Button(String(localized: "Save", bundle: .module)) {
                 guard !secure || !draft.isEmpty else {
                     return
                 }
@@ -276,7 +276,7 @@ private struct TextPropertyEditor: View {
     }
 
     private var placeholder: String {
-        property.class == Self.labelPropertyClass ? String(localized: "Add a label") : property.displayName
+        property.class == Self.labelPropertyClass ? String(localized: "Add a label", bundle: .module) : property.displayName
     }
 
     private var displayValue: String {

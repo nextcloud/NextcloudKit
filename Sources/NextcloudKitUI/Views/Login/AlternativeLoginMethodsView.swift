@@ -69,7 +69,7 @@ struct AlternativeLoginMethodsView: View {
                             .scaledToFit()
                             .frame(width: 32, height: 32)
 
-                        Text(String(localized: "Scan QR Code", comment: "Button label"))
+                        Text(String(localized: "Scan QR Code", bundle: .module, comment: "Button label"))
                     }
                     .padding()
                     .codeScannerSheet(isPresented: $isPresentingCodeScanner, scanHandler)
@@ -84,7 +84,7 @@ struct AlternativeLoginMethodsView: View {
                                 .scaledToFit()
                                 .frame(width: 32, height: 32)
 
-                            Text(String(localized: "Accounts from other Apps", comment: "Button label"))
+                            Text(String(localized: "Accounts from other Apps", bundle: .module, comment: "Button label"))
                         }
                         .padding()
                         .sharedAccountsSheet(isPresented: $isPresentingSharedAccounts, sharedAccounts: sharedAccounts, selectionHandler: selectionHandler)

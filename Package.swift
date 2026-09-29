@@ -9,6 +9,7 @@ import PackageDescription
 
 let package = Package(
     name: "NextcloudKit",
+    defaultLocalization: "en",
     platforms: [
         .iOS(.v17),
         .macOS(.v11),
