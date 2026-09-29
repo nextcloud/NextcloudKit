@@ -14,8 +14,7 @@ on:
       - develop
 
 env:
-  DESTINATION_IOS: platform=iOS Simulator,name=iPhone 16,OS=18.5
-  DESTINATION_MACOS: platform=macOS,arch=x86_64
+  DESTINATION_IOS: platform=iOS Simulator,name=iPhone 17,OS=27.0
   SCHEME: NextcloudKit-Package
   SERVER_BRANCH: stable30
   PHP_VERSION: 8.3
@@ -23,7 +22,7 @@ env:
 jobs:
   build-and-test:
     name: Build and Test
-    runs-on: macos-15
+    runs-on: xcode-27
     if: github.event.pull_request.draft == false
     steps:
     - name: Set env var
@@ -62,7 +61,7 @@ jobs:
     - name: Setup Xcode
       uses: maxim-lobanov/setup-xcode@60606e260d2fc5762a71e64e74b2174e8ea3c8bd # v1.6.0
       with:
-        xcode-version: '26.0.1'
+        xcode-version: '27.0'
 
     - name: Build & Test NextcloudKit
       run: |
