@@ -41,3 +41,6 @@ Package.resolved
 /.env-vars
 *.generated.swift
 /.build
+
+## Transifex per-language downloads, merged into Localizable.xcstrings
+/translations

@@ -52,7 +52,7 @@ struct SharedAccountsView: View {
                         .clipShape(Capsule())
                         .padding(.horizontal)
                     }
-                    .navigationTitle(String(localized: "Accounts from other Apps", comment: "Navigation bar title"))
+                    .navigationTitle(String(localized: "Accounts from other Apps", bundle: .module, comment: "Navigation bar title"))
 #if os(iOS)
                     .navigationBarTitleDisplayMode(.inline)
 #endif
