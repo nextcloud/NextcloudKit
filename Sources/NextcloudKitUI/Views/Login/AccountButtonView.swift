@@ -50,7 +50,7 @@ public struct AccountButtonView: View {
         .popover(isPresented: $showPopover) {
             VStack {
                 if supportsMultipleAccounts {
-                    Text("Accounts")
+                    Text("Accounts", bundle: .module)
                         .bold()
                         .padding(.top)
 

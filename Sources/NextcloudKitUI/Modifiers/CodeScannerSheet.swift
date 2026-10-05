@@ -28,7 +28,7 @@ struct CodeScannerSheet: ViewModifier {
                 CodeScannerView(codeTypes: [.qr], scanMode: .once, showViewfinder: true, completion: completionHandler)
                 .ignoresSafeArea()
                 .toolbarTitleDisplayMode(.inline)
-                .navigationTitle(String(localized: "Scan QR Code", comment: "Navigation bar title"))
+                .navigationTitle(String(localized: "Scan QR Code", bundle: .module, comment: "Navigation bar title"))
             }
         }
     }

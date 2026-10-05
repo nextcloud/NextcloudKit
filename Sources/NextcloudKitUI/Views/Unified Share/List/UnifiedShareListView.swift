@@ -96,11 +96,11 @@ public struct UnifiedShareListView: View {
 
         case .error(let error):
             ContentUnavailableView {
-                Label(String(localized: "Couldn't load shares"), systemImage: "exclamationmark.triangle")
+                Label(String(localized: "Couldn't load shares", bundle: .module), systemImage: "exclamationmark.triangle")
             } description: {
                 Text(error.localizedDescription)
             } actions: {
-                Button(String(localized: "Retry")) {
+                Button(String(localized: "Retry", bundle: .module)) {
                     model.load()
                 }
             }
@@ -120,9 +120,9 @@ public struct UnifiedShareListView: View {
             .overlay {
                 if shares.isEmpty {
                     ContentUnavailableView {
-                        Label("Not Shared Yet", systemImage: "person.badge.plus.fill")
+                        Label(String(localized: "Not Shared Yet", bundle: .module), systemImage: "person.badge.plus.fill")
                     } actions: {
-                        Button(isDirectory ? String(localized: "Share Folder") : String(localized: "Share File")) {
+                        Button(isDirectory ? String(localized: "Share Folder", bundle: .module) : String(localized: "Share File", bundle: .module)) {
                             createTrigger.isPresenting = true
                         }
                     }
@@ -160,7 +160,7 @@ public struct UnifiedShareListView: View {
                             .contentShape(Rectangle())
                     }
                     .buttonStyle(.plain)
-                    .accessibilityLabel(isExpanded.wrappedValue ? String(localized: "Hide recipients") : String(localized: "Show recipients"))
+                    .accessibilityLabel(isExpanded.wrappedValue ? String(localized: "Hide recipients", bundle: .module) : String(localized: "Show recipients", bundle: .module))
                 }
             }
             .disclosureGroupStyle(ShareDisclosureGroupStyle())
@@ -194,7 +194,7 @@ public struct UnifiedShareListView: View {
 
                 if let recipient = share.recipients.first, share.recipients.count == 1 {
                     if isLink(recipient) {
-                        Text(String(localized: "For people who already have access"))
+                        Text(String(localized: "For people who already have access", bundle: .module))
                             .font(.caption)
                             .foregroundStyle(.secondary)
                     }
@@ -276,7 +276,7 @@ public struct UnifiedShareListView: View {
                     .lineLimit(1)
 
                 if isLink(recipient) {
-                    Text(String(localized: "For people who already have access"))
+                    Text(String(localized: "For people who already have access", bundle: .module))
                         .font(.caption)
                         .foregroundStyle(.secondary)
                 }
@@ -311,7 +311,7 @@ public struct UnifiedShareListView: View {
 
                 Divider()
 
-                Button(String(localized: "Custom permissions")) {
+                Button(String(localized: "Custom permissions", bundle: .module)) {
                     editing = ShareEditor(share: share, forceCustomPermissions: true)
                 }
             } label: {
@@ -330,7 +330,7 @@ public struct UnifiedShareListView: View {
 
                 Divider()
 
-                Button(String(localized: "Custom permissions")) {
+                Button(String(localized: "Custom permissions", bundle: .module)) {
                     editing = ShareEditor(share: share, recipient: recipient)
                 }
             } label: {
@@ -375,24 +375,24 @@ public struct UnifiedShareListView: View {
         var components: [String] = []
 
         if peopleCount == 1 {
-            components.append(String(localized: "1 person"))
+            components.append(String(localized: "1 person", bundle: .module))
         } else if peopleCount > 1 {
-            components.append(String(localized: "\(peopleCount) people"))
+            components.append(String(localized: "\(peopleCount) people", bundle: .module))
         }
 
         if groupCount == 1 {
-            components.append(String(localized: "1 group"))
+            components.append(String(localized: "1 group", bundle: .module))
         } else if groupCount > 1 {
-            components.append(String(localized: "\(groupCount) groups"))
+            components.append(String(localized: "\(groupCount) groups", bundle: .module))
         }
 
         if linkCount == 1 {
-            components.append(String(localized: "1 link"))
+            components.append(String(localized: "1 link", bundle: .module))
         } else if linkCount > 1 {
-            components.append(String(localized: "\(linkCount) links"))
+            components.append(String(localized: "\(linkCount) links", bundle: .module))
         }
 
-        return components.isEmpty ? String(localized: "No recipients") : components.joined(separator: ", ")
+        return components.isEmpty ? String(localized: "No recipients", bundle: .module) : components.joined(separator: ", ")
     }
 
     private func recipientPresetLabel(_ recipient: NKUnifiedShareRecipient, in share: NKUnifiedShare) -> String {
@@ -401,7 +401,7 @@ public struct UnifiedShareListView: View {
         if recipient.permissions.isEmpty || isLink(recipient) {
             guard let presetClass = share.permissionPreset,
                   let preset = applicablePresets.first(where: { $0.class == presetClass }) else {
-                return String(localized: "Custom permissions")
+                return String(localized: "Custom permissions", bundle: .module)
             }
             return preset.displayName
         }
@@ -414,7 +414,7 @@ public struct UnifiedShareListView: View {
             return preset.displayName
         }
 
-        return String(localized: "Custom permissions")
+        return String(localized: "Custom permissions", bundle: .module)
     }
 
     // MARK: - Helpers
@@ -428,7 +428,7 @@ public struct UnifiedShareListView: View {
     }
 
     private func recipientDisplayName(_ recipient: NKUnifiedShareRecipient) -> String {
-        isLink(recipient) ? String(localized: "Internal link") : recipient.displayName
+        isLink(recipient) ? String(localized: "Internal link", bundle: .module) : recipient.displayName
     }
 
     private func iconURL(_ icon: NKUnifiedShareIcon) -> String? {
