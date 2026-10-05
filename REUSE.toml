@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 version = 1
 SPDX-PackageName = "NextcloudKit"
-SPDX-PackageSupplier = "2024 Nextcloud GmbH and Nextcloud contributors"
+SPDX-PackageSupplier = "Nextcloud GmbH <https://nextcloud.com/impressum/>"
 SPDX-PackageDownloadLocation = "https://github.com/nextcloud/NextcloudKit"
 
 [[annotations]]
