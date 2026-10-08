@@ -3,7 +3,16 @@
 
 import Foundation
 
-final class ChunkedUploadURLProtocol: URLProtocol {
+final class ChunkedUploadURLProtocol: URLProtocol, @unchecked Sendable {
+    private static let lock = NSLock()
+    private static var handlers: [String: @Sendable (ChunkedUploadURLProtocol) -> Bool] = [:]
+
+    static func setHandler(forHost host: String, handler: (@Sendable (ChunkedUploadURLProtocol) -> Bool)?) {
+        lock.lock()
+        defer { lock.unlock() }
+        handlers[host] = handler
+    }
+
     override class func canInit(with request: URLRequest) -> Bool {
         guard let host = request.url?.host else { return false }
         return host.hasPrefix("assembly-") && host.hasSuffix(".test")
@@ -16,6 +25,13 @@ final class ChunkedUploadURLProtocol: URLProtocol {
     override func startLoading() {
         guard let url = request.url else {
             client?.urlProtocol(self, didFailWithError: URLError(.badURL))
+            return
+        }
+
+        Self.lock.lock()
+        let handler = Self.handlers[url.host ?? ""]
+        Self.lock.unlock()
+        if handler?(self) == true {
             return
         }
 
@@ -45,9 +61,13 @@ final class ChunkedUploadURLProtocol: URLProtocol {
             statusCode = 500
         }
 
-        let response = HTTPURLResponse(url: url, statusCode: statusCode, httpVersion: "HTTP/1.1", headerFields: headers)!
+        respond(status: statusCode, headers: headers)
+    }
+
+    func respond(status: Int, headers: [String: String] = [:], data: Data = Data()) {
+        let response = HTTPURLResponse(url: request.url!, statusCode: status, httpVersion: "HTTP/1.1", headerFields: headers)!
         client?.urlProtocol(self, didReceive: response, cacheStoragePolicy: .notAllowed)
-        client?.urlProtocol(self, didLoad: Data())
+        client?.urlProtocol(self, didLoad: data)
         client?.urlProtocolDidFinishLoading(self)
     }
 
