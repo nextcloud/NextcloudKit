@@ -2115,12 +2115,6 @@
             "value" : "Cancel"
           }
         },
-        "sr-Latn" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Poništi"
-          }
-        },
         "sv" : {
           "stringUnit" : {
             "state" : "translated",
@@ -4429,12 +4423,6 @@
             "value" : "Delete"
           }
         },
-        "sr-Latn" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Obriši"
-          }
-        },
         "sv" : {
           "stringUnit" : {
             "state" : "translated",
@@ -5604,12 +5592,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Измени"
-          }
-        },
-        "sr-Latn" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Izmeni"
           }
         },
         "sv" : {
@@ -7581,12 +7563,6 @@
             "value" : "Учесници"
           }
         },
-        "sr-Latn" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Učesnici"
-          }
-        },
         "sv" : {
           "stringUnit" : {
             "state" : "translated",
@@ -8823,12 +8799,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Пошаљи"
-          }
-        },
-        "sr-Latn" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Pošalji"
           }
         },
         "sv" : {
@@ -10088,12 +10058,6 @@
             "value" : "Поставке"
           }
         },
-        "sr-Latn" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Поставке"
-          }
-        },
         "sv" : {
           "stringUnit" : {
             "state" : "translated",
@@ -10822,12 +10786,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Save"
-          }
-        },
-        "sr-Latn" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Sačuvaj"
           }
         },
         "sv" : {
@@ -11736,12 +11694,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Подели везу"
-          }
-        },
-        "sr-Latn" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Veza deljenja"
           }
         },
         "sv" : {
