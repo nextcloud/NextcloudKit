@@ -7,15 +7,16 @@ final class TestURLProtocol: URLProtocol {
     struct Reply {
         let status: Int
         let data: Data
+        let headers: [String: String]
     }
 
     private static let lock = NSLock()
     private static var reply: Reply?
     private static var recordedRequests: [URLRequest] = []
 
-    static func setReply(status: Int, data: Data) {
+    static func setReply(status: Int, data: Data, headers: [String: String] = [:]) {
         lock.lock()
-        reply = Reply(status: status, data: data)
+        reply = Reply(status: status, data: data, headers: headers)
         recordedRequests = []
         lock.unlock()
     }
@@ -43,7 +44,7 @@ final class TestURLProtocol: URLProtocol {
         Self.lock.unlock()
 
         guard let reply, let url = request.url,
-              let response = HTTPURLResponse(url: url, statusCode: reply.status, httpVersion: nil, headerFields: nil)
+              let response = HTTPURLResponse(url: url, statusCode: reply.status, httpVersion: nil, headerFields: reply.headers)
         else {
             client?.urlProtocol(self, didFailWithError: URLError(.badServerResponse))
             return

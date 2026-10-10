@@ -1256,7 +1256,7 @@ public extension NextcloudKit {
                     let activity = NKActivity()
 
                     activity.app = subJson["app"].stringValue
-                    activity.idActivity = subJson["activity_id"].intValue
+                    activity.idActivity = self.activityId(from: subJson["activity_id"])
                     if let datetime = subJson["datetime"].string,
                        let date = datetime.parsedDate(using: "yyyy-MM-dd'T'HH:mm:ssZZZZZ") {
                         activity.date = date
@@ -1298,6 +1298,14 @@ public extension NextcloudKit {
                 options.queue.async { completion(account, activities, activityFirstKnown, activityLastGiven, response, .success) }
             }
         }
+    }
+
+    /// Read an activity ID, which the server sends either as a JSON number or as a string.
+    private func activityId(from json: JSON) -> Int {
+        if let string = json.string {
+            return Int(string) ?? 0
+        }
+        return json.intValue
     }
 
     /// Asynchronously fetches the list of activities from the server.
