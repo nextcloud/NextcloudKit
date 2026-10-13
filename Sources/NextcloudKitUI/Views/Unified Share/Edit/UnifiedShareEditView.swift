@@ -226,7 +226,7 @@ public struct UnifiedShareEditView: View {
             Button(String(localized: "OK", bundle: .module), role: .cancel) {}
         } message: {
             if let error = model.mutationError {
-                Text(error.errorDescription)
+                Text(error.localizedMessage)
             }
         }
         .confirmationDialog(

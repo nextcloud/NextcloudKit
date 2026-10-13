@@ -31,7 +31,13 @@ public class UnifiedShareEditModel {
     /// Last property-update error text, keyed by property class (shown under the field).
     var propertyErrors: [String: String] = [:]
     /// Transient mutation failure, shown as an alert while the form stays usable.
-    var mutationError: NKError?
+    var mutationError: NKError? {
+        didSet {
+            if let mutationError {
+                nkLog(error: "Could not update share: \(mutationError.errorCode) \(mutationError.errorDescription)")
+            }
+        }
+    }
     /// Changes on a failed permission mutation so controls are recreated from server values.
     var permissionResetRevision = 0
     /// Per-property revisions used to restore editors after a rejected mutation.
@@ -451,8 +457,8 @@ public class UnifiedShareEditModel {
             pendingProperties.remove(propertyClass)
 
             guard let share = result.share else {
-                let description = result.error.errorDescription
-                propertyErrors[propertyClass] = description.isEmpty ? String(localized: "Failed to update share.", bundle: .module) : description
+                nkLog(error: "Could not update share property \(propertyClass): \(result.error.errorCode) \(result.error.errorDescription)")
+                propertyErrors[propertyClass] = result.error.localizedMessage
                 propertyResetRevisions[propertyClass, default: 0] += 1
 
                 return
