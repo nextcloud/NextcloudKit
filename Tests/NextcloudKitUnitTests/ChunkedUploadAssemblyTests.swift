@@ -15,10 +15,15 @@ final class ChunkedUploadAssemblyTests: XCTestCase {
         #endif
     }
 
-    private func uploadThroughMockedAssembly(moveStatus: Int, overwrite: Bool = true) async throws -> (error: NKError?, file: NKFile?) {
+    private func uploadThroughMockedAssembly(
+        moveStatus: Int,
+        overwrite: Bool = true,
+        host: String? = nil,
+        cancelAfterChunk: Bool = false
+    ) async throws -> (error: NKError?, file: NKFile?) {
         let kit = makeKit()
         let account = UUID().uuidString
-        let urlBase = "https://assembly-\(moveStatus).test"
+        let urlBase = "https://\(host ?? "assembly-\(moveStatus).test")"
         let configuration = URLSessionConfiguration.af.default
         configuration.protocolClasses = [ChunkedUploadURLProtocol.self]
         let session = NKSession(nkCommonInstance: kit.nkCommonInstance,
@@ -51,10 +56,99 @@ final class ChunkedUploadAssemblyTests: XCTestCase {
                                                         filesChunk: [(fileName: "00001", size: 5)],
                                                         chunkSize: 5,
                                                         account: account,
-                                                        overwrite: overwrite)
+                                                        overwrite: overwrite,
+                                                        uploaded: { _ in
+                                                            if cancelAfterChunk {
+                                                                withUnsafeCurrentTask { $0?.cancel() }
+                                                            }
+                                                        })
             return (nil, result.file)
         } catch let error as NKError {
             return (error, nil)
+        }
+    }
+
+    private func cancelledAssembly(moveStatus: Int, headersPresent: Bool = true, cancelDuringReadback: Bool = false) async throws -> (error: NKError?, file: NKFile?) {
+        let host = "assembly-\(UUID().uuidString)-\(moveStatus).test"
+        let (requests, continuation) = AsyncStream<ChunkedUploadURLProtocol>.makeStream()
+        defer {
+            continuation.finish()
+            ChunkedUploadURLProtocol.setHandler(forHost: host, handler: nil)
+        }
+        let readback = Data("""
+        <?xml version="1.0"?>
+        <d:multistatus xmlns:d="DAV:" xmlns:oc="http://owncloud.org/ns">
+          <d:response><d:href>/remote.php/dav/files/user/source.txt</d:href>
+            <d:propstat><d:prop><d:resourcetype/><d:getcontentlength>5</d:getcontentlength>
+              <d:getetag>"assembled-etag"</d:getetag><oc:id>assembled-file-id</oc:id>
+            </d:prop><d:status>HTTP/1.1 200 OK</d:status></d:propstat>
+          </d:response>
+        </d:multistatus>
+        """.utf8)
+        ChunkedUploadURLProtocol.setHandler(forHost: host) { request in
+            if request.request.httpMethod == "MOVE" {
+                if cancelDuringReadback {
+                    request.respond(status: moveStatus)
+                } else {
+                    continuation.yield(request)
+                }
+                return true
+            }
+            if request.request.httpMethod == "PROPFIND", request.request.url?.path.hasSuffix("/source.txt") == true {
+                if cancelDuringReadback {
+                    continuation.yield(request)
+                } else {
+                    request.respond(status: 207, data: readback)
+                }
+                return true
+            }
+            return false
+        }
+        let task = Task { try await uploadThroughMockedAssembly(moveStatus: moveStatus, host: host) }
+        defer { task.cancel() }
+        var iterator = requests.makeAsyncIterator()
+        let nextRequest = await iterator.next()
+        let pending = try XCTUnwrap(nextRequest)
+        task.cancel()
+        if cancelDuringReadback {
+            pending.respond(status: 207, data: readback)
+        } else {
+            pending.respond(status: moveStatus, headers: headersPresent ? ["OC-FileID": "assembled-file-id", "OC-ETag": "assembled-etag"] : [:])
+        }
+        return try await task.value
+    }
+
+    func test_cancellationDuringSuccessfulAssemblyPreservesFileIdentity() async throws {
+        let result = try await cancelledAssembly(moveStatus: 201)
+        XCTAssertNil(result.error)
+        XCTAssertEqual(result.file?.ocId, "assembled-file-id")
+        XCTAssertEqual(result.file?.etag, "assembled-etag")
+    }
+
+    func test_cancellationDuringSuccessfulAssemblyStillReadsMissingIdentity() async throws {
+        let result = try await cancelledAssembly(moveStatus: 201, headersPresent: false)
+        XCTAssertNil(result.error)
+        XCTAssertEqual(result.file?.ocId, "assembled-file-id")
+    }
+
+    func test_cancellationDuringAssemblyReadbackPreservesFileIdentity() async throws {
+        let result = try await cancelledAssembly(moveStatus: 201, headersPresent: false, cancelDuringReadback: true)
+        XCTAssertNil(result.error)
+        XCTAssertEqual(result.file?.ocId, "assembled-file-id")
+    }
+
+    func test_cancellationDuringFailedAssemblyPreservesServerError() async throws {
+        let result = try await cancelledAssembly(moveStatus: 507)
+        XCTAssertEqual(result.error?.errorCode, 507)
+        XCTAssertNil(result.file)
+    }
+
+    func test_cancellationBeforeAssemblyStopsUpload() async throws {
+        do {
+            _ = try await uploadThroughMockedAssembly(moveStatus: 201, cancelAfterChunk: true)
+            XCTFail("Cancellation before assembly should stop the upload")
+        } catch is CancellationError {
+            // No remote file has been committed yet.
         }
     }
 
