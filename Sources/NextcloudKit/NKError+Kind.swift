@@ -34,7 +34,7 @@ public extension NKError {
     }
 }
 
-public extension NKError.Kind {
+extension NKError.Kind {
     /// Classifies an ``NKError/errorCode``: a URL loading error, an HTTP status or an OCS status code.
     ///
     /// Returns `nil` for `0`, which means success. The request method tells some WebDAV statuses apart.

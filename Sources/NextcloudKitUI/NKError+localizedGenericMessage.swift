@@ -5,9 +5,9 @@
 import Foundation
 import NextcloudKit
 
-extension NKError {
+public extension NKError {
     ///
-    /// User friendly messages for generic errors. Each one fits a`kind`.
+    /// User friendly messages for generic errors. Each one fits a `kind`.
     ///
     var localizedGenericMessage: String {
         if let userFacingServerMessage {
@@ -16,7 +16,7 @@ extension NKError {
 
         switch kind ?? .unknown {
         case .offline:
-            return String(localized: "You're offline. Check your internet connection.", bundle: .module, comment: "Error message when the device has no internet connection.")
+            return String(localized: "You're offline. Please check your internet connection.", bundle: .module, comment: "Error message when the device has no internet connection.")
 
         case .timeout:
             return String(localized: "The server took too long to respond. Try again later.", bundle: .module, comment: "Error message when a request to the server timed out.")

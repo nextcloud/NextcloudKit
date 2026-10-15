@@ -12829,13 +12829,13 @@
         }
       }
     },
-    "You're offline. Check your internet connection." : {
+    "You're offline. Please check your internet connection." : {
       "comment" : "Error message when the device has no internet connection.",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "You're offline. Check your internet connection."
+            "value" : "You're offline. Please check your internet connection."
           }
         }
       }

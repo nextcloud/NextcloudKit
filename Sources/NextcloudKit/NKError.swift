@@ -47,13 +47,13 @@ public struct NKError: Error, Equatable, Sendable {
     /// What went wrong, for choosing the message shown to people; `nil` for ``success``.
     public let kind: Kind?
     /// The HTTP status code of the response, when there was one.
-    public let httpStatusCode: Int?
+    let httpStatusCode: Int?
     /// The `ocs.meta.statuscode` of an OCS response.
-    public let ocsStatusCode: Int?
+    let ocsStatusCode: Int?
     /// The text the server sent with the error: an OCS message, the WebDAV `s:message` or a JSON `message`.
-    public let serverMessage: String?
+    let serverMessage: String?
     /// The WebDAV exception class from `s:exception`, e.g. `Sabre\DAV\Exception\Conflict`.
-    public let davException: String?
+    let davException: String?
 
     public static let urlError = NKError(errorCode: NSURLErrorBadURL, errorDescription: NSLocalizedString("_invalid_url_", value: "Invalid server url", comment: ""))
     public static let invalidResponseError = NKError(errorCode: NSURLErrorBadServerResponse, errorDescription: NSLocalizedString("_error_response_", value: "Invalid response", comment: ""))
@@ -73,7 +73,7 @@ public struct NKError: Error, Equatable, Sendable {
 
     public static let success = NKError(errorCode: 0, errorDescription: "")
 
-    /// ``serverMessage`` when the server messages is user friendly, otherwise `nil`.
+    /// The server's message when it's user friendly, otherwise `nil`.
     ///
     /// That covers OCS API errors with a 4xx status, which Nextcloud mostly translates (e.g. sharing and
     /// password policy), and WebDAV file name rule violations. Other server texts are technical.
