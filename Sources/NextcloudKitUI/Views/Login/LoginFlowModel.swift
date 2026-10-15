@@ -153,13 +153,13 @@ final class LoginFlowModel: QRCodeParsing, URLSanitizing {
     }
 
     ///
-    /// A 404 or an unreadable response during login means there is no Nextcloud at the entered address.
+    /// A 404 or an unreadable response during login means there is no Nextcloud instance at the entered address.
     ///
     private func message(for error: NKError) -> String {
-        let isNotNextcloud = error.kind == .notFound || error.kind == .invalidResponse
+        let isInstanceNotFound = error.kind == .notFound || error.kind == .invalidResponse
 
-        if isNotNextcloud, error.userFacingServerMessage == nil {
-            return String(localized: "No Nextcloud server was found at this address.", bundle: .module, comment: "Login error message when the entered address does not point to a Nextcloud server.")
+        if isInstanceNotFound, error.userFacingServerMessage == nil {
+            return String(localized: "No server was found at this address.", bundle: .module, comment: "Login error message when the entered address does not point to a Nextcloud server.")
         }
 
         return error.localizedMessage

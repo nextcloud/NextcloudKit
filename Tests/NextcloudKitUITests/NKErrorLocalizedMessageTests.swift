@@ -8,7 +8,7 @@ import NextcloudKit
 import Testing
 
 ///
-/// Tests for the message ``NKError/localizedMessage`` shows to people.
+/// Tests for the message ``NKError/localizedMessage`` shows to users.
 ///
 struct NKErrorLocalizedMessageTests {
     @Test(arguments: NKError.Kind.allCases)

@@ -6906,17 +6906,6 @@
         }
       }
     },
-    "No Nextcloud server was found at this address." : {
-      "comment" : "Login error message when the entered address does not point to a Nextcloud server.",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "No Nextcloud server was found at this address."
-          }
-        }
-      }
-    },
     "No recipients" : {
       "comment" : "Recipient summary when a share has no recipients.",
       "localizations" : {
@@ -7008,6 +6997,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "沒有收件人"
+          }
+        }
+      }
+    },
+    "No server was found at this address." : {
+      "comment" : "Login error message when the entered address does not point to a Nextcloud server.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No server was found at this address."
           }
         }
       }
