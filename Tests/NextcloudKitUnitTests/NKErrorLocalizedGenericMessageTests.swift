@@ -3,14 +3,13 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 import Foundation
-import NextcloudKit
-@testable import NextcloudKitUI
 import Testing
+@testable import NextcloudKit
 
 ///
 /// Tests for the message ``NKError/localizedGenericMessage`` shows to users.
 ///
-struct NKErrorLocalizedMessageTests {
+struct NKErrorLocalizedGenericMessageTests {
     @Test(arguments: NKError.Kind.allCases)
     func kindMessage(kind: NKError.Kind) {
         let message = NKError(errorCode: -1, errorDescription: "Technical description", kind: kind).localizedGenericMessage
