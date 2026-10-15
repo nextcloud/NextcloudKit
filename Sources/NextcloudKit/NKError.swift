@@ -30,7 +30,10 @@ extension OCSPath {
     static var ocsMetaCode: Self { ["ocs", "meta", "statuscode"] }
     static var ocsMetaMsg: Self { ["ocs", "meta", "message"] }
     static var ocsDataMsg: Self { ["ocs", "data", "message"] }
+    static var ocsData: Self { ["ocs", "data"] }
     static var ocsXMLMsg: Self { ["d:error", "s:message"] }
+    static var davException: Self { ["d:error", "s:exception"] }
+    static var jsonMsg: Self { ["message"] }
 }
 
 public struct NKError: Error, Equatable, Sendable {
@@ -40,6 +43,17 @@ public struct NKError: Error, Equatable, Sendable {
     public let errorDescription: String
     public let error: Error
     public let responseData: Data?
+
+    /// What went wrong, for choosing the message shown to people; `nil` for ``success``.
+    public let kind: Kind?
+    /// The HTTP status code of the response, when there was one.
+    let httpStatusCode: Int?
+    /// The `ocs.meta.statuscode` of an OCS response.
+    let ocsStatusCode: Int?
+    /// The text the server sent with the error: an OCS message, the WebDAV `s:message` or a JSON `message`.
+    let serverMessage: String?
+    /// The WebDAV exception class from `s:exception`, e.g. `Sabre\DAV\Exception\Conflict`.
+    let davException: String?
 
     public static let urlError = NKError(errorCode: NSURLErrorBadURL, errorDescription: NSLocalizedString("_invalid_url_", value: "Invalid server url", comment: ""))
     public static let invalidResponseError = NKError(errorCode: NSURLErrorBadServerResponse, errorDescription: NSLocalizedString("_error_response_", value: "Invalid response", comment: ""))
@@ -55,9 +69,27 @@ public struct NKError: Error, Equatable, Sendable {
     public static let errorChunkFilesEmpty = NKError(errorCode: -9995, errorDescription: NSLocalizedString("_chunk_files_empty_", value: "Files not found", comment: ""))
     public static let errorChunkCreateFolder = NKError(errorCode: -9996, errorDescription: NSLocalizedString("_error_create_folder_", value: "Create folder error", comment: ""))
     public static let errorChunkMoveFile = NKError(errorCode: -9997, errorDescription: NSLocalizedString("_error_move_folder_", value: "Move file error", comment: ""))
-    public static let errorChunkNoEnoughMemory = NKError(errorCode: -9998, errorDescription: NSLocalizedString("_no_enough_memory_", value: "No enough memory", comment: ""))
+    public static let errorChunkNoEnoughMemory = NKError(errorCode: -9998, errorDescription: NSLocalizedString("_no_enough_memory_", value: "No enough memory", comment: ""), kind: .localStorageFull)
 
     public static let success = NKError(errorCode: 0, errorDescription: "")
+
+    /// The server's message when it's user friendly, otherwise `nil`.
+    ///
+    /// That covers OCS API errors with a 4xx status, which Nextcloud mostly translates (e.g. sharing and
+    /// password policy), and WebDAV file name rule violations. Other server texts are technical.
+    public var userFacingServerMessage: String? {
+        guard let serverMessage else { return nil }
+
+        if let ocsStatusCode, 400..<500 ~= ocsStatusCode {
+            return serverMessage
+        }
+
+        if davException == "OCA\\DAV\\Connector\\Sabre\\Exception\\InvalidPath" {
+            return serverMessage
+        }
+
+        return nil
+    }
 
     /// Returns a localized user-facing description for a known error code.
     ///
@@ -186,13 +218,43 @@ public struct NKError: Error, Equatable, Sendable {
         return description
     }
 
+    /// The OCS status code, server message and WebDAV exception found in an error response body.
+    private static func details(of data: Data?) -> (ocsStatusCode: Int?, serverMessage: String?, davException: String?) {
+        guard let data, !data.isEmpty else { return (nil, nil, nil) }
+
+        if let json = try? JSON(data: data) {
+            return (json[.ocsMetaCode].int, serverMessage(in: json), nil)
+        }
+
+        let xml = XML.parse(data)
+
+        return (xml[.ocsMetaCode].int, serverMessage(in: xml), firstNonEmpty(xml[.davException].text))
+    }
+
+    private static func serverMessage(in json: JSON) -> String? {
+        firstNonEmpty(json[.ocsDataMsg].string, json[.ocsData].string, json[.ocsMetaMsg].string, json[.jsonMsg].string)
+    }
+
+    private static func serverMessage(in xml: XML.Accessor) -> String? {
+        firstNonEmpty(xml[.ocsDataMsg].text, xml[.ocsMetaMsg].text, xml[.ocsXMLMsg].text)
+    }
+
+    private static func firstNonEmpty(_ candidates: String?...) -> String? {
+        candidates
+            .compactMap { $0?.trimmingCharacters(in: .whitespacesAndNewlines) }
+            .first { !$0.isEmpty }
+    }
+
     /// Creates an `NKError` from an explicit code and description.
     ///
     /// - Parameters:
     ///   - errorCode: The error code.
     ///   - errorDescription: The user-facing error description.
     ///   - responseData: Optional raw response data associated with the error.
-    public init(errorCode: Int = 0, errorDescription: String = "", responseData: Data? = nil) {
+    ///   - kind: The kind of failure; derived from `errorCode` when `nil`.
+    public init(errorCode: Int = 0, errorDescription: String = "", responseData: Data? = nil, kind: Kind? = nil) {
+        let details = errorCode == 0 ? nil : NKError.details(of: responseData)
+
         self.errorCode = errorCode
         self.errorDescription = errorDescription
         self.error = NSError(
@@ -201,6 +263,11 @@ public struct NKError: Error, Equatable, Sendable {
             userInfo: [NSLocalizedDescriptionKey: self.errorDescription]
         )
         self.responseData = responseData
+        self.kind = kind ?? Kind(code: errorCode)
+        self.httpStatusCode = nil
+        self.ocsStatusCode = details?.ocsStatusCode
+        self.serverMessage = details?.serverMessage
+        self.davException = details?.davException
     }
 
     /// Creates an `NKError` from a generic Swift `Error`.
@@ -213,6 +280,11 @@ public struct NKError: Error, Equatable, Sendable {
         self.errorDescription = error.localizedDescription
         self.error = error
         self.responseData = responseData
+        self.kind = Kind(error: error)
+        self.httpStatusCode = (error as? AFError)?.responseCode
+        self.ocsStatusCode = nil
+        self.serverMessage = nil
+        self.davException = nil
     }
 
     /// Creates an `NKError` from an `NSError`.
@@ -225,6 +297,11 @@ public struct NKError: Error, Equatable, Sendable {
         self.errorDescription = nsError.localizedDescription
         self.error = nsError
         self.responseData = responseData
+        self.kind = Kind(error: nsError)
+        self.httpStatusCode = nil
+        self.ocsStatusCode = nil
+        self.serverMessage = nil
+        self.davException = nil
     }
 
     /// Creates an `NKError` from an OCS JSON response.
@@ -251,6 +328,11 @@ public struct NKError: Error, Equatable, Sendable {
             code: self.errorCode,
             userInfo: [NSLocalizedDescriptionKey: self.errorDescription]
         )
+        self.kind = errorCode == 0 ? nil : Kind(code: statuscode)
+        self.httpStatusCode = fallbackStatusCode
+        self.ocsStatusCode = rootJson[.ocsMetaCode].int
+        self.serverMessage = NKError.serverMessage(in: rootJson)
+        self.davException = nil
     }
 
     /// Creates an `NKError` from an HTTP status code.
@@ -271,7 +353,14 @@ public struct NKError: Error, Equatable, Sendable {
             userInfo: [NSLocalizedDescriptionKey: self.errorDescription]
         )
 
+        let details = NKError.details(of: responseData)
+
         self.responseData = responseData
+        self.kind = Kind(code: statusCode)
+        self.httpStatusCode = statusCode
+        self.ocsStatusCode = details.ocsStatusCode
+        self.serverMessage = details.serverMessage
+        self.davException = details.davException
     }
 
     /// Creates an `NKError` from an HTTP response.
@@ -289,8 +378,9 @@ public struct NKError: Error, Equatable, Sendable {
     /// - Parameters:
     ///   - xmlData: The raw XML response data.
     ///   - fallbackStatusCode: The fallback HTTP status code used when the OCS status code is missing.
+    ///   - method: The HTTP method of the request, which tells some WebDAV statuses apart.
     ///   - responseData: Optional raw response data associated with the error.
-    init(xmlData: Data, fallbackStatusCode: Int? = nil, responseData: Data? = nil) {
+    init(xmlData: Data, fallbackStatusCode: Int? = nil, method: String? = nil, responseData: Data? = nil) {
         let xml = XML.parse(xmlData)
         let statuscode = xml[.ocsMetaCode].int ?? fallbackStatusCode ?? NSURLErrorCannotDecodeContentData
         errorCode = 200..<300 ~= statuscode ? 0 : statuscode
@@ -311,6 +401,11 @@ public struct NKError: Error, Equatable, Sendable {
             code: self.errorCode,
             userInfo: [NSLocalizedDescriptionKey: self.errorDescription]
         )
+        self.kind = errorCode == 0 ? nil : Kind(code: statuscode, method: method)
+        self.httpStatusCode = fallbackStatusCode
+        self.ocsStatusCode = xml[.ocsMetaCode].int
+        self.serverMessage = NKError.serverMessage(in: xml)
+        self.davException = NKError.firstNonEmpty(xml[.davException].text)
     }
 
     /// Creates an `NKError` from an Alamofire response and optional Alamofire error.
@@ -335,7 +430,7 @@ public struct NKError: Error, Equatable, Sendable {
             if let errorJson = try? JSON(data: errorData) {
                 self.init(rootJson: errorJson, fallbackStatusCode: errorCode, responseData: responseData)
             } else {
-                self.init(xmlData: errorData, fallbackStatusCode: errorCode, responseData: responseData)
+                self.init(xmlData: errorData, fallbackStatusCode: errorCode, method: dataResponse.request?.httpMethod, responseData: responseData)
             }
 
         } else if let error = error {

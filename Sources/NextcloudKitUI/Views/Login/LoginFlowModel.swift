@@ -145,9 +145,24 @@ final class LoginFlowModel: QRCodeParsing, URLSanitizing {
         cancel()
 
         if let error {
-            let message = (error as? NKError)?.errorDescription ?? error.localizedDescription
-            present(error: message)
+            let nkError = error as? NKError ?? NKError(error: error)
+
+            nkLog(error: "Login failed: \(nkError.errorCode) \(nkError.errorDescription)")
+            present(error: message(for: nkError))
         }
+    }
+
+    ///
+    /// A 404 or an unreadable response during login means there is no Nextcloud instance at the entered address.
+    ///
+    private func message(for error: NKError) -> String {
+        let isInstanceNotFound = error.kind == .notFound || error.kind == .invalidResponse
+
+        if isInstanceNotFound, error.userFacingServerMessage == nil {
+            return String(localized: "No server was found at this address.", bundle: .module, comment: "Login error message when the entered address does not point to a Nextcloud server.")
+        }
+
+        return error.localizedGenericMessage
     }
 
     private func present(error: String?) {
@@ -194,7 +209,8 @@ final class LoginFlowModel: QRCodeParsing, URLSanitizing {
             if result.error == .success, let token = result.token {
                 addAccount(credentials.host, credentials.user, token)
             } else {
-                present(error: result.error.errorDescription)
+                nkLog(error: "One-time login failed: \(result.error.errorCode) \(result.error.errorDescription)")
+                present(error: message(for: result.error))
             }
         }
     }
