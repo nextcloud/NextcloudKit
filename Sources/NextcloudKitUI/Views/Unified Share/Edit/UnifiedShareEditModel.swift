@@ -458,7 +458,7 @@ public class UnifiedShareEditModel {
 
             guard let share = result.share else {
                 nkLog(error: "Could not update share property \(propertyClass): \(result.error.errorCode) \(result.error.errorDescription)")
-                propertyErrors[propertyClass] = result.error.localizedMessage
+                propertyErrors[propertyClass] = result.error.localizedGenericMessage
                 propertyResetRevisions[propertyClass, default: 0] += 1
 
                 return

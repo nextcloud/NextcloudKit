@@ -12010,13 +12010,13 @@
         }
       }
     },
-    "Something went wrong. Try again." : {
+    "Something went wrong. Please try again." : {
       "comment" : "Error message when the cause of the error is unknown.",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Something went wrong. Try again."
+            "value" : "Something went wrong. Please try again."
           }
         }
       }
@@ -12054,13 +12054,13 @@
         }
       }
     },
-    "The item was changed on the server. Refresh and try again." : {
+    "The item was changed on the server. Please refresh and try again." : {
       "comment" : "Error message when the request conflicts with the current state on the server.",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "The item was changed on the server. Refresh and try again."
+            "value" : "The item was changed on the server. Please refresh and try again."
           }
         }
       }
@@ -12807,13 +12807,13 @@
         }
       }
     },
-    "Too many requests. Wait a moment and try again." : {
+    "Too many requests. Please wait a moment and try again." : {
       "comment" : "Error message when the server rate-limits the requests.",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Too many requests. Wait a moment and try again."
+            "value" : "Too many requests. Please wait a moment and try again."
           }
         }
       }
@@ -12840,13 +12840,13 @@
         }
       }
     },
-    "Your login is no longer valid. Log in again." : {
+    "Your login is no longer valid. Please log in again." : {
       "comment" : "Error message when the server rejects the account's credentials.",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Your login is no longer valid. Log in again."
+            "value" : "Your login is no longer valid. Please log in again."
           }
         }
       }

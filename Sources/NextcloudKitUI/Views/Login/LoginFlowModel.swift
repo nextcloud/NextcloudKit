@@ -162,7 +162,7 @@ final class LoginFlowModel: QRCodeParsing, URLSanitizing {
             return String(localized: "No server was found at this address.", bundle: .module, comment: "Login error message when the entered address does not point to a Nextcloud server.")
         }
 
-        return error.localizedMessage
+        return error.localizedGenericMessage
     }
 
     private func present(error: String?) {

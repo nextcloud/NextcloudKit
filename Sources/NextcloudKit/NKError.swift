@@ -73,7 +73,7 @@ public struct NKError: Error, Equatable, Sendable {
 
     public static let success = NKError(errorCode: 0, errorDescription: "")
 
-    /// ``serverMessage`` when Nextcloud wrote it for people, otherwise `nil`.
+    /// ``serverMessage`` when the server messages is user friendly, otherwise `nil`.
     ///
     /// That covers OCS API errors with a 4xx status, which Nextcloud mostly translates (e.g. sharing and
     /// password policy), and WebDAV file name rule violations. Other server texts are technical.

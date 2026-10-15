@@ -98,7 +98,7 @@ public struct UnifiedShareListView: View {
             ContentUnavailableView {
                 Label(String(localized: "Couldn't load shares", bundle: .module), systemImage: "exclamationmark.triangle")
             } description: {
-                Text(error.localizedMessage)
+                Text(error.localizedGenericMessage)
             } actions: {
                 Button(String(localized: "Retry", bundle: .module)) {
                     model.load()
