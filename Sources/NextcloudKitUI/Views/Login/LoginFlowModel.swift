@@ -2,6 +2,7 @@
 // SPDX-FileCopyrightText: 2026 Milen Pivchev
 // SPDX-License-Identifier: GPL-3.0-or-later
 
+import AuthenticationServices
 #if os(iOS)
 import CodeScanner
 #endif
@@ -40,8 +41,8 @@ final class LoginFlowModel: QRCodeParsing, URLSanitizing {
     /// State toggle for presenting the error alert.
     var isPresentingAlert = false
 
-    /// State toggle for presenting the web view.
-    var isPresentingWebView = false
+    /// State toggle for presenting the login page in the system browser.
+    var isPresentingLoginPage = false
 
     /// The login address acquired from the server through the login flow API.
     var loginAddress: URL?
@@ -87,7 +88,7 @@ final class LoginFlowModel: QRCodeParsing, URLSanitizing {
                 startPolling(token: token, endpoint: endpoint)
 
                 loginAddress = login
-                isPresentingWebView = true
+                isPresentingLoginPage = true
             } catch {
                 endLogin(error)
             }
@@ -124,21 +125,40 @@ final class LoginFlowModel: QRCodeParsing, URLSanitizing {
         }
     }
 
+    ///
+    /// The system browser supports passkeys and AutoFill.
+    /// Login Flow v2 never redirects to the callback scheme, so the session only ends by user or task cancellation.
+    ///
+    func presentLoginPage(_ url: URL, using session: WebAuthenticationSession) async {
+        do {
+            _ = try await session.authenticate(using: url, callbackURLScheme: "nc", preferredBrowserSession: .ephemeral)
+        } catch {
+            // Already handled when the login completed or was cancelled.
+            guard isPresentingLoginPage else { return }
+
+            if let error = error as? ASWebAuthenticationSessionError, error.code == .canceledLogin {
+                cancel()
+            } else {
+                endLogin(error)
+            }
+        }
+    }
+
     private func complete(host: URL, name: String, password: String) {
         pollingTask = nil
         isActive = false
-        isPresentingWebView = false
+        isPresentingLoginPage = false
         addAccount(host, name, password)
     }
 
     ///
-    /// Stop polling. Called when the web view is dismissed, regardless of the reason.
+    /// Stop polling. Called when the login page is closed, regardless of the reason.
     ///
     func cancel() {
         pollingTask?.cancel()
         pollingTask = nil
         isActive = false
-        isPresentingWebView = false
+        isPresentingLoginPage = false
     }
 
     private func endLogin(_ error: Error?) {
