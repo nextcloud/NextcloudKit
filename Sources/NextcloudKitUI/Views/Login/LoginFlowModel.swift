@@ -125,10 +125,6 @@ final class LoginFlowModel: QRCodeParsing, URLSanitizing {
         }
     }
 
-    ///
-    /// The system browser supports passkeys and AutoFill.
-    /// Login Flow v2 never redirects to the callback scheme, so the session only ends by user or task cancellation.
-    ///
     func presentLoginPage(_ url: URL, using session: WebAuthenticationSession) async {
         do {
             _ = try await session.authenticate(using: url, callbackURLScheme: "nc", preferredBrowserSession: .ephemeral)
