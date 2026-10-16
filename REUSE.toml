@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 version = 1
 SPDX-PackageName = "NextcloudKit"
-SPDX-PackageSupplier = "2024 Nextcloud GmbH and Nextcloud contributors"
+SPDX-PackageSupplier = "Nextcloud GmbH <https://nextcloud.com/impressum/>"
 SPDX-PackageDownloadLocation = "https://github.com/nextcloud/NextcloudKit"
 
 [[annotations]]
@@ -24,7 +24,7 @@ SPDX-FileCopyrightText = "2023 Nextcloud GmbH and Nextcloud contributors"
 SPDX-License-Identifier = "GPL-3.0-or-later"
 
 [[annotations]]
-path = ["Sources/NextcloudKitUI/Documentation.docc/Documentation.md", "Sources/NextcloudKitUI/Documentation.docc/theme-settings.json", "Sources/NextcloudKitUI/Localizable.xcstrings"]
+path = [".tx/config", "Sources/NextcloudKitUI/Documentation.docc/Documentation.md", "Sources/NextcloudKitUI/Documentation.docc/theme-settings.json", "Sources/NextcloudKitUI/Localizable.xcstrings"]
 precedence = "aggregate"
 SPDX-FileCopyrightText = "2026 Nextcloud GmbH and Nextcloud contributors"
 SPDX-License-Identifier = "GPL-3.0-or-later"

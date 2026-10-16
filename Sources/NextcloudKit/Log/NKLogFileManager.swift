@@ -64,9 +64,10 @@ public final class NKLogFileManager: @unchecked Sendable {
 
     /// Configures the shared logger instance.
     /// - Parameters:
-    ///   - minLevel: The minimum log level to be recorded.
-    public static func configure(logLevel: NKLogLevel = .normal) {
-        shared.setConfiguration(logLevel: logLevel)
+    ///   - logLevel: The minimum log level to be recorded.
+    ///   - logDirectory: The directory that contains the log files. Defaults to `Documents/Logs`.
+    public static func configure(logLevel: NKLogLevel = .normal, logDirectory: URL? = nil) {
+        shared.setConfiguration(logLevel: logLevel, logDirectory: logDirectory)
     }
 
     /// Configures filter.
@@ -83,7 +84,7 @@ public final class NKLogFileManager: @unchecked Sendable {
         shared.setWhitelist(whitelist: whitelist)
     }
 
-    /// Creates the "Logs" folder inside the user's Documents directory if it does not already exist.
+    /// Creates the configured log directory if it does not already exist.
     ///
     /// This static method delegates to the singleton instance (`shared`) and ensures
     /// that the log folder structure is created or re-created when needed.
@@ -92,14 +93,21 @@ public final class NKLogFileManager: @unchecked Sendable {
     /// (e.g., by iTunes File Sharing, iCloud Drive sync conflicts, or cleanup tools),
     /// and must be re-initialized manually.
     ///
-    /// The folder path is:
-    /// `~/Documents/Logs`
+    /// Unless a custom directory was configured, the folder path is `~/Documents/Logs`.
     ///
     /// If the folder already exists, the method does nothing. If creation fails, the error is silently ignored.
     ///
     /// - Note: This does not create or write any log file, only the folder itself.
     public static func createLogsFolder() {
         shared.createLogsFolder()
+    }
+
+    /// Waits until all pending file writes have completed.
+    ///
+    /// Extensions can call this before returning control to the system to prevent their final
+    /// messages from being lost if the extension process terminates immediately afterward.
+    public static func flush() {
+        shared.flush()
     }
 
     /// Returns the file URL of the currently active log file.
@@ -110,11 +118,10 @@ public final class NKLogFileManager: @unchecked Sendable {
     // MARK: - Configuration
 
     private let logFileName = "log.txt"
-    private let logDirectory: URL
+    private var logDirectory: URL
     public var logLevel: NKLogLevel
     private var blacklist: [String] = []
     private var whitelist: [String] = []
-    private var currentLogDate: String
     private let logQueue = DispatchQueue(label: "com.nextcloud.LogWriterQueue")
     private let rotationQueue = DispatchQueue(label: "com.nextcloud.LogRotationQueue")
     private let fileManager = FileManager.default
@@ -125,7 +132,7 @@ public final class NKLogFileManager: @unchecked Sendable {
 
     // MARK: - Initialization
 
-    private init(logLevel: NKLogLevel = .normal, blacklist: [String]? = nil, whitelist: [String]? = nil) {
+    private init(logLevel: NKLogLevel = .normal, logDirectory: URL? = nil, blacklist: [String]? = nil, whitelist: [String]? = nil) {
         self.logLevel = logLevel
         if let blacklist {
             self.blacklist = blacklist
@@ -134,42 +141,44 @@ public final class NKLogFileManager: @unchecked Sendable {
             self.whitelist = whitelist
         }
 
-        let documents = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
-        let logsFolder = documents.appendingPathComponent("Logs", isDirectory: true)
+        let logsFolder = logDirectory ?? Self.defaultLogDirectory()
         if !FileManager.default.fileExists(atPath: logsFolder.path) {
             try? FileManager.default.createDirectory(at: logsFolder, withIntermediateDirectories: true)
         }
         self.logDirectory = logsFolder
-        self.currentLogDate = Self.currentDateString()
     }
 
-    /// Creates the "Logs" folder inside the user's Documents directory if it does not already exist.
+    /// Creates the configured log directory if it does not already exist.
     ///
     /// This method performs the following steps:
-    /// - Retrieves the path to the `.documentDirectory` using `FileManager`.
-    /// - Appends a "Logs" subdirectory path.
+    /// - Uses the custom directory supplied during configuration, when available.
+    /// - Otherwise uses the "Logs" subdirectory of `.documentDirectory`.
     /// - Checks if the folder already exists.
     /// - If not, it creates the folder, including any intermediate directories.
-    /// - Finally, it sets the `logDirectory` and initializes the current log date.
-    ///
     /// If folder creation fails, the method silently ignores the error.
     ///
     /// - Note: The `logDirectory` property will point to the created `Logs` folder.
     ///
     private func createLogsFolder() {
-        let documents = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
-        let logsFolder = documents.appendingPathComponent("Logs", isDirectory: true)
+        let logsFolder = logDirectory
         if !FileManager.default.fileExists(atPath: logsFolder.path) {
             try? FileManager.default.createDirectory(at: logsFolder, withIntermediateDirectories: true)
         }
-        self.currentLogDate = Self.currentDateString()
     }
 
     /// Sets configuration parameters for the logger.
     /// - Parameters:
     ///   - logLevel: The NKLogLevel { disabled .. verbose }
-    private func setConfiguration(logLevel: NKLogLevel) {
+    private func setConfiguration(logLevel: NKLogLevel, logDirectory: URL?) {
+        flush()
         self.logLevel = logLevel
+        self.logDirectory = logDirectory ?? Self.defaultLogDirectory()
+        createLogsFolder()
+    }
+
+    private static func defaultLogDirectory() -> URL {
+        let documents = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
+        return documents.appendingPathComponent("Logs", isDirectory: true)
     }
 
     /// Sets blacklist for the logger.
@@ -327,27 +336,43 @@ public final class NKLogFileManager: @unchecked Sendable {
     // MARK: - Log Rotation
 
     private func checkForRotation() {
+        let currentPath = logDirectory.appendingPathComponent(logFileName)
         let today = Self.currentDateString()
-        guard today != currentLogDate else { return }
+        guard let attributes = try? fileManager.attributesOfItem(atPath: currentPath.path),
+              let modificationDate = attributes[.modificationDate] as? Date else {
+            return
+        }
 
-        rotateLog(for: currentLogDate)
-        currentLogDate = today
+        let logDate = Self.currentDateString(from: modificationDate)
+        guard today != logDate else { return }
+
+        rotateLog(for: logDate)
     }
 
     private func rotateLog(for date: String) {
         let currentPath = logDirectory.appendingPathComponent(logFileName)
         let rotatedPath = logDirectory.appendingPathComponent("log-\(date).txt")
+        var coordinationError: NSError?
+        let coordinator = NSFileCoordinator(filePresenter: nil)
+        coordinator.coordinate(
+            writingItemAt: currentPath,
+            options: .forMoving,
+            writingItemAt: rotatedPath,
+            options: .forReplacing,
+            error: &coordinationError
+        ) { coordinatedCurrentPath, coordinatedRotatedPath in
+            do {
+                if fileManager.fileExists(atPath: coordinatedCurrentPath.path),
+                   !fileManager.fileExists(atPath: coordinatedRotatedPath.path) {
+                    try fileManager.moveItem(at: coordinatedCurrentPath, to: coordinatedRotatedPath)
+                }
 
-        do {
-            if fileManager.fileExists(atPath: currentPath.path) {
-                try fileManager.moveItem(at: currentPath, to: rotatedPath)
+                if !fileManager.fileExists(atPath: coordinatedCurrentPath.path) {
+                    try Data().write(to: coordinatedCurrentPath)
+                }
+            } catch {
+                print("Log rotation failed: \(error)")
             }
-
-            // Create a new empty log file for today
-            try Data().write(to: currentPath)
-
-        } catch {
-            print("Log rotation failed: \(error)")
         }
     }
 
@@ -363,20 +388,28 @@ public final class NKLogFileManager: @unchecked Sendable {
 
         guard let data = message.data(using: .utf8) else { return }
 
-        do {
-            if !fileManager.fileExists(atPath: logPath.path) {
-                fileManager.createFile(atPath: logPath.path, contents: nil)
+        var coordinationError: NSError?
+        let coordinator = NSFileCoordinator(filePresenter: nil)
+        coordinator.coordinate(writingItemAt: logPath, options: .forMerging, error: &coordinationError) { coordinatedURL in
+            do {
+                if !fileManager.fileExists(atPath: coordinatedURL.path) {
+                    fileManager.createFile(atPath: coordinatedURL.path, contents: nil)
+                }
+
+                let handle = try FileHandle(forWritingTo: coordinatedURL)
+
+                defer { try? handle.close() }
+
+                try handle.seekToEnd()
+                try handle.write(contentsOf: data)
+            } catch {
+                // Ignore log write failures to avoid crashes when the device has no free space.
             }
-
-            let handle = try FileHandle(forWritingTo: logPath)
-
-            defer { try? handle.close() }
-
-            try handle.seekToEnd()
-            try handle.write(contentsOf: data)
-        } catch {
-            // Ignore log write failures to avoid crashes when the device has no free space.
         }
+    }
+
+    private func flush() {
+        logQueue.sync {}
     }
 
     // MARK: - Cached DateFormatters
@@ -452,7 +485,12 @@ public final class NKLogFileManager: @unchecked Sendable {
 
     /// Returns today's date string in "yyyy-MM-dd" format using a cached formatter.
     private static func currentDateString() -> String {
-        return cachedCurrentDateFormatter.string(from: Date())
+        return currentDateString(from: Date())
+    }
+
+    /// Returns the supplied date as a string in "yyyy-MM-dd" format.
+    private static func currentDateString(from date: Date) -> String {
+        return cachedCurrentDateFormatter.string(from: date)
     }
 
     /// Returns a stable timestamp string in "yyyy-MM-dd HH:mm:ss" format using a cached formatter.

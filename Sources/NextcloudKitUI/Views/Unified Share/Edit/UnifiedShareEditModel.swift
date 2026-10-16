@@ -452,7 +452,7 @@ public class UnifiedShareEditModel {
 
             guard let share = result.share else {
                 let description = result.error.errorDescription
-                propertyErrors[propertyClass] = description.isEmpty ? String(localized: "Failed to update share.") : description
+                propertyErrors[propertyClass] = description.isEmpty ? String(localized: "Failed to update share.", bundle: .module) : description
                 propertyResetRevisions[propertyClass, default: 0] += 1
 
                 return

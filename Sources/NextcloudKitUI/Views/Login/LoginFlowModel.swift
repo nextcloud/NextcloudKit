@@ -59,7 +59,7 @@ final class LoginFlowModel: QRCodeParsing, URLSanitizing {
         }
 
         guard let sanitizedServerAddress = sanitize(enteredServerAddress) else {
-            present(error: String(localized: "The entered server address is invalid.", comment: "This is an error message."))
+            present(error: String(localized: "The entered server address is invalid.", bundle: .module, comment: "This is an error message."))
             return
         }
 

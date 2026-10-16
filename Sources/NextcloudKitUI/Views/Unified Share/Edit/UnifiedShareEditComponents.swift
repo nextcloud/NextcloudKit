@@ -82,7 +82,7 @@ struct CustomLinkRow: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 4) {
-            Text(String(localized: "Custom link"))
+            Text(String(localized: "Custom link", bundle: .module))
 
             if !prefix.isEmpty {
                 Text(prefix)
@@ -91,7 +91,7 @@ struct CustomLinkRow: View {
             }
 
             HStack {
-                TextField(String(localized: "Link token"), text: $token)
+                TextField(String(localized: "Link token", bundle: .module), text: $token)
                     .lineLimit(1)
                     .minimumScaleFactor(0.5)
                     .focused($focused)
@@ -113,7 +113,7 @@ struct CustomLinkRow: View {
                     Image(systemName: "arrow.clockwise")
                 }
                 .buttonStyle(.plain)
-                .accessibilityLabel(String(localized: "Refresh link"))
+                .accessibilityLabel(String(localized: "Refresh link", bundle: .module))
             }
         }
         .padding(.vertical, 4)

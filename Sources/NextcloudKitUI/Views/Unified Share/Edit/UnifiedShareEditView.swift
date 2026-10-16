@@ -124,7 +124,7 @@ public struct UnifiedShareEditView: View {
 
                             if selectedRecipient == nil {
                                 TextField(
-                                    String(localized: "Add people"),
+                                    String(localized: "Add people", bundle: .module),
                                     text: $recipients
                                 )
                                 .onChange(of: recipients) {
@@ -193,7 +193,7 @@ public struct UnifiedShareEditView: View {
                     }
 
             case .error:
-                Text(String(localized: "Could not create share, try again later"))
+                Text(String(localized: "Could not create share, try again later", bundle: .module))
                     .foregroundStyle(.secondary)
             }
         }
@@ -217,20 +217,20 @@ public struct UnifiedShareEditView: View {
             }
         }
         .alert(
-            String(localized: "Failed to update share."),
+            String(localized: "Failed to update share.", bundle: .module),
             isPresented: Binding(
                 get: { model.mutationError != nil },
                 set: { if !$0 { model.mutationError = nil } }
             )
         ) {
-            Button(String(localized: "OK"), role: .cancel) {}
+            Button(String(localized: "OK", bundle: .module), role: .cancel) {}
         } message: {
             if let error = model.mutationError {
                 Text(error.errorDescription)
             }
         }
         .confirmationDialog(
-            String(localized: "Apply permissions to all recipients?"),
+            String(localized: "Apply permissions to all recipients?", bundle: .module),
             isPresented: Binding(
                 get: { pendingTopPermissionChange != nil },
                 set: { if !$0 { pendingTopPermissionChange = nil } }
@@ -238,16 +238,16 @@ public struct UnifiedShareEditView: View {
             titleVisibility: .visible
         ) {
             if let change = pendingTopPermissionChange {
-                Button(String(localized: "Apply to all")) {
+                Button(String(localized: "Apply to all", bundle: .module)) {
                     applyTopPermissionChange(change)
                 }
 
-                Button(String(localized: "Cancel"), role: .cancel) {
+                Button(String(localized: "Cancel", bundle: .module), role: .cancel) {
                     cancelTopPermissionChange(change)
                 }
             }
         } message: {
-            Text(String(localized: "This change will replace the individual permission settings of all recipients in this share."))
+            Text(String(localized: "This change will replace the individual permission settings of all recipients in this share.", bundle: .module))
         }
         .task {
             guard !isPreview else {
@@ -274,7 +274,7 @@ public struct UnifiedShareEditView: View {
         }
 
         let name = share.sources.first?.displayName ?? "..."
-        return String(localized: "Share \"\(name)\"")
+        return String(localized: "Share \"\(name)\"", bundle: .module)
     }
 
     @ViewBuilder
@@ -301,7 +301,7 @@ public struct UnifiedShareEditView: View {
                     .tag(preset.class)
             }
 
-            Text(String(localized: "Custom permissions"))
+            Text(String(localized: "Custom permissions", bundle: .module))
                 .tag(Self.customTag)
         }
         .pickerStyle(.menu)
@@ -326,8 +326,8 @@ public struct UnifiedShareEditView: View {
     private func recipientPermissionLimitDescription(_ share: NKUnifiedShare) -> String {
         let presetName = share.permissionPreset.flatMap { presetClass in
             model.permissionPresets.first(where: { $0.class == presetClass })?.displayName
-        } ?? String(localized: "Custom permissions")
-        let format = String(localized: "This share is limited to \"%@\". You can only grant the same or fewer permissions.")
+        } ?? String(localized: "Custom permissions", bundle: .module)
+        let format = String(localized: "This share is limited to \"%@\". You can only grant the same or fewer permissions.", bundle: .module)
         return String(format: format, locale: .current, presetName)
     }
 
@@ -343,10 +343,10 @@ public struct UnifiedShareEditView: View {
 
     private func shareeTypePicker(share: NKUnifiedShare) -> some View {
         Picker("", selection: $shareeType) {
-            Text(String(localized: "Invited People"))
+            Text(String(localized: "Invited People", bundle: .module))
                 .tag(ShareeType.invited)
 
-            Text(String(localized: "Anyone"))
+            Text(String(localized: "Anyone", bundle: .module))
                 .tag(ShareeType.anyone)
         }
         .pickerStyle(.segmented)
@@ -358,7 +358,7 @@ public struct UnifiedShareEditView: View {
 
     @ViewBuilder
     private func permissionField(share: NKUnifiedShare) -> some View {
-        Picker(String(localized: "Participants"), selection: Binding(
+        Picker(String(localized: "Participants", bundle: .module), selection: Binding(
             get: { isCustomSelected(share) ? Self.customTag : (selectedPresetClass(share) ?? Self.customTag) },
             set: { tag in
                 if tag == Self.customTag {
@@ -374,7 +374,7 @@ public struct UnifiedShareEditView: View {
             }
 
             // Custom: reveals the per-permission toggles below. Client-side only, no request.
-            Text(String(localized: "Custom permissions"))
+            Text(String(localized: "Custom permissions", bundle: .module))
                 .tag(Self.customTag)
         }
         .pickerStyle(.menu)
@@ -492,7 +492,7 @@ public struct UnifiedShareEditView: View {
 
                 customLinkRows(share: share)
             } label: {
-                Text(String(localized: "Settings"))
+                Text(String(localized: "Settings", bundle: .module))
             }
         }
     }
@@ -507,20 +507,20 @@ public struct UnifiedShareEditView: View {
                 deletionTarget = .share(id: share.id)
             }
         } label: {
-            Text(recipient == nil ? String(localized: "Delete share") : String(localized: "Delete recipient"))
+            Text(recipient == nil ? String(localized: "Delete share", bundle: .module) : String(localized: "Delete recipient", bundle: .module))
         }
         .buttonStyle(.bordered)
         .tint(.red)
         .disabled(selectedRecipient != nil && recipient == nil)
         .confirmationDialog(
-            deletionTarget?.isRecipient == true ? String(localized: "Delete recipient?") : String(localized: "Delete share?"),
+            deletionTarget?.isRecipient == true ? String(localized: "Delete recipient?", bundle: .module) : String(localized: "Delete share?", bundle: .module),
             isPresented: Binding(
                 get: { deletionTarget != nil },
                 set: { if !$0 { deletionTarget = nil } }
             ),
             titleVisibility: .visible
         ) {
-            Button(String(localized: "Delete"), role: .destructive) {
+            Button(String(localized: "Delete", bundle: .module), role: .destructive) {
                 switch deletionTarget {
                 case .recipient(let shareID, let recipient) where share.id == shareID:
                     model.removeRecipient(share: share, recipient: recipient) {
@@ -538,12 +538,12 @@ public struct UnifiedShareEditView: View {
                 deletionTarget = nil
             }
 
-            Button(String(localized: "Cancel"), role: .cancel) {}
+            Button(String(localized: "Cancel", bundle: .module), role: .cancel) {}
         } message: {
             if deletionTarget?.isRecipient == true {
-                Text(String(localized: "This recipient will be removed from the share."))
+                Text(String(localized: "This recipient will be removed from the share.", bundle: .module))
             } else {
-                Text(String(localized: "This share will be permanently removed."))
+                Text(String(localized: "This share will be permanently removed.", bundle: .module))
             }
         }
     }
@@ -561,7 +561,7 @@ public struct UnifiedShareEditView: View {
                 .id("\(recipient.secret.value ?? "")|\(model.recipientSecretResetRevision(share: share, recipient: recipient))")
             }
 
-            Text(String(localized: "The link can be changed to be easy to remember, but do not set it to something that is easy to guess."))
+            Text(String(localized: "The link can be changed to be easy to remember, but do not set it to something that is easy to guess.", bundle: .module))
                 .font(.footnote)
                 .foregroundStyle(.secondary)
                 .listRowSeparator(.hidden)
@@ -677,9 +677,9 @@ public struct UnifiedShareEditView: View {
             }
             .buttonStyle(.plain)
             .fixedSize()
-            .accessibilityLabel(String(localized: "Delete recipient"))
+            .accessibilityLabel(String(localized: "Delete recipient", bundle: .module))
             .confirmationDialog(
-                String(localized: "Delete recipient?"),
+                String(localized: "Delete recipient?", bundle: .module),
                 isPresented: Binding(
                     get: {
                         guard let recipientToDelete else { return false }
@@ -689,16 +689,16 @@ public struct UnifiedShareEditView: View {
                 ),
                 titleVisibility: .visible
             ) {
-                Button(String(localized: "Delete"), role: .destructive) {
+                Button(String(localized: "Delete", bundle: .module), role: .destructive) {
                     model.removeRecipient(share: share, recipient: recipient)
                     recipientToDelete = nil
                 }
 
-                Button(String(localized: "Cancel"), role: .cancel) {
+                Button(String(localized: "Cancel", bundle: .module), role: .cancel) {
                     recipientToDelete = nil
                 }
             } message: {
-                Text(String(localized: "This recipient will be removed from the share."))
+                Text(String(localized: "This recipient will be removed from the share.", bundle: .module))
             }
         }
         .padding(.horizontal, 12)
@@ -741,7 +741,7 @@ public struct UnifiedShareEditView: View {
                 Button {
                     model.activate(share: share)
                 } label: {
-                    Label(String(localized: "Send"), systemImage: "paperplane.fill")
+                    Label(String(localized: "Send", bundle: .module), systemImage: "paperplane.fill")
                         .foregroundStyle(.white)
                 }
                 .buttonStyle(.borderedProminent)
@@ -768,7 +768,7 @@ public struct UnifiedShareEditView: View {
                 if model.isPreparingLink {
                     ProgressView()
                 } else {
-                    Text(showsCopied ? String(localized: "Copied") : String(localized: "Copy public link"))
+                    Text(showsCopied ? String(localized: "Copied", bundle: .module) : String(localized: "Copy public link", bundle: .module))
                 }
             }
             .buttonStyle(.bordered)
@@ -780,7 +780,7 @@ public struct UnifiedShareEditView: View {
                     flashCopied()
                 }
             } label: {
-                Text(showsCopied ? String(localized: "Copied") : String(localized: "Copy private link"))
+                Text(showsCopied ? String(localized: "Copied", bundle: .module) : String(localized: "Copy private link", bundle: .module))
             }
             .buttonStyle(.bordered)
             .disabled(internalLink == nil)

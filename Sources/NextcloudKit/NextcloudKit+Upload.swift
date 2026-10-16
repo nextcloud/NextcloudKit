@@ -190,6 +190,7 @@ public extension NextcloudKit {
     ///   - account: Account identifier.
     ///   - options: Request options (headers, timeout, etc.).
     ///   - ifMatch: Optional ETag precondition applied **only** to the final assembly `MOVE` (not the chunk uploads). When set, the server rejects the assembly with `412 Precondition Failed` if the destination changed since this ETag, enabling optimistic-concurrency conflict detection for chunked uploads.
+    ///   - overwrite: Whether the final assembly may replace an existing destination. Defaults to true for existing callers.
     ///   - chunkProgressHandler: Reports per-chunk preparation progress as `(totalChunks, currentIndex)`.
     ///   - uploadStart: Called once when upload of chunks begins, with the final list of chunks.
     ///   - uploadTaskHandler: Exposes the low-level `URLSessionTask` for each chunk upload.
@@ -213,6 +214,7 @@ public extension NextcloudKit {
                           account: String,
                           options: NKRequestOptions = NKRequestOptions(),
                           ifMatch: String? = nil,
+                          overwrite: Bool = true,
                           chunkProgressHandler: @escaping (_ total: Int, _ counter: Int) -> Void = { _, _ in },
                           uploadStart: @escaping (_ filesChunk: [(fileName: String, size: Int64)]) -> Void = { _ in },
                           uploadTaskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
@@ -428,7 +430,7 @@ public extension NextcloudKit {
 
         let moveRes = await moveFileOrFolderAsync(serverUrlFileNameSource: serverUrlFileNameSource,
                                                   serverUrlFileNameDestination: serverUrlFileName,
-                                                  overwrite: true,
+                                                  overwrite: overwrite,
                                                   account: account,
                                                   options: options)
 
@@ -438,11 +440,10 @@ public extension NextcloudKit {
         options.customHeader?["If-Match"] = nil
 
         guard moveRes.error == .success else {
-            return (account, nil)
+            throw moveRes.error
         }
 
-        try Task.checkCancellation()
-
+        // A successful MOVE has committed the file. Cancellation must not discard its identity.
         // Prefer the assembled file's identity straight from the MOVE response headers.
         // On a successful chunk-assembly MOVE the server returns OC-FileID (and OC-ETag),
         // exactly as it does on MKCOL/PUT — the reference desktop client reads these off the
@@ -464,25 +465,27 @@ public extension NextcloudKit {
         // its OWN timeout and a bounded retry, so a transient PROPFIND failure or brief
         // post-assembly visibility lag no longer fails an upload that already succeeded. Only
         // after the retries are exhausted do we surface errorChunkMoveFile.
-        let readbackOptions = NKRequestOptions(timeout: 120, queue: options.queue)
-        let readbackBackoff: [UInt64] = [0, 1_000_000_000, 3_000_000_000] // attempt after 0s, 1s, 3s
+        // Finish the committed upload's readback and bounded retries independently of caller cancellation.
+        return try await Task {
+            let readbackOptions = NKRequestOptions(timeout: 120, queue: options.queue)
+            let readbackBackoff: [UInt64] = [0, 1_000_000_000, 3_000_000_000] // attempt after 0s, 1s, 3s
 
-        for backoff in readbackBackoff {
-            if backoff > 0 {
-                try? await Task.sleep(nanoseconds: backoff)
+            for backoff in readbackBackoff {
+                if backoff > 0 {
+                    try await Task.sleep(nanoseconds: backoff)
+                }
+
+                let readRes = await readFileOrFolderAsync(serverUrlFileName: serverUrlFileName,
+                                                          depth: "0",
+                                                          account: account,
+                                                          options: readbackOptions)
+                if readRes.error == .success, let file = readRes.files?.first {
+                    return (account, file)
+                }
             }
-            try Task.checkCancellation()
 
-            let readRes = await readFileOrFolderAsync(serverUrlFileName: serverUrlFileName,
-                                                      depth: "0",
-                                                      account: account,
-                                                      options: readbackOptions)
-            if readRes.error == .success, let file = readRes.files?.first {
-                return (account, file)
-            }
-        }
-
-        throw NKError.errorChunkMoveFile
+            throw NKError.errorChunkMoveFile
+        }.value
     }
 
     /// Builds the assembled file's `NKFile` from a chunk-assembly MOVE response's headers.

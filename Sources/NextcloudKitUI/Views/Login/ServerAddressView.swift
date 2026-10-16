@@ -109,7 +109,7 @@ public struct ServerAddressView: View {
                                 text: $model.enteredServerAddress,
                                 prompt: Text(verbatim: "https://example.org/").foregroundColor(backgroundColor.readable.opacity(0.5))
                             ) {
-                                Text("Server Address", comment: "Label for text field.")
+                                Text("Server Address", bundle: .module, comment: "Label for text field.")
                             }
                             .textContentType(.URL)
                             .autocorrectionDisabled()
@@ -157,7 +157,7 @@ public struct ServerAddressView: View {
                         }
                     }
 
-                    Text("The address of your Nextcloud web interface when you open it in your browser.", comment: "Label below the server address field in the login view.")
+                    Text("The address of your Nextcloud web interface when you open it in your browser.", bundle: .module, comment: "Label below the server address field in the login view.")
                         .foregroundStyle(backgroundColor.readable)
                         .font(.footnote)
                         .padding(4)
@@ -173,7 +173,7 @@ public struct ServerAddressView: View {
                             .scaledToFit()
                             .frame(width: 32, height: 32)
 
-                        Text(String(localized: "Scan QR Code", comment: "Button label"))
+                        Text(String(localized: "Scan QR Code", bundle: .module, comment: "Button label"))
                     }
                     .padding()
                     .codeScannerSheet(isPresented: $isPresentingCodeScanner) {
@@ -210,11 +210,11 @@ public struct ServerAddressView: View {
                 }
             }
             .webSheet(initialURL: $model.loginAddress, isPresented: $model.isPresentingWebView, userAgent: userAgent, onDismiss: { model.cancel() })
-            .alert(String(localized: "Login Failed", comment: "Alert title"), isPresented: $model.isPresentingAlert) {
+            .alert(String(localized: "Login Failed", bundle: .module, comment: "Alert title"), isPresented: $model.isPresentingAlert) {
                 Button(role: .cancel) {
                     model.errorMessage = nil
                 } label: {
-                    Text("OK", comment: "Button label for error alert dismissal.")
+                    Text("OK", bundle: .module, comment: "Button label for error alert dismissal.")
                 }
             } message: {
                 Text(model.errorMessage ?? "?")
@@ -231,7 +231,7 @@ public struct ServerAddressView: View {
                 isPresentingSharedAccounts = true
             } label: {
                 Label {
-                    Text("Accounts from other Apps", comment: "Button label")
+                    Text("Accounts from other Apps", bundle: .module, comment: "Button label")
                 } icon: {
                     Image(systemName: "person.badge.plus")
                 }
