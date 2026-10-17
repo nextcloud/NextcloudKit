@@ -82,6 +82,12 @@
             "value" : "%lld skupín"
           }
         },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld grupper"
+          }
+        },
         "tr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -181,6 +187,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "%lld odkazov"
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld länkar"
           }
         },
         "tr" : {
@@ -284,6 +296,12 @@
             "value" : "%lld ľudí"
           }
         },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld personer"
+          }
+        },
         "tr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -383,6 +401,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "1 skupina"
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "1 grupp"
           }
         },
         "tr" : {
@@ -486,6 +510,12 @@
             "value" : "1 odkaz"
           }
         },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "1 länk"
+          }
+        },
         "tr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -579,6 +609,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "1 osoba"
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "1 person"
           }
         },
         "tr" : {
@@ -682,6 +718,12 @@
             "value" : "Účty"
           }
         },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Konton"
+          }
+        },
         "tr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -781,6 +823,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Účty z iných aplikácií"
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Konton från andra appar"
           }
         },
         "tr" : {
@@ -1236,6 +1284,12 @@
             "value" : "Použiť oprávnenia na všetkých príjemcov?"
           }
         },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tillämpa behörigheterna för alla mottagare?"
+          }
+        },
         "tr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1329,6 +1383,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Použiť na všetko"
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tillämpa för alla"
           }
         },
         "tr" : {
@@ -2725,6 +2785,12 @@
             "value" : "Nukopijuota"
           }
         },
+        "mk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Копирано"
+          }
+        },
         "mn" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3664,6 +3730,12 @@
             "value" : "Nepodarilo sa vytvoriť zdieľanie, skúste to znova neskôr"
           }
         },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Det gick inte att skapa delningen. Försök igen senare."
+          }
+        },
         "tr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3759,6 +3831,12 @@
             "value" : "Nepodarilo sa načítať zdieľania"
           }
         },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Det gick inte att läsa in delningar."
+          }
+        },
         "tr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3852,6 +3930,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Vlastný odkaz"
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Anpassad länk"
           }
         },
         "tr" : {
@@ -4590,6 +4674,12 @@
             "value" : "Odstrániť príjemcu"
           }
         },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ta bort mottagare"
+          }
+        },
         "tr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -4683,6 +4773,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Odstrániť príjemcu?"
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ta bort mottagaren?"
           }
         },
         "tr" : {
@@ -5083,6 +5179,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Odstrániť zdieľanie?"
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ta bort delningen?"
           }
         },
         "tr" : {
@@ -5755,6 +5857,12 @@
             "value" : "Nepodarilo sa aktualizovať zdieľanie."
           }
         },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Det gick inte att uppdatera delningen."
+          }
+        },
         "tr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -5848,6 +5956,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Skryť príjemcov"
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dölj mottagare"
           }
         },
         "tr" : {
@@ -6543,6 +6657,12 @@
             "value" : "Pozvaní ľudia"
           }
         },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Inbjudna personer"
+          }
+        },
         "tr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -6853,6 +6973,12 @@
             "value" : "Prihlásenie zlyhalo"
           }
         },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Inloggningen misslyckades"
+          }
+        },
         "tr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -6948,6 +7074,12 @@
             "value" : "Žiadni príjemcovia"
           }
         },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Inga mottagare"
+          }
+        },
         "tr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -7041,6 +7173,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Zatiaľ nezdieľané"
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Inte delad ännu"
           }
         },
         "tr" : {
@@ -7139,6 +7277,12 @@
           }
         },
         "sk_SK" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "OK"
+          }
+        },
+        "sv" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "OK"
@@ -7698,6 +7842,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Obnoviť odkaz"
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Uppdatera länken"
           }
         },
         "tr" : {
@@ -8290,6 +8440,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Naskenovať QR kód"
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Skanna QR-kod"
           }
         },
         "tr" : {
@@ -9525,6 +9681,12 @@
             "value" : "Adresa servera"
           }
         },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Serveradress"
+          }
+        },
         "tr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -10217,6 +10379,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Odstrániť heslo"
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ta bort lösenord"
           }
         },
         "tr" : {
@@ -10955,6 +11123,12 @@
             "value" : "Zdieľať \"%@\""
           }
         },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dela ”%@”"
+          }
+        },
         "tr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -11329,6 +11503,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Дели фолдер"
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dela mapp"
           }
         },
         "tr" : {
@@ -11851,6 +12031,12 @@
             "value" : "Odkaz na zdieľanie (%lld)"
           }
         },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Delningslänk (%lld)"
+          }
+        },
         "tr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -11944,6 +12130,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Zobraziť príjemcov"
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Visa mottagare"
           }
         },
         "tr" : {
@@ -12041,6 +12233,12 @@
             "value" : "Táto zmena nahradí individuálne nastavenia oprávnení všetkých príjemcov v tomto zdieľaní."
           }
         },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ändringen ersätter de individuella behörighetsinställningarna för alla mottagare av den här delningen."
+          }
+        },
         "tr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -12134,6 +12332,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Adresa vášho webového rozhrania Nextcloud, keď ho otvoríte v prehliadači."
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Adressen till Nextclouds webbgränssnitt när du öppnar det i webbläsaren."
           }
         },
         "tr" : {
@@ -12231,6 +12435,12 @@
             "value" : "Zadaná adresa servera je neplatná."
           }
         },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Serveradressen du angav är ogiltig."
+          }
+        },
         "tr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -12324,6 +12534,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Odkaz je možné zmeniť tak, aby sa dal ľahko zapamätať, ale nenastavujte ho na niečo, čo sa dá ľahko uhádnuť."
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Du kan ändra länken så att den blir lätt att komma ihåg, men välj inte något som är lätt att gissa."
           }
         },
         "tr" : {
@@ -12421,6 +12637,12 @@
             "value" : "Toto zdieľanie je obmedzené na \"%1$@\". Môžete udeliť len rovnaké alebo menšie oprávnenia."
           }
         },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Den här delningen är begränsad till ”%1$@”. Du kan bara ge samma eller färre behörigheter."
+          }
+        },
         "tr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -12516,6 +12738,12 @@
             "value" : "Tento príjemca bude odstránený zo zdieľania."
           }
         },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Den här mottagaren tas bort från delningen."
+          }
+        },
         "tr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -12609,6 +12837,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Toto zdieľanie bude natrvalo odstránené."
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Den här delningen tas bort permanent."
           }
         },
         "tr" : {
