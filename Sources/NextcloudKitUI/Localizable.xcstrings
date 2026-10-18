@@ -1570,6 +1570,12 @@
             "value" : "Qualquer um"
           }
         },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Oricine"
+          }
+        },
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
@@ -5020,6 +5026,12 @@
             "value" : "Excluir compartilhamento"
           }
         },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Șterge partajarea"
+          }
+        },
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
@@ -6153,6 +6165,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Para as pessoas que já têm acesso"
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pentru persoanele care au deja acces"
           }
         },
         "ru" : {
@@ -12017,6 +12035,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Link de compartilhamento (%lld)"
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Link de partajare (%lld)"
           }
         },
         "ru" : {
