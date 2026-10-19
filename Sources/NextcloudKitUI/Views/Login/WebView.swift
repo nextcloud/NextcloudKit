@@ -16,17 +16,13 @@ import WebKit
 /// All of the web view session data is not persistent.
 ///
 public struct WebView: ViewRepresentable {
-    ///
-    /// This must be a binding to support presentation inside sheets.
-    /// The way this view gets created and updated inside a sheet has a race condition with sheet presentation.
-    /// A sheet might be displayed before a passed in state variable might have been set.
-    ///
-    @Binding var initialURL: URL?
+    /// Loaded once when the web view is created, so SwiftUI updates don't reload the page.
+    let initialURL: URL?
 
     let userAgent: String?
 
-    public init(initialURL: Binding<URL?>, userAgent: String? = nil) {
-        self._initialURL = initialURL
+    public init(initialURL: URL?, userAgent: String? = nil) {
+        self.initialURL = initialURL
         self.userAgent = userAgent
     }
 
@@ -41,17 +37,11 @@ public struct WebView: ViewRepresentable {
             webView.customUserAgent = userAgent
         }
 
-        return webView
-    }
-
-    func updateView(_ webView: WKWebView, context: Context) {
-
-        guard let initialURL = initialURL else {
-            return
+        if let initialURL {
+            webView.load(URLRequest(url: initialURL))
         }
 
-        let request = URLRequest(url: initialURL)
-        webView.load(request)
+        return webView
     }
 
     // MARK: - macOS
@@ -62,9 +52,7 @@ public struct WebView: ViewRepresentable {
         makeView()
     }
 
-    public func updateNSView(_ webView: WKWebView, context: Context) {
-        updateView(webView, context: context)
-    }
+    public func updateNSView(_ webView: WKWebView, context: Context) {}
 
     // MARK: - iOS
 
@@ -74,14 +62,12 @@ public struct WebView: ViewRepresentable {
         makeView()
     }
 
-    public func updateUIView(_ webView: WKWebView, context: Context) {
-        updateView(webView, context: context)
-    }
+    public func updateUIView(_ webView: WKWebView, context: Context) {}
 
     #endif
 }
 
 #Preview {
     // swiftlint:disable force_unwrapping
-    WebView(initialURL: .constant(URL(string: "http://localhost:8080")!), userAgent: nil)
+    WebView(initialURL: URL(string: "http://localhost:8080")!, userAgent: nil)
 }
