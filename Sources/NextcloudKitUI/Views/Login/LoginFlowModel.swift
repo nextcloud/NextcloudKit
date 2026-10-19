@@ -158,7 +158,7 @@ final class LoginFlowModel: QRCodeParsing, URLSanitizing {
     private func message(for error: NKError) -> String {
         let isInstanceNotFound = error.kind == .notFound || error.kind == .invalidResponse
 
-        if isInstanceNotFound, error.userFacingServerMessage == nil {
+        if isInstanceNotFound {
             return String(localized: "No server was found at this address.", bundle: .module, comment: "Login error message when the entered address does not point to a Nextcloud server.")
         }
 

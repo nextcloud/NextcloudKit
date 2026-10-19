@@ -8,7 +8,7 @@ import Foundation
 public extension NKError {
     /// What went wrong, independent of how the server or the system worded it.
     ///
-    /// Choose the message shown to people from this, and keep ``NKError/errorDescription`` for logs.
+    /// Choose the message shown to users from this, and keep ``NKError/errorDescription`` for logs.
     enum Kind: Sendable, CaseIterable {
         case offline
         case timeout
@@ -19,6 +19,8 @@ public extension NKError {
         case notFound
         /// `MKCOL` on an existing folder, or `COPY`/`MOVE` onto an existing item without overwriting it.
         case alreadyExists
+        /// The server doesn't accept the file or folder name.
+        case invalidName
         case conflict
         case locked
         case quotaExceeded
@@ -35,6 +37,13 @@ public extension NKError {
 }
 
 extension NKError.Kind {
+    /// Classifies the WebDAV exceptions that the HTTP status alone doesn't tell apart.
+    init?(davException: String?) {
+        guard davException == "OCA\\DAV\\Connector\\Sabre\\Exception\\InvalidPath" else { return nil }
+
+        self = .invalidName
+    }
+
     /// Classifies an ``NKError/errorCode``: a URL loading error, an HTTP status or an OCS status code.
     ///
     /// Returns `nil` for `0`, which means success. The request method tells some WebDAV statuses apart.

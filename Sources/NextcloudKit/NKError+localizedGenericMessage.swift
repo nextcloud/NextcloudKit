@@ -7,8 +7,8 @@ import Foundation
 public extension NKError {
     /// User friendly messages for generic errors. Each one fits a `kind`.
     var localizedGenericMessage: String {
-        if let userFacingServerMessage {
-            return userFacingServerMessage
+        if let userFriendlyServerMessage {
+            return userFriendlyServerMessage
         }
 
         switch kind ?? .unknown {
@@ -35,6 +35,9 @@ public extension NKError {
 
         case .alreadyExists:
             return NSLocalizedString("An item with this name already exists.", bundle: .module, comment: "Error message when a file or folder with the same name already exists.")
+
+        case .invalidName:
+            return NSLocalizedString("This name isn't allowed.", bundle: .module, comment: "Error message when the server rejects a file or folder name.")
 
         case .conflict:
             return NSLocalizedString("The item was changed on the server. Please refresh and try again.", bundle: .module, comment: "Error message when the request conflicts with the current state on the server.")

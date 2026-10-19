@@ -12,27 +12,27 @@ public final class FileNameValidator: Sendable {
     private let capabilities: NKCapabilities.Capabilities
 
     public func fileEmptyNameError() -> NKError {
-        NKError(errorCode: NSURLErrorCannotCreateFile, errorDescription: NSLocalizedString("_file_name_empty_", value: "File name cannot be empty.", comment: ""))
+        NKError(errorCode: NSURLErrorCannotCreateFile, errorDescription: NSLocalizedString("File name cannot be empty.", bundle: .module, comment: "Error message when a file or folder name is empty."))
     }
 
     public func fileWithSpaceError() -> NKError {
-        NKError(errorCode: NSURLErrorCannotCreateFile, errorDescription: NSLocalizedString("_file_name_validator_error_space_", value: "Name must not contain spaces at the beginning or end.", comment: ""))
+        NKError(errorCode: NSURLErrorCannotCreateFile, errorDescription: NSLocalizedString("Name must not contain spaces at the beginning or end.", bundle: .module, comment: "Error message when a name starts or ends with a space."))
     }
 
     public func fileReservedNameError(templateString: String) -> NKError {
-        let errorMessageTemplate = NSLocalizedString("_file_name_validator_error_reserved_name_", value: "\"%@\" is a forbidden name.", comment: "")
+        let errorMessageTemplate = NSLocalizedString("\"%@\" is a forbidden name.", bundle: .module, comment: "Error message when the server reserves a name. %@ is the name.")
         let errorMessage = String(format: errorMessageTemplate, templateString)
         return NKError(errorCode: NSURLErrorCannotCreateFile, errorDescription: errorMessage)
     }
 
     public func fileForbiddenFileExtensionError(templateString: String) -> NKError {
-        let errorMessageTemplate = NSLocalizedString("_file_name_validator_error_forbidden_file_extension_", value: ".\"%@\" is a forbidden file extension.", comment: "")
+        let errorMessageTemplate = NSLocalizedString(".\"%@\" is a forbidden file extension.", bundle: .module, comment: "Error message when the server forbids a file extension. %@ is the extension.")
         let errorMessage = String(format: errorMessageTemplate, templateString)
         return NKError(errorCode: NSURLErrorCannotCreateFile, errorDescription: errorMessage)
     }
 
     public func fileInvalidCharacterError(templateString: String) -> NKError {
-        let errorMessageTemplate = NSLocalizedString("_file_name_validator_error_invalid_character_", value: "Name contains an invalid character: \"%@\".", comment: "")
+        let errorMessageTemplate = NSLocalizedString("Name contains an invalid character: \"%@\".", bundle: .module, comment: "Error message when a name contains a forbidden character. %@ is the character.")
         let errorMessage = String(format: errorMessageTemplate, templateString)
         return NKError(errorCode: NSURLErrorCannotCreateFile, errorDescription: errorMessage)
     }

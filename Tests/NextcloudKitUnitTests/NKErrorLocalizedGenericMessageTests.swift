@@ -2,6 +2,7 @@
 // SPDX-FileCopyrightText: 2026 Milen Pivchev
 // SPDX-License-Identifier: GPL-3.0-or-later
 
+import Alamofire
 import Foundation
 import Testing
 @testable import NextcloudKit
@@ -24,18 +25,12 @@ struct NKErrorLocalizedGenericMessageTests {
         #expect(messages.count == NKError.Kind.allCases.count)
     }
 
-    @Test func prefersUserFacingServerMessage() {
-        let body = Data(#"{"ocs":{"meta":{"statuscode":400},"data":"Password needs to be at least 10 characters long"}}"#.utf8)
-        let error = NKError(errorCode: 400, errorDescription: "400: Bad request", responseData: body)
+    @Test func prefersUserFriendlyServerMessage() throws {
+        let url = try #require(URL(string: "https://cloud.example.com/ocs/v2.php/apps/files_sharing/api/v1/shares"))
+        let body = Data(#"{"ocs":{"meta":{"statuscode":400,"message":"Password needs to be at least 10 characters long"},"data":[]}}"#.utf8)
+        let response = HTTPURLResponse(url: url, statusCode: 400, httpVersion: "HTTP/1.1", headerFields: nil)
+        let dataResponse = AFDataResponse<Data>(request: URLRequest(url: url), response: response, data: body, metrics: nil, serializationDuration: 0, result: .failure(.responseValidationFailed(reason: .unacceptableStatusCode(code: 400))))
 
-        #expect(error.localizedGenericMessage == "Password needs to be at least 10 characters long")
-    }
-
-    @Test func ignoresTechnicalServerMessage() {
-        let body = Data(#"<?xml version="1.0"?><d:error xmlns:d="DAV:" xmlns:s="http://sabredav.org/ns"><s:exception>Sabre\DAV\Exception\Conflict</s:exception><s:message>Parent node does not exist</s:message></d:error>"#.utf8)
-        let error = NKError(errorCode: 409, errorDescription: "Parent node does not exist", responseData: body)
-
-        #expect(error.localizedGenericMessage != "Parent node does not exist")
-        #expect(error.localizedGenericMessage == NKError(errorCode: 409).localizedGenericMessage)
+        #expect(NKError(error: dataResponse.error, afResponse: dataResponse).localizedGenericMessage == "Password needs to be at least 10 characters long")
     }
 }

@@ -1,6 +1,28 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "\"%@\" is a forbidden name." : {
+      "comment" : "Error message when the server reserves a name. %@ is the name.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "\"%@\" is a forbidden name."
+          }
+        }
+      }
+    },
+    ".\"%@\" is a forbidden file extension." : {
+      "comment" : "Error message when the server forbids a file extension. %@ is the extension.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : ".\"%@\" is a forbidden file extension."
+          }
+        }
+      }
+    },
     "A secure connection to the server couldn't be established." : {
       "comment" : "Error message for TLS and certificate failures.",
       "localizations" : {
@@ -23,6 +45,28 @@
         }
       }
     },
+    "Bad gateway" : {
+      "comment" : "Error message when a proxy got an invalid response from the server (HTTP 502).",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bad gateway"
+          }
+        }
+      }
+    },
+    "Bad request" : {
+      "comment" : "Error message when the server cannot process the request (HTTP 400).",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bad request"
+          }
+        }
+      }
+    },
     "Can't reach the server. Check the address or try again later." : {
       "comment" : "Error message when the server cannot be reached.",
       "localizations" : {
@@ -30,6 +74,325 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Can't reach the server. Check the address or try again later."
+          }
+        }
+      }
+    },
+    "Cancelled" : {
+      "comment" : "Error message when a request was cancelled.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cancelled"
+          }
+        }
+      }
+    },
+    "Compact" : {
+      "comment" : "Log level that logs only the essentials.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Compact"
+          }
+        }
+      }
+    },
+    "Connection SSL error, try again" : {
+      "comment" : "Error message when a secure connection to the server failed.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Connection SSL error, try again"
+          }
+        }
+      }
+    },
+    "Create folder error" : {
+      "comment" : "Error message when the folder for a chunked upload cannot be created.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Create folder error"
+          }
+        }
+      }
+    },
+    "Disabled" : {
+      "comment" : "Log level that turns logging off.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Disabled"
+          }
+        }
+      }
+    },
+    "Expectation failed" : {
+      "comment" : "Error message when the server cannot meet the request's expectation (HTTP 417).",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Expectation failed"
+          }
+        }
+      }
+    },
+    "File name cannot be empty." : {
+      "comment" : "Error message when a file or folder name is empty.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "File name cannot be empty."
+          }
+        }
+      }
+    },
+    "File not found" : {
+      "comment" : "Error message when the file to upload in chunks cannot be found.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "File not found"
+          }
+        }
+      }
+    },
+    "Files not found" : {
+      "comment" : "Error message when a chunked upload has no chunks to upload.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Files not found"
+          }
+        }
+      }
+    },
+    "Forbidden" : {
+      "comment" : "Error message when the server forbids the request.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Forbidden"
+          }
+        }
+      }
+    },
+    "Gateway timeout" : {
+      "comment" : "Error message when a proxy timed out waiting for the server (HTTP 504).",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gateway timeout"
+          }
+        }
+      }
+    },
+    "Generic error" : {
+      "comment" : "Error message when no more specific description is available.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Generic error"
+          }
+        }
+      }
+    },
+    "Internal error" : {
+      "comment" : "Error message for an internal error in the app.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Internal error"
+          }
+        }
+      }
+    },
+    "Internal server error" : {
+      "comment" : "Error message when the server ran into an error (HTTP 500).",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Internal server error"
+          }
+        }
+      }
+    },
+    "Invalid data format" : {
+      "comment" : "Error message when data in the server's response cannot be read.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Invalid data format"
+          }
+        }
+      }
+    },
+    "Invalid date format" : {
+      "comment" : "Error message when a date in the server's response cannot be read.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Invalid date format"
+          }
+        }
+      }
+    },
+    "Invalid response" : {
+      "comment" : "Error message when the server's response is not valid.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Invalid response"
+          }
+        }
+      }
+    },
+    "Invalid response, error decoding XML" : {
+      "comment" : "Error message when the server's XML response cannot be read.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Invalid response, error decoding XML"
+          }
+        }
+      }
+    },
+    "Invalid server URL" : {
+      "comment" : "Error message when the server address is not a valid URL.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Invalid server URL"
+          }
+        }
+      }
+    },
+    "It is not possible to connect to the server at this time" : {
+      "comment" : "Error message when the connection to the server failed.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "It is not possible to connect to the server at this time"
+          }
+        }
+      }
+    },
+    "Move file error" : {
+      "comment" : "Error message when the uploaded chunks cannot be assembled into the file.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Move file error"
+          }
+        }
+      }
+    },
+    "Name contains an invalid character: \"%@\"." : {
+      "comment" : "Error message when a name contains a forbidden character. %@ is the character.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Name contains an invalid character: \"%@\"."
+          }
+        }
+      }
+    },
+    "Name must not contain spaces at the beginning or end." : {
+      "comment" : "Error message when a name starts or ends with a space.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Name must not contain spaces at the beginning or end."
+          }
+        }
+      }
+    },
+    "Normal" : {
+      "comment" : "Default log level.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Normal"
+          }
+        }
+      }
+    },
+    "Not enough memory" : {
+      "comment" : "Error message when the device lacks the space to split a file into chunks.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Not enough memory"
+          }
+        }
+      }
+    },
+    "Request timeout" : {
+      "comment" : "Error message when the server timed out waiting for the request (HTTP 408).",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Request timeout"
+          }
+        }
+      }
+    },
+    "Resource not modified" : {
+      "comment" : "Error message when the resource was not modified (HTTP 304).",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Resource not modified"
+          }
+        }
+      }
+    },
+    "Server connection error" : {
+      "comment" : "Error message when the device has no internet connection.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Server connection error"
+          }
+        }
+      }
+    },
+    "Server is currently in maintenance mode" : {
+      "comment" : "Error message when the server is in maintenance mode (HTTP 503).",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Server is currently in maintenance mode"
           }
         }
       }
@@ -45,6 +408,28 @@
         }
       }
     },
+    "Storage quota is reached" : {
+      "comment" : "Error message when the account's storage quota is used up (HTTP 507).",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Storage quota is reached"
+          }
+        }
+      }
+    },
+    "The certificate for this server is invalid" : {
+      "comment" : "Error message when the server's certificate is not trusted.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The certificate for this server is invalid"
+          }
+        }
+      }
+    },
     "The file is locked. Try again later." : {
       "comment" : "Error message when the file is locked on the server.",
       "localizations" : {
@@ -52,6 +437,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "The file is locked. Try again later."
+          }
+        }
+      }
+    },
+    "The file is too large" : {
+      "comment" : "Error message when the file is too large for the server (HTTP 413).",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The file is too large"
           }
         }
       }
@@ -89,6 +485,28 @@
         }
       }
     },
+    "The name contains at least one invalid character" : {
+      "comment" : "Error message when the server rejects a name because of invalid characters.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The name contains at least one invalid character"
+          }
+        }
+      }
+    },
+    "The request could not be completed due to a conflict with the current state of the resource" : {
+      "comment" : "Error message when the request conflicts with the current state on the server (HTTP 409).",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The request could not be completed due to a conflict with the current state of the resource"
+          }
+        }
+      }
+    },
     "The request was cancelled." : {
       "comment" : "Error message when a request was cancelled.",
       "localizations" : {
@@ -96,6 +514,50 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "The request was cancelled."
+          }
+        }
+      }
+    },
+    "The requested method is not supported" : {
+      "comment" : "Error message when the server doesn't allow the request method (HTTP 405).",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The requested method is not supported"
+          }
+        }
+      }
+    },
+    "The requested resource could not be found" : {
+      "comment" : "Error message when the file, folder or resource does not exist (HTTP 404).",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The requested resource could not be found"
+          }
+        }
+      }
+    },
+    "The server appears to be down" : {
+      "comment" : "Error message when the server cannot be reached.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The server appears to be down"
+          }
+        }
+      }
+    },
+    "The server does not meet one of the preconditions of the request" : {
+      "comment" : "Error message when a precondition of the request failed (HTTP 412).",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The server does not meet one of the preconditions of the request"
           }
         }
       }
@@ -166,6 +628,39 @@
         }
       }
     },
+    "This name isn't allowed." : {
+      "comment" : "Error message when the server rejects a file or folder name.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This name isn't allowed."
+          }
+        }
+      }
+    },
+    "Time out" : {
+      "comment" : "Error message when a request timed out.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Time out"
+          }
+        }
+      }
+    },
+    "Too many requests" : {
+      "comment" : "Error message when the server rate-limits the requests (HTTP 429).",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Too many requests"
+          }
+        }
+      }
+    },
     "Too many requests. Please wait a moment and try again." : {
       "comment" : "Error message when the server rate-limits the requests.",
       "localizations" : {
@@ -173,6 +668,94 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Too many requests. Please wait a moment and try again."
+          }
+        }
+      }
+    },
+    "Transfer stopped" : {
+      "comment" : "Error message when a transfer was stopped.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Transfer stopped"
+          }
+        }
+      }
+    },
+    "Unauthorized" : {
+      "comment" : "Error message when the server rejects the login (HTTP 401).",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Unauthorized"
+          }
+        }
+      }
+    },
+    "Unavailable" : {
+      "comment" : "Error message when the server is unavailable.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Unavailable"
+          }
+        }
+      }
+    },
+    "User authentication required" : {
+      "comment" : "Error message when the server requires a login.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "User authentication required"
+          }
+        }
+      }
+    },
+    "Verbose" : {
+      "comment" : "Log level that logs everything, for debugging.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Verbose"
+          }
+        }
+      }
+    },
+    "WebDAV Locked: Trying to access locked resource" : {
+      "comment" : "Error message when the file is locked (HTTP 423).",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "WebDAV Locked: Trying to access locked resource"
+          }
+        }
+      }
+    },
+    "WebDAV multistatus" : {
+      "comment" : "Error message for a WebDAV Multi-Status response (HTTP 207).",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "WebDAV multistatus"
+          }
+        }
+      }
+    },
+    "You don't have permission to complete the operation" : {
+      "comment" : "Error message when the server forbids the operation (HTTP 403).",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "You don't have permission to complete the operation"
           }
         }
       }
