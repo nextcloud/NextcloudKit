@@ -700,6 +700,12 @@
             "value" : "Сметки"
           }
         },
+        "mn" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Бүртгэлүүд"
+          }
+        },
         "pt_BR" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1544,6 +1550,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Bet kas"
+          }
+        },
+        "mn" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Хэн ч бай"
           }
         },
         "nl" : {
@@ -7280,6 +7292,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Добро"
+          }
+        },
+        "mn" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ок"
           }
         },
         "pt_BR" : {
