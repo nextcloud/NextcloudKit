@@ -2,6 +2,7 @@
 // SPDX-FileCopyrightText: 2025 Iva Horn
 // SPDX-License-Identifier: GPL-3.0-or-later
 
+import AuthenticationServices
 import SwiftUI
 
 ///
@@ -18,7 +19,6 @@ public typealias AddAccountHandler = (_ host: URL, _ name: String, _ password: S
 public struct ServerAddressView: View {
     let brandImage: Image
     var sharedAccounts: [SharedAccount]
-    let userAgent: String?
 
     ///
     /// Create a new server address view.
@@ -27,14 +27,13 @@ public struct ServerAddressView: View {
     ///     - backgroundColor: The main theme color the view should use. Foreground color will be adapted automatically based on this.
     ///     - brandImage: The image to display on top of the server address view. Falls back to an SF Symbol placeholder in case of `nil`.
     ///     - sharedAccounts: Any shared accounts from the app group being available for selection and faster login.
-    ///     - userAgent: An optional user agent string to override the one used by ``WKWebView``.
+    ///     - userAgent: An optional user agent for server requests.
     ///     - addAccount: see ``AddAccountHandler``.
     ///
     public init(backgroundColor: Binding<Color>, brandImage: Image, sharedAccounts: [SharedAccount], userAgent: String? = nil, addAccount: @escaping AddAccountHandler) {
         self._backgroundColor = backgroundColor
         self.brandImage = brandImage
         self.sharedAccounts = sharedAccounts
-        self.userAgent = userAgent
         self._model = State(initialValue: LoginFlowModel(userAgent: userAgent, addAccount: addAccount))
     }
 
@@ -42,6 +41,7 @@ public struct ServerAddressView: View {
 
     @Environment(\.horizontalSizeClass) var horizontalSizeClass
     @Environment(\.verticalSizeClass) var verticalSizeClass
+    @Environment(\.webAuthenticationSession) private var webAuthenticationSession
 
     // MARK: - Bindings
 
@@ -209,7 +209,12 @@ public struct ServerAddressView: View {
                     hasSuggestedSharedAccounts = true
                 }
             }
-            .webSheet(initialURL: $model.loginAddress, isPresented: $model.isPresentingWebView, userAgent: userAgent, onDismiss: { model.cancel() })
+            .task(id: model.isPresentingLoginPage) {
+                // Clearing the flag cancels this task, which closes the browser sheet.
+                guard model.isPresentingLoginPage, let loginAddress = model.loginAddress else { return }
+
+                await model.presentLoginPage(loginAddress, using: webAuthenticationSession)
+            }
             .alert(String(localized: "Login Failed", bundle: .module, comment: "Alert title"), isPresented: $model.isPresentingAlert) {
                 Button(role: .cancel) {
                     model.errorMessage = nil
