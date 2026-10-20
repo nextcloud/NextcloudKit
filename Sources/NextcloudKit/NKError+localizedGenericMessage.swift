@@ -5,7 +5,7 @@
 import Foundation
 
 public extension NKError {
-    /// User friendly messages for generic errors. Each one fits a `kind`.
+    /// The message to show users: the share API's own message when there is one, otherwise a translated message for ``kind``.
     var localizedGenericMessage: String {
         if let userFriendlyServerMessage {
             return userFriendlyServerMessage

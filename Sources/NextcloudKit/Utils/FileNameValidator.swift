@@ -26,7 +26,7 @@ public final class FileNameValidator: Sendable {
     }
 
     public func fileForbiddenFileExtensionError(templateString: String) -> NKError {
-        let errorMessageTemplate = NSLocalizedString(".\"%@\" is a forbidden file extension.", bundle: .module, comment: "Error message when the server forbids a file extension. %@ is the extension.")
+        let errorMessageTemplate = NSLocalizedString("\".%@\" is a forbidden file extension.", bundle: .module, comment: "Error message when the server forbids a file extension. %@ is the extension.")
         let errorMessage = String(format: errorMessageTemplate, templateString)
         return NKError(errorCode: NSURLErrorCannotCreateFile, errorDescription: errorMessage)
     }

@@ -45,25 +45,25 @@ public struct NKError: Error, Equatable, Sendable {
     /// What went wrong, for choosing the message shown to users; `nil` for ``success``.
     public let kind: Kind?
     /// The OCS message the server sent with the error.
-    let serverMessage: String?
+    private let serverMessage: String?
     /// The URL path of the request that failed, when known.
-    private(set) var requestPath: String?
+    private var requestPath: String?
 
-    public static let urlError = NKError(errorCode: NSURLErrorBadURL, errorDescription: NSLocalizedString("Invalid server URL", bundle: .module, comment: "Error message when the server address is not a valid URL."))
-    public static let invalidResponseError = NKError(errorCode: NSURLErrorBadServerResponse, errorDescription: NSLocalizedString("Invalid response", bundle: .module, comment: "Error message when the server's response is not valid."))
-    public static let xmlError = NKError(errorCode: NSURLErrorBadServerResponse, errorDescription: NSLocalizedString("Invalid response, error decoding XML", bundle: .module, comment: "Error message when the server's XML response cannot be read."))
-    public static let invalidDate = NKError(errorCode: NSURLErrorBadServerResponse, errorDescription: NSLocalizedString("Invalid date format", bundle: .module, comment: "Error message when a date in the server's response cannot be read."))
-    public static let invalidData = NKError(errorCode: NSURLErrorCannotDecodeContentData, errorDescription: NSLocalizedString("Invalid data format", bundle: .module, comment: "Error message when data in the server's response cannot be read."))
-    public static let unauthorizedError = NKError(errorCode: 401, errorDescription: NSLocalizedString("Unauthorized", bundle: .module, comment: "Error message when the server rejects the login (HTTP 401)."))
-    public static let unavailableError = NKError(errorCode: 503, errorDescription: NSLocalizedString("Unavailable", bundle: .module, comment: "Error message when the server is unavailable."))
-    public static let forbiddenError = NKError(errorCode: 403, errorDescription: NSLocalizedString("Forbidden", bundle: .module, comment: "Error message when the server forbids the request."))
-    public static let cancelled = NKError(errorCode: -999, errorDescription: NSLocalizedString("Cancelled", bundle: .module, comment: "Error message when a request was cancelled."))
+    public static let urlError = NKError(errorCode: NSURLErrorBadURL, errorDescription: "Invalid server URL")
+    public static let invalidResponseError = NKError(errorCode: NSURLErrorBadServerResponse, errorDescription: "Invalid response")
+    public static let xmlError = NKError(errorCode: NSURLErrorBadServerResponse, errorDescription: "Invalid response, error decoding XML")
+    public static let invalidDate = NKError(errorCode: NSURLErrorBadServerResponse, errorDescription: "Invalid date format")
+    public static let invalidData = NKError(errorCode: NSURLErrorCannotDecodeContentData, errorDescription: "Invalid data format")
+    public static let unauthorizedError = NKError(errorCode: 401, errorDescription: "Unauthorized")
+    public static let unavailableError = NKError(errorCode: 503, errorDescription: "Unavailable")
+    public static let forbiddenError = NKError(errorCode: 403, errorDescription: "Forbidden")
+    public static let cancelled = NKError(errorCode: -999, errorDescription: "Cancelled")
 
-    public static let errorChunkFileNull = NKError(errorCode: -9994, errorDescription: NSLocalizedString("File not found", bundle: .module, comment: "Error message when the file to upload in chunks cannot be found."))
-    public static let errorChunkFilesEmpty = NKError(errorCode: -9995, errorDescription: NSLocalizedString("Files not found", bundle: .module, comment: "Error message when a chunked upload has no chunks to upload."))
-    public static let errorChunkCreateFolder = NKError(errorCode: -9996, errorDescription: NSLocalizedString("Create folder error", bundle: .module, comment: "Error message when the folder for a chunked upload cannot be created."))
-    public static let errorChunkMoveFile = NKError(errorCode: -9997, errorDescription: NSLocalizedString("Move file error", bundle: .module, comment: "Error message when the uploaded chunks cannot be assembled into the file."))
-    public static let errorChunkNoEnoughMemory = NKError(errorCode: -9998, errorDescription: NSLocalizedString("Not enough memory", bundle: .module, comment: "Error message when the device lacks the space to split a file into chunks."), kind: .localStorageFull)
+    public static let errorChunkFileNull = NKError(errorCode: -9994, errorDescription: "File not found")
+    public static let errorChunkFilesEmpty = NKError(errorCode: -9995, errorDescription: "Files not found")
+    public static let errorChunkCreateFolder = NKError(errorCode: -9996, errorDescription: "Create folder error")
+    public static let errorChunkMoveFile = NKError(errorCode: -9997, errorDescription: "Move file error")
+    public static let errorChunkNoEnoughMemory = NKError(errorCode: -9998, errorDescription: "Not enough memory", kind: .localStorageFull)
 
     public static let success = NKError(errorCode: 0, errorDescription: "")
 
@@ -74,110 +74,110 @@ public struct NKError: Error, Equatable, Sendable {
         return serverMessage
     }
 
-    /// Returns a localized user-facing description for a known error code.
+    /// Returns the English description of a known error code, for logs.
     ///
     /// - Parameter code: The HTTP, URL loading, WebDAV, OCS, or internal error code.
-    /// - Returns: A localized description when the code is known, otherwise `nil`.
+    /// - Returns: A description when the code is known, otherwise `nil`.
     public static func getErrorDescription(for code: Int) -> String? {
         switch code {
         case -9999:
-            return NSLocalizedString("Internal error", bundle: .module, comment: "Error message for an internal error in the app.")
+            return "Internal error"
 
         case -1001:
-            return NSLocalizedString("Time out", bundle: .module, comment: "Error message when a request timed out.")
+            return "Time out"
 
         case -1004:
-            return NSLocalizedString("The server appears to be down", bundle: .module, comment: "Error message when the server cannot be reached.")
+            return "The server appears to be down"
 
         case -1005:
-            return NSLocalizedString("It is not possible to connect to the server at this time", bundle: .module, comment: "Error message when the connection to the server failed.")
+            return "It is not possible to connect to the server at this time"
 
         case -1009:
-            return NSLocalizedString("Server connection error", bundle: .module, comment: "Error message when the device has no internet connection.")
+            return "Server connection error"
 
         case -1011:
-            return NSLocalizedString("Generic error", bundle: .module, comment: "Error message when no more specific description is available.")
+            return "Generic error"
 
         case -1012:
-            return NSLocalizedString("It is not possible to connect to the server at this time", bundle: .module, comment: "Error message when the connection to the server failed.")
+            return "It is not possible to connect to the server at this time"
 
         case -1013:
-            return NSLocalizedString("User authentication required", bundle: .module, comment: "Error message when the server requires a login.")
+            return "User authentication required"
 
         case -1200:
-            return NSLocalizedString("Connection SSL error, try again", bundle: .module, comment: "Error message when a secure connection to the server failed.")
+            return "Connection SSL error, try again"
 
         case -1202:
-            return NSLocalizedString("The certificate for this server is invalid", bundle: .module, comment: "Error message when the server's certificate is not trusted.")
+            return "The certificate for this server is invalid"
 
         case 0:
             return ""
 
         case 101:
-            return NSLocalizedString("The name contains at least one invalid character", bundle: .module, comment: "Error message when the server rejects a name because of invalid characters.")
+            return "The name contains at least one invalid character"
 
         case 200:
-            return NSLocalizedString("Transfer stopped", bundle: .module, comment: "Error message when a transfer was stopped.")
+            return "Transfer stopped"
 
         case 207:
-            return NSLocalizedString("WebDAV multistatus", bundle: .module, comment: "Error message for a WebDAV Multi-Status response (HTTP 207).")
+            return "WebDAV multistatus"
 
         case 304:
-            return NSLocalizedString("Resource not modified", bundle: .module, comment: "Error message when the resource was not modified (HTTP 304).")
+            return "Resource not modified"
 
         case 400:
-            return NSLocalizedString("Bad request", bundle: .module, comment: "Error message when the server cannot process the request (HTTP 400).")
+            return "Bad request"
 
         case 401:
-            return NSLocalizedString("Unauthorized", bundle: .module, comment: "Error message when the server rejects the login (HTTP 401).")
+            return "Unauthorized"
 
         case 403:
-            return NSLocalizedString("You don't have permission to complete the operation", bundle: .module, comment: "Error message when the server forbids the operation (HTTP 403).")
+            return "You don't have permission to complete the operation"
 
         case 404:
-            return NSLocalizedString("The requested resource could not be found", bundle: .module, comment: "Error message when the file, folder or resource does not exist (HTTP 404).")
+            return "The requested resource could not be found"
 
         case 405:
-            return NSLocalizedString("The requested method is not supported", bundle: .module, comment: "Error message when the server doesn't allow the request method (HTTP 405).")
+            return "The requested method is not supported"
 
         case 408:
-            return NSLocalizedString("Request timeout", bundle: .module, comment: "Error message when the server timed out waiting for the request (HTTP 408).")
+            return "Request timeout"
 
         case 409:
-            return NSLocalizedString("The request could not be completed due to a conflict with the current state of the resource", bundle: .module, comment: "Error message when the request conflicts with the current state on the server (HTTP 409).")
+            return "The request could not be completed due to a conflict with the current state of the resource"
 
         case 412:
-            return NSLocalizedString("The server does not meet one of the preconditions of the request", bundle: .module, comment: "Error message when a precondition of the request failed (HTTP 412).")
+            return "The server does not meet one of the preconditions of the request"
 
         case 413:
-            return NSLocalizedString("The file is too large", bundle: .module, comment: "Error message when the file is too large for the server (HTTP 413).")
+            return "The file is too large"
 
         case 417:
-            return NSLocalizedString("Expectation failed", bundle: .module, comment: "Error message when the server cannot meet the request's expectation (HTTP 417).")
+            return "Expectation failed"
 
         case 423:
-            return NSLocalizedString("WebDAV Locked: Trying to access locked resource", bundle: .module, comment: "Error message when the file is locked (HTTP 423).")
+            return "WebDAV Locked: Trying to access locked resource"
 
         case 429:
-            return NSLocalizedString("Too many requests", bundle: .module, comment: "Error message when the server rate-limits the requests (HTTP 429).")
+            return "Too many requests"
 
         case 500:
-            return NSLocalizedString("Internal server error", bundle: .module, comment: "Error message when the server ran into an error (HTTP 500).")
+            return "Internal server error"
 
         case 502:
-            return NSLocalizedString("Bad gateway", bundle: .module, comment: "Error message when a proxy got an invalid response from the server (HTTP 502).")
+            return "Bad gateway"
 
         case 503:
-            return NSLocalizedString("Server is currently in maintenance mode", bundle: .module, comment: "Error message when the server is in maintenance mode (HTTP 503).")
+            return "Server is currently in maintenance mode"
 
         case 504:
-            return NSLocalizedString("Gateway timeout", bundle: .module, comment: "Error message when a proxy timed out waiting for the server (HTTP 504).")
+            return "Gateway timeout"
 
         case 507:
-            return NSLocalizedString("Storage quota is reached", bundle: .module, comment: "Error message when the account's storage quota is used up (HTTP 507).")
+            return "Storage quota is reached"
 
         case NSURLErrorCannotDecodeContentData:
-            return NSLocalizedString("Invalid data format", bundle: .module, comment: "Error message when data in the server's response cannot be read.")
+            return "Invalid data format"
 
         default:
             return nil
@@ -195,7 +195,7 @@ public struct NKError: Error, Equatable, Sendable {
         let description = HTTPURLResponse.localizedString(forStatusCode: statusCode)
 
         if description.isEmpty {
-            return NSLocalizedString("Generic error", bundle: .module, comment: "Error message when no more specific description is available.")
+            return "Generic error"
         }
 
         return description
@@ -211,7 +211,7 @@ public struct NKError: Error, Equatable, Sendable {
     ///
     /// - Parameters:
     ///   - errorCode: The error code.
-    ///   - errorDescription: The user-facing error description.
+    ///   - errorDescription: The error description, mostly for logs.
     ///   - responseData: Optional raw response data associated with the error.
     ///   - kind: The kind of failure; derived from `errorCode` when `nil`.
     public init(errorCode: Int = 0, errorDescription: String = "", responseData: Data? = nil, kind: Kind? = nil) {

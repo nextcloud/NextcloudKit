@@ -7,9 +7,7 @@ import Foundation
 import Testing
 @testable import NextcloudKit
 
-///
 /// Tests for the message ``NKError/localizedGenericMessage`` shows to users.
-///
 struct NKErrorLocalizedGenericMessageTests {
     @Test(arguments: NKError.Kind.allCases)
     func kindMessage(kind: NKError.Kind) {

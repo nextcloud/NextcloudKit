@@ -86,7 +86,7 @@ extension NKError.Kind {
 }
 
 extension NKError.Kind {
-    init(urlErrorCode code: Int) {
+    private init(urlErrorCode code: Int) {
         switch code {
         case NSURLErrorCancelled:
             self = .cancelled
@@ -122,7 +122,7 @@ extension NKError.Kind {
         }
     }
 
-    init(httpStatusCode: Int, method: String? = nil) {
+    private init(httpStatusCode: Int, method: String? = nil) {
         let method = method?.uppercased()
 
         switch httpStatusCode {
