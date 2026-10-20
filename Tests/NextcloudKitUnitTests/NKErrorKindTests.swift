@@ -15,6 +15,7 @@ struct NKErrorKindTests {
         (NSURLErrorNotConnectedToInternet, .offline),
         (NSURLErrorTimedOut, .timeout),
         (NSURLErrorCannotFindHost, .serverUnreachable),
+        (NSURLErrorBadURL, .serverUnreachable),
         (NSURLErrorServerCertificateUntrusted, .secureConnection),
         (NSURLErrorUserAuthenticationRequired, .unauthorized),
         (NSURLErrorCannotParseResponse, .invalidResponse),
