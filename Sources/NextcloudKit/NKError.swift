@@ -30,6 +30,7 @@ extension OCSPath {
     static var ocsMetaCode: Self { ["ocs", "meta", "statuscode"] }
     static var ocsMetaMsg: Self { ["ocs", "meta", "message"] }
     static var ocsDataMsg: Self { ["ocs", "data", "message"] }
+    static var ocsData: Self { ["ocs", "data"] }
     static var ocsXMLMsg: Self { ["d:error", "s:message"] }
     static var davException: Self { ["d:error", "s:exception"] }
 }
@@ -67,11 +68,15 @@ public struct NKError: Error, Equatable, Sendable {
 
     public static let success = NKError(errorCode: 0, errorDescription: "")
 
-    /// The share API's error message, which Nextcloud writes for users. Other server texts are technical.
+    /// The server's message where Nextcloud writes it for users: the share API and unified sharing's property updates.
+    /// Other server texts are technical.
     public var userFriendlyServerMessage: String? {
-        guard requestPath?.contains("/apps/files_sharing/api/v1/shares") == true else { return nil }
+        guard let requestPath else { return nil }
 
-        return serverMessage
+        let isShareAPI = requestPath.contains("/apps/files_sharing/api/v1/shares")
+        let isUnifiedShareProperty = requestPath.contains("/apps/sharing/api/v1/share/") && requestPath.hasSuffix("/property")
+
+        return isShareAPI || isUnifiedShareProperty ? serverMessage : nil
     }
 
     /// Returns the English description of a known error code, for logs.
@@ -265,13 +270,9 @@ public struct NKError: Error, Equatable, Sendable {
         let statuscode = rootJson[.ocsMetaCode].int ?? fallbackStatusCode ?? NSURLErrorCannotDecodeContentData
         errorCode = 200..<300 ~= statuscode ? 0 : statuscode
 
-        if let dataMsg = rootJson[.ocsDataMsg].string {
-            errorDescription = dataMsg
-        } else if let metaMsg = rootJson[.ocsMetaMsg].string {
-            errorDescription = metaMsg
-        } else {
-            errorDescription = NKError.getErrorDescription(for: statuscode) ?? NKError.httpFallbackDescription(for: statuscode)
-        }
+        let message = NKError.firstNonEmpty(rootJson[.ocsDataMsg].string, rootJson[.ocsData].string, rootJson[.ocsMetaMsg].string)
+
+        errorDescription = message ?? NKError.getErrorDescription(for: statuscode) ?? NKError.httpFallbackDescription(for: statuscode)
 
         self.responseData = responseData
         self.error = NSError(
@@ -280,7 +281,7 @@ public struct NKError: Error, Equatable, Sendable {
             userInfo: [NSLocalizedDescriptionKey: self.errorDescription]
         )
         self.kind = errorCode == 0 ? nil : Kind(code: statuscode)
-        self.serverMessage = NKError.firstNonEmpty(rootJson[.ocsDataMsg].string, rootJson[.ocsMetaMsg].string)
+        self.serverMessage = message
     }
 
     /// Creates an `NKError` from an HTTP status code.

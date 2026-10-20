@@ -49,6 +49,7 @@ struct NKErrorKindTests {
 
     private static let davURL = URL(string: "https://cloud.example.com/remote.php/dav/files/alice/Documents")!
     private static let shareURL = URL(string: "https://cloud.example.com/ocs/v2.php/apps/files_sharing/api/v1/shares/42")!
+    private static let unifiedSharePropertyURL = URL(string: "https://cloud.example.com/ocs/v2.php/apps/sharing/api/v1/share/abc/property")!
 
     private func davErrorBody(exception: String, message: String) -> Data {
         Data("""
@@ -131,8 +132,18 @@ struct NKErrorKindTests {
         #expect(error.userFriendlyServerMessage == "Public upload disabled by the administrator")
     }
 
+    @Test("Passes on unified sharing's property validation messages")
+    func unifiedSharePropertyMessage() {
+        let body = Data(#"{"ocs":{"meta":{"status":"failure","statuscode":400,"message":""},"data":"Password needs to be at least 10 characters long"}}"#.utf8)
+        let error = responseError(url: Self.unifiedSharePropertyURL, statusCode: 400, method: "PUT", body: body)
+
+        #expect(error.userFriendlyServerMessage == "Password needs to be at least 10 characters long")
+        #expect(error.errorDescription == "Password needs to be at least 10 characters long")
+    }
+
     @Test("Keeps the messages of other OCS APIs in the logs only", arguments: [
         "https://cloud.example.com/ocs/v2.php/apps/sharing/api/v1/share/abc",
+        "https://cloud.example.com/ocs/v2.php/apps/sharing/api/v1/share/abc/state",
         "https://cloud.example.com/ocs/v2.php/apps/files_sharing/api/v1/sharees"
     ])
     func otherOCSMessages(url: String) throws {
