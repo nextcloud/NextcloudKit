@@ -275,7 +275,7 @@
         "mk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%lld луѓе"
+            "value" : "%lld особа"
           }
         },
         "pt_BR" : {
@@ -591,6 +591,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "1 persona"
+          }
+        },
+        "mk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "1 особа"
           }
         },
         "pt_BR" : {
@@ -950,6 +956,12 @@
             "value" : "Pridėti apibūdinimą"
           }
         },
+        "mk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Додади ознака"
+          }
+        },
         "nb_NO" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1141,6 +1153,12 @@
             "value" : "Aggiungi persone"
           }
         },
+        "mk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Додај луѓе"
+          }
+        },
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1272,6 +1290,12 @@
             "value" : "Applicare le autorizzazioni a tutti i destinatari?"
           }
         },
+        "mk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Примени за сите примачи?"
+          }
+        },
         "pt_BR" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1371,6 +1395,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Applicare a tutti"
+          }
+        },
+        "mk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Примени за сите"
           }
         },
         "pt_BR" : {
@@ -1550,6 +1580,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Bet kas"
+          }
+        },
+        "mk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Било кој"
           }
         },
         "mn" : {
@@ -2064,7 +2100,7 @@
         "mk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Cancel"
+            "value" : "Откажи"
           }
         },
         "mn" : {
@@ -3932,6 +3968,12 @@
             "value" : "Link personalizzato"
           }
         },
+        "mk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Прилагоден линк"
+          }
+        },
         "pt_BR" : {
           "stringUnit" : {
             "state" : "translated",
@@ -4396,7 +4438,7 @@
         "mk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Delete"
+            "value" : "Избриши"
           }
         },
         "mn" : {
@@ -4674,6 +4716,12 @@
             "value" : "Elimina il destinatario"
           }
         },
+        "mk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Острани примач"
+          }
+        },
         "pt_BR" : {
           "stringUnit" : {
             "state" : "translated",
@@ -4773,6 +4821,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Eliminare il destinatario?"
+          }
+        },
+        "mk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Острани примач?"
           }
         },
         "pt_BR" : {
@@ -5185,6 +5239,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Eliminare la condivisione?"
+          }
+        },
+        "mk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Избриши споделување?"
           }
         },
         "pt_BR" : {
@@ -5964,6 +6024,12 @@
             "value" : "Nascondi destinatari"
           }
         },
+        "mk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Сокриј примачи"
+          }
+        },
         "pt_BR" : {
           "stringUnit" : {
             "state" : "translated",
@@ -6669,6 +6735,12 @@
             "value" : "Persone invitate"
           }
         },
+        "mk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Поканети луѓе"
+          }
+        },
         "pt_BR" : {
           "stringUnit" : {
             "state" : "translated",
@@ -6985,6 +7057,12 @@
             "value" : "Accesso non riuscito."
           }
         },
+        "mk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Неуспешна најава"
+          }
+        },
         "pt_BR" : {
           "stringUnit" : {
             "state" : "translated",
@@ -7084,6 +7162,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Nessun destinatario"
+          }
+        },
+        "mk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Нема примачи"
           }
         },
         "pt_BR" : {
@@ -7860,6 +7944,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Aggiorna il link"
+          }
+        },
+        "mk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Освежи линк"
           }
         },
         "pt_BR" : {
@@ -10399,6 +10489,12 @@
             "value" : "Rimuovi la password"
           }
         },
+        "mk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Избриши лозинка"
+          }
+        },
         "pt_BR" : {
           "stringUnit" : {
             "state" : "translated",
@@ -10863,7 +10959,7 @@
         "mk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Save"
+            "value" : "Зачувај"
           }
         },
         "mn" : {
@@ -11139,6 +11235,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Condividi \"%@\""
+          }
+        },
+        "mk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Сподели \"%@\""
           }
         },
         "pt_BR" : {
@@ -11505,6 +11607,12 @@
             "value" : "Kopīgot mapi"
           }
         },
+        "mk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Сподели папка"
+          }
+        },
         "nb_NO" : {
           "stringUnit" : {
             "state" : "translated",
@@ -11819,7 +11927,7 @@
         "mk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Сподели ја врската"
+            "value" : "Сподели линк"
           }
         },
         "mn" : {
@@ -12049,6 +12157,12 @@
             "value" : "Condividi collegamento (%lld)"
           }
         },
+        "mk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Сподели линк (%lld)"
+          }
+        },
         "pt_BR" : {
           "stringUnit" : {
             "state" : "translated",
@@ -12154,6 +12268,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Mostra i destinatari"
+          }
+        },
+        "mk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Прикажи примачи"
           }
         },
         "pt_BR" : {
@@ -12762,6 +12882,12 @@
             "value" : "Questo destinatario verrà rimosso dalla condivisione."
           }
         },
+        "mk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Примачот ќе се острани од споделувањето."
+          }
+        },
         "pt_BR" : {
           "stringUnit" : {
             "state" : "translated",
@@ -12861,6 +12987,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Questo elemento condiviso verrà rimosso definitivamente."
+          }
+        },
+        "mk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ова споделување ќе биде трајно избришано."
           }
         },
         "pt_BR" : {
