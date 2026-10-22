@@ -798,7 +798,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Comptes depuis d'autres applications"
+            "value" : "Comptes d'autres applications"
           }
         },
         "ga" : {
@@ -1592,6 +1592,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Хэн ч бай"
+          }
+        },
+        "nb_NO" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hvem som helst"
           }
         },
         "nl" : {
@@ -6875,7 +6881,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Nom du lien"
+            "value" : "Identifiant du lien"
           }
         },
         "ga" : {
@@ -8554,6 +8560,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Escanear código QR"
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Scanează codul QR"
           }
         },
         "ru" : {
@@ -11222,7 +11234,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Partager « %1 »"
+            "value" : "Partager « %@ »"
           }
         },
         "ga" : {
@@ -12665,7 +12677,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Le lien peut être changé pour être plus simple à retenir, mais ne le définissez pas sur quelque chose de facile à deviner."
+            "value" : "Vous pouvez modifier le lien pour le rendre plus facile à retenir, mais évitez de choisir une valeur facile à deviner."
           }
         },
         "ga" : {
@@ -12766,7 +12778,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ce partage est limité à \"%1$@\". Vous pouvez accorder, au maximum, ce nombre d'autorisations."
+            "value" : "Ce partage est limité à « %1$@ ». Vous ne pouvez accorder que des autorisations identiques ou plus restreintes."
           }
         },
         "ga" : {
@@ -12974,7 +12986,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ce partage sera définitivement  supprimé."
+            "value" : "Ce partage sera définitivement supprimé."
           }
         },
         "ga" : {
