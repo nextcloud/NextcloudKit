@@ -1,0 +1,325 @@
+{
+  "sourceLanguage" : "en",
+  "strings" : {
+    "\"%@\" is a forbidden name." : {
+      "comment" : "Error message when the server reserves a name. %@ is the name.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "\"%@\" is a forbidden name."
+          }
+        }
+      }
+    },
+    "\".%@\" is a forbidden file extension." : {
+      "comment" : "Error message when the server forbids a file extension. %@ is the extension.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "\".%@\" is a forbidden file extension."
+          }
+        }
+      }
+    },
+    "A secure connection to the server couldn't be established." : {
+      "comment" : "Error message for TLS and certificate failures.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A secure connection to the server couldn't be established."
+          }
+        }
+      }
+    },
+    "An item with this name already exists." : {
+      "comment" : "Error message when a file or folder with the same name already exists.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "An item with this name already exists."
+          }
+        }
+      }
+    },
+    "Can't reach the server. Check the address or try again later." : {
+      "comment" : "Error message when the server cannot be reached.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Can't reach the server. Check the address or try again later."
+          }
+        }
+      }
+    },
+    "Compact" : {
+      "comment" : "Log level that logs only the essentials.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Compact"
+          }
+        }
+      }
+    },
+    "Disabled" : {
+      "comment" : "Log level that turns logging off.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Disabled"
+          }
+        }
+      }
+    },
+    "File name cannot be empty." : {
+      "comment" : "Error message when a file or folder name is empty.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "File name cannot be empty."
+          }
+        }
+      }
+    },
+    "Name contains an invalid character: \"%@\"." : {
+      "comment" : "Error message when a name contains a forbidden character. %@ is the character.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Name contains an invalid character: \"%@\"."
+          }
+        }
+      }
+    },
+    "Name must not contain spaces at the beginning or end." : {
+      "comment" : "Error message when a name starts or ends with a space.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Name must not contain spaces at the beginning or end."
+          }
+        }
+      }
+    },
+    "Normal" : {
+      "comment" : "Default log level.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Normal"
+          }
+        }
+      }
+    },
+    "Something went wrong. Please try again." : {
+      "comment" : "Error message when the cause of the error is unknown.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Something went wrong. Please try again."
+          }
+        }
+      }
+    },
+    "The file is locked. Try again later." : {
+      "comment" : "Error message when the file is locked on the server.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The file is locked. Try again later."
+          }
+        }
+      }
+    },
+    "The file is too large for the server." : {
+      "comment" : "Error message when the server rejects a file because of its size.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The file is too large for the server."
+          }
+        }
+      }
+    },
+    "The item could not be found on the server." : {
+      "comment" : "Error message when the requested file, folder or share does not exist on the server.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The item could not be found on the server."
+          }
+        }
+      }
+    },
+    "The item was changed on the server. Please refresh and try again." : {
+      "comment" : "Error message when the request conflicts with the current state on the server.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The item was changed on the server. Please refresh and try again."
+          }
+        }
+      }
+    },
+    "The request was cancelled." : {
+      "comment" : "Error message when a request was cancelled.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The request was cancelled."
+          }
+        }
+      }
+    },
+    "The server is temporarily unavailable. Try again later." : {
+      "comment" : "Error message when the server is unavailable, e.g. in maintenance mode.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The server is temporarily unavailable. Try again later."
+          }
+        }
+      }
+    },
+    "The server ran into a problem. Try again later." : {
+      "comment" : "Error message for internal server errors.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The server ran into a problem. Try again later."
+          }
+        }
+      }
+    },
+    "The server sent an unexpected response. Try again later." : {
+      "comment" : "Error message when the server's response cannot be read.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The server sent an unexpected response. Try again later."
+          }
+        }
+      }
+    },
+    "The server took too long to respond. Try again later." : {
+      "comment" : "Error message when a request to the server timed out.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The server took too long to respond. Try again later."
+          }
+        }
+      }
+    },
+    "There is not enough storage space left on the server." : {
+      "comment" : "Error message when the account's storage quota is used up.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "There is not enough storage space left on the server."
+          }
+        }
+      }
+    },
+    "There is not enough storage space left on this device." : {
+      "comment" : "Error message when the device runs out of storage space.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "There is not enough storage space left on this device."
+          }
+        }
+      }
+    },
+    "This name isn't allowed." : {
+      "comment" : "Error message when the server rejects a file or folder name.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This name isn't allowed."
+          }
+        }
+      }
+    },
+    "Too many requests. Please wait a moment and try again." : {
+      "comment" : "Error message when the server rate-limits the requests.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Too many requests. Please wait a moment and try again."
+          }
+        }
+      }
+    },
+    "Verbose" : {
+      "comment" : "Log level that logs everything, for debugging.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Verbose"
+          }
+        }
+      }
+    },
+    "You don't have permission to do this." : {
+      "comment" : "Error message when the server forbids the action.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "You don't have permission to do this."
+          }
+        }
+      }
+    },
+    "You're offline. Please check your internet connection." : {
+      "comment" : "Error message when the device has no internet connection.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "You're offline. Please check your internet connection."
+          }
+        }
+      }
+    },
+    "Your login is no longer valid. Please log in again." : {
+      "comment" : "Error message when the server rejects the account's credentials.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Your login is no longer valid. Please log in again."
+          }
+        }
+      }
+    }
+  },
+  "version" : "1.0"
+}
