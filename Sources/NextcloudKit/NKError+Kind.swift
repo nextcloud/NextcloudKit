@@ -46,8 +46,8 @@ extension NKError.Kind {
 
     /// Classifies an ``NKError/errorCode``: a URL loading error, an HTTP status or an OCS status code.
     ///
-    /// Returns `nil` for `0`, which means success. The request method tells some WebDAV statuses apart.
-    init?(code: Int, method: String? = nil) {
+    /// Returns `nil` for `0`, which means success. The request tells some WebDAV statuses apart.
+    init?(code: Int, request: URLRequest? = nil) {
         switch code {
         case 0:
             return nil
@@ -65,7 +65,7 @@ extension NKError.Kind {
             self = .notFound
 
         default:
-            self.init(httpStatusCode: code, method: method)
+            self.init(httpStatusCode: code, request: request)
         }
     }
 
@@ -122,8 +122,8 @@ extension NKError.Kind {
         }
     }
 
-    private init(httpStatusCode: Int, method: String? = nil) {
-        let method = method?.uppercased()
+    private init(httpStatusCode: Int, request: URLRequest? = nil) {
+        let method = request?.httpMethod?.uppercased()
 
         switch httpStatusCode {
         case 401:
@@ -144,7 +144,7 @@ extension NKError.Kind {
         case 409:
             self = .conflict
 
-        case 412 where method == "COPY" || method == "MOVE":
+        case 412 where NKError.Kind.refusesOverwrite(request):
             self = .alreadyExists
 
         case 412:
@@ -174,6 +174,17 @@ extension NKError.Kind {
         default:
             self = .unknown
         }
+    }
+
+    /// A `COPY` or `MOVE` that may not replace an existing item. Other 412s are failed state preconditions such as `If-Match`.
+    private static func refusesOverwrite(_ request: URLRequest?) -> Bool {
+        let method = request?.httpMethod?.uppercased()
+
+        guard let request, method == "COPY" || method == "MOVE" else { return false }
+
+        let hasStatePrecondition = request.value(forHTTPHeaderField: "If-Match") != nil || request.value(forHTTPHeaderField: "If") != nil
+
+        return request.value(forHTTPHeaderField: "Overwrite")?.uppercased() == "F" && !hasStatePrecondition
     }
 
     private init(afError: AFError) {

@@ -23,6 +23,17 @@
         }
       }
     },
+    "A file or folder with this name already exists." : {
+      "comment" : "Error message when a file or folder with the same name already exists.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A file or folder with this name already exists."
+          }
+        }
+      }
+    },
     "A secure connection to the server couldn't be established." : {
       "comment" : "Error message for TLS and certificate failures.",
       "localizations" : {
@@ -30,17 +41,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "A secure connection to the server couldn't be established."
-          }
-        }
-      }
-    },
-    "An item with this name already exists." : {
-      "comment" : "Error message when a file or folder with the same name already exists.",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "An item with this name already exists."
           }
         }
       }
@@ -155,24 +155,24 @@
         }
       }
     },
-    "The item could not be found on the server." : {
+    "The file or folder could not be found on the server." : {
       "comment" : "Error message when the requested file, folder or share does not exist on the server.",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "The item could not be found on the server."
+            "value" : "The file or folder could not be found on the server."
           }
         }
       }
     },
-    "The item was changed on the server. Please refresh and try again." : {
+    "The file or folder has changed on the server. Please refresh and try again." : {
       "comment" : "Error message when the request conflicts with the current state on the server.",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "The item was changed on the server. Please refresh and try again."
+            "value" : "The file or folder has changed on the server. Please refresh and try again."
           }
         }
       }

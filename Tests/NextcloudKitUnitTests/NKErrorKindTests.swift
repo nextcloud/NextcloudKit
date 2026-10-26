@@ -65,9 +65,13 @@ struct NKErrorKindTests {
         Data(#"{"ocs":{"meta":{"status":"failure","statuscode":\#(statusCode),"message":"\#(message)"},"data":[]}}"#.utf8)
     }
 
-    private func responseError(url: URL = NKErrorKindTests.davURL, statusCode: Int, method: String, body: Data?) -> NKError {
+    private func responseError(url: URL = NKErrorKindTests.davURL, statusCode: Int, method: String, headers: [String: String] = [:], body: Data?) -> NKError {
         var request = URLRequest(url: url)
         request.httpMethod = method
+
+        for (field, value) in headers {
+            request.setValue(value, forHTTPHeaderField: field)
+        }
 
         let response = HTTPURLResponse(url: url, statusCode: statusCode, httpVersion: "HTTP/1.1", headerFields: nil)
         let dataResponse = AFDataResponse<Data>(request: request, response: response, data: body, metrics: nil, serializationDuration: 0, result: .failure(.responseValidationFailed(reason: .unacceptableStatusCode(code: statusCode))))
@@ -95,14 +99,16 @@ struct NKErrorKindTests {
         #expect(NKError(rootJson: json, fallbackStatusCode: 200).kind == kind)
     }
 
-    @Test("Uses the request method to tell WebDAV statuses apart")
+    @Test("Uses the request to tell WebDAV statuses apart")
     func requestMethod() {
-        let body = davErrorBody(exception: "Sabre\\DAV\\Exception\\MethodNotAllowed", message: "The resource you tried to create already exists")
+        let body = davErrorBody(exception: "Sabre\\DAV\\Exception\\PreconditionFailed", message: "Precondition failed")
 
         #expect(responseError(statusCode: 405, method: "MKCOL", body: body).kind == .alreadyExists)
         #expect(responseError(statusCode: 405, method: "PROPFIND", body: body).kind == .unknown)
-        #expect(responseError(statusCode: 412, method: "MOVE", body: body).kind == .alreadyExists)
-        #expect(responseError(statusCode: 412, method: "COPY", body: body).kind == .alreadyExists)
+        #expect(responseError(statusCode: 412, method: "MOVE", headers: ["Overwrite": "F"], body: body).kind == .alreadyExists)
+        #expect(responseError(statusCode: 412, method: "COPY", headers: ["Overwrite": "F"], body: body).kind == .alreadyExists)
+        #expect(responseError(statusCode: 412, method: "MOVE", headers: ["Overwrite": "T", "If-Match": "\"abc\""], body: body).kind == .conflict)
+        #expect(responseError(statusCode: 412, method: "MOVE", headers: ["Overwrite": "F", "If-Match": "\"abc\""], body: body).kind == .conflict)
         #expect(responseError(statusCode: 412, method: "PUT", body: body).kind == .conflict)
     }
 
@@ -194,7 +200,11 @@ struct NKErrorKindTests {
         #expect(NKError.Kind(code: 507) == .quotaExceeded)
         #expect(NKError.Kind(code: NSURLErrorNotConnectedToInternet) == .offline)
         #expect(NKError.Kind(code: 997) == .unauthorized)
-        #expect(NKError.Kind(code: 405, method: "MKCOL") == .alreadyExists)
+
+        var mkcol = URLRequest(url: Self.davURL)
+        mkcol.httpMethod = "MKCOL"
+
+        #expect(NKError.Kind(code: 405, request: mkcol) == .alreadyExists)
     }
 
     @Test("Equality still compares only the code and the description")

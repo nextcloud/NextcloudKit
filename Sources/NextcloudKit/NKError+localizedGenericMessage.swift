@@ -31,16 +31,16 @@ public extension NKError {
             return NSLocalizedString("You don't have permission to do this.", bundle: .module, comment: "Error message when the server forbids the action.")
 
         case .notFound:
-            return NSLocalizedString("The item could not be found on the server.", bundle: .module, comment: "Error message when the requested file, folder or share does not exist on the server.")
+            return NSLocalizedString("The file or folder could not be found on the server.", bundle: .module, comment: "Error message when the requested file, folder or share does not exist on the server.")
 
         case .alreadyExists:
-            return NSLocalizedString("An item with this name already exists.", bundle: .module, comment: "Error message when a file or folder with the same name already exists.")
+            return NSLocalizedString("A file or folder with this name already exists.", bundle: .module, comment: "Error message when a file or folder with the same name already exists.")
 
         case .invalidName:
             return NSLocalizedString("This name isn't allowed.", bundle: .module, comment: "Error message when the server rejects a file or folder name.")
 
         case .conflict:
-            return NSLocalizedString("The item was changed on the server. Please refresh and try again.", bundle: .module, comment: "Error message when the request conflicts with the current state on the server.")
+            return NSLocalizedString("The file or folder has changed on the server. Please refresh and try again.", bundle: .module, comment: "Error message when the request conflicts with the current state on the server.")
 
         case .locked:
             return NSLocalizedString("The file is locked. Try again later.", bundle: .module, comment: "Error message when the file is locked on the server.")

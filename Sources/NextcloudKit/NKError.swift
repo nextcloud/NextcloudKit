@@ -322,9 +322,9 @@ public struct NKError: Error, Equatable, Sendable {
     /// - Parameters:
     ///   - xmlData: The raw XML response data.
     ///   - fallbackStatusCode: The fallback HTTP status code used when the OCS status code is missing.
-    ///   - method: The HTTP method of the request, which tells some WebDAV statuses apart.
+    ///   - request: The request, which tells some WebDAV statuses apart.
     ///   - responseData: Optional raw response data associated with the error.
-    init(xmlData: Data, fallbackStatusCode: Int? = nil, method: String? = nil, responseData: Data? = nil) {
+    init(xmlData: Data, fallbackStatusCode: Int? = nil, request: URLRequest? = nil, responseData: Data? = nil) {
         let xml = XML.parse(xmlData)
         let statuscode = xml[.ocsMetaCode].int ?? fallbackStatusCode ?? NSURLErrorCannotDecodeContentData
         errorCode = 200..<300 ~= statuscode ? 0 : statuscode
@@ -345,7 +345,7 @@ public struct NKError: Error, Equatable, Sendable {
             code: self.errorCode,
             userInfo: [NSLocalizedDescriptionKey: self.errorDescription]
         )
-        self.kind = errorCode == 0 ? nil : Kind(davException: xml[.davException].text) ?? Kind(code: statuscode, method: method)
+        self.kind = errorCode == 0 ? nil : Kind(davException: xml[.davException].text) ?? Kind(code: statuscode, request: request)
         self.serverMessage = nil
     }
 
@@ -363,7 +363,7 @@ public struct NKError: Error, Equatable, Sendable {
                 if let errorJson = try? JSON(data: errorData) {
                     self.init(rootJson: errorJson, fallbackStatusCode: errorCode, responseData: responseData)
                 } else {
-                    self.init(xmlData: errorData, fallbackStatusCode: errorCode, method: dataResponse?.request?.httpMethod, responseData: responseData)
+                    self.init(xmlData: errorData, fallbackStatusCode: errorCode, request: dataResponse?.request, responseData: responseData)
                 }
             } else {
                 self.init(
