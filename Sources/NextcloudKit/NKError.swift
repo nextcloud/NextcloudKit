@@ -49,6 +49,8 @@ public struct NKError: Error, Equatable, Sendable {
     private let serverMessage: String?
     /// The URL path of the request that failed, when known.
     private var requestPath: String?
+    /// Whether the server wrote ``serverMessage`` for users, e.g. a server app's client integration action.
+    private var isUserFriendlyServerMessage = false
 
     public static let urlError = NKError(errorCode: NSURLErrorBadURL, errorDescription: "Invalid server URL")
     public static let invalidResponseError = NKError(errorCode: NSURLErrorBadServerResponse, errorDescription: "Invalid response")
@@ -68,15 +70,27 @@ public struct NKError: Error, Equatable, Sendable {
 
     public static let success = NKError(errorCode: 0, errorDescription: "")
 
-    /// The server's message where Nextcloud writes it for users: the share API and unified sharing's property updates.
-    /// Other server texts are technical.
+    /// The server's message where it's written for users: the share API, unified sharing's property updates and
+    /// server apps' client integration actions. Other server texts are technical.
     public var userFriendlyServerMessage: String? {
+        if isUserFriendlyServerMessage, ![.unauthorized, .serverError, .unavailable].contains(kind) {
+            return serverMessage
+        }
+
         guard let requestPath else { return nil }
 
         let isShareAPI = requestPath.contains("/apps/files_sharing/api/v1/shares")
         let isUnifiedShareProperty = requestPath.contains("/apps/sharing/api/v1/share/") && requestPath.hasSuffix("/property")
 
         return isShareAPI || isUnifiedShareProperty ? serverMessage : nil
+    }
+
+    /// The same error, with its server message marked as written for users.
+    func markAsUserFriendlyServerMessage() -> NKError {
+        var error = self
+        error.isUserFriendlyServerMessage = true
+
+        return error
     }
 
     /// Returns the English description of a known error code, for logs.

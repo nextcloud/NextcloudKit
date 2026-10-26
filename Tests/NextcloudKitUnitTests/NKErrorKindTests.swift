@@ -147,6 +147,16 @@ struct NKErrorKindTests {
         #expect(error.errorDescription == "Password needs to be at least 10 characters long")
     }
 
+    @Test("Passes on trusted server messages, except for login and server failures", arguments: [(400, true), (403, true), (404, true), (401, false), (500, false), (503, false)])
+    func trustedServerMessage(statusCode: Int, isShown: Bool) {
+        let url = URL(string: "https://cloud.example.com/ocs/v2.php/apps/myapp/api/v1/action")!
+        let error = responseError(url: url, statusCode: statusCode, method: "POST", body: ocsErrorBody(statusCode: statusCode, message: "The file type isn't supported"))
+
+        #expect(error.userFriendlyServerMessage == nil)
+        #expect(error.markAsUserFriendlyServerMessage().userFriendlyServerMessage == (isShown ? "The file type isn't supported" : nil))
+        #expect(error.markAsUserFriendlyServerMessage() == error)
+    }
+
     @Test("Keeps the messages of other OCS APIs in the logs only", arguments: [
         "https://cloud.example.com/ocs/v2.php/apps/sharing/api/v1/share/abc",
         "https://cloud.example.com/ocs/v2.php/apps/sharing/api/v1/share/abc/state",

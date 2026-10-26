@@ -5,7 +5,8 @@
 import Foundation
 
 public extension NKError {
-    /// The message to show users: the share API's own message when there is one, otherwise a translated message for ``kind``.
+    /// The message to show users: the server's own message where it's written for users (``userFriendlyServerMessage``),
+    /// otherwise a translated message for ``kind``.
     var localizedGenericMessage: String {
         if let userFriendlyServerMessage {
             return userFriendlyServerMessage
