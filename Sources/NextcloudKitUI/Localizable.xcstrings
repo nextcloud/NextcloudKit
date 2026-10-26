@@ -70,6 +70,12 @@
             "value" : "%lld grupos"
           }
         },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld grupuri"
+          }
+        },
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
@@ -177,6 +183,12 @@
             "value" : "%lld links"
           }
         },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld linkuri"
+          }
+        },
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
@@ -275,13 +287,19 @@
         "mk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%lld луѓе"
+            "value" : "%lld особа"
           }
         },
         "pt_BR" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "%lld pessoas"
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld persoane"
           }
         },
         "ru" : {
@@ -391,6 +409,12 @@
             "value" : "1 grupo"
           }
         },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "1 grup"
+          }
+        },
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
@@ -498,6 +522,12 @@
             "value" : "1 link"
           }
         },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "1 link"
+          }
+        },
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
@@ -593,10 +623,22 @@
             "value" : "1 persona"
           }
         },
+        "mk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "1 особа"
+          }
+        },
         "pt_BR" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "1 pessoa"
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "1 persoană"
           }
         },
         "ru" : {
@@ -712,6 +754,12 @@
             "value" : "Contas"
           }
         },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Conturi"
+          }
+        },
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
@@ -792,7 +840,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Comptes depuis d'autres applications"
+            "value" : "Comptes d'autres applications"
           }
         },
         "ga" : {
@@ -817,6 +865,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Contas de outros aplicativos"
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Conturi din alte aplicații"
           }
         },
         "ru" : {
@@ -950,6 +1004,12 @@
             "value" : "Pridėti apibūdinimą"
           }
         },
+        "mk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Додади ознака"
+          }
+        },
         "nb_NO" : {
           "stringUnit" : {
             "state" : "translated",
@@ -972,6 +1032,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Adicionar um rótulo"
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Adaugă o etichetă"
           }
         },
         "ru" : {
@@ -1141,6 +1207,12 @@
             "value" : "Aggiungi persone"
           }
         },
+        "mk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Додај луѓе"
+          }
+        },
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1157,6 +1229,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Adicionar pessoas"
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Adaugă persoane"
           }
         },
         "ru" : {
@@ -1272,10 +1350,22 @@
             "value" : "Applicare le autorizzazioni a tutti i destinatari?"
           }
         },
+        "mk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Примени за сите примачи?"
+          }
+        },
         "pt_BR" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Aplicar permissões a todos os destinatários?"
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aplici permisiunile tuturor destinatarilor?"
           }
         },
         "ru" : {
@@ -1373,10 +1463,22 @@
             "value" : "Applicare a tutti"
           }
         },
+        "mk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Примени за сите"
+          }
+        },
         "pt_BR" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Aplicar a todos"
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aplică tuturor"
           }
         },
         "ru" : {
@@ -1552,10 +1654,22 @@
             "value" : "Bet kas"
           }
         },
+        "mk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Било кој"
+          }
+        },
         "mn" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Хэн ч бай"
+          }
+        },
+        "nb_NO" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hvem som helst"
           }
         },
         "nl" : {
@@ -2064,7 +2178,7 @@
         "mk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Cancel"
+            "value" : "Откажи"
           }
         },
         "mn" : {
@@ -2148,7 +2262,7 @@
         "ro" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Cancel"
+            "value" : "Anulează"
           }
         },
         "ru" : {
@@ -2519,7 +2633,7 @@
         "ro" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Permisiuni particularizate"
+            "value" : "Permisiuni personalizate"
           }
         },
         "ru" : {
@@ -3213,7 +3327,7 @@
         "ro" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Copiază link privat"
+            "value" : "Copiază linkul privat"
           }
         },
         "ru" : {
@@ -3578,7 +3692,7 @@
         "ro" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Copiză link-ul public"
+            "value" : "Copiază linkul public"
           }
         },
         "ru" : {
@@ -3736,6 +3850,12 @@
             "value" : "Não foi possível criar o compartilhamento; tente novamente mais tarde"
           }
         },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Partajarea nu a putut fi creată, încearcă din nou mai târziu"
+          }
+        },
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3837,6 +3957,12 @@
             "value" : "Não foi possível carregar os compartilhamentos"
           }
         },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Partajările nu au putut fi încărcate"
+          }
+        },
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3932,10 +4058,22 @@
             "value" : "Link personalizzato"
           }
         },
+        "mk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Прилагоден линк"
+          }
+        },
         "pt_BR" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Link personalizado"
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Link personalizat"
           }
         },
         "ru" : {
@@ -4396,7 +4534,7 @@
         "mk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Delete"
+            "value" : "Избриши"
           }
         },
         "mn" : {
@@ -4480,7 +4618,7 @@
         "ro" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Delete"
+            "value" : "Șterge"
           }
         },
         "ru" : {
@@ -4674,10 +4812,22 @@
             "value" : "Elimina il destinatario"
           }
         },
+        "mk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Острани примач"
+          }
+        },
         "pt_BR" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Excluir destinatário"
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Elimină destinatarul"
           }
         },
         "ru" : {
@@ -4775,10 +4925,22 @@
             "value" : "Eliminare il destinatario?"
           }
         },
+        "mk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Острани примач?"
+          }
+        },
         "pt_BR" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Excluir destinatário?"
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Elimini destinatarul?"
           }
         },
         "ru" : {
@@ -5187,10 +5349,22 @@
             "value" : "Eliminare la condivisione?"
           }
         },
+        "mk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Избриши споделување?"
+          }
+        },
         "pt_BR" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Excluir compartilhamento?"
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ștergi partajarea?"
           }
         },
         "ru" : {
@@ -5869,6 +6043,12 @@
             "value" : "Falha ao atualizar o compartilhamento."
           }
         },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Partajarea nu a putut fi actualizată."
+          }
+        },
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
@@ -5964,10 +6144,22 @@
             "value" : "Nascondi destinatari"
           }
         },
+        "mk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Сокриј примачи"
+          }
+        },
         "pt_BR" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Ocultar destinatários"
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ascunde destinatarii"
           }
         },
         "ru" : {
@@ -6669,10 +6861,22 @@
             "value" : "Persone invitate"
           }
         },
+        "mk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Поканети луѓе"
+          }
+        },
         "pt_BR" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Pessoas convidadas"
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Persoane invitate"
           }
         },
         "ru" : {
@@ -6803,7 +7007,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Nom du lien"
+            "value" : "Identifiant du lien"
           }
         },
         "ga" : {
@@ -6864,6 +7068,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Token de link"
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tokenul linkului"
           }
         },
         "ru" : {
@@ -6985,10 +7195,22 @@
             "value" : "Accesso non riuscito."
           }
         },
+        "mk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Неуспешна најава"
+          }
+        },
         "pt_BR" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Falha no login"
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Autentificarea a eșuat"
           }
         },
         "ru" : {
@@ -7086,10 +7308,22 @@
             "value" : "Nessun destinatario"
           }
         },
+        "mk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Нема примачи"
+          }
+        },
         "pt_BR" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Nenhum destinatário"
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Niciun destinatar"
           }
         },
         "ru" : {
@@ -7204,6 +7438,12 @@
             "value" : "Ainda não compartilhado"
           }
         },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Încă nepartajat"
+          }
+        },
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
@@ -7312,6 +7552,12 @@
           }
         },
         "pt_BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "OK"
+          }
+        },
+        "ro" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "OK"
@@ -7873,10 +8119,22 @@
             "value" : "Aggiorna il link"
           }
         },
+        "mk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Освежи линк"
+          }
+        },
         "pt_BR" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Atualizar link"
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reîmprospătează linkul"
           }
         },
         "ru" : {
@@ -8475,6 +8733,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Escanear código QR"
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Scanează codul QR"
           }
         },
         "ru" : {
@@ -9534,7 +9798,7 @@
         "ro" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Trimite email"
+            "value" : "Trimite un e-mail"
           }
         },
         "ru" : {
@@ -9714,6 +9978,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Endereço do servidor"
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Adresa serverului"
           }
         },
         "ru" : {
@@ -10410,10 +10680,22 @@
             "value" : "Rimuovi la password"
           }
         },
+        "mk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Избриши лозинка"
+          }
+        },
         "pt_BR" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Remover senha"
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Elimină parola"
           }
         },
         "ru" : {
@@ -10874,7 +11156,7 @@
         "mk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Save"
+            "value" : "Зачувај"
           }
         },
         "mn" : {
@@ -10958,7 +11240,7 @@
         "ro" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Save"
+            "value" : "Salvează"
           }
         },
         "ru" : {
@@ -11137,7 +11419,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Partager « %1 »"
+            "value" : "Partager « %@ »"
           }
         },
         "ga" : {
@@ -11152,10 +11434,22 @@
             "value" : "Condividi \"%@\""
           }
         },
+        "mk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Сподели \"%@\""
+          }
+        },
         "pt_BR" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Compartilhar “%@”"
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Partajează „%@”"
           }
         },
         "ru" : {
@@ -11355,6 +11649,12 @@
             "value" : "Partilhar ficheiro"
           }
         },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Partajează fișierul"
+          }
+        },
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
@@ -11516,6 +11816,12 @@
             "value" : "Kopīgot mapi"
           }
         },
+        "mk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Сподели папка"
+          }
+        },
         "nb_NO" : {
           "stringUnit" : {
             "state" : "translated",
@@ -11532,6 +11838,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Compartilhar pasta"
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Partajează dosarul"
           }
         },
         "ru" : {
@@ -11830,7 +12142,7 @@
         "mk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Сподели ја врската"
+            "value" : "Сподели линк"
           }
         },
         "mn" : {
@@ -11884,7 +12196,7 @@
         "ro" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Partajază legătură"
+            "value" : "Partajează linkul"
           }
         },
         "ru" : {
@@ -12060,6 +12372,12 @@
             "value" : "Condividi collegamento (%lld)"
           }
         },
+        "mk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Сподели линк (%lld)"
+          }
+        },
         "pt_BR" : {
           "stringUnit" : {
             "state" : "translated",
@@ -12167,10 +12485,22 @@
             "value" : "Mostra i destinatari"
           }
         },
+        "mk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Прикажи примачи"
+          }
+        },
         "pt_BR" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Mostrar destinatários"
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Afișează destinatarii"
           }
         },
         "ru" : {
@@ -12274,6 +12604,12 @@
             "value" : "Essa alteração substituirá as configurações de permissão individuais de todos os destinatários deste compartilhamento."
           }
         },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Această modificare va înlocui setările individuale de permisiuni ale tuturor destinatarilor acestei partajări."
+          }
+        },
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
@@ -12373,6 +12709,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "O endereço do site Nextcloud ao abri-lo no navegador."
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Adresa interfeței web Nextcloud, așa cum apare când o deschizi în browser."
           }
         },
         "ru" : {
@@ -12476,6 +12818,12 @@
             "value" : "O endereço do servidor inserido é inválido."
           }
         },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Adresa de server introdusă este nevalidă."
+          }
+        },
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
@@ -12556,7 +12904,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Le lien peut être changé pour être plus simple à retenir, mais ne le définissez pas sur quelque chose de facile à deviner."
+            "value" : "Vous pouvez modifier le lien pour le rendre plus facile à retenir, mais évitez de choisir une valeur facile à deviner."
           }
         },
         "ga" : {
@@ -12575,6 +12923,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "O link pode ser alterado para ficar fácil de lembrar, mas não o defina como algo que seja fácil de adivinhar."
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Linkul poate fi modificat pentru a fi ușor de reținut, dar nu îl seta la ceva ușor de ghicit."
           }
         },
         "ru" : {
@@ -12657,7 +13011,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ce partage est limité à \"%1$@\". Vous pouvez accorder, au maximum, ce nombre d'autorisations."
+            "value" : "Ce partage est limité à « %1$@ ». Vous ne pouvez accorder que des autorisations identiques ou plus restreintes."
           }
         },
         "ga" : {
@@ -12676,6 +13030,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Essa compartilhamento está limitado a “%1$@”. Você só pode conceder as mesmas permissões ou menos do que essas."
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Această partajare este limitată la „%1$@”. Poți acorda doar aceleași permisiuni sau mai puține."
           }
         },
         "ru" : {
@@ -12773,10 +13133,22 @@
             "value" : "Questo destinatario verrà rimosso dalla condivisione."
           }
         },
+        "mk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Примачот ќе се острани од споделувањето."
+          }
+        },
         "pt_BR" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Esse destinatário será removido do compartilhamento."
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Acest destinatar va fi eliminat din partajare."
           }
         },
         "ru" : {
@@ -12859,7 +13231,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ce partage sera définitivement  supprimé."
+            "value" : "Ce partage sera définitivement supprimé."
           }
         },
         "ga" : {
@@ -12874,10 +13246,22 @@
             "value" : "Questo elemento condiviso verrà rimosso definitivamente."
           }
         },
+        "mk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ова споделување ќе биде трајно избришано."
+          }
+        },
         "pt_BR" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Esse compartilhamento será removido definitivamente."
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Această partajare va fi eliminată definitiv."
           }
         },
         "ru" : {
