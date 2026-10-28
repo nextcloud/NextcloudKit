@@ -6,6 +6,9 @@ import Foundation
 
 /// The `sharing` block of the server capabilities, describing unified-sharing support.
 public struct NKUnifiedSharingCapabilities: Codable, Sendable {
+    /// The unified-sharing API version this client implements.
+    static let unifiedShareApiVersion = "v1"
+
     public let apiVersions: [String]
     public let sourceTypes: [NKUnifiedShareSourceType]
     public let permissionPresets: [NKUnifiedSharePermissionPreset]

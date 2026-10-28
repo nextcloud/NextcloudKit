@@ -155,7 +155,13 @@ public extension NextcloudKit {
 
                         struct Governance: Codable {}
 
-                        struct Sharing: Codable {}
+                        struct Sharing: Codable {
+                            let apiVersions: [String]?
+
+                            enum CodingKeys: String, CodingKey {
+                                case apiVersions = "api_versions"
+                            }
+                        }
 
                         struct DownloadLimit: Codable {
                             let enabled: Bool?
@@ -399,7 +405,7 @@ public extension NextcloudKit {
             capabilities.fileSharingDownloadLimit = json.downloadLimit?.enabled ?? false
             capabilities.fileSharingDownloadLimitDefaultLimit = json.downloadLimit?.defaultLimit ?? 1
 
-            capabilities.unifiedSharingEnabled = json.sharing != nil
+            capabilities.unifiedSharingEnabled = json.sharing?.apiVersions?.contains(NKUnifiedSharingCapabilities.unifiedShareApiVersion) ?? false
 
             capabilities.themingColor = json.theming?.color ?? ""
             capabilities.themingColorElement = json.theming?.colorelement ?? ""
