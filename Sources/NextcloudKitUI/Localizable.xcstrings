@@ -1,7 +1,6 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
-    "" : {},
     "%lld groups" : {
       "comment" : "Recipient summary for multiple groups.",
       "localizations" : {
