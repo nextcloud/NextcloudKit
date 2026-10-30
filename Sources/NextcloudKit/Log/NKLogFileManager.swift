@@ -292,7 +292,7 @@ public final class NKLogFileManager: @unchecked Sendable {
 
         // Build the console line with emoji
         let consoleLine = "[NKLOG] [\(consoleTimestamp)] \(emoji)\(visualMessage)"
-        print(consoleLine)
+        NSLog("%@", consoleLine)
 
         if consoleOnly {
             return
