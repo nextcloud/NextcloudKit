@@ -160,7 +160,7 @@ public extension NextcloudKit {
         switch response.result {
         case .failure(let afError):
             let nkErr = NKError(error: afError, afResponse: response, responseData: response.data)
-            return (account, nil, nkErr)
+            return (account, nil, nkErr.markAsUserFriendlyServerMessage())
         case .success(let data):
             do {
                 let decoder = JSONDecoder()

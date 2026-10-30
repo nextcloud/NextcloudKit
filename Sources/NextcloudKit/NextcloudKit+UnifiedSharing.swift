@@ -97,7 +97,7 @@ public extension NextcloudKit {
 
         switch response.result {
         case .failure(let error):
-            return (account, nil, response, unifiedShareError(from: response, error: error))
+            return (account, nil, response, NKError(error: error, afResponse: response, responseData: response.data))
         case .success(let data):
             do {
                 let wrap = try JSONDecoder().decode(NKOCSWrapper<[NKUnifiedShareRecipient]>.self, from: data)
@@ -135,7 +135,7 @@ public extension NextcloudKit {
 
         switch response.result {
         case .failure(let error):
-            return (account, nil, response, unifiedShareError(from: response, error: error))
+            return (account, nil, response, NKError(error: error, afResponse: response, responseData: response.data))
         case .success(let data):
             do {
                 let wrap = try JSONDecoder().decode(NKOCSWrapper<String>.self, from: data)
@@ -176,7 +176,7 @@ public extension NextcloudKit {
 
         switch response.result {
         case .failure(let error):
-            return (account, nil, response, unifiedShareError(from: response, error: error))
+            return (account, nil, response, NKError(error: error, afResponse: response, responseData: response.data))
         case .success(let data):
             do {
                 let wrap = try JSONDecoder().decode(NKOCSWrapper<CapabilitiesEnvelope>.self, from: data)
@@ -294,7 +294,7 @@ public extension NextcloudKit {
 
         switch response.result {
         case .failure(let error):
-            return (account, response, unifiedShareError(from: response, error: error))
+            return (account, response, NKError(error: error, afResponse: response, responseData: response.data))
         case .success:
             return (account, response, .success)
         }
@@ -591,7 +591,7 @@ public extension NextcloudKit {
     ) -> (account: String, share: NKUnifiedShare?, responseData: AFDataResponse<Data>?, error: NKError) {
         switch response.result {
         case .failure(let error):
-            return (account, nil, response, unifiedShareError(from: response, error: error))
+            return (account, nil, response, NKError(error: error, afResponse: response, responseData: response.data))
         case .success(let data):
             do {
                 let wrap = try JSONDecoder().decode(NKOCSWrapper<NKUnifiedShare>.self, from: data)
@@ -605,16 +605,6 @@ public extension NextcloudKit {
         }
     }
 
-    /// Unified-sharing error bodies carry the message as the whole `ocs.data` string.
-    private func unifiedShareError(from response: AFDataResponse<Data>, error: AFError) -> NKError {
-        if let data = response.data,
-           let wrap = try? JSONDecoder().decode(NKOCSWrapper<String>.self, from: data),
-           !wrap.ocs.data.isEmpty {
-            return NKError(errorCode: wrap.ocs.meta.statuscode, errorDescription: wrap.ocs.data, responseData: data)
-        }
-
-        return NKError(error: error, afResponse: response, responseData: response.data)
-    }
 
     /// Decode an OCS response containing an array of `Share`.
     private func decodeUnifiedShareList(response: AFDataResponse<Data>,
@@ -622,7 +612,7 @@ public extension NextcloudKit {
     ) -> (account: String, shares: [NKUnifiedShare]?, responseData: AFDataResponse<Data>?, error: NKError) {
         switch response.result {
         case .failure(let error):
-            return (account, nil, response, unifiedShareError(from: response, error: error))
+            return (account, nil, response, NKError(error: error, afResponse: response, responseData: response.data))
         case .success(let data):
             do {
                 let wrap = try JSONDecoder().decode(NKOCSWrapper<[NKUnifiedShare]>.self, from: data)

@@ -25,10 +25,10 @@ public enum NKLogLevel: Int, CaseIterable, Identifiable, Comparable {
     // For Picker display
     public var displayText: String {
         switch self {
-        case .disabled: return NSLocalizedString("_disabled_", comment: "")
-        case .compact: return NSLocalizedString("_compact_", comment: "")
-        case .normal: return NSLocalizedString("_normal_", comment: "")
-        case .verbose: return NSLocalizedString("_verbose_", comment: "")
+        case .disabled: return NSLocalizedString("Disabled", bundle: .module, comment: "Log level that turns logging off.")
+        case .compact: return NSLocalizedString("Compact", bundle: .module, comment: "Log level that logs only the essentials.")
+        case .normal: return NSLocalizedString("Normal", bundle: .module, comment: "Default log level.")
+        case .verbose: return NSLocalizedString("Verbose", bundle: .module, comment: "Log level that logs everything, for debugging.")
         }
     }
 

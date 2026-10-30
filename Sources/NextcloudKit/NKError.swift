@@ -30,7 +30,9 @@ extension OCSPath {
     static var ocsMetaCode: Self { ["ocs", "meta", "statuscode"] }
     static var ocsMetaMsg: Self { ["ocs", "meta", "message"] }
     static var ocsDataMsg: Self { ["ocs", "data", "message"] }
+    static var ocsData: Self { ["ocs", "data"] }
     static var ocsXMLMsg: Self { ["d:error", "s:message"] }
+    static var davException: Self { ["d:error", "s:exception"] }
 }
 
 public struct NKError: Error, Equatable, Sendable {
@@ -41,128 +43,160 @@ public struct NKError: Error, Equatable, Sendable {
     public let error: Error
     public let responseData: Data?
 
-    public static let urlError = NKError(errorCode: NSURLErrorBadURL, errorDescription: NSLocalizedString("_invalid_url_", value: "Invalid server url", comment: ""))
-    public static let invalidResponseError = NKError(errorCode: NSURLErrorBadServerResponse, errorDescription: NSLocalizedString("_error_response_", value: "Invalid response", comment: ""))
-    public static let xmlError = NKError(errorCode: NSURLErrorBadServerResponse, errorDescription: NSLocalizedString("_error_decode_xml_", value: "Invalid response, error decoding XML", comment: ""))
-    public static let invalidDate = NKError(errorCode: NSURLErrorBadServerResponse, errorDescription: NSLocalizedString("_invalid_date_format_", value: "Invalid date format", comment: ""))
-    public static let invalidData = NKError(errorCode: NSURLErrorCannotDecodeContentData, errorDescription: NSLocalizedString("_invalid_data_format_", value: "Invalid data format", comment: ""))
-    public static let unauthorizedError = NKError(errorCode: 401, errorDescription: NSLocalizedString("_unauthorized_", value: "Unauthorized", comment: ""))
-    public static let unavailableError = NKError(errorCode: 503, errorDescription: NSLocalizedString("_Unavailable_", value: "Unavailable", comment: ""))
-    public static let forbiddenError = NKError(errorCode: 403, errorDescription: NSLocalizedString("_forbidden_", value: "Forbidden", comment: ""))
-    public static let cancelled = NKError(errorCode: -999, errorDescription: NSLocalizedString("_cancelled_", value: "Cancelled", comment: ""))
+    /// What went wrong, for choosing the message shown to users; `nil` for ``success``.
+    public let kind: Kind?
+    /// The OCS message the server sent with the error.
+    private let serverMessage: String?
+    /// The URL path of the request that failed, when known.
+    private var requestPath: String?
+    /// Whether the server wrote ``serverMessage`` for users, e.g. a server app's client integration action.
+    private var isUserFriendlyServerMessage = false
 
-    public static let errorChunkFileNull = NKError(errorCode: -9994, errorDescription: NSLocalizedString("_error_file_null_", value: "File not found", comment: ""))
-    public static let errorChunkFilesEmpty = NKError(errorCode: -9995, errorDescription: NSLocalizedString("_chunk_files_empty_", value: "Files not found", comment: ""))
-    public static let errorChunkCreateFolder = NKError(errorCode: -9996, errorDescription: NSLocalizedString("_error_create_folder_", value: "Create folder error", comment: ""))
-    public static let errorChunkMoveFile = NKError(errorCode: -9997, errorDescription: NSLocalizedString("_error_move_folder_", value: "Move file error", comment: ""))
-    public static let errorChunkNoEnoughMemory = NKError(errorCode: -9998, errorDescription: NSLocalizedString("_no_enough_memory_", value: "No enough memory", comment: ""))
+    public static let urlError = NKError(errorCode: NSURLErrorBadURL, errorDescription: "Invalid server URL")
+    public static let invalidResponseError = NKError(errorCode: NSURLErrorBadServerResponse, errorDescription: "Invalid response")
+    public static let xmlError = NKError(errorCode: NSURLErrorBadServerResponse, errorDescription: "Invalid response, error decoding XML")
+    public static let invalidDate = NKError(errorCode: NSURLErrorBadServerResponse, errorDescription: "Invalid date format")
+    public static let invalidData = NKError(errorCode: NSURLErrorCannotDecodeContentData, errorDescription: "Invalid data format")
+    public static let unauthorizedError = NKError(errorCode: 401, errorDescription: "Unauthorized")
+    public static let unavailableError = NKError(errorCode: 503, errorDescription: "Unavailable")
+    public static let forbiddenError = NKError(errorCode: 403, errorDescription: "Forbidden")
+    public static let cancelled = NKError(errorCode: -999, errorDescription: "Cancelled")
+
+    public static let errorChunkFileNull = NKError(errorCode: -9994, errorDescription: "File not found")
+    public static let errorChunkFilesEmpty = NKError(errorCode: -9995, errorDescription: "Files not found")
+    public static let errorChunkCreateFolder = NKError(errorCode: -9996, errorDescription: "Create folder error")
+    public static let errorChunkMoveFile = NKError(errorCode: -9997, errorDescription: "Move file error")
+    public static let errorChunkNoEnoughMemory = NKError(errorCode: -9998, errorDescription: "Not enough memory", kind: .localStorageFull)
 
     public static let success = NKError(errorCode: 0, errorDescription: "")
 
-    /// Returns a localized user-facing description for a known error code.
+    /// The server's message where it's written for users: the share API, unified sharing's property updates and
+    /// server apps' client integration actions. Other server texts are technical.
+    public var userFriendlyServerMessage: String? {
+        if isUserFriendlyServerMessage, ![.unauthorized, .serverError, .unavailable].contains(kind) {
+            return serverMessage
+        }
+
+        guard let requestPath else { return nil }
+
+        let isShareAPI = requestPath.contains("/apps/files_sharing/api/v1/shares")
+        let isUnifiedShareProperty = requestPath.contains("/apps/sharing/api/v1/share/") && requestPath.hasSuffix("/property")
+
+        return isShareAPI || isUnifiedShareProperty ? serverMessage : nil
+    }
+
+    /// The same error, with its server message marked as written for users.
+    func markAsUserFriendlyServerMessage() -> NKError {
+        var error = self
+        error.isUserFriendlyServerMessage = true
+
+        return error
+    }
+
+    /// Returns the English description of a known error code, for logs.
     ///
     /// - Parameter code: The HTTP, URL loading, WebDAV, OCS, or internal error code.
-    /// - Returns: A localized description when the code is known, otherwise `nil`.
+    /// - Returns: A description when the code is known, otherwise `nil`.
     public static func getErrorDescription(for code: Int) -> String? {
         switch code {
         case -9999:
-            return NSLocalizedString("_internal_server_", value: "Internal error", comment: "")
+            return "Internal error"
 
         case -1001:
-            return NSLocalizedString("_time_out_", value: "Time out", comment: "")
+            return "Time out"
 
         case -1004:
-            return NSLocalizedString("_server_down_", value: "The server appears to be down", comment: "")
+            return "The server appears to be down"
 
         case -1005:
-            return NSLocalizedString("_not_possible_connect_to_server_", value: "It is not possible to connect to the server at this time", comment: "")
+            return "It is not possible to connect to the server at this time"
 
         case -1009:
-            return NSLocalizedString("_not_connected_internet_", value: "Server connection error", comment: "")
+            return "Server connection error"
 
         case -1011:
-            return NSLocalizedString("_error_", value: "Generic error", comment: "")
+            return "Generic error"
 
         case -1012:
-            return NSLocalizedString("_not_possible_connect_to_server_", value: "It is not possible to connect to the server at this time", comment: "")
+            return "It is not possible to connect to the server at this time"
 
         case -1013:
-            return NSLocalizedString("_user_authentication_required_", value: "User authentication required", comment: "")
+            return "User authentication required"
 
         case -1200:
-            return NSLocalizedString("_ssl_connection_error_", value: "Connection SSL error, try again", comment: "")
+            return "Connection SSL error, try again"
 
         case -1202:
-            return NSLocalizedString("_ssl_certificate_untrusted_", value: "The certificate for this server is invalid", comment: "")
+            return "The certificate for this server is invalid"
 
         case 0:
             return ""
 
         case 101:
-            return NSLocalizedString("_forbidden_characters_from_server_", value: "The name contains at least one invalid character", comment: "")
+            return "The name contains at least one invalid character"
 
         case 200:
-            return NSLocalizedString("_transfer_stopped_", value: "Transfer stopped", comment: "")
+            return "Transfer stopped"
 
         case 207:
-            return NSLocalizedString("_error_multi_status_", value: "WebDAV multistatus", comment: "")
+            return "WebDAV multistatus"
 
         case 304:
-            return NSLocalizedString("_error_not_modified_", value: "Resource not modified", comment: "")
+            return "Resource not modified"
 
         case 400:
-            return NSLocalizedString("_bad_request_", value: "Bad request", comment: "")
+            return "Bad request"
 
         case 401:
-            return NSLocalizedString("_unauthorized_", value: "Unauthorized", comment: "")
+            return "Unauthorized"
 
         case 403:
-            return NSLocalizedString("_error_not_permission_", value: "You don't have permission to complete the operation", comment: "")
+            return "You don't have permission to complete the operation"
 
         case 404:
-            return NSLocalizedString("_error_not_found_", value: "The requested resource could not be found", comment: "")
+            return "The requested resource could not be found"
 
         case 405:
-            return NSLocalizedString("_method_not_allowed_", value: "The requested method is not supported", comment: "")
+            return "The requested method is not supported"
 
         case 408:
-            return NSLocalizedString("_request_timeout_", value: "Request timeout", comment: "")
+            return "Request timeout"
 
         case 409:
-            return NSLocalizedString("_error_conflict_", value: "The request could not be completed due to a conflict with the current state of the resource", comment: "")
+            return "The request could not be completed due to a conflict with the current state of the resource"
 
         case 412:
-            return NSLocalizedString("_error_precondition_", value: "The server does not meet one of the preconditions that the requester", comment: "")
+            return "The server does not meet one of the preconditions of the request"
 
         case 413:
-            return NSLocalizedString("_request_entity_too_large_", value: "The file is too large", comment: "")
+            return "The file is too large"
 
         case 417:
-            return NSLocalizedString("_expectation_failed_", value: "Expectation failed", comment: "")
+            return "Expectation failed"
 
         case 423:
-            return NSLocalizedString("_webdav_locked_", value: "WebDAV Locked: Trying to access locked resource", comment: "")
+            return "WebDAV Locked: Trying to access locked resource"
 
         case 429:
-            return NSLocalizedString("_too_many_requests_", value: "Too many requests", comment: "")
+            return "Too many requests"
 
         case 500:
-            return NSLocalizedString("_internal_server_", value: "Internal server error", comment: "")
+            return "Internal server error"
 
         case 502:
-            return NSLocalizedString("_bad_gateway_", value: "Bad gateway", comment: "")
+            return "Bad gateway"
 
         case 503:
-            return NSLocalizedString("_server_maintenance_mode_", value: "Server is currently in maintenance mode", comment: "")
+            return "Server is currently in maintenance mode"
 
         case 504:
-            return NSLocalizedString("_gateway_timeout_", value: "Gateway timeout", comment: "")
+            return "Gateway timeout"
 
         case 507:
-            return NSLocalizedString("_user_over_quota_", value: "Storage quota is reached", comment: "")
+            return "Storage quota is reached"
 
         case NSURLErrorCannotDecodeContentData:
-            return NSLocalizedString("_invalid_data_format_", value: "Invalid data format", comment: "")
+            return "Invalid data format"
 
         default:
             return nil
@@ -180,19 +214,26 @@ public struct NKError: Error, Equatable, Sendable {
         let description = HTTPURLResponse.localizedString(forStatusCode: statusCode)
 
         if description.isEmpty {
-            return NSLocalizedString("_error_", value: "Generic error", comment: "")
+            return "Generic error"
         }
 
         return description
+    }
+
+    private static func firstNonEmpty(_ candidates: String?...) -> String? {
+        candidates
+            .compactMap { $0?.trimmingCharacters(in: .whitespacesAndNewlines) }
+            .first { !$0.isEmpty }
     }
 
     /// Creates an `NKError` from an explicit code and description.
     ///
     /// - Parameters:
     ///   - errorCode: The error code.
-    ///   - errorDescription: The user-facing error description.
+    ///   - errorDescription: The error description, mostly for logs.
     ///   - responseData: Optional raw response data associated with the error.
-    public init(errorCode: Int = 0, errorDescription: String = "", responseData: Data? = nil) {
+    ///   - kind: The kind of failure; derived from `errorCode` when `nil`.
+    public init(errorCode: Int = 0, errorDescription: String = "", responseData: Data? = nil, kind: Kind? = nil) {
         self.errorCode = errorCode
         self.errorDescription = errorDescription
         self.error = NSError(
@@ -201,6 +242,8 @@ public struct NKError: Error, Equatable, Sendable {
             userInfo: [NSLocalizedDescriptionKey: self.errorDescription]
         )
         self.responseData = responseData
+        self.kind = kind ?? Kind(code: errorCode)
+        self.serverMessage = nil
     }
 
     /// Creates an `NKError` from a generic Swift `Error`.
@@ -213,6 +256,8 @@ public struct NKError: Error, Equatable, Sendable {
         self.errorDescription = error.localizedDescription
         self.error = error
         self.responseData = responseData
+        self.kind = Kind(error: error)
+        self.serverMessage = nil
     }
 
     /// Creates an `NKError` from an `NSError`.
@@ -225,6 +270,8 @@ public struct NKError: Error, Equatable, Sendable {
         self.errorDescription = nsError.localizedDescription
         self.error = nsError
         self.responseData = responseData
+        self.kind = Kind(error: nsError)
+        self.serverMessage = nil
     }
 
     /// Creates an `NKError` from an OCS JSON response.
@@ -237,13 +284,9 @@ public struct NKError: Error, Equatable, Sendable {
         let statuscode = rootJson[.ocsMetaCode].int ?? fallbackStatusCode ?? NSURLErrorCannotDecodeContentData
         errorCode = 200..<300 ~= statuscode ? 0 : statuscode
 
-        if let dataMsg = rootJson[.ocsDataMsg].string {
-            errorDescription = dataMsg
-        } else if let metaMsg = rootJson[.ocsMetaMsg].string {
-            errorDescription = metaMsg
-        } else {
-            errorDescription = NKError.getErrorDescription(for: statuscode) ?? NKError.httpFallbackDescription(for: statuscode)
-        }
+        let message = NKError.firstNonEmpty(rootJson[.ocsDataMsg].string, rootJson[.ocsData].string, rootJson[.ocsMetaMsg].string)
+
+        errorDescription = message ?? NKError.getErrorDescription(for: statuscode) ?? NKError.httpFallbackDescription(for: statuscode)
 
         self.responseData = responseData
         self.error = NSError(
@@ -251,6 +294,8 @@ public struct NKError: Error, Equatable, Sendable {
             code: self.errorCode,
             userInfo: [NSLocalizedDescriptionKey: self.errorDescription]
         )
+        self.kind = errorCode == 0 ? nil : Kind(code: statuscode)
+        self.serverMessage = message
     }
 
     /// Creates an `NKError` from an HTTP status code.
@@ -272,6 +317,8 @@ public struct NKError: Error, Equatable, Sendable {
         )
 
         self.responseData = responseData
+        self.kind = Kind(code: statusCode)
+        self.serverMessage = nil
     }
 
     /// Creates an `NKError` from an HTTP response.
@@ -289,8 +336,9 @@ public struct NKError: Error, Equatable, Sendable {
     /// - Parameters:
     ///   - xmlData: The raw XML response data.
     ///   - fallbackStatusCode: The fallback HTTP status code used when the OCS status code is missing.
+    ///   - request: The request, which tells some WebDAV statuses apart.
     ///   - responseData: Optional raw response data associated with the error.
-    init(xmlData: Data, fallbackStatusCode: Int? = nil, responseData: Data? = nil) {
+    init(xmlData: Data, fallbackStatusCode: Int? = nil, request: URLRequest? = nil, responseData: Data? = nil) {
         let xml = XML.parse(xmlData)
         let statuscode = xml[.ocsMetaCode].int ?? fallbackStatusCode ?? NSURLErrorCannotDecodeContentData
         errorCode = 200..<300 ~= statuscode ? 0 : statuscode
@@ -311,6 +359,8 @@ public struct NKError: Error, Equatable, Sendable {
             code: self.errorCode,
             userInfo: [NSLocalizedDescriptionKey: self.errorDescription]
         )
+        self.kind = errorCode == 0 ? nil : Kind(davException: xml[.davException].text) ?? Kind(code: statuscode, request: request)
+        self.serverMessage = nil
     }
 
     /// Creates an `NKError` from an Alamofire response and optional Alamofire error.
@@ -320,22 +370,21 @@ public struct NKError: Error, Equatable, Sendable {
     ///   - afResponse: The Alamofire response.
     ///   - responseData: Optional raw response data associated with the error.
     public init<T: AFResponse>(error: AFError?, afResponse: T, responseData: Data? = nil) {
+        let dataResponse = afResponse as? Alamofire.DataResponse<T.Success, T.Failure>
+
         if let errorCode = afResponse.response?.statusCode {
-            guard let dataResponse = afResponse as? Alamofire.DataResponse<T.Success, T.Failure>,
-                  let errorData = dataResponse.data
-            else {
+            if let errorData = dataResponse?.data {
+                if let errorJson = try? JSON(data: errorData) {
+                    self.init(rootJson: errorJson, fallbackStatusCode: errorCode, responseData: responseData)
+                } else {
+                    self.init(xmlData: errorData, fallbackStatusCode: errorCode, request: dataResponse?.request, responseData: responseData)
+                }
+            } else {
                 self.init(
                     statusCode: errorCode,
                     fallbackDescription: Self.httpFallbackDescription(for: errorCode),
                     responseData: responseData
                 )
-                return
-            }
-
-            if let errorJson = try? JSON(data: errorData) {
-                self.init(rootJson: errorJson, fallbackStatusCode: errorCode, responseData: responseData)
-            } else {
-                self.init(xmlData: errorData, fallbackStatusCode: errorCode, responseData: responseData)
             }
 
         } else if let error = error {
@@ -361,6 +410,8 @@ public struct NKError: Error, Equatable, Sendable {
         } else {
             self.init(errorCode: 0, errorDescription: "", responseData: responseData)
         }
+
+        requestPath = dataResponse?.request?.url?.path
     }
 
     public static func == (lhs: NKError, rhs: NKError) -> Bool {

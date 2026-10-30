@@ -286,12 +286,12 @@ public extension NextcloudKit {
                 }
 
                 guard let endpointString, let endpointURL = URL(string: endpointString) else {
-                    continuation.resume(throwing: NKError.urlError)
+                    continuation.resume(throwing: NKError.invalidResponseError)
                     return
                 }
 
                 guard let loginString, let loginURL = URL(string: loginString) else {
-                    continuation.resume(throwing: NKError.urlError)
+                    continuation.resume(throwing: NKError.invalidResponseError)
                     return
                 }
 

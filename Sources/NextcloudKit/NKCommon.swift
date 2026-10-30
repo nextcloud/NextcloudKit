@@ -162,7 +162,7 @@ public struct NKCommon: Sendable {
         @inline(__always)
         func checkCancelled() throws {
             if Task.isCancelled {
-                throw NKError(errorCode: -5, errorDescription: "Chunking was cancelled.")
+                throw NKError(errorCode: -5, errorDescription: "Chunking was cancelled.", kind: .cancelled)
             }
         }
 
@@ -247,11 +247,11 @@ public struct NKCommon: Sendable {
             case -2:
                 throw NKError(errorCode: -2, errorDescription: "Failed to open the output chunk file for writing.")
             case -3:
-                throw NKError(errorCode: -3, errorDescription: "There is not enough available disk space to proceed.")
+                throw NKError(errorCode: -3, errorDescription: "There is not enough available disk space to proceed.", kind: .localStorageFull)
             case -4:
                 throw NKError(errorCode: -4, errorDescription: "Failed to write data to chunk file.")
             case -5:
-                throw NKError(errorCode: -5, errorDescription: "Chunking was cancelled.")
+                throw NKError(errorCode: -5, errorDescription: "Chunking was cancelled.", kind: .cancelled)
             default:
                 continue
             }

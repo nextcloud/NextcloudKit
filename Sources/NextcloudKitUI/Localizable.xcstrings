@@ -7376,6 +7376,17 @@
         }
       }
     },
+    "No server was found at this address." : {
+      "comment" : "Login error message when the entered address does not point to a Nextcloud server.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No server was found at this address."
+          }
+        }
+      }
+    },
     "Not Shared Yet" : {
       "comment" : "Empty-state title shown when a file or folder has no unified shares.",
       "localizations" : {

@@ -1,8 +1,14 @@
 [main]
 host = https://www.transifex.com
 
+[o:nextcloud:p:nextcloud:r:nextcloudkit]
+file_filter = translations/nextcloudkit/<lang>.xcstrings
+source_file = Sources/NextcloudKit/Localizable.xcstrings
+source_lang = en
+type        = XCSTRINGS
+
 [o:nextcloud:p:nextcloud:r:nextcloudkitui]
-file_filter = translations/<lang>.xcstrings
+file_filter = translations/nextcloudkitui/<lang>.xcstrings
 source_file = Sources/NextcloudKitUI/Localizable.xcstrings
 source_lang = en
 type        = XCSTRINGS
