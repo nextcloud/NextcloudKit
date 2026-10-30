@@ -26,7 +26,7 @@ public extension NKError {
             return NSLocalizedString("A secure connection to the server couldn't be established.", bundle: .module, comment: "Error message for TLS and certificate failures.")
 
         case .unauthorized:
-            return NSLocalizedString("Your login is no longer valid. Please log in again.", bundle: .module, comment: "Error message when the server rejects the account's credentials.")
+            return NSLocalizedString("Login was unsuccessful. Please try again.", bundle: .module, comment: "Error message when the server rejects the account's credentials.")
 
         case .forbidden:
             return NSLocalizedString("You don't have permission to do this.", bundle: .module, comment: "Error message when the server forbids the action.")
@@ -41,7 +41,7 @@ public extension NKError {
             return NSLocalizedString("This name isn't allowed.", bundle: .module, comment: "Error message when the server rejects a file or folder name.")
 
         case .conflict:
-            return NSLocalizedString("The file or folder has changed on the server. Please refresh and try again.", bundle: .module, comment: "Error message when the request conflicts with the current state on the server.")
+            return NSLocalizedString("The operation could not be completed because of a server conflict. Please refresh and try again.", bundle: .module, comment: "Error message when the request conflicts with the current state on the server.")
 
         case .locked:
             return NSLocalizedString("The file is locked. Try again later.", bundle: .module, comment: "Error message when the file is locked on the server.")

@@ -89,6 +89,17 @@
         }
       }
     },
+    "Login was unsuccessful. Please try again." : {
+      "comment" : "Error message when the server rejects the account's credentials.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Login was unsuccessful. Please try again."
+          }
+        }
+      }
+    },
     "Name contains an invalid character: \"%@\"." : {
       "comment" : "Error message when a name contains a forbidden character. %@ is the character.",
       "localizations" : {
@@ -166,13 +177,13 @@
         }
       }
     },
-    "The file or folder has changed on the server. Please refresh and try again." : {
+    "The operation could not be completed because of a server conflict. Please refresh and try again." : {
       "comment" : "Error message when the request conflicts with the current state on the server.",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "The file or folder has changed on the server. Please refresh and try again."
+            "value" : "The operation could not be completed because of a server conflict. Please refresh and try again."
           }
         }
       }
@@ -305,17 +316,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "You're offline. Please check your internet connection."
-          }
-        }
-      }
-    },
-    "Your login is no longer valid. Please log in again." : {
-      "comment" : "Error message when the server rejects the account's credentials.",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Your login is no longer valid. Please log in again."
           }
         }
       }
