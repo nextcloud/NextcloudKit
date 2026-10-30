@@ -34,7 +34,9 @@ struct SharedAccountsView: View {
                                     .resizable()
                                     .aspectRatio(contentMode: .fit)
                                     .frame(width: 40, height: 40)
+                                    .clipShape(Capsule())
                                     .padding(.trailing, 8)
+
 
                                 VStack(alignment: .leading) {
                                     Text(sharedAccount.name)
@@ -48,7 +50,7 @@ struct SharedAccountsView: View {
                             .padding()
                         }
                         .buttonStyle(PlainButtonStyle())
-                        .background(.ultraThickMaterial)
+                        .background(.thickMaterial)
                         .clipShape(Capsule())
                         .padding(.horizontal)
                     }
@@ -57,6 +59,7 @@ struct SharedAccountsView: View {
                     .navigationBarTitleDisplayMode(.inline)
 #endif
                 }
+                .contentMargins(.top, 20, for: .scrollContent)
             }
         }
     }
@@ -66,7 +69,7 @@ struct SharedAccountsView: View {
 
     // swiftlint:disable force_unwrapping
     let accounts = [
-        SharedAccount("jane", on: URL(string: "http://localhost:8080")!, with: Image(systemName: "person.circle.fill")),
+        SharedAccount("jane", on: URL(string: "http://localhost:8080")!, with: Image(systemName: "square")),
         SharedAccount("john", on: URL(string: "http://localhost:8081")!, with: Image(systemName: "bird.circle.fill")),
         SharedAccount("jean", on: URL(string: "http://localhost:8082")!, with: Image(systemName: "leaf.circle.fill"))
     ]
