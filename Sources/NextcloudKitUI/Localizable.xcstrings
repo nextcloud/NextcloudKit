@@ -230,6 +230,12 @@
     "%lld people" : {
       "comment" : "Recipient summary for multiple people.",
       "localizations" : {
+        "cs_CZ" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld lidé"
+          }
+        },
         "da" : {
           "stringUnit" : {
             "state" : "translated",
@@ -682,6 +688,12 @@
     "Accounts" : {
       "comment" : "Navigation title for the list of configured Nextcloud accounts.",
       "localizations" : {
+        "cs_CZ" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Účty"
+          }
+        },
         "da" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1293,232 +1305,6 @@
         }
       }
     },
-    "Apply permissions to all recipients?" : {
-      "comment" : "Confirmation title shown before replacing every recipient's individual permissions.",
-      "localizations" : {
-        "da" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Anvend rettighederne på alle modtagere?"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Berechtigungen auf alle Empfänger anwenden"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Apply permissions to all recipients?"
-          }
-        },
-        "en_GB" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Apply permissions to all recipients?"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "¿Aplicar permisos a todos los destinatarios?"
-          }
-        },
-        "et_EE" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Kas rakendad õigusi kõikidele saajatele?"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Appliquer les autorisations à tous les destinataires ?"
-          }
-        },
-        "ga" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Cuir ceadanna i bhfeidhm ar gach faighteoir?"
-          }
-        },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Applicare le autorizzazioni a tutti i destinatari?"
-          }
-        },
-        "mk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Примени за сите примачи?"
-          }
-        },
-        "pt_BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Aplicar permissões a todos os destinatários?"
-          }
-        },
-        "ro" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Aplici permisiunile tuturor destinatarilor?"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Применить разрешения ко всем получателям?"
-          }
-        },
-        "sk_SK" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Použiť oprávnenia na všetkých príjemcov?"
-          }
-        },
-        "sv" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Tillämpa behörigheterna för alla mottagare?"
-          }
-        },
-        "tr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "İzinler tüm alıcılara uygulansın mı?"
-          }
-        },
-        "zh_HK" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "要將權限套用至所有接收者嗎？"
-          }
-        },
-        "zh_TW" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "套用權限至所有收件人？"
-          }
-        }
-      }
-    },
-    "Apply to all" : {
-      "comment" : "Button that confirms applying top-level permissions to every recipient.",
-      "localizations" : {
-        "da" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Anvend på alle"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Auf alle anwenden"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Apply to all"
-          }
-        },
-        "en_GB" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Apply to all"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Aplicar a todos"
-          }
-        },
-        "et_EE" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Rakenda kõigile"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Appliquer à tous"
-          }
-        },
-        "ga" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Cuir i bhfeidhm ar gach rud"
-          }
-        },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Applicare a tutti"
-          }
-        },
-        "mk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Примени за сите"
-          }
-        },
-        "pt_BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Aplicar a todos"
-          }
-        },
-        "ro" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Aplică tuturor"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Применить ко всем"
-          }
-        },
-        "sk_SK" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Použiť na všetko"
-          }
-        },
-        "sv" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Tillämpa för alla"
-          }
-        },
-        "tr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Tümüne uygula"
-          }
-        },
-        "zh_HK" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "套用至全部"
-          }
-        },
-        "zh_TW" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "套用至全部"
-          }
-        }
-      }
-    },
     "Anyone" : {
       "comment" : "Audience option that makes a unified share accessible to anyone with its public link.",
       "localizations" : {
@@ -1754,6 +1540,232 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "任何人"
+          }
+        }
+      }
+    },
+    "Apply permissions to all recipients?" : {
+      "comment" : "Confirmation title shown before replacing every recipient's individual permissions.",
+      "localizations" : {
+        "da" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Anvend rettighederne på alle modtagere?"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Berechtigungen auf alle Empfänger anwenden"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Apply permissions to all recipients?"
+          }
+        },
+        "en_GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Apply permissions to all recipients?"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¿Aplicar permisos a todos los destinatarios?"
+          }
+        },
+        "et_EE" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kas rakendad õigusi kõikidele saajatele?"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Appliquer les autorisations à tous les destinataires ?"
+          }
+        },
+        "ga" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cuir ceadanna i bhfeidhm ar gach faighteoir?"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Applicare le autorizzazioni a tutti i destinatari?"
+          }
+        },
+        "mk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Примени за сите примачи?"
+          }
+        },
+        "pt_BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aplicar permissões a todos os destinatários?"
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aplici permisiunile tuturor destinatarilor?"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Применить разрешения ко всем получателям?"
+          }
+        },
+        "sk_SK" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Použiť oprávnenia na všetkých príjemcov?"
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tillämpa behörigheterna för alla mottagare?"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "İzinler tüm alıcılara uygulansın mı?"
+          }
+        },
+        "zh_HK" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "要將權限套用至所有接收者嗎？"
+          }
+        },
+        "zh_TW" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "套用權限至所有收件人？"
+          }
+        }
+      }
+    },
+    "Apply to all" : {
+      "comment" : "Button that confirms applying top-level permissions to every recipient.",
+      "localizations" : {
+        "da" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Anvend på alle"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Auf alle anwenden"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Apply to all"
+          }
+        },
+        "en_GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Apply to all"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aplicar a todos"
+          }
+        },
+        "et_EE" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rakenda kõigile"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Appliquer à tous"
+          }
+        },
+        "ga" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cuir i bhfeidhm ar gach rud"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Applicare a tutti"
+          }
+        },
+        "mk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Примени за сите"
+          }
+        },
+        "pt_BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aplicar a todos"
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aplică tuturor"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Применить ко всем"
+          }
+        },
+        "sk_SK" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Použiť na všetko"
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tillämpa för alla"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tümüne uygula"
+          }
+        },
+        "zh_HK" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "套用至全部"
+          }
+        },
+        "zh_TW" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "套用至全部"
           }
         }
       }
@@ -2399,325 +2411,517 @@
         }
       }
     },
-    "Custom permissions" : {
-      "comment" : "Menu option that reveals per-permission toggles for custom permissions.",
+    "Continue" : {
+      "comment" : "Button label to leave the onboarding screen.",
       "localizations" : {
+        "af" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gaan voort"
+          }
+        },
+        "an" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Continar"
+          }
+        },
         "ar" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "أذونات مخصصة"
+            "value" : "متابعة"
           }
         },
         "ast" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Personlizar los permisos"
+            "value" : "Siguir"
           }
         },
         "az" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Xüsusi icazələr"
+            "value" : "Davam et"
+          }
+        },
+        "be" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Працягнуць"
           }
         },
         "bg_BG" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Персонализиране на права"
+            "value" : "Продължаване"
+          }
+        },
+        "bn_BD" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "চালিয়ে যাও"
+          }
+        },
+        "br" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kendec'hel"
+          }
+        },
+        "bs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nastavi"
           }
         },
         "ca" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Permisos personalitzats"
+            "value" : "Continuar"
           }
         },
         "cs_CZ" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Uživatelsky určená oprávnění"
+            "value" : "Pokračovat"
           }
         },
         "da" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Brugerdefinerede rettigheder"
+            "value" : "Fortsæt"
           }
         },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Benutzerdefinierte Berechtigungen"
+            "value" : "Fortsetzen"
           }
         },
         "el" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Προσαρμοσμένα δικαιώματα"
+            "value" : "Συνέχεια"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Custom permissions"
+            "value" : "Continue"
           }
         },
         "en_GB" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Custom permissions"
+            "value" : "Continue"
+          }
+        },
+        "eo" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Daŭrigi"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Permisos personalizados"
+            "value" : "Continuar"
+          }
+        },
+        "es_419" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Continuar"
+          }
+        },
+        "es_AR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Continuar"
+          }
+        },
+        "es_CR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Continuar"
           }
         },
         "es_EC" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Permisos personalizados"
+            "value" : "Continuar"
+          }
+        },
+        "es_GT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Continuar"
           }
         },
         "es_MX" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Permisos personalizados"
+            "value" : "Continuar"
+          }
+        },
+        "es_NI" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Continuar"
+          }
+        },
+        "es_PA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Continuar"
+          }
+        },
+        "es_PE" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Continuar"
+          }
+        },
+        "es_PR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Continuar"
+          }
+        },
+        "es_PY" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Continuar"
+          }
+        },
+        "es_SV" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Continuar"
+          }
+        },
+        "es_UY" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Continuar"
           }
         },
         "et_EE" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Kohandatud õigused"
+            "value" : "Jätka"
           }
         },
         "eu" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Baimen pertsonalizatuak"
+            "value" : "Jarraitu"
           }
         },
         "fa" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "مجوزهای سفارشی"
+            "value" : "ادامه"
           }
         },
         "fi_FI" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Mukautetut oikeudet"
+            "value" : "Jatka"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Autorisations personnalisées"
+            "value" : "Continuer"
           }
         },
         "ga" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ceadanna saincheaptha"
+            "value" : "Lean ar aghaidh"
           }
         },
         "gl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Permisos personalizados"
+            "value" : "Continuar"
+          }
+        },
+        "he" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "להמשך"
           }
         },
         "hr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Prilagođena dopuštenja"
+            "value" : "Nastavi"
           }
         },
         "hu_HU" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Egyéni jogosultságok"
+            "value" : "Folytatás"
+          }
+        },
+        "hy" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Շարունակել"
           }
         },
         "id" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Izin kustom"
+            "value" : "Lanjutkan"
           }
         },
         "is" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Sérsniðnar heimildir"
+            "value" : "Halda áfram"
           }
         },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Autorizzazioni personalizzate"
+            "value" : "Continua"
           }
         },
         "ja_JP" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "カスタム権限"
+            "value" : "続ける"
           }
         },
         "ka" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Custom permissions"
+            "value" : "გაგრძელება"
+          }
+        },
+        "kab" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kemmel"
+          }
+        },
+        "km" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "បន្ត"
+          }
+        },
+        "kn" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "﻿ಮುಂದುವರಿಸಿ"
           }
         },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "사용자 지정 권한"
+            "value" : "계속"
+          }
+        },
+        "lb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Weider"
           }
         },
         "lo" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "ສິດອະນຸຍາດແບບກຳນົດເອງ"
+            "value" : "ສືບຕໍ່"
           }
         },
         "lt_LT" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Tinkinti leidimai"
+            "value" : "Tęsti"
+          }
+        },
+        "lv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Turpināt"
           }
         },
         "mk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Прилагодени дозволи"
+            "value" : "Продолжи"
           }
         },
         "mn" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Тусгай эрхүүд"
+            "value" : "үргэлжлүүлэх"
+          }
+        },
+        "mr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "पुढे"
           }
         },
         "nb_NO" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Egendefinerte tillatelser"
+            "value" : "Fortsett"
           }
         },
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Aangepaste machtigingen"
+            "value" : "Doorgaan"
+          }
+        },
+        "nn_NO" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gå vidare"
+          }
+        },
+        "oc" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Contunhar"
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Uprawnienia niestandardowe"
+            "value" : "Kontynuuj"
+          }
+        },
+        "ps" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "وړاندې تګ"
           }
         },
         "pt_BR" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Permissões personalizadas"
+            "value" : "Continuar"
           }
         },
         "pt_PT" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Permissões personalizadas"
+            "value" : "Continuar"
           }
         },
         "ro" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Permisiuni personalizate"
+            "value" : "Continuă"
           }
         },
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Пользовательские права доступа"
-          }
-        },
-        "sc" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Permissos personalizados"
+            "value" : "Продолжить"
           }
         },
         "sk_SK" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Vlastné oprávnenia"
+            "value" : "Pokračovať"
           }
         },
         "sl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Dovoljenja po meri"
+            "value" : "Nadaljuj"
+          }
+        },
+        "sq" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vazhdo"
           }
         },
         "sr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Произвољне дозволе"
+            "value" : "Настави"
           }
         },
         "sv" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Anpassade behörigheter"
+            "value" : "Fortsätt"
           }
         },
         "sw" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ruhusa maalum"
+            "value" : "Endelea"
+          }
+        },
+        "th_TH" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ดำเนินการต่อ"
           }
         },
         "tr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Özel izinler"
+            "value" : "İlerle"
           }
         },
         "ug" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "ئىختىيارى ئىجازەت"
+            "value" : "داۋاملاشتۇر"
           }
         },
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Спеціальні дозволи"
+            "value" : "Продовжити"
+          }
+        },
+        "ur_PK" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "جاری"
+          }
+        },
+        "uz" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Davom etish"
           }
         },
         "vi" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Quyền tùy chỉnh"
+            "value" : "Tiếp tục"
           }
         },
         "zh_CN" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "自定义权限"
+            "value" : "继续"
           }
         },
         "zh_HK" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "自訂權限"
+            "value" : "繼續"
           }
         },
         "zh_TW" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "自訂權限"
+            "value" : "繼續"
           }
         }
       }
@@ -4114,6 +4318,329 @@
         }
       }
     },
+    "Custom permissions" : {
+      "comment" : "Menu option that reveals per-permission toggles for custom permissions.",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "أذونات مخصصة"
+          }
+        },
+        "ast" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Personlizar los permisos"
+          }
+        },
+        "az" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Xüsusi icazələr"
+          }
+        },
+        "bg_BG" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Персонализиране на права"
+          }
+        },
+        "ca" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Permisos personalitzats"
+          }
+        },
+        "cs_CZ" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Uživatelsky určená oprávnění"
+          }
+        },
+        "da" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Brugerdefinerede rettigheder"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Benutzerdefinierte Berechtigungen"
+          }
+        },
+        "el" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Προσαρμοσμένα δικαιώματα"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Custom permissions"
+          }
+        },
+        "en_GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Custom permissions"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Permisos personalizados"
+          }
+        },
+        "es_EC" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Permisos personalizados"
+          }
+        },
+        "es_MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Permisos personalizados"
+          }
+        },
+        "et_EE" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kohandatud õigused"
+          }
+        },
+        "eu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Baimen pertsonalizatuak"
+          }
+        },
+        "fa" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "مجوزهای سفارشی"
+          }
+        },
+        "fi_FI" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mukautetut oikeudet"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Autorisations personnalisées"
+          }
+        },
+        "ga" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ceadanna saincheaptha"
+          }
+        },
+        "gl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Permisos personalizados"
+          }
+        },
+        "hr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Prilagođena dopuštenja"
+          }
+        },
+        "hu_HU" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Egyéni jogosultságok"
+          }
+        },
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Izin kustom"
+          }
+        },
+        "is" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sérsniðnar heimildir"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Autorizzazioni personalizzate"
+          }
+        },
+        "ja_JP" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "カスタム権限"
+          }
+        },
+        "ka" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Custom permissions"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "사용자 지정 권한"
+          }
+        },
+        "lo" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ສິດອະນຸຍາດແບບກຳນົດເອງ"
+          }
+        },
+        "lt_LT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tinkinti leidimai"
+          }
+        },
+        "mk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Прилагодени дозволи"
+          }
+        },
+        "mn" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Тусгай эрхүүд"
+          }
+        },
+        "nb_NO" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Egendefinerte tillatelser"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aangepaste machtigingen"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Uprawnienia niestandardowe"
+          }
+        },
+        "pt_BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Permissões personalizadas"
+          }
+        },
+        "pt_PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Permissões personalizadas"
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Permisiuni personalizate"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Пользовательские права доступа"
+          }
+        },
+        "sc" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Permissos personalizados"
+          }
+        },
+        "sk_SK" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vlastné oprávnenia"
+          }
+        },
+        "sl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dovoljenja po meri"
+          }
+        },
+        "sr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Произвољне дозволе"
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Anpassade behörigheter"
+          }
+        },
+        "sw" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ruhusa maalum"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Özel izinler"
+          }
+        },
+        "ug" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ئىختىيارى ئىجازەت"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Спеціальні дозволи"
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Quyền tùy chỉnh"
+          }
+        },
+        "zh_CN" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "自定义权限"
+          }
+        },
+        "zh_HK" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "自訂權限"
+          }
+        },
+        "zh_TW" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "自訂權限"
+          }
+        }
+      }
+    },
     "Delete" : {
       "comment" : "Destructive confirmation button for deleting a share or removing a recipient.",
       "localizations" : {
@@ -5405,581 +5932,6 @@
         }
       }
     },
-    "Edit" : {
-      "comment" : "Action that opens the unified share editor.",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "تحرير"
-          }
-        },
-        "ast" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Editar"
-          }
-        },
-        "az" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Dəyişiklik et"
-          }
-        },
-        "be" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Рэдагаваць"
-          }
-        },
-        "bg_BG" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Промяна"
-          }
-        },
-        "bn_BD" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "সম্পাদনা"
-          }
-        },
-        "br" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Embann"
-          }
-        },
-        "bs" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Izmjeni"
-          }
-        },
-        "ca" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Edita"
-          }
-        },
-        "cs_CZ" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Upravit"
-          }
-        },
-        "cy_GB" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Golygu"
-          }
-        },
-        "da" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Rediger"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Bearbeiten"
-          }
-        },
-        "el" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Επεξεργασία"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Edit"
-          }
-        },
-        "en_GB" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Edit"
-          }
-        },
-        "eo" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Modifi"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Editar"
-          }
-        },
-        "es_419" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Editar"
-          }
-        },
-        "es_AR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Editar"
-          }
-        },
-        "es_CL" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Editar"
-          }
-        },
-        "es_CO" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Editar"
-          }
-        },
-        "es_CR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Editar"
-          }
-        },
-        "es_DO" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Editar"
-          }
-        },
-        "es_EC" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Editar"
-          }
-        },
-        "es_GT" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Editar"
-          }
-        },
-        "es_HN" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Editar"
-          }
-        },
-        "es_MX" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Editar"
-          }
-        },
-        "es_NI" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Editar"
-          }
-        },
-        "es_PA" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Editar"
-          }
-        },
-        "es_PE" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Editar"
-          }
-        },
-        "es_PR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Editar"
-          }
-        },
-        "es_PY" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Editar"
-          }
-        },
-        "es_SV" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Editar"
-          }
-        },
-        "es_UY" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Editar"
-          }
-        },
-        "et_EE" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Muuda"
-          }
-        },
-        "eu" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Editatu"
-          }
-        },
-        "fa" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "ویرایش"
-          }
-        },
-        "fi_FI" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Muokkaa"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Modifier"
-          }
-        },
-        "ga" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Cuir in eagar"
-          }
-        },
-        "gd" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Deasaich"
-          }
-        },
-        "gl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Editar"
-          }
-        },
-        "he" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "עריכה"
-          }
-        },
-        "hr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Uredi"
-          }
-        },
-        "hu_HU" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Szerkesztés"
-          }
-        },
-        "hy" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "մշակել"
-          }
-        },
-        "ia" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Modificar"
-          }
-        },
-        "id" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Sunting"
-          }
-        },
-        "is" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Breyta"
-          }
-        },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Modifica"
-          }
-        },
-        "ja_JP" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "編集"
-          }
-        },
-        "ka" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Edit"
-          }
-        },
-        "ka_GE" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "შეცვლა"
-          }
-        },
-        "kab" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ẓreg"
-          }
-        },
-        "km" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "កែប្រែ"
-          }
-        },
-        "kn" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "ಸಂಪಾದಿಸು"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "편집"
-          }
-        },
-        "lb" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Beaarbechten"
-          }
-        },
-        "lo" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "ແກ້ໄຂ"
-          }
-        },
-        "lt_LT" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Redaguoti"
-          }
-        },
-        "lv" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Labot"
-          }
-        },
-        "mk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Уреди"
-          }
-        },
-        "mn" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "”®”©—Ä—á–ª”©—Ö"
-          }
-        },
-        "ms_MY" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Sunting"
-          }
-        },
-        "my" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "တည်းဖြတ်ပါ"
-          }
-        },
-        "nb_NO" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Rediger"
-          }
-        },
-        "nl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Bewerken"
-          }
-        },
-        "nn_NO" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Rediger"
-          }
-        },
-        "oc" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Modificar"
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Edycja"
-          }
-        },
-        "pt_BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Editar"
-          }
-        },
-        "pt_PT" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Editar"
-          }
-        },
-        "ro" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Editează"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Редактировать"
-          }
-        },
-        "sc" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Modìfica"
-          }
-        },
-        "si" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "සංස්කරණය"
-          }
-        },
-        "sk_SK" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Upraviť"
-          }
-        },
-        "sl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Uredi"
-          }
-        },
-        "sq" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Përpuno"
-          }
-        },
-        "sr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Измени"
-          }
-        },
-        "sv" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Redigera"
-          }
-        },
-        "sw" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Hariri"
-          }
-        },
-        "ta" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "தொகுக்க"
-          }
-        },
-        "th_TH" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "แก้ไข"
-          }
-        },
-        "tk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Redaktirläň"
-          }
-        },
-        "tr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Düzenle"
-          }
-        },
-        "ug" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "تەھرىر"
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Редагувати"
-          }
-        },
-        "ur_PK" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "تدوین کریں"
-          }
-        },
-        "uz" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Tahrirlash"
-          }
-        },
-        "vi" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Chỉnh sửa"
-          }
-        },
-        "zh_CN" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "编辑"
-          }
-        },
-        "zh_HK" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "編輯"
-          }
-        },
-        "zh_TW" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "編輯"
-          }
-        }
-      }
-    },
     "Failed to update share." : {
       "comment" : "Shown when a share modification fails.",
       "localizations" : {
@@ -6083,119 +6035,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "更新分享失敗。"
-          }
-        }
-      }
-    },
-    "Hide recipients" : {
-      "comment" : "Accessibility label for collapsing a share's recipient list.",
-      "localizations" : {
-        "da" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Skjul modtagere"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Empfänger ausblenden"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Hide recipients"
-          }
-        },
-        "en_GB" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Hide recipients"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Esconder destinatarios"
-          }
-        },
-        "et_EE" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Peida saajad"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Masquer les destinataires"
-          }
-        },
-        "ga" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Folaigh na faighteoirí"
-          }
-        },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Nascondi destinatari"
-          }
-        },
-        "mk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Сокриј примачи"
-          }
-        },
-        "pt_BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ocultar destinatários"
-          }
-        },
-        "ro" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ascunde destinatarii"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Скрыть получателей"
-          }
-        },
-        "sk_SK" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Skryť príjemcov"
-          }
-        },
-        "sv" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Dölj mottagare"
-          }
-        },
-        "tr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Alıcıları gizle"
-          }
-        },
-        "zh_HK" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "隱藏接收者"
-          }
-        },
-        "zh_TW" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "隱藏收件人"
           }
         }
       }
@@ -6447,6 +6286,119 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "對於已有存取權限的人"
+          }
+        }
+      }
+    },
+    "Hide recipients" : {
+      "comment" : "Accessibility label for collapsing a share's recipient list.",
+      "localizations" : {
+        "da" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Skjul modtagere"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Empfänger ausblenden"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hide recipients"
+          }
+        },
+        "en_GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hide recipients"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Esconder destinatarios"
+          }
+        },
+        "et_EE" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Peida saajad"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Masquer les destinataires"
+          }
+        },
+        "ga" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Folaigh na faighteoirí"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nascondi destinatari"
+          }
+        },
+        "mk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Сокриј примачи"
+          }
+        },
+        "pt_BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ocultar destinatários"
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ascunde destinatarii"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Скрыть получателей"
+          }
+        },
+        "sk_SK" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Skryť príjemcov"
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dölj mottagare"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Alıcıları gizle"
+          }
+        },
+        "zh_HK" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "隱藏接收者"
+          }
+        },
+        "zh_TW" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "隱藏收件人"
           }
         }
       }
@@ -7483,8 +7435,14 @@
       }
     },
     "OK" : {
-      "comment" : "Button that dismisses an error alert.",
+      "comment" : "Button label for error alert dismissal.",
       "localizations" : {
+        "cs_CZ" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "OK"
+          }
+        },
         "da" : {
           "stringUnit" : {
             "state" : "translated",
@@ -8175,6 +8133,119 @@
         }
       }
     },
+    "Remove password" : {
+      "comment" : "Destructive action that removes the password from a share.",
+      "localizations" : {
+        "da" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fjern adgangskode"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Passwort entfernen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Remove password"
+          }
+        },
+        "en_GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Remove password"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eliminar contraseña"
+          }
+        },
+        "et_EE" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eemalda salaõna"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Supprimer le mot de passe"
+          }
+        },
+        "ga" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bain an focal faire"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rimuovi la password"
+          }
+        },
+        "mk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Избриши лозинка"
+          }
+        },
+        "pt_BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Remover senha"
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Elimină parola"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Удалить пароль"
+          }
+        },
+        "sk_SK" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Odstrániť heslo"
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ta bort lösenord"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Parolayı kaldır"
+          }
+        },
+        "zh_HK" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "移除密碼"
+          }
+        },
+        "zh_TW" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "移除密碼"
+          }
+        }
+      }
+    },
     "Retry" : {
       "comment" : "Button that retries loading the unified share list after an error.",
       "localizations" : {
@@ -8662,6 +8733,647 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "重試"
+          }
+        }
+      }
+    },
+    "Save" : {
+      "comment" : "Button that confirms a text property change.",
+      "localizations" : {
+        "af" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Save"
+          }
+        },
+        "an" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Save"
+          }
+        },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Save"
+          }
+        },
+        "ast" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Save"
+          }
+        },
+        "az" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Save"
+          }
+        },
+        "be" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Save"
+          }
+        },
+        "bg_BG" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Save"
+          }
+        },
+        "bn_BD" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Save"
+          }
+        },
+        "br" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Save"
+          }
+        },
+        "bs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Save"
+          }
+        },
+        "ca" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Desa"
+          }
+        },
+        "cs_CZ" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Uložit"
+          }
+        },
+        "cy_GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Save"
+          }
+        },
+        "da" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gem"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Speichern"
+          }
+        },
+        "el" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Αποθήκευση"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Save"
+          }
+        },
+        "en_GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Save"
+          }
+        },
+        "eo" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Save"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Guardar"
+          }
+        },
+        "es_419" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Save"
+          }
+        },
+        "es_AR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Save"
+          }
+        },
+        "es_CL" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Save"
+          }
+        },
+        "es_CO" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Save"
+          }
+        },
+        "es_CR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Save"
+          }
+        },
+        "es_DO" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Save"
+          }
+        },
+        "es_EC" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Save"
+          }
+        },
+        "es_GT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Save"
+          }
+        },
+        "es_HN" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Save"
+          }
+        },
+        "es_MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Save"
+          }
+        },
+        "es_NI" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Save"
+          }
+        },
+        "es_PA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Save"
+          }
+        },
+        "es_PE" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Save"
+          }
+        },
+        "es_PR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Save"
+          }
+        },
+        "es_PY" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Save"
+          }
+        },
+        "es_SV" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Save"
+          }
+        },
+        "es_UY" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Save"
+          }
+        },
+        "et_EE" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Salvesta"
+          }
+        },
+        "eu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Save"
+          }
+        },
+        "fa" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ذخیره"
+          }
+        },
+        "fi_FI" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Save"
+          }
+        },
+        "fo" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Save"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enregistrer"
+          }
+        },
+        "ga" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sábháil"
+          }
+        },
+        "gd" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Save"
+          }
+        },
+        "gl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gardar"
+          }
+        },
+        "he" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Save"
+          }
+        },
+        "hi_IN" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Save"
+          }
+        },
+        "hr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Spremi"
+          }
+        },
+        "hsb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Save"
+          }
+        },
+        "hu_HU" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mentés"
+          }
+        },
+        "hy" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Save"
+          }
+        },
+        "ia" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Save"
+          }
+        },
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Simpan"
+          }
+        },
+        "ig" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Save"
+          }
+        },
+        "is" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vista"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Save"
+          }
+        },
+        "ja_JP" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "保存する"
+          }
+        },
+        "ka" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Save"
+          }
+        },
+        "ka_GE" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Save"
+          }
+        },
+        "kab" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sekles"
+          }
+        },
+        "km" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Save"
+          }
+        },
+        "kn" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Save"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Save"
+          }
+        },
+        "la" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Save"
+          }
+        },
+        "lb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Save"
+          }
+        },
+        "lo" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Save"
+          }
+        },
+        "lt_LT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Išsaugoti"
+          }
+        },
+        "lv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Save"
+          }
+        },
+        "mk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Зачувај"
+          }
+        },
+        "mn" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "–•–∞–¥–≥–∞–ª–∞—Ö"
+          }
+        },
+        "mr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Save"
+          }
+        },
+        "ms_MY" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Save"
+          }
+        },
+        "my" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Save"
+          }
+        },
+        "nb_NO" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Save"
+          }
+        },
+        "ne" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Save"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Opslaan"
+          }
+        },
+        "nn_NO" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Save"
+          }
+        },
+        "oc" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Save"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zapisz"
+          }
+        },
+        "ps" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Save"
+          }
+        },
+        "pt_BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Salvar"
+          }
+        },
+        "pt_PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Save"
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Salvează"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Save"
+          }
+        },
+        "sc" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Save"
+          }
+        },
+        "si" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Save"
+          }
+        },
+        "sk_SK" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Uložiť"
+          }
+        },
+        "sl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Save"
+          }
+        },
+        "sq" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Save"
+          }
+        },
+        "sr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Save"
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Spara"
+          }
+        },
+        "sw" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hifadhi"
+          }
+        },
+        "ta" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Save"
+          }
+        },
+        "th_TH" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Save"
+          }
+        },
+        "tk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Save"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kaydet"
+          }
+        },
+        "ug" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Save"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Save"
+          }
+        },
+        "ur_PK" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Save"
+          }
+        },
+        "uz" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Saqlash"
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Save"
+          }
+        },
+        "zh_CN" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "保存"
+          }
+        },
+        "zh_HK" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "儲存"
+          }
+        },
+        "zh_TW" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "儲存"
+          }
+        },
+        "zu_ZA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Save"
           }
         }
       }
@@ -9344,569 +10056,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "傳送"
-          }
-        }
-      }
-    },
-    "Send email" : {
-      "comment" : "Legacy action for notifying unified-share recipients by email; currently not displayed.",
-      "localizations" : {
-        "af" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Stuur e-pos"
-          }
-        },
-        "an" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ninviar correu electronico"
-          }
-        },
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "إرسال بريد"
-          }
-        },
-        "ast" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Unviar un corréu electrónicu"
-          }
-        },
-        "az" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Email yolla"
-          }
-        },
-        "be" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Адправіць электронны ліст"
-          }
-        },
-        "bg_BG" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Изпращане на имейл"
-          }
-        },
-        "bn_BD" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "ইমেইল পাঠান "
-          }
-        },
-        "br" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Kas postel"
-          }
-        },
-        "bs" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Pošalji e-poštu"
-          }
-        },
-        "ca" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Enviar correu"
-          }
-        },
-        "cs_CZ" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Odeslat e-mail"
-          }
-        },
-        "cy_GB" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Anfon e-bost"
-          }
-        },
-        "da" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Send e-mail"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "E-Mail senden"
-          }
-        },
-        "el" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Αποστολή email"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Send email"
-          }
-        },
-        "en_GB" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Send email"
-          }
-        },
-        "eo" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Sendi retpoŝtmesaĝon"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Enviar correo electrónico"
-          }
-        },
-        "es_419" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Enviar correo electrónico"
-          }
-        },
-        "es_AR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Enviar correo electrónico"
-          }
-        },
-        "es_CL" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Enviar correo electrónico"
-          }
-        },
-        "es_CO" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Enviar correo electrónico"
-          }
-        },
-        "es_CR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Enviar correo electrónico"
-          }
-        },
-        "es_DO" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Enviar correo electrónico"
-          }
-        },
-        "es_EC" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Enviar correo electrónico"
-          }
-        },
-        "es_GT" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Enviar correo electrónico"
-          }
-        },
-        "es_HN" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Enviar correo electrónico"
-          }
-        },
-        "es_MX" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Enviar correo electrónico"
-          }
-        },
-        "es_NI" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Enviar correo electrónico"
-          }
-        },
-        "es_PA" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Enviar correo electrónico"
-          }
-        },
-        "es_PE" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Enviar correo electrónico"
-          }
-        },
-        "es_PR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Enviar correo electrónico"
-          }
-        },
-        "es_PY" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Enviar correo electrónico"
-          }
-        },
-        "es_SV" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Enviar correo electrónico"
-          }
-        },
-        "es_UY" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Enviar correo electrónico"
-          }
-        },
-        "et_EE" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Saada e-kiri"
-          }
-        },
-        "eu" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Bidali mezu elektronikoa"
-          }
-        },
-        "fa" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "ارسال ایمیل"
-          }
-        },
-        "fi_FI" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Lähetä sähköposti"
-          }
-        },
-        "fo" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Send t-post"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Envoyer un e-mail"
-          }
-        },
-        "ga" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Seol ríomhphost"
-          }
-        },
-        "gl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Enviar o correo"
-          }
-        },
-        "he" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "שליחת דואר אלקטרוני"
-          }
-        },
-        "hi_IN" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "ईमेल भेजें"
-          }
-        },
-        "hr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Pošalji poruku e-pošte"
-          }
-        },
-        "hu_HU" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "E-mail küldése"
-          }
-        },
-        "hy" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ուղարկել փոստ"
-          }
-        },
-        "ia" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Inviar message de e-posta"
-          }
-        },
-        "id" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Kirim email"
-          }
-        },
-        "is" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Senda tölvupóst"
-          }
-        },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Invia email"
-          }
-        },
-        "ja_JP" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "メールを送信"
-          }
-        },
-        "ka" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "ელ.ფოსტის გაგზავნა"
-          }
-        },
-        "ka_GE" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "ელ-წერილის გაგზავნა"
-          }
-        },
-        "kab" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Azen imayl"
-          }
-        },
-        "km" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "ផ្ញើ​អ៊ីមែល"
-          }
-        },
-        "kn" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "ಇ-ಅಂಚೆಯನ್ನು  ಕಳುಹಿಸಿ"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "이메일 보내기"
-          }
-        },
-        "lo" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "ສົ່ງອີເມວ"
-          }
-        },
-        "lt_LT" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Siųsti elektroninį laišką"
-          }
-        },
-        "lv" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Nosūtīt e-pasta ziņojumu"
-          }
-        },
-        "mk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Испрати е-пошта"
-          }
-        },
-        "mn" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Мэйл илгээх"
-          }
-        },
-        "ms_MY" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Menghantar E-mel"
-          }
-        },
-        "nb_NO" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Send e-post"
-          }
-        },
-        "nl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "E-mail verzenden"
-          }
-        },
-        "nn_NO" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Send e-post"
-          }
-        },
-        "oc" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Enviar email"
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Wyślij e-mail"
-          }
-        },
-        "pt_BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Enviar e-mail"
-          }
-        },
-        "pt_PT" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Enviar mensagem"
-          }
-        },
-        "ro" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Trimite un e-mail"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Отправить письмо"
-          }
-        },
-        "sc" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Imbia messàgiu de posta eletrònica"
-          }
-        },
-        "sk_SK" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Odoslať email"
-          }
-        },
-        "sl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Pošlji elektronsko sporočilo"
-          }
-        },
-        "sq" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Dërgo email"
-          }
-        },
-        "sr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Пошаљи е-пошту"
-          }
-        },
-        "sv" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Skicka e-post"
-          }
-        },
-        "sw" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Tuma barua pepe"
-          }
-        },
-        "th_TH" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "ส่งอีเมล"
-          }
-        },
-        "tk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "E-poçta iber"
-          }
-        },
-        "tr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "E-posta gönder"
-          }
-        },
-        "ug" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "ئېلېكترونلۇق خەت ئەۋەتىڭ"
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Запрошення"
-          }
-        },
-        "uz" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Xabar yuborish"
-          }
-        },
-        "vi" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Gửi email"
-          }
-        },
-        "zh_CN" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "发送电子邮件"
-          }
-        },
-        "zh_HK" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "傳送電子郵件"
-          }
-        },
-        "zh_TW" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "傳送電子郵件"
           }
         }
       }
@@ -10623,760 +10772,6 @@
         }
       }
     },
-    "Remove password" : {
-      "comment" : "Destructive action that removes the password from a share.",
-      "localizations" : {
-        "da" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Fjern adgangskode"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Passwort entfernen"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Remove password"
-          }
-        },
-        "en_GB" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Remove password"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Eliminar contraseña"
-          }
-        },
-        "et_EE" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Eemalda salaõna"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Supprimer le mot de passe"
-          }
-        },
-        "ga" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Bain an focal faire"
-          }
-        },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Rimuovi la password"
-          }
-        },
-        "mk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Избриши лозинка"
-          }
-        },
-        "pt_BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Remover senha"
-          }
-        },
-        "ro" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Elimină parola"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Удалить пароль"
-          }
-        },
-        "sk_SK" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Odstrániť heslo"
-          }
-        },
-        "sv" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ta bort lösenord"
-          }
-        },
-        "tr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Parolayı kaldır"
-          }
-        },
-        "zh_HK" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "移除密碼"
-          }
-        },
-        "zh_TW" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "移除密碼"
-          }
-        }
-      }
-    },
-    "Save" : {
-      "comment" : "Button that confirms a text property change.",
-      "localizations" : {
-        "af" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Save"
-          }
-        },
-        "an" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Save"
-          }
-        },
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Save"
-          }
-        },
-        "ast" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Save"
-          }
-        },
-        "az" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Save"
-          }
-        },
-        "be" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Save"
-          }
-        },
-        "bg_BG" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Save"
-          }
-        },
-        "bn_BD" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Save"
-          }
-        },
-        "br" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Save"
-          }
-        },
-        "bs" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Save"
-          }
-        },
-        "ca" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Desa"
-          }
-        },
-        "cs_CZ" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Uložit"
-          }
-        },
-        "cy_GB" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Save"
-          }
-        },
-        "da" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Gem"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Speichern"
-          }
-        },
-        "el" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Αποθήκευση"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Save"
-          }
-        },
-        "en_GB" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Save"
-          }
-        },
-        "eo" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Save"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Guardar"
-          }
-        },
-        "es_419" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Save"
-          }
-        },
-        "es_AR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Save"
-          }
-        },
-        "es_CL" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Save"
-          }
-        },
-        "es_CO" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Save"
-          }
-        },
-        "es_CR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Save"
-          }
-        },
-        "es_DO" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Save"
-          }
-        },
-        "es_EC" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Save"
-          }
-        },
-        "es_GT" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Save"
-          }
-        },
-        "es_HN" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Save"
-          }
-        },
-        "es_MX" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Save"
-          }
-        },
-        "es_NI" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Save"
-          }
-        },
-        "es_PA" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Save"
-          }
-        },
-        "es_PE" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Save"
-          }
-        },
-        "es_PR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Save"
-          }
-        },
-        "es_PY" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Save"
-          }
-        },
-        "es_SV" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Save"
-          }
-        },
-        "es_UY" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Save"
-          }
-        },
-        "et_EE" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Salvesta"
-          }
-        },
-        "eu" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Save"
-          }
-        },
-        "fa" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "ذخیره"
-          }
-        },
-        "fi_FI" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Save"
-          }
-        },
-        "fo" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Save"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Enregistrer"
-          }
-        },
-        "ga" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Sábháil"
-          }
-        },
-        "gd" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Save"
-          }
-        },
-        "gl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Gardar"
-          }
-        },
-        "he" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Save"
-          }
-        },
-        "hi_IN" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Save"
-          }
-        },
-        "hr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Spremi"
-          }
-        },
-        "hsb" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Save"
-          }
-        },
-        "hu_HU" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Mentés"
-          }
-        },
-        "hy" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Save"
-          }
-        },
-        "ia" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Save"
-          }
-        },
-        "id" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Simpan"
-          }
-        },
-        "ig" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Save"
-          }
-        },
-        "is" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Vista"
-          }
-        },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Save"
-          }
-        },
-        "ja_JP" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "保存する"
-          }
-        },
-        "ka" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Save"
-          }
-        },
-        "ka_GE" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Save"
-          }
-        },
-        "kab" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Sekles"
-          }
-        },
-        "km" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Save"
-          }
-        },
-        "kn" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Save"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Save"
-          }
-        },
-        "la" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Save"
-          }
-        },
-        "lb" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Save"
-          }
-        },
-        "lo" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Save"
-          }
-        },
-        "lt_LT" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Išsaugoti"
-          }
-        },
-        "lv" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Save"
-          }
-        },
-        "mk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Зачувај"
-          }
-        },
-        "mn" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "–•–∞–¥–≥–∞–ª–∞—Ö"
-          }
-        },
-        "mr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Save"
-          }
-        },
-        "ms_MY" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Save"
-          }
-        },
-        "my" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Save"
-          }
-        },
-        "nb_NO" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Save"
-          }
-        },
-        "ne" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Save"
-          }
-        },
-        "nl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Opslaan"
-          }
-        },
-        "nn_NO" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Save"
-          }
-        },
-        "oc" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Save"
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Zapisz"
-          }
-        },
-        "ps" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Save"
-          }
-        },
-        "pt_BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Salvar"
-          }
-        },
-        "pt_PT" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Save"
-          }
-        },
-        "ro" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Salvează"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Save"
-          }
-        },
-        "sc" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Save"
-          }
-        },
-        "si" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Save"
-          }
-        },
-        "sk_SK" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Uložiť"
-          }
-        },
-        "sl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Save"
-          }
-        },
-        "sq" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Save"
-          }
-        },
-        "sr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Save"
-          }
-        },
-        "sv" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Spara"
-          }
-        },
-        "sw" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Hifadhi"
-          }
-        },
-        "ta" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Save"
-          }
-        },
-        "th_TH" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Save"
-          }
-        },
-        "tk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Save"
-          }
-        },
-        "tr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Kaydet"
-          }
-        },
-        "ug" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Save"
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Save"
-          }
-        },
-        "ur_PK" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Save"
-          }
-        },
-        "uz" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Saqlash"
-          }
-        },
-        "vi" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Save"
-          }
-        },
-        "zh_CN" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "保存"
-          }
-        },
-        "zh_HK" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "儲存"
-          }
-        },
-        "zh_TW" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "儲存"
-          }
-        },
-        "zu_ZA" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Save"
-          }
-        }
-      }
-    },
     "Share \"%@\"" : {
       "comment" : "Share editor title; placeholder is the shared file or folder name.",
       "localizations" : {
@@ -11890,544 +11285,6 @@
         }
       }
     },
-    "Share link" : {
-      "comment" : "Row title for a public link share.",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "رابط مشاركة"
-          }
-        },
-        "ast" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Compartir l'enllaz"
-          }
-        },
-        "be" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Абагуліць спасылку"
-          }
-        },
-        "bg_BG" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Връзка за споделяне"
-          }
-        },
-        "br" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Lodañ al liamm"
-          }
-        },
-        "ca" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Comparteix un enllaç"
-          }
-        },
-        "cs_CZ" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Nasdílet odkaz"
-          }
-        },
-        "da" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Del link"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Freigabe Link"
-          }
-        },
-        "el" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Σύνδεσμος κοινοποίησης"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Share link"
-          }
-        },
-        "en_GB" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Share link"
-          }
-        },
-        "eo" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Konhavigi ligilon"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Enlace del recurso compartido"
-          }
-        },
-        "es_AR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Compartir link"
-          }
-        },
-        "es_CO" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Compartir enlace"
-          }
-        },
-        "es_EC" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Compartir liga"
-          }
-        },
-        "es_MX" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Compartir enlace"
-          }
-        },
-        "et_EE" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Jagamislink"
-          }
-        },
-        "eu" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Partekatu esteka"
-          }
-        },
-        "fa" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "لینک را به اشتراک بگذارید"
-          }
-        },
-        "fi_FI" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Jaa linkki"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Partage par lien"
-          }
-        },
-        "ga" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Comhroinn nasc"
-          }
-        },
-        "gd" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ceangal co-roinnidh"
-          }
-        },
-        "gl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ligazón para compartir"
-          }
-        },
-        "he" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "שיתוף קישור"
-          }
-        },
-        "hr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Dijeli poveznicu"
-          }
-        },
-        "hu_HU" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Megosztási hivatkozás"
-          }
-        },
-        "ia" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Divulgar ligamine"
-          }
-        },
-        "id" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Bagikan tautan"
-          }
-        },
-        "is" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Tengill á sameign"
-          }
-        },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Collegamento di condivisione"
-          }
-        },
-        "ja_JP" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "共有リンク"
-          }
-        },
-        "ka" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "გაზიარების ლინკი"
-          }
-        },
-        "ka_GE" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "ბმულს გაზიარება"
-          }
-        },
-        "kab" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Bḍu aseɣwen"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "링크 공유"
-          }
-        },
-        "lo" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "ແບ່ງປັນລິ້ງ"
-          }
-        },
-        "lt_LT" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Bendrinimo nuoroda"
-          }
-        },
-        "lv" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Dalīt saiti"
-          }
-        },
-        "mk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Сподели линк"
-          }
-        },
-        "mn" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "–•–æ–ª–±–æ–æ—Å —Ö—É–≤–∞–∞–ª—Ü–∞—Ö"
-          }
-        },
-        "nb_NO" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Del lenke"
-          }
-        },
-        "nl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Deel link"
-          }
-        },
-        "oc" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Partejar via ligam"
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Udostępnij link"
-          }
-        },
-        "ps" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "د شرېکولو لېنک"
-          }
-        },
-        "pt_BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Compartilhar link"
-          }
-        },
-        "pt_PT" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Partilhar ligação"
-          }
-        },
-        "ro" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Partajează linkul"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Поделиться ссылкой"
-          }
-        },
-        "sc" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Cumpartzi ligòngiu"
-          }
-        },
-        "sk_SK" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Zdieľať odkaz"
-          }
-        },
-        "sl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Povezava za souporabo"
-          }
-        },
-        "sq" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Lidhje ndarjeje"
-          }
-        },
-        "sr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Подели везу"
-          }
-        },
-        "sv" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Delningslänk"
-          }
-        },
-        "sw" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Shirikisha kiungio"
-          }
-        },
-        "ta" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "இணைப்பைப் பகிரவும்"
-          }
-        },
-        "th_TH" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "แชร์ลิงก์"
-          }
-        },
-        "tk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Baglanyşyk paýlaş"
-          }
-        },
-        "tr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Bağlantıyı paylaş"
-          }
-        },
-        "ug" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "ھەمبەھىر ئۇلىنىشى"
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Надати у публічний доступ"
-          }
-        },
-        "uz" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Havolani ulashish"
-          }
-        },
-        "vi" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Chia sẻ liên kết"
-          }
-        },
-        "zh_CN" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "共享链接"
-          }
-        },
-        "zh_HK" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "分享連結"
-          }
-        },
-        "zh_TW" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "分享連結"
-          }
-        }
-      }
-    },
-    "Share link (%lld)" : {
-      "comment" : "Row title for the nth public link share of a file.",
-      "localizations" : {
-        "da" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Del link (%lld)"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Link teilen (%lld)"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Share link (%lld)"
-          }
-        },
-        "en_GB" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Share link (%lld)"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Compartir enlace (%lld)"
-          }
-        },
-        "et_EE" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Jagamislink (%lld)"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Lien de partage (%lld)"
-          }
-        },
-        "ga" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Comhroinn an nasc (%lld)"
-          }
-        },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Condividi collegamento (%lld)"
-          }
-        },
-        "mk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Сподели линк (%lld)"
-          }
-        },
-        "pt_BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Link de compartilhamento (%lld)"
-          }
-        },
-        "ro" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Link de partajare (%lld)"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ссылка общего доступа (%lld)"
-          }
-        },
-        "sk_SK" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Odkaz na zdieľanie (%lld)"
-          }
-        },
-        "sv" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Delningslänk (%lld)"
-          }
-        },
-        "tr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Bağlantıyı paylaş (%lld)"
-          }
-        },
-        "zh_HK" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "分享連結（%lld）"
-          }
-        },
-        "zh_TW" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "分享連結 (%lld)"
-          }
-        }
-      }
-    },
     "Show recipients" : {
       "comment" : "Accessibility label for expanding a share's recipient list.",
       "localizations" : {
@@ -12537,113 +11394,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "顯示收件人"
-          }
-        }
-      }
-    },
-    "This change will replace the individual permission settings of all recipients in this share." : {
-      "comment" : "Explanation shown before propagating top-level permission changes to every recipient.",
-      "localizations" : {
-        "da" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Denne ændring erstatter de individuelle rettigheder for alle modtagere af denne deling."
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Diese Änderung ersetzt die individuellen Berechtigungseinstellungen aller Empfänger dieser Freigabe."
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "This change will replace the individual permission settings of all recipients in this share."
-          }
-        },
-        "en_GB" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "This change will replace the individual permission settings of all recipients in this share."
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "El cambio reemplazará los ajustes de permisos individuales de todos los destinatarios de este recurso compartido."
-          }
-        },
-        "et_EE" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Selle muudatusega asendad kõikide jagamise saajate isiklikud õigused üldiste õigustega."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Cette modification remplacera les paramètres des autorisations individuelles de tous les destinataires de ce partage."
-          }
-        },
-        "ga" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Cuirfidh an t-athrú seo ionad na socruithe ceada aonair do gach faighteoir sa scair seo."
-          }
-        },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Questa modifica sostituirà le impostazioni di autorizzazione individuali di tutti i destinatari di questa condivisione."
-          }
-        },
-        "pt_BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Essa alteração substituirá as configurações de permissão individuais de todos os destinatários deste compartilhamento."
-          }
-        },
-        "ro" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Această modificare va înlocui setările individuale de permisiuni ale tuturor destinatarilor acestei partajări."
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Это изменение заменит индивидуальные настройки прав доступа всех получателей в этом общем ресурсе."
-          }
-        },
-        "sk_SK" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Táto zmena nahradí individuálne nastavenia oprávnení všetkých príjemcov v tomto zdieľaní."
-          }
-        },
-        "sv" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ändringen ersätter de individuella behörighetsinställningarna för alla mottagare av den här delningen."
-          }
-        },
-        "tr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Bu değişiklik, bu paylaşımdaki tüm alıcıların bireysel izin ayarlarının yerini alacak."
-          }
-        },
-        "zh_HK" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "此變更會取代此分享中所有接收者的個別權限設定。"
-          }
-        },
-        "zh_TW" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "此變更會取代此分享中所有收件人的個別權限設定。"
           }
         }
       }
@@ -12969,109 +11719,109 @@
         }
       }
     },
-    "This share is limited to \"%@\". You can only grant the same or fewer permissions." : {
-      "comment" : "Explains that recipient permissions cannot exceed the share-wide preset; the placeholder is the preset name.",
+    "This change will replace the individual permission settings of all recipients in this share." : {
+      "comment" : "Explanation shown before propagating top-level permission changes to every recipient.",
       "localizations" : {
         "da" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Denne deling er begrænset til \"%1$@\". Du kan kun give de samme eller færre rettigheder."
+            "value" : "Denne ændring erstatter de individuelle rettigheder for alle modtagere af denne deling."
           }
         },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Diese Freigabe ist auf \"%1$@\" beschränkt. Sie können nur dieselben oder weniger Berechtigungen erteilen."
+            "value" : "Diese Änderung ersetzt die individuellen Berechtigungseinstellungen aller Empfänger dieser Freigabe."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "This share is limited to \"%1$@\". You can only grant the same or fewer permissions."
+            "value" : "This change will replace the individual permission settings of all recipients in this share."
           }
         },
         "en_GB" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "This share is limited to \"%1$@\". You can only grant the same or fewer permissions."
+            "value" : "This change will replace the individual permission settings of all recipients in this share."
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Este recurso compartido está limitado a %1$@\". Sólo puedes dar los mismos o menos permisos."
+            "value" : "El cambio reemplazará los ajustes de permisos individuales de todos los destinatarios de este recurso compartido."
           }
         },
         "et_EE" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Sellel jagamisel kehtib piirang (%1$@) ja sa võid jagada vaid samade või vähemate õigustega."
+            "value" : "Selle muudatusega asendad kõikide jagamise saajate isiklikud õigused üldiste õigustega."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ce partage est limité à « %1$@ ». Vous ne pouvez accorder que des autorisations identiques ou plus restreintes."
+            "value" : "Cette modification remplacera les paramètres des autorisations individuelles de tous les destinataires de ce partage."
           }
         },
         "ga" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Tá an comhroinnt seo teoranta do \"%1$@\". Ní féidir leat ach na ceadanna céanna nó níos lú ná iad a dheonú."
+            "value" : "Cuirfidh an t-athrú seo ionad na socruithe ceada aonair do gach faighteoir sa scair seo."
           }
         },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Questa quota è limitata a \"%1$@\". È possibile concedere solo gli stessi permessi o un numero inferiore di permessi."
+            "value" : "Questa modifica sostituirà le impostazioni di autorizzazione individuali di tutti i destinatari di questa condivisione."
           }
         },
         "pt_BR" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Essa compartilhamento está limitado a “%1$@”. Você só pode conceder as mesmas permissões ou menos do que essas."
+            "value" : "Essa alteração substituirá as configurações de permissão individuais de todos os destinatários deste compartilhamento."
           }
         },
         "ro" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Această partajare este limitată la „%1$@”. Poți acorda doar aceleași permisiuni sau mai puține."
+            "value" : "Această modificare va înlocui setările individuale de permisiuni ale tuturor destinatarilor acestei partajări."
           }
         },
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Этот общий ресурс ограничен правами \"%1$@\". Вы можете предоставить только те же или меньшие права доступа."
+            "value" : "Это изменение заменит индивидуальные настройки прав доступа всех получателей в этом общем ресурсе."
           }
         },
         "sk_SK" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Toto zdieľanie je obmedzené na \"%1$@\". Môžete udeliť len rovnaké alebo menšie oprávnenia."
+            "value" : "Táto zmena nahradí individuálne nastavenia oprávnení všetkých príjemcov v tomto zdieľaní."
           }
         },
         "sv" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Den här delningen är begränsad till ”%1$@”. Du kan bara ge samma eller färre behörigheter."
+            "value" : "Ändringen ersätter de individuella behörighetsinställningarna för alla mottagare av den här delningen."
           }
         },
         "tr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Bu paylaşım \"%1$@\" ile sınırlı. Yalnızca aynı veya daha az izinler verebilirsiniz."
+            "value" : "Bu değişiklik, bu paylaşımdaki tüm alıcıların bireysel izin ayarlarının yerini alacak."
           }
         },
         "zh_HK" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "此分享的權限僅限於「%1$@」。你只能授予相同或更少的權限。"
+            "value" : "此變更會取代此分享中所有接收者的個別權限設定。"
           }
         },
         "zh_TW" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "此分享的權限僅限於「%1$@」。您僅能授予相同或更少的權限。"
+            "value" : "此變更會取代此分享中所有收件人的個別權限設定。"
           }
         }
       }
@@ -13185,6 +11935,113 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "此收件人將會從分享中移除。"
+          }
+        }
+      }
+    },
+    "This share is limited to \"%@\". You can only grant the same or fewer permissions." : {
+      "comment" : "Explains that recipient permissions cannot exceed the share-wide preset; the placeholder is the preset name.",
+      "localizations" : {
+        "da" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Denne deling er begrænset til \"%1$@\". Du kan kun give de samme eller færre rettigheder."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Diese Freigabe ist auf \"%1$@\" beschränkt. Sie können nur dieselben oder weniger Berechtigungen erteilen."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This share is limited to \"%1$@\". You can only grant the same or fewer permissions."
+          }
+        },
+        "en_GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This share is limited to \"%1$@\". You can only grant the same or fewer permissions."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Este recurso compartido está limitado a %1$@\". Sólo puedes dar los mismos o menos permisos."
+          }
+        },
+        "et_EE" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sellel jagamisel kehtib piirang (%1$@) ja sa võid jagada vaid samade või vähemate õigustega."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ce partage est limité à « %1$@ ». Vous ne pouvez accorder que des autorisations identiques ou plus restreintes."
+          }
+        },
+        "ga" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tá an comhroinnt seo teoranta do \"%1$@\". Ní féidir leat ach na ceadanna céanna nó níos lú ná iad a dheonú."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Questa quota è limitata a \"%1$@\". È possibile concedere solo gli stessi permessi o un numero inferiore di permessi."
+          }
+        },
+        "pt_BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Essa compartilhamento está limitado a “%1$@”. Você só pode conceder as mesmas permissões ou menos do que essas."
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Această partajare este limitată la „%1$@”. Poți acorda doar aceleași permisiuni sau mai puține."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Этот общий ресурс ограничен правами \"%1$@\". Вы можете предоставить только те же или меньшие права доступа."
+          }
+        },
+        "sk_SK" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Toto zdieľanie je obmedzené na \"%1$@\". Môžete udeliť len rovnaké alebo menšie oprávnenia."
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Den här delningen är begränsad till ”%1$@”. Du kan bara ge samma eller färre behörigheter."
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bu paylaşım \"%1$@\" ile sınırlı. Yalnızca aynı veya daha az izinler verebilirsiniz."
+          }
+        },
+        "zh_HK" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "此分享的權限僅限於「%1$@」。你只能授予相同或更少的權限。"
+          }
+        },
+        "zh_TW" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "此分享的權限僅限於「%1$@」。您僅能授予相同或更少的權限。"
           }
         }
       }

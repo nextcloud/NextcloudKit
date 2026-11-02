@@ -19,6 +19,11 @@ Key traits of this package:
 
 ## Topics
 
+### Onboarding
+
+- ``OnboardingView``
+- ``OnboardingFeature``
+
 ### Login
 
 - ``ServerAddressView``
