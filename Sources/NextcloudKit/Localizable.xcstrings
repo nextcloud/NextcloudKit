@@ -37,10 +37,112 @@
     "A secure connection to the server couldn't be established." : {
       "comment" : "Error message for TLS and certificate failures.",
       "localizations" : {
+        "da" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Der kunne ikke oprettes en sikker forbindelse til serveren."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eine sichere Verbindung zum Server konnte nicht hergestellt werden."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "A secure connection to the server couldn't be established."
+          }
+        },
+        "en_GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A secure connection to the server couldn't be established."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No se ha podido establecer una conexión segura con el servidor."
+          }
+        },
+        "et_EE" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Turvalise ühenduse loomine serveriga ei õnnestunud."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Impossible d'établir une connexion sécurisée avec le serveur."
+          }
+        },
+        "ga" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Níorbh fhéidir nasc slán leis an bhfreastalaí a bhunú."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Non è stato possibile stabilire una connessione sicura al server."
+          }
+        },
+        "pt_BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Não foi possível estabelecer uma conexão segura com o servidor."
+          }
+        },
+        "pt_PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Conexão Oracle não pôde ser estabelecida"
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nu s-a putut stabili o conexiune securizată cu serverul."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Не удалось установить защищённое подключение к серверу."
+          }
+        },
+        "sk_SK" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nepodarilo sa nadviazať bezpečné spojenie so serverom."
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Det gick inte att upprätta en säker anslutning till servern."
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sunucu ile güvenli bir bağlantı kurulamadı."
+          }
+        },
+        "zh_HK" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "無法與伺服器建立安全連線。"
+          }
+        },
+        "zh_TW" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "無法建立至伺服器的安全連線。"
           }
         }
       }
@@ -48,10 +150,112 @@
     "Can't reach the server. Check the address or try again later." : {
       "comment" : "Error message when the server cannot be reached.",
       "localizations" : {
+        "da" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Serveren kan ikke nås. Kontroller adressen, eller prøv igen senere."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Server kann nicht erreicht werden. Die Adresse überprüfen, oder es später erneut versuchen."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Can't reach the server. Check the address or try again later."
+          }
+        },
+        "en_GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Can't reach the server. Check the address or try again later."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No se ha podido alcanzar el servidor. Comprueba la dirección o vuelve a intentarlo más tarde."
+          }
+        },
+        "et_EE" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "See server pole leitav. Kontrolli, kas aadress on ikka õige või proovi hiljem uuesti."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Impossible de joindre le serveur. Vérifiez l'adresse ou réessayez plus tard."
+          }
+        },
+        "ga" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ní féidir teacht ar an bhfreastalaí. Seiceáil an seoladh nó bain triail as arís níos déanaí."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Impossibile raggiungere il server. Controlla l'indirizzo o riprova più tardi."
+          }
+        },
+        "pt_BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Não é possível acessar o servidor. Verifique o endereço ou tente novamente mais tarde."
+          }
+        },
+        "pt_PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Não é possível acessar o servidor. Tente abrir a pasta novamente mais tarde."
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Serverul nu poate fi accesat. Verifică adresa sau încearcă din nou mai târziu."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Сервер недоступен. Проверьте адрес или повторите попытку позже."
+          }
+        },
+        "sk_SK" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Server sa nedá kontaktovať. Skontrolujte adresu alebo skúste to znova neskôr."
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Det går inte att nå servern. Kontrollera adressen eller försök igen senare."
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sunucuya ulaşılamadı. Adresi denetleyin ya da bir süre sonra yeniden deneyin."
+          }
+        },
+        "zh_HK" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "無法連接至伺服器。請檢查位址，或稍後再試。"
+          }
+        },
+        "zh_TW" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "無法連線至伺服器。檢查位址或稍後再試。"
           }
         }
       }
@@ -136,10 +340,292 @@
     "Something went wrong. Please try again." : {
       "comment" : "Error message when the cause of the error is unknown.",
       "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "حدث خطأٌ ما. يرجى إعادة المحاولة."
+          }
+        },
+        "bg_BG" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Нещо се обърка. Моля, опитайте отново."
+          }
+        },
+        "ca" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "S'ha produït un error. Torneu-ho a provar."
+          }
+        },
+        "cs_CZ" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Něco se pokazilo. Zkuste to znovu."
+          }
+        },
+        "da" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Noget gik galt. Prøv igen."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Etwas ist schiefgelaufen. Bitte erneut versuchen."
+          }
+        },
+        "el" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Κάτι πήγε στραβά. Παρακαλούμε προσπαθήστε ξανά."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Something went wrong. Please try again."
+          }
+        },
+        "en_GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Something went wrong. Please try again."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Algo no funcionó correctamente. Por favor, intente de nuevo."
+          }
+        },
+        "es_EC" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Algo salió mal. Por favor, inténtalo de nuevo."
+          }
+        },
+        "et_EE" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Midagi läks viltu, palun proovi uuesti."
+          }
+        },
+        "eu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Arazoren bat izan da. Saiatu berriro."
+          }
+        },
+        "fa" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "مشکلی پیش آمد. لطفا دوباره تلاش کنید."
+          }
+        },
+        "fi_FI" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Jokin meni pieleen. Yritä uudelleen."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Une erreur est survenue. Merci d'essayer à nouveau."
+          }
+        },
+        "ga" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Chuaigh rud eigin mícheart. Arís, le do thoil."
+          }
+        },
+        "gl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Algo foi mal. Ténteo de novo."
+          }
+        },
+        "hr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nešto je pošlo po krivu. Pokušajte ponovno."
+          }
+        },
+        "hu_HU" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Valami balul sült el. Próbálja újra."
+          }
+        },
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ada yang salah. Silakan coba lagi."
+          }
+        },
+        "is" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eitthvað fór úrskeiðis. Prófaðu aftur."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Qualcosa non ha funzionato. Prova ancora."
+          }
+        },
+        "ja_JP" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "何か問題が発生しました。もう一度お試しください。"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "문제가 발생했습니다. 다시 시도하십시오."
+          }
+        },
+        "lo" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Something went wrong. Please try again."
+          }
+        },
+        "lt_LT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kažkas nutiko. Bandykite dar kartą."
+          }
+        },
+        "nb_NO" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Noe gikk feil, vennligst forsøk på ny."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Er ging iets fout... probeer het opnieuw."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Coś poszło nie tak. Spróbuj ponownie."
+          }
+        },
+        "pt_BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Algo deu errado. Por favor, tente novamente."
+          }
+        },
+        "pt_PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Algo deu errado. Por favor, tente novamente."
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ceva nu a funcționat. Încearcă din nou."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Что-то пошло не так. Повторите попытку."
+          }
+        },
+        "sc" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ddoe at àpidu un'errore. Torra a proare."
+          }
+        },
+        "sk_SK" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Niečo sa pokazilo. Skúste to prosím znova."
+          }
+        },
+        "sl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Prišlo je do napake. poskusite znova."
+          }
+        },
+        "sq" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dicka shkoi keq. Ju lutemi provoni përsëri."
+          }
+        },
+        "sr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Нешто није у реду. Молимо вас покушајте поново."
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Något gick fel. Vänligen försök igen."
+          }
+        },
+        "sw" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hitilafu fulani imetokea. Tafadhali jaribu tena."
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bir sorun çıktı. Lütfen yeniden deneyin."
+          }
+        },
+        "ug" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "چاتاق چىقتى. قايتا سىناڭ."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Щось пішло не так. Будь ласка, спробуйте ще раз."
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Một điều gì đó không mong muốn đã xảy ra. Vui lòng thử lại."
+          }
+        },
+        "zh_CN" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "出错了。请再试一次。"
+          }
+        },
+        "zh_HK" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "發生錯誤，請重試。"
+          }
+        },
+        "zh_TW" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "出了點問題。請再試一次。"
           }
         }
       }
@@ -147,10 +633,112 @@
     "The file is locked. Try again later." : {
       "comment" : "Error message when the file is locked on the server.",
       "localizations" : {
+        "da" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Filen er låst. Prøv igen senere."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die Datei ist gesperrt. Bitte später noch einmal versuchen."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "The file is locked. Try again later."
+          }
+        },
+        "en_GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The file is locked. Try again later."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "El archivo está bloqueado. Inténtalo de nuevo más tarde."
+          }
+        },
+        "et_EE" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fail on lukustatud. Proovi hiljem uuesti."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le fichier est verrouillé. Réessayez plus tard."
+          }
+        },
+        "ga" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tá an comhad faoi ghlas. Bain triail as arís níos déanaí."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Il file è bloccato. Riprova più tardi."
+          }
+        },
+        "pt_BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "O arquivo está trancado. Tente novamente mais tarde."
+          }
+        },
+        "pt_PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "O arquivo está trancada ou em uso"
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fișierul este blocat. Încearcă din nou mai târziu."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Файл заблокирован. Повторите попытку позже."
+          }
+        },
+        "sk_SK" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Súbor je uzamknutý. Skúste to znova neskôr."
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Filen är låst. Försök igen senare."
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dosya kilitli. Bir süre sonra yeniden deneyin."
+          }
+        },
+        "zh_HK" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "檔案已鎖定。請稍後再試。"
+          }
+        },
+        "zh_TW" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "檔案已鎖定。請稍後再試。"
           }
         }
       }
@@ -158,10 +746,112 @@
     "The file is too large for the server." : {
       "comment" : "Error message when the server rejects a file because of its size.",
       "localizations" : {
+        "da" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Filen er for stor til serveren."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die Datei ist zu groß für den Server."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "The file is too large for the server."
+          }
+        },
+        "en_GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The file is too large for the server."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "El archivo es demasiado grande para el servidor."
+          }
+        },
+        "et_EE" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "See fail on serveri jaoks liiga suur."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le fichier est trop volumineux pour le serveur."
+          }
+        },
+        "ga" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tá an comhad ró-mhór don fhreastalaí."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Il file è troppo grande per il server."
+          }
+        },
+        "pt_BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "O arquivo é grande demais para o servidor."
+          }
+        },
+        "pt_PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "O arquivo é grande demais para ser enviado."
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fișierul este prea mare pentru server."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Файл слишком большой для сервера."
+          }
+        },
+        "sk_SK" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Súbor je príliš veľký pre server."
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Filen är för stor för servern."
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dosya sunucu için çok büyük."
+          }
+        },
+        "zh_HK" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "檔案超出伺服器允許的大小。"
+          }
+        },
+        "zh_TW" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "檔案過大，伺服器無法處理。"
           }
         }
       }
@@ -191,10 +881,112 @@
     "The request was cancelled." : {
       "comment" : "Error message when a request was cancelled.",
       "localizations" : {
+        "da" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Anmodningen blev annulleret."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die Anfrage wurde abgebrochen."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "The request was cancelled."
+          }
+        },
+        "en_GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The request was cancelled."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Se ha cancelado la petición."
+          }
+        },
+        "et_EE" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Päring on katkestatud."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La requête a été annulée."
+          }
+        },
+        "ga" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cealaíodh an t-iarratas."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La richiesta è stata annullata."
+          }
+        },
+        "pt_BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A solicitação foi cancelada."
+          }
+        },
+        "pt_PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A solicitação de sincronização foi cancelada."
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Solicitarea a fost anulată."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Запрос отменён."
+          }
+        },
+        "sk_SK" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Požiadavka bola zrušená."
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Begäran avbröts."
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "İstek iptal edildi."
+          }
+        },
+        "zh_HK" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "請求已取消。"
+          }
+        },
+        "zh_TW" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "請求已取消。"
           }
         }
       }
@@ -202,10 +994,112 @@
     "The server is temporarily unavailable. Try again later." : {
       "comment" : "Error message when the server is unavailable, e.g. in maintenance mode.",
       "localizations" : {
+        "da" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Serveren er midlertidigt utilgængelig. Prøv igen senere."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Der Server ist vorübergehend nicht verfügbar. Später noch einmal versuchen."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "The server is temporarily unavailable. Try again later."
+          }
+        },
+        "en_GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The server is temporarily unavailable. Try again later."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "El servidor no está disponible temporalmente. Inténtalo de nuevo más tarde."
+          }
+        },
+        "et_EE" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Server pole ajutiselt saadaval. Proovi hiljem uuesti."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le serveur est temporairement indisponible. Réessayez plus tard."
+          }
+        },
+        "ga" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Níl an freastalaí ar fáil go sealadach. Bain triail as arís níos déanaí."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Il server è temporaneamente non disponibile. Riprova più tardi."
+          }
+        },
+        "pt_BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "O servidor está temporariamente indisponível. Tente novamente mais tarde."
+          }
+        },
+        "pt_PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "O servidor está temporariamente indisponível. Tente novamente mais tarde."
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Serverul este temporar indisponibil. Încearcă din nou mai târziu."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Сервер временно недоступен. Повторите попытку позже."
+          }
+        },
+        "sk_SK" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Server je dočasne nedostupný. Skúste to znova neskôr."
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Servern är tillfälligt otillgänglig. Försök igen senare."
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sunucu geçici olarak kullanılamıyor. Bir süre sonra yeniden deneyin."
+          }
+        },
+        "zh_HK" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "伺服器暫時無法使用。請稍後再試。"
+          }
+        },
+        "zh_TW" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "伺服器暫時不可用。請稍後再試。"
           }
         }
       }
@@ -213,10 +1107,112 @@
     "The server ran into a problem. Try again later." : {
       "comment" : "Error message for internal server errors.",
       "localizations" : {
+        "da" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Der opstod et problem på serveren. Prøv igen senere."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Der Server ist auf ein Problem gestoßen. Später noch einmal versuchen."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "The server ran into a problem. Try again later."
+          }
+        },
+        "en_GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The server ran into a problem. Try again later."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "El servidor ha tenido un problema. Inténtalo de nuevo más tarde."
+          }
+        },
+        "et_EE" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Serveris tekkis viga. Proovi hiljem uuesti."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le serveur a rencontré un problème. Réessayez plus tard."
+          }
+        },
+        "ga" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tháinig fadhb chun cinn ar an bhfreastalaí. Bain triail as arís níos déanaí."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Il server ha riscontrato un problema. Riprova più tardi."
+          }
+        },
+        "pt_BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "O servidor encontrou um problema. Tente novamente mais tarde."
+          }
+        },
+        "pt_PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "O servidor encontrou um problema. Tente novamente mais tarde."
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Serverul a întâmpinat o problemă. Încearcă din nou mai târziu."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "На сервере произошла ошибка. Повторите попытку позже."
+          }
+        },
+        "sk_SK" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Server narazil na problém. Skúste to znova neskôr."
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ett problem uppstod på servern. Försök igen senare."
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sunucuda bir sorun çıktı. Bir süre sonra yeniden deneyin."
+          }
+        },
+        "zh_HK" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "伺服器遇到問題。請稍後再試。"
+          }
+        },
+        "zh_TW" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "伺服器出了點問題。請稍後再試。"
           }
         }
       }
@@ -224,10 +1220,112 @@
     "The server sent an unexpected response. Try again later." : {
       "comment" : "Error message when the server's response cannot be read.",
       "localizations" : {
+        "da" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Serveren sendte et uventet svar. Prøv igen senere."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Der Server hat eine unerwartete Antwort gesendet. Bitte später noch einmal versuchen."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "The server sent an unexpected response. Try again later."
+          }
+        },
+        "en_GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The server sent an unexpected response. Try again later."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "El servidor envió una respuesta inesperada. Inténtalo de nuevo más tarde."
+          }
+        },
+        "et_EE" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Server saatis tagasi ootamatu vastuse. Proovi hiljem uuesti."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le serveur a renvoyé une réponse inattendue. Réessayez plus tard."
+          }
+        },
+        "ga" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sheol an freastalaí freagra gan choinne. Bain triail as arís níos déanaí."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Il server ha inviato una risposta imprevista. Riprova più tardi."
+          }
+        },
+        "pt_BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "O servidor enviou uma resposta inesperada. Tente novamente mais tarde."
+          }
+        },
+        "pt_PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "O servidor encontrou um problema. Tente novamente mais tarde."
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Serverul a trimis un răspuns neașteptat. Încearcă din nou mai târziu."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Сервер прислал неожиданный ответ. Повторите попытку позже."
+          }
+        },
+        "sk_SK" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Server poslal neočakávanú odpoveď. Skúste to znova neskôr."
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Servern skickade ett oväntat svar. Försök igen senare."
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sunucu beklenmeyen bir yanıt gönderdi. Bir süre sonra yeniden deneyin."
+          }
+        },
+        "zh_HK" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "伺服器傳回了非預期的回應。請稍後再試。"
+          }
+        },
+        "zh_TW" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "伺服器傳送了非預期的回應。請稍後再試。"
           }
         }
       }
@@ -235,10 +1333,112 @@
     "The server took too long to respond. Try again later." : {
       "comment" : "Error message when a request to the server timed out.",
       "localizations" : {
+        "da" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Serveren var for lang tid om at svare. Prøv igen senere."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Der Server brauchte zu lange, um zu antworten. Bitte später noch einmal versuchen."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "The server took too long to respond. Try again later."
+          }
+        },
+        "en_GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The server took too long to respond. Try again later."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "El servidor ha tardado demasiado en responder. Inténtalo de nuevo más tarde."
+          }
+        },
+        "et_EE" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Serveril kulus vastamiseks liiga kaua aega. Proovi hiljem uuesti."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le serveur a mis trop de temps à répondre. Réessayez plus tard."
+          }
+        },
+        "ga" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Thóg sé ró-fhada ar an bhfreastalaí freagairt. Bain triail as arís níos déanaí."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Il server ha impiegato troppo tempo per rispondere. Riprova più tardi."
+          }
+        },
+        "pt_BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "O servidor demorou muito para responder. Tente novamente mais tarde."
+          }
+        },
+        "pt_PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "O servidor demorou muito tempo a responder. Tente novamente mais tarde."
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Serverul a răspuns prea târziu. Încearcă din nou mai târziu."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Сервер слишком долго не отвечает. Повторите попытку позже."
+          }
+        },
+        "sk_SK" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Server odpovedal príliš dlho. Skúste to znova neskôr."
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Det tog för lång tid för servern att svara. Försök igen senare."
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sunucunun yanıt vermesi çok uzun sürdü. Bir süre sonra yeniden deneyin."
+          }
+        },
+        "zh_HK" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "伺服器回應時間過長。請稍後再試。"
+          }
+        },
+        "zh_TW" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "伺服回應時間太久了。請稍後再試。"
           }
         }
       }
@@ -246,10 +1446,112 @@
     "There is not enough storage space left on the server." : {
       "comment" : "Error message when the account's storage quota is used up.",
       "localizations" : {
+        "da" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Der er ikke nok lagringsplads tilbage på serveren."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Auf dem Server ist nicht mehr genügend Speicherplatz vorhanden."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "There is not enough storage space left on the server."
+          }
+        },
+        "en_GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "There is not enough storage space left on the server."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No queda suficiente espacio de almacenamiento en el servidor."
+          }
+        },
+        "et_EE" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Serveris pole piisavalt vaba andmeruumi."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Il ne reste pas assez d'espace de stockage sur le serveur."
+          }
+        },
+        "ga" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Níl dóthain spáis stórála fágtha ar an bhfreastalaí."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sul server non è rimasto abbastanza spazio di archiviazione."
+          }
+        },
+        "pt_BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Não há espaço de armazenamento suficiente no servidor."
+          }
+        },
+        "pt_PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Não existe espaço de armazenamento suficiente disponível no servidor."
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nu mai există suficient spațiu de stocare pe server."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "На сервере недостаточно места."
+          }
+        },
+        "sk_SK" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Na serveri nezostáva dostatok úložného priestoru."
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Det finns inte tillräckligt med lagringsutrymme kvar på servern."
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sunucuda yeterli depolama alanı kalmadı."
+          }
+        },
+        "zh_HK" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "伺服器的剩餘儲存空間不足。"
+          }
+        },
+        "zh_TW" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "此伺服器上的可用儲存空間不足。"
           }
         }
       }
@@ -257,10 +1559,112 @@
     "There is not enough storage space left on this device." : {
       "comment" : "Error message when the device runs out of storage space.",
       "localizations" : {
+        "da" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Der er ikke nok lagringsplads tilbage på denne enhed."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Auf diesem Gerät ist nicht mehr genügend Speicherplatz vorhanden."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "There is not enough storage space left on this device."
+          }
+        },
+        "en_GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "There is not enough storage space left on this device."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No queda suficiente espacio de almacenamiento en este dispositivo."
+          }
+        },
+        "et_EE" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Selles seadmes pole piisavalt vaba andmeruumi."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Il ne reste pas assez d'espace de stockage sur cet appareil."
+          }
+        },
+        "ga" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Níl dóthain spáis stórála fágtha ar an ngléas seo."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Su questo dispositivo non è rimasto abbastanza spazio di archiviazione."
+          }
+        },
+        "pt_BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Não há espaço de armazenamento suficiente neste dispositivo."
+          }
+        },
+        "pt_PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Não existe espaço de armazenamento suficiente disponível no servidor."
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nu mai există suficient spațiu de stocare pe acest dispozitiv."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "На этом устройстве недостаточно места."
+          }
+        },
+        "sk_SK" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Na tomto zariadení nezostáva dostatok úložného priestoru."
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Det finns inte tillräckligt med lagringsutrymme kvar på den här enheten."
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bu aygıt üzerinde yeterli depolama alanı kalmadı."
+          }
+        },
+        "zh_HK" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "此裝置的剩餘儲存空間不足。"
+          }
+        },
+        "zh_TW" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "此裝置上的可用儲存空間不足。"
           }
         }
       }
@@ -279,10 +1683,112 @@
     "Too many requests. Please wait a moment and try again." : {
       "comment" : "Error message when the server rate-limits the requests.",
       "localizations" : {
+        "da" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "For mange anmodninger. Vent et øjeblik, og prøv igen."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zu viele Anfragen. Bitte einen Moment warten und es erneut versuchen."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Too many requests. Please wait a moment and try again."
+          }
+        },
+        "en_GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Too many requests. Please wait a moment and try again."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Demasiadas peticiones. Por favor, espera un momento y vuelve a intentarlo."
+          }
+        },
+        "et_EE" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Liiga palju päringuid. Palun oota mõne hetke ja proovi uuesti."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Trop de requêtes. Veuillez patienter quelques instants et réessayer."
+          }
+        },
+        "ga" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "An iomarca iarratas. Fan nóiméad, le do thoil, agus bain triail as arís."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Troppe richieste. Attendi un momento e riprova."
+          }
+        },
+        "pt_BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Excesso de solicitações. Aguarde um momento e tente novamente."
+          }
+        },
+        "pt_PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Excesso de solicitações. Aguarde alguns minutos e tente novamente."
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Prea multe solicitări. Așteaptă puțin și încearcă din nou."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Слишком много запросов. Подождите немного и повторите попытку."
+          }
+        },
+        "sk_SK" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Príliš veľa požiadaviek. Počkajte chvíľu a skúste to znova."
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "För många begäranden. Vänta en stund och försök igen."
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Çok fazla sayıda istek yapıldı. Lütfen bir dakika bekleyip yeniden deneyin."
+          }
+        },
+        "zh_HK" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "請求過多。請稍候再試。"
+          }
+        },
+        "zh_TW" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "太多請求。請稍後再試。"
           }
         }
       }
@@ -301,10 +1807,112 @@
     "You don't have permission to do this." : {
       "comment" : "Error message when the server forbids the action.",
       "localizations" : {
+        "da" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Du har ikke tilladelse til at gøre dette."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sie haben nicht die Berechtigung, dies zu tun."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "You don't have permission to do this."
+          }
+        },
+        "en_GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "You don't have permission to do this."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No tienes permiso para hacer esto."
+          }
+        },
+        "et_EE" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sul pole selle tegevuse jaoks vajalikke õigusi."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vous n'êtes pas autorisé à effectuer cette action."
+          }
+        },
+        "ga" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Níl cead agat é seo a dhéanamh."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Non hai il permesso di farlo."
+          }
+        },
+        "pt_BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Você não tem permissão para fazer isso."
+          }
+        },
+        "pt_PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Não tem permissão para fazer isso."
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nu ai permisiunea de a face acest lucru."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "У вас нет прав на это действие."
+          }
+        },
+        "sk_SK" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nemáte oprávnenie na vykonanie tejto akcie."
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Du har inte behörighet att göra detta."
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bu işlemi yapma izniniz yok."
+          }
+        },
+        "zh_HK" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "你沒有執行此操作的權限。"
+          }
+        },
+        "zh_TW" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "您無權執行此動作。"
           }
         }
       }
@@ -312,10 +1920,112 @@
     "You're offline. Please check your internet connection." : {
       "comment" : "Error message when the device has no internet connection.",
       "localizations" : {
+        "da" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Du er offline. Kontroller internetforbindelsen."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sie sind offline. Bitte die Internetverbindung überprüfen."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "You're offline. Please check your internet connection."
+          }
+        },
+        "en_GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "You're offline. Please check your internet connection."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Estás sin conexión. Por favor, comprueba tu conexión a internet."
+          }
+        },
+        "et_EE" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sa ei ole hetkel võrgus. Palun kontrolli oma seadme internetiühenduse toimimist."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vous êtes hors ligne. Veuillez vérifier votre connexion Internet."
+          }
+        },
+        "ga" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tá tú as líne. Seiceáil do nasc idirlín, le do thoil."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sei offline. Controlla la tua connessione a Internet."
+          }
+        },
+        "pt_BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Você está off-line. Verifique sua conexão com a internet."
+          }
+        },
+        "pt_PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Está offline. Por favor, verifique a sua ligação à internet."
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ești offline. Verifică-ți conexiunea la internet."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Нет подключения к сети. Проверьте подключение к Интернету."
+          }
+        },
+        "sk_SK" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nie ste online. Skontrolujte svoje internetové pripojenie."
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Du är offline. Kontrollera din internetanslutning."
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Çevrim dışısınız. Lütfen internet bağlantınızı denetleyin."
+          }
+        },
+        "zh_HK" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "你目前處於離線狀態。請檢查你的互聯網連線。"
+          }
+        },
+        "zh_TW" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "您已離線。請檢查您的網際網路連線。"
           }
         }
       }
