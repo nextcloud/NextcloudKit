@@ -217,6 +217,12 @@ struct NKErrorKindTests {
         #expect(NKError.Kind(code: 405, request: mkcol) == .alreadyExists)
     }
 
+    @Test("Describes the code, kind and description for logs")
+    func logDescription() {
+        #expect(NKError(errorCode: 409, errorDescription: "Parent node does not exist").logDescription == "Code: 409, Kind: conflict, Description: Parent node does not exist")
+        #expect(NKError.success.logDescription == "Code: 0, Kind: none, Description: ")
+    }
+
     @Test("Equality still compares only the code and the description")
     func equality() {
         #expect(NKError(errorCode: 404, errorDescription: "Gone", kind: .notFound) == NKError(errorCode: 404, errorDescription: "Gone", kind: .unknown))

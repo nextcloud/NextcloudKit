@@ -34,7 +34,7 @@ public class UnifiedShareEditModel {
     var mutationError: NKError? {
         didSet {
             if let mutationError {
-                nkLog(error: "Could not update share: \(mutationError.errorCode) \(mutationError.errorDescription)")
+                nkLog(error: "Could not update share: \(mutationError.logDescription)")
             }
         }
     }
@@ -257,7 +257,7 @@ public class UnifiedShareEditModel {
         Task {
             let result = await NextcloudKit.shared.createUnifiedShare(account: account)
             guard var share = result.share else {
-                nkLog(error: "Could not create share: \(result.error.errorCode) \(result.error.errorDescription)")
+                nkLog(error: "Could not create share: \(result.error.logDescription)")
                 state = .error
                 return
             }
@@ -457,7 +457,7 @@ public class UnifiedShareEditModel {
             pendingProperties.remove(propertyClass)
 
             guard let share = result.share else {
-                nkLog(error: "Could not update share property \(propertyClass): \(result.error.errorCode) \(result.error.errorDescription)")
+                nkLog(error: "Could not update share property \(propertyClass): \(result.error.logDescription)")
                 propertyErrors[propertyClass] = result.error.localizedGenericMessage
                 propertyResetRevisions[propertyClass, default: 0] += 1
 

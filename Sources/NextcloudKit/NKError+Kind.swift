@@ -9,7 +9,8 @@ public extension NKError {
     /// What went wrong, independent of how the server or the system worded it.
     ///
     /// Choose the message shown to users from this, and keep ``NKError/errorDescription`` for logs.
-    enum Kind: Sendable, CaseIterable {
+    /// Apps may store the raw value, so don't rename cases.
+    enum Kind: String, Sendable, CaseIterable {
         case offline
         case timeout
         case serverUnreachable

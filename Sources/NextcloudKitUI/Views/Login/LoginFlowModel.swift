@@ -163,7 +163,7 @@ final class LoginFlowModel: QRCodeParsing, URLSanitizing {
         if let error {
             let nkError = error as? NKError ?? NKError(error: error)
 
-            nkLog(error: "Login failed: \(nkError.errorCode) \(nkError.errorDescription)")
+            nkLog(error: "Login failed: \(nkError.logDescription)")
             present(error: message(for: nkError))
         }
     }
@@ -225,7 +225,7 @@ final class LoginFlowModel: QRCodeParsing, URLSanitizing {
             if result.error == .success, let token = result.token {
                 addAccount(credentials.host, credentials.user, token)
             } else {
-                nkLog(error: "One-time login failed: \(result.error.errorCode) \(result.error.errorDescription)")
+                nkLog(error: "One-time login failed: \(result.error.logDescription)")
                 present(error: message(for: result.error))
             }
         }

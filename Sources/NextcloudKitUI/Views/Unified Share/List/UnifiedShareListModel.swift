@@ -67,7 +67,7 @@ public class UnifiedShareListModel {
             if case .loaded = state {
                 onError?(result.error)
             } else {
-                nkLog(error: "Could not load shares: \(result.error.errorCode) \(result.error.errorDescription)")
+                nkLog(error: "Could not load shares: \(result.error.logDescription)")
                 state = .error(result.error)
             }
 

@@ -85,6 +85,11 @@ public struct NKError: Error, Equatable, Sendable {
         return isShareAPI || isUnifiedShareProperty ? serverMessage : nil
     }
 
+    /// The code, ``kind`` and ``errorDescription`` in one line, for logs.
+    public var logDescription: String {
+        "Code: \(errorCode), Kind: \(kind?.rawValue ?? "none"), Description: \(errorDescription)"
+    }
+
     /// The same error, with its server message marked as written for users.
     func markAsUserFriendlyServerMessage() -> NKError {
         var error = self
