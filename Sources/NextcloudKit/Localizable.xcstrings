@@ -4,10 +4,46 @@
     "\"%@\" is a forbidden name." : {
       "comment" : "Error message when the server reserves a name. %@ is the name.",
       "localizations" : {
+        "da" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "\"%@\" er et forbudt navn."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "\"%@\" ist ein verbotener Name."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "\"%@\" is a forbidden name."
+          }
+        },
+        "pt_BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "“%@” é um nome proibido."
+          }
+        },
+        "sk_SK" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "„%@“ je zakázaný názov."
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "\"%@\" adına izin verilmiyor."
+          }
+        },
+        "zh_TW" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "「%@」是禁止使用的名稱。"
           }
         }
       }
@@ -15,10 +51,46 @@
     "\".%@\" is a forbidden file extension." : {
       "comment" : "Error message when the server forbids a file extension. %@ is the extension.",
       "localizations" : {
+        "da" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "\".%@\" er et forbudt filtypenavn."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "\".%@\" ist eine verbotene Dateierweiterung."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "\".%@\" is a forbidden file extension."
+          }
+        },
+        "pt_BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "“.%@” é uma extensão de arquivo proibida."
+          }
+        },
+        "sk_SK" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "„.%@“ je zakázaná prípona súboru."
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "\"%@\" dosya uzantısına izin verilmiyor."
+          }
+        },
+        "zh_TW" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "「.%@」是禁止使用的副檔名。"
           }
         }
       }
@@ -26,10 +98,46 @@
     "A file or folder with this name already exists." : {
       "comment" : "Error message when a file or folder with the same name already exists.",
       "localizations" : {
+        "da" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Der findes allerede en fil eller mappe med dette navn."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eine Datei oder ein Ordner mit diesem Namen existiert bereits."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "A file or folder with this name already exists."
+          }
+        },
+        "pt_BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Já existe um arquivo ou uma pasta com esse nome."
+          }
+        },
+        "sk_SK" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Súbor alebo priečinok s týmto názvom už existuje."
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aynı adlı bir dosya ya da klasör zaten var."
+          }
+        },
+        "zh_TW" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "已有此名稱的檔案或資料夾。"
           }
         }
       }
@@ -527,12 +635,6 @@
             "value" : "Збијено"
           }
         },
-        "sr-Latn" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Zbijeno"
-          }
-        },
         "sv" : {
           "stringUnit" : {
             "state" : "translated",
@@ -985,7 +1087,7 @@
         "pt_BR" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Desativada"
+            "value" : "Desativado"
           }
         },
         "pt_PT" : {
@@ -1063,7 +1165,7 @@
         "tr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Kullanılmıyor"
+            "value" : "Kapalı"
           }
         },
         "ug" : {
@@ -1182,7 +1284,7 @@
         "da" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Filnavnet kan ikke stå tomt."
+            "value" : "Filnavnet må ikke være tomt."
           }
         },
         "de" : {
@@ -1569,12 +1671,6 @@
             "value" : "Назив фајла не може бити празан."
           }
         },
-        "sr-Latn" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Naziv fajla ne može biti prazan."
-          }
-        },
         "sv" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1646,10 +1742,46 @@
     "Login was unsuccessful. Please try again." : {
       "comment" : "Error message when the server rejects the account's credentials.",
       "localizations" : {
+        "da" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Login mislykkedes. Prøv igen."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Anmeldung fehlgeschlagen. Bitte erneut versuchen."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Login was unsuccessful. Please try again."
+          }
+        },
+        "pt_BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "O login não foi bem-sucedido. Por favor, tente novamente."
+          }
+        },
+        "sk_SK" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Prihlásenie sa nepodarilo. Skúste to znova."
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Oturum açılamadı. Lütfen yeniden deneyin."
+          }
+        },
+        "zh_TW" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "登入失敗。請重試。"
           }
         }
       }
@@ -1657,10 +1789,46 @@
     "Name contains an invalid character: \"%@\"." : {
       "comment" : "Error message when a name contains a forbidden character. %@ is the character.",
       "localizations" : {
+        "da" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Navnet indeholder et ugyldigt tegn: \"%@\"."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Der Name enthält ein ungültiges Zeichen: \"%@\"."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Name contains an invalid character: \"%@\"."
+          }
+        },
+        "pt_BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "O nome contém um caractere inválido: “%@”."
+          }
+        },
+        "sk_SK" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Názov obsahuje nepovolený znak: „%@“."
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ad içinde geçersiz bir karakter var: \"%@\"."
+          }
+        },
+        "zh_TW" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "名稱包含了無效的字元：「%@」。"
           }
         }
       }
@@ -1668,10 +1836,46 @@
     "Name must not contain spaces at the beginning or end." : {
       "comment" : "Error message when a name starts or ends with a space.",
       "localizations" : {
+        "da" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Navnet må ikke begynde eller slutte med mellemrum."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Name darf am Anfang oder Ende keine Leerzeichen enthalten."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Name must not contain spaces at the beginning or end."
+          }
+        },
+        "pt_BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "O nome não deve conter espaços no início nem no final."
+          }
+        },
+        "sk_SK" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Názov nesmie obsahovať medzery na začiatku ani na konci."
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Adların başında veya sonunda boşluk bulunmamalıdır."
+          }
+        },
+        "zh_TW" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "名稱的開頭或結尾不能包含空格。"
           }
         }
       }
@@ -2049,12 +2253,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Нормална"
-          }
-        },
-        "sr-Latn" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Normalna"
           }
         },
         "sv" : {
@@ -2647,10 +2845,46 @@
     "The file or folder could not be found on the server." : {
       "comment" : "Error message when the requested file, folder or share does not exist on the server.",
       "localizations" : {
+        "da" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Filen eller mappen kunne ikke findes på serveren."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die Datei oder der Ordner konnte auf dem Server nicht gefunden werden."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "The file or folder could not be found on the server."
+          }
+        },
+        "pt_BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Não foi possível localizar o arquivo ou a pasta no servidor."
+          }
+        },
+        "sk_SK" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Súbor alebo priečinok sa na serveri nepodarilo nájsť."
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dosya veya klasör sunucu üzerinde bulunamadı."
+          }
+        },
+        "zh_TW" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "伺服器上找不到檔案或資料夾。"
           }
         }
       }
@@ -2658,10 +2892,46 @@
     "The operation could not be completed because of a server conflict. Please refresh and try again." : {
       "comment" : "Error message when the request conflicts with the current state on the server.",
       "localizations" : {
+        "da" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Handlingen kunne ikke udføres på grund af en konflikt på serveren. Opdater, og prøv igen."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Der Vorgang konnte aufgrund eines Serverkonflikts nicht abgeschlossen werden. Die Seite aktualisieren und erneut versuchen."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "The operation could not be completed because of a server conflict. Please refresh and try again."
+          }
+        },
+        "pt_BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A operação não pôde ser concluída devido a um conflito no servidor. Atualize a página e tente novamente."
+          }
+        },
+        "sk_SK" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Operáciu sa nepodarilo dokončiť pre konflikt na serveri. Obnovte zobrazenie a skúste to znova."
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "İşlem sunucu çakışması nedeniyle tamamlanamadı. Lütfen yenileyip yeniden deneyin."
+          }
+        },
+        "zh_TW" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "由於伺服器發生衝突，無法完成此操作。請重新整理頁面並再次嘗試。"
           }
         }
       }
@@ -3460,10 +3730,40 @@
     "This name isn't allowed." : {
       "comment" : "Error message when the server rejects a file or folder name.",
       "localizations" : {
+        "da" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dette navn er ikke tilladt."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dieser Name ist nicht erlaubt."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "This name isn't allowed."
+          }
+        },
+        "pt_BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Esse nome não é permitido."
+          }
+        },
+        "sk_SK" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tento názov nie je povolený."
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bu ada izin verilmiyor."
           }
         }
       }
@@ -3584,10 +3884,40 @@
     "Verbose" : {
       "comment" : "Log level that logs everything, for debugging.",
       "localizations" : {
+        "da" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Detaljeret"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ausführlich"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Verbose"
+          }
+        },
+        "pt_BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Verboso"
+          }
+        },
+        "sk_SK" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Podrobné"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ayrıntılı"
           }
         }
       }
