@@ -4,8 +4,12 @@
 
 import Foundation
 
-public final class NKBackground: NSObject, URLSessionTaskDelegate, URLSessionDelegate, URLSessionDownloadDelegate {
+public final class NKBackground: NSObject, URLSessionTaskDelegate, URLSessionDelegate, URLSessionDownloadDelegate, URLSessionDataDelegate {
     let nkCommonInstance: NKCommon
+
+    /// The bodies of failed uploads, so their errors are read like foreground ones.
+    private var errorResponseBodies: [ObjectIdentifier: Data] = [:]
+    private let errorResponseBodiesLock = NSLock()
 
     public init(nkCommonInstance: NKCommon) {
         self.nkCommonInstance = nkCommonInstance
@@ -278,6 +282,14 @@ public final class NKBackground: NSObject, URLSessionTaskDelegate, URLSessionDel
         self.nkCommonInstance.delegate?.uploadProgress(progress, totalBytes: totalBytesSent, totalBytesExpected: totalBytesExpectedToSend, fileName: fileName, serverUrl: serverUrl, session: session, task: task)
     }
 
+    public func urlSession(_ session: URLSession, dataTask: URLSessionDataTask, didReceive data: Data) {
+        guard let response = dataTask.response as? HTTPURLResponse, !(200..<300).contains(response.statusCode) else { return }
+
+        errorResponseBodiesLock.lock()
+        errorResponseBodies[ObjectIdentifier(dataTask), default: Data()].append(data)
+        errorResponseBodiesLock.unlock()
+    }
+
     public func urlSession(_ session: URLSession, task: URLSessionTask, didCompleteWithError error: Error?) {
         var fileName: String = "", serverUrl: String = ""
         let url = task.currentRequest?.url?.absoluteString.removingPercentEncoding
@@ -287,11 +299,17 @@ public final class NKBackground: NSObject, URLSessionTaskDelegate, URLSessionDel
         }
         var nkError: NKError = .success
 
+        errorResponseBodiesLock.lock()
+        let errorResponseBody = errorResponseBodies.removeValue(forKey: ObjectIdentifier(task))
+        errorResponseBodiesLock.unlock()
+
         if let response = (task.response as? HTTPURLResponse) {
             if response.statusCode >= 200 && response.statusCode < 300 {
                 if let error = error {
                     nkError = NKError(error: error)
                 }
+            } else if let errorResponseBody {
+                nkError = NKError(xmlData: errorResponseBody, fallbackStatusCode: response.statusCode, request: task.originalRequest, responseData: errorResponseBody)
             } else {
                 nkError = NKError(httpResponse: response)
             }
