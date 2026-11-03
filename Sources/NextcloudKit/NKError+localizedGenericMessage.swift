@@ -40,6 +40,9 @@ public extension NKError {
         case .invalidName:
             return NSLocalizedString("This name isn't allowed.", bundle: .module, comment: "Error message when the server rejects a file or folder name.")
 
+        case .blockedByVirusScan:
+            return NSLocalizedString("The server's virus scan blocked this file.", bundle: .module, comment: "Error message when the server's antivirus app rejects an uploaded file.")
+
         case .conflict:
             return NSLocalizedString("The operation could not be completed because of a server conflict. Please refresh and try again.", bundle: .module, comment: "Error message when the request conflicts with the current state on the server.")
 
