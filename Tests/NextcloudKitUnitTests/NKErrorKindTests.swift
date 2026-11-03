@@ -130,6 +130,17 @@ struct NKErrorKindTests {
         #expect(error.userFriendlyServerMessage == nil)
     }
 
+    @Test("Recognizes a file blocked by the server's virus scan, but not other unsupported media types")
+    func virusScan() {
+        let virus = davErrorBody(exception: "OCA\\DAV\\Connector\\Sabre\\Exception\\UnsupportedMediaType", message: "Virus Eicar-Test-Signature is detected in the file. Upload cannot be completed.")
+        let unscanned = davErrorBody(exception: "OCA\\DAV\\Connector\\Sabre\\Exception\\UnsupportedMediaType", message: "No connection to anti virus. Upload cannot be completed.")
+        let other = davErrorBody(exception: "Sabre\\DAV\\Exception\\UnsupportedMediaType", message: "Unsupported media type")
+
+        #expect(responseError(statusCode: 415, method: "PUT", body: virus).kind == .blockedByVirusScan)
+        #expect(responseError(statusCode: 415, method: "MOVE", body: unscanned).kind == .blockedByVirusScan)
+        #expect(responseError(statusCode: 415, method: "PROPPATCH", body: other).kind == .unknown)
+    }
+
     @Test("Passes on the share API's messages")
     func shareAPIMessage() {
         let error = responseError(url: Self.shareURL, statusCode: 403, method: "PUT", body: ocsErrorBody(statusCode: 403, message: "Public upload disabled by the administrator"))

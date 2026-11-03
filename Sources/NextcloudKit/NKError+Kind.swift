@@ -22,6 +22,8 @@ public extension NKError {
         case alreadyExists
         /// The server doesn't accept the file or folder name.
         case invalidName
+        /// The server's antivirus app rejected the file: it found a threat, or couldn't scan it and the admin blocks such files.
+        case blockedByVirusScan
         case conflict
         case locked
         case quotaExceeded
@@ -40,9 +42,17 @@ public extension NKError {
 extension NKError.Kind {
     /// Classifies the WebDAV exceptions that the HTTP status alone doesn't tell apart.
     init?(davException: String?) {
-        guard davException == "OCA\\DAV\\Connector\\Sabre\\Exception\\InvalidPath" else { return nil }
+        switch davException {
+        case "OCA\\DAV\\Connector\\Sabre\\Exception\\InvalidPath":
+            self = .invalidName
 
-        self = .invalidName
+        // The server's `InvalidContentException`, which only the antivirus app throws.
+        case "OCA\\DAV\\Connector\\Sabre\\Exception\\UnsupportedMediaType":
+            self = .blockedByVirusScan
+
+        default:
+            return nil
+        }
     }
 
     /// Classifies an ``NKError/errorCode``: a URL loading error, an HTTP status or an OCS status code.
