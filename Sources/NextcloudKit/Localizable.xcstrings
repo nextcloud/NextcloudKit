@@ -13,7 +13,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "\"%@\" ist ein verbotener Name."
+            "value" : "\"%@\" ist ein unzulässiger Name."
           }
         },
         "en" : {
@@ -22,10 +22,28 @@
             "value" : "\"%@\" is a forbidden name."
           }
         },
+        "et_EE" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "„%@“ on keelatud nimi."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "« %@ » est un nom interdit."
+          }
+        },
         "pt_BR" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "“%@” é um nome proibido."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Имя «%@» запрещено."
           }
         },
         "sk_SK" : {
@@ -60,7 +78,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "\".%@\" ist eine verbotene Dateierweiterung."
+            "value" : "\".%@\" ist eine unzulässige Dateierweiterung."
           }
         },
         "en" : {
@@ -69,10 +87,28 @@
             "value" : "\".%@\" is a forbidden file extension."
           }
         },
+        "et_EE" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "„.%@“ on keelatud faililaiend."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "« .%@ » est une extension de fichier interdite."
+          }
+        },
         "pt_BR" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "“.%@” é uma extensão de arquivo proibida."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Расширение «.%@» запрещено."
           }
         },
         "sk_SK" : {
@@ -116,10 +152,28 @@
             "value" : "A file or folder with this name already exists."
           }
         },
+        "et_EE" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Selle nimega fail või kaust on juba olemas."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Un fichier ou un dossier portant ce nom existe déjà."
+          }
+        },
         "pt_BR" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Já existe um arquivo ou uma pasta com esse nome."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Файл или папка с таким именем уже существует."
           }
         },
         "sk_SK" : {
@@ -608,7 +662,7 @@
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Компактный"
+            "value" : "Краткий"
           }
         },
         "sk_SK" : {
@@ -1105,7 +1159,7 @@
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Отключено"
+            "value" : "Отключён"
           }
         },
         "sc" : {
@@ -1766,6 +1820,12 @@
             "value" : "O login não foi bem-sucedido. Por favor, tente novamente."
           }
         },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Не удалось войти. Повторите попытку."
+          }
+        },
         "sk_SK" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1807,10 +1867,22 @@
             "value" : "Name contains an invalid character: \"%@\"."
           }
         },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le nom contient un caractère invalide : « %@ »."
+          }
+        },
         "pt_BR" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "O nome contém um caractere inválido: “%@”."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Имя содержит недопустимый символ: «%@»."
           }
         },
         "sk_SK" : {
@@ -1854,10 +1926,22 @@
             "value" : "Name must not contain spaces at the beginning or end."
           }
         },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le nom ne doit pas contenir d'espaces au début ou à la fin."
+          }
+        },
         "pt_BR" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "O nome não deve conter espaços no início nem no final."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Имя не должно начинаться или заканчиваться пробелом."
           }
         },
         "sk_SK" : {
@@ -2228,7 +2312,7 @@
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Обычная"
+            "value" : "Обычный"
           }
         },
         "sk_SK" : {
@@ -2863,10 +2947,22 @@
             "value" : "The file or folder could not be found on the server."
           }
         },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le fichier ou le dossier n'a pas pu être trouvé sur le serveur."
+          }
+        },
         "pt_BR" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Não foi possível localizar o arquivo ou a pasta no servidor."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Файл или папка на сервере не найдены."
           }
         },
         "sk_SK" : {
@@ -2914,6 +3010,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "A operação não pôde ser concluída devido a um conflito no servidor. Atualize a página e tente novamente."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Не удалось выполнить действие: конфликт с данными на сервере. Обновите и повторите попытку."
           }
         },
         "sk_SK" : {
@@ -3750,7 +3852,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Dieser Name ist nicht erlaubt."
+            "value" : "Dieser Name ist unzulässig."
           }
         },
         "en" : {
@@ -3759,10 +3861,22 @@
             "value" : "This name isn't allowed."
           }
         },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ce nom n'est pas autorisé."
+          }
+        },
         "pt_BR" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Esse nome não é permitido."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Это имя недопустимо."
           }
         },
         "sk_SK" : {
@@ -3919,6 +4033,12 @@
             "value" : "Verboso"
           }
         },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Подробный"
+          }
+        },
         "sk_SK" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3929,6 +4049,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Ayrıntılı"
+          }
+        },
+        "zh_TW" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "詳細"
           }
         }
       }

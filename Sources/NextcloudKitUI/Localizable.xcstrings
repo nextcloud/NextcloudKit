@@ -6834,7 +6834,7 @@
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Приглашенные люди"
+            "value" : "Приглашённые"
           }
         },
         "sk_SK" : {
@@ -7337,10 +7337,28 @@
             "value" : "No server was found at this address."
           }
         },
+        "et_EE" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sellelt aadressilt ei leidunud ühtegi serverit."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aucun serveur n'a été trouvé à cette adresse."
+          }
+        },
         "pt_BR" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Não foi encontrado nenhum servidor neste endereço."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "По этому адресу сервер не найден."
           }
         },
         "sk_SK" : {
@@ -9283,7 +9301,7 @@
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Save"
+            "value" : "Сохранить"
           }
         },
         "sc" : {
@@ -9492,7 +9510,7 @@
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Сканировать QR код"
+            "value" : "Сканировать QR-код"
           }
         },
         "sk_SK" : {
@@ -10886,7 +10904,7 @@
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Опубликовать \"%@\""
+            "value" : "Поделиться «%@»"
           }
         },
         "sk_SK" : {
@@ -11280,7 +11298,7 @@
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Опубликовать папку"
+            "value" : "Поделиться папкой"
           }
         },
         "sk_SK" : {
@@ -11940,7 +11958,7 @@
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Этот получатель будет удален из общего доступа."
+            "value" : "Этот получатель будет удалён из общего доступа."
           }
         },
         "sk_SK" : {
@@ -12047,7 +12065,7 @@
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Этот общий ресурс ограничен правами \"%1$@\". Вы можете предоставить только те же или меньшие права доступа."
+            "value" : "Этот общий ресурс ограничен правами «%1$@». Можно предоставить только такие же или меньшие права."
           }
         },
         "sk_SK" : {
