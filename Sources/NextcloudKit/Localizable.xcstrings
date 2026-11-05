@@ -1814,6 +1814,12 @@
             "value" : "Login was unsuccessful. Please try again."
           }
         },
+        "et_EE" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sisselogimine ei õnnestunud. Palun proovi uuesti."
+          }
+        },
         "pt_BR" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1865,6 +1871,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Name contains an invalid character: \"%@\"."
+          }
+        },
+        "et_EE" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nimes leidub keelatud tähemärke: „%@“."
           }
         },
         "fr" : {
@@ -1924,6 +1936,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Name must not contain spaces at the beginning or end."
+          }
+        },
+        "et_EE" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nime alguses või lõpus ei tohi olla tühikuid."
           }
         },
         "fr" : {
@@ -2947,6 +2965,12 @@
             "value" : "The file or folder could not be found on the server."
           }
         },
+        "et_EE" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Seda faili või kausta ei õnnestunud serverist leida."
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3004,6 +3028,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "The operation could not be completed because of a server conflict. Please refresh and try again."
+          }
+        },
+        "et_EE" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tegevuse lõpetamine ei õnnestunud serveris oleva vastuolu tõttu. Palun laadi leht uuesti ja proovi veel kord."
           }
         },
         "pt_BR" : {
@@ -3606,10 +3636,64 @@
     "The server's virus scan blocked this file." : {
       "comment" : "Error message when the server's antivirus app rejects an uploaded file.",
       "localizations" : {
+        "da" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Serverens virusscanning blokerede denne fil."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Der Virenscan des Servers hat diese Datei blockiert."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "The server's virus scan blocked this file."
+          }
+        },
+        "et_EE" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Serveripoolne viirusekontroll blokeeris selle faili."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "L'analyse antivirus du serveur a bloqué ce fichier."
+          }
+        },
+        "pt_BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A verificação antivírus do servidor bloqueou este arquivo."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Антивирусная проверка сервера заблокировала этот файл."
+          }
+        },
+        "sk_SK" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Antivírusová kontrola servera zablokovala tento súbor."
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sunucunun virüs koruması bu dosyayı engelledi."
+          }
+        },
+        "zh_TW" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "伺服器的病毒掃描已封鎖此檔案。"
           }
         }
       }
@@ -3861,6 +3945,12 @@
             "value" : "This name isn't allowed."
           }
         },
+        "et_EE" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "See nimi pole lubatud."
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3889,6 +3979,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Bu ada izin verilmiyor."
+          }
+        },
+        "zh_TW" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "不允許此名稱"
           }
         }
       }
@@ -4025,6 +4121,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Verbose"
+          }
+        },
+        "et_EE" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Jutukas"
           }
         },
         "pt_BR" : {
