@@ -22,6 +22,12 @@
             "value" : "\"%@\" is a forbidden name."
           }
         },
+        "en_GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "\"%@\" is a forbidden name."
+          }
+        },
         "et_EE" : {
           "stringUnit" : {
             "state" : "translated",
@@ -58,6 +64,12 @@
             "value" : "\"%@\" adına izin verilmiyor."
           }
         },
+        "zh_HK" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "「%@」是禁止使用的名稱。"
+          }
+        },
         "zh_TW" : {
           "stringUnit" : {
             "state" : "translated",
@@ -82,6 +94,12 @@
           }
         },
         "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "\".%@\" is a forbidden file extension."
+          }
+        },
+        "en_GB" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "\".%@\" is a forbidden file extension."
@@ -123,6 +141,12 @@
             "value" : "\"%@\" dosya uzantısına izin verilmiyor."
           }
         },
+        "zh_HK" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "「.%@」是禁止使用的副檔名。"
+          }
+        },
         "zh_TW" : {
           "stringUnit" : {
             "state" : "translated",
@@ -147,6 +171,12 @@
           }
         },
         "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A file or folder with this name already exists."
+          }
+        },
+        "en_GB" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "A file or folder with this name already exists."
@@ -186,6 +216,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Aynı adlı bir dosya ya da klasör zaten var."
+          }
+        },
+        "zh_HK" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "已有同名檔案或資料夾。"
           }
         },
         "zh_TW" : {
@@ -1814,6 +1850,12 @@
             "value" : "Login was unsuccessful. Please try again."
           }
         },
+        "en_GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Login was unsuccessful. Please try again."
+          }
+        },
         "et_EE" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1844,6 +1886,12 @@
             "value" : "Oturum açılamadı. Lütfen yeniden deneyin."
           }
         },
+        "zh_HK" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "登入失敗，請再試一次。"
+          }
+        },
         "zh_TW" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1868,6 +1916,12 @@
           }
         },
         "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Name contains an invalid character: \"%@\"."
+          }
+        },
+        "en_GB" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Name contains an invalid character: \"%@\"."
@@ -1909,6 +1963,12 @@
             "value" : "Ad içinde geçersiz bir karakter var: \"%@\"."
           }
         },
+        "zh_HK" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "名稱包含無效字元：「%@」。"
+          }
+        },
         "zh_TW" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1933,6 +1993,12 @@
           }
         },
         "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Name must not contain spaces at the beginning or end."
+          }
+        },
+        "en_GB" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Name must not contain spaces at the beginning or end."
@@ -1972,6 +2038,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Adların başında veya sonunda boşluk bulunmamalıdır."
+          }
+        },
+        "zh_HK" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "名稱開頭或結尾不可包含空格。"
           }
         },
         "zh_TW" : {
@@ -2965,6 +3037,12 @@
             "value" : "The file or folder could not be found on the server."
           }
         },
+        "en_GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The file or folder could not be found on the server."
+          }
+        },
         "et_EE" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3001,6 +3079,12 @@
             "value" : "Dosya veya klasör sunucu üzerinde bulunamadı."
           }
         },
+        "zh_HK" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "在伺服器上找不到該檔案或資料夾。"
+          }
+        },
         "zh_TW" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3025,6 +3109,12 @@
           }
         },
         "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The operation could not be completed because of a server conflict. Please refresh and try again."
+          }
+        },
+        "en_GB" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "The operation could not be completed because of a server conflict. Please refresh and try again."
@@ -3058,6 +3148,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "İşlem sunucu çakışması nedeniyle tamamlanamadı. Lütfen yenileyip yeniden deneyin."
+          }
+        },
+        "zh_HK" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "由於伺服器發生衝突，無法完成操作。請重新整理後再試一次。"
           }
         },
         "zh_TW" : {
@@ -3654,6 +3750,12 @@
             "value" : "The server's virus scan blocked this file."
           }
         },
+        "en_GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The server's virus scan blocked this file."
+          }
+        },
         "et_EE" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3688,6 +3790,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Sunucunun virüs koruması bu dosyayı engelledi."
+          }
+        },
+        "zh_HK" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "伺服器的病毒掃描已封鎖此檔案。"
           }
         },
         "zh_TW" : {
@@ -3945,6 +4053,12 @@
             "value" : "This name isn't allowed."
           }
         },
+        "en_GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This name isn't allowed."
+          }
+        },
         "et_EE" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3979,6 +4093,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Bu ada izin verilmiyor."
+          }
+        },
+        "zh_HK" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "不允許使用此名稱。"
           }
         },
         "zh_TW" : {
@@ -4123,6 +4243,12 @@
             "value" : "Verbose"
           }
         },
+        "en_GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Verbose"
+          }
+        },
         "et_EE" : {
           "stringUnit" : {
             "state" : "translated",
@@ -4151,6 +4277,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Ayrıntılı"
+          }
+        },
+        "zh_HK" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "詳細"
           }
         },
         "zh_TW" : {

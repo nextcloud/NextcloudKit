@@ -7337,6 +7337,12 @@
             "value" : "No server was found at this address."
           }
         },
+        "en_GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No server was found at this address."
+          }
+        },
         "et_EE" : {
           "stringUnit" : {
             "state" : "translated",
@@ -7371,6 +7377,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Bu adreste bir sunucu bulunamadı."
+          }
+        },
+        "zh_HK" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "在此地址找不到伺服器。"
           }
         },
         "zh_TW" : {
