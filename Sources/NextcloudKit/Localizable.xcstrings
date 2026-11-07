@@ -1740,7 +1740,7 @@
         "sk_SK" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Meno súboru nemôže byť prázdne"
+            "value" : "Názov súboru nemôže byť prázdny."
           }
         },
         "sl" : {
@@ -2408,7 +2408,7 @@
         "sk_SK" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Normálna"
+            "value" : "Normálna úroveň"
           }
         },
         "sl" : {
