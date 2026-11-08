@@ -40,6 +40,12 @@
             "value" : "« %@ » est un nom interdit."
           }
         },
+        "ga" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Is ainm toirmiscthe é \"%@\"."
+          }
+        },
         "pt_BR" : {
           "stringUnit" : {
             "state" : "translated",
@@ -56,6 +62,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "„%@“ je zakázaný názov."
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "\"%@\" är ett förbjudet namn."
           }
         },
         "tr" : {
@@ -117,6 +129,12 @@
             "value" : "« .%@ » est une extension de fichier interdite."
           }
         },
+        "ga" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Is síneadh comhaid toirmiscthe é \".%@\"."
+          }
+        },
         "pt_BR" : {
           "stringUnit" : {
             "state" : "translated",
@@ -133,6 +151,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "„.%@“ je zakázaná prípona súboru."
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "\".%@\" är ett förbjudet filtillägg."
           }
         },
         "tr" : {
@@ -194,6 +218,12 @@
             "value" : "Un fichier ou un dossier portant ce nom existe déjà."
           }
         },
+        "ga" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tá comhad nó fillteán leis an ainm seo ann cheana."
+          }
+        },
         "pt_BR" : {
           "stringUnit" : {
             "state" : "translated",
@@ -210,6 +240,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Súbor alebo priečinok s týmto názvom už existuje."
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "En fil eller mapp med det namnet finns redan."
           }
         },
         "tr" : {
@@ -1862,6 +1898,12 @@
             "value" : "Sisselogimine ei õnnestunud. Palun proovi uuesti."
           }
         },
+        "ga" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Theip ar an logáil isteach. Bain triail as arís, le do thoil."
+          }
+        },
         "pt_BR" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1878,6 +1920,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Prihlásenie sa nepodarilo. Skúste to znova."
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Inloggningen misslyckades. Försök igen."
           }
         },
         "tr" : {
@@ -1939,6 +1987,12 @@
             "value" : "Le nom contient un caractère invalide : « %@ »."
           }
         },
+        "ga" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tá carachtar neamhbhailí san ainm: \"%@\"."
+          }
+        },
         "pt_BR" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1955,6 +2009,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Názov obsahuje nepovolený znak: „%@“."
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Namnet innehåller ett ogiltigt tecken: \"%@\"."
           }
         },
         "tr" : {
@@ -2016,6 +2076,12 @@
             "value" : "Le nom ne doit pas contenir d'espaces au début ou à la fin."
           }
         },
+        "ga" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ní ceadmhach spásanna a bheith ag tús nó ag deireadh an ainm."
+          }
+        },
         "pt_BR" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2032,6 +2098,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Názov nesmie obsahovať medzery na začiatku ani na konci."
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Namnet får inte innehålla mellanslag i början eller slutet."
           }
         },
         "tr" : {
@@ -3055,6 +3127,12 @@
             "value" : "Le fichier ou le dossier n'a pas pu être trouvé sur le serveur."
           }
         },
+        "ga" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Níorbh fhéidir an comhad nó an fillteán a aimsiú ar an bhfreastalaí."
+          }
+        },
         "pt_BR" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3071,6 +3149,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Súbor alebo priečinok sa na serveri nepodarilo nájsť."
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Filen eller mappen kunde inte hittas på servern."
           }
         },
         "tr" : {
@@ -3126,6 +3210,12 @@
             "value" : "Tegevuse lõpetamine ei õnnestunud serveris oleva vastuolu tõttu. Palun laadi leht uuesti ja proovi veel kord."
           }
         },
+        "ga" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Níorbh fhéidir an oibríocht a chur i gcrích de bharr coinbhleachta ar an bhfreastalaí. Athnuaigh an leathanach agus bain triail as arís, le do thoil."
+          }
+        },
         "pt_BR" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3142,6 +3232,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Operáciu sa nepodarilo dokončiť pre konflikt na serveri. Obnovte zobrazenie a skúste to znova."
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Åtgärden kunde inte slutföras på grund av en konflikt på servern. Uppdatera sidan och försök igen."
           }
         },
         "tr" : {
@@ -3768,6 +3864,12 @@
             "value" : "L'analyse antivirus du serveur a bloqué ce fichier."
           }
         },
+        "ga" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Chuir scanadh víreas an fhreastalaí bac ar an gcomhad seo.<br>"
+          }
+        },
         "pt_BR" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3784,6 +3886,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Antivírusová kontrola servera zablokovala tento súbor."
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Serverns virusskanning blockerade den här filen."
           }
         },
         "tr" : {
@@ -4071,6 +4179,12 @@
             "value" : "Ce nom n'est pas autorisé."
           }
         },
+        "ga" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Níl an t-ainm seo ceadaithe."
+          }
+        },
         "pt_BR" : {
           "stringUnit" : {
             "state" : "translated",
@@ -4087,6 +4201,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Tento názov nie je povolený."
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Det här namnet är inte tillåtet."
           }
         },
         "tr" : {
@@ -4255,6 +4375,12 @@
             "value" : "Jutukas"
           }
         },
+        "ga" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Foclach"
+          }
+        },
         "pt_BR" : {
           "stringUnit" : {
             "state" : "translated",
@@ -4271,6 +4397,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Podrobné"
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Utförlig"
           }
         },
         "tr" : {

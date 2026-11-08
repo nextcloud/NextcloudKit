@@ -7355,6 +7355,12 @@
             "value" : "Aucun serveur n'a été trouvé à cette adresse."
           }
         },
+        "ga" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Níor aimsíodh freastalaí ar an seoladh seo."
+          }
+        },
         "pt_BR" : {
           "stringUnit" : {
             "state" : "translated",
@@ -7371,6 +7377,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Na tejto adrese sa nenašiel žiadny server."
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ingen server hittades på den här adressen."
           }
         },
         "tr" : {
