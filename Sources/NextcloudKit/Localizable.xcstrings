@@ -1898,6 +1898,12 @@
             "value" : "Sisselogimine ei õnnestunud. Palun proovi uuesti."
           }
         },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La connexion n'a pas réussi. Veuillez réessayer."
+          }
+        },
         "ga" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3210,6 +3216,12 @@
             "value" : "Tegevuse lõpetamine ei õnnestunud serveris oleva vastuolu tõttu. Palun laadi leht uuesti ja proovi veel kord."
           }
         },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "L'opération n'a pas pu être terminée en raison d'un conflit sur le serveur. Veuillez rafraîchir et réessayer."
+          }
+        },
         "ga" : {
           "stringUnit" : {
             "state" : "translated",
@@ -4373,6 +4385,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Jutukas"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Verbeux"
           }
         },
         "ga" : {
