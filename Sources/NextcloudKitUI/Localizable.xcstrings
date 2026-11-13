@@ -1326,6 +1326,12 @@
             "value" : "Kdokoli"
           }
         },
+        "cy_GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "rhywun"
+          }
+        },
         "da" : {
           "stringUnit" : {
             "state" : "translated",
@@ -7567,6 +7573,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Ceart go leor"
+          }
+        },
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "OKE"
           }
         },
         "it" : {
