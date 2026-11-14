@@ -46,6 +46,12 @@
             "value" : "Is ainm toirmiscthe é \"%@\"."
           }
         },
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "\"%@\" adalah nama yang dilarang."
+          }
+        },
         "pt_BR" : {
           "stringUnit" : {
             "state" : "translated",
@@ -135,6 +141,12 @@
             "value" : "Is síneadh comhaid toirmiscthe é \".%@\"."
           }
         },
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "\".%@\" adalah ekstensi berkas yang dilarang."
+          }
+        },
         "pt_BR" : {
           "stringUnit" : {
             "state" : "translated",
@@ -222,6 +234,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Tá comhad nó fillteán leis an ainm seo ann cheana."
+          }
+        },
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Berkas atau folder dengan nama ini sudah ada."
           }
         },
         "pt_BR" : {
@@ -317,6 +335,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Níorbh fhéidir nasc slán leis an bhfreastalaí a bhunú."
+          }
+        },
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Koneksi aman ke server tidak dapat dibuat."
           }
         },
         "it" : {
@@ -430,6 +454,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Ní féidir teacht ar an bhfreastalaí. Seiceáil an seoladh nó bain triail as arís níos déanaí."
+          }
+        },
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tidak dapat menjangkau server. Periksa alamatnya atau coba lagi nanti."
           }
         },
         "it" : {
@@ -1910,6 +1940,12 @@
             "value" : "Theip ar an logáil isteach. Bain triail as arís, le do thoil."
           }
         },
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gagal masuk. Silakan coba lagi."
+          }
+        },
         "pt_BR" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1999,6 +2035,12 @@
             "value" : "Tá carachtar neamhbhailí san ainm: \"%@\"."
           }
         },
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nama mengandung karakter yang tidak valid: \"%@\"."
+          }
+        },
         "pt_BR" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2086,6 +2128,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Ní ceadmhach spásanna a bheith ag tús nó ag deireadh an ainm."
+          }
+        },
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nama tidak boleh mengandung spasi di awal atau akhir."
           }
         },
         "pt_BR" : {
@@ -2701,7 +2749,7 @@
         "id" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ada yang salah. Silakan coba lagi."
+            "value" : "Terjadi kesalahan. Silakan coba lagi."
           }
         },
         "is" : {
@@ -2919,6 +2967,12 @@
             "value" : "Tá an comhad faoi ghlas. Bain triail as arís níos déanaí."
           }
         },
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Berkas terkunci. Coba lagi nanti."
+          }
+        },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3032,6 +3086,12 @@
             "value" : "Tá an comhad ró-mhór don fhreastalaí."
           }
         },
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ukuran berkas terlalu besar untuk server."
+          }
+        },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3139,6 +3199,12 @@
             "value" : "Níorbh fhéidir an comhad nó an fillteán a aimsiú ar an bhfreastalaí."
           }
         },
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Berkas atau folder tidak dapat ditemukan di server."
+          }
+        },
         "pt_BR" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3226,6 +3292,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Níorbh fhéidir an oibríocht a chur i gcrích de bharr coinbhleachta ar an bhfreastalaí. Athnuaigh an leathanach agus bain triail as arís, le do thoil."
+          }
+        },
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Operasi tidak dapat diselesaikan karena konflik di server. Muat ulang dan coba lagi."
           }
         },
         "pt_BR" : {
@@ -3321,6 +3393,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Cealaíodh an t-iarratas."
+          }
+        },
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Permintaan dibatalkan."
           }
         },
         "it" : {
@@ -3436,6 +3514,12 @@
             "value" : "Níl an freastalaí ar fáil go sealadach. Bain triail as arís níos déanaí."
           }
         },
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Server untuk sementara tidak tersedia. Coba lagi nanti."
+          }
+        },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3547,6 +3631,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Tháinig fadhb chun cinn ar an bhfreastalaí. Bain triail as arís níos déanaí."
+          }
+        },
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Server mengalami masalah. Coba lagi nanti."
           }
         },
         "it" : {
@@ -3662,6 +3752,12 @@
             "value" : "Sheol an freastalaí freagra gan choinne. Bain triail as arís níos déanaí."
           }
         },
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Server mengirim respons yang tidak terduga. Coba lagi nanti."
+          }
+        },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3775,6 +3871,12 @@
             "value" : "Thóg sé ró-fhada ar an bhfreastalaí freagairt. Bain triail as arís níos déanaí."
           }
         },
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Server membutuhkan waktu terlalu lama untuk merespons. Coba lagi nanti."
+          }
+        },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3882,6 +3984,12 @@
             "value" : "Chuir scanadh víreas an fhreastalaí bac ar an gcomhad seo.<br>"
           }
         },
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pemindaian virus server memblokir berkas ini."
+          }
+        },
         "pt_BR" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3975,6 +4083,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Níl dóthain spáis stórála fágtha ar an bhfreastalaí."
+          }
+        },
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ruang penyimpanan yang tersisa di server tidak mencukupi."
           }
         },
         "it" : {
@@ -4090,6 +4204,12 @@
             "value" : "Níl dóthain spáis stórála fágtha ar an ngléas seo."
           }
         },
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ruang penyimpanan yang tersisa di perangkat ini tidak mencukupi."
+          }
+        },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
@@ -4197,6 +4317,12 @@
             "value" : "Níl an t-ainm seo ceadaithe."
           }
         },
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nama ini tidak diizinkan."
+          }
+        },
         "pt_BR" : {
           "stringUnit" : {
             "state" : "translated",
@@ -4290,6 +4416,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "An iomarca iarratas. Fan nóiméad, le do thoil, agus bain triail as arís."
+          }
+        },
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Terlalu banyak permintaan. Tunggu sebentar dan coba lagi."
           }
         },
         "it" : {
@@ -4399,6 +4531,12 @@
             "value" : "Foclach"
           }
         },
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Terperinci"
+          }
+        },
         "pt_BR" : {
           "stringUnit" : {
             "state" : "translated",
@@ -4492,6 +4630,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Níl cead agat é seo a dhéanamh."
+          }
+        },
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Anda tidak memiliki izin untuk melakukan tindakan ini."
           }
         },
         "it" : {
@@ -4605,6 +4749,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Tá tú as líne. Seiceáil do nasc idirlín, le do thoil."
+          }
+        },
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Anda sedang luring. Periksa koneksi internet Anda."
           }
         },
         "it" : {
