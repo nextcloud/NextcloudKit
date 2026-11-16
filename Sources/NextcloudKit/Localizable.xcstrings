@@ -52,6 +52,12 @@
             "value" : "\"%@\" adalah nama yang dilarang."
           }
         },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "\"%@\" è un nome proibito."
+          }
+        },
         "pt_BR" : {
           "stringUnit" : {
             "state" : "translated",
@@ -147,6 +153,12 @@
             "value" : "\".%@\" adalah ekstensi berkas yang dilarang."
           }
         },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "\".%@\" è una estensione proibita."
+          }
+        },
         "pt_BR" : {
           "stringUnit" : {
             "state" : "translated",
@@ -240,6 +252,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Berkas atau folder dengan nama ini sudah ada."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Esiste già un file o una cartella con lo stesso nome."
           }
         },
         "pt_BR" : {
@@ -1946,6 +1964,12 @@
             "value" : "Gagal masuk. Silakan coba lagi."
           }
         },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Accesso non riuscito. Riprova."
+          }
+        },
         "pt_BR" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2041,6 +2065,12 @@
             "value" : "Nama mengandung karakter yang tidak valid: \"%@\"."
           }
         },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Il nome contiene un carattere non valido: \"%@\"."
+          }
+        },
         "pt_BR" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2134,6 +2164,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Nama tidak boleh mengandung spasi di awal atau akhir."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Il nome non deve contenere spazi all'inizio o alla fine."
           }
         },
         "pt_BR" : {
@@ -3205,6 +3241,12 @@
             "value" : "Berkas atau folder tidak dapat ditemukan di server."
           }
         },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Il file o la cartella non è stato trovato sul server."
+          }
+        },
         "pt_BR" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3298,6 +3340,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Operasi tidak dapat diselesaikan karena konflik di server. Muat ulang dan coba lagi."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "L'operazione non ha potuto essere completata a causa di un conflitto sul server. Si prega di aggiornare e riprovare."
           }
         },
         "pt_BR" : {
@@ -3990,6 +4038,12 @@
             "value" : "Pemindaian virus server memblokir berkas ini."
           }
         },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La scansione antivirus del server ha bloccato questo file."
+          }
+        },
         "pt_BR" : {
           "stringUnit" : {
             "state" : "translated",
@@ -4323,6 +4377,12 @@
             "value" : "Nama ini tidak diizinkan."
           }
         },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Questo nome non è valido."
+          }
+        },
         "pt_BR" : {
           "stringUnit" : {
             "state" : "translated",
@@ -4535,6 +4595,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Terperinci"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dettagliato"
           }
         },
         "pt_BR" : {

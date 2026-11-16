@@ -1506,6 +1506,12 @@
             "value" : "Ktokoľvek"
           }
         },
+        "sl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kdorkoli"
+          }
+        },
         "sv" : {
           "stringUnit" : {
             "state" : "translated",
