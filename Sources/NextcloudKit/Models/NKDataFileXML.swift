@@ -284,6 +284,8 @@ public class NKDataFileXML: NSObject {
             return files
         }
         let xml = XML.parse(xmlData)
+        guard let document = xml.element else { return files }
+        normalizeFileResponseNamespaces(in: document)
         let elements = xml["d:multistatus", "d:response"]
 
         for element in elements {
@@ -330,46 +332,46 @@ public class NKDataFileXML: NSObject {
                 }
             }
 
-            let propstat = element["d:propstat"][0]
+            let properties = successfulFileProperties(in: element)
 
-            if let getlastmodified = propstat["d:prop", "d:getlastmodified"].text,
+            if let getlastmodified = properties["d:getlastmodified"].text,
                let date = getlastmodified.parsedDate(using: "EEE, dd MMM y HH:mm:ss zzz") { 
                 file.date = date
             }
 
-            if let creationtime = propstat["d:prop", "nc:creation_time"].double, creationtime > 0 {
+            if let creationtime = properties["nc:creation_time"].double, creationtime > 0 {
                 file.creationDate = Date(timeIntervalSince1970: creationtime)
             }
 
-            if let uploadtime = propstat["d:prop", "nc:upload_time"].double, uploadtime > 0 {
+            if let uploadtime = properties["nc:upload_time"].double, uploadtime > 0 {
                 file.uploadDate = Date(timeIntervalSince1970: uploadtime)
             }
 
-            if let getetag = propstat["d:prop", "d:getetag"].text {
+            if let getetag = properties["d:getetag"].text {
                 file.etag = getetag.replacingOccurrences(of: "\"", with: "")
             }
 
-            if let getcontenttype = propstat["d:prop", "d:getcontenttype"].text {
+            if let getcontenttype = properties["d:getcontenttype"].text {
                 file.contentType = getcontenttype
             }
 
-            if let dataFingerprint = propstat["d:prop", "d:data-fingerprint"].text {
+            if let dataFingerprint = properties["d:data-fingerprint"].text {
                 file.dataFingerprint = dataFingerprint
             }
 
-            if let downloadURL = propstat["d:prop", "d:downloadURL"].text {
+            if let downloadURL = properties["d:downloadURL"].text {
                 file.downloadURL = downloadURL
             }
 
-            if let note = propstat["d:prop", "nc:note"].text {
+            if let note = properties["nc:note"].text {
                 file.note = note
             }
 
-            if let sharePermissionsCollaborationServices = propstat["d:prop", "x1:share-permissions"].int {
+            if let sharePermissionsCollaborationServices = properties["x1:share-permissions"].int {
                 file.sharePermissionsCollaborationServices = sharePermissionsCollaborationServices
             }
 
-            if let sharePermissionsCloudMesh = propstat["d:prop", "x2:share-permissions"].text {
+            if let sharePermissionsCloudMesh = properties["x2:share-permissions"].text {
                 let elements = sharePermissionsCloudMesh.components(separatedBy: ",")
                 for element in elements {
                     let result = (element as String).replacingOccurrences(of: "[", with: "").replacingOccurrences(of: "]", with: "").replacingOccurrences(of: "\"", with: "")
@@ -377,169 +379,169 @@ public class NKDataFileXML: NSObject {
                 }
             }
 
-            if let checksums = propstat["d:prop", "d:checksums"].text {
+            if let checksums = properties["d:checksums"].text {
                 file.checksums = checksums
             }
 
-            let resourcetypeElement = propstat["d:prop", "d:resourcetype"]
+            let resourcetypeElement = properties["d:resourcetype"]
             if resourcetypeElement["d:collection"].error == nil {
                 file.directory = true
                 file.contentType = "httpd/unix-directory"
             } else {
-                if let resourcetype = propstat["d:prop", "d:resourcetype"].text {
+                if let resourcetype = properties["d:resourcetype"].text {
                     file.resourceType = resourcetype
                 }
             }
 
-            if let quotaavailablebytes = propstat["d:prop", "d:quota-available-bytes"].text {
+            if let quotaavailablebytes = properties["d:quota-available-bytes"].text {
                 file.quotaAvailableBytes = Int64(quotaavailablebytes) ?? 0
             }
 
-            if let quotausedbytes = propstat["d:prop", "d:quota-used-bytes"].text {
+            if let quotausedbytes = properties["d:quota-used-bytes"].text {
                 file.quotaUsedBytes = Int64(quotausedbytes) ?? 0
             }
 
-            if let permissions = propstat["d:prop", "oc:permissions"].text {
+            if let permissions = properties["oc:permissions"].text {
                 file.permissions = permissions
             }
 
-            if let ocId = propstat["d:prop", "oc:id"].text {
+            if let ocId = properties["oc:id"].text {
                 file.ocId = ocId
             }
 
-            if let fileId = propstat["d:prop", "oc:fileid"].text {
+            if let fileId = properties["oc:fileid"].text {
                 file.fileId = fileId
             }
 
-            if let size = propstat["d:prop", "oc:size"].text {
+            if let size = properties["oc:size"].text {
                 file.size = Int64(size) ?? 0
             }
 
-            for shareTypesElement in propstat["d:prop", "oc:share-types"] {
+            for shareTypesElement in properties["oc:share-types"] {
                 if let shareTypes = shareTypesElement["oc:share-type"].int {
                     file.shareType.append(shareTypes)
                 }
             }
 
-            if let favorite = propstat["d:prop", "oc:favorite"].text {
+            if let favorite = properties["oc:favorite"].text {
                 file.favorite = (favorite as NSString).boolValue
             }
 
-            if let ownerid = propstat["d:prop", "oc:owner-id"].text {
+            if let ownerid = properties["oc:owner-id"].text {
                 file.ownerId = ownerid
             }
 
-            if let ownerdisplayname = propstat["d:prop", "oc:owner-display-name"].text {
+            if let ownerdisplayname = properties["oc:owner-display-name"].text {
                 file.ownerDisplayName = ownerdisplayname
             }
 
-            if let commentsunread = propstat["d:prop", "oc:comments-unread"].text {
+            if let commentsunread = properties["oc:comments-unread"].text {
                 file.commentsUnread = (commentsunread as NSString).boolValue
             }
 
-            if let encrypted = propstat["d:prop", "nc:is-encrypted"].text {
+            if let encrypted = properties["nc:is-encrypted"].text {
                 file.e2eEncrypted = (encrypted as NSString).boolValue
             }
 
-            if let haspreview = propstat["d:prop", "nc:has-preview"].text {
+            if let haspreview = properties["nc:has-preview"].text {
                 file.hasPreview = (haspreview as NSString).boolValue
             }
 
-            if let mounttype = propstat["d:prop", "nc:mount-type"].text {
+            if let mounttype = properties["nc:mount-type"].text {
                 file.mountType = mounttype
             }
 
-            if let richWorkspace = propstat["d:prop", "nc:rich-workspace"].text {
+            if let richWorkspace = properties["nc:rich-workspace"].text {
                 file.richWorkspace = richWorkspace
             }
 
-            if let lock = propstat["d:prop", "nc:lock"].int {
+            if let lock = properties["nc:lock"].int {
                 file.lock = lock > 0
             }
 
-            if let lockOwner = propstat["d:prop", "nc:lock-owner"].text {
+            if let lockOwner = properties["nc:lock-owner"].text {
                 file.lockOwner = lockOwner
             }
-            if let lockOwnerEditor = propstat["d:prop", "nc:lock-owner-editor"].text {
+            if let lockOwnerEditor = properties["nc:lock-owner-editor"].text {
                 file.lockOwnerEditor = lockOwnerEditor
             }
-            if let lockOwnerType = propstat["d:prop", "nc:lock-owner-type"].int {
+            if let lockOwnerType = properties["nc:lock-owner-type"].int {
                 file.lockOwnerType = lockOwnerType
             }
-            if let lockOwnerDisplayName = propstat["d:prop", "nc:lock-owner-displayname"].text {
+            if let lockOwnerDisplayName = properties["nc:lock-owner-displayname"].text {
                 file.lockOwnerDisplayName = lockOwnerDisplayName
             }
-            if let lockTime = propstat["d:prop", "nc:lock-time"].int {
+            if let lockTime = properties["nc:lock-time"].int {
                 file.lockTime = Date(timeIntervalSince1970: TimeInterval(lockTime))
             }
-            if let lockTimeOut = propstat["d:prop", "nc:lock-timeout"].int, lockTimeOut > 0 {
+            if let lockTimeOut = properties["nc:lock-timeout"].int, lockTimeOut > 0 {
                 file.lockTimeOut = file.lockTime?.addingTimeInterval(TimeInterval(lockTimeOut))
             }
 
-            let tags: [NKTag] = NKTag.parse(systemTagElements: propstat["d:prop", "nc:system-tags", "nc:system-tag"])
+            let tags: [NKTag] = NKTag.parse(systemTagElements: properties["nc:system-tags", "nc:system-tag"])
             file.tags.append(contentsOf: tags)
 
             // NC27 -----
-            if let latitude = propstat["d:prop", "nc:file-metadata-gps", "latitude"].double {
+            if let latitude = properties["nc:file-metadata-gps", "latitude"].double {
                 file.latitude = latitude
             }
-            if let longitude = propstat["d:prop", "nc:file-metadata-gps", "longitude"].double {
+            if let longitude = properties["nc:file-metadata-gps", "longitude"].double {
                 file.longitude = longitude
             }
-            if let altitude = propstat["d:prop", "nc:file-metadata-gps", "altitude"].double {
+            if let altitude = properties["nc:file-metadata-gps", "altitude"].double {
                 file.altitude = altitude
             }
 
-            if let width = propstat["d:prop", "nc:file-metadata-size", "width"].double {
+            if let width = properties["nc:file-metadata-size", "width"].double {
                 file.width = width
             }
-            if let height = propstat["d:prop", "nc:file-metadata-size", "height"].double {
+            if let height = properties["nc:file-metadata-size", "height"].double {
                 file.height = height
             }
             // ----------
 
             // ----- NC28
-            if let latitude = propstat["d:prop", "nc:metadata-photos-gps", "latitude"].double {
+            if let latitude = properties["nc:metadata-photos-gps", "latitude"].double {
                 file.latitude = latitude
             }
-            if let longitude = propstat["d:prop", "nc:metadata-photos-gps", "longitude"].double {
+            if let longitude = properties["nc:metadata-photos-gps", "longitude"].double {
                 file.longitude = longitude
             }
-            if let altitude = propstat["d:prop", "nc:metadata-photos-gps", "altitude"].double {
+            if let altitude = properties["nc:metadata-photos-gps", "altitude"].double {
                 file.altitude = altitude
             }
 
-            if let width = propstat["d:prop", "nc:metadata-photos-size", "width"].double {
+            if let width = properties["nc:metadata-photos-size", "width"].double {
                 file.width = width
             }
-            if let height = propstat["d:prop", "nc:metadata-photos-size", "height"].double {
+            if let height = properties["nc:metadata-photos-size", "height"].double {
                 file.height = height
             }
             // ----------
 
-            if let livePhotoFile = propstat["d:prop", "nc:metadata-files-live-photo"].text {
+            if let livePhotoFile = properties["nc:metadata-files-live-photo"].text {
                 file.livePhotoFile = livePhotoFile
                 file.isFlaggedAsLivePhotoByServer = true
             }
 
-            if let hidden = propstat["d:prop", "nc:hidden"].text {
+            if let hidden = properties["nc:hidden"].text {
                 file.hidden = (hidden as NSString).boolValue
             }
 
-            if let datePhotosOriginal = propstat["d:prop", "nc:metadata-photos-original_date_time"].double, datePhotosOriginal > 0 {
+            if let datePhotosOriginal = properties["nc:metadata-photos-original_date_time"].double, datePhotosOriginal > 0 {
                 file.datePhotosOriginal = Date(timeIntervalSince1970: datePhotosOriginal)
             }
 
-            let exifPhotosElements = propstat["d:prop", "nc:metadata-photos-exif"]
+            let exifPhotosElements = properties["nc:metadata-photos-exif"]
             if let element = exifPhotosElements.element {
                 for child in element.childElements {
                     file.exifPhotos.append([child.name: child.text])
                 }
             }
 
-            file.placePhotos = propstat["d:prop", "nc:metadata-photos-place"].text
+            file.placePhotos = properties["nc:metadata-photos-place"].text
 
-            for downloadLimit in propstat["d:prop", "nc:share-download-limits", "nc:share-download-limit"] {
+            for downloadLimit in properties["nc:share-download-limits", "nc:share-download-limit"] {
                 guard let token = downloadLimit["nc:token"].text else {
                     continue
                 }
@@ -588,6 +590,60 @@ public class NKDataFileXML: NSObject {
         }
 
         return files
+    }
+
+    private static let fileResponseNamespacePrefixes = [
+        "DAV:": "d",
+        "http://owncloud.org/ns": "oc",
+        "http://nextcloud.org/ns": "nc",
+        "http://open-collaboration-services.org/ns": "x1",
+        "http://open-cloud-mesh.org/ns": "x2"
+    ]
+
+    // SwiftyXMLParser exposes qualified names and xmlns declarations. Resolve scoped declarations
+    // to the prefixes used by the file property accessors.
+    private func normalizeFileResponseNamespaces(
+        in element: XML.Element,
+        inheritedNamespaces: [String: String] = [:]
+    ) {
+        var namespaces = inheritedNamespaces
+        for (attribute, namespace) in element.attributes {
+            if attribute == "xmlns" {
+                namespaces[""] = namespace
+            } else if attribute.hasPrefix("xmlns:") {
+                namespaces[String(attribute.dropFirst("xmlns:".count))] = namespace
+            }
+        }
+
+        let nameParts = element.name.split(separator: ":", maxSplits: 1)
+        let prefix = nameParts.count == 2 ? String(nameParts[0]) : ""
+        if let namespace = namespaces[prefix], !namespace.isEmpty, let localName = nameParts.last {
+            if let canonicalPrefix = Self.fileResponseNamespacePrefixes[namespace] {
+                element.name = "\(canonicalPrefix):\(localName)"
+            } else {
+                element.name = "{\(namespace)}\(localName)"
+            }
+        }
+
+        // EXIF metadata exposes its child names verbatim.
+        guard element.name != "nc:metadata-photos-exif" else { return }
+        for child in element.childElements {
+            normalizeFileResponseNamespaces(in: child, inheritedNamespaces: namespaces)
+        }
+    }
+
+    private func successfulFileProperties(in response: XML.Accessor) -> XML.Accessor {
+        let elements = response["d:propstat"].flatMap { propstat -> [XML.Element] in
+            guard let status = propstat["d:status"].text?.split(whereSeparator: \.isWhitespace).dropFirst().first,
+                  let code = Int(status),
+                  (200..<300).contains(code)
+            else {
+                return []
+            }
+            return propstat["d:prop"].element?.childElements ?? []
+        }
+
+        return XML.Accessor(XML.Element(name: "d:prop", childElements: elements))
     }
 
     func convertDataTrash(xmlData: Data, nkSession: NKSession, showHiddenFiles: Bool) async -> [NKTrash] {
