@@ -59,7 +59,7 @@ public extension NextcloudKit {
                 .onURLSessionTaskCreation { task in
                 task.taskDescription = options.taskDescription
                 taskHandler(task)
-            }.responseData(queue: self.nkCommonInstance.backgroundQueue) { response in
+            }.responseData(queue: self.nkCommonInstance.responseQueue) { response in
                 switch response.result {
                     case .failure(let error):
                         let error = NKError(error: error, afResponse: response, responseData: response.data)

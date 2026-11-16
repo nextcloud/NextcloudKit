@@ -70,7 +70,10 @@ public struct NKCommon: Sendable {
     public let rootQueue = DispatchQueue(label: "com.nextcloud.session.rootQueue")
     public let requestQueue = DispatchQueue(label: "com.nextcloud.session.requestQueue")
     public let serializationQueue = DispatchQueue(label: "com.nextcloud.session.serializationQueue")
-    public let backgroundQueue = DispatchQueue(label: "com.nextcloud.nextcloudkit.backgroundqueue", qos: .background, attributes: .concurrent)
+    public let responseQueue = DispatchQueue(label: "com.nextcloud.nextcloudkit.responsequeue", qos: .userInitiated, attributes: .concurrent)
+
+    @available(*, deprecated, renamed: "responseQueue")
+    public var backgroundQueue: DispatchQueue { responseQueue }
     private let logQueue = DispatchQueue(label: "com.nextcloud.nextcloudkit.queuelog", attributes: .concurrent )
 
     public let headerAccount = "X-NC-Account"

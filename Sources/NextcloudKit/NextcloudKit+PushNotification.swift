@@ -41,7 +41,7 @@ public extension NextcloudKit {
         nkSession.sessionData.request(url, method: .post, parameters: parameters, encoding: URLEncoding.default, headers: headers, interceptor: NKInterceptor(nkCommonInstance: nkCommonInstance)).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
             task.taskDescription = options.taskDescription
             taskHandler(task)
-        }.responseData(queue: self.nkCommonInstance.backgroundQueue) { response in
+        }.responseData(queue: self.nkCommonInstance.responseQueue) { response in
             switch response.result {
             case .failure(let error):
                 let error = NKError(error: error, afResponse: response, responseData: response.data)
@@ -130,7 +130,7 @@ public extension NextcloudKit {
         nkSession.sessionData.request(url, method: .delete, encoding: URLEncoding.default, headers: headers, interceptor: NKInterceptor(nkCommonInstance: nkCommonInstance)).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
             task.taskDescription = options.taskDescription
             taskHandler(task)
-        }.responseData(queue: self.nkCommonInstance.backgroundQueue) { response in
+        }.responseData(queue: self.nkCommonInstance.responseQueue) { response in
             switch response.result {
             case .failure(let error):
                 let error = NKError(error: error, afResponse: response, responseData: response.data)
@@ -210,7 +210,7 @@ public extension NextcloudKit {
         nkSession.sessionData.request(url, method: .post, parameters: parameters, encoding: URLEncoding.default, headers: headers, interceptor: NKInterceptor(nkCommonInstance: nkCommonInstance)).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
             task.taskDescription = options.taskDescription
             taskHandler(task)
-        }.responseData(queue: self.nkCommonInstance.backgroundQueue) { response in
+        }.responseData(queue: self.nkCommonInstance.responseQueue) { response in
             switch response.result {
             case .failure(let error):
                 let error = NKError(error: error, afResponse: response, responseData: response.data)
@@ -299,7 +299,7 @@ public extension NextcloudKit {
         nkSession.sessionData.request(url, method: .delete, parameters: parameters, encoding: URLEncoding.default, headers: headers, interceptor: NKInterceptor(nkCommonInstance: nkCommonInstance)).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
             task.taskDescription = options.taskDescription
             taskHandler(task)
-        }.responseData(queue: self.nkCommonInstance.backgroundQueue) { response in
+        }.responseData(queue: self.nkCommonInstance.responseQueue) { response in
             switch response.result {
             case .failure(let error):
                 let error = NKError(error: error, afResponse: response, responseData: response.data)
