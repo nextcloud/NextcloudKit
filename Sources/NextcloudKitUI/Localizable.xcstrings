@@ -1314,6 +1314,12 @@
             "value" : "Enige iemand"
           }
         },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "أي شخص"
+          }
+        },
         "bn_BD" : {
           "stringUnit" : {
             "state" : "translated",
