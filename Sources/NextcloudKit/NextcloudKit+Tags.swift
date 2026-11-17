@@ -67,7 +67,7 @@ public extension NextcloudKit {
                     task.taskDescription = options.taskDescription
                     taskHandler(task)
                 }
-                .responseData(queue: self.nkCommonInstance.backgroundQueue) { response in
+                .responseData(queue: self.nkCommonInstance.responseQueue) { response in
                     switch response.result {
                     case .failure(let error):
                         let error = NKError(error: error, afResponse: response, responseData: response.data)
@@ -145,7 +145,7 @@ public extension NextcloudKit {
                     task.taskDescription = options.taskDescription
                     taskHandler(task)
                 }
-                .responseData(queue: self.nkCommonInstance.backgroundQueue) { response in
+                .responseData(queue: self.nkCommonInstance.responseQueue) { response in
                     let result = self.evaluateResponse(response)
                     continuation.resume(returning: (
                         account: account,
@@ -204,7 +204,7 @@ public extension NextcloudKit {
                     task.taskDescription = options.taskDescription
                     taskHandler(task)
                 }
-                .responseData(queue: self.nkCommonInstance.backgroundQueue) { response in
+                .responseData(queue: self.nkCommonInstance.responseQueue) { response in
                     let result = self.evaluateResponse(response)
                     continuation.resume(returning: (
                         account: account,
@@ -262,7 +262,7 @@ public extension NextcloudKit {
                     task.taskDescription = options.taskDescription
                     taskHandler(task)
                 }
-                .responseData(queue: self.nkCommonInstance.backgroundQueue) { response in
+                .responseData(queue: self.nkCommonInstance.responseQueue) { response in
                     let result = self.evaluateResponse(response)
                     continuation.resume(returning: (
                         account: account,
@@ -327,7 +327,7 @@ public extension NextcloudKit {
                     task.taskDescription = options.taskDescription
                     taskHandler(task)
                 }
-                .responseData(queue: self.nkCommonInstance.backgroundQueue) { response in
+                .responseData(queue: self.nkCommonInstance.responseQueue) { response in
                     let result = self.evaluateResponse(response)
                     continuation.resume(returning: (
                         account: account,

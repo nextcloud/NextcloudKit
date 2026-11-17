@@ -51,7 +51,7 @@ public extension NextcloudKit {
             options.queue.async { taskHandler(task) }
         } .downloadProgress { progress in
             options.queue.async { progressHandler(progress) }
-        } .response(queue: self.nkCommonInstance.backgroundQueue) { response in
+        } .response(queue: self.nkCommonInstance.responseQueue) { response in
             let nkError = self.evaluateDownloadResponse(response)
 
             // A failed HTTP response can still have been downloaded and moved to the final path.
