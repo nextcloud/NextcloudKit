@@ -7,51 +7,54 @@ import Foundation
 ///
 /// Turn user input of a server address into a sanitized URL.
 ///
-/// - Returns: If `input` is a valid URL, then the sanitized `URL` and otherwise `nil`.
-///
-protocol URLSanitizing {
-    func sanitize(_ input: String) -> URL?
-}
+protocol URLSanitizing {}
 
 extension URLSanitizing {
-    func sanitize(_ input: String) -> URL? {
-        guard input.isEmpty == false else {
+    ///
+    /// - Parameters:
+    ///     - input: The server address as typed, with or without scheme, port, path or a trailing `index.php`.
+    ///     - upgradingInsecureHTTP: Whether an explicit `http` scheme is replaced with `https`.
+    ///
+    /// - Returns: If `input` is a valid HTTP(S) address, then the sanitized `URL` ending in `/` and otherwise `nil`.
+    ///
+    func sanitize(_ input: String, upgradingInsecureHTTP: Bool = false) -> URL? {
+        var address = input.trimmingCharacters(in: .whitespacesAndNewlines)
+
+        guard address.isEmpty == false else {
             return nil
         }
 
-        guard var components = URLComponents(string: input) else {
+        // Without a scheme, URLComponents reads "host" as a path and "host:8080" as a scheme.
+        if address.hasPrefix("//") {
+            address = "https:\(address)"
+        } else if address.contains("://") == false {
+            address = "https://\(address)"
+        }
+
+        guard var components = URLComponents(string: address),
+              let scheme = components.scheme?.lowercased(),
+              ["http", "https"].contains(scheme),
+              let host = components.host,
+              host.isEmpty == false else {
             return nil
         }
 
-        // Ensure HTTP(S) is used.
-        if let givenScheme = components.scheme {
-            if ["http", "https"].contains(givenScheme) == false {
-                return nil
-            }
-        } else {
-            components.scheme = "https"
+        components.scheme = upgradingInsecureHTTP ? "https" : scheme
+        components.query = nil
+        components.fragment = nil
+
+        var pathComponents = components.path.split(separator: "/").map(String.init)
+
+        if pathComponents.last == "index.php" {
+            pathComponents.removeLast()
         }
 
-        if components.path.isEmpty {
-            components.path = "/"
-        } else {
-            // Drop last path component, if it is a PHP script.
-            let pathComponents = components.path.split(separator: "/")
+        components.path = "/" + pathComponents.joined(separator: "/")
 
-            if let lastPathComponent = pathComponents.last, lastPathComponent == "index.php" {
-                components.path = pathComponents.dropLast().joined(separator: "/")
-            }
-
-            // Add trailing slash, if missing.
-            if components.path.hasSuffix("/") == false {
-                components.path = "\(components.path)/"
-            }
+        if components.path.hasSuffix("/") == false {
+            components.path += "/"
         }
 
-        guard let url = components.url else {
-            return nil
-        }
-
-        return url
+        return components.url
     }
 }

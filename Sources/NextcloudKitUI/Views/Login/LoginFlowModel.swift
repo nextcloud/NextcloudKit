@@ -214,7 +214,7 @@ final class LoginFlowModel: QRCodeParsing, URLSanitizing {
         }
     }
 
-    private func exchangeOnetimeToken(_ credentials: ParsedLoginCredentials) {
+    private func exchangeOnetimeToken(_ credentials: LoginCredentials) {
         isActive = true
 
         Task {

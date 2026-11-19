@@ -11821,6 +11821,15 @@
         }
       }
     },
+    "The login code is missing the password." : {
+      "comment" : "Error message when a login QR code has no password."
+    },
+    "The login code is missing the server address." : {
+      "comment" : "Error message when a login QR code has no server address."
+    },
+    "The login code is missing the user name." : {
+      "comment" : "Error message when a login QR code has no user name."
+    },
     "This change will replace the individual permission settings of all recipients in this share." : {
       "comment" : "Explanation shown before propagating top-level permission changes to every recipient.",
       "localizations" : {
@@ -11927,6 +11936,9 @@
           }
         }
       }
+    },
+    "This is not a valid login code." : {
+      "comment" : "Error message when a scanned QR code is not a Nextcloud login code."
     },
     "This recipient will be removed from the share." : {
       "comment" : "Message of the recipient removal confirmation dialog.",
