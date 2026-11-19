@@ -26,8 +26,13 @@ Key traits of this package:
 
 ### Login
 
+Apps with branding, managed configuration or their own certificate handling pass a ``LoginFlowConfiguration`` to ``ServerAddressView``. The view stays busy until the ``AddAccountHandler`` returns and shows the error it throws.
+
 - ``ServerAddressView``
 - ``AddAccountHandler``
+- ``LoginFlowConfiguration``
+- ``LoginCallbackParser``
+- ``LoginCredentials``
 
 ### Account Menu
 

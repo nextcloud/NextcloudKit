@@ -39,7 +39,12 @@ struct SharedAccountsView: View {
 
 
                                 VStack(alignment: .leading) {
-                                    Text(sharedAccount.name)
+                                    if let user = sharedAccount.user, user != sharedAccount.name {
+                                        Text(verbatim: "\(sharedAccount.name) (\(user))")
+                                    } else {
+                                        Text(sharedAccount.name)
+                                    }
+
                                     Text(sharedAccount.host.absoluteString)
                                         .foregroundStyle(.secondary)
                                         .font(.subheadline)

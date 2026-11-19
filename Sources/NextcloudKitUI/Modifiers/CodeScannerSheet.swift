@@ -15,6 +15,7 @@ struct CodeScannerSheet: ViewModifier {
     @Environment(\.dismiss) private var dismiss
 
     @Binding var isPresentingCodeScanner: Bool
+    @State private var isTorchOn = false
     let completionHandler: (Result<ScanResult, ScanError>) -> Void
 
     init(isPresented: Binding<Bool>, _ completionHandler: @escaping (Result<ScanResult, ScanError>) -> Void) {
@@ -25,10 +26,32 @@ struct CodeScannerSheet: ViewModifier {
     func body(content: Content) -> some View {
         content.sheet(isPresented: $isPresentingCodeScanner) {
             NavigationStack {
-                CodeScannerView(codeTypes: [.qr], scanMode: .once, showViewfinder: true, completion: completionHandler)
+                CodeScannerView(codeTypes: [.qr], scanMode: .once, showViewfinder: true, isTorchOn: isTorchOn, completion: completionHandler)
                 .ignoresSafeArea()
                 .toolbarTitleDisplayMode(.inline)
                 .navigationTitle(String(localized: "Scan QR Code", bundle: .module, comment: "Navigation bar title"))
+                .toolbar {
+                    ToolbarItem(placement: .cancellationAction) {
+                        Button {
+                            isPresentingCodeScanner = false
+                        } label: {
+                            Text("Cancel", bundle: .module, comment: "Button label")
+                        }
+                    }
+
+                    ToolbarItem(placement: .primaryAction) {
+                        Button {
+                            isTorchOn.toggle()
+                        } label: {
+                            Label {
+                                Text("Flashlight", bundle: .module, comment: "Accessibility label of the button which toggles the flashlight while scanning a QR code.")
+                            } icon: {
+                                Image(systemName: isTorchOn ? "flashlight.on.fill" : "flashlight.off.fill")
+                            }
+                        }
+                        .accessibilityIdentifier("toggleTorch")
+                    }
+                }
             }
         }
     }

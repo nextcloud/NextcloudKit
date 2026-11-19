@@ -26,21 +26,28 @@ public struct SharedAccount: Identifiable, Sendable {
     public let host: URL
 
     ///
-    /// The login name of this shared account.
+    /// The name to display for this shared account.
     ///
     public let name: String
+
+    ///
+    /// The login name of this shared account, shown next to ``name`` when set.
+    ///
+    public let user: String?
 
     ///
     /// Create a new instance.
     ///
     /// - Parameters:
     ///     - name: See ``name``.
+    ///     - user: See ``user``.
     ///     - host: See ``host``.
     ///     - image: See ``image``.
     ///
-    public init(_ name: String, on host: URL, with image: Image) {
+    public init(_ name: String, user: String? = nil, on host: URL, with image: Image) {
         self.id = UUID()
         self.name = name
+        self.user = user
         self.host = host
         self.image = image
     }
