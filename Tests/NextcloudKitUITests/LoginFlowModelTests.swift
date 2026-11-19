@@ -20,6 +20,7 @@ struct LoginFlowModelTests {
         var addedAccounts: [(host: URL, name: String, password: String)] = []
         var serverErrors: [(error: NKError, url: URL)] = []
         var isActiveDuringAddAccount: Bool?
+        var isAddingAccountDuringAddAccount: Bool?
         var addAccountError: Error?
         weak var model: LoginFlowModel?
     }
@@ -27,6 +28,7 @@ struct LoginFlowModelTests {
     private func makeModel(configuration: LoginFlowConfiguration = LoginFlowConfiguration(), recorder: Recorder) -> LoginFlowModel {
         let model = LoginFlowModel(userAgent: nil, configuration: configuration) { host, name, password in
             recorder.isActiveDuringAddAccount = recorder.model?.isActive
+            recorder.isAddingAccountDuringAddAccount = recorder.model?.isAddingAccount
             recorder.addedAccounts.append((host, name, password))
 
             if let error = recorder.addAccountError {
@@ -95,6 +97,8 @@ struct LoginFlowModelTests {
         #expect(account.name == "jane")
         #expect(account.password == "secret")
         #expect(recorder.isActiveDuringAddAccount == true)
+        #expect(recorder.isAddingAccountDuringAddAccount == true)
+        #expect(model.isAddingAccount == false)
         #expect(model.isPresentingAlert == false)
     }
 
@@ -176,6 +180,30 @@ struct LoginFlowModelTests {
 
         #expect(recorder.serverErrors.map(\.url.absoluteString) == ["https://127.0.0.1:1/", "http://127.0.0.1:2/"])
         #expect(model.enteredServerAddress == "http://127.0.0.1:2/")
+        #expect(model.isPresentingAlert == false)
+    }
+
+    @Test func cancelWhileRecoveringStopsTheLogin() async throws {
+        let recorder = Recorder()
+        var configuration = LoginFlowConfiguration()
+
+        configuration.onServerError = { error, url in
+            recorder.serverErrors.append((error, url))
+            recorder.model?.cancel()
+
+            return .retry(URL(string: "http://127.0.0.1:2/")!) // swiftlint:disable:this force_unwrapping
+        }
+
+        let model = makeModel(configuration: configuration, recorder: recorder)
+        model.enteredServerAddress = "127.0.0.1:1"
+        model.logIn()
+
+        try await waitUntil { recorder.serverErrors.count == 1 && model.isActive == false }
+        try await Task.sleep(for: .milliseconds(200))
+
+        #expect(recorder.serverErrors.count == 1)
+        #expect(model.enteredServerAddress == "https://127.0.0.1:1/")
+        #expect(model.isActive == false)
         #expect(model.isPresentingAlert == false)
     }
 }

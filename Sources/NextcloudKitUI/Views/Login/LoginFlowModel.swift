@@ -51,6 +51,9 @@ final class LoginFlowModel: QRCodeParsing, URLSanitizing {
     /// Whether an activity currently requires disabling the user interface.
     var isActive = false
 
+    /// Whether the account is being added, after which the login can no longer be cancelled.
+    var isAddingAccount = false
+
     /// State toggle for presenting the error alert.
     var isPresentingAlert = false
 
@@ -128,7 +131,12 @@ final class LoginFlowModel: QRCodeParsing, URLSanitizing {
 
         nkLog(error: "Login server check failed: \(error.logDescription)")
 
-        switch await onServerError(error, serverURL) {
+        let recovery = await onServerError(error, serverURL)
+
+        // The user may have cancelled while the host was asking how to recover.
+        guard Task.isCancelled == false else { return }
+
+        switch recovery {
         case .retry(let url):
             enteredServerAddress = url.absoluteString
             start(serverURL: url)
@@ -210,6 +218,7 @@ final class LoginFlowModel: QRCodeParsing, URLSanitizing {
         pollingTask = nil
         isPresentingLoginPage = false
         isActive = true
+        isAddingAccount = true
 
         // Not a child of the polling or presentation task, which end when the login page closes.
         Task {
@@ -220,6 +229,7 @@ final class LoginFlowModel: QRCodeParsing, URLSanitizing {
                 present(error: (error as? NKError)?.localizedGenericMessage ?? error.localizedDescription)
             }
 
+            isAddingAccount = false
             isActive = false
         }
     }
@@ -298,6 +308,7 @@ final class LoginFlowModel: QRCodeParsing, URLSanitizing {
 
     private func exchangeOnetimeToken(_ credentials: LoginCredentials) {
         isActive = true
+        isAddingAccount = true
 
         Task {
             let result = await NextcloudKit.shared.getAppPasswordOnetimeAsync(url: credentials.host.absoluteString, user: credentials.user, onetimeToken: credentials.password, userAgent: userAgent)
@@ -305,6 +316,7 @@ final class LoginFlowModel: QRCodeParsing, URLSanitizing {
             if result.error == .success, let token = result.token {
                 complete(host: credentials.host, name: credentials.user, password: token)
             } else {
+                isAddingAccount = false
                 isActive = false
                 nkLog(error: "One-time login failed: \(result.error.logDescription)")
                 present(error: message(for: result.error))

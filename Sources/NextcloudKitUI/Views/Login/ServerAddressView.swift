@@ -336,7 +336,7 @@ public struct ServerAddressView: View {
                 }
             }
             .tint(foregroundColor)
-            .disabled(model.isActive)
+            .disabled(model.isAddingAccount)
             .accessibilityIdentifier("cancelLogin")
         }
     }
