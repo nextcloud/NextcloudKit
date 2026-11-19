@@ -356,4 +356,81 @@ public extension NextcloudKit {
         return value
     }
 
+
+    /// Updates the favorite tag through the Files web API, which can be used while a file is locked.
+    ///
+    /// This endpoint replaces the Files app's personal tag selection with the supplied favorite tag
+    /// or an empty selection. It does not modify system tags.
+    /// - Parameters:
+    ///   - filePath: The unescaped path relative to the account's Files root.
+    ///   - favorite: Whether to add or remove the favorite tag.
+    ///   - account: The account performing the request.
+    ///   - options: Optional request options.
+    ///   - taskHandler: Callback for the underlying URL session task.
+    func setFavoriteTag(filePath: String,
+                        favorite: Bool,
+                        account: String,
+                        options: NKRequestOptions = NKRequestOptions(),
+                        taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
+                        completion: @escaping (_ account: String, _ responseData: AFDataResponse<Data>?, _ error: NKError) -> Void) {
+        let components = filePath.split(separator: "/")
+        guard !components.isEmpty,
+              !components.contains(where: { $0 == "." || $0 == ".." }),
+              let nkSession = nkCommonInstance.nksessions.session(forAccount: account),
+              let headers = nkCommonInstance.getStandardHeaders(account: account, options: options, contentType: "application/json"),
+              let baseURL = try? nkCommonInstance.createStandardUrl(
+                serverUrl: nkSession.urlBase,
+                endpoint: "index.php/apps/files/api/v1/files"
+              )?.asURL() else {
+            return options.queue.async { completion(account, nil, .urlError) }
+        }
+
+        let url = components.reduce(baseURL) { url, component in
+            url.appendingPathComponent(String(component))
+        }
+        let tags = favorite ? ["_$!<Favorite>!$_"] : []
+        let request: URLRequest
+        do {
+            var urlRequest = try URLRequest(url: url, method: .post, headers: headers)
+            urlRequest.timeoutInterval = options.timeout
+            urlRequest.httpBody = try JSONEncoder().encode(["tags": tags])
+            request = urlRequest
+        } catch {
+            let result = NKError(error: error)
+            return options.queue.async { completion(account, nil, result) }
+        }
+
+        nkSession.sessionData.request(request, interceptor: NKInterceptor(nkCommonInstance: nkCommonInstance))
+            .validate(statusCode: 200..<300)
+            .onURLSessionTaskCreation { task in
+                task.taskDescription = options.taskDescription
+                taskHandler(task)
+            }
+            .responseData(queue: nkCommonInstance.responseQueue) { response in
+                let error = self.evaluateResponse(response)
+                let confirmedTags = response.value.flatMap {
+                    (try? JSONSerialization.jsonObject(with: $0) as? [String: Any])?["tags"] as? [String]
+                }
+                let result: NKError = error == .success && confirmedTags != tags ? .invalidData : error
+                options.queue.async { completion(account, response, result) }
+            }
+    }
+
+    /// Asynchronously updates the favorite tag through the Files web API.
+    func setFavoriteTagAsync(filePath: String,
+                             favorite: Bool,
+                             account: String,
+                             options: NKRequestOptions = NKRequestOptions(),
+                             taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in }
+    ) async -> (account: String, responseData: AFDataResponse<Data>?, error: NKError) {
+        await withCheckedContinuation { continuation in
+            setFavoriteTag(filePath: filePath,
+                           favorite: favorite,
+                           account: account,
+                           options: options,
+                           taskHandler: taskHandler) { account, responseData, error in
+                continuation.resume(returning: (account: account, responseData: responseData, error: error))
+            }
+        }
+    }
 }
