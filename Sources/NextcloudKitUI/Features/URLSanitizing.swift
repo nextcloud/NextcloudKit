@@ -24,6 +24,12 @@ extension URLSanitizing {
             return nil
         }
 
+        // Repair a scheme typed with fewer than two slashes, such as "https:/host".
+        if let range = address.range(of: #"^https?:/?(?!/)"#, options: [.regularExpression, .caseInsensitive]) {
+            let scheme = address[range].prefix { $0 != ":" }
+            address.replaceSubrange(range, with: "\(scheme)://")
+        }
+
         // Without a scheme, URLComponents reads "host" as a path and "host:8080" as a scheme.
         if address.hasPrefix("//") {
             address = "https:\(address)"

@@ -67,6 +67,16 @@ struct URLSanitizingTests {
         #expect(sanitized.absoluteString == expected)
     }
 
+    @Test(arguments: [
+        ("https:/cloud.example.com", "https://cloud.example.com/"),
+        ("https:cloud.example.com", "https://cloud.example.com/"),
+        ("HTTPS:/cloud.example.com/nextcloud", "https://cloud.example.com/nextcloud/"),
+        ("http:/localhost:8080", "http://localhost:8080/")
+    ]) func mistypedSchemeSlashes(_ input: String, _ expected: String) async throws {
+        let sanitized = try #require(testSubject.sanitize(input))
+        #expect(sanitized.absoluteString == expected)
+    }
+
     @Test func trimsWhitespaceAndNewlines() async throws {
         let sanitized = try #require(testSubject.sanitize("  https://cloud.example.com \n"))
         #expect(sanitized.absoluteString == "https://cloud.example.com/")
