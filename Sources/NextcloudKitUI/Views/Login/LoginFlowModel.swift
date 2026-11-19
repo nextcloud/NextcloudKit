@@ -92,15 +92,18 @@ final class LoginFlowModel: QRCodeParsing, URLSanitizing {
         isActive = true
 
         startTask = Task {
+            let options = NKRequestOptions(customUserAgent: userAgent)
+
+            let (_, statusResult) = await NextcloudKit.shared.getServerStatusAsync(serverUrl: serverURL.absoluteString, options: options)
+
+            guard Task.isCancelled == false else { return }
+
+            if case .failure(let error) = statusResult {
+                await recover(from: error, serverURL: serverURL)
+                return
+            }
+
             do {
-                let options = NKRequestOptions(customUserAgent: userAgent)
-
-                let (_, statusResult) = await NextcloudKit.shared.getServerStatusAsync(serverUrl: serverURL.absoluteString, options: options)
-
-                if case .failure(let error) = statusResult {
-                    throw error
-                }
-
                 let (endpoint, login, token) = try await NextcloudKit.shared.getLoginFlowV2(serverUrl: serverURL.absoluteString, options: options)
 
                 guard Task.isCancelled == false else { return }
@@ -112,29 +115,27 @@ final class LoginFlowModel: QRCodeParsing, URLSanitizing {
             } catch {
                 guard Task.isCancelled == false else { return }
 
-                await recover(from: error, serverURL: serverURL)
+                endLogin(error)
             }
         }
     }
 
-    private func recover(from error: Error, serverURL: URL) async {
-        let nkError = error as? NKError ?? NKError(error: error)
-
+    private func recover(from error: NKError, serverURL: URL) async {
         guard let onServerError = configuration.onServerError else {
-            endLogin(nkError)
+            endLogin(error)
             return
         }
 
-        nkLog(error: "Login server check failed: \(nkError.logDescription)")
+        nkLog(error: "Login server check failed: \(error.logDescription)")
 
-        switch await onServerError(nkError, serverURL) {
+        switch await onServerError(error, serverURL) {
         case .retry(let url):
             enteredServerAddress = url.absoluteString
             start(serverURL: url)
         case .cancel:
             cancel()
         case .presentError:
-            endLogin(nkError)
+            endLogin(error)
         }
     }
 

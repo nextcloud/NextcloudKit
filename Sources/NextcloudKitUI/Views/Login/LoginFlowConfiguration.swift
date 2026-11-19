@@ -27,7 +27,7 @@ public struct LoginFlowConfiguration: Sendable {
     }
 
     ///
-    /// How the login flow continues after the server check or the login flow request failed.
+    /// How the login flow continues after the server status check failed.
     ///
     public enum Recovery: Sendable {
         /// Start over with this address, e.g. after trusting a certificate or falling back to `http`.
