@@ -60,6 +60,12 @@ final class LoginFlowModel: QRCodeParsing, URLSanitizing {
     /// State toggle for presenting the login page in the system browser.
     var isPresentingLoginPage = false
 
+    /// State toggle for presenting the QR code scanner, which stays open while a scanned code logs in.
+    var isPresentingCodeScanner = false
+
+    /// Whether the QR code scanner closes with the alert, because the camera cannot scan.
+    private var closesCodeScannerWithAlert = false
+
     /// The login address acquired from the server through the login flow API.
     var loginAddress: URL?
 
@@ -224,6 +230,7 @@ final class LoginFlowModel: QRCodeParsing, URLSanitizing {
         Task {
             do {
                 try await addAccount(host, name, password)
+                isPresentingCodeScanner = false
             } catch {
                 nkLog(error: "Adding the account failed: \(error)")
                 present(error: (error as? NKError)?.localizedGenericMessage ?? error.localizedDescription)
@@ -276,7 +283,26 @@ final class LoginFlowModel: QRCodeParsing, URLSanitizing {
         isPresentingAlert = true
     }
 
+    ///
+    /// Clear the alert, and close a QR code scanner that cannot scan.
+    ///
+    func dismissAlert() {
+        errorMessage = nil
+        alertAction = nil
+        isPresentingAlert = false
+
+        if closesCodeScannerWithAlert {
+            isPresentingCodeScanner = false
+            closesCodeScannerWithAlert = false
+        }
+    }
+
     // MARK: - QR code
+
+    func presentCodeScanner() {
+        closesCodeScannerWithAlert = false
+        isPresentingCodeScanner = true
+    }
 
     #if os(iOS)
     func handleQRCodeScan(_ result: Result<ScanResult, ScanError>) {
@@ -284,8 +310,10 @@ final class LoginFlowModel: QRCodeParsing, URLSanitizing {
         case .success(let result):
             handleLoginCode(result.string)
         case .failure(.permissionDenied):
+            closesCodeScannerWithAlert = true
             present(error: String(localized: "Camera access is required to scan QR codes. Allow it in Settings.", bundle: .module, comment: "Error message when the app may not use the camera to scan a login QR code."), action: .openSettings)
         case .failure:
+            closesCodeScannerWithAlert = true
             present(error: String(localized: "The camera is not available.", bundle: .module, comment: "Error message when the camera cannot be used to scan a login QR code."))
         }
     }

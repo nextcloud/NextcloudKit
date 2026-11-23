@@ -2,6 +2,9 @@
 // SPDX-FileCopyrightText: 2026 Milen Pivchev
 // SPDX-License-Identifier: GPL-3.0-or-later
 
+#if os(iOS)
+import CodeScanner
+#endif
 import Foundation
 import NextcloudKit
 @testable import NextcloudKitUI
@@ -10,7 +13,10 @@ import Testing
 ///
 /// Tests for ``LoginFlowModel`` which need no Nextcloud server.
 ///
+/// Serialized, because parallel requests through the shared `NextcloudKit` sessions drop each other.
+///
 @MainActor
+@Suite(.serialized)
 struct LoginFlowModelTests {
     ///
     /// Records what the model hands to the host app.
@@ -21,6 +27,7 @@ struct LoginFlowModelTests {
         var serverErrors: [(error: NKError, url: URL)] = []
         var isActiveDuringAddAccount: Bool?
         var isAddingAccountDuringAddAccount: Bool?
+        var isPresentingCodeScannerDuringAddAccount: Bool?
         var addAccountError: Error?
         weak var model: LoginFlowModel?
     }
@@ -29,6 +36,7 @@ struct LoginFlowModelTests {
         let model = LoginFlowModel(userAgent: nil, configuration: configuration) { host, name, password in
             recorder.isActiveDuringAddAccount = recorder.model?.isActive
             recorder.isAddingAccountDuringAddAccount = recorder.model?.isAddingAccount
+            recorder.isPresentingCodeScannerDuringAddAccount = recorder.model?.isPresentingCodeScanner
             recorder.addedAccounts.append((host, name, password))
 
             if let error = recorder.addAccountError {
@@ -182,6 +190,70 @@ struct LoginFlowModelTests {
         #expect(model.enteredServerAddress == "http://127.0.0.1:2/")
         #expect(model.isPresentingAlert == false)
     }
+
+    @Test func scannedCodeKeepsScannerOpenUntilAccountIsAdded() async throws {
+        let recorder = Recorder()
+        let model = makeModel(recorder: recorder)
+
+        model.presentCodeScanner()
+        model.handleLoginCode("nc://login/user:jane&password:secret&server:https://cloud.example.com")
+
+        try await waitUntil { recorder.addedAccounts.count == 1 && model.isActive == false }
+
+        #expect(recorder.isPresentingCodeScannerDuringAddAccount == true)
+        #expect(model.isPresentingCodeScanner == false)
+        #expect(model.isPresentingAlert == false)
+    }
+
+    @Test func invalidScannedCodeShowsErrorAndKeepsScanning() async throws {
+        let model = makeModel(recorder: Recorder())
+
+        model.presentCodeScanner()
+        model.handleLoginCode("https://cloud.example.com")
+
+        #expect(model.isPresentingAlert)
+        #expect(model.isPresentingCodeScanner)
+
+        model.dismissAlert()
+
+        #expect(model.isPresentingAlert == false)
+        #expect(model.errorMessage == nil)
+        #expect(model.isPresentingCodeScanner)
+    }
+
+    @Test func failedLoginFromScannedCodeShowsErrorInScanner() async throws {
+        let recorder = Recorder()
+        recorder.addAccountError = NKError(errorCode: 401)
+        let model = makeModel(recorder: recorder)
+
+        model.presentCodeScanner()
+        model.handleLoginCode("nc://login/user:jane&password:secret&server:https://cloud.example.com")
+
+        try await waitUntil { model.isPresentingAlert }
+
+        #expect(model.isPresentingCodeScanner)
+        #expect(model.isActive == false)
+
+        model.dismissAlert()
+
+        #expect(model.isPresentingCodeScanner)
+    }
+
+    #if os(iOS)
+    @Test func cameraFailureClosesScannerWithAlert() async throws {
+        let model = makeModel(recorder: Recorder())
+
+        model.presentCodeScanner()
+        model.handleQRCodeScan(.failure(.permissionDenied))
+
+        #expect(model.isPresentingAlert)
+        #expect(model.alertAction == .openSettings)
+
+        model.dismissAlert()
+
+        #expect(model.isPresentingCodeScanner == false)
+    }
+    #endif
 
     @Test func cancelWhileRecoveringStopsTheLogin() async throws {
         let recorder = Recorder()

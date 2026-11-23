@@ -9,34 +9,45 @@ import SwiftUI
 
 ///
 /// A sheet with a camera view to scan QR codes for logging in.
-/// Includes toolbar configuration and its appearance.
+/// It stays open and busy while a scanned code logs in, and shows errors itself.
 ///
 struct CodeScannerSheet: ViewModifier {
-    @Environment(\.dismiss) private var dismiss
-
-    @Binding var isPresentingCodeScanner: Bool
+    let model: LoginFlowModel
     @State private var isTorchOn = false
-    let completionHandler: (Result<ScanResult, ScanError>) -> Void
-
-    init(isPresented: Binding<Bool>, _ completionHandler: @escaping (Result<ScanResult, ScanError>) -> Void) {
-        self._isPresentingCodeScanner = isPresented
-        self.completionHandler = completionHandler
-    }
 
     func body(content: Content) -> some View {
-        content.sheet(isPresented: $isPresentingCodeScanner) {
+        @Bindable var model = model
+
+        return content.sheet(isPresented: $model.isPresentingCodeScanner) {
             NavigationStack {
-                CodeScannerView(codeTypes: [.qr], scanMode: .once, showViewfinder: true, isTorchOn: isTorchOn, completion: completionHandler)
+                ZStack {
+                    // Each code is read once, so one that did not work does not fail again while it is in view.
+                    CodeScannerView(codeTypes: [.qr], scanMode: .oncePerCode, showViewfinder: true, isTorchOn: isTorchOn, isPaused: model.isActive || model.isPresentingAlert) { result in
+                        model.handleQRCodeScan(result)
+                    }
+
+                    if model.isActive {
+                        Color.black.opacity(0.5)
+
+                        ProgressView()
+                            .progressViewStyle(.circular)
+                            .controlSize(.large)
+                            .tint(.white)
+                            .accessibilityIdentifier("codeScannerProgress")
+                    }
+                }
                 .ignoresSafeArea()
                 .toolbarTitleDisplayMode(.inline)
                 .navigationTitle(String(localized: "Scan QR Code", bundle: .module, comment: "Navigation bar title"))
                 .toolbar {
                     ToolbarItem(placement: .cancellationAction) {
                         Button {
-                            isPresentingCodeScanner = false
+                            model.isPresentingCodeScanner = false
                         } label: {
                             Text("Cancel", bundle: .module, comment: "Button label")
                         }
+                        .disabled(model.isActive)
+                        .accessibilityIdentifier("cancelCodeScanner")
                     }
 
                     ToolbarItem(placement: .primaryAction) {
@@ -49,10 +60,13 @@ struct CodeScannerSheet: ViewModifier {
                                 Image(systemName: isTorchOn ? "flashlight.on.fill" : "flashlight.off.fill")
                             }
                         }
+                        .disabled(model.isActive)
                         .accessibilityIdentifier("toggleTorch")
                     }
                 }
             }
+            .interactiveDismissDisabled(model.isActive)
+            .loginFlowAlert(model: model, isPresented: $model.isPresentingAlert)
         }
     }
 }
@@ -63,8 +77,8 @@ extension View {
     ///
     /// See ``CodeScannerSheet`` for its implementation.
     ///
-    func codeScannerSheet(isPresented: Binding<Bool>, _ completionHandler: @escaping (Result<ScanResult, ScanError>) -> Void) -> some View {
-        modifier(CodeScannerSheet(isPresented: isPresented, completionHandler))
+    func codeScannerSheet(model: LoginFlowModel) -> some View {
+        modifier(CodeScannerSheet(model: model))
     }
 }
 

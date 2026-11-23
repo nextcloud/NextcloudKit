@@ -50,6 +50,6 @@ let package = Package(
             dependencies: ["NextcloudKit", "Mocker"]),
         .testTarget(
             name: "NextcloudKitUITests",
-            dependencies: ["NextcloudKit", "NextcloudKitUI", "Mocker"]),
+            dependencies: ["NextcloudKit", "NextcloudKitUI", "CodeScanner", "Mocker"]),
     ]
 )

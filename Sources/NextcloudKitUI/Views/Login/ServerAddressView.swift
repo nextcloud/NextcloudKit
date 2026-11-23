@@ -46,7 +46,6 @@ public struct ServerAddressView: View {
     @Environment(\.horizontalSizeClass) var horizontalSizeClass
     @Environment(\.verticalSizeClass) var verticalSizeClass
     @Environment(\.webAuthenticationSession) private var webAuthenticationSession
-    @Environment(\.openURL) private var openURL
 
     // MARK: - Bindings
 
@@ -58,13 +57,6 @@ public struct ServerAddressView: View {
     /// The login flow engine. Owns the server address input, polling and web view state.
     ///
     @State private var model: LoginFlowModel
-
-    #if os(iOS)
-    ///
-    /// State toggle for presenting the QR code scanner sheet.
-    ///
-    @State private var isPresentingCodeScanner = false
-    #endif
 
     ///
     /// State toggle whether the shared accounts have been suggested once during lifetime of this view.
@@ -185,7 +177,7 @@ public struct ServerAddressView: View {
 
                 #if os(iOS) // Camera usually is available on iOS devices only.
                 Button {
-                    isPresentingCodeScanner = true
+                    model.presentCodeScanner()
                 } label: {
                     Image(systemName: "qrcode.viewfinder")
                         .resizable()
@@ -196,11 +188,6 @@ public struct ServerAddressView: View {
                 }
                 .padding()
                 .accessibilityIdentifier("scanQRCode")
-                .codeScannerSheet(isPresented: $isPresentingCodeScanner) { result in
-                    // Close the scanner first, so the host can present on top of this view.
-                    isPresentingCodeScanner = false
-                    model.handleQRCodeScan(result)
-                }
                 #endif
 
                 Spacer()
@@ -229,6 +216,10 @@ public struct ServerAddressView: View {
         .toolbarBackground(.hidden, for: .navigationBar)
         #endif
         .sharedAccountsSheet(isPresented: $isPresentingSharedAccounts, sharedAccounts: sharedAccounts, selectionHandler: { model.selectSharedAccount($0) })
+        #if os(iOS)
+        // Outside the form, whose disabled state and brand tint would carry over into the sheet and its alert.
+        .codeScannerSheet(model: model)
+        #endif
         .onAppear {
             if sharedAccounts.isEmpty == false && hasSuggestedSharedAccounts == false {
                 isPresentingSharedAccounts = true
@@ -241,31 +232,12 @@ public struct ServerAddressView: View {
 
             await model.presentLoginPage(loginAddress, using: webAuthenticationSession)
         }
-        .alert(String(localized: "Login Failed", bundle: .module, comment: "Alert title"), isPresented: $model.isPresentingAlert) {
-            #if os(iOS)
-            if model.alertAction == .openSettings {
-                Button {
-                    model.errorMessage = nil
-                    model.alertAction = nil
-
-                    if let settingsURL = URL(string: UIApplication.openSettingsURLString) {
-                        openURL(settingsURL)
-                    }
-                } label: {
-                    Text("Open Settings", bundle: .module, comment: "Button label in the login error alert which opens the system settings of the app.")
-                }
-            }
-            #endif
-
-            Button(role: .cancel) {
-                model.errorMessage = nil
-                model.alertAction = nil
-            } label: {
-                Text("OK", bundle: .module, comment: "Button label for error alert dismissal.")
-            }
-        } message: {
-            Text(model.errorMessage ?? "?")
-        }
+        // The QR code scanner shows its own errors while it is open.
+        .loginFlowAlert(model: model, isPresented: Binding {
+            model.isPresentingAlert && model.isPresentingCodeScanner == false
+        } set: {
+            model.isPresentingAlert = $0
+        })
     }
 
     private var serverAddressField: some View {
