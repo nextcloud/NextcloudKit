@@ -38,6 +38,8 @@ struct CodeScannerSheet: ViewModifier {
                 }
                 .ignoresSafeArea()
                 .toolbarTitleDisplayMode(.inline)
+                // The camera preview runs under the bar, which keeps its title and buttons readable only with a background.
+                .toolbarBackground(.visible, for: .navigationBar)
                 .navigationTitle(String(localized: "Scan QR Code", bundle: .module, comment: "Navigation bar title"))
                 .toolbar {
                     ToolbarItem(placement: .cancellationAction) {
