@@ -221,7 +221,10 @@ public struct ServerAddressView: View {
         .codeScannerSheet(model: model)
         #endif
         .onAppear {
-            if sharedAccounts.isEmpty == false && hasSuggestedSharedAccounts == false {
+            model.startLoginOnAppear()
+
+            // Not on top of a login that started by itself.
+            if configuration.startsLoginOnAppear == false && sharedAccounts.isEmpty == false && hasSuggestedSharedAccounts == false {
                 isPresentingSharedAccounts = true
                 hasSuggestedSharedAccounts = true
             }

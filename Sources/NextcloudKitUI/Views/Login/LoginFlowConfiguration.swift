@@ -63,6 +63,11 @@ public struct LoginFlowConfiguration: Sendable {
     ///
     public var initialServerAddress: String?
 
+    ///
+    /// Starts the login for ``initialServerAddress`` when the view appears, e.g. for a server the user just signed up on.
+    ///
+    public var startsLoginOnAppear = false
+
     public var isServerAddressEditable = true
 
     ///
