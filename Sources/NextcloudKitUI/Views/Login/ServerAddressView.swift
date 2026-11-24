@@ -94,11 +94,12 @@ public struct ServerAddressView: View {
 
             // Scrolls only where the form does not fit, such as on small phones in landscape.
             GeometryReader { proxy in
-                ScrollView {
-                    form
-                        .frame(minHeight: proxy.size.height)
+                if #available(iOS 26.0, macOS 26.0, *) {
+                    scrollingForm(minHeight: proxy.size.height)
+                        .scrollEdgeEffectHidden()
+                } else {
+                    scrollingForm(minHeight: proxy.size.height)
                 }
-                .scrollBounceBehavior(.basedOnSize)
             }
         }
         .ignoresSafeArea()
@@ -147,6 +148,14 @@ public struct ServerAddressView: View {
         } set: {
             model.isPresentingAlert = $0
         })
+    }
+
+    private func scrollingForm(minHeight: CGFloat) -> some View {
+        ScrollView {
+            form
+                .frame(minHeight: minHeight)
+        }
+        .scrollBounceBehavior(.basedOnSize)
     }
 
     private var form: some View {
