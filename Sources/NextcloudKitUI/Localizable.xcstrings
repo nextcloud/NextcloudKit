@@ -1446,6 +1446,12 @@
             "value" : "誰でも"
           }
         },
+        "ka" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ნებისმიერი"
+          }
+        },
         "lt_LT" : {
           "stringUnit" : {
             "state" : "translated",
