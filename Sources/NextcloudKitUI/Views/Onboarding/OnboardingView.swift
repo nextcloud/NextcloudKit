@@ -106,6 +106,7 @@ public struct OnboardingView: View {
             .buttonStyle(.borderedProminent)
             .controlSize(.large)
             .tint(tint)
+            .accessibilityIdentifier("continueOnboarding")
             .padding(.horizontal, horizontalPadding)
             .padding(.vertical)
             .frame(maxWidth: 520)
