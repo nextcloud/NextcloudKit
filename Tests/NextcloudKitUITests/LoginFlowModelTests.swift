@@ -124,6 +124,30 @@ struct LoginFlowModelTests {
         #expect(model.isActive == false)
     }
 
+    @Test func addAccountFailureWording() async throws {
+        let notFound = NKError(errorCode: 404)
+        let invalidResponse = NKError.invalidResponseError
+
+        let notFoundMessage = try await addAccountMessage(for: notFound)
+        let invalidResponseMessage = try await addAccountMessage(for: invalidResponse)
+
+        // A 404 means a wrong address, while an unreadable reply may come from a proxy in front of a server that exists.
+        #expect(notFoundMessage != notFound.localizedGenericMessage)
+        #expect(invalidResponseMessage == invalidResponse.localizedGenericMessage)
+    }
+
+    private func addAccountMessage(for error: NKError) async throws -> String? {
+        let recorder = Recorder()
+        recorder.addAccountError = error
+        let model = makeModel(recorder: recorder)
+
+        model.handleLoginCode("nc://login/user:jane&password:secret&server:https://cloud.example.com")
+
+        try await waitUntil { model.isPresentingAlert }
+
+        return model.errorMessage
+    }
+
     @Test func loginCodeUsesConfiguredScheme() async throws {
         let recorder = Recorder()
         var configuration = LoginFlowConfiguration()

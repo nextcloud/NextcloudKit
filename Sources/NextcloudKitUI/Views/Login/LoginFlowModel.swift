@@ -233,7 +233,7 @@ final class LoginFlowModel: QRCodeParsing, URLSanitizing {
                 isPresentingCodeScanner = false
             } catch {
                 nkLog(error: "Adding the account failed: \(error)")
-                present(error: (error as? NKError)?.localizedGenericMessage ?? error.localizedDescription)
+                present(error: (error as? NKError).map { message(for: $0, whileAddingAccount: true) } ?? error.localizedDescription)
             }
 
             isAddingAccount = false
@@ -266,9 +266,10 @@ final class LoginFlowModel: QRCodeParsing, URLSanitizing {
 
     ///
     /// A 404 or an unreadable response during login means there is no Nextcloud instance at the entered address.
+    /// While adding the account an unreadable response can come from a proxy in front of the server, so only a 404 counts.
     ///
-    private func message(for error: NKError) -> String {
-        let isInstanceNotFound = error.kind == .notFound || error.kind == .invalidResponse
+    private func message(for error: NKError, whileAddingAccount: Bool = false) -> String {
+        let isInstanceNotFound = error.kind == .notFound || (error.kind == .invalidResponse && !whileAddingAccount)
 
         if isInstanceNotFound {
             return String(localized: "No server was found at this address.", bundle: .module, comment: "Login error message when the entered address does not point to a Nextcloud server.")
