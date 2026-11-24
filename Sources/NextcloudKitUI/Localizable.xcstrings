@@ -7117,6 +7117,9 @@
     "Log in" : {
       "comment" : "Accessibility label of the button which starts the login."
     },
+    "Log in with QR code" : {
+      "comment" : "Button label which opens the QR code scanner in the login view."
+    },
     "Login Failed" : {
       "comment" : "Alert title",
       "localizations" : {
@@ -9493,7 +9496,7 @@
       }
     },
     "Scan QR Code" : {
-      "comment" : "Button label\nNavigation bar title",
+      "comment" : "Navigation bar title",
       "localizations" : {
         "da" : {
           "stringUnit" : {
@@ -12293,6 +12296,9 @@
           }
         }
       }
+    },
+    "or" : {
+      "comment" : "Separator between the server address field and the other ways to log in."
     }
   },
   "version" : "1.0"

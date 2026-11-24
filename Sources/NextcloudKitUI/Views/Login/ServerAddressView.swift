@@ -47,6 +47,7 @@ public struct ServerAddressView: View {
     @Environment(\.verticalSizeClass) var verticalSizeClass
     @Environment(\.webAuthenticationSession) private var webAuthenticationSession
     @Environment(\.openURL) private var openURL
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
 
     // MARK: - Bindings
 
@@ -245,31 +246,51 @@ public struct ServerAddressView: View {
     }
 
     ///
-    /// Scan QR Code and the links of the host app as prominent buttons, side by side when the height is compact.
+    /// The other ways to log in, below an "or", side by side when the height is compact.
     ///
     private var actions: some View {
-        let layout = verticalSizeClass == .compact ? AnyLayout(HStackLayout(spacing: 12)) : AnyLayout(VStackLayout(spacing: 12))
+        let isSideBySide = verticalSizeClass == .compact && dynamicTypeSize.isAccessibilitySize == false
+        let layout = isSideBySide ? AnyLayout(HStackLayout(spacing: 10)) : AnyLayout(VStackLayout(spacing: 10))
 
-        return layout {
-            #if os(iOS) // Camera usually is available on iOS devices only.
-            actionButton(String(localized: "Scan QR Code", bundle: .module, comment: "Button label"), systemImage: "qrcode.viewfinder", identifier: "scanQRCode") {
-                model.presentCodeScanner()
-            }
+        return VStack(spacing: 16) {
+            orSeparator
 
-            if let providerSignUp = configuration.providerSignUp {
-                actionButton(providerSignUp.title, systemImage: "person.crop.circle.badge.plus", identifier: "signUpWithProvider") {
-                    model.presentProviderSignUp(providerSignUp.url)
+            layout {
+                #if os(iOS) // Camera usually is available on iOS devices only.
+                actionButton(String(localized: "Log in with QR code", bundle: .module, comment: "Button label which opens the QR code scanner in the login view."), systemImage: "qrcode.viewfinder", identifier: "scanQRCode") {
+                    model.presentCodeScanner()
                 }
-            }
-            #endif
 
-            if let hostingInformation = configuration.hostingInformation {
-                actionButton(hostingInformation.title, systemImage: "server.rack", identifier: "hostYourOwnServer") {
-                    openURL(hostingInformation.url)
+                if let providerSignUp = configuration.providerSignUp {
+                    actionButton(providerSignUp.title, systemImage: "person.crop.circle.badge.plus", identifier: "signUpWithProvider") {
+                        model.presentProviderSignUp(providerSignUp.url)
+                    }
+                }
+                #endif
+
+                if let hostingInformation = configuration.hostingInformation {
+                    actionButton(hostingInformation.title, systemImage: "server.rack", identifier: "hostYourOwnServer") {
+                        openURL(hostingInformation.url)
+                    }
                 }
             }
         }
-        .frame(maxWidth: verticalSizeClass == .compact ? .infinity : 400)
+        .frame(maxWidth: isSideBySide ? .infinity : 320)
+    }
+
+    private var orSeparator: some View {
+        HStack(spacing: 12) {
+            Rectangle()
+                .frame(height: 1)
+
+            Text("or", bundle: .module, comment: "Separator between the server address field and the other ways to log in.")
+                .font(.footnote)
+
+            Rectangle()
+                .frame(height: 1)
+        }
+        .foregroundStyle(foregroundColor.opacity(0.7))
+        .accessibilityHidden(true)
     }
 
     ///
@@ -280,17 +301,16 @@ public struct ServerAddressView: View {
         let button = Button(action: action) {
             Label {
                 Text(verbatim: title)
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.8)
+                    .lineLimit(2)
+                    .multilineTextAlignment(.center)
             } icon: {
                 Image(systemName: systemImage)
             }
-            .font(.headline)
+            .font(.subheadline.weight(.semibold))
             .foregroundStyle(backgroundColor)
             .frame(maxWidth: .infinity)
-            .padding(.vertical, 6)
         }
-        .controlSize(.large)
+        .controlSize(.regular)
         .accessibilityIdentifier(identifier)
 
         if #available(iOS 26.0, macOS 26.0, *) {
