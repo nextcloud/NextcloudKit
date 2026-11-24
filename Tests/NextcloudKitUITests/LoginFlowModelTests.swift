@@ -71,37 +71,6 @@ struct LoginFlowModelTests {
         #expect(model.enteredServerAddress == "https://cloud.example.com")
     }
 
-    @Test func startsLoginOnAppearOnceWhenConfigured() async throws {
-        var configuration = LoginFlowConfiguration()
-        configuration.initialServerAddress = "http://127.0.0.1:1"
-        configuration.startsLoginOnAppear = true
-
-        let model = makeModel(configuration: configuration, recorder: Recorder())
-
-        model.startLoginOnAppear()
-
-        #expect(model.isActive)
-
-        // Nothing listens on port 1, so the login ends with an error right away.
-        try await waitUntil { model.isPresentingAlert }
-
-        model.dismissAlert()
-        model.startLoginOnAppear()
-
-        #expect(model.isActive == false)
-    }
-
-    @Test func doesNotStartLoginOnAppearByDefault() async throws {
-        var configuration = LoginFlowConfiguration()
-        configuration.initialServerAddress = "https://cloud.example.com"
-
-        let model = makeModel(configuration: configuration, recorder: Recorder())
-
-        model.startLoginOnAppear()
-
-        #expect(model.isActive == false)
-    }
-
     @Test func emptyAddressDoesNothing() async throws {
         let model = makeModel(recorder: Recorder())
         model.enteredServerAddress = "   "

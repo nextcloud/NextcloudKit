@@ -66,8 +66,6 @@ final class LoginFlowModel: QRCodeParsing, URLSanitizing {
     /// Whether the QR code scanner closes with the alert, because the camera cannot scan.
     private var closesCodeScannerWithAlert = false
 
-    private var hasStartedLoginOnAppear = false
-
     /// The login address acquired from the server through the login flow API.
     var loginAddress: URL?
 
@@ -91,16 +89,6 @@ final class LoginFlowModel: QRCodeParsing, URLSanitizing {
 
         enteredServerAddress = sanitizedServerAddress.absoluteString
         start(serverURL: sanitizedServerAddress)
-    }
-
-    ///
-    /// Start the login once, when ``LoginFlowConfiguration/startsLoginOnAppear`` asks for it.
-    ///
-    func startLoginOnAppear() {
-        guard configuration.startsLoginOnAppear, hasStartedLoginOnAppear == false else { return }
-
-        hasStartedLoginOnAppear = true
-        logIn()
     }
 
     ///

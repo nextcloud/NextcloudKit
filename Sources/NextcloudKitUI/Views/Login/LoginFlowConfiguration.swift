@@ -76,11 +76,6 @@ public struct LoginFlowConfiguration: Sendable {
     ///
     public var initialServerAddress: String?
 
-    ///
-    /// Starts the login for ``initialServerAddress`` when the view appears, e.g. for a server the user just signed up on.
-    ///
-    public var startsLoginOnAppear = false
-
     public var isServerAddressEditable = true
 
     ///
@@ -107,11 +102,6 @@ public struct LoginFlowConfiguration: Sendable {
     /// The scheme of login QR codes and of the URL the login page redirects to, without `://`.
     ///
     public var loginURLScheme = "nc"
-
-    ///
-    /// Set to `false` when the view is pushed onto an existing navigation stack, so its toolbar items join that navigation bar.
-    ///
-    public var embedsNavigationStack = true
 
     public var showsCancelButton = false
 

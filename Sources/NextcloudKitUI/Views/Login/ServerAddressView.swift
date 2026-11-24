@@ -81,11 +81,7 @@ public struct ServerAddressView: View {
     // MARK: - Implementation
 
     public var body: some View {
-        if configuration.embedsNavigationStack {
-            NavigationStack {
-                content
-            }
-        } else {
+        NavigationStack {
             content
         }
     }
@@ -134,10 +130,7 @@ public struct ServerAddressView: View {
         }
         #endif
         .onAppear {
-            model.startLoginOnAppear()
-
-            // Not on top of a login that started by itself.
-            if configuration.startsLoginOnAppear == false && sharedAccounts.isEmpty == false && hasSuggestedSharedAccounts == false {
+            if sharedAccounts.isEmpty == false && hasSuggestedSharedAccounts == false {
                 isPresentingSharedAccounts = true
                 hasSuggestedSharedAccounts = true
             }
