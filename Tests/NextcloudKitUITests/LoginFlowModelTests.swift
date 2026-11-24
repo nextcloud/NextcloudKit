@@ -229,23 +229,22 @@ struct LoginFlowModelTests {
         #expect(model.isPresentingAlert == false)
     }
 
-    @Test func invalidScannedCodeShowsErrorAndKeepsScanning() async throws {
+    @Test func invalidScannedCodeClosesScannerThenShowsError() async throws {
         let model = makeModel(recorder: Recorder())
 
         model.presentCodeScanner()
         model.handleLoginCode("https://cloud.example.com")
 
-        #expect(model.isPresentingAlert)
-        #expect(model.isPresentingCodeScanner)
-
-        model.dismissAlert()
-
+        #expect(model.isPresentingCodeScanner == false)
         #expect(model.isPresentingAlert == false)
-        #expect(model.errorMessage == nil)
-        #expect(model.isPresentingCodeScanner)
+
+        model.codeScannerDidClose()
+
+        #expect(model.isPresentingAlert)
+        #expect(model.errorMessage == QRCodeError.invalidPrefix.localizedDescription)
     }
 
-    @Test func failedLoginFromScannedCodeShowsErrorInScanner() async throws {
+    @Test func failedLoginFromScannedCodeClosesScannerThenShowsError() async throws {
         let recorder = Recorder()
         recorder.addAccountError = NKError(errorCode: 401)
         let model = makeModel(recorder: recorder)
@@ -253,55 +252,24 @@ struct LoginFlowModelTests {
         model.presentCodeScanner()
         model.handleLoginCode("nc://login/user:jane&password:secret&server:https://cloud.example.com")
 
-        try await waitUntil { model.isPresentingAlert }
+        try await waitUntil { model.isPresentingCodeScanner == false && model.isActive == false }
 
-        #expect(model.isPresentingCodeScanner)
-        #expect(model.isActive == false)
+        #expect(recorder.isPresentingCodeScannerDuringAddAccount == true)
 
-        model.dismissAlert()
-
-        #expect(model.isPresentingCodeScanner)
-    }
-
-    @Test func failedScannedCodeCountsAgainOnceOutOfView() async throws {
-        let recorder = Recorder()
-        recorder.addAccountError = NKError(errorCode: 401)
-        let model = makeModel(recorder: recorder)
-        let code = "nc://login/user:jane&password:secret&server:https://cloud.example.com"
-        model.failedCodeHoldTime = .milliseconds(200)
-
-        model.presentCodeScanner()
-        model.handleScannedCode(code)
-
-        try await waitUntil { model.isPresentingAlert }
-
-        model.dismissAlert()
-
-        // Still in front of the camera.
-        model.handleScannedCode(code)
-
-        #expect(recorder.addedAccounts.count == 1)
-        #expect(model.isPresentingAlert == false)
-
-        try await Task.sleep(for: .milliseconds(300))
-        model.handleScannedCode(code)
-
-        try await waitUntil { recorder.addedAccounts.count == 2 }
-    }
-
-    @Test func otherCodeScansRightAfterAFailure() async throws {
-        let recorder = Recorder()
-        let model = makeModel(recorder: recorder)
-
-        model.presentCodeScanner()
-        model.handleScannedCode("https://cloud.example.com")
+        model.codeScannerDidClose()
 
         #expect(model.isPresentingAlert)
+    }
 
-        model.dismissAlert()
-        model.handleScannedCode("nc://login/user:jane&password:secret&server:https://cloud.example.com")
+    @Test func reopenedScannerForgetsTheLastError() async throws {
+        let model = makeModel(recorder: Recorder())
 
-        try await waitUntil { recorder.addedAccounts.count == 1 }
+        model.presentCodeScanner()
+        model.handleLoginCode("https://cloud.example.com")
+        model.presentCodeScanner()
+        model.codeScannerDidClose()
+
+        #expect(model.isPresentingAlert == false)
     }
 
     #if os(iOS)
@@ -376,12 +344,12 @@ struct LoginFlowModelTests {
         model.presentCodeScanner()
         model.handleQRCodeScan(.failure(.permissionDenied))
 
+        #expect(model.isPresentingCodeScanner == false)
+
+        model.codeScannerDidClose()
+
         #expect(model.isPresentingAlert)
         #expect(model.alertAction == .openSettings)
-
-        model.dismissAlert()
-
-        #expect(model.isPresentingCodeScanner == false)
     }
     #endif
 

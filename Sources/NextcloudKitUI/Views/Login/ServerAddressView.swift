@@ -142,12 +142,7 @@ public struct ServerAddressView: View {
 
             await model.presentLoginPage(loginAddress, using: webAuthenticationSession)
         }
-        // The QR code scanner shows its own errors while it is open.
-        .loginFlowAlert(model: model, isPresented: Binding {
-            model.isPresentingAlert && model.isPresentingCodeScanner == false
-        } set: {
-            model.isPresentingAlert = $0
-        })
+        .loginFlowAlert(model: model, isPresented: $model.isPresentingAlert)
     }
 
     private func scrollingForm(minHeight: CGFloat) -> some View {

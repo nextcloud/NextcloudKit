@@ -4,6 +4,7 @@
 
 import AuthenticationServices
 #if os(iOS)
+import AVFoundation
 import CodeScanner
 #endif
 import NextcloudKit
@@ -63,17 +64,8 @@ final class LoginFlowModel: QRCodeParsing, URLSanitizing {
     /// State toggle for presenting the QR code scanner, which stays open while a scanned code logs in.
     var isPresentingCodeScanner = false
 
-    /// Whether the QR code scanner closes with the alert, because the camera cannot scan.
-    private var closesCodeScannerWithAlert = false
-
-    /// The code the scanner read last.
-    private var lastScannedCode: String?
-
-    /// A scanned code that failed, ignored while it stays in front of the camera so its error does not come right back.
-    private var failedCode: (code: String, lastSeen: ContinuousClock.Instant)?
-
-    /// How long a failed code must be out of view before it counts again.
-    var failedCodeHoldTime: Duration = .seconds(1.5)
+    /// An error of the QR code scanner, shown by the login view once the scanner has closed.
+    private var codeScannerError: (message: String?, action: AlertAction?)?
 
     /// The login address acquired from the server through the login flow API.
     var loginAddress: URL?
@@ -298,64 +290,78 @@ final class LoginFlowModel: QRCodeParsing, URLSanitizing {
     }
 
     private func present(error: String?, action: AlertAction? = nil) {
+        // The scanner closes first; the user opens it again to scan another code.
+        if isPresentingCodeScanner {
+            codeScannerError = (error, action)
+            isPresentingCodeScanner = false
+            return
+        }
+
         errorMessage = error
         alertAction = action
         isPresentingAlert = true
     }
 
-    ///
-    /// Clear the alert, and close a QR code scanner that cannot scan.
-    ///
     func dismissAlert() {
         errorMessage = nil
         alertAction = nil
         isPresentingAlert = false
-
-        if closesCodeScannerWithAlert {
-            isPresentingCodeScanner = false
-            closesCodeScannerWithAlert = false
-        } else if isPresentingCodeScanner, let lastScannedCode {
-            failedCode = (lastScannedCode, .now)
-        }
     }
 
     // MARK: - QR code
 
     func presentCodeScanner() {
-        closesCodeScannerWithAlert = false
-        lastScannedCode = nil
-        failedCode = nil
+        codeScannerError = nil
+
+        #if os(iOS) && !targetEnvironment(simulator)
+        // The scanner reports neither of these, and a denial only while it is still sliding in.
+        switch AVCaptureDevice.authorizationStatus(for: .video) {
+        case .denied, .restricted:
+            present(error: Self.cameraAccessMessage, action: .openSettings)
+            return
+        default:
+            break
+        }
+
+        guard AVCaptureDevice.default(for: .video) != nil else {
+            present(error: Self.cameraUnavailableMessage)
+            return
+        }
+        #endif
+
         isPresentingCodeScanner = true
+    }
+
+    ///
+    /// Show the error the scanner closed with.
+    ///
+    func codeScannerDidClose() {
+        guard let codeScannerError else { return }
+
+        self.codeScannerError = nil
+        present(error: codeScannerError.message, action: codeScannerError.action)
     }
 
     #if os(iOS)
     func handleQRCodeScan(_ result: Result<ScanResult, ScanError>) {
         switch result {
         case .success(let result):
-            handleScannedCode(result.string)
+            handleLoginCode(result.string)
         case .failure(.permissionDenied):
-            closesCodeScannerWithAlert = true
-            present(error: String(localized: "Camera access is required to scan QR codes. Allow it in Settings.", bundle: .module, comment: "Error message when the app may not use the camera to scan a login QR code."), action: .openSettings)
+            present(error: Self.cameraAccessMessage, action: .openSettings)
         case .failure:
-            closesCodeScannerWithAlert = true
-            present(error: String(localized: "The camera is not available.", bundle: .module, comment: "Error message when the camera cannot be used to scan a login QR code."))
+            present(error: Self.cameraUnavailableMessage)
         }
+    }
+
+    private static var cameraAccessMessage: String {
+        String(localized: "Camera access is required to scan QR codes. Allow it in Settings.", bundle: .module, comment: "Error message when the app may not use the camera to scan a login QR code.")
+    }
+
+    private static var cameraUnavailableMessage: String {
+        String(localized: "The camera is not available.", bundle: .module, comment: "Error message when the camera cannot be used to scan a login QR code.")
     }
     #endif
-
-    ///
-    /// The scanner reports a code again and again while it is in view.
-    ///
-    func handleScannedCode(_ code: String) {
-        if let failedCode, failedCode.code == code, ContinuousClock.now - failedCode.lastSeen < failedCodeHoldTime {
-            self.failedCode = (code, .now)
-            return
-        }
-
-        failedCode = nil
-        lastScannedCode = code
-        handleLoginCode(code)
-    }
 
     func handleLoginCode(_ code: String) {
         do {

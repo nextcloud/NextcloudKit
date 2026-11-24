@@ -9,7 +9,7 @@ import SwiftUI
 
 ///
 /// A sheet with a camera view to scan QR codes for logging in.
-/// It stays open and busy while a scanned code logs in, and shows errors itself.
+/// It stays open and busy while a scanned code logs in, and closes on an error, which the login view shows.
 ///
 struct CodeScannerSheet: ViewModifier {
     let model: LoginFlowModel
@@ -19,10 +19,12 @@ struct CodeScannerSheet: ViewModifier {
         @Bindable var model = model
 
         return content.sheet(isPresented: $model.isPresentingCodeScanner) {
+            model.codeScannerDidClose()
+        } content: {
             NavigationStack {
                 ZStack {
-                    // Reads continuously; the model ignores a code that failed while it stays in view.
-                    CodeScannerView(codeTypes: [.qr], scanMode: .continuous, scanInterval: 0.5, showViewfinder: true, isTorchOn: isTorchOn, isPaused: model.isActive || model.isPresentingAlert) { result in
+                    // One code per opening: an error closes the scanner.
+                    CodeScannerView(codeTypes: [.qr], scanMode: .once, showViewfinder: true, isTorchOn: isTorchOn) { result in
                         model.handleQRCodeScan(result)
                     }
 
@@ -36,9 +38,10 @@ struct CodeScannerSheet: ViewModifier {
                             .accessibilityIdentifier("codeScannerProgress")
                     }
                 }
-                // Below the bar, which would otherwise be see-through over the camera.
-                .ignoresSafeArea(edges: .bottom)
+                .ignoresSafeArea()
                 .toolbarTitleDisplayMode(.inline)
+                // The camera cannot scroll, so no scroll edge effect keeps the title readable over it.
+                .toolbarBackground(.ultraThinMaterial, for: .navigationBar)
                 .toolbarBackground(.visible, for: .navigationBar)
                 .navigationTitle(String(localized: "Scan QR Code", bundle: .module, comment: "Navigation bar title"))
                 .toolbar {
@@ -68,7 +71,6 @@ struct CodeScannerSheet: ViewModifier {
                 }
             }
             .interactiveDismissDisabled(model.isActive)
-            .loginFlowAlert(model: model, isPresented: $model.isPresentingAlert)
         }
     }
 }

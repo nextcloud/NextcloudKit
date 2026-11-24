@@ -5,7 +5,7 @@
 import SwiftUI
 
 ///
-/// The alert for errors of ``LoginFlowModel``, shown by the login view or the QR code scanner on top of it.
+/// The alert for errors of ``LoginFlowModel``, shown by the login view.
 ///
 struct LoginFlowAlert: ViewModifier {
     @Environment(\.openURL) private var openURL
