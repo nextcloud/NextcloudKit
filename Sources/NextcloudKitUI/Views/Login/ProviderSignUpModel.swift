@@ -48,9 +48,12 @@ final class ProviderSignUpModel: NSObject, Identifiable, WKNavigationDelegate {
     /// Why the page did not load. Shown instead of the page.
     private(set) var errorMessage: String?
 
+    /// The color the page asks for, as Safari colors its bar: its theme color, otherwise its background.
+    private(set) var pageColor: UIColor?
+
     @ObservationIgnored private let callbackScheme: String
     @ObservationIgnored private let onCallback: @MainActor (URL) -> Void
-    @ObservationIgnored private var loadingObservation: NSKeyValueObservation?
+    @ObservationIgnored private var observations: [NSKeyValueObservation] = []
     @ObservationIgnored private var reissuedURLs: Set<URL> = []
     @ObservationIgnored private var requestedURL: URL?
     @ObservationIgnored private var hasStarted = false
@@ -81,11 +84,18 @@ final class ProviderSignUpModel: NSObject, Identifiable, WKNavigationDelegate {
 
         webView.navigationDelegate = self
 
-        loadingObservation = webView.observe(\.isLoading, options: [.initial, .new]) { [weak self] webView, _ in
-            MainActor.assumeIsolated {
-                self?.isLoading = webView.isLoading
+        observations = [
+            webView.observe(\.isLoading, options: [.initial, .new]) { [weak self] webView, _ in
+                MainActor.assumeIsolated {
+                    self?.isLoading = webView.isLoading
+                }
+            },
+            webView.observe(\.themeColor, options: [.new]) { [weak self] webView, _ in
+                MainActor.assumeIsolated {
+                    self?.pageColor = webView.themeColor ?? webView.underPageBackgroundColor
+                }
             }
-        }
+        ]
     }
 
     // MARK: - Loading
@@ -266,6 +276,7 @@ final class ProviderSignUpModel: NSObject, Identifiable, WKNavigationDelegate {
     }
 
     func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
+        pageColor = webView.themeColor ?? webView.underPageBackgroundColor
         pageDidFinish()
     }
 
