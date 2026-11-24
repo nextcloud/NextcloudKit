@@ -21,8 +21,8 @@ struct CodeScannerSheet: ViewModifier {
         return content.sheet(isPresented: $model.isPresentingCodeScanner) {
             NavigationStack {
                 ZStack {
-                    // Each code is read once, so one that did not work does not fail again while it is in view.
-                    CodeScannerView(codeTypes: [.qr], scanMode: .oncePerCode, showViewfinder: true, isTorchOn: isTorchOn, isPaused: model.isActive || model.isPresentingAlert) { result in
+                    // Reads continuously; the model ignores a code that failed while it stays in view.
+                    CodeScannerView(codeTypes: [.qr], scanMode: .continuous, scanInterval: 0.5, showViewfinder: true, isTorchOn: isTorchOn, isPaused: model.isActive || model.isPresentingAlert) { result in
                         model.handleQRCodeScan(result)
                     }
 
@@ -36,9 +36,9 @@ struct CodeScannerSheet: ViewModifier {
                             .accessibilityIdentifier("codeScannerProgress")
                     }
                 }
-                .ignoresSafeArea()
+                // Below the bar, which would otherwise be see-through over the camera.
+                .ignoresSafeArea(edges: .bottom)
                 .toolbarTitleDisplayMode(.inline)
-                // The camera preview runs under the bar, which keeps its title and buttons readable only with a background.
                 .toolbarBackground(.visible, for: .navigationBar)
                 .navigationTitle(String(localized: "Scan QR Code", bundle: .module, comment: "Navigation bar title"))
                 .toolbar {

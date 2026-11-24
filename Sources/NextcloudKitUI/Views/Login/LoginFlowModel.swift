@@ -66,6 +66,15 @@ final class LoginFlowModel: QRCodeParsing, URLSanitizing {
     /// Whether the QR code scanner closes with the alert, because the camera cannot scan.
     private var closesCodeScannerWithAlert = false
 
+    /// The code the scanner read last.
+    private var lastScannedCode: String?
+
+    /// A scanned code that failed, ignored while it stays in front of the camera so its error does not come right back.
+    private var failedCode: (code: String, lastSeen: ContinuousClock.Instant)?
+
+    /// How long a failed code must be out of view before it counts again.
+    var failedCodeHoldTime: Duration = .seconds(1.5)
+
     /// The login address acquired from the server through the login flow API.
     var loginAddress: URL?
 
@@ -305,6 +314,8 @@ final class LoginFlowModel: QRCodeParsing, URLSanitizing {
         if closesCodeScannerWithAlert {
             isPresentingCodeScanner = false
             closesCodeScannerWithAlert = false
+        } else if isPresentingCodeScanner, let lastScannedCode {
+            failedCode = (lastScannedCode, .now)
         }
     }
 
@@ -312,6 +323,8 @@ final class LoginFlowModel: QRCodeParsing, URLSanitizing {
 
     func presentCodeScanner() {
         closesCodeScannerWithAlert = false
+        lastScannedCode = nil
+        failedCode = nil
         isPresentingCodeScanner = true
     }
 
@@ -319,7 +332,7 @@ final class LoginFlowModel: QRCodeParsing, URLSanitizing {
     func handleQRCodeScan(_ result: Result<ScanResult, ScanError>) {
         switch result {
         case .success(let result):
-            handleLoginCode(result.string)
+            handleScannedCode(result.string)
         case .failure(.permissionDenied):
             closesCodeScannerWithAlert = true
             present(error: String(localized: "Camera access is required to scan QR codes. Allow it in Settings.", bundle: .module, comment: "Error message when the app may not use the camera to scan a login QR code."), action: .openSettings)
@@ -329,6 +342,20 @@ final class LoginFlowModel: QRCodeParsing, URLSanitizing {
         }
     }
     #endif
+
+    ///
+    /// The scanner reports a code again and again while it is in view.
+    ///
+    func handleScannedCode(_ code: String) {
+        if let failedCode, failedCode.code == code, ContinuousClock.now - failedCode.lastSeen < failedCodeHoldTime {
+            self.failedCode = (code, .now)
+            return
+        }
+
+        failedCode = nil
+        lastScannedCode = code
+        handleLoginCode(code)
+    }
 
     func handleLoginCode(_ code: String) {
         do {

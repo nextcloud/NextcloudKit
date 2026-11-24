@@ -263,6 +263,47 @@ struct LoginFlowModelTests {
         #expect(model.isPresentingCodeScanner)
     }
 
+    @Test func failedScannedCodeCountsAgainOnceOutOfView() async throws {
+        let recorder = Recorder()
+        recorder.addAccountError = NKError(errorCode: 401)
+        let model = makeModel(recorder: recorder)
+        let code = "nc://login/user:jane&password:secret&server:https://cloud.example.com"
+        model.failedCodeHoldTime = .milliseconds(200)
+
+        model.presentCodeScanner()
+        model.handleScannedCode(code)
+
+        try await waitUntil { model.isPresentingAlert }
+
+        model.dismissAlert()
+
+        // Still in front of the camera.
+        model.handleScannedCode(code)
+
+        #expect(recorder.addedAccounts.count == 1)
+        #expect(model.isPresentingAlert == false)
+
+        try await Task.sleep(for: .milliseconds(300))
+        model.handleScannedCode(code)
+
+        try await waitUntil { recorder.addedAccounts.count == 2 }
+    }
+
+    @Test func otherCodeScansRightAfterAFailure() async throws {
+        let recorder = Recorder()
+        let model = makeModel(recorder: recorder)
+
+        model.presentCodeScanner()
+        model.handleScannedCode("https://cloud.example.com")
+
+        #expect(model.isPresentingAlert)
+
+        model.dismissAlert()
+        model.handleScannedCode("nc://login/user:jane&password:secret&server:https://cloud.example.com")
+
+        try await waitUntil { recorder.addedAccounts.count == 1 }
+    }
+
     #if os(iOS)
     @Test func providerSignUpAddsAccountOnceItsPageClosed() async throws {
         let recorder = Recorder()
