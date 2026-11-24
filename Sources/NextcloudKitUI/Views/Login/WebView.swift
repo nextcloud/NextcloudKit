@@ -21,12 +21,26 @@ public struct WebView: ViewRepresentable {
 
     let userAgent: String?
 
+    /// A web view its owner configures and drives, shown as it is.
+    private let webView: WKWebView?
+
     public init(initialURL: URL?, userAgent: String? = nil) {
         self.initialURL = initialURL
         self.userAgent = userAgent
+        self.webView = nil
+    }
+
+    init(webView: WKWebView) {
+        self.initialURL = nil
+        self.userAgent = nil
+        self.webView = webView
     }
 
     func makeView() -> WKWebView {
+        if let webView {
+            return webView
+        }
+
         let configuration = WKWebViewConfiguration()
         configuration.websiteDataStore = .nonPersistent()
 
