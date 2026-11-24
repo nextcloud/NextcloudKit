@@ -26,7 +26,7 @@ Key traits of this package:
 
 ### Login
 
-Apps with branding, managed configuration or their own certificate handling pass a ``LoginFlowConfiguration`` to ``ServerAddressView``. The view stays busy until the ``AddAccountHandler`` returns and shows the error it throws.
+Apps with branding, managed configuration or their own certificate handling pass a ``LoginFlowConfiguration`` to ``ServerAddressView``. The view stays busy until the ``AddAccountHandler`` returns and shows the error it throws. With ``LoginFlowConfiguration/providerSignUp`` and ``LoginFlowConfiguration/hostingInformation`` it also offers to sign up with a provider and to read about hosting a server.
 
 - ``ServerAddressView``
 - ``AddAccountHandler``

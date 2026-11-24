@@ -295,6 +295,71 @@ struct LoginFlowModelTests {
     }
 
     #if os(iOS)
+    @Test func providerSignUpAddsAccountOnceItsPageClosed() async throws {
+        let recorder = Recorder()
+        let model = makeModel(recorder: recorder)
+
+        model.presentProviderSignUp(URL(string: "http://127.0.0.1:1/signup")!) // swiftlint:disable:this force_unwrapping
+        model.finishProviderSignUp(callbackURL: URL(string: "nc://login/server:https://cloud.example.com&user:jane&password:secret")!) // swiftlint:disable:this force_unwrapping
+
+        #expect(model.providerSignUp == nil)
+        #expect(recorder.addedAccounts.isEmpty)
+
+        model.providerSignUpDidClose()
+
+        try await waitUntil { recorder.addedAccounts.count == 1 && model.isActive == false }
+
+        let account = try #require(recorder.addedAccounts.first)
+        #expect(account.host.absoluteString == "https://cloud.example.com")
+        #expect(account.name == "jane")
+        #expect(account.password == "secret")
+        #expect(recorder.isActiveDuringAddAccount == true)
+        #expect(model.isPresentingAlert == false)
+    }
+
+    @Test func closedProviderSignUpWithoutCallbackDoesNothing() async throws {
+        let recorder = Recorder()
+        let model = makeModel(recorder: recorder)
+
+        model.presentProviderSignUp(URL(string: "http://127.0.0.1:1/signup")!) // swiftlint:disable:this force_unwrapping
+        model.providerSignUp = nil
+        model.providerSignUpDidClose()
+
+        #expect(model.isActive == false)
+        #expect(model.isPresentingAlert == false)
+        #expect(recorder.addedAccounts.isEmpty)
+    }
+
+    @Test func refusedSignUpCredentialsRestartTheLogin() async throws {
+        let recorder = Recorder()
+        let refusal = NKError(errorCode: 401)
+        recorder.addAccountError = refusal
+        let model = makeModel(recorder: recorder)
+
+        // Nothing listens on port 1, so the restarted login fails at its server check.
+        model.finishProviderSignUp(callbackURL: URL(string: "nc://login/server:http://127.0.0.1:1&user:jane&password:token")!) // swiftlint:disable:this force_unwrapping
+        model.providerSignUpDidClose()
+
+        try await waitUntil { model.isPresentingAlert }
+
+        #expect(recorder.addedAccounts.count == 1)
+        #expect(model.enteredServerAddress == "http://127.0.0.1:1/")
+        #expect(model.errorMessage != refusal.localizedGenericMessage)
+        #expect(model.isActive == false)
+        #expect(model.isAddingAccount == false)
+    }
+
+    @Test func malformedSignUpCallbackShowsError() async throws {
+        let recorder = Recorder()
+        let model = makeModel(recorder: recorder)
+
+        model.finishProviderSignUp(callbackURL: URL(string: "nc://login/user:jane")!) // swiftlint:disable:this force_unwrapping
+        model.providerSignUpDidClose()
+
+        #expect(model.isPresentingAlert)
+        #expect(recorder.addedAccounts.isEmpty)
+    }
+
     @Test func cameraFailureClosesScannerWithAlert() async throws {
         let model = makeModel(recorder: Recorder())
 

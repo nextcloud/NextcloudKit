@@ -232,7 +232,9 @@ final class LoginFlowModel: QRCodeParsing, URLSanitizing {
     ///
     /// Hand the credentials to the host. The view stays busy until the host has added the account.
     ///
-    private func complete(host: URL, name: String, password: String) {
+    /// - Parameter restartsLoginIfUnauthorized: Start the login for the server when it refuses the credentials.
+    ///
+    private func complete(host: URL, name: String, password: String, restartsLoginIfUnauthorized: Bool = false) {
         pollingTask = nil
         isPresentingLoginPage = false
         isActive = true
@@ -243,6 +245,14 @@ final class LoginFlowModel: QRCodeParsing, URLSanitizing {
             do {
                 try await addAccount(host, name, password)
                 isPresentingCodeScanner = false
+            } catch let error as NKError where restartsLoginIfUnauthorized && error.kind == .unauthorized {
+                nkLog(error: "The server refused the credentials, starting the login: \(error.logDescription)")
+
+                isAddingAccount = false
+                isActive = false
+                enteredServerAddress = host.absoluteString
+                logIn()
+                return
             } catch {
                 nkLog(error: "Adding the account failed: \(error)")
                 present(error: (error as? NKError).map { message(for: $0, whileAddingAccount: true) } ?? error.localizedDescription)
@@ -364,6 +374,46 @@ final class LoginFlowModel: QRCodeParsing, URLSanitizing {
             }
         }
     }
+
+    // MARK: - Provider sign-up
+
+    #if os(iOS)
+    /// The provider sign-up page while it is open.
+    var providerSignUp: ProviderSignUpModel?
+
+    /// The login callback URL the sign-up ended on, handled once its page has closed.
+    private var providerSignUpCallbackURL: URL?
+
+    func presentProviderSignUp(_ url: URL) {
+        providerSignUpCallbackURL = nil
+        providerSignUp = ProviderSignUpModel(url: url, callbackScheme: configuration.loginURLScheme, userAgent: userAgent) { [weak self] callbackURL in
+            self?.finishProviderSignUp(callbackURL: callbackURL)
+        }
+    }
+
+    func finishProviderSignUp(callbackURL: URL) {
+        providerSignUpCallbackURL = callbackURL
+        providerSignUp = nil
+    }
+
+    ///
+    /// Add the account the sign-up ended on, once its page has closed.
+    ///
+    func providerSignUpDidClose() {
+        guard let callbackURL = providerSignUpCallbackURL else { return }
+
+        providerSignUpCallbackURL = nil
+
+        do {
+            let credentials = try LoginCallbackParser.parse(callbackURL, scheme: configuration.loginURLScheme)
+
+            // Providers may hand over a session token, which servers refuse, so the user logs in to the new account instead.
+            complete(host: credentials.host, name: credentials.user, password: credentials.password, restartsLoginIfUnauthorized: true)
+        } catch {
+            present(error: error.localizedDescription)
+        }
+    }
+    #endif
 
     // MARK: - Shared accounts
 

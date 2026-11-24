@@ -27,6 +27,19 @@ public struct LoginFlowConfiguration: Sendable {
     }
 
     ///
+    /// A web page the login view offers below the server address.
+    ///
+    public struct WebLink: Sendable {
+        public let title: String
+        public let url: URL
+
+        public init(title: String, url: URL) {
+            self.title = title
+            self.url = url
+        }
+    }
+
+    ///
     /// How the login flow continues after the server status check failed.
     ///
     public enum Recovery: Sendable {
@@ -74,6 +87,16 @@ public struct LoginFlowConfiguration: Sendable {
     /// When not empty, a picker over these servers replaces the server address field.
     ///
     public var enforcedServers: [Server] = []
+
+    ///
+    /// A provider's sign-up page, which must end on the login callback URL with ``loginURLScheme``. iOS only.
+    ///
+    public var providerSignUp: WebLink?
+
+    ///
+    /// Information about hosting a server, opened in the browser.
+    ///
+    public var hostingInformation: WebLink?
 
     ///
     /// Whether an explicit `http` scheme typed by the user is replaced with `https`.
