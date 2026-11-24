@@ -250,10 +250,10 @@ public struct ServerAddressView: View {
     }
 
     ///
-    /// Scan QR Code and the links of the host app in one design, side by side when the height is compact.
+    /// Scan QR Code and the links of the host app as prominent buttons, side by side when the height is compact.
     ///
     private var actions: some View {
-        let layout = verticalSizeClass == .compact ? AnyLayout(HStackLayout()) : AnyLayout(VStackLayout())
+        let layout = verticalSizeClass == .compact ? AnyLayout(HStackLayout(spacing: 12)) : AnyLayout(VStackLayout(spacing: 12))
 
         return layout {
             #if os(iOS) // Camera usually is available on iOS devices only.
@@ -274,19 +274,35 @@ public struct ServerAddressView: View {
                 }
             }
         }
+        .frame(maxWidth: verticalSizeClass == .compact ? .infinity : 400)
     }
 
+    ///
+    /// Filled with the foreground color, so the label takes the background color.
+    ///
+    @ViewBuilder
     private func actionButton(_ title: String, systemImage: String, identifier: String, action: @escaping () -> Void) -> some View {
-        Button(action: action) {
-            Image(systemName: systemImage)
-                .resizable()
-                .scaledToFit()
-                .frame(width: 32, height: 32)
-
-            Text(verbatim: title)
+        let button = Button(action: action) {
+            Label {
+                Text(verbatim: title)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.8)
+            } icon: {
+                Image(systemName: systemImage)
+            }
+            .font(.headline)
+            .foregroundStyle(backgroundColor)
+            .frame(maxWidth: .infinity)
+            .padding(.vertical, 6)
         }
-        .padding()
+        .controlSize(.large)
         .accessibilityIdentifier(identifier)
+
+        if #available(iOS 26.0, macOS 26.0, *) {
+            button.buttonStyle(.glassProminent)
+        } else {
+            button.buttonStyle(.borderedProminent)
+        }
     }
 
     private var serverAddressField: some View {
