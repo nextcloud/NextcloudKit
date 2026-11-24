@@ -187,6 +187,7 @@ public extension NextcloudKit {
     ///   - chunkFolder: Remote temporary chunk folder name (for example, a UUID).
     ///   - filesChunk: Precomputed chunk descriptors to reuse. Pass an empty array to generate chunks from the source file.
     ///   - chunkSize: Desired chunk size in bytes.
+    ///   - assemblyChecksum: Supplies a whole-file `OC-Checksum` after all chunks are uploaded. Throw to stop before the final `MOVE`.
     ///   - account: Account identifier.
     ///   - options: Request options (headers, timeout, etc.).
     ///   - ifMatch: Optional ETag precondition applied **only** to the final assembly `MOVE` (not the chunk uploads). When set, the server rejects the assembly with `412 Precondition Failed` if the destination changed since this ETag, enabling optimistic-concurrency conflict detection for chunked uploads.
@@ -200,7 +201,7 @@ public extension NextcloudKit {
     ///
     /// - Returns: A tuple `(account, file)` where `account` is the account identifier used for the upload and `file` is the final `NKFile` metadata if available, otherwise `nil`.
     ///
-    /// - Throws: `NKError` for any failure (including disk preflight errors, network errors, server-side failures, or user cancellations).
+    /// - Throws: An error from `assemblyChecksum`, `CancellationError`, or `NKError` for upload failures.
     func uploadChunkAsync(directory: String,
                           fileChunksOutputDirectory: String? = nil,
                           fileName: String,
@@ -211,6 +212,7 @@ public extension NextcloudKit {
                           chunkFolder: String,
                           filesChunk: [(fileName: String, size: Int64)],
                           chunkSize: Int,
+                          assemblyChecksum: @escaping () throws -> String? = { nil },
                           account: String,
                           options: NKRequestOptions = NKRequestOptions(),
                           ifMatch: String? = nil,
@@ -399,6 +401,7 @@ public extension NextcloudKit {
         }
 
         try Task.checkCancellation()
+        let checksum = try assemblyChecksum()
 
         // Assemble the chunks (MOVE .file -> final path)
         let serverUrlFileNameSource = serverUrlChunkFolder + "/.file"
@@ -426,6 +429,10 @@ public extension NextcloudKit {
             options.customHeader?["If-Match"] = ifMatch
         }
 
+        let previousChecksum = options.customHeader?["OC-Checksum"]
+        if let checksum {
+            options.customHeader?["OC-Checksum"] = checksum
+        }
         assembling()
 
         let moveRes = await moveFileOrFolderAsync(serverUrlFileNameSource: serverUrlFileNameSource,
@@ -434,6 +441,7 @@ public extension NextcloudKit {
                                                   account: account,
                                                   options: options)
 
+        options.customHeader?["OC-Checksum"] = previousChecksum
         // Don't let the precondition leak onto the post-assembly PROPFIND readback:
         // after a successful MOVE the destination carries a fresh etag, which would
         // fail an If-Match against the pre-assembly value.

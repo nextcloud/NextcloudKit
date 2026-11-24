@@ -19,7 +19,11 @@ final class ChunkedUploadAssemblyTests: XCTestCase {
         moveStatus: Int,
         overwrite: Bool = true,
         host: String? = nil,
-        cancelAfterChunk: Bool = false
+        cancelAfterChunk: Bool = false,
+        options: NKRequestOptions = .init(),
+        ifMatch: String? = nil,
+        assemblyChecksum: @escaping () throws -> String? = { nil },
+        assembling: @escaping () -> Void = { }
     ) async throws -> (error: NKError?, file: NKFile?) {
         let kit = makeKit()
         let account = UUID().uuidString
@@ -48,20 +52,27 @@ final class ChunkedUploadAssemblyTests: XCTestCase {
         try Data("chunk".utf8).write(to: directory.appendingPathComponent("00001"))
 
         do {
-            let result = try await kit.uploadChunkAsync(directory: directory.path,
-                                                        fileName: "source.txt",
-                                                        date: nil, creationDate: nil,
-                                                        serverUrl: urlBase + "/remote.php/dav/files/user",
-                                                        chunkFolder: "chunks",
-                                                        filesChunk: [(fileName: "00001", size: 5)],
-                                                        chunkSize: 5,
-                                                        account: account,
-                                                        overwrite: overwrite,
-                                                        uploaded: { _ in
-                                                            if cancelAfterChunk {
-                                                                withUnsafeCurrentTask { $0?.cancel() }
-                                                            }
-                                                        })
+            let result = try await kit.uploadChunkAsync(
+                directory: directory.path,
+                fileName: "source.txt",
+                date: nil,
+                creationDate: nil,
+                serverUrl: urlBase + "/remote.php/dav/files/user",
+                chunkFolder: "chunks",
+                filesChunk: [(fileName: "00001", size: 5)],
+                chunkSize: 5,
+                assemblyChecksum: assemblyChecksum,
+                account: account,
+                options: options,
+                ifMatch: ifMatch,
+                overwrite: overwrite,
+                uploaded: { _ in
+                    if cancelAfterChunk {
+                        withUnsafeCurrentTask { $0?.cancel() }
+                    }
+                },
+                assembling: assembling
+            )
             return (nil, result.file)
         } catch let error as NKError {
             return (error, nil)
@@ -173,6 +184,76 @@ final class ChunkedUploadAssemblyTests: XCTestCase {
         let result = try await uploadThroughMockedAssembly(moveStatus: 201)
         XCTAssertNil(result.error)
         XCTAssertEqual(result.file?.ocId, "assembled-file-id")
+    }
+
+    func test_assemblyChecksumIsSentOnlyOnFinalMove() async throws {
+        let host = "assembly-\(UUID().uuidString.lowercased())-201.test"
+        let checksum = "SHA256:" + String(repeating: "a", count: 64)
+        let options = NKRequestOptions()
+        let (requests, continuation) = AsyncStream<URLRequest>.makeStream()
+        ChunkedUploadURLProtocol.setHandler(forHost: host) { request in
+            continuation.yield(request.request)
+            return false
+        }
+        defer {
+            continuation.finish()
+            ChunkedUploadURLProtocol.setHandler(forHost: host, handler: nil)
+        }
+
+        let result = try await uploadThroughMockedAssembly(
+            moveStatus: 201,
+            host: host,
+            options: options,
+            assemblyChecksum: { checksum }
+        )
+        XCTAssertNil(result.error)
+        XCTAssertEqual(result.file?.ocId, "assembled-file-id")
+        XCTAssertNil(options.customHeader?["OC-Checksum"])
+
+        continuation.finish()
+        var methods: [String] = []
+        for await request in requests {
+            methods.append(request.httpMethod ?? "")
+            let expectedChecksum = request.httpMethod == "MOVE" ? checksum : nil
+            XCTAssertEqual(request.value(forHTTPHeaderField: "OC-Checksum"), expectedChecksum)
+        }
+        XCTAssertEqual(methods, ["PROPFIND", "MKCOL", "PUT", "MOVE"])
+    }
+
+    func test_assemblyChecksumErrorStopsBeforeFinalMove() async throws {
+        let host = "assembly-\(UUID().uuidString.lowercased())-201.test"
+        let options = NKRequestOptions()
+        let (requests, continuation) = AsyncStream<String>.makeStream()
+        ChunkedUploadURLProtocol.setHandler(forHost: host) { request in
+            continuation.yield(request.request.httpMethod ?? "")
+            return false
+        }
+        defer {
+            continuation.finish()
+            ChunkedUploadURLProtocol.setHandler(forHost: host, handler: nil)
+        }
+
+        do {
+            _ = try await uploadThroughMockedAssembly(
+                moveStatus: 201,
+                host: host,
+                options: options,
+                ifMatch: "expected-etag",
+                assemblyChecksum: { throw CocoaError(.fileWriteUnknown) },
+                assembling: { XCTFail("Assembly started after its preparation failed") }
+            )
+            XCTFail("The assembly checksum error should reach the caller")
+        } catch let error as CocoaError {
+            XCTAssertEqual(error.code, .fileWriteUnknown)
+        }
+        XCTAssertNil(options.customHeader?["If-Match"])
+
+        continuation.finish()
+        var methods: [String] = []
+        for await method in requests {
+            methods.append(method)
+        }
+        XCTAssertEqual(methods, ["PROPFIND", "MKCOL", "PUT"])
     }
 
     func test_assembledFile_withOCFileId_derivesNKFileFromHeaders() {
