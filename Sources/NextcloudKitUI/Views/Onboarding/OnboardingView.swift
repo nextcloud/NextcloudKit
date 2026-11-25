@@ -38,6 +38,10 @@ public struct OnboardingView: View {
     // MARK: - Environment
 
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+
+    /// Fades the text in once the view appears.
+    @State private var isTextShown = false
 
     @ScaledMetric(relativeTo: .largeTitle) private var iconSize: CGFloat = 64
 
@@ -75,10 +79,12 @@ public struct OnboardingView: View {
                         .accessibilityAddTraits(.isHeader)
                         .fixedSize(horizontal: false, vertical: true)
                         .padding(.bottom, 32)
+                        .fadeIn(isShown: isTextShown, order: 0, slides: reduceMotion == false)
 
                     VStack(alignment: .leading, spacing: 24) {
-                        ForEach(Array(features.enumerated()), id: \.offset) { _, feature in
+                        ForEach(Array(features.enumerated()), id: \.offset) { index, feature in
                             featureRow(feature)
+                                .fadeIn(isShown: isTextShown, order: index + 1, slides: reduceMotion == false)
                         }
                     }
                 }
@@ -90,6 +96,9 @@ public struct OnboardingView: View {
                 .frame(maxWidth: .infinity)
             }
             .scrollBounceBehavior(.basedOnSize)
+            .onAppear {
+                isTextShown = true
+            }
 
             Button(action: continueHandler) {
                 Group {
@@ -136,6 +145,17 @@ public struct OnboardingView: View {
             .fixedSize(horizontal: false, vertical: true)
         }
         .accessibilityElement(children: .combine)
+    }
+}
+
+private extension View {
+    ///
+    /// Fades in after the views before it, sliding up slightly when `slides` is set.
+    ///
+    func fadeIn(isShown: Bool, order: Int, slides: Bool) -> some View {
+        opacity(isShown ? 1 : 0)
+            .offset(y: isShown || slides == false ? 0 : 8)
+            .animation(.easeOut(duration: 0.35).delay(Double(order) * 0.06), value: isShown)
     }
 }
 
