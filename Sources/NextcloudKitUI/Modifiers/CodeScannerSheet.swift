@@ -5,8 +5,6 @@
 import CodeScanner
 import SwiftUI
 
-#if os(iOS)
-
 ///
 /// A sheet with a camera view to scan QR codes for logging in.
 /// It stays open and busy while a scanned code logs in, and closes on an error, which the login view shows.
@@ -85,5 +83,3 @@ extension View {
         modifier(CodeScannerSheet(model: model))
     }
 }
-
-#endif

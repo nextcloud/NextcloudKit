@@ -60,9 +60,7 @@ struct SharedAccountsView: View {
                         .padding(.horizontal)
                     }
                     .navigationTitle(String(localized: "Accounts from other Apps", bundle: .module, comment: "Navigation bar title"))
-#if os(iOS)
                     .navigationBarTitleDisplayMode(.inline)
-#endif
                 }
                 .contentMargins(.top, 20, for: .scrollContent)
             }

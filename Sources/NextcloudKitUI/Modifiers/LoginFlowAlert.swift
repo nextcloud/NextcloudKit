@@ -15,7 +15,6 @@ struct LoginFlowAlert: ViewModifier {
 
     func body(content: Content) -> some View {
         content.alert(String(localized: "Login Failed", bundle: .module, comment: "Alert title"), isPresented: $isPresented) {
-            #if os(iOS)
             if model.alertAction == .openSettings {
                 Button {
                     model.dismissAlert()
@@ -27,7 +26,6 @@ struct LoginFlowAlert: ViewModifier {
                     Text("Open Settings", bundle: .module, comment: "Button label in the login error alert which opens the system settings of the app.")
                 }
             }
-            #endif
 
             Button(role: .cancel) {
                 model.dismissAlert()

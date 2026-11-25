@@ -15,7 +15,7 @@ import WebKit
 ///
 /// All of the web view session data is not persistent.
 ///
-public struct WebView: ViewRepresentable {
+public struct WebView: UIViewRepresentable {
     /// Loaded once when the web view is created, so SwiftUI updates don't reload the page.
     let initialURL: URL?
 
@@ -58,27 +58,11 @@ public struct WebView: ViewRepresentable {
         return webView
     }
 
-    // MARK: - macOS
-
-    #if os(macOS)
-
-    public func makeNSView(context: Context) -> WKWebView {
-        makeView()
-    }
-
-    public func updateNSView(_ webView: WKWebView, context: Context) {}
-
-    // MARK: - iOS
-
-    #else
-
     public func makeUIView(context: Context) -> WKWebView {
         makeView()
     }
 
     public func updateUIView(_ webView: WKWebView, context: Context) {}
-
-    #endif
 }
 
 #Preview {

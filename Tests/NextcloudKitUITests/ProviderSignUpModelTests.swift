@@ -2,8 +2,6 @@
 // SPDX-FileCopyrightText: 2026 Milen Pivchev
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-#if os(iOS)
-
 import Foundation
 import NextcloudKit
 @testable import NextcloudKitUI
@@ -138,5 +136,3 @@ struct ProviderSignUpModelTests {
         #expect(model.errorMessage == NKError(errorCode: NSURLErrorTimedOut).localizedGenericMessage)
     }
 }
-
-#endif

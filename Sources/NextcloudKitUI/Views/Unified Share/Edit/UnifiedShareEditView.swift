@@ -5,9 +5,7 @@
 
 import SwiftUI
 import NextcloudKit
-#if canImport(UIKit)
 import UIKit
-#endif
 
 /// View used for Unified Sharing.
 public struct UnifiedShareEditView: View {
@@ -815,9 +813,7 @@ public struct UnifiedShareEditView: View {
     }
 
     private func copyToPasteboard(_ string: String) {
-        #if canImport(UIKit)
         UIPasteboard.general.string = string
-        #endif
     }
 }
 

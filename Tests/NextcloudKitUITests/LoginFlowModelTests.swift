@@ -2,9 +2,7 @@
 // SPDX-FileCopyrightText: 2026 Milen Pivchev
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-#if os(iOS)
 import CodeScanner
-#endif
 import Foundation
 import NextcloudKit
 @testable import NextcloudKitUI
@@ -272,7 +270,6 @@ struct LoginFlowModelTests {
         #expect(model.isPresentingAlert == false)
     }
 
-    #if os(iOS)
     @Test func providerSignUpAddsAccountOnceItsPageClosed() async throws {
         let recorder = Recorder()
         let model = makeModel(recorder: recorder)
@@ -351,7 +348,6 @@ struct LoginFlowModelTests {
         #expect(model.isPresentingAlert)
         #expect(model.alertAction == .openSettings)
     }
-    #endif
 
     @Test func cancelWhileRecoveringStopsTheLogin() async throws {
         let recorder = Recorder()

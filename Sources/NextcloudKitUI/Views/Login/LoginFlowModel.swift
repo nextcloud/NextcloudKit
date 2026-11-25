@@ -3,10 +3,8 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 import AuthenticationServices
-#if os(iOS)
 import AVFoundation
 import CodeScanner
-#endif
 import NextcloudKit
 import SwiftUI
 
@@ -313,7 +311,7 @@ final class LoginFlowModel: QRCodeParsing, URLSanitizing {
     func presentCodeScanner() {
         codeScannerError = nil
 
-        #if os(iOS) && !targetEnvironment(simulator)
+        #if !targetEnvironment(simulator)
         // The scanner reports neither of these, and a denial only while it is still sliding in.
         switch AVCaptureDevice.authorizationStatus(for: .video) {
         case .denied, .restricted:
@@ -342,7 +340,6 @@ final class LoginFlowModel: QRCodeParsing, URLSanitizing {
         present(error: codeScannerError.message, action: codeScannerError.action)
     }
 
-    #if os(iOS)
     func handleQRCodeScan(_ result: Result<ScanResult, ScanError>) {
         switch result {
         case .success(let result):
@@ -361,7 +358,6 @@ final class LoginFlowModel: QRCodeParsing, URLSanitizing {
     private static var cameraUnavailableMessage: String {
         String(localized: "The camera is not available.", bundle: .module, comment: "Error message when the camera cannot be used to scan a login QR code.")
     }
-    #endif
 
     func handleLoginCode(_ code: String) {
         do {
@@ -398,7 +394,6 @@ final class LoginFlowModel: QRCodeParsing, URLSanitizing {
 
     // MARK: - Provider sign-up
 
-    #if os(iOS)
     /// The provider sign-up page while it is open.
     var providerSignUp: ProviderSignUpModel?
 
@@ -434,7 +429,6 @@ final class LoginFlowModel: QRCodeParsing, URLSanitizing {
             present(error: error.localizedDescription)
         }
     }
-    #endif
 
     // MARK: - Shared accounts
 

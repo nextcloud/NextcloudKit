@@ -21,7 +21,6 @@ extension Color {
             }
         }
 
-        #if os(iOS)
         let uiColor = UIColor(self)
 
         var red: CGFloat = 0, green: CGFloat = 0, blue: CGFloat = 0, alpha: CGFloat = 0
@@ -29,17 +28,6 @@ extension Color {
         guard uiColor.getRed(&red, green: &green, blue: &blue, alpha: &alpha) else {
             return .primary
         }
-        #endif
-
-        #if os(macOS)
-        guard let rgbColor = NSColor(self).usingColorSpace(.sRGB) else {
-            return .primary
-        }
-
-        let red = rgbColor.redComponent
-        let green = rgbColor.greenComponent
-        let blue = rgbColor.blueComponent
-        #endif
 
         let luminance = 0.2126 * adjust(red) + 0.7152 * adjust(green) + 0.0722 * adjust(blue)
 

@@ -2,8 +2,6 @@
 // SPDX-FileCopyrightText: 2026 Milen Pivchev
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-#if os(iOS)
-
 import NextcloudKit
 import SwiftUI
 import UIKit
@@ -292,5 +290,3 @@ final class ProviderSignUpModel: NSObject, Identifiable, WKNavigationDelegate {
         webContentProcessDidTerminate()
     }
 }
-
-#endif
