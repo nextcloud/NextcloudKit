@@ -302,7 +302,7 @@ public struct ServerAddressView: View {
 
         return TextField(
             text: $model.enteredServerAddress,
-            prompt: Text(verbatim: "https://example.org/").foregroundColor(foregroundColor.opacity(0.5))
+            prompt: Text(verbatim: configuration.serverAddressPrompt ?? "https://example.org/").foregroundColor(foregroundColor.opacity(0.5))
         ) {
             Text("Server Address", bundle: .module, comment: "Label for text field.")
         }

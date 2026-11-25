@@ -62,6 +62,11 @@ public struct LoginFlowConfiguration: Sendable {
     public var foregroundColor: Color?
 
     ///
+    /// Replaces the placeholder of the server address field.
+    ///
+    public var serverAddressPrompt: String?
+
+    ///
     /// Replaces the hint below the server address field.
     ///
     public var serverAddressDescription: String?
