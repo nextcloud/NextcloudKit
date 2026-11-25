@@ -155,7 +155,7 @@ private extension View {
     func fadeIn(isShown: Bool, order: Int, slides: Bool) -> some View {
         opacity(isShown ? 1 : 0)
             .offset(y: isShown || slides == false ? 0 : 8)
-            .animation(.easeOut(duration: 0.35).delay(Double(order) * 0.06), value: isShown)
+            .animation(.easeOut(duration: 0.5).delay(Double(order) * 0.1), value: isShown)
     }
 }
 
