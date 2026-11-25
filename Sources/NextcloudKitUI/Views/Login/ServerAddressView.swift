@@ -206,14 +206,18 @@ public struct ServerAddressView: View {
             Spacer()
 
             if let hostingInformation = configuration.hostingInformation {
-                actionButton(hostingInformation.title, systemImage: "server.rack", identifier: "hostYourOwnServer") {
+                Button(hostingInformation.title) {
                     openURL(hostingInformation.url)
                 }
-                .frame(maxWidth: actionsMaxWidth)
+                .buttonStyle(.borderless)
+                .font(.subheadline)
+                .accessibilityIdentifier("hostYourOwnServer")
             }
         }
         .disabled(model.isActive)
         .tint(foregroundColor)
+        // Dark appearance with light text on the background, so the controls match it.
+        .environment(\.colorScheme, foregroundColor.readable == .black ? .dark : .light)
         .padding()
         .safeAreaPadding(.all)
     }
@@ -273,11 +277,10 @@ public struct ServerAddressView: View {
     }
 
     ///
-    /// A prominent glass button filled with the foreground color, so the label takes the background color.
+    /// A secondary button tinted with the foreground color, so the server address stays the main way to log in.
     ///
-    @ViewBuilder
     private func actionButton(_ title: String, systemImage: String, identifier: String, action: @escaping () -> Void) -> some View {
-        let button = Button(action: action) {
+        Button(action: action) {
             Label {
                 Text(verbatim: title)
                     .lineLimit(2)
@@ -286,18 +289,12 @@ public struct ServerAddressView: View {
                 Image(systemName: systemImage)
             }
             .font(.headline)
-            .foregroundStyle(backgroundColor)
             .frame(maxWidth: .infinity)
             .padding(.vertical, -3)
         }
+        .buttonStyle(.bordered)
         .controlSize(.large)
         .accessibilityIdentifier(identifier)
-
-        if #available(iOS 26.0, *) {
-            button.buttonStyle(.glassProminent)
-        } else {
-            button.buttonStyle(.borderedProminent)
-        }
     }
 
     private var serverAddressField: some View {
