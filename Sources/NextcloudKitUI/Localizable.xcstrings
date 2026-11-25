@@ -1,6 +1,9 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "" : {
+
+    },
     "%lld groups" : {
       "comment" : "Recipient summary for multiple groups.",
       "localizations" : {
@@ -1792,7 +1795,7 @@
       "comment" : "Error message when the app may not use the camera to scan a login QR code."
     },
     "Cancel" : {
-      "comment" : "Button that dismisses a confirmation dialog without making changes.",
+      "comment" : "Button label",
       "localizations" : {
         "af" : {
           "stringUnit" : {
@@ -7676,6 +7679,9 @@
     "Open Settings" : {
       "comment" : "Button label in the login error alert which opens the system settings of the app."
     },
+    "or" : {
+      "comment" : "Separator between the server address field and the other ways to log in."
+    },
     "Participants" : {
       "comment" : "Label above the permission selector in the unified share view.",
       "localizations" : {
@@ -12296,9 +12302,6 @@
           }
         }
       }
-    },
-    "or" : {
-      "comment" : "Separator between the server address field and the other ways to log in."
     }
   },
   "version" : "1.0"

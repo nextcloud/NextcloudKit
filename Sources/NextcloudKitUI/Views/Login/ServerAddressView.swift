@@ -1,5 +1,6 @@
 // SPDX-FileCopyrightText: Nextcloud GmbH
 // SPDX-FileCopyrightText: 2025 Iva Horn
+// SPDX-FileCopyrightText: 2026 Milen Pivchev
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 import AuthenticationServices
@@ -61,11 +62,6 @@ public struct ServerAddressView: View {
     @State private var model: LoginFlowModel
 
     ///
-    /// State toggle whether the shared accounts have been suggested once during lifetime of this view.
-    ///
-    @State private var hasSuggestedSharedAccounts = false
-
-    ///
     /// State toggle for presenting the sheet to select accounts shared among apps of the same group.
     ///
     @State private var isPresentingSharedAccounts = false
@@ -95,7 +91,7 @@ public struct ServerAddressView: View {
 
             // Scrolls only where the form does not fit, such as on small phones in landscape.
             GeometryReader { proxy in
-                if #available(iOS 26.0, macOS 26.0, *) {
+                if #available(iOS 26.0, *) {
                     scrollingForm(minHeight: proxy.size.height)
                         .scrollEdgeEffectHidden()
                 } else {
@@ -108,34 +104,15 @@ public struct ServerAddressView: View {
             if configuration.showsCancelButton {
                 cancelToolbarItem
             }
-
-            if sharedAccounts.isEmpty == false {
-                if #available(iOS 26.0, macOS 26.0, *) {
-                    sharedAccountsToolbarItem
-                        .sharedBackgroundVisibility(.hidden)
-                } else {
-                    sharedAccountsToolbarItem
-                }
-            }
         }
-        #if os(iOS)
         .toolbarBackground(.hidden, for: .navigationBar)
-        #endif
         .sharedAccountsSheet(isPresented: $isPresentingSharedAccounts, sharedAccounts: sharedAccounts, selectionHandler: { model.selectSharedAccount($0) })
-        #if os(iOS)
         // Outside the form, whose disabled state and brand tint would carry over into the sheet, the page and their alerts.
         .codeScannerSheet(model: model)
         .fullScreenCover(item: $model.providerSignUp) {
             model.providerSignUpDidClose()
         } content: { providerSignUp in
             ProviderSignUpView(model: providerSignUp)
-        }
-        #endif
-        .onAppear {
-            if sharedAccounts.isEmpty == false && hasSuggestedSharedAccounts == false {
-                isPresentingSharedAccounts = true
-                hasSuggestedSharedAccounts = true
-            }
         }
         .task(id: model.isPresentingLoginPage) {
             // Clearing the flag cancels this task, which closes the browser sheet.
@@ -156,7 +133,7 @@ public struct ServerAddressView: View {
 
     private var form: some View {
         VStack {
-            Spacer(minLength: 40)
+            Spacer().frame(minHeight: 10, maxHeight: 50)
 
             brandImage
                 .resizable()
@@ -193,28 +170,17 @@ public struct ServerAddressView: View {
                         Button {
                             model.logIn()
                         } label: {
-                            #if !os(macOS)
                             Image(systemName: "arrow.right")
-                            #else
-                            Image(systemName: "arrow.right.circle")
-                                .font(.title)
-                                .foregroundStyle(.white)
-                            #endif
                         }
-                        #if os(macOS)
-                        .buttonStyle(.plain)
-                        #endif
                         .accessibilityLabel(Text("Log in", bundle: .module, comment: "Accessibility label of the button which starts the login."))
                         .accessibilityIdentifier("submitServerAddress")
                     }
                 }
-                #if !os(macOS)
                 .padding(EdgeInsets(top: 8, leading: 10, bottom: 8, trailing: 10))
                 .overlay(
                     RoundedRectangle(cornerRadius: 8)
                         .stroke(foregroundColor, lineWidth: 1)
                 )
-                #endif
 
                 if horizontalSizeClass == .regular {
                     Spacer(minLength: 100)
@@ -233,7 +199,7 @@ public struct ServerAddressView: View {
             .multilineTextAlignment(.center)
             .padding(4)
 
-            Spacer()
+            Spacer().frame(height: 30)
 
             actions
 
@@ -262,16 +228,23 @@ public struct ServerAddressView: View {
     ///
     @ViewBuilder
     private var actions: some View {
-        #if os(iOS) // Camera usually is available on iOS devices only.
         let isSideBySide = verticalSizeClass == .compact && dynamicTypeSize.isAccessibilitySize == false
         let layout = isSideBySide ? AnyLayout(HStackLayout(spacing: 12)) : AnyLayout(VStackLayout(spacing: 12))
 
         VStack(spacing: 16) {
             orSeparator
 
+            Spacer().frame(height: 5)
+
             layout {
                 actionButton(String(localized: "Log in with QR code", bundle: .module, comment: "Button label which opens the QR code scanner in the login view."), systemImage: "qrcode.viewfinder", identifier: "scanQRCode") {
                     model.presentCodeScanner()
+                }
+
+                if sharedAccounts.isEmpty == false {
+                    actionButton(String(localized: "Accounts from other Apps", bundle: .module, comment: "Button label"), systemImage: "person.badge.plus", identifier: "sharedAccounts") {
+                        isPresentingSharedAccounts = true
+                    }
                 }
 
                 if let providerSignUp = configuration.providerSignUp {
@@ -282,7 +255,6 @@ public struct ServerAddressView: View {
             }
         }
         .frame(maxWidth: actionsMaxWidth)
-        #endif
     }
 
     private var orSeparator: some View {
@@ -316,12 +288,12 @@ public struct ServerAddressView: View {
             .font(.headline)
             .foregroundStyle(backgroundColor)
             .frame(maxWidth: .infinity)
-            .padding(.vertical, 4)
+            .padding(.vertical, -3)
         }
         .controlSize(.large)
         .accessibilityIdentifier(identifier)
 
-        if #available(iOS 26.0, macOS 26.0, *) {
+        if #available(iOS 26.0, *) {
             button.buttonStyle(.glassProminent)
         } else {
             button.buttonStyle(.borderedProminent)
@@ -339,17 +311,16 @@ public struct ServerAddressView: View {
         }
         .textContentType(.URL)
         .autocorrectionDisabled()
-        #if os(iOS)
         .foregroundStyle(foregroundColor)
         .keyboardType(.URL)
         .textInputAutocapitalization(.never)
         .submitLabel(.done)
-        #endif
         .onSubmit {
             model.logIn()
         }
         .disabled(configuration.isServerAddressEditable == false)
         .opacity(configuration.isServerAddressEditable ? 1 : 0.5)
+        .padding(.vertical, 5)
         .accessibilityIdentifier("serverAddress")
     }
 
@@ -380,6 +351,7 @@ public struct ServerAddressView: View {
             }
             .foregroundStyle(foregroundColor)
         }
+        .padding(.vertical, 5)
         .accessibilityIdentifier("enforcedServers")
     }
 
@@ -398,26 +370,6 @@ public struct ServerAddressView: View {
             .tint(foregroundColor)
             .disabled(model.isAddingAccount)
             .accessibilityIdentifier("cancelLogin")
-        }
-    }
-
-    ///
-    /// The toolbar entry point for accounts from other apps, as in the login view of the Files app.
-    ///
-    private var sharedAccountsToolbarItem: some ToolbarContent {
-        ToolbarItem(placement: .primaryAction) {
-            Button {
-                isPresentingSharedAccounts = true
-            } label: {
-                Label {
-                    Text("Accounts from other Apps", bundle: .module, comment: "Button label")
-                } icon: {
-                    Image(systemName: "person.badge.plus")
-                }
-            }
-            .tint(foregroundColor)
-            .disabled(model.isActive)
-            .accessibilityIdentifier("sharedAccounts")
         }
     }
 }
@@ -453,7 +405,7 @@ public struct ServerAddressView: View {
     configuration.providerSignUp = LoginFlowConfiguration.WebLink(title: "Sign up with provider", url: URL(string: "https://nextcloud.com/signup-ios")!)
     configuration.hostingInformation = LoginFlowConfiguration.WebLink(title: "Host your own server", url: URL(string: "https://nextcloud.com/install")!)
 
-    return ServerAddressView(backgroundColor: .constant(.accentColor), brandImage: Image(systemName: "cloud"), sharedAccounts: [], configuration: configuration) { _, _, _ in
+    return ServerAddressView(backgroundColor: .constant(.accentColor), brandImage: Image(systemName: "photo"), sharedAccounts: [], configuration: configuration) { _, _, _ in
         print("Add account!")
     }
 }
