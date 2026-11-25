@@ -238,6 +238,13 @@ public struct ServerAddressView: View {
             actions
 
             Spacer()
+
+            if let hostingInformation = configuration.hostingInformation {
+                actionButton(hostingInformation.title, systemImage: "server.rack", identifier: "hostYourOwnServer") {
+                    openURL(hostingInformation.url)
+                }
+                .frame(maxWidth: actionsMaxWidth)
+            }
         }
         .disabled(model.isActive)
         .tint(foregroundColor)
@@ -245,18 +252,24 @@ public struct ServerAddressView: View {
         .safeAreaPadding(.all)
     }
 
+    /// As wide as the server address field, up to a readable width on large screens.
+    private var actionsMaxWidth: CGFloat {
+        horizontalSizeClass == .regular ? 500 : .infinity
+    }
+
     ///
     /// The other ways to log in, below an "or", side by side when the height is compact.
     ///
+    @ViewBuilder
     private var actions: some View {
+        #if os(iOS) // Camera usually is available on iOS devices only.
         let isSideBySide = verticalSizeClass == .compact && dynamicTypeSize.isAccessibilitySize == false
-        let layout = isSideBySide ? AnyLayout(HStackLayout(spacing: 10)) : AnyLayout(VStackLayout(spacing: 10))
+        let layout = isSideBySide ? AnyLayout(HStackLayout(spacing: 12)) : AnyLayout(VStackLayout(spacing: 12))
 
-        return VStack(spacing: 16) {
+        VStack(spacing: 16) {
             orSeparator
 
             layout {
-                #if os(iOS) // Camera usually is available on iOS devices only.
                 actionButton(String(localized: "Log in with QR code", bundle: .module, comment: "Button label which opens the QR code scanner in the login view."), systemImage: "qrcode.viewfinder", identifier: "scanQRCode") {
                     model.presentCodeScanner()
                 }
@@ -266,16 +279,10 @@ public struct ServerAddressView: View {
                         model.presentProviderSignUp(providerSignUp.url)
                     }
                 }
-                #endif
-
-                if let hostingInformation = configuration.hostingInformation {
-                    actionButton(hostingInformation.title, systemImage: "server.rack", identifier: "hostYourOwnServer") {
-                        openURL(hostingInformation.url)
-                    }
-                }
             }
         }
-        .frame(maxWidth: isSideBySide ? .infinity : 320)
+        .frame(maxWidth: actionsMaxWidth)
+        #endif
     }
 
     private var orSeparator: some View {
@@ -294,7 +301,7 @@ public struct ServerAddressView: View {
     }
 
     ///
-    /// Filled with the foreground color, so the label takes the background color.
+    /// A prominent glass button filled with the foreground color, so the label takes the background color.
     ///
     @ViewBuilder
     private func actionButton(_ title: String, systemImage: String, identifier: String, action: @escaping () -> Void) -> some View {
@@ -306,11 +313,12 @@ public struct ServerAddressView: View {
             } icon: {
                 Image(systemName: systemImage)
             }
-            .font(.subheadline.weight(.semibold))
+            .font(.headline)
             .foregroundStyle(backgroundColor)
             .frame(maxWidth: .infinity)
+            .padding(.vertical, 4)
         }
-        .controlSize(.regular)
+        .controlSize(.large)
         .accessibilityIdentifier(identifier)
 
         if #available(iOS 26.0, macOS 26.0, *) {
