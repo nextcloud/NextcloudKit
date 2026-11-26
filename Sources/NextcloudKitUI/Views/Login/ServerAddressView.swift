@@ -96,7 +96,7 @@ public struct ServerAddressView: View {
             }
             .ignoresSafeArea()
             .toolbar {
-                if configuration.showsCancelButton {
+                if configuration.onCancel != nil {
                     cancelToolbarItem
                 }
             }
@@ -406,7 +406,7 @@ public struct ServerAddressView: View {
         LoginFlowConfiguration.Server(name: "Example Cloud", url: URL(string: "https://cloud.example.com")!),
         LoginFlowConfiguration.Server(name: "Example Cloud EU", url: URL(string: "https://eu.cloud.example.com")!)
     ]
-    configuration.showsCancelButton = true
+    configuration.onCancel = {}
 
     return ServerAddressView(backgroundColor: .constant(.orange), brandImage: Image(systemName: "cloud"), sharedAccounts: [], configuration: configuration) { _, _, _ in
         print("Add account!")

@@ -61,8 +61,10 @@ final class LoginFlowModel: QRCodeParsing, URLSanitizing {
     /// The login address acquired from the server through the login flow API.
     var loginAddress: URL?
 
-    private var startTask: Task<Void, Never>?
-    private var pollingTask: Task<Void, Never>?
+    private var loginTask: Task<Void, Never>?
+
+    /// Matches the lifetime of a login flow token on the server.
+    private static let pollingTimeout: Duration = .seconds(20 * 60)
 
     // MARK: - Login flow
 
@@ -87,12 +89,10 @@ final class LoginFlowModel: QRCodeParsing, URLSanitizing {
     /// Check the server, request the login flow, present its web page and begin polling.
     ///
     func start(serverURL: URL) {
-        startTask?.cancel()
-        pollingTask?.cancel()
-        pollingTask = nil
+        loginTask?.cancel()
         isActive = true
 
-        startTask = Task {
+        loginTask = Task {
             let options = NKRequestOptions(customUserAgent: userAgent)
 
             let (_, statusResult) = await NextcloudKit.shared.getServerStatusAsync(serverUrl: serverURL.absoluteString, options: options)
@@ -109,10 +109,10 @@ final class LoginFlowModel: QRCodeParsing, URLSanitizing {
 
                 guard Task.isCancelled == false else { return }
 
-                startPolling(token: token, endpoint: endpoint)
-
                 loginAddress = login
                 isPresentingLoginPage = true
+
+                await poll(token: token, endpoint: endpoint, options: options)
             } catch {
                 guard Task.isCancelled == false else { return }
 
@@ -122,14 +122,9 @@ final class LoginFlowModel: QRCodeParsing, URLSanitizing {
     }
 
     private func recover(from error: NKError, serverURL: URL) async {
-        guard let onServerError = configuration.onServerError else {
-            endLogin(error)
-            return
-        }
-
         nkLog(error: "Login server check failed: \(error.logDescription)")
 
-        let recovery = await onServerError(error, serverURL)
+        let recovery = await configuration.onServerError?(error, serverURL) ?? .presentError
 
         // The user may have cancelled while the host was asking how to recover.
         guard Task.isCancelled == false else { return }
@@ -145,43 +140,37 @@ final class LoginFlowModel: QRCodeParsing, URLSanitizing {
         }
     }
 
-    private func startPolling(token: String, endpoint: URL) {
-        let deadline = ContinuousClock.now + configuration.pollingTimeout
+    private func poll(token: String, endpoint: URL, options: NKRequestOptions) async {
+        let deadline = ContinuousClock.now + Self.pollingTimeout
 
-        pollingTask = Task { [weak self] in
-            guard let self else { return }
-
-            let options = NKRequestOptions(customUserAgent: self.userAgent)
-
-            while Task.isCancelled == false {
-                guard ContinuousClock.now < deadline else {
-                    self.cancel()
-                    self.present(error: String(localized: "The login timed out. Please try again.", bundle: .module, comment: "Error message when the user did not finish the login in the browser in time."))
-                    return
-                }
-
-                let poll = await NextcloudKit.shared.getLoginFlowV2PollAsync(token: token, endpoint: endpoint.absoluteString, options: options)
-
-                guard Task.isCancelled == false else { return }
-
-                if poll.error == .success,
-                   let server = poll.server, let host = URL(string: server),
-                   let loginName = poll.loginName,
-                   let appPassword = poll.appPassword {
-                    self.complete(host: host, name: loginName, password: appPassword)
-                    return
-                }
-
-                // HTTP 404 means the flow is still pending, as do network blips while the user is in the browser.
-                let isPending = poll.error == .success || poll.responseData?.response?.statusCode == 404 || LoginPollingPolicy.isTransient(poll.error)
-
-                if isPending == false {
-                    self.endLogin(poll.error)
-                    return
-                }
-
-                try? await Task.sleep(for: .seconds(1))
+        while Task.isCancelled == false {
+            guard ContinuousClock.now < deadline else {
+                cancel()
+                present(error: String(localized: "The login timed out. Please try again.", bundle: .module, comment: "Error message when the user did not finish the login in the browser in time."))
+                return
             }
+
+            let result = await NextcloudKit.shared.getLoginFlowV2PollAsync(token: token, endpoint: endpoint.absoluteString, options: options)
+
+            guard Task.isCancelled == false else { return }
+
+            if result.error == .success,
+               let server = result.server, let host = URL(string: server),
+               let loginName = result.loginName,
+               let appPassword = result.appPassword {
+                complete(host: host, name: loginName, password: appPassword)
+                return
+            }
+
+            // HTTP 404 means the flow is still pending, as do network blips while the user is in the browser.
+            let isPending = result.error == .success || result.responseData?.response?.statusCode == 404 || LoginPollingPolicy.isTransient(result.error)
+
+            if isPending == false {
+                endLogin(result.error)
+                return
+            }
+
+            try? await Task.sleep(for: .seconds(1))
         }
     }
 
@@ -195,7 +184,7 @@ final class LoginFlowModel: QRCodeParsing, URLSanitizing {
                 return
             }
 
-            pollingTask?.cancel()
+            loginTask?.cancel()
             complete(host: credentials.host, name: credentials.user, password: credentials.password)
         } catch {
             // Already handled when the login completed or was cancelled.
@@ -215,12 +204,12 @@ final class LoginFlowModel: QRCodeParsing, URLSanitizing {
     /// - Parameter restartsLoginIfUnauthorized: Start the login for the server when it refuses the credentials.
     ///
     private func complete(host: URL, name: String, password: String, restartsLoginIfUnauthorized: Bool = false) {
-        pollingTask = nil
+        loginTask = nil
         isPresentingLoginPage = false
         isActive = true
         isAddingAccount = true
 
-        // Not a child of the polling or presentation task, which end when the login page closes.
+        // Not a child of the login or presentation task, which end when the login page closes.
         Task {
             do {
                 try await addAccount(host, name, password)
@@ -247,10 +236,8 @@ final class LoginFlowModel: QRCodeParsing, URLSanitizing {
     /// Stop the login. Called when the login page is closed, regardless of the reason.
     ///
     func cancel() {
-        startTask?.cancel()
-        startTask = nil
-        pollingTask?.cancel()
-        pollingTask = nil
+        loginTask?.cancel()
+        loginTask = nil
         isActive = false
         isPresentingLoginPage = false
     }

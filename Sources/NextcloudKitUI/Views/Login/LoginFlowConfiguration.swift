@@ -108,10 +108,8 @@ public struct LoginFlowConfiguration: Sendable {
     ///
     public var loginURLScheme = "nc"
 
-    public var showsCancelButton = false
-
     ///
-    /// Called after the cancel button ended the login. The host dismisses the view.
+    /// Shows a cancel button, which ends the login and then calls this. The host dismisses the view.
     ///
     public var onCancel: CancelHandler?
 
@@ -119,11 +117,6 @@ public struct LoginFlowConfiguration: Sendable {
     /// Lets the host resolve a failed server check, e.g. with its own certificate trust prompt. Without it, the error is shown.
     ///
     public var onServerError: ServerErrorHandler?
-
-    ///
-    /// Ends polling for the login result after this time. Matches the lifetime of a login flow token on the server.
-    ///
-    public var pollingTimeout: Duration = .seconds(20 * 60)
 
     public init() {}
 }
