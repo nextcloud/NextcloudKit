@@ -346,7 +346,7 @@ struct LoginFlowModelTests {
         model.codeScannerDidClose()
 
         #expect(model.isPresentingAlert)
-        #expect(model.alertAction == .openSettings)
+        #expect(model.alertOffersSettings)
     }
 
     @Test func cancelWhileRecoveringStopsTheLogin() async throws {

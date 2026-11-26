@@ -78,49 +78,61 @@ public struct ServerAddressView: View {
     // MARK: - Implementation
 
     public var body: some View {
-        NavigationStack {
-            content
-        }
-    }
-
-    private var content: some View {
         @Bindable var model = model
 
-        return ZStack {
-            backgroundColor
+        return NavigationStack {
+            ZStack {
+                backgroundColor
 
-            // Scrolls only where the form does not fit, such as on small phones in landscape.
-            GeometryReader { proxy in
-                if #available(iOS 26.0, *) {
-                    scrollingForm(minHeight: proxy.size.height)
-                        .scrollEdgeEffectHidden()
-                } else {
-                    scrollingForm(minHeight: proxy.size.height)
+                // Scrolls only where the form does not fit, such as on small phones in landscape.
+                GeometryReader { proxy in
+                    if #available(iOS 26.0, *) {
+                        scrollingForm(minHeight: proxy.size.height)
+                            .scrollEdgeEffectHidden()
+                    } else {
+                        scrollingForm(minHeight: proxy.size.height)
+                    }
                 }
             }
-        }
-        .ignoresSafeArea()
-        .toolbar {
-            if configuration.showsCancelButton {
-                cancelToolbarItem
+            .ignoresSafeArea()
+            .toolbar {
+                if configuration.showsCancelButton {
+                    cancelToolbarItem
+                }
+            }
+            .toolbarBackground(.hidden, for: .navigationBar)
+            .sharedAccountsSheet(isPresented: $isPresentingSharedAccounts, sharedAccounts: sharedAccounts, selectionHandler: { model.selectSharedAccount($0) })
+            // Outside the form, whose disabled state and brand tint would carry over into the sheet, the page and their alerts.
+            .codeScannerSheet(model: model)
+            .fullScreenCover(item: $model.providerSignUp) {
+                model.providerSignUpDidClose()
+            } content: { providerSignUp in
+                ProviderSignUpView(model: providerSignUp)
+            }
+            .task(id: model.isPresentingLoginPage) {
+                // Clearing the flag cancels this task, which closes the browser sheet.
+                guard model.isPresentingLoginPage, let loginAddress = model.loginAddress else { return }
+
+                await model.presentLoginPage(loginAddress, using: webAuthenticationSession)
+            }
+            .alert(String(localized: "Login Failed", bundle: .module, comment: "Alert title"), isPresented: $model.isPresentingAlert) {
+                if model.alertOffersSettings {
+                    Button {
+                        if let settingsURL = URL(string: UIApplication.openSettingsURLString) {
+                            openURL(settingsURL)
+                        }
+                    } label: {
+                        Text("Open Settings", bundle: .module, comment: "Button label in the login error alert which opens the system settings of the app.")
+                    }
+                }
+
+                Button(role: .cancel) {} label: {
+                    Text("OK", bundle: .module, comment: "Button label for error alert dismissal.")
+                }
+            } message: {
+                Text(model.errorMessage ?? "?")
             }
         }
-        .toolbarBackground(.hidden, for: .navigationBar)
-        .sharedAccountsSheet(isPresented: $isPresentingSharedAccounts, sharedAccounts: sharedAccounts, selectionHandler: { model.selectSharedAccount($0) })
-        // Outside the form, whose disabled state and brand tint would carry over into the sheet, the page and their alerts.
-        .codeScannerSheet(model: model)
-        .fullScreenCover(item: $model.providerSignUp) {
-            model.providerSignUpDidClose()
-        } content: { providerSignUp in
-            ProviderSignUpView(model: providerSignUp)
-        }
-        .task(id: model.isPresentingLoginPage) {
-            // Clearing the flag cancels this task, which closes the browser sheet.
-            guard model.isPresentingLoginPage, let loginAddress = model.loginAddress else { return }
-
-            await model.presentLoginPage(loginAddress, using: webAuthenticationSession)
-        }
-        .loginFlowAlert(model: model, isPresented: $model.isPresentingAlert)
     }
 
     private func scrollingForm(minHeight: CGFloat) -> some View {
@@ -187,17 +199,11 @@ public struct ServerAddressView: View {
                 }
             }
 
-            Group {
-                if let serverAddressDescription = configuration.serverAddressDescription {
-                    Text(verbatim: serverAddressDescription)
-                } else {
-                    Text("The address of your Nextcloud web interface when you open it in your browser.", bundle: .module, comment: "Label below the server address field in the login view.")
-                }
-            }
-            .foregroundStyle(foregroundColor)
-            .font(.footnote)
-            .multilineTextAlignment(.center)
-            .padding(4)
+            Text(verbatim: configuration.serverAddressDescription ?? String(localized: "The address of your Nextcloud web interface when you open it in your browser.", bundle: .module, comment: "Label below the server address field in the login view."))
+                .foregroundStyle(foregroundColor)
+                .font(.footnote)
+                .multilineTextAlignment(.center)
+                .padding(4)
 
             Spacer().frame(height: 30)
 
@@ -222,11 +228,6 @@ public struct ServerAddressView: View {
         .safeAreaPadding(.all)
     }
 
-    /// As wide as the server address field, up to a readable width on large screens.
-    private var actionsMaxWidth: CGFloat {
-        horizontalSizeClass == .regular ? 500 : .infinity
-    }
-
     ///
     /// The other ways to log in, below an "or", side by side when the height is compact.
     ///
@@ -235,10 +236,8 @@ public struct ServerAddressView: View {
         let isSideBySide = verticalSizeClass == .compact && dynamicTypeSize.isAccessibilitySize == false
         let layout = isSideBySide ? AnyLayout(HStackLayout(spacing: 12)) : AnyLayout(VStackLayout(spacing: 12))
 
-        VStack(spacing: 16) {
+        VStack(spacing: 37) {
             orSeparator
-
-            Spacer().frame(height: 5)
 
             layout {
                 actionButton(String(localized: "Log in with QR code", bundle: .module, comment: "Button label which opens the QR code scanner in the login view."), systemImage: "qrcode.viewfinder", identifier: "scanQRCode") {
@@ -258,7 +257,7 @@ public struct ServerAddressView: View {
                 }
             }
         }
-        .frame(maxWidth: actionsMaxWidth)
+        .frame(maxWidth: horizontalSizeClass == .regular ? 500 : .infinity)
     }
 
     private var orSeparator: some View {
@@ -331,16 +330,8 @@ public struct ServerAddressView: View {
             }
         } label: {
             HStack {
-                Group {
-                    if let selectedServer {
-                        Text(verbatim: selectedServer.name)
-                    } else if let enforcedServersPrompt = configuration.enforcedServersPrompt {
-                        Text(verbatim: enforcedServersPrompt)
-                    } else {
-                        Text("Select a server", bundle: .module, comment: "Label of the server picker in the login view before a server was picked.")
-                    }
-                }
-                .lineLimit(1)
+                Text(verbatim: selectedServer?.name ?? configuration.enforcedServersPrompt ?? String(localized: "Select a server", bundle: .module, comment: "Label of the server picker in the login view before a server was picked."))
+                    .lineLimit(1)
 
                 Spacer()
 

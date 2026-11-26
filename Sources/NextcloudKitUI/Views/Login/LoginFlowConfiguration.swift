@@ -89,7 +89,7 @@ public struct LoginFlowConfiguration: Sendable {
     public var enforcedServers: [Server] = []
 
     ///
-    /// A provider's sign-up page, which must end on the login callback URL with ``loginURLScheme``. iOS only.
+    /// A provider's sign-up page, which must end on the login callback URL with ``loginURLScheme``.
     ///
     public var providerSignUp: WebLink?
 

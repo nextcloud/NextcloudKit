@@ -18,13 +18,6 @@ import SwiftUI
 @MainActor
 @Observable
 final class LoginFlowModel: QRCodeParsing, URLSanitizing {
-    ///
-    /// An extra action offered by the error alert.
-    ///
-    enum AlertAction {
-        case openSettings
-    }
-
     private let userAgent: String?
     private let configuration: LoginFlowConfiguration
     private let addAccount: AddAccountHandler
@@ -44,8 +37,8 @@ final class LoginFlowModel: QRCodeParsing, URLSanitizing {
     /// Message to display in case of error.
     var errorMessage: String?
 
-    /// Extra action for the error alert.
-    var alertAction: AlertAction?
+    /// Whether the error alert offers to open the system settings.
+    var alertOffersSettings = false
 
     /// Whether an activity currently requires disabling the user interface.
     var isActive = false
@@ -63,7 +56,7 @@ final class LoginFlowModel: QRCodeParsing, URLSanitizing {
     var isPresentingCodeScanner = false
 
     /// An error of the QR code scanner, shown by the login view once the scanner has closed.
-    private var codeScannerError: (message: String?, action: AlertAction?)?
+    private var codeScannerError: (message: String?, offersSettings: Bool)?
 
     /// The login address acquired from the server through the login flow API.
     var loginAddress: URL?
@@ -287,23 +280,17 @@ final class LoginFlowModel: QRCodeParsing, URLSanitizing {
         return error.localizedGenericMessage
     }
 
-    private func present(error: String?, action: AlertAction? = nil) {
+    private func present(error: String?, offersSettings: Bool = false) {
         // The scanner closes first; the user opens it again to scan another code.
         if isPresentingCodeScanner {
-            codeScannerError = (error, action)
+            codeScannerError = (error, offersSettings)
             isPresentingCodeScanner = false
             return
         }
 
         errorMessage = error
-        alertAction = action
+        alertOffersSettings = offersSettings
         isPresentingAlert = true
-    }
-
-    func dismissAlert() {
-        errorMessage = nil
-        alertAction = nil
-        isPresentingAlert = false
     }
 
     // MARK: - QR code
@@ -315,7 +302,7 @@ final class LoginFlowModel: QRCodeParsing, URLSanitizing {
         // The scanner reports neither of these, and a denial only while it is still sliding in.
         switch AVCaptureDevice.authorizationStatus(for: .video) {
         case .denied, .restricted:
-            present(error: Self.cameraAccessMessage, action: .openSettings)
+            present(error: Self.cameraAccessMessage, offersSettings: true)
             return
         default:
             break
@@ -337,7 +324,7 @@ final class LoginFlowModel: QRCodeParsing, URLSanitizing {
         guard let codeScannerError else { return }
 
         self.codeScannerError = nil
-        present(error: codeScannerError.message, action: codeScannerError.action)
+        present(error: codeScannerError.message, offersSettings: codeScannerError.offersSettings)
     }
 
     func handleQRCodeScan(_ result: Result<ScanResult, ScanError>) {
@@ -345,7 +332,7 @@ final class LoginFlowModel: QRCodeParsing, URLSanitizing {
         case .success(let result):
             handleLoginCode(result.string)
         case .failure(.permissionDenied):
-            present(error: Self.cameraAccessMessage, action: .openSettings)
+            present(error: Self.cameraAccessMessage, offersSettings: true)
         case .failure:
             present(error: Self.cameraUnavailableMessage)
         }
