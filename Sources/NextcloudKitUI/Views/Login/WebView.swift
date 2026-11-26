@@ -15,27 +15,39 @@ import WebKit
 ///
 /// All of the web view session data is not persistent.
 ///
-public struct WebView: ViewRepresentable {
+public struct WebView: UIViewRepresentable {
     /// Loaded once when the web view is created, so SwiftUI updates don't reload the page.
     let initialURL: URL?
 
     let userAgent: String?
 
+    /// A web view its owner configures and drives, shown as it is.
+    private let webView: WKWebView?
+
     public init(initialURL: URL?, userAgent: String? = nil) {
         self.initialURL = initialURL
         self.userAgent = userAgent
+        self.webView = nil
     }
 
-    func makeView() -> WKWebView {
+    init(webView: WKWebView) {
+        self.initialURL = nil
+        self.userAgent = nil
+        self.webView = webView
+    }
+
+    public func makeUIView(context: Context) -> WKWebView {
+        if let webView {
+            return webView
+        }
+
         let configuration = WKWebViewConfiguration()
         configuration.websiteDataStore = .nonPersistent()
 
         let webView = WKWebView(frame: CGRect.zero, configuration: configuration)
         webView.isInspectable = true
 
-        if let userAgent {
-            webView.customUserAgent = userAgent
-        }
+        webView.customUserAgent = userAgent
 
         if let initialURL {
             webView.load(URLRequest(url: initialURL))
@@ -44,27 +56,7 @@ public struct WebView: ViewRepresentable {
         return webView
     }
 
-    // MARK: - macOS
-
-    #if os(macOS)
-
-    public func makeNSView(context: Context) -> WKWebView {
-        makeView()
-    }
-
-    public func updateNSView(_ webView: WKWebView, context: Context) {}
-
-    // MARK: - iOS
-
-    #else
-
-    public func makeUIView(context: Context) -> WKWebView {
-        makeView()
-    }
-
     public func updateUIView(_ webView: WKWebView, context: Context) {}
-
-    #endif
 }
 
 #Preview {

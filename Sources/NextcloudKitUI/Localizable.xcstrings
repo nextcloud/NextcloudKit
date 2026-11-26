@@ -1794,8 +1794,11 @@
         }
       }
     },
+    "Camera access is required to scan QR codes. Allow it in Settings." : {
+      "comment" : "Error message when the app may not use the camera to scan a login QR code."
+    },
     "Cancel" : {
-      "comment" : "Button that dismisses a confirmation dialog without making changes.",
+      "comment" : "Button label",
       "localizations" : {
         "af" : {
           "stringUnit" : {
@@ -6063,6 +6066,9 @@
         }
       }
     },
+    "Flashlight" : {
+      "comment" : "Accessibility label of the button which toggles the flashlight while scanning a QR code."
+    },
     "For people who already have access" : {
       "comment" : "Subtitle explaining that an internal link works only for people who already have access.",
       "localizations" : {
@@ -7114,6 +7120,15 @@
         }
       }
     },
+    "Log in" : {
+      "comment" : "Accessibility label of the button which starts the login."
+    },
+    "Log in with QR code" : {
+      "comment" : "Button label which opens the QR code scanner in the login view."
+    },
+    "Logging in to this server is not allowed." : {
+      "comment" : "Login error message when a QR code or sign-up points to a server other than the ones the app is limited to."
+    },
     "Login Failed" : {
       "comment" : "Alert title",
       "localizations" : {
@@ -7666,6 +7681,12 @@
           }
         }
       }
+    },
+    "Open Settings" : {
+      "comment" : "Button label in the login error alert which opens the system settings of the app."
+    },
+    "or" : {
+      "comment" : "Separator between the server address field and the other ways to log in."
     },
     "Participants" : {
       "comment" : "Label above the permission selector in the unified share view.",
@@ -9487,7 +9508,7 @@
       }
     },
     "Scan QR Code" : {
-      "comment" : "Button label\nNavigation bar title",
+      "comment" : "Navigation bar title",
       "localizations" : {
         "da" : {
           "stringUnit" : {
@@ -9598,6 +9619,9 @@
           }
         }
       }
+    },
+    "Select a server" : {
+      "comment" : "Label of the server picker in the login view before a server was picked."
     },
     "Send" : {
       "comment" : "Primary action button title in the unified share view.",
@@ -11613,6 +11637,9 @@
         }
       }
     },
+    "The camera is not available." : {
+      "comment" : "Error message when the camera cannot be used to scan a login QR code."
+    },
     "The entered server address is invalid." : {
       "comment" : "This is an error message.",
       "localizations" : {
@@ -11827,6 +11854,18 @@
         }
       }
     },
+    "The login code is missing the password." : {
+      "comment" : "Error message when a login QR code has no password."
+    },
+    "The login code is missing the server address." : {
+      "comment" : "Error message when a login QR code has no server address."
+    },
+    "The login code is missing the user name." : {
+      "comment" : "Error message when a login QR code has no user name."
+    },
+    "The login timed out. Please try again." : {
+      "comment" : "Error message when the user did not finish the login in the browser in time."
+    },
     "This change will replace the individual permission settings of all recipients in this share." : {
       "comment" : "Explanation shown before propagating top-level permission changes to every recipient.",
       "localizations" : {
@@ -11933,6 +11972,9 @@
           }
         }
       }
+    },
+    "This is not a valid login code." : {
+      "comment" : "Error message when a scanned QR code is not a Nextcloud login code."
     },
     "This recipient will be removed from the share." : {
       "comment" : "Message of the recipient removal confirmation dialog.",

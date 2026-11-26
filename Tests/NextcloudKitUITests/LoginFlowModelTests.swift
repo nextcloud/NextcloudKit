@@ -1,0 +1,388 @@
+// SPDX-FileCopyrightText: Nextcloud GmbH
+// SPDX-FileCopyrightText: 2026 Milen Pivchev
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+import CodeScanner
+import Foundation
+import NextcloudKit
+@testable import NextcloudKitUI
+import Testing
+
+///
+/// Tests for ``LoginFlowModel`` which need no Nextcloud server.
+///
+/// Serialized, because parallel requests through the shared `NextcloudKit` sessions drop each other.
+///
+@MainActor
+@Suite(.serialized)
+struct LoginFlowModelTests {
+    ///
+    /// Records what the model hands to the host app.
+    ///
+    @MainActor
+    final class Recorder {
+        var addedAccounts: [(host: URL, name: String, password: String)] = []
+        var serverErrors: [(error: NKError, url: URL)] = []
+        var isActiveDuringAddAccount: Bool?
+        var isAddingAccountDuringAddAccount: Bool?
+        var isPresentingCodeScannerDuringAddAccount: Bool?
+        var addAccountError: Error?
+        weak var model: LoginFlowModel?
+    }
+
+    private let loginCode = "nc://login/user:jane&password:secret&server:https://cloud.example.com"
+
+    private func makeModel(configuration: LoginFlowConfiguration = LoginFlowConfiguration(), recorder: Recorder) -> LoginFlowModel {
+        let model = LoginFlowModel(userAgent: nil, configuration: configuration) { host, name, password in
+            recorder.isActiveDuringAddAccount = recorder.model?.isActive
+            recorder.isAddingAccountDuringAddAccount = recorder.model?.isAddingAccount
+            recorder.isPresentingCodeScannerDuringAddAccount = recorder.model?.isPresentingCodeScanner
+            recorder.addedAccounts.append((host, name, password))
+
+            if let error = recorder.addAccountError {
+                throw error
+            }
+        }
+
+        recorder.model = model
+
+        return model
+    }
+
+    private func waitUntil(_ condition: @MainActor () -> Bool) async throws {
+        let deadline = ContinuousClock.now + .seconds(10)
+
+        while condition() == false {
+            guard ContinuousClock.now < deadline else {
+                Issue.record("Timed out waiting for the condition.")
+                return
+            }
+
+            try await Task.sleep(for: .milliseconds(20))
+        }
+    }
+
+    @Test func prefillsInitialServerAddress() async throws {
+        var configuration = LoginFlowConfiguration()
+        configuration.initialServerAddress = "https://cloud.example.com"
+
+        let model = makeModel(configuration: configuration, recorder: Recorder())
+
+        #expect(model.enteredServerAddress == "https://cloud.example.com")
+    }
+
+    @Test func emptyAddressDoesNothing() async throws {
+        let model = makeModel(recorder: Recorder())
+        model.enteredServerAddress = "   "
+
+        model.logIn()
+
+        #expect(model.isActive == false)
+        #expect(model.isPresentingAlert == false)
+    }
+
+    @Test func invalidAddressPresentsAlert() async throws {
+        let model = makeModel(recorder: Recorder())
+        model.enteredServerAddress = "ssh://cloud.example.com"
+
+        model.logIn()
+
+        #expect(model.isActive == false)
+        #expect(model.isPresentingAlert)
+        #expect(model.errorMessage?.isEmpty == false)
+    }
+
+    @Test func addAccountFailureWording() async throws {
+        let unauthorized = NKError(errorCode: 401)
+        let notFound = NKError(errorCode: 404)
+        let invalidResponse = NKError.invalidResponseError
+
+        let unauthorizedMessage = try await addAccountMessage(for: unauthorized)
+        let notFoundMessage = try await addAccountMessage(for: notFound)
+        let invalidResponseMessage = try await addAccountMessage(for: invalidResponse)
+
+        // QR code logins are not restarted when the server refuses the credentials.
+        #expect(unauthorizedMessage == unauthorized.localizedGenericMessage)
+
+        // A 404 means a wrong address, while an unreadable reply may come from a proxy in front of a server that exists.
+        #expect(notFoundMessage != notFound.localizedGenericMessage)
+        #expect(invalidResponseMessage == invalidResponse.localizedGenericMessage)
+    }
+
+    private func addAccountMessage(for error: NKError) async throws -> String? {
+        let recorder = Recorder()
+        recorder.addAccountError = error
+        let model = makeModel(recorder: recorder)
+
+        model.handleLoginCode(loginCode)
+
+        try await waitUntil { model.isPresentingAlert }
+
+        #expect(model.isActive == false)
+
+        return model.errorMessage
+    }
+
+    @Test func loginCodeUsesConfiguredScheme() async throws {
+        let recorder = Recorder()
+        var configuration = LoginFlowConfiguration()
+        configuration.loginURLScheme = "abc"
+        let model = makeModel(configuration: configuration, recorder: recorder)
+
+        model.handleLoginCode(loginCode)
+
+        #expect(model.isPresentingAlert)
+        #expect(model.errorMessage == QRCodeError.invalidPrefix.localizedDescription)
+
+        model.handleLoginCode("abc://login/user:jane&password:secret&server:https://cloud.example.com")
+
+        try await waitUntil { recorder.addedAccounts.count == 1 }
+    }
+
+    @Test func enforcedServersRefuseOtherHosts() async throws {
+        let recorder = Recorder()
+        var configuration = LoginFlowConfiguration()
+        configuration.enforcedServers = [.init(name: "Example", url: URL(string: "https://Cloud.Example.com/nextcloud")!)]
+        let model = makeModel(configuration: configuration, recorder: recorder)
+
+        model.handleLoginCode("nc://login/user:jane&password:secret&server:https://evil.example.org")
+
+        #expect(model.isPresentingAlert)
+        #expect(recorder.addedAccounts.isEmpty)
+
+        model.finishProviderSignUp(callbackURL: URL(string: "nc://login/server:https://evil.example.org&user:jane&password:secret")!)
+        model.providerSignUpDidClose()
+
+        #expect(recorder.addedAccounts.isEmpty)
+        #expect(model.isAllowed(URL(string: "https://evil.example.org")!) == false)
+
+        model.isPresentingAlert = false
+        model.handleLoginCode(loginCode)
+
+        try await waitUntil { recorder.addedAccounts.count == 1 }
+    }
+
+    @Test func withoutEnforcedServersAnyHostIsAllowed() {
+        let model = makeModel(recorder: Recorder())
+
+        #expect(model.isAllowed(URL(string: "https://evil.example.org")!))
+    }
+
+    @Test func cancelResetsState() async throws {
+        let model = makeModel(recorder: Recorder())
+        model.isActive = true
+        model.isPresentingLoginPage = true
+
+        model.cancel()
+
+        #expect(model.isActive == false)
+        #expect(model.isPresentingLoginPage == false)
+    }
+
+    @Test func serverErrorWithoutHandlerIsPresented() async throws {
+        let model = makeModel(recorder: Recorder())
+
+        // Nothing listens on port 1, so the connection is refused right away.
+        model.enteredServerAddress = "http://127.0.0.1:1"
+        model.logIn()
+
+        #expect(model.enteredServerAddress == "http://127.0.0.1:1/")
+        #expect(model.isActive)
+
+        try await waitUntil { model.isPresentingAlert }
+
+        #expect(model.isActive == false)
+    }
+
+    @Test func serverErrorHandlerCanRetryAndCancel() async throws {
+        let recorder = Recorder()
+        var configuration = LoginFlowConfiguration()
+
+        configuration.onServerError = { error, url in
+            recorder.serverErrors.append((error, url))
+
+            if recorder.serverErrors.count == 1 {
+                return .retry(URL(string: "http://127.0.0.1:2/")!)
+            }
+
+            return .cancel
+        }
+
+        let model = makeModel(configuration: configuration, recorder: recorder)
+        model.enteredServerAddress = "127.0.0.1:1"
+        model.logIn()
+
+        try await waitUntil { recorder.serverErrors.count == 2 && model.isActive == false }
+
+        #expect(recorder.serverErrors.map(\.url.absoluteString) == ["https://127.0.0.1:1/", "http://127.0.0.1:2/"])
+        #expect(model.enteredServerAddress == "http://127.0.0.1:2/")
+        #expect(model.isPresentingAlert == false)
+    }
+
+    @Test func scannedCodeAddsAccountWhileScannerStaysOpen() async throws {
+        let recorder = Recorder()
+        let model = makeModel(recorder: recorder)
+
+        model.presentCodeScanner()
+        model.handleLoginCode(loginCode)
+
+        try await waitUntil { recorder.addedAccounts.count == 1 && model.isActive == false }
+
+        let account = try #require(recorder.addedAccounts.first)
+        #expect(account.host.absoluteString == "https://cloud.example.com")
+        #expect(account.name == "jane")
+        #expect(account.password == "secret")
+        #expect(recorder.isActiveDuringAddAccount == true)
+        #expect(recorder.isAddingAccountDuringAddAccount == true)
+        #expect(recorder.isPresentingCodeScannerDuringAddAccount == true)
+        #expect(model.isAddingAccount == false)
+        #expect(model.isPresentingCodeScanner == false)
+        #expect(model.isPresentingAlert == false)
+    }
+
+    @Test func invalidScannedCodeClosesScannerThenShowsError() async throws {
+        let model = makeModel(recorder: Recorder())
+
+        model.presentCodeScanner()
+        model.handleLoginCode("https://cloud.example.com")
+
+        #expect(model.isPresentingCodeScanner == false)
+        #expect(model.isPresentingAlert == false)
+
+        model.codeScannerDidClose()
+
+        #expect(model.isPresentingAlert)
+        #expect(model.errorMessage == QRCodeError.invalidPrefix.localizedDescription)
+    }
+
+    @Test func failedLoginFromScannedCodeClosesScannerThenShowsError() async throws {
+        let recorder = Recorder()
+        recorder.addAccountError = NKError(errorCode: 401)
+        let model = makeModel(recorder: recorder)
+
+        model.presentCodeScanner()
+        model.handleLoginCode(loginCode)
+
+        try await waitUntil { model.isPresentingCodeScanner == false && model.isActive == false }
+
+        #expect(recorder.isPresentingCodeScannerDuringAddAccount == true)
+
+        model.codeScannerDidClose()
+
+        #expect(model.isPresentingAlert)
+    }
+
+    @Test func reopenedScannerForgetsTheLastError() async throws {
+        let model = makeModel(recorder: Recorder())
+
+        model.presentCodeScanner()
+        model.handleLoginCode("https://cloud.example.com")
+        model.presentCodeScanner()
+        model.codeScannerDidClose()
+
+        #expect(model.isPresentingAlert == false)
+    }
+
+    @Test func providerSignUpAddsAccountOnceItsPageClosed() async throws {
+        let recorder = Recorder()
+        let model = makeModel(recorder: recorder)
+
+        model.presentProviderSignUp(URL(string: "http://127.0.0.1:1/signup")!)
+        model.finishProviderSignUp(callbackURL: URL(string: "nc://login/server:https://cloud.example.com&user:jane&password:secret")!)
+
+        #expect(model.providerSignUp == nil)
+        #expect(recorder.addedAccounts.isEmpty)
+
+        model.providerSignUpDidClose()
+
+        try await waitUntil { recorder.addedAccounts.count == 1 && model.isActive == false }
+
+        let account = try #require(recorder.addedAccounts.first)
+        #expect(account.host.absoluteString == "https://cloud.example.com")
+        #expect(account.name == "jane")
+        #expect(account.password == "secret")
+        #expect(recorder.isActiveDuringAddAccount == true)
+        #expect(model.isPresentingAlert == false)
+    }
+
+    @Test func closedProviderSignUpWithoutCallbackDoesNothing() async throws {
+        let recorder = Recorder()
+        let model = makeModel(recorder: recorder)
+
+        model.presentProviderSignUp(URL(string: "http://127.0.0.1:1/signup")!)
+        model.providerSignUp = nil
+        model.providerSignUpDidClose()
+
+        #expect(model.isActive == false)
+        #expect(model.isPresentingAlert == false)
+        #expect(recorder.addedAccounts.isEmpty)
+    }
+
+    @Test func refusedSignUpCredentialsRestartTheLogin() async throws {
+        let recorder = Recorder()
+        let refusal = NKError(errorCode: 401)
+        recorder.addAccountError = refusal
+        let model = makeModel(recorder: recorder)
+
+        // Nothing listens on port 1, so the restarted login fails at its server check.
+        model.finishProviderSignUp(callbackURL: URL(string: "nc://login/server:http://127.0.0.1:1&user:jane&password:token")!)
+        model.providerSignUpDidClose()
+
+        try await waitUntil { model.isPresentingAlert }
+
+        #expect(recorder.addedAccounts.count == 1)
+        #expect(model.enteredServerAddress == "http://127.0.0.1:1/")
+        #expect(model.errorMessage != refusal.localizedGenericMessage)
+        #expect(model.isActive == false)
+        #expect(model.isAddingAccount == false)
+    }
+
+    @Test func malformedSignUpCallbackShowsError() async throws {
+        let recorder = Recorder()
+        let model = makeModel(recorder: recorder)
+
+        model.finishProviderSignUp(callbackURL: URL(string: "nc://login/user:jane")!)
+        model.providerSignUpDidClose()
+
+        #expect(model.isPresentingAlert)
+        #expect(recorder.addedAccounts.isEmpty)
+    }
+
+    @Test func cameraFailureClosesScannerWithAlert() async throws {
+        let model = makeModel(recorder: Recorder())
+
+        model.presentCodeScanner()
+        model.handleQRCodeScan(.failure(.permissionDenied))
+
+        #expect(model.isPresentingCodeScanner == false)
+
+        model.codeScannerDidClose()
+
+        #expect(model.isPresentingAlert)
+        #expect(model.alertOffersSettings)
+    }
+
+    @Test func cancelWhileRecoveringStopsTheLogin() async throws {
+        let recorder = Recorder()
+        var configuration = LoginFlowConfiguration()
+
+        configuration.onServerError = { error, url in
+            recorder.serverErrors.append((error, url))
+            recorder.model?.cancel()
+
+            return .retry(URL(string: "http://127.0.0.1:2/")!)
+        }
+
+        let model = makeModel(configuration: configuration, recorder: recorder)
+        model.enteredServerAddress = "127.0.0.1:1"
+        model.logIn()
+
+        try await waitUntil { recorder.serverErrors.count == 1 && model.isActive == false }
+        try await Task.sleep(for: .milliseconds(200))
+
+        #expect(recorder.serverErrors.count == 1)
+        #expect(model.enteredServerAddress == "https://127.0.0.1:1/")
+        #expect(model.isActive == false)
+        #expect(model.isPresentingAlert == false)
+    }
+}

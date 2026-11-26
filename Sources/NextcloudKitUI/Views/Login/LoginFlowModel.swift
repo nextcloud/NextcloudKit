@@ -3,9 +3,8 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 import AuthenticationServices
-#if os(iOS)
+import AVFoundation
 import CodeScanner
-#endif
 import NextcloudKit
 import SwiftUI
 
@@ -20,23 +19,32 @@ import SwiftUI
 @Observable
 final class LoginFlowModel: QRCodeParsing, URLSanitizing {
     private let userAgent: String?
+    private let configuration: LoginFlowConfiguration
     private let addAccount: AddAccountHandler
 
-    init(userAgent: String?, addAccount: @escaping AddAccountHandler) {
+    init(userAgent: String?, configuration: LoginFlowConfiguration = LoginFlowConfiguration(), addAccount: @escaping AddAccountHandler) {
         self.userAgent = userAgent
+        self.configuration = configuration
         self.addAccount = addAccount
+        self.enteredServerAddress = configuration.initialServerAddress ?? ""
     }
 
     // MARK: - State observed by the view
 
     /// The unsanitized user input.
-    var enteredServerAddress = ""
+    var enteredServerAddress: String
 
     /// Message to display in case of error.
     var errorMessage: String?
 
+    /// Whether the error alert offers to open the system settings.
+    var alertOffersSettings = false
+
     /// Whether an activity currently requires disabling the user interface.
     var isActive = false
+
+    /// Whether the account is being added, after which the login can no longer be cancelled.
+    var isAddingAccount = false
 
     /// State toggle for presenting the error alert.
     var isPresentingAlert = false
@@ -44,10 +52,19 @@ final class LoginFlowModel: QRCodeParsing, URLSanitizing {
     /// State toggle for presenting the login page in the system browser.
     var isPresentingLoginPage = false
 
+    /// State toggle for presenting the QR code scanner, which stays open while a scanned code logs in.
+    var isPresentingCodeScanner = false
+
+    /// An error of the QR code scanner, shown by the login view once the scanner has closed.
+    private var codeScannerError: (message: String?, offersSettings: Bool)?
+
     /// The login address acquired from the server through the login flow API.
     var loginAddress: URL?
 
-    private var pollingTask: Task<Void, Never>?
+    private var loginTask: Task<Void, Never>?
+
+    /// Matches the lifetime of a login flow token on the server.
+    private static let pollingTimeout: Duration = .seconds(20 * 60)
 
     // MARK: - Login flow
 
@@ -55,15 +72,16 @@ final class LoginFlowModel: QRCodeParsing, URLSanitizing {
     /// Sanitize the entered server address and start the login flow.
     ///
     func logIn() {
-        guard enteredServerAddress.trimmingCharacters(in: .whitespaces).isEmpty == false else {
+        guard enteredServerAddress.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty == false else {
             return
         }
 
-        guard let sanitizedServerAddress = sanitize(enteredServerAddress) else {
+        guard let sanitizedServerAddress = sanitize(enteredServerAddress, upgradingInsecureHTTP: configuration.upgradesInsecureHTTP) else {
             present(error: String(localized: "The entered server address is invalid.", bundle: .module, comment: "This is an error message."))
             return
         }
 
+        enteredServerAddress = sanitizedServerAddress.absoluteString
         start(serverURL: sanitizedServerAddress)
     }
 
@@ -71,63 +89,103 @@ final class LoginFlowModel: QRCodeParsing, URLSanitizing {
     /// Check the server, request the login flow, present its web page and begin polling.
     ///
     func start(serverURL: URL) {
+        loginTask?.cancel()
         isActive = true
 
-        Task {
+        loginTask = Task {
+            let options = NKRequestOptions(customUserAgent: userAgent)
+
+            let (_, statusResult) = await NextcloudKit.shared.getServerStatusAsync(serverUrl: serverURL.absoluteString, options: options)
+
+            guard Task.isCancelled == false else { return }
+
+            if case .failure(let error) = statusResult {
+                await recover(from: error, serverURL: serverURL)
+                return
+            }
+
             do {
-                let options = NKRequestOptions(customUserAgent: userAgent)
-
-                let (_, statusResult) = await NextcloudKit.shared.getServerStatusAsync(serverUrl: serverURL.absoluteString, options: options)
-
-                if case .failure(let error) = statusResult {
-                    throw error
-                }
-
                 let (endpoint, login, token) = try await NextcloudKit.shared.getLoginFlowV2(serverUrl: serverURL.absoluteString, options: options)
 
-                startPolling(token: token, endpoint: endpoint)
+                guard Task.isCancelled == false else { return }
 
                 loginAddress = login
                 isPresentingLoginPage = true
+
+                await poll(token: token, endpoint: endpoint, options: options)
             } catch {
+                guard Task.isCancelled == false else { return }
+
                 endLogin(error)
             }
         }
     }
 
-    private func startPolling(token: String, endpoint: URL) {
-        pollingTask?.cancel()
+    private func recover(from error: NKError, serverURL: URL) async {
+        nkLog(error: "Login server check failed: \(error.logDescription)")
 
-        pollingTask = Task { [weak self] in
-            guard let self else { return }
+        let recovery = await configuration.onServerError?(error, serverURL) ?? .presentError
 
-            let options = NKRequestOptions(customUserAgent: self.userAgent)
+        // The user may have cancelled while the host was asking how to recover.
+        guard Task.isCancelled == false else { return }
 
-            while Task.isCancelled == false {
-                let poll = await NextcloudKit.shared.getLoginFlowV2PollAsync(token: token, endpoint: endpoint.absoluteString, options: options)
+        switch recovery {
+        case .retry(let url):
+            enteredServerAddress = url.absoluteString
+            start(serverURL: url)
+        case .cancel:
+            cancel()
+        case .presentError:
+            endLogin(error)
+        }
+    }
 
-                if poll.error == .success,
-                   let server = poll.server, let host = URL(string: server),
-                   let loginName = poll.loginName,
-                   let appPassword = poll.appPassword {
-                    self.complete(host: host, name: loginName, password: appPassword)
-                    return
-                }
+    private func poll(token: String, endpoint: URL, options: NKRequestOptions) async {
+        let deadline = ContinuousClock.now + Self.pollingTimeout
 
-                // HTTP 404 means the flow is still pending; any other failure is terminal.
-                if poll.error != .success, poll.responseData?.response?.statusCode != 404 {
-                    self.endLogin(poll.error)
-                    return
-                }
-
-                try? await Task.sleep(for: .seconds(1))
+        while Task.isCancelled == false {
+            guard ContinuousClock.now < deadline else {
+                cancel()
+                present(error: String(localized: "The login timed out. Please try again.", bundle: .module, comment: "Error message when the user did not finish the login in the browser in time."))
+                return
             }
+
+            let result = await NextcloudKit.shared.getLoginFlowV2PollAsync(token: token, endpoint: endpoint.absoluteString, options: options)
+
+            guard Task.isCancelled == false else { return }
+
+            if result.error == .success,
+               let server = result.server, let host = URL(string: server),
+               let loginName = result.loginName,
+               let appPassword = result.appPassword {
+                complete(host: host, name: loginName, password: appPassword)
+                return
+            }
+
+            // HTTP 404 means the flow is still pending, as do network blips while the user is in the browser.
+            let isPending = result.error == .success || result.responseData?.response?.statusCode == 404 || LoginPollingPolicy.isTransient(result.error)
+
+            if isPending == false {
+                endLogin(result.error)
+                return
+            }
+
+            try? await Task.sleep(for: .seconds(1))
         }
     }
 
     func presentLoginPage(_ url: URL, using session: WebAuthenticationSession) async {
         do {
-            _ = try await session.authenticate(using: url, callbackURLScheme: "nc", preferredBrowserSession: .ephemeral)
+            let callbackURL = try await session.authenticate(using: url, callbackURLScheme: configuration.loginURLScheme, preferredBrowserSession: .ephemeral)
+
+            // A login page that redirects to the callback URL hands over the credentials directly. Otherwise polling continues.
+            guard isPresentingLoginPage,
+                  let credentials = try? parseLoginCallback(callbackURL, scheme: configuration.loginURLScheme) else {
+                return
+            }
+
+            loginTask?.cancel()
+            complete(host: credentials.host, name: credentials.user, password: credentials.password)
         } catch {
             // Already handled when the login completed or was cancelled.
             guard isPresentingLoginPage else { return }
@@ -140,19 +198,46 @@ final class LoginFlowModel: QRCodeParsing, URLSanitizing {
         }
     }
 
-    private func complete(host: URL, name: String, password: String) {
-        pollingTask = nil
-        isActive = false
+    ///
+    /// Hand the credentials to the host. The view stays busy until the host has added the account.
+    ///
+    /// - Parameter restartsLoginIfUnauthorized: Start the login for the server when it refuses the credentials.
+    ///
+    private func complete(host: URL, name: String, password: String, restartsLoginIfUnauthorized: Bool = false) {
+        loginTask = nil
         isPresentingLoginPage = false
-        addAccount(host, name, password)
+        isActive = true
+        isAddingAccount = true
+
+        // Not a child of the login or presentation task, which end when the login page closes.
+        Task {
+            do {
+                try await addAccount(host, name, password)
+                isPresentingCodeScanner = false
+            } catch let error as NKError where restartsLoginIfUnauthorized && error.kind == .unauthorized {
+                nkLog(error: "The server refused the credentials, starting the login: \(error.logDescription)")
+
+                isAddingAccount = false
+                isActive = false
+                enteredServerAddress = host.absoluteString
+                logIn()
+                return
+            } catch {
+                nkLog(error: "Adding the account failed: \(error)")
+                present(error: (error as? NKError).map { message(for: $0, whileAddingAccount: true) } ?? error.localizedDescription)
+            }
+
+            isAddingAccount = false
+            isActive = false
+        }
     }
 
     ///
-    /// Stop polling. Called when the login page is closed, regardless of the reason.
+    /// Stop the login. Called when the login page is closed, regardless of the reason.
     ///
     func cancel() {
-        pollingTask?.cancel()
-        pollingTask = nil
+        loginTask?.cancel()
+        loginTask = nil
         isActive = false
         isPresentingLoginPage = false
     }
@@ -170,9 +255,10 @@ final class LoginFlowModel: QRCodeParsing, URLSanitizing {
 
     ///
     /// A 404 or an unreadable response during login means there is no Nextcloud instance at the entered address.
+    /// While adding the account an unreadable response can come from a proxy in front of the server, so only a 404 counts.
     ///
-    private func message(for error: NKError) -> String {
-        let isInstanceNotFound = error.kind == .notFound || error.kind == .invalidResponse
+    private func message(for error: NKError, whileAddingAccount: Bool = false) -> String {
+        let isInstanceNotFound = error.kind == .notFound || (error.kind == .invalidResponse && !whileAddingAccount)
 
         if isInstanceNotFound {
             return String(localized: "No server was found at this address.", bundle: .module, comment: "Login error message when the entered address does not point to a Nextcloud server.")
@@ -181,31 +267,84 @@ final class LoginFlowModel: QRCodeParsing, URLSanitizing {
         return error.localizedGenericMessage
     }
 
-    private func present(error: String?) {
+    private func present(error: String?, offersSettings: Bool = false) {
+        // The scanner closes first; the user opens it again to scan another code.
+        if isPresentingCodeScanner {
+            codeScannerError = (error, offersSettings)
+            isPresentingCodeScanner = false
+            return
+        }
+
         errorMessage = error
+        alertOffersSettings = offersSettings
         isPresentingAlert = true
     }
 
     // MARK: - QR code
 
-    #if os(iOS)
+    func presentCodeScanner() {
+        codeScannerError = nil
+
+        #if !targetEnvironment(simulator)
+        // The scanner reports neither of these, and a denial only while it is still sliding in.
+        switch AVCaptureDevice.authorizationStatus(for: .video) {
+        case .denied, .restricted:
+            present(error: Self.cameraAccessMessage, offersSettings: true)
+            return
+        default:
+            break
+        }
+
+        guard AVCaptureDevice.default(for: .video) != nil else {
+            present(error: Self.cameraUnavailableMessage)
+            return
+        }
+        #endif
+
+        isPresentingCodeScanner = true
+    }
+
+    ///
+    /// Show the error the scanner closed with.
+    ///
+    func codeScannerDidClose() {
+        guard let codeScannerError else { return }
+
+        self.codeScannerError = nil
+        present(error: codeScannerError.message, offersSettings: codeScannerError.offersSettings)
+    }
+
     func handleQRCodeScan(_ result: Result<ScanResult, ScanError>) {
         switch result {
         case .success(let result):
             handleLoginCode(result.string)
-        case .failure(let error):
-            present(error: error.localizedDescription)
+        case .failure(.permissionDenied):
+            present(error: Self.cameraAccessMessage, offersSettings: true)
+        case .failure:
+            present(error: Self.cameraUnavailableMessage)
         }
     }
-    #endif
+
+    private static var cameraAccessMessage: String {
+        String(localized: "Camera access is required to scan QR codes. Allow it in Settings.", bundle: .module, comment: "Error message when the app may not use the camera to scan a login QR code.")
+    }
+
+    private static var cameraUnavailableMessage: String {
+        String(localized: "The camera is not available.", bundle: .module, comment: "Error message when the camera cannot be used to scan a login QR code.")
+    }
 
     func handleLoginCode(_ code: String) {
         do {
-            let credentials = try parseLogin(code)
+            let credentials = try parseLogin(code, scheme: configuration.loginURLScheme)
+
+            guard isAllowed(credentials.host) else {
+                present(error: Self.serverNotAllowedMessage)
+                return
+            }
 
             switch credentials.kind {
             case .login:
-                addAccount(credentials.host, credentials.user, credentials.password)
+                complete(host: credentials.host, name: credentials.user, password: credentials.password)
             case .onetimeLogin:
                 exchangeOnetimeToken(credentials)
             }
@@ -214,21 +353,80 @@ final class LoginFlowModel: QRCodeParsing, URLSanitizing {
         }
     }
 
-    private func exchangeOnetimeToken(_ credentials: ParsedLoginCredentials) {
+    private func exchangeOnetimeToken(_ credentials: LoginCredentials) {
         isActive = true
+        isAddingAccount = true
 
         Task {
             let result = await NextcloudKit.shared.getAppPasswordOnetimeAsync(url: credentials.host.absoluteString, user: credentials.user, onetimeToken: credentials.password, userAgent: userAgent)
 
-            isActive = false
-
             if result.error == .success, let token = result.token {
-                addAccount(credentials.host, credentials.user, token)
+                complete(host: credentials.host, name: credentials.user, password: token)
             } else {
+                isAddingAccount = false
+                isActive = false
                 nkLog(error: "One-time login failed: \(result.error.logDescription)")
                 present(error: message(for: result.error))
             }
         }
+    }
+
+    // MARK: - Provider sign-up
+
+    /// The provider sign-up page while it is open.
+    var providerSignUp: ProviderSignUpModel?
+
+    /// The login callback URL the sign-up ended on, handled once its page has closed.
+    private var providerSignUpCallbackURL: URL?
+
+    func presentProviderSignUp(_ url: URL) {
+        providerSignUpCallbackURL = nil
+        providerSignUp = ProviderSignUpModel(url: url, callbackScheme: configuration.loginURLScheme, userAgent: userAgent) { [weak self] callbackURL in
+            self?.finishProviderSignUp(callbackURL: callbackURL)
+        }
+    }
+
+    func finishProviderSignUp(callbackURL: URL) {
+        providerSignUpCallbackURL = callbackURL
+        providerSignUp = nil
+    }
+
+    ///
+    /// Add the account the sign-up ended on, once its page has closed.
+    ///
+    func providerSignUpDidClose() {
+        guard let callbackURL = providerSignUpCallbackURL else { return }
+
+        providerSignUpCallbackURL = nil
+
+        do {
+            let credentials = try parseLoginCallback(callbackURL, scheme: configuration.loginURLScheme)
+
+            guard isAllowed(credentials.host) else {
+                present(error: Self.serverNotAllowedMessage)
+                return
+            }
+
+            // Providers may hand over a session token, which servers refuse, so the user logs in to the new account instead.
+            complete(host: credentials.host, name: credentials.user, password: credentials.password, restartsLoginIfUnauthorized: true)
+        } catch {
+            present(error: error.localizedDescription)
+        }
+    }
+
+    // MARK: - Enforced servers
+
+    private static var serverNotAllowedMessage: String {
+        String(localized: "Logging in to this server is not allowed.", bundle: .module, comment: "Login error message when a QR code or sign-up points to a server other than the ones the app is limited to.")
+    }
+
+    ///
+    /// Whether the app may log in to this server: any server, unless ``LoginFlowConfiguration/enforcedServers`` limits it to their hosts.
+    ///
+    func isAllowed(_ server: URL) -> Bool {
+        guard configuration.enforcedServers.isEmpty == false else { return true }
+
+        return configuration.enforcedServers.contains { $0.url.host?.lowercased() == server.host?.lowercased() }
     }
 
     // MARK: - Shared accounts

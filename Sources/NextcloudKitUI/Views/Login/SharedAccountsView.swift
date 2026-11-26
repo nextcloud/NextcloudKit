@@ -39,7 +39,12 @@ struct SharedAccountsView: View {
 
 
                                 VStack(alignment: .leading) {
-                                    Text(sharedAccount.name)
+                                    if let user = sharedAccount.user, user != sharedAccount.name {
+                                        Text(verbatim: "\(sharedAccount.name) (\(user))")
+                                    } else {
+                                        Text(sharedAccount.name)
+                                    }
+
                                     Text(sharedAccount.host.absoluteString)
                                         .foregroundStyle(.secondary)
                                         .font(.subheadline)
@@ -55,9 +60,7 @@ struct SharedAccountsView: View {
                         .padding(.horizontal)
                     }
                     .navigationTitle(String(localized: "Accounts from other Apps", bundle: .module, comment: "Navigation bar title"))
-#if os(iOS)
                     .navigationBarTitleDisplayMode(.inline)
-#endif
                 }
                 .contentMargins(.top, 20, for: .scrollContent)
             }
