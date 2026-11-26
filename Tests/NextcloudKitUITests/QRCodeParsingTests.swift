@@ -21,39 +21,16 @@ struct QRCodeParsingTests {
         testSubject = QRCodeParsingTestSubject()
     }
 
-    @Test func emptyCode() async throws {
-        #expect(throws: QRCodeError.implausibleLength) {
-            try testSubject.parse("")
-        }
-    }
-
-    @Test func invalidPrefix() async throws {
-        #expect(throws: QRCodeError.invalidPrefix) {
-            try testSubject.parse("nope://login/&user:test&password:secret&server:http://localhost:8080")
-        }
-    }
-
-    @Test func missingUser() async throws {
-        #expect(throws: QRCodeError.missingUser) {
-            try testSubject.parse("nc://login/&password:secret&server:http://localhost:8080")
-        }
-    }
-
-    @Test func missingPassword() async throws {
-        #expect(throws: QRCodeError.missingPassword) {
-            try testSubject.parse("nc://login/&user:test&server:http://localhost:8080")
-        }
-    }
-
-    @Test func missingHost() async throws {
-        #expect(throws: QRCodeError.missingHost) {
-            try testSubject.parse("nc://login/&user:test&password:secret")
-        }
-    }
-
-    @Test func validCode() async throws {
-        #expect(throws: Never.self) {
-            try testSubject.parse("nc://login/&user:test&password:secret&server:http://localhost:8080")
+    @Test(arguments: [
+        ("nc://login/", QRCodeError.implausibleLength),
+        ("nope://login/user:test&password:secret&server:http://localhost:8080", .invalidPrefix),
+        ("nc://login/password:secret&server:http://localhost:8080", .missingUser),
+        ("nc://login/user:&password:secret&server:https://cloud.example.com", .missingUser),
+        ("nc://login/user:test&server:http://localhost:8080", .missingPassword),
+        ("nc://login/user:test&password:secret", .missingHost)
+    ]) func invalidCode(_ code: String, _ error: QRCodeError) async throws {
+        #expect(throws: error) {
+            try testSubject.parseLogin(code)
         }
     }
 
@@ -73,19 +50,37 @@ struct QRCodeParsingTests {
         #expect(credentials.password == "token")
     }
 
-    @Test func customScheme() async throws {
-        let code = "abc://login/user:jane&password:secret&server:https://cloud.example.com"
+    @Test func validCallback() async throws {
+        let url = try #require(URL(string: "nc://login/server:https://cloud.example.com/nextcloud&user:jane&password:secret"))
+        let credentials = try testSubject.parseLoginCallback(url)
 
-        #expect(try testSubject.parseLogin(code, scheme: "abc").user == "jane")
-
-        #expect(throws: QRCodeError.invalidPrefix) {
-            try testSubject.parseLogin(code)
-        }
+        #expect(credentials.kind == .login)
+        #expect(credentials.user == "jane")
+        #expect(credentials.password == "secret")
+        #expect(credentials.host.absoluteString == "https://cloud.example.com/nextcloud")
     }
 
-    @Test func emptyValues() async throws {
-        #expect(throws: QRCodeError.missingUser) {
-            try testSubject.parseLogin("nc://login/user:&password:secret&server:https://cloud.example.com")
+    @Test func callbackPlusInUserIsSpace() async throws {
+        let url = try #require(URL(string: "nc://login/server:https://cloud.example.com&user:jane+doe&password:secret"))
+
+        #expect(try testSubject.parseLoginCallback(url).user == "jane doe")
+    }
+
+    @Test func callbackPercentEncodedValues() async throws {
+        let url = try #require(URL(string: "nc://login/server:https://cloud.example.com&user:jane%40example.com&password:se%2Bcret"))
+        let credentials = try testSubject.parseLoginCallback(url)
+
+        #expect(credentials.user == "jane@example.com")
+        #expect(credentials.password == "se+cret")
+    }
+
+    @Test func callbackCustomScheme() async throws {
+        let url = try #require(URL(string: "abc://login/server:https://cloud.example.com&user:jane&password:secret"))
+
+        #expect(try testSubject.parseLoginCallback(url, scheme: "abc").user == "jane")
+
+        #expect(throws: QRCodeError.invalidPrefix) {
+            try testSubject.parseLoginCallback(url)
         }
     }
 

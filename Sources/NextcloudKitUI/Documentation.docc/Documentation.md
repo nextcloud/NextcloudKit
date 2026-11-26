@@ -31,8 +31,6 @@ Apps with branding, managed configuration or their own certificate handling pass
 - ``ServerAddressView``
 - ``AddAccountHandler``
 - ``LoginFlowConfiguration``
-- ``LoginCallbackParser``
-- ``LoginCredentials``
 
 ### Account Menu
 

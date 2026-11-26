@@ -31,46 +31,32 @@ enum QRCodeError: Error, LocalizedError {
 ///
 /// Credentials parsed from a login code, tagged with which login variant they represent.
 ///
-public struct LoginCredentials: Sendable, Equatable {
+struct LoginCredentials {
     ///
     /// Whether the password is a ready-to-use app password (`login`) or a onetime token that
     /// still has to be exchanged for an app password (`onetimeLogin`).
     ///
-    public enum Kind: Sendable {
+    enum Kind {
         case login
         case onetimeLogin
     }
 
-    public let kind: Kind
-    public let user: String
+    let kind: Kind
+    let user: String
 
     ///
     /// The app password for ``Kind/login`` or the onetime token for ``Kind/onetimeLogin``.
     ///
-    public let password: String
-    public let host: URL
+    let password: String
+    let host: URL
 }
 
 ///
 /// Logic for parsing the atomic data values from a composite string as provided through a QR code for logging in.
 ///
-protocol QRCodeParsing {
-    ///
-    /// Extract individual bits from a composite string as in an QR code for logging in.
-    ///
-    /// - Parameters:
-    ///     - code: The raw string which is attained from a scanned QR code.
-    ///
-    /// - Returns: A tuple consisting of the user name, app password and server address in this exact order.
-    ///
-    func parse(_ code: String) throws -> (user: String, password: String, host: URL)
-}
+protocol QRCodeParsing {}
 
 extension QRCodeParsing {
-    func parse(_ code: String) throws -> (user: String, password: String, host: URL) {
-        try decomposeLoginCode(code, prefix: "nc://login/")
-    }
-
     ///
     /// Parse a login QR code into ``LoginCredentials``, distinguishing direct logins
     /// (`<scheme>://login/…`) from onetime logins (`<scheme>://onetime-login/…`).
@@ -96,6 +82,15 @@ extension QRCodeParsing {
 
         return LoginCredentials(kind: kind, user: user, password: password, host: host)
     }
+
+    ///
+    /// Parse the `<scheme>://login/…` URL a server or sign-up provider redirects to after a successful login.
+    ///
+    func parseLoginCallback(_ url: URL, scheme: String = "nc") throws -> LoginCredentials {
+        let (user, password, host) = try decomposeLoginCode(url.absoluteString, prefix: "\(scheme)://login/", decodingValues: true)
+
+        return LoginCredentials(kind: .login, user: user, password: password, host: host)
+    }
 }
 
 ///
@@ -104,7 +99,7 @@ extension QRCodeParsing {
 /// - Parameters:
 ///     - decodingValues: Whether values are percent-decoded and `+` in the user name means a space, as in the URL the server redirects to after a login.
 ///
-func decomposeLoginCode(_ code: String, prefix loginCodePrefix: String, decodingValues: Bool = false) throws -> (user: String, password: String, host: URL) {
+private func decomposeLoginCode(_ code: String, prefix loginCodePrefix: String, decodingValues: Bool = false) throws -> (user: String, password: String, host: URL) {
     guard code.count > loginCodePrefix.count else {
         throw QRCodeError.implausibleLength
     }
@@ -149,11 +144,11 @@ func decomposeLoginCode(_ code: String, prefix loginCodePrefix: String, decoding
         decomposedKeyValuePairs[key] = value
     }
 
-    guard let user = decomposedKeyValuePairs["user"], user.isEmpty == false else {
+    guard let user = decomposedKeyValuePairs["user"] else {
         throw QRCodeError.missingUser
     }
 
-    guard let password = decomposedKeyValuePairs["password"], password.isEmpty == false else {
+    guard let password = decomposedKeyValuePairs["password"] else {
         throw QRCodeError.missingPassword
     }
 

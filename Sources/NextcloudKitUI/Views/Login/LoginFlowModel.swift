@@ -180,7 +180,7 @@ final class LoginFlowModel: QRCodeParsing, URLSanitizing {
 
             // A login page that redirects to the callback URL hands over the credentials directly. Otherwise polling continues.
             guard isPresentingLoginPage,
-                  let credentials = try? LoginCallbackParser.parse(callbackURL, scheme: configuration.loginURLScheme) else {
+                  let credentials = try? parseLoginCallback(callbackURL, scheme: configuration.loginURLScheme) else {
                 return
             }
 
@@ -395,7 +395,7 @@ final class LoginFlowModel: QRCodeParsing, URLSanitizing {
         providerSignUpCallbackURL = nil
 
         do {
-            let credentials = try LoginCallbackParser.parse(callbackURL, scheme: configuration.loginURLScheme)
+            let credentials = try parseLoginCallback(callbackURL, scheme: configuration.loginURLScheme)
 
             // Providers may hand over a session token, which servers refuse, so the user logs in to the new account instead.
             complete(host: credentials.host, name: credentials.user, password: credentials.password, restartsLoginIfUnauthorized: true)
