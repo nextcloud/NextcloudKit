@@ -36,7 +36,7 @@ public struct WebView: UIViewRepresentable {
         self.webView = webView
     }
 
-    func makeView() -> WKWebView {
+    public func makeUIView(context: Context) -> WKWebView {
         if let webView {
             return webView
         }
@@ -47,19 +47,13 @@ public struct WebView: UIViewRepresentable {
         let webView = WKWebView(frame: CGRect.zero, configuration: configuration)
         webView.isInspectable = true
 
-        if let userAgent {
-            webView.customUserAgent = userAgent
-        }
+        webView.customUserAgent = userAgent
 
         if let initialURL {
             webView.load(URLRequest(url: initialURL))
         }
 
         return webView
-    }
-
-    public func makeUIView(context: Context) -> WKWebView {
-        makeView()
     }
 
     public func updateUIView(_ webView: WKWebView, context: Context) {}

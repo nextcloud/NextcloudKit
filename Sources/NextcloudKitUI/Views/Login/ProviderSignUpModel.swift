@@ -47,7 +47,7 @@ final class ProviderSignUpModel: NSObject, Identifiable, WKNavigationDelegate {
     private(set) var errorMessage: String?
 
     /// The color the page asks for, as Safari colors its bar: its theme color, otherwise its background.
-    private(set) var pageColor: UIColor?
+    private(set) var pageColor: Color?
 
     @ObservationIgnored private let callbackScheme: String
     @ObservationIgnored private let onCallback: @MainActor (URL) -> Void
@@ -74,9 +74,7 @@ final class ProviderSignUpModel: NSObject, Identifiable, WKNavigationDelegate {
         configuration.websiteDataStore = .nonPersistent()
         webView = WKWebView(frame: .zero, configuration: configuration)
 
-        if let userAgent {
-            webView.customUserAgent = userAgent
-        }
+        webView.customUserAgent = userAgent
 
         super.init()
 
@@ -90,7 +88,7 @@ final class ProviderSignUpModel: NSObject, Identifiable, WKNavigationDelegate {
             },
             webView.observe(\.themeColor, options: [.new]) { [weak self] webView, _ in
                 MainActor.assumeIsolated {
-                    self?.pageColor = webView.themeColor ?? webView.underPageBackgroundColor
+                    self?.pageColor = Color(uiColor: webView.themeColor ?? webView.underPageBackgroundColor)
                 }
             }
         ]
@@ -202,22 +200,6 @@ final class ProviderSignUpModel: NSObject, Identifiable, WKNavigationDelegate {
         return NKError(errorCode: statusCode, errorDescription: HTTPURLResponse.localizedString(forStatusCode: statusCode), kind: kind)
     }
 
-    func pageDidFinish() {
-        reissuedURLs.removeAll()
-        hasReloadedAfterTermination = false
-    }
-
-    func webContentProcessDidTerminate() {
-        // WebKit stops reloading by itself once the delegate handles this, so reload once and report a repeat.
-        guard hasReloadedAfterTermination else {
-            hasReloadedAfterTermination = true
-            retry()
-            return
-        }
-
-        showLoadError(NKError(errorCode: WKError.Code.webContentProcessTerminated.rawValue, errorDescription: "Web content process terminated", kind: .unknown))
-    }
-
     func showLoadError(_ error: Error) {
         // Page loads this model replaces end as interrupted or cancelled.
         let nsError = error as NSError
@@ -267,15 +249,10 @@ final class ProviderSignUpModel: NSObject, Identifiable, WKNavigationDelegate {
         showLoadError(error)
     }
 
-    func webView(_ webView: WKWebView, didReceiveServerRedirectForProvisionalNavigation navigation: WKNavigation!) {
-        guard let url = webView.url, url.scheme?.lowercased() == callbackScheme else { return }
-
-        finish(callbackURL: url)
-    }
-
     func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
-        pageColor = webView.themeColor ?? webView.underPageBackgroundColor
-        pageDidFinish()
+        pageColor = Color(uiColor: webView.themeColor ?? webView.underPageBackgroundColor)
+        reissuedURLs.removeAll()
+        hasReloadedAfterTermination = false
     }
 
     func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: Error) {
@@ -287,6 +264,13 @@ final class ProviderSignUpModel: NSObject, Identifiable, WKNavigationDelegate {
     }
 
     func webViewWebContentProcessDidTerminate(_ webView: WKWebView) {
-        webContentProcessDidTerminate()
+        // WebKit stops reloading by itself once the delegate handles this, so reload once and report a repeat.
+        guard hasReloadedAfterTermination else {
+            hasReloadedAfterTermination = true
+            retry()
+            return
+        }
+
+        showLoadError(NKError(errorCode: WKError.Code.webContentProcessTerminated.rawValue, errorDescription: "Web content process terminated", kind: .unknown))
     }
 }

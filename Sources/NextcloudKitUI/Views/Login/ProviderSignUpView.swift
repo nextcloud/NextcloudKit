@@ -16,17 +16,13 @@ struct ProviderSignUpView: View {
         NavigationStack {
             page
                 // Colored like the page, as in Safari, since the bar does not track the web view's scrolling.
-                .toolbarBackground(pageColor ?? Color(uiColor: .systemBackground), for: .navigationBar)
+                .toolbarBackground(model.pageColor ?? Color(uiColor: .systemBackground), for: .navigationBar)
                 .toolbarBackground(.visible, for: .navigationBar)
-                .toolbarColorScheme(pageColor.map { $0.readable == .white ? .dark : .light }, for: .navigationBar)
+                .toolbarColorScheme(model.pageColor.map { $0.readable == .white ? .dark : .light }, for: .navigationBar)
         }
         .onAppear {
             model.start()
         }
-    }
-
-    private var pageColor: Color? {
-        model.pageColor.map { Color(uiColor: $0) }
     }
 
     private var page: some View {

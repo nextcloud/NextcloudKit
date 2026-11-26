@@ -6,6 +6,7 @@ import Foundation
 import NextcloudKit
 @testable import NextcloudKitUI
 import Testing
+import WebKit
 
 ///
 /// Tests for the page load rules of ``ProviderSignUpModel``, which need no page to load.
@@ -49,7 +50,7 @@ struct ProviderSignUpModelTests {
         #expect(model.policy(for: request, isMainFrame: true) == .reissue(ProviderSignUpModel.request(for: pageURL)))
         #expect(model.policy(for: request, isMainFrame: true) == .allow)
 
-        model.pageDidFinish()
+        model.webView(model.webView, didFinish: nil)
 
         #expect(model.policy(for: request, isMainFrame: true) == .reissue(ProviderSignUpModel.request(for: pageURL)))
 
@@ -109,16 +110,16 @@ struct ProviderSignUpModelTests {
     @Test func webContentProcessEndReloadsOnceThenFails() {
         let model = makeModel()
 
-        model.webContentProcessDidTerminate()
+        model.webViewWebContentProcessDidTerminate(model.webView)
 
         #expect(model.errorMessage == nil)
 
-        model.webContentProcessDidTerminate()
+        model.webViewWebContentProcessDidTerminate(model.webView)
 
         #expect(model.errorMessage != nil)
 
-        model.pageDidFinish()
-        model.webContentProcessDidTerminate()
+        model.webView(model.webView, didFinish: nil)
+        model.webViewWebContentProcessDidTerminate(model.webView)
 
         #expect(model.errorMessage == nil)
     }
