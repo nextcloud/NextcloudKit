@@ -84,7 +84,7 @@ public struct LoginFlowConfiguration: Sendable {
     public var isServerAddressEditable = true
 
     ///
-    /// When not empty, a picker over these servers replaces the server address field.
+    /// When not empty, a picker over these servers replaces the server address field, and QR codes, sign-ups and shared accounts for other hosts are refused.
     ///
     public var enforcedServers: [Server] = []
 

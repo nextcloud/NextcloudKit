@@ -37,9 +37,11 @@ public struct ServerAddressView: View {
     public init(backgroundColor: Binding<Color>, brandImage: Image, sharedAccounts: [SharedAccount], userAgent: String? = nil, configuration: LoginFlowConfiguration = LoginFlowConfiguration(), addAccount: @escaping AddAccountHandler) {
         self._backgroundColor = backgroundColor
         self.brandImage = brandImage
-        self.sharedAccounts = sharedAccounts
+        let model = LoginFlowModel(userAgent: userAgent, configuration: configuration, addAccount: addAccount)
+
+        self.sharedAccounts = sharedAccounts.filter { model.isAllowed($0.host) }
         self.configuration = configuration
-        self._model = State(initialValue: LoginFlowModel(userAgent: userAgent, configuration: configuration, addAccount: addAccount))
+        self._model = State(initialValue: model)
     }
 
     // MARK: - Environment

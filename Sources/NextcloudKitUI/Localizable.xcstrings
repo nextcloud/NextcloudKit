@@ -7126,6 +7126,9 @@
     "Log in with QR code" : {
       "comment" : "Button label which opens the QR code scanner in the login view."
     },
+    "Logging in to this server is not allowed." : {
+      "comment" : "Login error message when a QR code or sign-up points to a server other than the ones the app is limited to."
+    },
     "Login Failed" : {
       "comment" : "Alert title",
       "localizations" : {

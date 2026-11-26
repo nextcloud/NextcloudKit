@@ -139,6 +139,35 @@ struct LoginFlowModelTests {
         try await waitUntil { recorder.addedAccounts.count == 1 }
     }
 
+    @Test func enforcedServersRefuseOtherHosts() async throws {
+        let recorder = Recorder()
+        var configuration = LoginFlowConfiguration()
+        configuration.enforcedServers = [.init(name: "Example", url: URL(string: "https://Cloud.Example.com/nextcloud")!)]
+        let model = makeModel(configuration: configuration, recorder: recorder)
+
+        model.handleLoginCode("nc://login/user:jane&password:secret&server:https://evil.example.org")
+
+        #expect(model.isPresentingAlert)
+        #expect(recorder.addedAccounts.isEmpty)
+
+        model.finishProviderSignUp(callbackURL: URL(string: "nc://login/server:https://evil.example.org&user:jane&password:secret")!)
+        model.providerSignUpDidClose()
+
+        #expect(recorder.addedAccounts.isEmpty)
+        #expect(model.isAllowed(URL(string: "https://evil.example.org")!) == false)
+
+        model.isPresentingAlert = false
+        model.handleLoginCode(loginCode)
+
+        try await waitUntil { recorder.addedAccounts.count == 1 }
+    }
+
+    @Test func withoutEnforcedServersAnyHostIsAllowed() {
+        let model = makeModel(recorder: Recorder())
+
+        #expect(model.isAllowed(URL(string: "https://evil.example.org")!))
+    }
+
     @Test func cancelResetsState() async throws {
         let model = makeModel(recorder: Recorder())
         model.isActive = true

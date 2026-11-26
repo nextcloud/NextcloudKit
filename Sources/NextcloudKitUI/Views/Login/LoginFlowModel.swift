@@ -337,6 +337,11 @@ final class LoginFlowModel: QRCodeParsing, URLSanitizing {
         do {
             let credentials = try parseLogin(code, scheme: configuration.loginURLScheme)
 
+            guard isAllowed(credentials.host) else {
+                present(error: Self.serverNotAllowedMessage)
+                return
+            }
+
             switch credentials.kind {
             case .login:
                 complete(host: credentials.host, name: credentials.user, password: credentials.password)
@@ -397,11 +402,31 @@ final class LoginFlowModel: QRCodeParsing, URLSanitizing {
         do {
             let credentials = try parseLoginCallback(callbackURL, scheme: configuration.loginURLScheme)
 
+            guard isAllowed(credentials.host) else {
+                present(error: Self.serverNotAllowedMessage)
+                return
+            }
+
             // Providers may hand over a session token, which servers refuse, so the user logs in to the new account instead.
             complete(host: credentials.host, name: credentials.user, password: credentials.password, restartsLoginIfUnauthorized: true)
         } catch {
             present(error: error.localizedDescription)
         }
+    }
+
+    // MARK: - Enforced servers
+
+    private static var serverNotAllowedMessage: String {
+        String(localized: "Logging in to this server is not allowed.", bundle: .module, comment: "Login error message when a QR code or sign-up points to a server other than the ones the app is limited to.")
+    }
+
+    ///
+    /// Whether the app may log in to this server: any server, unless ``LoginFlowConfiguration/enforcedServers`` limits it to their hosts.
+    ///
+    func isAllowed(_ server: URL) -> Bool {
+        guard configuration.enforcedServers.isEmpty == false else { return true }
+
+        return configuration.enforcedServers.contains { $0.url.host?.lowercased() == server.host?.lowercased() }
     }
 
     // MARK: - Shared accounts
