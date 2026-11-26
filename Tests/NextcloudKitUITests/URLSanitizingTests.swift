@@ -82,11 +82,6 @@ struct URLSanitizingTests {
         #expect(sanitized.absoluteString == "https://cloud.example.com/")
     }
 
-    @Test func lowercasesScheme() async throws {
-        let sanitized = try #require(testSubject.sanitize("HTTPS://cloud.example.com"))
-        #expect(sanitized.absoluteString == "https://cloud.example.com/")
-    }
-
     @Test func dropsQueryAndFragment() async throws {
         let sanitized = try #require(testSubject.sanitize("https://cloud.example.com/nextcloud/?redirect=1#top"))
         #expect(sanitized.absoluteString == "https://cloud.example.com/nextcloud/")

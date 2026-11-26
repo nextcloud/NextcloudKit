@@ -20,10 +20,6 @@ extension URLSanitizing {
     func sanitize(_ input: String, upgradingInsecureHTTP: Bool = false) -> URL? {
         var address = input.trimmingCharacters(in: .whitespacesAndNewlines)
 
-        guard address.isEmpty == false else {
-            return nil
-        }
-
         // Repair a scheme typed with fewer than two slashes, such as "https:/host".
         if let range = address.range(of: #"^https?:/?(?!/)"#, options: [.regularExpression, .caseInsensitive]) {
             let scheme = address[range].prefix { $0 != ":" }
@@ -49,17 +45,13 @@ extension URLSanitizing {
         components.query = nil
         components.fragment = nil
 
-        var pathComponents = components.path.split(separator: "/").map(String.init)
+        var pathComponents = components.path.split(separator: "/")
 
         if pathComponents.last == "index.php" {
             pathComponents.removeLast()
         }
 
-        components.path = "/" + pathComponents.joined(separator: "/")
-
-        if components.path.hasSuffix("/") == false {
-            components.path += "/"
-        }
+        components.path = "/" + pathComponents.map { "\($0)/" }.joined()
 
         return components.url
     }

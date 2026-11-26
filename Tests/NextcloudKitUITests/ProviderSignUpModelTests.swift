@@ -15,8 +15,8 @@ import WebKit
 @Suite
 struct ProviderSignUpModelTests {
     // Nothing listens on port 1, so a load the model starts by itself goes nowhere.
-    private let signUpURL = URL(string: "http://127.0.0.1:1/signup")! // swiftlint:disable:this force_unwrapping
-    private let pageURL = URL(string: "https://provider.example.com/register")! // swiftlint:disable:this force_unwrapping
+    private let signUpURL = URL(string: "http://127.0.0.1:1/signup")!
+    private let pageURL = URL(string: "https://provider.example.com/register")!
 
     private func makeModel() -> ProviderSignUpModel {
         ProviderSignUpModel(url: signUpURL, callbackScheme: "nc", userAgent: nil) { _ in }
@@ -30,7 +30,7 @@ struct ProviderSignUpModelTests {
     }
 
     @Test func uncachedURLAddsAQueryItem() {
-        let withQuery = URL(string: "https://nextcloud.com/signup-ios?lang=de")! // swiftlint:disable:this force_unwrapping
+        let withQuery = URL(string: "https://nextcloud.com/signup-ios?lang=de")!
 
         #expect(ProviderSignUpModel.uncachedURL(pageURL).absoluteString == "https://provider.example.com/register?ocsapi=1")
         #expect(ProviderSignUpModel.uncachedURL(withQuery).absoluteString == "https://nextcloud.com/signup-ios?lang=de&ocsapi=1")
@@ -38,7 +38,7 @@ struct ProviderSignUpModelTests {
 
     @Test func callbackURLFinishesInAnyLetterCase() {
         let model = makeModel()
-        let callbackURL = URL(string: "NC://login/server:https://cloud.example.com&user:jane&password:secret")! // swiftlint:disable:this force_unwrapping
+        let callbackURL = URL(string: "NC://login/server:https://cloud.example.com&user:jane&password:secret")!
 
         #expect(model.policy(for: URLRequest(url: callbackURL), isMainFrame: false) == .finish(callbackURL))
     }
@@ -71,8 +71,8 @@ struct ProviderSignUpModelTests {
 
     @Test func linksTheWebViewCannotShowOpenInTheirApp() {
         let model = makeModel()
-        let mail = URL(string: "mailto:support@provider.example.com")! // swiftlint:disable:this force_unwrapping
-        let blank = URL(string: "about:blank")! // swiftlint:disable:this force_unwrapping
+        let mail = URL(string: "mailto:support@provider.example.com")!
+        let blank = URL(string: "about:blank")!
 
         #expect(model.policy(for: URLRequest(url: mail), isMainFrame: true) == .openExternally(mail))
         #expect(model.policy(for: URLRequest(url: mail), isMainFrame: false) == .cancel)
