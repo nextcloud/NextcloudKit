@@ -30,6 +30,8 @@ struct LoginFlowModelTests {
         weak var model: LoginFlowModel?
     }
 
+    private let loginCode = "nc://login/user:jane&password:secret&server:https://cloud.example.com"
+
     private func makeModel(configuration: LoginFlowConfiguration = LoginFlowConfiguration(), recorder: Recorder) -> LoginFlowModel {
         let model = LoginFlowModel(userAgent: nil, configuration: configuration) { host, name, password in
             recorder.isActiveDuringAddAccount = recorder.model?.isActive
@@ -90,44 +92,17 @@ struct LoginFlowModelTests {
         #expect(model.errorMessage?.isEmpty == false)
     }
 
-    @Test func loginCodeAddsAccountWhileBusy() async throws {
-        let recorder = Recorder()
-        let model = makeModel(recorder: recorder)
-
-        model.handleLoginCode("nc://login/user:jane&password:secret&server:https://cloud.example.com")
-
-        try await waitUntil { recorder.addedAccounts.count == 1 && model.isActive == false }
-
-        let account = try #require(recorder.addedAccounts.first)
-        #expect(account.host.absoluteString == "https://cloud.example.com")
-        #expect(account.name == "jane")
-        #expect(account.password == "secret")
-        #expect(recorder.isActiveDuringAddAccount == true)
-        #expect(recorder.isAddingAccountDuringAddAccount == true)
-        #expect(model.isAddingAccount == false)
-        #expect(model.isPresentingAlert == false)
-    }
-
-    @Test func thrownAddAccountErrorIsPresented() async throws {
-        let recorder = Recorder()
-        let error = NKError(errorCode: 401)
-        recorder.addAccountError = error
-        let model = makeModel(recorder: recorder)
-
-        model.handleLoginCode("nc://login/user:jane&password:secret&server:https://cloud.example.com")
-
-        try await waitUntil { model.isPresentingAlert }
-
-        #expect(model.errorMessage == error.localizedGenericMessage)
-        #expect(model.isActive == false)
-    }
-
     @Test func addAccountFailureWording() async throws {
+        let unauthorized = NKError(errorCode: 401)
         let notFound = NKError(errorCode: 404)
         let invalidResponse = NKError.invalidResponseError
 
+        let unauthorizedMessage = try await addAccountMessage(for: unauthorized)
         let notFoundMessage = try await addAccountMessage(for: notFound)
         let invalidResponseMessage = try await addAccountMessage(for: invalidResponse)
+
+        // QR code logins are not restarted when the server refuses the credentials.
+        #expect(unauthorizedMessage == unauthorized.localizedGenericMessage)
 
         // A 404 means a wrong address, while an unreadable reply may come from a proxy in front of a server that exists.
         #expect(notFoundMessage != notFound.localizedGenericMessage)
@@ -139,9 +114,11 @@ struct LoginFlowModelTests {
         recorder.addAccountError = error
         let model = makeModel(recorder: recorder)
 
-        model.handleLoginCode("nc://login/user:jane&password:secret&server:https://cloud.example.com")
+        model.handleLoginCode(loginCode)
 
         try await waitUntil { model.isPresentingAlert }
+
+        #expect(model.isActive == false)
 
         return model.errorMessage
     }
@@ -152,7 +129,7 @@ struct LoginFlowModelTests {
         configuration.loginURLScheme = "abc"
         let model = makeModel(configuration: configuration, recorder: recorder)
 
-        model.handleLoginCode("nc://login/user:jane&password:secret&server:https://cloud.example.com")
+        model.handleLoginCode(loginCode)
 
         #expect(model.isPresentingAlert)
         #expect(model.errorMessage == QRCodeError.invalidPrefix.localizedDescription)
@@ -196,7 +173,7 @@ struct LoginFlowModelTests {
             recorder.serverErrors.append((error, url))
 
             if recorder.serverErrors.count == 1 {
-                return .retry(URL(string: "http://127.0.0.1:2/")!) // swiftlint:disable:this force_unwrapping
+                return .retry(URL(string: "http://127.0.0.1:2/")!)
             }
 
             return .cancel
@@ -213,16 +190,23 @@ struct LoginFlowModelTests {
         #expect(model.isPresentingAlert == false)
     }
 
-    @Test func scannedCodeKeepsScannerOpenUntilAccountIsAdded() async throws {
+    @Test func scannedCodeAddsAccountWhileScannerStaysOpen() async throws {
         let recorder = Recorder()
         let model = makeModel(recorder: recorder)
 
         model.presentCodeScanner()
-        model.handleLoginCode("nc://login/user:jane&password:secret&server:https://cloud.example.com")
+        model.handleLoginCode(loginCode)
 
         try await waitUntil { recorder.addedAccounts.count == 1 && model.isActive == false }
 
+        let account = try #require(recorder.addedAccounts.first)
+        #expect(account.host.absoluteString == "https://cloud.example.com")
+        #expect(account.name == "jane")
+        #expect(account.password == "secret")
+        #expect(recorder.isActiveDuringAddAccount == true)
+        #expect(recorder.isAddingAccountDuringAddAccount == true)
         #expect(recorder.isPresentingCodeScannerDuringAddAccount == true)
+        #expect(model.isAddingAccount == false)
         #expect(model.isPresentingCodeScanner == false)
         #expect(model.isPresentingAlert == false)
     }
@@ -248,7 +232,7 @@ struct LoginFlowModelTests {
         let model = makeModel(recorder: recorder)
 
         model.presentCodeScanner()
-        model.handleLoginCode("nc://login/user:jane&password:secret&server:https://cloud.example.com")
+        model.handleLoginCode(loginCode)
 
         try await waitUntil { model.isPresentingCodeScanner == false && model.isActive == false }
 
@@ -274,8 +258,8 @@ struct LoginFlowModelTests {
         let recorder = Recorder()
         let model = makeModel(recorder: recorder)
 
-        model.presentProviderSignUp(URL(string: "http://127.0.0.1:1/signup")!) // swiftlint:disable:this force_unwrapping
-        model.finishProviderSignUp(callbackURL: URL(string: "nc://login/server:https://cloud.example.com&user:jane&password:secret")!) // swiftlint:disable:this force_unwrapping
+        model.presentProviderSignUp(URL(string: "http://127.0.0.1:1/signup")!)
+        model.finishProviderSignUp(callbackURL: URL(string: "nc://login/server:https://cloud.example.com&user:jane&password:secret")!)
 
         #expect(model.providerSignUp == nil)
         #expect(recorder.addedAccounts.isEmpty)
@@ -296,7 +280,7 @@ struct LoginFlowModelTests {
         let recorder = Recorder()
         let model = makeModel(recorder: recorder)
 
-        model.presentProviderSignUp(URL(string: "http://127.0.0.1:1/signup")!) // swiftlint:disable:this force_unwrapping
+        model.presentProviderSignUp(URL(string: "http://127.0.0.1:1/signup")!)
         model.providerSignUp = nil
         model.providerSignUpDidClose()
 
@@ -312,7 +296,7 @@ struct LoginFlowModelTests {
         let model = makeModel(recorder: recorder)
 
         // Nothing listens on port 1, so the restarted login fails at its server check.
-        model.finishProviderSignUp(callbackURL: URL(string: "nc://login/server:http://127.0.0.1:1&user:jane&password:token")!) // swiftlint:disable:this force_unwrapping
+        model.finishProviderSignUp(callbackURL: URL(string: "nc://login/server:http://127.0.0.1:1&user:jane&password:token")!)
         model.providerSignUpDidClose()
 
         try await waitUntil { model.isPresentingAlert }
@@ -328,7 +312,7 @@ struct LoginFlowModelTests {
         let recorder = Recorder()
         let model = makeModel(recorder: recorder)
 
-        model.finishProviderSignUp(callbackURL: URL(string: "nc://login/user:jane")!) // swiftlint:disable:this force_unwrapping
+        model.finishProviderSignUp(callbackURL: URL(string: "nc://login/user:jane")!)
         model.providerSignUpDidClose()
 
         #expect(model.isPresentingAlert)
@@ -357,7 +341,7 @@ struct LoginFlowModelTests {
             recorder.serverErrors.append((error, url))
             recorder.model?.cancel()
 
-            return .retry(URL(string: "http://127.0.0.1:2/")!) // swiftlint:disable:this force_unwrapping
+            return .retry(URL(string: "http://127.0.0.1:2/")!)
         }
 
         let model = makeModel(configuration: configuration, recorder: recorder)
