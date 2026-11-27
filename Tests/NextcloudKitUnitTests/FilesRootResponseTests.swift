@@ -7,15 +7,21 @@ import Testing
 @testable import NextcloudKit
 
 struct FilesRootResponseTests {
-    @Test(arguments: [("backend-user", "backend-user"), ("backend user", "backend%20user")])
-    func identifiesFilesRootByBackendUserID(userID: String, encodedUserID: String) async throws {
+    @Test(
+        arguments: [("backend-user", "backend-user"), ("backend user", "backend%20user")],
+        [("", ""), ("/nextcloud", "/nextcloud"), ("/nextcloud%20install/", "/nextcloud%20install")]
+    )
+    func identifiesFilesRoot(
+        user: (id: String, hrefComponent: String),
+        webroot: (baseURLPath: String, hrefPrefix: String)
+    ) async throws {
         let common = NKCommon()
-        let baseURL = "https://example.invalid"
+        let origin = "https://example.invalid"
         let session = NKSession(
             nkCommonInstance: common,
-            urlBase: baseURL,
+            urlBase: origin + webroot.baseURLPath,
             user: "login@example.invalid",
-            userId: userID,
+            userId: user.id,
             password: "",
             account: UUID().uuidString,
             userAgent: "NextcloudKitTests",
@@ -24,7 +30,7 @@ struct FilesRootResponseTests {
             httpMaximumConnectionsPerHostInDownload: 1,
             httpMaximumConnectionsPerHostInUpload: 1
         )
-        let rootHref = "/remote.php/dav/files/\(encodedUserID)/"
+        let rootHref = "\(webroot.hrefPrefix)/remote.php/dav/files/\(user.hrefComponent)/"
         let xml = """
         <d:multistatus xmlns:d="DAV:" xmlns:oc="http://owncloud.org/ns">
           <d:response>
@@ -39,7 +45,7 @@ struct FilesRootResponseTests {
             </d:propstat>
           </d:response>
           <d:response>
-            <d:href>\(rootHref)\(encodedUserID)/</d:href>
+            <d:href>\(rootHref)\(user.hrefComponent)/</d:href>
             <d:propstat>
               <d:prop>
                 <d:resourcetype><d:collection/></d:resourcetype>
@@ -50,7 +56,7 @@ struct FilesRootResponseTests {
             </d:propstat>
           </d:response>
           <d:response>
-            <d:href>/remote.php/dav%2Ffiles/\(encodedUserID)/</d:href>
+            <d:href>\(webroot.hrefPrefix)/remote.php/dav%2Ffiles/\(user.hrefComponent)/</d:href>
             <d:propstat>
               <d:prop>
                 <d:resourcetype><d:collection/></d:resourcetype>
@@ -73,16 +79,17 @@ struct FilesRootResponseTests {
         #expect(files.count == 3)
         let root = try #require(files.first { $0.ocId == "00000042instance" })
         let child = try #require(files.first { $0.ocId == "00000043instance" })
-        let rootURL = "\(baseURL)/remote.php/dav/files/\(userID)"
+        let rootURL = try #require((origin + rootHref.dropLast()).removingPercentEncoding)
+        let expectedUserID = try #require(user.hrefComponent.removingPercentEncoding)
         #expect(root.fileName == common.rootFileName)
         #expect(root.serverUrl == rootURL)
         #expect(root.directory)
         #expect(root.fileId == "42")
-        #expect(child.fileName == userID)
+        #expect(child.fileName == expectedUserID)
         #expect(child.serverUrl == rootURL)
         #expect(child.directory)
         #expect(child.fileId == "43")
         let differentParent = try #require(files.first { $0.ocId == "00000044instance" })
-        #expect(differentParent.fileName == userID)
+        #expect(differentParent.fileName == expectedUserID)
     }
 }

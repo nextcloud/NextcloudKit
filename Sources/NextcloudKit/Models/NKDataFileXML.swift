@@ -279,7 +279,8 @@ public class NKDataFileXML: NSObject {
 
     func convertDataFile(xmlData: Data, nkSession: NKSession, rootFileName: String, showHiddenFiles: Bool, includeHiddenFiles: [String]) async -> [NKFile] {
         var files: [NKFile] = []
-        let rootFiles = "/" + nkSession.dav + "/files/"
+        let webroot = URLComponents(string: nkSession.urlBase)?.percentEncodedPath ?? ""
+        let rootFiles = NSString.path(withComponents: ["/", webroot, nkSession.dav, "files"]) + "/"
         let davUserId = nkSession.userId.isEmpty ? nkSession.user : nkSession.userId
         guard let baseUrl = self.nkCommonInstance.getHostName(urlString: nkSession.urlBase) else {
             return files
@@ -325,7 +326,7 @@ public class NKDataFileXML: NSObject {
                 // An encoded separator in the parent must not match the DAV Files collection.
                 if parentPath == rootFiles, file.fileName.utf8.elementsEqual(davUserId.utf8) {
                     file.fileName = rootFileName
-                    file.serverUrl = baseUrl + rootFiles + davUserId
+                    file.serverUrl = baseUrl + file.path + davUserId
                 } else {
                     file.serverUrl = baseUrl + file.path.dropLast()
                 }
