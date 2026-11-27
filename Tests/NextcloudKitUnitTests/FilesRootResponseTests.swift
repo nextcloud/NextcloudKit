@@ -1,5 +1,5 @@
 // SPDX-FileCopyrightText: Nextcloud GmbH
-// SPDX-FileCopyrightText: 2026 Nextcloud contributors
+// SPDX-FileCopyrightText: 2026 Claudio Cambra
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 import Foundation
@@ -8,7 +8,7 @@ import Testing
 
 struct FilesRootResponseTests {
     @Test(
-        arguments: [("backend-user", "backend-user"), ("backend user", "backend%20user")],
+        arguments: [("backend-user", "backend-user"), ("backend user", "backend%20user"), ("", "login%40example.invalid")],
         [("", ""), ("/nextcloud", "/nextcloud"), ("/nextcloud%20install/", "/nextcloud%20install")]
     )
     func identifiesFilesRoot(
