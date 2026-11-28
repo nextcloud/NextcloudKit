@@ -1795,7 +1795,51 @@
       }
     },
     "Camera access is required to scan QR codes. Allow it in Settings." : {
-      "comment" : "Error message when the app may not use the camera to scan a login QR code."
+      "comment" : "Error message when the app may not use the camera to scan a login QR code.",
+      "localizations" : {
+        "da" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Der kræves adgang til kameraet for at scanne QR-koder. Giv adgang i Indstillinger."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zum Scannen von QR-Codes wird Zugriff auf die Kamera benötigt. Der Zugriff kann in den Einstellungen erlaubt werden."
+          }
+        },
+        "et_EE" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ligipääs kaamerale on vajalik QR-koodide skaneerimiseks. Saad selle lubada seadistustest."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "L’accès à l’appareil photo est requis pour scanner les QR codes. Autorisez-le dans les Paramètres."
+          }
+        },
+        "pt_BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "É necessário ter acesso à câmera para escanear códigos QR. Permita esse acesso nas configurações."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Для сканирования QR-кодов требуется доступ к камере. Разрешите его в настройках."
+          }
+        },
+        "zh_TW" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "需要存取相機才能掃描 QR code。請在設定中允許。"
+          }
+        }
+      }
     },
     "Cancel" : {
       "comment" : "Button label",
@@ -6067,7 +6111,51 @@
       }
     },
     "Flashlight" : {
-      "comment" : "Accessibility label of the button which toggles the flashlight while scanning a QR code."
+      "comment" : "Accessibility label of the button which toggles the flashlight while scanning a QR code.",
+      "localizations" : {
+        "da" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lommelygte"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Taschenlampe"
+          }
+        },
+        "et_EE" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Taskulamp"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Flash"
+          }
+        },
+        "pt_BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lanterna"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Фонарик"
+          }
+        },
+        "zh_TW" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "閃光燈"
+          }
+        }
+      }
     },
     "For people who already have access" : {
       "comment" : "Subtitle explaining that an internal link works only for people who already have access.",
@@ -7121,13 +7209,667 @@
       }
     },
     "Log in" : {
-      "comment" : "Accessibility label of the button which starts the login."
+      "comment" : "Accessibility label of the button which starts the login.",
+      "localizations" : {
+        "af" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Teken Aan"
+          }
+        },
+        "an" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Iniciar sesión"
+          }
+        },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تسجيل الدخول"
+          }
+        },
+        "ast" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aniciar la sesión"
+          }
+        },
+        "az" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Giriş"
+          }
+        },
+        "be" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Увайсці"
+          }
+        },
+        "bn_BD" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "প্রবেশ"
+          }
+        },
+        "br" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kennaskañ"
+          }
+        },
+        "bs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Prijava"
+          }
+        },
+        "ca" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Inicia la sessió"
+          }
+        },
+        "cs_CZ" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Přihlásit se"
+          }
+        },
+        "cy_GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mewngofnodi"
+          }
+        },
+        "da" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Log ind"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Anmelden"
+          }
+        },
+        "el" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Σύνδεση"
+          }
+        },
+        "en_GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Log in"
+          }
+        },
+        "eo" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ensaluti"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Iniciar sesión"
+          }
+        },
+        "es_419" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ingresar"
+          }
+        },
+        "es_AR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Iniciar sesión"
+          }
+        },
+        "es_CL" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ingresar"
+          }
+        },
+        "es_CO" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ingresar"
+          }
+        },
+        "es_CR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ingresar"
+          }
+        },
+        "es_DO" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ingresar"
+          }
+        },
+        "es_EC" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ingresar"
+          }
+        },
+        "es_GT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ingresar"
+          }
+        },
+        "es_HN" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ingresar"
+          }
+        },
+        "es_MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ingresar"
+          }
+        },
+        "es_NI" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ingresar"
+          }
+        },
+        "es_PA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ingresar"
+          }
+        },
+        "es_PE" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ingresar"
+          }
+        },
+        "es_PR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ingresar"
+          }
+        },
+        "es_PY" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ingresar"
+          }
+        },
+        "es_SV" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ingresar"
+          }
+        },
+        "es_UY" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ingresar"
+          }
+        },
+        "et_EE" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Logi sisse"
+          }
+        },
+        "eu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Izena eman"
+          }
+        },
+        "fa" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ورود"
+          }
+        },
+        "fi_FI" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kirjaudu sisään"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Se connecter"
+          }
+        },
+        "ga" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Logáil isteach"
+          }
+        },
+        "gd" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Clàraich a-steach"
+          }
+        },
+        "gl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Acceder"
+          }
+        },
+        "he" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "כניסה"
+          }
+        },
+        "hr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Prijavite se"
+          }
+        },
+        "hu_HU" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bejelentkezés"
+          }
+        },
+        "hy" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Մուտք գործել"
+          }
+        },
+        "ia" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aperir session"
+          }
+        },
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Masuk"
+          }
+        },
+        "is" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Skrá inn"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Login"
+          }
+        },
+        "ja_JP" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ログイン"
+          }
+        },
+        "ka" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "შესვლა"
+          }
+        },
+        "ka_GE" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "შესვლა"
+          }
+        },
+        "kab" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Qqen"
+          }
+        },
+        "km" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ចូល"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "로그인"
+          }
+        },
+        "lb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Umellen"
+          }
+        },
+        "lo" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ເຂົ້າລະບົບ"
+          }
+        },
+        "lt_LT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Prisijungti"
+          }
+        },
+        "lv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pieteikties"
+          }
+        },
+        "mk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Најава"
+          }
+        },
+        "mn" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Нэвтрэх"
+          }
+        },
+        "ms_MY" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Log masuk"
+          }
+        },
+        "nb_NO" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Logg inn"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aanmelden"
+          }
+        },
+        "nn_NO" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Logg inn"
+          }
+        },
+        "oc" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Connexion"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zaloguj się"
+          }
+        },
+        "pt_BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Entrar"
+          }
+        },
+        "pt_PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Iniciar sessão"
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Autentifică-te"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Войти"
+          }
+        },
+        "sc" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Intra"
+          }
+        },
+        "si" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "පිවිසෙන්න"
+          }
+        },
+        "sk_SK" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Prihlásiť sa"
+          }
+        },
+        "sl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Prijava"
+          }
+        },
+        "sq" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hyni"
+          }
+        },
+        "sr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Пријава"
+          }
+        },
+        "sr-Latn" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Prijava"
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Logga in"
+          }
+        },
+        "sw" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ingia"
+          }
+        },
+        "ta" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "புகுபதிகை"
+          }
+        },
+        "th_TH" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "เข้าสู่ระบบ"
+          }
+        },
+        "tk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Giriň"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Oturum aç"
+          }
+        },
+        "ug" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "كىرىڭ"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Увійти"
+          }
+        },
+        "ur_PK" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "لاگ ان"
+          }
+        },
+        "uz" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kirish"
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Đăng nhập"
+          }
+        },
+        "zh_CN" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "登录"
+          }
+        },
+        "zh_HK" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "登入"
+          }
+        },
+        "zh_TW" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "登入"
+          }
+        }
+      }
     },
     "Log in with QR code" : {
-      "comment" : "Button label which opens the QR code scanner in the login view."
+      "comment" : "Button label which opens the QR code scanner in the login view.",
+      "localizations" : {
+        "da" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Log ind med QR-kode"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Anmelden mit QR-Code"
+          }
+        },
+        "et_EE" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Logi sisse QR-koodiga"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Connexion par QR code"
+          }
+        },
+        "pt_BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fazer login com o código QR"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Войти по QR-коду"
+          }
+        },
+        "zh_TW" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "使用 QA code 登入"
+          }
+        }
+      }
     },
     "Logging in to this server is not allowed." : {
-      "comment" : "Login error message when a QR code or sign-up points to a server other than the ones the app is limited to."
+      "comment" : "Login error message when a QR code or sign-up points to a server other than the ones the app is limited to.",
+      "localizations" : {
+        "da" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Det er ikke tilladt at logge ind på denne server."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die Anmeldung an diesem Server ist nicht erlaubt."
+          }
+        },
+        "et_EE" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sisselogimine sellesse serverisse pole lubatud."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La connexion à ce serveur n'est pas autorisée."
+          }
+        },
+        "pt_BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Não é permitido fazer login neste servidor."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Вход на этот сервер запрещён."
+          }
+        },
+        "zh_TW" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "不允許登入至此伺服器。"
+          }
+        }
+      }
     },
     "Login Failed" : {
       "comment" : "Alert title",
@@ -7683,10 +8425,662 @@
       }
     },
     "Open Settings" : {
-      "comment" : "Button label in the login error alert which opens the system settings of the app."
+      "comment" : "Button label in the login error alert which opens the system settings of the app.",
+      "localizations" : {
+        "cs_CZ" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Otevřít nastavení"
+          }
+        },
+        "da" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Åbn indstillinger"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Einstellungen öffnen"
+          }
+        },
+        "el" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Άνοιγμα Ρυθμίσεων"
+          }
+        },
+        "en_GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Open Settings"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abrir Ajustes"
+          }
+        },
+        "et_EE" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ava seadistused"
+          }
+        },
+        "fa" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "باز کردن تنظیمات"
+          }
+        },
+        "fi_FI" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Avaa asetukset"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ouvrir les paramètres"
+          }
+        },
+        "ga" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Oscail Socruithe"
+          }
+        },
+        "gl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abrir os axustes"
+          }
+        },
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Buka Pengaturan"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Apri impostazioni"
+          }
+        },
+        "kab" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ldi iɣewwaren"
+          }
+        },
+        "lo" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ເປີດການຕັ້ງຄ່າ"
+          }
+        },
+        "lt_LT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Atidaryti nustatymus"
+          }
+        },
+        "lv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Atvērt iestatījumus"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Open Instellingen"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Otwórz ustawienia"
+          }
+        },
+        "pt_BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abrir configurações"
+          }
+        },
+        "pt_PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abrir configurações"
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Deschide setările"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Открыть настройки"
+          }
+        },
+        "sk_SK" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Otvoriť nastavenia"
+          }
+        },
+        "sr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Отвори подешавања"
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Öppna inställningar"
+          }
+        },
+        "sw" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fungua mipangilio"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ayarları aç"
+          }
+        },
+        "ug" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تەڭشەكلەرنى ئېچىش"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Відкрийте Налаштування"
+          }
+        },
+        "zh_CN" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "打开设置"
+          }
+        },
+        "zh_HK" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "打開設置"
+          }
+        },
+        "zh_TW" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "開啟設定"
+          }
+        }
+      }
     },
     "or" : {
-      "comment" : "Separator between the server address field and the other ways to log in."
+      "comment" : "Separator between the server address field and the other ways to log in.",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "او"
+          }
+        },
+        "ast" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "o"
+          }
+        },
+        "be" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "або"
+          }
+        },
+        "bg_BG" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "или"
+          }
+        },
+        "ca" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "o"
+          }
+        },
+        "cs_CZ" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "nebo"
+          }
+        },
+        "cy_GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "neu"
+          }
+        },
+        "da" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "eller"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "oder"
+          }
+        },
+        "el" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ή"
+          }
+        },
+        "en_GB" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "or"
+          }
+        },
+        "eo" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "aŭ"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "o"
+          }
+        },
+        "es_419" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "o"
+          }
+        },
+        "es_CL" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "o"
+          }
+        },
+        "es_CO" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "o"
+          }
+        },
+        "es_CR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "o"
+          }
+        },
+        "es_DO" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "o"
+          }
+        },
+        "es_EC" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "o"
+          }
+        },
+        "es_GT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "o"
+          }
+        },
+        "es_HN" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "o"
+          }
+        },
+        "es_MX" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "o"
+          }
+        },
+        "es_NI" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "o"
+          }
+        },
+        "es_PA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "o"
+          }
+        },
+        "es_PE" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "o"
+          }
+        },
+        "es_PR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "o"
+          }
+        },
+        "es_PY" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "o"
+          }
+        },
+        "es_SV" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "o"
+          }
+        },
+        "es_UY" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "o"
+          }
+        },
+        "et_EE" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "või"
+          }
+        },
+        "eu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "edo"
+          }
+        },
+        "fa" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "یا"
+          }
+        },
+        "fi_FI" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "tai"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ou"
+          }
+        },
+        "ga" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "nó"
+          }
+        },
+        "gl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ou"
+          }
+        },
+        "he" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "או"
+          }
+        },
+        "hr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ili"
+          }
+        },
+        "hu_HU" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "vagy"
+          }
+        },
+        "id" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "atau"
+          }
+        },
+        "is" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "eða"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "o"
+          }
+        },
+        "ja_JP" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "或いは"
+          }
+        },
+        "ka" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "or"
+          }
+        },
+        "ka_GE" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ან"
+          }
+        },
+        "kab" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "neɣ"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "또는"
+          }
+        },
+        "lo" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ຫຼື"
+          }
+        },
+        "lt_LT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ar"
+          }
+        },
+        "lv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "vai"
+          }
+        },
+        "mk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "или"
+          }
+        },
+        "mn" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "эсвэл"
+          }
+        },
+        "nb_NO" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "eller"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "of"
+          }
+        },
+        "oc" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "o"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "lub"
+          }
+        },
+        "pt_BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ou"
+          }
+        },
+        "pt_PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ou"
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "sau"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "или"
+          }
+        },
+        "sc" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "o"
+          }
+        },
+        "sk_SK" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "alebo"
+          }
+        },
+        "sl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ali"
+          }
+        },
+        "sr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "или"
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "eller"
+          }
+        },
+        "sw" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "au"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ya da"
+          }
+        },
+        "ug" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ياكى"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "або"
+          }
+        },
+        "uz" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "yoki"
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "hoặc"
+          }
+        },
+        "zh_CN" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "或"
+          }
+        },
+        "zh_HK" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "或者"
+          }
+        },
+        "zh_TW" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "或者"
+          }
+        }
+      }
     },
     "Participants" : {
       "comment" : "Label above the permission selector in the unified share view.",
@@ -9621,7 +11015,51 @@
       }
     },
     "Select a server" : {
-      "comment" : "Label of the server picker in the login view before a server was picked."
+      "comment" : "Label of the server picker in the login view before a server was picked.",
+      "localizations" : {
+        "da" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vælg en server"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Einen Server auswählen"
+          }
+        },
+        "et_EE" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vali oma server"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sélectionner un serveur"
+          }
+        },
+        "pt_BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Selecione um servidor"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Выберите сервер"
+          }
+        },
+        "zh_TW" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "選取伺服器"
+          }
+        }
+      }
     },
     "Send" : {
       "comment" : "Primary action button title in the unified share view.",
@@ -11638,7 +13076,51 @@
       }
     },
     "The camera is not available." : {
-      "comment" : "Error message when the camera cannot be used to scan a login QR code."
+      "comment" : "Error message when the camera cannot be used to scan a login QR code.",
+      "localizations" : {
+        "da" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kameraet er ikke tilgængeligt."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Der Kamera ist nicht verfügbar."
+          }
+        },
+        "et_EE" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kaamera pole saadaval."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "L'appareil photo n'est pas disponible."
+          }
+        },
+        "pt_BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A câmera não está disponível."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Камера недоступна."
+          }
+        },
+        "zh_TW" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "相機無法使用"
+          }
+        }
+      }
     },
     "The entered server address is invalid." : {
       "comment" : "This is an error message.",
@@ -11855,16 +13337,192 @@
       }
     },
     "The login code is missing the password." : {
-      "comment" : "Error message when a login QR code has no password."
+      "comment" : "Error message when a login QR code has no password.",
+      "localizations" : {
+        "da" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Login-koden mangler adgangskoden."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Im Anmeldecode fehlt das Passwort."
+          }
+        },
+        "et_EE" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sellest sisselogimiskoodist on puudu salasõna."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le code de connexion n'intègre pas le mot de passe."
+          }
+        },
+        "pt_BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Falta a senha no código de login."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "В коде входа отсутствует пароль."
+          }
+        },
+        "zh_TW" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "登入碼缺少密碼。"
+          }
+        }
+      }
     },
     "The login code is missing the server address." : {
-      "comment" : "Error message when a login QR code has no server address."
+      "comment" : "Error message when a login QR code has no server address.",
+      "localizations" : {
+        "da" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Login-koden mangler serveradressen."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Im Anmeldecode fehlt die Serveradresse."
+          }
+        },
+        "et_EE" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sellest sisselogimiskoodist on puudu serveri aadress."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le code de connexion n'intègre pas l'adresse du serveur."
+          }
+        },
+        "pt_BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Falta o endereço do servidor no código de login."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "В коде входа отсутствует адрес сервера."
+          }
+        },
+        "zh_TW" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "登入碼缺少伺服器位址。"
+          }
+        }
+      }
     },
     "The login code is missing the user name." : {
-      "comment" : "Error message when a login QR code has no user name."
+      "comment" : "Error message when a login QR code has no user name.",
+      "localizations" : {
+        "da" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Login-koden mangler brugernavnet."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Im Anmeldecode fehlt der Benutzername."
+          }
+        },
+        "et_EE" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sellest sisselogimiskoodist on puudu kasutajanimi."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le code de connexion n'intègre pas le nom d'utilisateur."
+          }
+        },
+        "pt_BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Falta o nome de usuário no código de login."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "В коде входа отсутствует имя пользователя."
+          }
+        },
+        "zh_TW" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "登入碼缺少使用者名稱。"
+          }
+        }
+      }
     },
     "The login timed out. Please try again." : {
-      "comment" : "Error message when the user did not finish the login in the browser in time."
+      "comment" : "Error message when the user did not finish the login in the browser in time.",
+      "localizations" : {
+        "da" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Det tog for lang tid at logge ind. Prøv igen."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zeitüberschreitung bei der Anmeldung. Bitte erneut versuchen."
+          }
+        },
+        "et_EE" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sisselogimine aegus. Palun proovi uuesti."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La connexion a expiré. Veuillez réessayer."
+          }
+        },
+        "pt_BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "O tempo de espera para o login expirou. Tente novamente."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Время ожидания входа истекло. Повторите попытку."
+          }
+        },
+        "zh_TW" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "登入逾時。請重試。"
+          }
+        }
+      }
     },
     "This change will replace the individual permission settings of all recipients in this share." : {
       "comment" : "Explanation shown before propagating top-level permission changes to every recipient.",
@@ -11974,7 +13632,51 @@
       }
     },
     "This is not a valid login code." : {
-      "comment" : "Error message when a scanned QR code is not a Nextcloud login code."
+      "comment" : "Error message when a scanned QR code is not a Nextcloud login code.",
+      "localizations" : {
+        "da" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dette er ikke en gyldig login-kode."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dies ist kein gültiger Anmeldecode."
+          }
+        },
+        "et_EE" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "See pole korrektne sisselogimiskood."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ce n'est pas un code de connexion valide."
+          }
+        },
+        "pt_BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Este não é um código de login válido."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Это недействительный код входа."
+          }
+        },
+        "zh_TW" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "這不是有效的登入碼。"
+          }
+        }
+      }
     },
     "This recipient will be removed from the share." : {
       "comment" : "Message of the recipient removal confirmation dialog.",

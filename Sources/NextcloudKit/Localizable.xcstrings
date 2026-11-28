@@ -64,6 +64,12 @@
             "value" : "“%@” é um nome proibido."
           }
         },
+        "pt_PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "\"%@\" é um nome proibido."
+          }
+        },
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
@@ -165,6 +171,12 @@
             "value" : "“.%@” é uma extensão de arquivo proibida."
           }
         },
+        "pt_PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "\".%@\" é uma extensão de ficheiro proibida."
+          }
+        },
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
@@ -264,6 +276,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Já existe um arquivo ou uma pasta com esse nome."
+          }
+        },
+        "pt_PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Já existe um ficheiro ou uma pasta com este nome."
           }
         },
         "ru" : {
@@ -1976,6 +1994,12 @@
             "value" : "O login não foi bem-sucedido. Por favor, tente novamente."
           }
         },
+        "pt_PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "O acesso não foi bem-sucedido. Por favor, tente novamente."
+          }
+        },
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2077,6 +2101,12 @@
             "value" : "O nome contém um caractere inválido: “%@”."
           }
         },
+        "pt_PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "O nome contém um caractere inválido: \"%@\"."
+          }
+        },
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2176,6 +2206,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "O nome não deve conter espaços no início nem no final."
+          }
+        },
+        "pt_PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "O nome não pode conter espaços no início nem no fim."
           }
         },
         "ru" : {
@@ -3253,6 +3289,12 @@
             "value" : "Não foi possível localizar o arquivo ou a pasta no servidor."
           }
         },
+        "pt_PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Não foi possível encontrar o ficheiro ou a pasta no servidor."
+          }
+        },
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3352,6 +3394,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "A operação não pôde ser concluída devido a um conflito no servidor. Atualize a página e tente novamente."
+          }
+        },
+        "pt_PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A operação não pôde ser concluída devido a um conflito no servidor. Actualize a página e tente novamente."
           }
         },
         "ru" : {
@@ -4050,6 +4098,12 @@
             "value" : "A verificação antivírus do servidor bloqueou este arquivo."
           }
         },
+        "pt_PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A verificação antivírus do servidor bloqueou este ficheiro."
+          }
+        },
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
@@ -4389,6 +4443,12 @@
             "value" : "Esse nome não é permitido."
           }
         },
+        "pt_PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Este nome não é permitido."
+          }
+        },
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
@@ -4607,6 +4667,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Verboso"
+          }
+        },
+        "pt_PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Detalhado"
           }
         },
         "ru" : {
